@@ -336,7 +336,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category project-brief"
     },
     "inception-analysis": {
       "required": [
@@ -401,7 +402,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category inception-analysis"
     },
     "architecture-design": {
       "required": [
@@ -478,7 +480,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-design"
     },
     "decision": {
       "required": [
@@ -543,7 +546,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category decision"
     },
     "evidence": {
       "required": [
@@ -617,7 +621,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category evidence"
     },
     "closure-review": {
       "required": [
@@ -679,7 +684,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category closure-review"
     },
     "vision": {
       "required": [
@@ -744,7 +750,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category vision"
     },
     "blueprint": {
       "required": [
@@ -772,23 +779,12 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "config.json",
             "pointer": "/capabilities"
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "blueprint",
-              "scope": "programme"
-            }
           }
         ],
         "Action registry and data model": [
           {
-            "kind": "rows",
-            "file": "actions.json",
-            "pointer": "/actions",
-            "projection": "live"
+            "kind": "computed",
+            "name": "action_registry"
           }
         ],
         "Deployment estate": [
@@ -831,16 +827,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         "Current, intermediate and target states": [
           {
             "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/programme_baselines"
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "blueprint-states"
+            }
           },
           {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/project_baselines"
+            "kind": "absence",
+            "fallback": true,
+            "record": "the blueprint's current, intermediate and target states: a governed asset of kind blueprint-states"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category blueprint"
     },
     "business-case": {
       "required": [
@@ -865,54 +865,66 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "sources": {
         "Why now": [
           {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
             "match": {
-              "category": "business-case",
-              "scope": "programme"
+              "kind": "issue"
             }
-          }
-        ],
-        "Licensing frame": [
+          },
           {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "business-case",
-              "scope": "programme"
-            }
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/programme"
           }
         ],
-        "Options, including doing nothing": [
+        "Benefit map": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_links"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles"
+          }
+        ],
+        "Cost and risk posture": [
           {
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/register_items",
             "match": {
-              "kind": "change"
+              "kind": "risk"
+            }
+          }
+        ],
+        "Licensing frame": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "licensing_frame"
             }
           },
           {
-            "kind": "rows",
-            "file": "work.json",
-            "pointer": "/approvals",
-            "match": {
-              "status": "approved"
-            }
+            "kind": "absence",
+            "fallback": true,
+            "record": "the programme's licensing frame: a governed asset of kind licensing_frame stating the public, opt-in and tenant boundary"
+          }
+        ],
+        "Options, including doing nothing": [
+          {
+            "kind": "absence",
+            "record": "the options appraisal: a decision with its options, including doing nothing, and their appraisal"
           }
         ],
         "Investment appraisal and cash flow": [
           {
-            "kind": "rows",
-            "file": "measure.json",
-            "pointer": "/inference/by_project"
-          },
-          {
-            "kind": "rows",
-            "file": "measure.json",
-            "pointer": "/inference/by_model"
+            "kind": "absence",
+            "record": "the programme cost model: the investment appraisal and cash-flow schedule with its basis"
           }
         ],
         "Capabilities the benefits depend on": [
@@ -921,30 +933,9 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "msp.json",
             "pointer": "/benefit_links"
           }
-        ],
-        "Benefit map": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "business-case",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Cost and risk posture": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "business-case",
-              "scope": "programme"
-            }
-          }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category business-case"
     },
     "programme-plan": {
       "required": [
@@ -1026,7 +1017,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category programme-plan"
     },
     "governance": {
       "required": [
@@ -1102,7 +1094,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/lists"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category governance"
     },
     "reuse-map": {
       "required": [
@@ -1154,7 +1147,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category reuse-map"
     },
     "brief-template": {
       "required": [
@@ -1204,7 +1198,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category brief-template"
     },
     "architecture-analysis": {
       "required": [
@@ -1269,7 +1264,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-analysis"
     },
     "spec": {
       "required": [
@@ -1331,7 +1327,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category spec"
     },
     "benefit-profile": {
       "required": [
@@ -1411,7 +1408,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefit-profile"
     },
     "benefits-map": {
       "required": [
@@ -1447,7 +1445,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "name": "benefit_map"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefits-map"
     },
     "benefits-registry": {
       "required": [
@@ -1487,7 +1486,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/benefit_profiles"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefits-registry"
     },
     "benefit-evaluation": {
       "required": [
@@ -1545,7 +1545,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefit-evaluation"
     },
     "projects-dossier": {
       "required": [
@@ -1604,7 +1605,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category projects-dossier"
     },
     "tranche-plan": {
       "required": [
@@ -1662,7 +1664,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category tranche-plan"
     },
     "tranche-review": {
       "required": [
@@ -1717,7 +1720,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category tranche-review"
     },
     "benefits-strategy": {
       "required": [
@@ -1779,7 +1783,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefits-strategy"
     },
     "realization-plan": {
       "required": [
@@ -1841,7 +1846,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category realization-plan"
     },
     "stakeholder-profiles": {
       "required": [
@@ -1895,7 +1901,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/stakeholder_profiles"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category stakeholder-profiles"
     },
     "architecture-principles": {
       "required": [
@@ -1940,7 +1947,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-principles"
     },
     "adm-profile": {
       "required": [
@@ -1982,7 +1990,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "name": "architecture_capability"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category adm-profile"
     },
     "artifact-standard": {
       "required": [
@@ -2040,7 +2049,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/artifacts"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category artifact-standard"
     },
     "architecture-artifact": {
       "required": [
@@ -2095,7 +2105,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-artifact"
     },
     "architecture-artifact-instance": {
       "required": [
@@ -2137,7 +2148,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "name": "artifact_document"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-artifact-instance"
     },
     "statement-of-architecture-work": {
       "required": [
@@ -2216,7 +2228,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category statement-of-architecture-work"
     },
     "compliance-review": {
       "required": [
@@ -2258,27 +2271,18 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         ],
         "Waivers": [
           {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/waivers",
-            "optional": true,
-            "match": {
-              "project_id": "$subject_id"
-            }
+            "kind": "computed",
+            "name": "waiver_status"
           }
         ],
         "Decision": [
           {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/compliance_reviews",
-            "optional": true,
-            "match": {
-              "project_id": "$subject_id"
-            }
+            "kind": "computed",
+            "name": "governing_review"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category compliance-review"
     },
     "waiver": {
       "required": [
@@ -2339,7 +2343,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category waiver"
     },
     "maturity-assessment": {
       "required": [
@@ -2385,7 +2390,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/maturity"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category maturity-assessment"
     },
     "skills-assessment": {
       "required": [
@@ -2431,7 +2437,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/skills"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category skills-assessment"
     },
     "programme-brief": {
       "required": [
@@ -2484,17 +2491,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         ],
         "Cost, timescale and effort": [
           {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/projects",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          },
-          {
-            "kind": "rows",
-            "file": "measure.json",
-            "pointer": "/inference/by_project"
+            "kind": "absence",
+            "record": "the programme cost, effort and timescale model: its estimate, basis and cash flow"
           }
         ],
         "Risks and support": [
@@ -2514,7 +2512,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/tranches"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category programme-brief"
     },
     "mandate": {
       "required": [
@@ -2635,7 +2634,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category mandate"
     },
     "refined-vision": {
       "required": [
@@ -2658,15 +2658,6 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/tranche_reviews"
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "refined-vision",
-              "scope": "programme"
-            }
           }
         ],
         "Changes from the mandate": [
@@ -2679,7 +2670,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category refined-vision"
     },
     "programme-baselines": {
       "required": [
@@ -2728,7 +2720,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category programme-baselines"
     },
     "programme-strategies": {
       "required": [
@@ -2822,7 +2815,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/inference/by_project"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category programme-strategies"
     },
     "programme-risk-register": {
       "required": [
@@ -2882,7 +2876,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category programme-risk-register"
     },
     "benefit-transition": {
       "required": [
@@ -2953,7 +2948,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefit-transition"
     },
     "programme-report": {
       "required": [
@@ -2998,7 +2994,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "name": "programme_summary"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category programme-report"
     },
     "requirements-catalog": {
       "required": [
@@ -3042,7 +3039,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category requirements-catalog"
     },
     "architecture-capability": {
       "required": [
@@ -3100,7 +3098,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "name": "architecture_maturity_skills"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-capability"
     },
     "architecture-governance-log": {
       "required": [
@@ -3142,7 +3141,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "optional": true
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-governance-log"
     },
     "adr-register": {
       "required": [
@@ -3191,7 +3191,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category adr-register"
     },
     "delivery-contract": {
       "required": [
@@ -3212,38 +3213,36 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "sources": {
         "Commitments": [
           {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "delivery_contract",
-              "project_id": "$subject_id"
-            }
+            "kind": "computed",
+            "name": "contract_field",
+            "field": "commitments"
+          },
+          {
+            "kind": "absence",
+            "fallback": true,
+            "record": "the contract's commitment list: a commitments field on the delivery contract body"
           }
         ],
         "Compliance method": [
           {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "delivery_contract",
-              "project_id": "$subject_id"
-            }
+            "kind": "computed",
+            "name": "contract_field",
+            "field": "compliance"
+          },
+          {
+            "kind": "absence",
+            "fallback": true,
+            "record": "the contract's compliance method: a compliance field on the delivery contract body"
           }
         ],
         "Approval": [
           {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "delivery_contract",
-              "project_id": "$subject_id"
-            }
+            "kind": "computed",
+            "name": "contract_approval"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category delivery-contract"
     },
     "statement-of-intent": {
       "required": [
@@ -3294,7 +3293,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category statement-of-intent"
     },
     "request-for-architecture-work": {
       "required": [
@@ -3345,7 +3345,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category request-for-architecture-work"
     },
     "safe-portfolio": {
       "required": [
@@ -3384,7 +3385,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/benefit_links"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category safe-portfolio"
     },
     "safe-art": {
       "required": [
@@ -3406,15 +3408,14 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "sources": {
         "ART charter": [
           {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/programme"
+            "kind": "computed",
+            "name": "programme_charter"
           }
         ],
         "Solution intent": [
           {
-            "kind": "computed",
-            "name": "programme_summary"
+            "kind": "absence",
+            "record": "the solution-intent record: the ART's intended outcomes, measures and constraints"
           }
         ],
         "Backlog with WSJF": [
@@ -3434,7 +3435,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "severity": "P1"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category safe-art"
     },
     "safe-cadence": {
       "required": [
@@ -3507,7 +3509,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category safe-cadence"
     },
     "project-wbs": {
       "required": [
@@ -3556,7 +3559,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category project-wbs"
     },
     "project-baseline": {
       "required": [
@@ -3582,7 +3586,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "msp.json",
             "pointer": "/project_baselines",
             "match": {
-              "project_id": "$subject_id"
+              "project_id": "$subject_id",
+              "kind": "scope"
             }
           }
         ],
@@ -3592,8 +3597,14 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "msp.json",
             "pointer": "/project_baselines",
             "match": {
-              "project_id": "$subject_id"
+              "project_id": "$subject_id",
+              "kind": "schedule"
             }
+          },
+          {
+            "kind": "absence",
+            "fallback": true,
+            "record": "the project schedule baseline: a project_baseline row of kind schedule"
           }
         ],
         "Cost": [
@@ -3602,21 +3613,29 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "file": "msp.json",
             "pointer": "/project_baselines",
             "match": {
-              "project_id": "$subject_id"
+              "project_id": "$subject_id",
+              "kind": "cost"
             }
+          },
+          {
+            "kind": "absence",
+            "fallback": true,
+            "record": "the project cost baseline: a project_baseline row of kind cost"
           }
         ],
         "Approval": [
           {
             "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/project_baselines",
+            "file": "work.json",
+            "pointer": "/approvals",
             "match": {
-              "project_id": "$subject_id"
+              "project_id": "$subject_id",
+              "gate": "baseline"
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category project-baseline"
     },
     "project-registers": {
       "required": [
@@ -3704,7 +3723,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category project-registers"
     },
     "change-control": {
       "required": [
@@ -3736,9 +3756,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         ],
         "Impact": [
           {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
+            "kind": "computed",
+            "name": "change_impact",
             "match": {
               "project_id": "$subject_id",
               "kind": "change"
@@ -3756,7 +3775,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category change-control"
     },
     "phase-preliminary": {
       "required": [
@@ -3804,7 +3824,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/profiles"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-preliminary"
     },
     "phase-a": {
       "required": [
@@ -3859,7 +3880,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-a"
     },
     "phase-b": {
       "required": [
@@ -3914,7 +3936,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-b"
     },
     "phase-c": {
       "required": [
@@ -3969,7 +3992,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-c"
     },
     "phase-d": {
       "required": [
@@ -4024,7 +4048,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-d"
     },
     "candidate-solutions": {
       "required": [
@@ -4076,7 +4101,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category candidate-solutions"
     },
     "project-context-diagram": {
       "required": [
@@ -4126,7 +4152,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category project-context-diagram"
     },
     "benefits-diagram": {
       "required": [
@@ -4176,7 +4203,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefits-diagram"
     },
     "gap-analysis": {
       "required": [
@@ -4222,7 +4250,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "severity": "P1"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category gap-analysis"
     },
     "phase-e": {
       "required": [
@@ -4336,7 +4365,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-e"
     },
     "phase-f": {
       "required": [
@@ -4391,7 +4421,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-f"
     },
     "phase-g": {
       "required": [
@@ -4446,7 +4477,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-g"
     },
     "phase-h": {
       "required": [
@@ -4501,7 +4533,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-h"
     },
     "pi-plan": {
       "required": [
@@ -4592,7 +4625,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "severity": "P1"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category pi-plan"
     },
     "pi-objectives": {
       "required": [
@@ -4658,7 +4692,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "projection": "live"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category pi-objectives"
     },
     "system-demo": {
       "required": [
@@ -4717,7 +4752,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/documents"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category system-demo"
     },
     "inspect-adapt": {
       "required": [
@@ -4785,7 +4821,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "severity": "P1"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category inspect-adapt"
     }
   },
   "on_demand": [

@@ -27,7 +27,7 @@ GEN_PATH = HERE / "generate-standards.py"
 SCHEMA = "artefact-body/v1"
 PLACEHOLDER = re.compile(r"\b(TODO|TBD|PLACEHOLDER|FIXME|LOREM IPSUM)\b", re.IGNORECASE)
 UNSUBSTITUTED = re.compile(r"\$subject[A-Za-z0-9_]*")
-SOURCE_KINDS = {"rows", "documents", "computed", "register"}
+SOURCE_KINDS = {"rows", "documents", "computed", "register", "absence"}
 
 
 class Refusal(Exception):
@@ -163,6 +163,37 @@ def source_summary(entry: dict[str, Any], category: str) -> dict[str, Any]:
     }
 
 
+def source_is_self_document(
+    source: dict[str, Any],
+    template: dict[str, Any],
+    subject: dict[str, Any],
+    category: str,
+    gen,
+) -> bool:
+    """Does this source cite the artefact's own document category?
+
+    A heading sourced only by the document it is part of has no facts of its own: the
+    business case's Why now, Benefit map, Cost and risk posture and Licensing frame
+    headings all resolved to the business case itself, which is how a heading without
+    evidence passed the zero-row refusal. The match defaults to ``$category``, which is
+    the artefact's own category, so an omitted category is also self-reference.
+    """
+    if str(source.get("kind") or "") != "documents":
+        return False
+    own = str(template.get("document_category") or "")
+    if not own:
+        return False
+    wanted = str(
+        gen.substitute(
+            (source.get("match") or {}).get("category", "$category"),
+            subject,
+            own or category,
+            subject.get("phase"),
+        )
+    )
+    return wanted == own
+
+
 def source_count(
     gen,
     template: dict[str, Any],
@@ -270,11 +301,36 @@ def compose(
                 f"required heading {heading!r} declares no source",
                 heading=heading,
             )
+        active = [source for source in declared if not source.get("optional")]
+        if active and all(
+            source_is_self_document(source, template, subject, category, gen)
+            for source in active
+        ):
+            refuse(
+                "SELF_REFERENCE",
+                f"required heading {heading!r} cites only its own document "
+                f"{template.get('document_category')!r}; a heading may not cite the "
+                "artefact it is part of",
+                heading=heading,
+                category=str(template.get("document_category") or ""),
+            )
+        absences: list[str] = []
+        fallback_absences: list[str] = []
         for source in declared:
             kind = str(source.get("kind") or "")
             if kind not in SOURCE_KINDS:
                 abort("UNKNOWN_SOURCE_KIND", f"unknown source kind {kind!r}", heading=heading)
             if source.get("optional"):
+                continue
+            if kind == "absence":
+                record = str(source.get("record") or "").strip()
+                if not record:
+                    refuse(
+                        "EMPTY_ABSENCE",
+                        f"required heading {heading!r} declares an absence with no record",
+                        heading=heading,
+                    )
+                (fallback_absences if source.get("fallback") else absences).append(record)
                 continue
             pointer = str(source.get("pointer") or "")
             if kind == "rows" and pointer.strip() in {"", "/"}:
@@ -293,10 +349,10 @@ def compose(
                 abort("GENERATION_ERROR", str(exc), heading=heading)
             raise
         for source in declared:
-            if source.get("optional"):
+            if source.get("optional") or source.get("kind") == "absence":
                 continue
             count = source_count(gen, template, category, subject, snapshot, projects, section, source)
-            if count <= 0:
+            if count <= 0 and not fallback_absences:
                 refuse(
                     "EMPTY_POINTER",
                     f"required heading {heading!r} has a source that resolves to zero rows",
@@ -305,6 +361,11 @@ def compose(
                            f"#{source.get('pointer', '')}",
                 )
         body.extend([f"## {heading}", "", intent, ""])
+        heading_facts = sum(
+            1 for entry in section["sources"] if int(entry.get("count") or 0) > 0
+        )
+        for record in absences + (fallback_absences if heading_facts == 0 else []):
+            body.extend([f"_Explicit absence — {record}._", ""])
         for entry in section["sources"]:
             rows = entry.get("rows")
             if not isinstance(rows, list):
@@ -380,6 +441,22 @@ def self_test() -> None:
         "source_label",
         source_label({"kind": "rows", "file": "programme.json", "pointer": "/projects"})
         == "programme.json#/projects",
+    ))
+    checks.append((
+        "self_reference",
+        source_is_self_document(
+            {"kind": "documents", "match": {"category": "business-case"}},
+            {"document_category": "business-case"},
+            {"kind": "programme", "phase": None}, "business-case", gen,
+        ),
+    ))
+    checks.append((
+        "not_self_reference",
+        not source_is_self_document(
+            {"kind": "documents", "match": {"category": "benefit-profile"}},
+            {"document_category": "business-case"},
+            {"kind": "programme", "phase": None}, "business-case", gen,
+        ),
     ))
     for name, ok in checks:
         if not ok:

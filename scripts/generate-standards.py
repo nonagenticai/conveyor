@@ -843,16 +843,212 @@ def computed_rows(
         projects = programme_doc.get("projects") or []
         programme_id = subject.get("programme_id")
         bound = [p for p in projects if str(p.get("programme_id")) == programme_id] if programme_id else projects
+        # Every status has its own bucket, archived included, or the canvas's total cannot
+        # equal the sum of its breakdown (measured: 48 named, 26 closed + 21 active = 47).
+        status_counts: dict[str, int] = {}
+        for project in bound:
+            status = str(project.get("status") or "unknown")
+            status_counts[status] = status_counts.get(status, 0) + 1
         return [{
             "kind": "summary",
-            "projects": len(bound),
-            "closed": sum(1 for p in bound if p.get("status") == "closed"),
-            "active": sum(1 for p in bound if p.get("status") == "active"),
+            "projects": sum(status_counts.values()),
+            "closed": status_counts.get("closed", 0),
+            "active": status_counts.get("active", 0),
+            "archived": status_counts.get("archived", 0),
+            "status_counts": status_counts,
             "tranches": len([t for t in msp.get("tranches") or [] if t.get("programme_id") in (None, programme_id)]),
             "benefits": len([b for b in msp.get("benefit_profiles") or [] if b.get("programme_id") in (None, programme_id)]),
             "cadences": len(msp.get("cadences") or []),
             "baselines": len(msp.get("programme_baselines") or []),
             "register_items": len(msp.get("register_items") or []),
+        }]
+    if name == "change_impact":
+        wanted = substitute(
+            source.get("match") or {"kind": "change"}, subject, category, phase
+        )
+        affected: list[dict[str, Any]] = []
+        for row in msp.get("register_items") or []:
+            if not isinstance(row, dict) or not matches(row, wanted):
+                continue
+            meta = row.get("meta") if isinstance(row.get("meta"), dict) else {}
+            affected.append({
+                **row,
+                # The record carries its impact in `meta.impact`; the typed column is
+                # null. Publish the field that actually holds the text.
+                "impact": row.get("impact") if row.get("impact") is not None else meta.get("impact"),
+                "title": row.get("title") or row.get("code") or row.get("id"),
+            })
+        return affected
+    if name == "governing_review":
+        project_id = str(subject.get("project_id") or subject.get("id") or "")
+        reviews = [
+            row for row in architecture.get("compliance_reviews") or []
+            if isinstance(row, dict) and str(row.get("project_id") or "") == project_id
+        ]
+        if not reviews:
+            return []
+        latest = max(
+            reviews,
+            key=lambda row: (str(row.get("reviewed_at") or ""), str(row.get("version") or "")),
+        )
+        evidence = latest.get("evidence") if isinstance(latest.get("evidence"), dict) else {}
+        return [{
+            "kind": "governing_review",
+            "id": latest.get("id"),
+            "level": latest.get("level"),
+            "outcome": latest.get("outcome"),
+            "conditions": latest.get("conditions") or evidence.get("conditions"),
+            "reviewed_at": latest.get("reviewed_at"),
+            "reviewed_by_name": latest.get("reviewed_by_name"),
+            "findings": latest.get("findings") or [],
+            "title": (
+                f"governing review {latest.get('id')}: "
+                f"{latest.get('level') or 'unlevelled'} / {latest.get('outcome') or 'no outcome'}"
+            ),
+        }]
+    if name == "waiver_status":
+        project_id = str(subject.get("project_id") or subject.get("id") or "")
+        waivers = [
+            row for row in architecture.get("waivers") or []
+            if isinstance(row, dict) and str(row.get("project_id") or "") == project_id
+        ]
+        if waivers:
+            return [
+                {
+                    **row,
+                    "title": (
+                        f"waiver {row.get('reason') or row.get('title') or row.get('id')} "
+                        f"until {row.get('reassess_at') or row.get('reassessment_at') or 'no date'}"
+                    ),
+                }
+                for row in waivers
+            ]
+        return [{
+            "kind": "waiver_status",
+            "waivers": 0,
+            "title": "None recorded — 0 waivers for this project",
+        }]
+    if name == "programme_charter":
+        projects = programme_doc.get("projects") or []
+        definition = next(
+            (row for row in projects if isinstance(row, dict) and str(row.get("key") or "") == "P0"),
+            None,
+        )
+        charters = [
+            row for row in (snapshot.get("artefacts") or {}).get("governed_assets") or []
+            if isinstance(row, dict)
+            and str(row.get("kind") or "") == "charter"
+            and str(row.get("owner_user_id") or "")
+        ]
+        if definition is not None:
+            charters = [
+                row for row in charters
+                if str(row.get("project_id") or "") == str(definition.get("id") or "")
+            ]
+        if not charters:
+            return []
+        charter = max(charters, key=lambda row: str(row.get("created_at") or ""))
+        return [{
+            **charter,
+            "title": (
+                f"{charter.get('title') or 'Charter'} — owner "
+                f"{charter.get('owner_user_id')}"
+            ),
+        }]
+    if name == "action_registry":
+        # `actions.json` carries the served action names as strings; `rows_for` keeps
+        # dicts only, so the blueprint's registry source resolved to zero even though the
+        # registry was in the snapshot. Wrap every served action as a row, then carry the
+        # registry's own tables/invariants/events when the snapshot projects them.
+        actions_doc = snapshot.get("actions") or {}
+        rows: list[dict[str, Any]] = []
+        for action in actions_doc.get("actions") or []:
+            if isinstance(action, str):
+                rows.append({"kind": "action", "name": action, "title": action})
+            elif isinstance(action, dict):
+                rows.append({
+                    "kind": "action",
+                    **action,
+                    "title": action.get("name") or action.get("key") or action.get("id") or "action",
+                })
+        config = snapshot.get("config") or {}
+        for key, kind in (("tables", "table"), ("invariants", "invariant"), ("events", "event")):
+            for item in config.get(key) or []:
+                if isinstance(item, str):
+                    rows.append({"kind": kind, "name": item, "title": item})
+                elif isinstance(item, dict):
+                    rows.append({
+                        "kind": kind,
+                        **item,
+                        "title": item.get("name") or item.get("key") or json.dumps(item, sort_keys=True),
+                    })
+        return rows
+    if name == "contract_approval":
+        project_id = str(subject.get("project_id") or subject.get("id") or "")
+        contracts = [
+            row for row in architecture.get("contracts") or []
+            if isinstance(row, dict)
+            and str(row.get("kind") or "") == "delivery_contract"
+            and str(row.get("project_id") or "") == project_id
+        ]
+        if not contracts:
+            return []
+        contract = max(
+            contracts,
+            key=lambda row: (str(row.get("approved_at") or ""), str(row.get("version") or "")),
+        )
+        approval_id = str(contract.get("approval_id") or "")
+        if not approval_id:
+            return []
+        work = snapshot.get("work") or {}
+        approval = next(
+            (
+                row for row in work.get("approvals") or []
+                if isinstance(row, dict) and str(row.get("id") or "") == approval_id
+            ),
+            None,
+        )
+        return [{
+            "kind": "contract_approval",
+            "id": approval_id,
+            "status": str((approval or {}).get("status") or contract.get("status") or ""),
+            "approved_by": contract.get("approved_by"),
+            "approved_at": contract.get("approved_at"),
+            "requested_by": contract.get("requested_by"),
+            "title": (
+                f"approval {approval_id} — "
+                f"{(approval or {}).get('status') or contract.get('status') or 'unrecorded'}"
+            ),
+        }]
+    if name == "contract_field":
+        field = str(source.get("field") or "")
+        project_id = str(subject.get("project_id") or subject.get("id") or "")
+        contracts = [
+            row for row in architecture.get("contracts") or []
+            if isinstance(row, dict)
+            and str(row.get("kind") or "") == "delivery_contract"
+            and str(row.get("project_id") or "") == project_id
+        ]
+        if not contracts or not field:
+            return []
+        contract = max(
+            contracts,
+            key=lambda row: (str(row.get("approved_at") or ""), str(row.get("version") or "")),
+        )
+        body = contract.get("body") if isinstance(contract.get("body"), dict) else {}
+        value = body.get(field)
+        if value in (None, "", [], {}):
+            return []
+        return [{
+            "kind": "contract_field",
+            "field": field,
+            "value": value,
+            "contract_id": contract.get("id"),
+            "approved_by": contract.get("approved_by"),
+            "title": (
+                f"{field}: "
+                f"{value if isinstance(value, str) else json.dumps(value, sort_keys=True)}"
+            ),
         }]
     if name == "benefit_map":
         return [
@@ -1150,11 +1346,23 @@ def resolve_section(
                 resolved.append(entry)
             elif kind == "register":
                 resolved.append({"kind": "register", "count": 0, "items": []})
+            elif kind == "absence":
+                # A declared explicit absence names the record that would satisfy the
+                # heading. It is rendered as an absence, never counted as evidence: the
+                # section stays absent until the record exists.
+                resolved.append({
+                    "kind": "absence",
+                    "record": str(source.get("record") or ""),
+                    "count": 0,
+                    "items": [],
+                })
 
-    # A document-backed artefact falls back to its published document when the row sources are
-    # empty (or the template declares no row source for this heading). Without the fallback a
-    # published compliance review would read as absent because its row table is empty.
-    if template.get("document_category") and not [item for item in resolved if item["count"] > 0]:
+    # A document-backed artefact falls back to its published document only when the heading
+    # declares no source at all. A declared source that resolves to zero rows is a record
+    # gap: falling back to the artefact's own document would present the document (or its
+    # skeleton) as the heading's evidence, which is how the business case's four headings
+    # and every compliance review's Waivers heading passed while carrying no facts.
+    if template.get("document_category") and not declared:
         document_source, heading_found = resolve_documents(
             heading, template, subject, snapshot, outputs_dir, programme_projects,
         )
@@ -1165,6 +1373,14 @@ def resolve_section(
 
     evidence = [source for source in resolved if source["count"] > 0]
     status = "evidenced" if evidence else ("partial" if missing_headings else "absent")
+    # An absence flagged `fallback` is declared for a heading whose real source may not
+    # exist yet: it renders as an explicit absence only when the heading has no facts, and
+    # yields to the row the moment the record lands. A plain absence always renders.
+    fallback_records = [
+        str(source.get("record") or "")
+        for source in declared or []
+        if source.get("kind") == "absence" and source.get("fallback")
+    ]
     # Why the section could not resolve decides the package kind (R11): a heading the template
     # sources but whose rows/documents are absent is a RECORD gap; a heading the template declares
     # required yet gives no source (and no document fallback) is a STANDARD defect — it can never
@@ -1176,10 +1392,13 @@ def resolve_section(
         "severity": declared_severity,
         "cause": cause,
         "sources": resolved,
-        "missing": [] if evidence else [
-            f"No row or document satisfies '{heading}'"
-            + ("; a document exists but lacks the heading" if missing_headings else "")
-        ],
+        "missing": [] if evidence else (
+            [f"Explicit absence — {record}" for record in fallback_records]
+            if fallback_records else [
+                f"No row or document satisfies '{heading}'"
+                + ("; a document exists but lacks the heading" if missing_headings else "")
+            ]
+        ),
     }
 
 
@@ -2498,10 +2717,59 @@ def self_test_section_cause(outputs: Path, fixture: dict[str, Any]) -> None:
     print("generate-standards: self-test case section-cause-decides-kind OK")
 
 
+def self_test_computed_sources(fixture: dict[str, Any]) -> None:
+    """The sources the W4 STANDARD packages depend on resolve from the record they name.
+
+    Each case copies the fixture so one case's rows cannot mask another's absence.
+    """
+    snap = json.loads(json.dumps(fixture))
+    snap["actions"] = {"actions": ["card.get", "board.list"]}
+    rows = computed_rows(
+        "action_registry", {}, snap, {"kind": "programme", "id": "pg1"}, {}
+    )
+    assert [row["title"] for row in rows] == ["card.get", "board.list"], rows
+
+    snap = json.loads(json.dumps(fixture))
+    snap["msp"]["register_items"] = [{
+        "id": "c1", "kind": "change", "title": "Change one", "impact": None,
+        "meta": {"impact": {"scope": "one", "cost": "none"}},
+    }]
+    rows = computed_rows(
+        "change_impact", {"match": {"kind": "change"}}, snap,
+        {"kind": "project", "id": "p1"}, {},
+    )
+    assert rows and rows[0]["impact"] == {"scope": "one", "cost": "none"}, rows
+
+    snap = json.loads(json.dumps(fixture))
+    snap["programme"]["projects"].append(
+        {"id": "p3", "key": "T9", "programme_id": "pg1", "status": "archived"}
+    )
+    rows = computed_rows(
+        "programme_summary", {}, snap,
+        {"kind": "programme", "id": "pg1", "programme_id": "pg1"}, {},
+    )
+    summary = rows[0]
+    assert summary["archived"] == 1, summary
+    assert summary["projects"] == sum(summary["status_counts"].values()) == 3, summary
+
+    snap = json.loads(json.dumps(fixture))
+    snap["artefacts"]["governed_assets"] = [{
+        "id": "ch1", "kind": "charter", "project_id": "p1", "owner_user_id": "u1",
+        "created_at": "2026-11-20T00:00:00Z", "title": "Charter",
+    }]
+    rows = computed_rows(
+        "programme_charter", {}, snap,
+        {"kind": "programme", "id": "pg1", "programme_id": "pg1"}, {},
+    )
+    assert rows and rows[0]["owner_user_id"] == "u1", rows
+    print("generate-standards: self-test case computed-sources OK")
+
+
 def self_test() -> int:
     fixture = self_test_fixture()
     std = json.loads(STANDARD_PATH.read_text(encoding="utf-8"))
     self_test_sources_declared(std)
+    self_test_computed_sources(fixture)
     with tempfile.TemporaryDirectory() as tmp:
         outputs = Path(tmp)
         self_test_outputs(outputs)
