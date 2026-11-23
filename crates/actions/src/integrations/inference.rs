@@ -47,6 +47,7 @@ pub struct ChatMessage {
     /// entirely. Both mean the empty string here: the router accepts null, but a `String` field
     /// would reject the replay shape this action exists to pass through.
     #[serde(default, deserialize_with = "null_as_empty")]
+    #[schemars(with = "Option<String>")]
     pub content: String,
     /// The model's tool calls, passed through unchanged (OpenAI shape).
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -260,6 +261,35 @@ mod tests {
             required.is_some_and(|names| names.iter().any(|name| name == "messages")),
             "messages must be required: {schema}"
         );
+    }
+
+    #[test]
+    fn a_null_or_absent_replay_content_is_accepted_and_read_as_empty() {
+        let schema = spec_schema();
+        let input = serde_json::json!({
+            "messages": [
+                {"role": "user", "content": "What is the weather?"},
+                {"role": "assistant", "content": null, "tool_calls": [{
+                    "id": "call_1", "type": "function",
+                    "function": {"name": "get_weather", "arguments": "{\"city\":\"Amsterdam\"}"}
+                }]},
+                {"role": "tool", "tool_call_id": "call_1", "content": "{\"temperature_c\": 12}"}
+            ]
+        });
+        assert!(
+            crate::spec::validate_input(&schema, &input).is_empty(),
+            "the schema must accept the OpenAI replay shape it documents: {schema}"
+        );
+        let parsed: CompletionIn = serde_json::from_value(input).expect("null content parses");
+        assert_eq!(parsed.messages[1].content, "", "null is the empty string");
+
+        let absent = serde_json::json!({"messages": [{"role": "assistant"}]});
+        assert!(
+            crate::spec::validate_input(&schema, &absent).is_empty(),
+            "an absent content is the empty string: {schema}"
+        );
+        let parsed: CompletionIn = serde_json::from_value(absent).expect("absent content parses");
+        assert_eq!(parsed.messages[0].content, "");
     }
 
     fn spec_schema() -> Value {
