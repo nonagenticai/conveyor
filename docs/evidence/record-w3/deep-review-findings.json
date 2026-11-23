@@ -46,6 +46,7 @@
       "title": "programme-risk-register requires Categories and Escalations, which project_register_item does not carry",
       "evidence": "information_schema for project_register_item has kind, severity, probability, impact, response, review_at, links, meta and no category or escalation column; the published register states the absence rather than inventing values.",
       "acceptance": "the template maps Categories to kind (or retires the heading) and Escalations to meta.escalation, and generate-standards --check is green",
+      "acceptance_test": "python3 -I scripts/generate-standards.py --self-test",
       "artifact": "seed/output-standard.json#programme-risk-register"
     },
     {
