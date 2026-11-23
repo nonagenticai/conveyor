@@ -911,4 +911,3 @@ cancelled run. Succeed, fail, cancel and reap: each writes exactly one row for a
 `v1-p75-1`/`v1-w4a-1`, enforced in the invoke precheck and the broker; §24 does not add a second
 gate. `v1-p66-1`'s lane-refusal clause (a delivery card moved into a work lane without a binding)
 needs a delivery-card marker that does not exist and remains open.
-

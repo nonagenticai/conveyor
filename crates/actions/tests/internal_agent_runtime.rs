@@ -357,6 +357,25 @@ async fn seal_laya_token_with(pg: &support::Pg, seeded: &support::Seeded, token:
     tx.commit().await.expect("commit the laya token");
 }
 
+/// Seal the inference-router bearer. `inference.token` is the name the inference client resolves
+/// (`crates/actions/src/integrations/inference.rs:37`); sealing only `laya.token` leaves the
+/// model leg unauthenticated.
+async fn seal_inference_token_with(pg: &support::Pg, seeded: &support::Seeded, token: &[u8]) {
+    let mut tx = conveyor_store::begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scoped tx");
+    conveyor_store::secret::create_secret_tx(
+        &mut tx,
+        seeded.tenant,
+        "inference.token",
+        token,
+        "tenant",
+    )
+    .await
+    .expect("seal the inference token");
+    tx.commit().await.expect("commit the inference token");
+}
+
 async fn seed_policy(
     pg: &support::Pg,
     seeded: &support::Seeded,
@@ -1500,7 +1519,7 @@ async fn the_next_run_prompt_reads_the_prior_attempt() {
 ///
 /// ```text
 /// CONVEYOR_EXTERNAL_INFERENCE_URL=… CONVEYOR_EXTERNAL_LAYA_URL=… \
-/// CONVEYOR_LIVE_LAYA_TOKEN=… CONVEYOR_LIVE_MODEL=… \
+/// CONVEYOR_LIVE_INFERENCE_TOKEN=… CONVEYOR_LIVE_LAYA_TOKEN=… CONVEYOR_LIVE_MODEL=… \
 /// cargo test -p conveyor-actions --test internal_agent_runtime -- --ignored
 /// ```
 #[tokio::test]
@@ -1513,12 +1532,15 @@ async fn the_live_run_executes_against_the_real_router_and_laya() {
         .expect("CONVEYOR_EXTERNAL_LAYA_URL must point at the real laya bridge");
     let token = std::env::var("CONVEYOR_LIVE_LAYA_TOKEN")
         .expect("CONVEYOR_LIVE_LAYA_TOKEN must carry the real laya token");
+    let inference_token = std::env::var("CONVEYOR_LIVE_INFERENCE_TOKEN")
+        .expect("CONVEYOR_LIVE_INFERENCE_TOKEN must carry the real inference-router bearer");
     let model = std::env::var("CONVEYOR_LIVE_MODEL").unwrap_or_else(|_| "router/medium".to_owned());
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
     support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
 
     let (pg, seeded, running) = fixture().await;
     seal_laya_token_with(&pg, &seeded, token.as_bytes()).await;
+    seal_inference_token_with(&pg, &seeded, inference_token.as_bytes()).await;
     // Threshold 0.0 with `annotate` accepts any score; the proof is that the gate ran and a
     // decision was recorded, not that the real laya happened to score a particular way.
     seed_policy(&pg, &seeded, 0.0, "closed", "annotate").await;
@@ -1620,6 +1642,7 @@ async fn the_live_run_executes_against_the_real_router_and_laya() {
 ///
 /// ```text
 /// CONVEYOR_EXTERNAL_INFERENCE_URL=http://127.0.0.1:8150 CONVEYOR_LIVE_MODEL=router/medium \
+/// CONVEYOR_LIVE_INFERENCE_TOKEN=… \
 /// cargo test -p conveyor-actions --test internal_agent_runtime -- --ignored the_live_model
 /// ```
 #[tokio::test]
@@ -1628,10 +1651,13 @@ async fn the_live_model_executes_the_compiled_prompt() {
     let _guard = STUBS.lock().await;
     let router = std::env::var("CONVEYOR_EXTERNAL_INFERENCE_URL")
         .expect("CONVEYOR_EXTERNAL_INFERENCE_URL must point at the real inference-router");
+    let inference_token = std::env::var("CONVEYOR_LIVE_INFERENCE_TOKEN")
+        .expect("CONVEYOR_LIVE_INFERENCE_TOKEN must carry the real inference-router bearer");
     let model = std::env::var("CONVEYOR_LIVE_MODEL").unwrap_or_else(|_| "router/medium".to_owned());
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
 
     let (pg, seeded, running) = fixture().await;
+    seal_inference_token_with(&pg, &seeded, inference_token.as_bytes()).await;
     let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), &model).await;
     let (job, release) = seed_job(
         &pg,

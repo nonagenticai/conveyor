@@ -20,7 +20,10 @@
 - The attempt row is written on **every** terminal path, not only the two transition helpers:
   `cancel_run_tx` records a cancelled run, and both reap sweeps (`run.execute` and `process.step`)
   record their reaped runs through the same writer, in the same transaction. Found in flight
-  against the first implementation, which covered only `transition_run_tx`/`fail_run_tx`.
+  against the first implementation, which covered only `transition_run_tx`/`fail_run_tx`. The
+  sweep's memory-insert failure is **retryable** (`run_failure` maps a transient database refusal
+  to a retry), so a blip cannot permanently fail the sweep and strand the run live; a rolled-back
+  finish leaves neither the status nor the row (`run_memory::a_rolled_back_finish_leaves_neither`).
 
 ## Not this step
 
@@ -34,7 +37,7 @@ start, an invoke precheck that refuses an unbudgeted capturing call). The token 
 | Suite | Result |
 |---|---|
 | `crates/actions/tests/card_binding.rs` (new) | **7 passed** (4 scenarios + 3 support) |
-| `crates/store/tests/run_memory.rs` (new) | **6 passed** (succeeded, failed, cancelled both ways, reaped, root-only) |
+| `crates/store/tests/run_memory.rs` (new) | **7 passed** (succeeded, failed, cancelled both ways, reaped, rolled-back, root-only) |
 | server `process_reap` (extended) | **3 passed** (the reaped process run records its attempt) |
 | `internal_agent_runtime.rs` (extended) | **16 passed / 2 ignored** (the live proofs) |
 | `board` | **15 passed** |
@@ -77,10 +80,13 @@ Two `#[ignore]`, env-gated tests in `internal_agent_runtime`:
 
 - `the_live_model_executes_the_compiled_prompt` — the model leg: the compiled prompt reaches the
   estate's real inference-router, the reply becomes a draft, the terminal run records its attempt.
-  Needs `CONVEYOR_EXTERNAL_INFERENCE_URL` and `CONVEYOR_LIVE_MODEL`.
+  Needs `CONVEYOR_EXTERNAL_INFERENCE_URL`, `CONVEYOR_LIVE_INFERENCE_TOKEN` and
+  `CONVEYOR_LIVE_MODEL`.
 - `the_live_run_executes_against_the_real_router_and_laya` — the full leg: the same, plus one real
   `gate.precheck` decision from the laya bridge. Needs `CONVEYOR_EXTERNAL_LAYA_URL` and
-  `CONVEYOR_LIVE_LAYA_TOKEN` too.
+  `CONVEYOR_LIVE_LAYA_TOKEN` too. Both tests seal `inference.token` (the name the inference client
+  resolves) from `CONVEYOR_LIVE_INFERENCE_TOKEN`; the first cut sealed only `laya.token`, so the
+  model leg would have 401'd even with a laya credential.
 
 **Attempted 2026-11-22 23:15Z — BLOCKED on a caller licence, not on reachability.**
 

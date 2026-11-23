@@ -2563,6 +2563,12 @@ fn run_failure(error: store::run::RunStoreError) -> JobFailure {
         store::run::RunStoreError::Database(error) => {
             JobFailure::retryable(format!("database: {error}"))
         }
+        // The terminal memory insert commits in the same transaction as the terminal status.
+        // A transient database refusal there must retry the whole sweep, not permanently fail
+        // it and strand the run live (holding `uq_run_live`) with no row.
+        store::run::RunStoreError::Memory(store::memory::MemoryStoreError::Database(error)) => {
+            JobFailure::retryable(format!("database: {error}"))
+        }
         other => JobFailure::permanent(other.to_string()),
     }
 }

@@ -456,8 +456,8 @@
       "path": "docs/evidence/S21-RUN.html",
       "source": "docs/evidence/S21-RUN.md",
       "section": "Evidence",
-      "sha256": "3c0ddf9abee0fa97e0f11becf84812d3faaccc7d89dbe20fcae5a86c24b71df2",
-      "bytes": 6838,
+      "sha256": "d02376ff2af8864e85be31e6bea6b654dec8ec859d63fbc66ef1f9e4c162de8f",
+      "bytes": 7406,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-RUN.md"
     },
     {
@@ -591,8 +591,8 @@
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "f4522b514d520ba6a9e0aabb502aee1d6cdf28f980fcb8dbe6d245be65750d48",
-      "bytes": 77278,
+      "sha256": "85fe038c0ab33a2d2fe7edb48318a9668e4f8cd3fcf75f20fa1b2ecdf2a42cc0",
+      "bytes": 77277,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {

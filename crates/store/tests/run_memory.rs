@@ -69,6 +69,35 @@ async fn a_succeeded_root_run_records_one_attempt() {
 }
 
 #[tokio::test]
+async fn a_rolled_back_finish_leaves_neither() {
+    let db = support::TestDb::fresh().await;
+    let seed = support::seed_tenant(&db.super_pool, "run-mem-rollback").await;
+
+    let mut tx = begin_scoped(&db.runtime, tenant(&seed))
+        .await
+        .expect("scope");
+    store::run::transition_run_tx(&mut tx, tenant(&seed), seed.run, RunStatus::Running)
+        .await
+        .expect("queued -> running");
+    store::run::transition_run_tx(&mut tx, tenant(&seed), seed.run, RunStatus::Succeeded)
+        .await
+        .expect("running -> succeeded");
+    // The status and the attempt row are one transaction: neither survives a rollback.
+    tx.rollback().await.expect("rollback");
+
+    let status: String = sqlx::query_scalar("SELECT status FROM run WHERE id = $1")
+        .bind(seed.run)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("the run's status");
+    assert_eq!(status, "queued", "the terminal status rolled back");
+    assert!(
+        rows(&db, &seed, seed.card).await.is_empty(),
+        "and so did the attempt row"
+    );
+}
+
+#[tokio::test]
 async fn a_failed_run_records_its_class() {
     let db = support::TestDb::fresh().await;
     let seed = support::seed_tenant(&db.super_pool, "run-mem-fail").await;

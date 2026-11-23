@@ -31,7 +31,7 @@
 <li><code>runs.create</code> inherits the card's binding when the request omits one; an explicit binding that differs is <code>422 card_binding_mismatch</code> before the INSERT; a card with no binding keeps the plain run path. The pin/stale checks stay in <code>insert_run_tx</code>.</li>
 <li>A terminal root run of a card inserts exactly one <code>work_package_memory</code> row (<code>kind=attempt</code>, <code>source=system</code>, <code>run_id</code> set) through the existing store writer, in the same transaction as the terminal status (<code>record_run_memory</code> in <code>crates/store/src/run.rs</code>); the existing per-card <code>memory.consolidate</code> job then has real rows. A child run and a card-less run write none.</li>
 <li>The compiled prompt of the next run on the card carries the prior attempt (the memory selector reads the hot rows; ids make the selection part of the hash).</li>
-<li>The attempt row is written on <strong>every</strong> terminal path, not only the two transition helpers: <code>cancel_run_tx</code> records a cancelled run, and both reap sweeps (<code>run.execute</code> and <code>process.step</code>) record their reaped runs through the same writer, in the same transaction. Found in flight against the first implementation, which covered only <code>transition_run_tx</code>/<code>fail_run_tx</code>.</li>
+<li>The attempt row is written on <strong>every</strong> terminal path, not only the two transition helpers: <code>cancel_run_tx</code> records a cancelled run, and both reap sweeps (<code>run.execute</code> and <code>process.step</code>) record their reaped runs through the same writer, in the same transaction. Found in flight against the first implementation, which covered only <code>transition_run_tx</code>/<code>fail_run_tx</code>. The sweep's memory-insert failure is <strong>retryable</strong> (<code>run_failure</code> maps a transient database refusal to a retry), so a blip cannot permanently fail the sweep and strand the run live; a rolled-back finish leaves neither the status nor the row (<code>run_memory::a_rolled_back_finish_leaves_neither</code>).</li>
 </ul>
 <h2 id="not-this-step">Not this step</h2>
 <p>The budget. <code>v1-p75-1</code>/<code>v1-w4a-1</code> are resolved on <code>origin/issue/526-u5a</code> (commit <code>8f1e5770</code>, <code>crates/actions/tests/tool_budget.rs</code> 14 passed, <code>422 budget_missing</code> at run start, an invoke precheck that refuses an unbudgeted capturing call). The token ceiling (<code>ReleaseLimits.max_tokens</code>, recorded-only) is that gate's residual. See ADR 0014.</p>
@@ -50,7 +50,7 @@
 </tr>
 <tr>
 <td><code>crates/store/tests/run_memory.rs</code> (new)</td>
-<td><strong>6 passed</strong> (succeeded, failed, cancelled both ways, reaped, root-only)</td>
+<td><strong>7 passed</strong> (succeeded, failed, cancelled both ways, reaped, rolled-back, root-only)</td>
 </tr>
 <tr>
 <td>server <code>process_reap</code> (extended)</td>
@@ -150,8 +150,8 @@
 <h2 id="live-proof">Live proof</h2>
 <p>Two <code>#[ignore]</code>, env-gated tests in <code>internal_agent_runtime</code>:</p>
 <ul>
-<li><code>the_live_model_executes_the_compiled_prompt</code> — the model leg: the compiled prompt reaches the estate's real inference-router, the reply becomes a draft, the terminal run records its attempt. Needs <code>CONVEYOR_EXTERNAL_INFERENCE_URL</code> and <code>CONVEYOR_LIVE_MODEL</code>.</li>
-<li><code>the_live_run_executes_against_the_real_router_and_laya</code> — the full leg: the same, plus one real <code>gate.precheck</code> decision from the laya bridge. Needs <code>CONVEYOR_EXTERNAL_LAYA_URL</code> and <code>CONVEYOR_LIVE_LAYA_TOKEN</code> too.</li>
+<li><code>the_live_model_executes_the_compiled_prompt</code> — the model leg: the compiled prompt reaches the estate's real inference-router, the reply becomes a draft, the terminal run records its attempt. Needs <code>CONVEYOR_EXTERNAL_INFERENCE_URL</code>, <code>CONVEYOR_LIVE_INFERENCE_TOKEN</code> and <code>CONVEYOR_LIVE_MODEL</code>.</li>
+<li><code>the_live_run_executes_against_the_real_router_and_laya</code> — the full leg: the same, plus one real <code>gate.precheck</code> decision from the laya bridge. Needs <code>CONVEYOR_EXTERNAL_LAYA_URL</code> and <code>CONVEYOR_LIVE_LAYA_TOKEN</code> too. Both tests seal <code>inference.token</code> (the name the inference client resolves) from <code>CONVEYOR_LIVE_INFERENCE_TOKEN</code>; the first cut sealed only <code>laya.token</code>, so the model leg would have 401'd even with a laya credential.</li>
 </ul>
 <p><strong>Attempted 2026-11-22 23:15Z — BLOCKED on a caller licence, not on reachability.</strong></p>
 <ul>
