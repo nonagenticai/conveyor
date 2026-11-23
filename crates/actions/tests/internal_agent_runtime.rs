@@ -1767,7 +1767,8 @@ async fn the_release_request_renders_and_the_envelope_does_not() {
         &seeded,
         "request_job",
         json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
-               "model_ref": "router/release", "title": "Draft job", "charter": "write a draft"}),
+               "model_ref": "router/release", "job_key": "request_job",
+               "title": "Draft job", "charter": "write a draft"}),
     )
     .await;
     let binding = bind(&pg, &seeded, job, release, agent, capability).await;
@@ -1801,12 +1802,49 @@ async fn the_release_request_renders_and_the_envelope_does_not() {
         tx.commit().await.expect("commit");
         (step_id, hash)
     };
-    let compiled = conveyor_actions::prompt::compile_for_run(
+    // The run's terminal transition wrote this run's attempt memory row (S21 step 6), so a
+    // post-run recompile would read it and legitimately differ. Reconstruct the pre-run facts:
+    // assert the row existed, then clear the card's post-run memory. What remains is exactly the
+    // facts the executor compiled — the same technique as the process-agent test.
+    let attempts: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM work_package_memory WHERE tenant_id = $1 AND run_id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(attempts, 1, "the terminal run recorded its attempt");
+    sqlx::query("DELETE FROM work_package_memory WHERE tenant_id = $1 AND card_id = $2")
+        .bind(seeded.tenant.as_uuid())
+        .bind(Uuid::parse_str(&card).expect("card id"))
+        .execute(&pg.super_pool)
+        .await
+        .expect("clear the post-run memory");
+    // Compile with the SAME pins the executor used: the binding's release anatomy, not the live
+    // capability row (the release's model and caps win over the row).
+    let anatomy = {
+        let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+            .await
+            .expect("scope");
+        let snapshot: Value = sqlx::query_scalar(
+            "SELECT release_snapshot FROM job_binding WHERE tenant_id = $1 AND id = $2",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(binding)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("the binding's snapshot");
+        tx.commit().await.expect("commit");
+        conveyor_domain::organisation::parse_release_anatomy(&snapshot)
+            .expect("the release anatomy")
+    };
+    let compiled = conveyor_actions::prompt::compile_for_run_with_pins(
         &pg.runtime,
         seeded.tenant,
         run,
         Some(step_id),
         "agent@1",
+        Some(&anatomy),
     )
     .await
     .expect("recompile");
@@ -1851,8 +1889,8 @@ async fn the_judge_state_carries_the_release_request() {
         &seeded,
         "gated_request_job",
         json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
-               "model_ref": "router/release", "title": "Gated request job",
-               "charter": "write the gated draft"}),
+               "model_ref": "router/release", "job_key": "gated_request_job",
+               "title": "Gated request job", "charter": "write the gated draft"}),
     )
     .await;
     let binding = bind(&pg, &seeded, job, release, agent, capability).await;
