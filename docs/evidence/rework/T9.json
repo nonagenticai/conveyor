@@ -151,7 +151,7 @@
   ],
   "failures": [],
   "gate": "an architecture project passes Preliminary and A\u2013F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata",
-  "generated_at": "2026-11-23T09:44:12.294889+00:00",
+  "generated_at": "2026-11-23T10:18:12.825072+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T9.toml",
   "name": "TOGAF ADM capability",
@@ -159,8 +159,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-23T09:41:16.455014+00:00",
-    "git_sha": "b208c54b9b48f06c6cb9aa06f47cb0da89b8679b",
-    "path": "retained-snapshot/b208c54b9b48f06c6cb9aa06f47cb0da89b8679b"
+    "git_sha": "c44b23fb1a5f866cabd1697fab977d240a2c6575",
+    "path": "retained-snapshot/c44b23fb1a5f866cabd1697fab977d240a2c6575"
   },
   "verdict": "green",
   "warnings": []

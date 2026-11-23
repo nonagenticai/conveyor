@@ -11,6 +11,11 @@
       "title": "no governed_assets action family and no MSP kinds on governed_asset",
       "evidence": "SPEC_V2 §8.3 maps mandate/brief/blueprint/business_case/refined_vision/benefits_strategy/benefits_realization_plan/projects_dossier to governed_asset kinds; §10.4 names governed_assets.compose|submit|approve. The served action surface has no governed_assets.* action; governance/assets.rs defines requirements/principles/decisions only; governed_asset kinds in the live copy are adr, charter, closure, postmortem, requirement.",
       "acceptance": "an action creates a governed_asset of kind mandate on the programme-definition project, the row reads back, and a test proves the MSP kind set is accepted while an unknown kind is refused",
+      "resolved_by": {
+        "commit": "577806533065d32539cda126e4cb3964b6b654e0",
+        "test": "crates/actions/tests/governed_assets.rs::the_msp_kind_set_is_accepted",
+        "evidence": "The governed_assets.compose|get|list|submit|approve family is served (docs/design/data/actions.json); AssetKind carries Mandate/ProgrammeBrief/BusinessCase at crates/domain/src/governance.rs:40-46; governed_assets.rs::a_mandate_is_composed_on_a_project_and_reads_back, ::the_msp_kind_set_is_accepted and ::an_unknown_kind_is_refused_and_writes_nothing prove the DoD at 57780653, an ancestor of the head."
+      },
       "artifact": "seed/output-standard.json#mandate"
     },
     {

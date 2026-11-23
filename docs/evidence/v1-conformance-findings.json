@@ -5767,6 +5767,61 @@
       "acceptance": "A served action family writes programme.shared_config scoped by tenant and programme, validating the object shape (values object, locked array) and taking an optimistic version; a read action returns it; a test writes then reads back and refuses a non-object; the safe-art body's Shared configuration section resolves from the row and the published document exists.",
       "owner_project": "PLATFORM",
       "kind": "CODE"
+    },
+    {
+      "id": "v1-std-investment-appraisal",
+      "area": "§8.3",
+      "standard": "MSP",
+      "spec": "§8.3",
+      "severity": "P1",
+      "title": "The business case has no quantified investment appraisal or cash-flow schedule",
+      "problem": "The owner assessment found no quantified investment appraisal or cash-flow schedule in the published business case. The standard's 'Investment appraisal and cash flow' section resolves only measure.json#/inference/by_project and /inference/by_model — token-spend rows, not an appraisal — and the first pointer does not resolve at the snapshot, so the section publishes empty. No standard or seed row carries a cost/benefit appraisal, a net position, a payback or an NPV, and no cash-flow schedule exists by period. This is the STANDARD gap behind v1-std-broken-source: fixing the pointer would fill the heading with token counts and still leave no appraisal.",
+      "evidence": [
+        {
+          "path": "seed/output-standard.json",
+          "line": 906,
+          "quote": "        \"Investment appraisal and cash flow\": ["
+        },
+        {
+          "path": "seed/output-standard.json",
+          "line": 910,
+          "quote": "            \"pointer\": \"/inference/by_project\""
+        }
+      ],
+      "failure_scenario": "A tranche or sponsor decision approves the programme on a business case whose appraisal section is empty or holds token counts; cost and benefit posture are prose, so no actual can be compared with a plan and a cost regression passes the review unnoticed.",
+      "acceptance": "The business case's Investment appraisal and cash flow section renders a quantified appraisal (costs, benefits, net position and payback or NPV with its basis) and a cash-flow schedule by period from a source that resolves; the standard's verifier refuses the section when it is empty, placeholder or carries only inference counts; the published business case document contains the appraisal and is read back.",
+      "owner_project": "PLATFORM",
+      "kind": "STANDARD"
+    },
+    {
+      "id": "v1-w2-viability-writes-board",
+      "area": "§12",
+      "standard": "SPEC",
+      "spec": "§12",
+      "severity": "P1",
+      "title": "The viability check rewrote the board it reports",
+      "problem": "verify-viability.py's manifests check ran `verify-project.py --all` with no evidence-dir, so a viability run republished every project receipt from whatever environment it inherited. Run without the live transport env, it flipped 14 green manifests red and the next slice audit read those receipts and reported 45 of 45 slices absent — a fabricated regression caused by the instrument that reports it.",
+      "evidence": [
+        {
+          "path": "scripts/verify-viability.py",
+          "line": 264,
+          "quote": "    with tempfile.TemporaryDirectory() as evidence:"
+        },
+        {
+          "path": "scripts/verify-viability.py",
+          "line": 272,
+          "quote": "                \"--evidence-dir\","
+        }
+      ],
+      "failure_scenario": "A reviewer or CI job runs the viability check without the transport credentials; the check rewrites every committed receipt red, the next verify-slices run reports every slice absent, and the board's own evidence is corrupted by a read-only question.",
+      "acceptance": "The manifests check executes verify-project with a bounded temporary evidence directory; a viability run leaves docs/evidence/rework byte-identical (proved by hashing before and after a run with no transport env); the self-test stays green.",
+      "owner_project": "PLATFORM",
+      "kind": "CODE",
+      "resolved_by": {
+        "commit": "deb457a5d04abf5d3d266abb4c5e22d630f95d0e",
+        "test": "scripts/verify-viability.py",
+        "evidence": "python3 scripts/verify-viability.py --self-test is green; the invariance proof is `find docs/evidence/rework -name '*.json' -exec shasum -a 256 {} + | sort | shasum -a 256` unchanged (1bf343a10fd858bc) across a run with CONVEYOR_SSH_KEY/CONVEYOR_HOST unset while that run reported 5 of 6 checks missing. The manifests check now runs verify-project --all --evidence-dir <temp> (scripts/verify-viability.py:264-273)."
+      }
     }
   ]
 }
