@@ -165,16 +165,16 @@
     "gate (P0): the gate check 'S18-baseline' did not pass; the gate check 'S18-charter' did not pass; the gate check 'S18-closure-outputs' did not pass; the gate check 'S18-contract' did not pass; the gate check 'S18-review' did not pass; the gate check 'S18-closure-gate' did not pass; the gate check 'S18-pi-cadence' did not pass; the gate check 'S18-pi-plan' did not pass; the gate check 'S18-pi-objectives' did not pass; the gate check 'S18-lessons' did not pass; the gate check 'S18-wsjf' did not pass; the gate check 'S18-demo-credits' did not pass"
   ],
   "gate": "The end-to-end proof is one real katas-tenant iteration: a candidate `capability_agent` version, one run, a comparison against the promoted baseline, and a recorded keep/revert \u2014 with the screen showing the same numbers.",
-  "generated_at": "2026-11-23T09:20:22.965943+00:00",
+  "generated_at": "2026-11-23T09:44:08.695503+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S18.toml",
   "name": "Kata continuous improvement",
   "project": "S18",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T08:09:50.563209+00:00",
-    "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
-    "path": "retained-snapshot/65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8"
+    "generated_at": "2026-11-23T09:41:16.455014+00:00",
+    "git_sha": "b208c54b9b48f06c6cb9aa06f47cb0da89b8679b",
+    "path": "retained-snapshot/b208c54b9b48f06c6cb9aa06f47cb0da89b8679b"
   },
   "verdict": "red",
   "warnings": []

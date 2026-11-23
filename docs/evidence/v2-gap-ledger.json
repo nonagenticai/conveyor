@@ -1,37 +1,37 @@
 {
   "schema": "v2-gap-ledger/v1",
-  "lane_pin": "b14ee948",
+  "lane_pin": "faacafde",
   "generated_from": {
     "artefact_record": {
-      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526/scripts/generate-standards.py --snapshot /tmp/snap-526v7b/data --outputs-dir /tmp/snap-526v7b/docs --register docs/evidence/rework-register.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-g6mqklub --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-g6mqklub/findings.json",
+      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526/scripts/generate-standards.py --snapshot /tmp/snap-final/data --outputs-dir /tmp/snap-final/docs --register docs/evidence/rework-register.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-udytuici --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-udytuici/findings.json",
       "summary": {
-        "absent": 411,
-        "artefacts": 1049,
-        "evidenced": 310,
-        "findings": 542,
-        "mandatory": 947,
-        "partial": 328
+        "absent": 410,
+        "artefacts": 1048,
+        "evidenced": 322,
+        "findings": 529,
+        "mandatory": 946,
+        "partial": 316
       }
     },
     "sources": [
       {
-        "path": "/tmp/snap-526v7b/data",
-        "sha256": "a3340393d8e777f653a84ad0303b46222fb941b01ac1ae5fb9cfa8194b167f2d",
+        "path": "/tmp/snap-final/data",
+        "sha256": "fcb5964c8aed4f489b4150de66afa7999b021e24cd84c038c55b30716c2284aa",
         "role": "post-close snapshot; absent set"
       },
       {
-        "path": "/tmp/snap-526v7b/docs",
-        "sha256": "974987a6394810ac8a6d46d4b899d1888cc0135524924405ce5ab334698d18e1",
+        "path": "/tmp/snap-final/docs",
+        "sha256": "7d5f70b7430c0705b9635d377c2d94a4ec9345aed77c69c5466e86a310a84581",
         "role": "published pages the record resolves document headings from"
       },
       {
         "path": "docs/evidence/rework-register.json",
-        "sha256": "b7e1e7dd50394e391a6c3e65ed6fc0d27b77fb4d39eb94cb3079ab19bae9b86f",
+        "sha256": "d192692f47a2a744da5c3bc1802bae4cbd90734eca041b01e4889485d23945b6",
         "role": "rework register; fix cards and owners"
       },
       {
-        "path": "/tmp/board-merged/conformance-gap-register.json",
-        "sha256": "843ff4789c7242f4134ddaf249f7c1a48545abe153fcb0420e4d62e54cdd3d8f",
+        "path": "/tmp/board-final/conformance-gap-register.json",
+        "sha256": "7f068357d2224345113d49f599121961d1b0bc8e7151eb0ed44b9b40c74b7490",
         "role": "live gaps; baseline liveness"
       },
       {
@@ -41,7 +41,7 @@
       },
       {
         "path": "docs/evidence/v1-conformance-findings.json",
-        "sha256": "8c1a9b2674e5d41377283e3ed21fa1ec450d2a04d5d69d4d24a28a2acf7fc2e0",
+        "sha256": "fed6fd7dce7c6fbea49844fb40fae685fcfd1021e03210b04c22dde2dde1870b",
         "role": "v1 findings; open ledger"
       },
       {
@@ -83,44 +83,44 @@
     "deploy_bound": "the not-yet-deployed set is migrations 0062-0066 and the authoring.* family 0066 creates"
   },
   "counts": {
-    "rows": 402,
+    "rows": 399,
     "by_kind": {
-      "artefact": 327,
+      "artefact": 326,
       "baseline": 0,
-      "ledger": 75
+      "ledger": 73
     },
     "by_severity": {
-      "P1": 225,
+      "P1": 222,
       "P0": 22,
       "P2": 155
     },
     "by_kind_severity": {
       "artefact": {
-        "P1": 177,
+        "P1": 176,
         "P0": 21,
         "P2": 129
       },
       "baseline": {},
       "ledger": {
-        "P1": 48,
+        "P1": 46,
         "P2": 26,
         "P0": 1
       }
     },
     "by_deploy_bound": {
-      "false": 402
+      "false": 399
     },
     "by_status": {
-      "absent": 327,
-      "open": 75
+      "absent": 326,
+      "open": 73
     },
     "by_fix_card_resolution": {
-      "published_package": 327,
-      "finding_id": 75
+      "published_package": 326,
+      "finding_id": 73
     },
     "declared_package_keys_absent_from_register": [],
     "artefact_fix_card_resolution": {
-      "published_package": 327
+      "published_package": 326
     }
   },
   "rows": [
@@ -788,24 +788,6 @@
       "standard_id": "std-pmp-change-control-t8",
       "declared_package_key": "std-pmp-change-control-t8:T8",
       "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "artefact:std-pmp-closure-review-p0",
-      "kind": "artefact",
-      "standard": "PMP",
-      "spec": "§8.4",
-      "subject": "P0",
-      "project": "P0",
-      "title": "Closure Review — Programme-level unit (plan: docs/plans/P0-programme-definition.md)",
-      "status": "absent",
-      "severity": "P1",
-      "owner": "PLATFORM",
-      "fix_card": "std-pmp-closure-review-p0:P0",
-      "fix_card_resolution": "published_package",
-      "standard_id": "std-pmp-closure-review-p0",
-      "declared_package_key": "std-pmp-closure-review-p0:P0",
-      "target_phase": "Preliminary",
       "deploy_bound": false
     },
     {
@@ -1628,7 +1610,7 @@
       "title": "Project Brief — Programme-level unit (plan: docs/plans/P0-programme-definition.md)",
       "status": "absent",
       "severity": "P1",
-      "owner": "PLATFORM",
+      "owner": "P0",
       "fix_card": "std-pmp-project-brief-p0:P0",
       "fix_card_resolution": "published_package",
       "standard_id": "std-pmp-project-brief-p0",
@@ -3014,7 +2996,7 @@
       "title": "Benefits Diagram — Programme-level unit (plan: docs/plans/P0-programme-definition.md)",
       "status": "absent",
       "severity": "P1",
-      "owner": "PLATFORM",
+      "owner": "P0",
       "fix_card": "std-togaf-benefits-diagram-p0:P0",
       "fix_card_resolution": "published_package",
       "standard_id": "std-togaf-benefits-diagram-p0",
@@ -3266,7 +3248,7 @@
       "title": "Candidate Solutions — Programme-level unit (plan: docs/plans/P0-programme-definition.md)",
       "status": "absent",
       "severity": "P1",
-      "owner": "PLATFORM",
+      "owner": "P0",
       "fix_card": "std-togaf-candidate-solutions-p0:P0",
       "fix_card_resolution": "published_package",
       "standard_id": "std-togaf-candidate-solutions-p0",
@@ -4634,7 +4616,7 @@
       "title": "Phase G — P0 — G",
       "status": "absent",
       "severity": "P1",
-      "owner": "PLATFORM",
+      "owner": "P0",
       "fix_card": "std-togaf-phase-g-p0-g:P0",
       "fix_card_resolution": "published_package",
       "standard_id": "std-togaf-phase-g-p0-g",
@@ -4670,7 +4652,7 @@
       "title": "Phase G — S00 — G",
       "status": "absent",
       "severity": "P1",
-      "owner": "PLATFORM",
+      "owner": "P0",
       "fix_card": "mandatory_artefacts:tranche-0",
       "fix_card_resolution": "published_package",
       "standard_id": "",
@@ -4688,7 +4670,7 @@
       "title": "Phase G — S01 — G",
       "status": "absent",
       "severity": "P1",
-      "owner": "PLATFORM",
+      "owner": "P0",
       "fix_card": "mandatory_artefacts:tranche-0",
       "fix_card_resolution": "published_package",
       "standard_id": "",
@@ -5138,7 +5120,7 @@
       "title": "Phase G — T0 — G",
       "status": "absent",
       "severity": "P1",
-      "owner": "PLATFORM",
+      "owner": "P0",
       "fix_card": "mandatory_artefacts:tranche-0",
       "fix_card_resolution": "published_package",
       "standard_id": "",
@@ -5480,7 +5462,7 @@
       "title": "Phase H — P0 — H",
       "status": "absent",
       "severity": "P1",
-      "owner": "PLATFORM",
+      "owner": "P0",
       "fix_card": "std-togaf-phase-h-p0-h:P0",
       "fix_card_resolution": "published_package",
       "standard_id": "std-togaf-phase-h-p0-h",
@@ -5516,7 +5498,7 @@
       "title": "Phase H — S00 — H",
       "status": "absent",
       "severity": "P1",
-      "owner": "PLATFORM",
+      "owner": "P0",
       "fix_card": "mandatory_artefacts:tranche-0",
       "fix_card_resolution": "published_package",
       "standard_id": "",
@@ -5534,7 +5516,7 @@
       "title": "Phase H — S01 — H",
       "status": "absent",
       "severity": "P1",
-      "owner": "PLATFORM",
+      "owner": "P0",
       "fix_card": "mandatory_artefacts:tranche-0",
       "fix_card_resolution": "published_package",
       "standard_id": "",
@@ -5624,7 +5606,7 @@
       "title": "Phase H — T0 — H",
       "status": "absent",
       "severity": "P1",
-      "owner": "PLATFORM",
+      "owner": "P0",
       "fix_card": "mandatory_artefacts:tranche-0",
       "fix_card_resolution": "published_package",
       "standard_id": "",
@@ -5786,7 +5768,7 @@
       "title": "Project Context Diagram — Programme-level unit (plan: docs/plans/P0-programme-definition.md)",
       "status": "absent",
       "severity": "P1",
-      "owner": "PLATFORM",
+      "owner": "P0",
       "fix_card": "std-togaf-project-context-diagram-p0:P0",
       "fix_card_resolution": "published_package",
       "standard_id": "std-togaf-project-context-diagram-p0",
@@ -6497,24 +6479,6 @@
       "deploy_bound": false
     },
     {
-      "key": "ledger:v1-p81-4",
-      "kind": "ledger",
-      "standard": "TOGAF",
-      "spec": "§8.1",
-      "subject": "§8.1",
-      "project": "T9",
-      "title": "A draft Architecture Board can govern, and can be approved with an empty charter",
-      "status": "open",
-      "severity": "P1",
-      "owner": "T9",
-      "fix_card": "v1-p81-4",
-      "fix_card_resolution": "finding_id",
-      "standard_id": "v1-p81-4",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
       "key": "ledger:v1-p81-5",
       "kind": "ledger",
       "standard": "TOGAF",
@@ -6816,24 +6780,6 @@
       "fix_card": "v1-s07-1",
       "fix_card_resolution": "finding_id",
       "standard_id": "v1-s07-1",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "ledger:v1-s08-1",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§5.4",
-      "subject": "S08 governance/modelling",
-      "project": "S08",
-      "title": "S08 validation-findings proof has no assertion",
-      "status": "open",
-      "severity": "P1",
-      "owner": "S08",
-      "fix_card": "v1-s08-1",
-      "fix_card_resolution": "finding_id",
-      "standard_id": "v1-s08-1",
       "declared_package_key": "",
       "target_phase": "G",
       "deploy_bound": false

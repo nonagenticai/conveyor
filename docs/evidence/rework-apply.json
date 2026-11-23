@@ -514,10 +514,12 @@
     "v1-w2c-3:T3",
     "v1-w3a-1:T7",
     "v1-w4a-1:T13",
-    "v1-w4a-2:T13"
+    "v1-w4a-2:T13",
+    "v1-p83-3:T10",
+    "v1-s10-2:S10"
   ],
   "failures": [],
   "schema": "conveyor-rework-apply/v1",
   "tenant": "nonagentic",
-  "updated_at": "2026-11-23T09:28:02+00:00"
+  "updated_at": "2026-11-23T09:42:50+00:00"
 }

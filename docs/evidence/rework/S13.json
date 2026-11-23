@@ -175,16 +175,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "Green when the process limb passes with the gate parked and resumed and the coach child proving the run tree; the judge proves accept, reject-rerun, the two-reject BLOCK and the outage wait; the bus proves duplicate idempotency, re-delivery after `FLUSHALL` and the DLQ; the default catalogue is exactly 280; the dispositions have no `delta:` row; and with Redis stopped the Postgres-only limb still passes.",
-  "generated_at": "2026-11-23T09:20:22.242430+00:00",
+  "generated_at": "2026-11-23T09:44:07.725855+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S13.toml",
   "name": "Process engine, judge, map and care-bus \u2014 the process is the executor, the DAG retained as the tool-sequence engine, the 348 flows re-authored",
   "project": "S13",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T08:09:50.563209+00:00",
-    "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
-    "path": "retained-snapshot/65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8"
+    "generated_at": "2026-11-23T09:41:16.455014+00:00",
+    "git_sha": "b208c54b9b48f06c6cb9aa06f47cb0da89b8679b",
+    "path": "retained-snapshot/b208c54b9b48f06c6cb9aa06f47cb0da89b8679b"
   },
   "verdict": "red",
   "warnings": []
