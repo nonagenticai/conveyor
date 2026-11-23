@@ -642,8 +642,11 @@ async fn invoke_action(
     Ok(outcome.body.get("output").cloned().unwrap_or(outcome.body))
 }
 
-/// A database read/write failed: retryable, never a dead letter.
-fn db(error: sqlx::Error) -> JobFailure {
+/// A store read/write failed: retryable, never a dead letter.
+///
+/// Generic because the stores each return their own error enum; every one implements `Display`
+/// and none of them is a typed refusal.
+fn db<E: std::fmt::Display>(error: E) -> JobFailure {
     JobFailure::retryable(format!("database: {error}"))
 }
 
