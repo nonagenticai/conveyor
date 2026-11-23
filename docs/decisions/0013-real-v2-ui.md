@@ -1,4 +1,4 @@
-# 0009 — The real V2 UI is the app, not the design pack
+# 0013 — The real V2 UI is the app, not the design pack
 
 Status: Proposed · Date: 2026-11-22 · Issue: #559 · Spec: SPEC_V2 §10.5, D64, D65
 
