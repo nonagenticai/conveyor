@@ -107,6 +107,8 @@
       "baseline": "not measured - no meeting rows exist before T19; the current record is the approval row only",
       "measurement_method": "Read-time aggregates over meeting, meeting_agenda_item, meeting_attendance, meeting_position, approval_decision and project_dependency; a metric reads rows and writes nothing.",
       "owner_role": "BCM",
+      "owner_job_key": "bcm",
+      "benefit_owner_job_key": "bcm",
       "project_key": "T19"
     }
   ],

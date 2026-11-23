@@ -809,12 +809,8 @@ async fn try_review_tranche(
     decision: &str,
     delegation: &str,
 ) -> Result<conveyor_actions::InvokeOutcome, conveyor_actions::ActionError> {
-    let evidence = json!({
-        "snapshot_sha": SNAPSHOT_SHA,
-        "baselines": ["B0"],
-        "benefit_status": {"BEN-1": "tracking"},
-        "risk_register": ["risk-1"]
-    });
+    let mut evidence = support::tranche_review_evidence(pg, seeded, tranche).await;
+    evidence["snapshot_sha"] = json!(SNAPSHOT_SHA);
     try_review_tranche_with_evidence(pg, running, seeded, tranche, decision, delegation, evidence)
         .await
 }
@@ -1263,12 +1259,8 @@ async fn a_tranche_review_records_the_snapshot_it_judged() {
     let delegation = support::delegation_ref(&running, TOKEN).await;
 
     let (_programme, flat_tranche) = programme_and_tranche(&pg, seeded.tenant_id, "planned").await;
-    let flat = json!({
-        "snapshot_sha": SNAPSHOT_SHA,
-        "baselines": ["B0"],
-        "benefit_status": {"BEN-1": "tracking"},
-        "risk_register": ["risk-1"]
-    });
+    let mut flat = support::tranche_review_evidence(&pg, &seeded, flat_tranche).await;
+    flat["snapshot_sha"] = json!(SNAPSHOT_SHA);
     let outcome = try_review_tranche_with_evidence(
         &pg,
         &running,
@@ -1284,12 +1276,8 @@ async fn a_tranche_review_records_the_snapshot_it_judged() {
 
     let (_programme, nested_tranche) =
         programme_and_tranche(&pg, seeded.tenant_id, "planned").await;
-    let nested = json!({
-        "snapshot": {"git_sha": SNAPSHOT_SHA},
-        "baselines": ["B0"],
-        "benefit_status": {"BEN-1": "tracking"},
-        "risk_register": ["risk-1"]
-    });
+    let mut nested = support::tranche_review_evidence(&pg, &seeded, nested_tranche).await;
+    nested["snapshot"] = json!({"git_sha": SNAPSHOT_SHA});
     let outcome = try_review_tranche_with_evidence(
         &pg,
         &running,

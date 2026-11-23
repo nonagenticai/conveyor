@@ -1276,7 +1276,7 @@ async fn a_benefit_link_accepts_a_node_in_its_programme() {
 /// P5.3 — a tranche review without evidence is refused; with evidence it records the decision.
 #[tokio::test(flavor = "multi_thread")]
 async fn a_tranche_review_without_evidence_is_refused() {
-    let (_pg, running, _seeded) = fixture().await;
+    let (pg, running, seeded) = fixture().await;
     let programme = create_programme(&running, "Tranche programme").await;
     let (status, tranche) = running
         .invoke(
@@ -1317,17 +1317,19 @@ async fn a_tranche_review_without_evidence_is_refused() {
         .await;
     assert_eq!(status, 201, "{next}");
 
+    let mut evidence = support::tranche_review_evidence(
+        &pg,
+        &seeded,
+        uuid::Uuid::parse_str(&id).expect("tranche id"),
+    )
+    .await;
+    // v1-tr2-2: the review names the snapshot it judged.
+    evidence["snapshot_sha"] = json!("0123456789abcdef0123456789abcdef01234567");
     let input = json!({
         "id": id,
         "decision": "continue",
         "delegation_ref": delegation,
-        "evidence": {
-            // v1-tr2-2: the review names the snapshot it judged.
-            "snapshot_sha": "0123456789abcdef0123456789abcdef01234567",
-            "baselines": ["B0"],
-            "benefit_status": {"BEN-01": "tracking"},
-            "risk_register": ["risk-1"]
-        }
+        "evidence": evidence
     });
     let gate = support::review_gate(&running, "dev:alice", &input).await;
     let (status, reviewed) = running
