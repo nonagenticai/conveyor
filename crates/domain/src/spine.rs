@@ -143,6 +143,15 @@ pub enum PlanError {
     /// A benefit has no measured baseline, so it cannot claim a realized improvement.
     #[error("benefit_baseline_missing")]
     BenefitBaselineMissing,
+    /// A realization record's measurement is not the typed `{value, unit}` pair.
+    #[error("benefit_measurement_invalid")]
+    BenefitMeasurementInvalid {
+        /// The offending field.
+        field: &'static str,
+    },
+    /// A realized claim needs measured values and evidence, not two timestamps.
+    #[error("benefit_realization_unmeasured")]
+    BenefitRealizationUnmeasured,
     /// An approved benefit profile's measurement fields change only through an approved change.
     #[error("benefit_change_required")]
     BenefitChangeRequired,
@@ -255,6 +264,71 @@ pub fn benefit_profile_missing(profile: &BenefitProfileFields) -> Vec<&'static s
         missing.push("benefit_owner");
     }
     missing
+}
+
+/// The unit texts that describe an absent measurement, never a measurement.
+const PLACEHOLDER_UNITS: [&str; 11] = [
+    "not measured",
+    "unmeasured",
+    "not applicable",
+    "n/a",
+    "na",
+    "none",
+    "unknown",
+    "tbd",
+    "tbc",
+    "placeholder",
+    "-",
+];
+
+/// One benefit measurement: the numeric reading and the unit it is expressed in (§8.3).
+///
+/// The stored and posted shape is `{ "value": <number>, "unit": <text> }`. Anything else —
+/// prose, `{}`, a numeric string, a blank unit or a placeholder unit — is not a measurement, so
+/// a realized claim built on it would be an opinion.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct Measurement {
+    /// The numeric reading.
+    pub value: f64,
+    /// The unit the reading is expressed in; never blank or a placeholder.
+    pub unit: String,
+}
+
+impl Measurement {
+    /// Parse the typed pair; `None` means the value is not a measurement.
+    pub fn parse(measurement: &Value) -> Option<Self> {
+        let object = measurement.as_object()?;
+        let value = object.get("value")?.as_f64()?;
+        if !value.is_finite() {
+            return None;
+        }
+        let unit = object.get("unit")?.as_str()?.trim();
+        if unit.is_empty() {
+            return None;
+        }
+        let lowered = unit.to_ascii_lowercase();
+        if PLACEHOLDER_UNITS.contains(&lowered.as_str()) {
+            return None;
+        }
+        Some(Self {
+            value,
+            unit: unit.to_owned(),
+        })
+    }
+}
+
+/// A realization record's evidence: a non-empty list carrying at least one real entry. A blank
+/// string or a null is a slot, not evidence.
+pub fn transition_has_evidence(evidence: &Value) -> bool {
+    evidence.as_array().is_some_and(|items| {
+        items.iter().any(|item| match item {
+            Value::Null => false,
+            Value::String(text) => !text.trim().is_empty(),
+            Value::Object(map) => !map.is_empty(),
+            Value::Array(list) => !list.is_empty(),
+            _ => true,
+        })
+    })
 }
 
 /// The subset of a profile the completeness rule reads.

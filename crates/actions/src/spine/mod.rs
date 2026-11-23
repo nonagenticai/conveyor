@@ -17,7 +17,7 @@
 //! surface uses, so a subscriber watches one row or a family.
 
 use chrono::{DateTime, Utc};
-use conveyor_domain::spine::{PlanError, WsjfInputs, wsjf};
+use conveyor_domain::spine::{Measurement, PlanError, WsjfInputs, wsjf};
 use conveyor_store as store;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -137,6 +137,18 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "baseline",
             "benefit_baseline_missing",
             "a benefit with no measured baseline cannot record a post-transition measurement",
+        ),
+        PlanStoreError::Illegal(PlanError::BenefitMeasurementInvalid { field }) => invalid(
+            field,
+            "benefit_measurement_invalid",
+            "a measurement is a number and a unit; prose, blanks and placeholder units are not \
+             measurements",
+        ),
+        PlanStoreError::Illegal(PlanError::BenefitRealizationUnmeasured) => invalid(
+            "post_value",
+            "benefit_realization_unmeasured",
+            "a realized benefit needs a measured baseline value, a measured post value and \
+             evidence; two timestamps are not a measurement",
         ),
         PlanStoreError::Illegal(PlanError::BenefitChangeRequired) => ActionError::new(
             409,

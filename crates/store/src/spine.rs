@@ -13,8 +13,9 @@
 use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
 use conveyor_domain::spine::{
-    BenefitMapFields, BenefitProfileFields, PlanError, WsjfInputs, benefit_map_missing,
-    benefit_profile_missing, tranche_review_has_evidence, validate_change,
+    BenefitMapFields, BenefitProfileFields, Measurement, PlanError, WsjfInputs,
+    benefit_map_missing, benefit_profile_missing, tranche_review_has_evidence,
+    transition_has_evidence, validate_change,
 };
 use serde_json::Value;
 use sqlx::{AssertSqlSafe, PgConnection};
@@ -1993,14 +1994,23 @@ pub async fn update_benefit_tx(
         return Err(PlanStoreError::Illegal(PlanError::BenefitRetired));
     }
     if patch.status.as_deref() == Some("realized") {
-        // §8.3: a benefit whose baseline was never measured cannot claim an improvement. The
-        // realization record is the only proof that both readings exist; consult it here so the
-        // status cannot advance past it.
+        // §8.3: a realized claim is made of measurements, not timestamps. The transition must
+        // carry a typed baseline value, a typed post value and evidence; two timestamps alone
+        // never advance the status.
         let measured = get_transition_tx(&mut *conn, tenant, id)
             .await?
-            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());
+            .is_some_and(|t| {
+                t.baseline_value
+                    .as_ref()
+                    .and_then(Measurement::parse)
+                    .is_some()
+                    && t.post_value.as_ref().and_then(Measurement::parse).is_some()
+                    && transition_has_evidence(&t.evidence)
+            });
         if !measured {
-            return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
+            return Err(PlanStoreError::Illegal(
+                PlanError::BenefitRealizationUnmeasured,
+            ));
         }
     }
     let approved =
@@ -2381,12 +2391,16 @@ pub struct TransitionRecord {
     pub benefit_id: Uuid,
     /// When the baseline was measured.
     pub baseline_measured_at: Option<DateTime<Utc>>,
+    /// The measured baseline value: the typed pair `{ "value": <number>, "unit": <text> }`.
+    pub baseline_value: Option<Value>,
     /// The readiness assessment.
     pub readiness: Value,
     /// When the transition was enacted.
     pub enacted_at: Option<DateTime<Utc>>,
     /// When the post-transition measurement was taken.
     pub post_measured_at: Option<DateTime<Utc>>,
+    /// The measured post-transition value: the typed pair `{ "value": <number>, "unit": <text> }`.
+    pub post_value: Option<Value>,
     /// When the legacy practice was retired.
     pub retired_at: Option<DateTime<Utc>>,
     /// The evidence.
@@ -2395,20 +2409,24 @@ pub struct TransitionRecord {
     pub version: i64,
 }
 
-const TRANSITION_COLUMNS: &str = "id, benefit_id, baseline_measured_at, readiness, enacted_at, \
-    post_measured_at, retired_at, evidence, version";
+const TRANSITION_COLUMNS: &str = "id, benefit_id, baseline_measured_at, baseline_value, readiness, \
+    enacted_at, post_measured_at, post_value, retired_at, evidence, version";
 
 /// The editable fields of a realization record. `None` leaves the stored value in place.
 #[derive(Clone, Debug, Default)]
 pub struct TransitionPatch {
     /// When the baseline was measured.
     pub baseline_measured_at: Option<DateTime<Utc>>,
+    /// The typed baseline measurement; a placeholder is refused.
+    pub baseline_value: Option<Value>,
     /// The readiness assessment.
     pub readiness: Option<Value>,
     /// When the transition was enacted.
     pub enacted_at: Option<DateTime<Utc>>,
     /// When the post-transition measurement was taken.
     pub post_measured_at: Option<DateTime<Utc>>,
+    /// The typed post-transition measurement; needs a baseline value and is never a placeholder.
+    pub post_value: Option<Value>,
     /// When the legacy practice was retired.
     pub retired_at: Option<DateTime<Utc>>,
     /// The evidence.
@@ -2438,8 +2456,9 @@ pub async fn list_transitions_tx(
     tenant: TenantId,
     programme_id: Uuid,
 ) -> Result<Vec<TransitionRecord>, PlanStoreError> {
-    let sql = "SELECT t.id, t.benefit_id, t.baseline_measured_at, t.readiness, t.enacted_at,
-                      t.post_measured_at, t.retired_at, t.evidence, t.version
+    let sql = "SELECT t.id, t.benefit_id, t.baseline_measured_at, t.baseline_value, t.readiness,
+                      t.enacted_at, t.post_measured_at, t.post_value, t.retired_at, t.evidence,
+                      t.version
                  FROM benefit_transition t
                  JOIN benefit_profile b ON b.id = t.benefit_id AND b.tenant_id = t.tenant_id
                 WHERE t.tenant_id = $1 AND b.programme_id = $2
@@ -2480,13 +2499,32 @@ pub async fn upsert_transition_tx(
             what: "benefit transition",
         });
     }
+    for (field, value) in [
+        ("baseline_value", patch.baseline_value.as_ref()),
+        ("post_value", patch.post_value.as_ref()),
+    ] {
+        if value.is_some_and(|value| Measurement::parse(value).is_none()) {
+            return Err(PlanStoreError::Illegal(
+                PlanError::BenefitMeasurementInvalid { field },
+            ));
+        }
+    }
     let baseline = patch
         .baseline_measured_at
         .or(current.as_ref().and_then(|row| row.baseline_measured_at));
     let post = patch
         .post_measured_at
         .or(current.as_ref().and_then(|row| row.post_measured_at));
-    if post.is_some() && baseline.is_none() {
+    let baseline_value = patch
+        .baseline_value
+        .clone()
+        .or_else(|| current.as_ref().and_then(|row| row.baseline_value.clone()));
+    let post_value = patch
+        .post_value
+        .clone()
+        .or_else(|| current.as_ref().and_then(|row| row.post_value.clone()));
+    if (post.is_some() && baseline.is_none()) || (post_value.is_some() && baseline_value.is_none())
+    {
         return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
     }
     match current {
@@ -2494,22 +2532,26 @@ pub async fn upsert_transition_tx(
             let sql = format!(
                 "UPDATE benefit_transition SET
                     baseline_measured_at = coalesce($3, baseline_measured_at),
-                    readiness = coalesce($4, readiness),
-                    enacted_at = coalesce($5, enacted_at),
-                    post_measured_at = coalesce($6, post_measured_at),
-                    retired_at = coalesce($7, retired_at),
-                    evidence = coalesce($8, evidence),
+                    baseline_value = coalesce($4, baseline_value),
+                    readiness = coalesce($5, readiness),
+                    enacted_at = coalesce($6, enacted_at),
+                    post_measured_at = coalesce($7, post_measured_at),
+                    post_value = coalesce($8, post_value),
+                    retired_at = coalesce($9, retired_at),
+                    evidence = coalesce($10, evidence),
                     version = version + 1, updated_at = now()
-                  WHERE tenant_id = $1 AND id = $2 AND version = $9
+                  WHERE tenant_id = $1 AND id = $2 AND version = $11
                   RETURNING {TRANSITION_COLUMNS}"
             );
             let row: Option<TransitionRecord> = sqlx::query_as(AssertSqlSafe(sql))
                 .bind(tenant.as_uuid())
                 .bind(current.id)
                 .bind(patch.baseline_measured_at)
+                .bind(&patch.baseline_value)
                 .bind(&patch.readiness)
                 .bind(patch.enacted_at)
                 .bind(patch.post_measured_at)
+                .bind(&patch.post_value)
                 .bind(patch.retired_at)
                 .bind(&patch.evidence)
                 .bind(current.version)
@@ -2522,19 +2564,21 @@ pub async fn upsert_transition_tx(
         None => {
             let sql = format!(
                 "INSERT INTO benefit_transition
-                    (tenant_id, benefit_id, baseline_measured_at, readiness, enacted_at,
-                     post_measured_at, retired_at, evidence)
-                 VALUES ($1, $2, $3, coalesce($4, '{{}}'::jsonb), $5, $6, $7,
-                         coalesce($8, '[]'::jsonb))
+                    (tenant_id, benefit_id, baseline_measured_at, baseline_value, readiness,
+                     enacted_at, post_measured_at, post_value, retired_at, evidence)
+                 VALUES ($1, $2, $3, $4, coalesce($5, '{{}}'::jsonb), $6, $7, $8, $9,
+                         coalesce($10, '[]'::jsonb))
                  RETURNING {TRANSITION_COLUMNS}"
             );
             let row: TransitionRecord = sqlx::query_as(AssertSqlSafe(sql))
                 .bind(tenant.as_uuid())
                 .bind(benefit_id)
                 .bind(patch.baseline_measured_at)
+                .bind(&patch.baseline_value)
                 .bind(&patch.readiness)
                 .bind(patch.enacted_at)
                 .bind(patch.post_measured_at)
+                .bind(&patch.post_value)
                 .bind(patch.retired_at)
                 .bind(&patch.evidence)
                 .fetch_one(&mut *conn)
@@ -3265,9 +3309,9 @@ pub struct BenefitRealization {
     pub post_measured_at: Option<DateTime<Utc>>,
     /// The operational area the improvement is attributed to.
     pub operational_area: String,
-    /// The baseline value, when the profile records one.
+    /// The baseline value the transition records, when it carries one.
     pub baseline_value: Option<f64>,
-    /// The post-transition value, when the transition's evidence records one.
+    /// The post-transition value the transition records, when it carries one.
     pub post_value: Option<f64>,
     /// `post - baseline`, when both values exist.
     pub delta: Option<f64>,
@@ -3280,15 +3324,14 @@ pub async fn benefit_realization_tx(
     tenant: TenantId,
     benefit_id: Uuid,
 ) -> Result<BenefitRealization, PlanStoreError> {
-    let profile: Option<(Value, String)> = sqlx::query_as(
-        "SELECT coalesce(baseline, '{}'::jsonb), operational_area FROM benefit_profile
-          WHERE tenant_id = $1 AND id = $2",
+    let operational_area: Option<String> = sqlx::query_scalar(
+        "SELECT operational_area FROM benefit_profile WHERE tenant_id = $1 AND id = $2",
     )
     .bind(tenant.as_uuid())
     .bind(benefit_id)
     .fetch_optional(&mut *conn)
     .await?;
-    let (baseline, operational_area) = profile.ok_or(PlanStoreError::NotFound {
+    let operational_area = operational_area.ok_or(PlanStoreError::NotFound {
         what: "benefit profile",
     })?;
     let transition = get_transition_tx(&mut *conn, tenant, benefit_id)
@@ -3297,19 +3340,16 @@ pub async fn benefit_realization_tx(
             what: "benefit realization",
             why: "the transition has not started",
         })?;
-    if transition.post_measured_at.is_some() && transition.baseline_measured_at.is_none() {
-        return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
-    }
-    let baseline_value = baseline.get("value").and_then(Value::as_f64).or_else(|| {
-        transition
-            .evidence
-            .get("baseline_value")
-            .and_then(Value::as_f64)
-    });
+    let baseline_value = transition
+        .baseline_value
+        .as_ref()
+        .and_then(Measurement::parse)
+        .map(|measurement| measurement.value);
     let post_value = transition
-        .evidence
-        .get("post_value")
-        .and_then(Value::as_f64);
+        .post_value
+        .as_ref()
+        .and_then(Measurement::parse)
+        .map(|measurement| measurement.value);
     let delta = match (baseline_value, post_value) {
         (Some(baseline), Some(post)) => Some(post - baseline),
         _ => None,
