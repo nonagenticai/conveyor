@@ -137,6 +137,22 @@ pub enum SnapshotError {
         /// Why it was refused.
         detail: String,
     },
+    /// The issue registry carries no `provenance.tenant`/`provenance.source` block.
+    #[error("issue registry {path}: no provenance; a registry must declare its tenant and source")]
+    IssuesProvenanceMissing {
+        /// The path the snapshot read.
+        path: String,
+    },
+    /// The issue registry was fetched for another tenant than the snapshot's.
+    #[error(
+        "issue registry declares tenant {declared:?}, but this snapshot is for tenant {requested:?}"
+    )]
+    IssuesTenantMismatch {
+        /// The tenant the registry names.
+        declared: String,
+        /// The tenant the snapshot was asked for.
+        requested: String,
+    },
 }
 
 /// Read one tenant and write every snapshot file.
@@ -182,7 +198,7 @@ pub async fn run_with_pool(
     let mut data = store::snapshot::snapshot_tx(&mut tx, tenant).await?;
     tx.rollback().await?;
 
-    let issues = read_issues(&args.issues)?;
+    let issues = read_issues(&args.issues, &args.tenant)?;
     let feedback = feedback_issues(&issues);
     // The rework register is a file input like the issue registry, but the flag is explicit:
     // an unreadable register or a wrong schema is refused, never silently omitted.
@@ -519,18 +535,69 @@ pub(crate) fn redact_text(text: &str) -> String {
 
 /// The issue registry written by `scripts/fetch-issues.sh`. Absent is not fatal: the app does
 /// not call GitHub at runtime, and a snapshot without the registry still renders every row.
-fn read_issues(path: &Path) -> Result<Value, SnapshotError> {
+///
+/// A registry that exists must name the tenant it was fetched for. The publisher runs in a
+/// multi-tenant estate: an image built for one tenant must never inject its registry into
+/// another tenant's programme, so a missing or foreign `provenance.tenant` is refused, never
+/// published.
+fn read_issues(path: &Path, tenant: &str) -> Result<Value, SnapshotError> {
     if !path.exists() {
         tracing::warn!(path = %path.display(), "issue registry absent; publishing no issue links");
         return Ok(json!({"issues": []}));
     }
     let text = std::fs::read_to_string(path)?;
     let value: Value = serde_json::from_str(&text)?;
-    Ok(if value.get("issues").is_some() {
+    let value = if value.get("issues").is_some() {
         value
     } else {
         json!({"issues": value})
-    })
+    };
+    let provenance =
+        value
+            .get("provenance")
+            .ok_or_else(|| SnapshotError::IssuesProvenanceMissing {
+                path: path.display().to_string(),
+            })?;
+    let declared = provenance
+        .get("tenant")
+        .and_then(Value::as_str)
+        .ok_or_else(|| SnapshotError::IssuesProvenanceMissing {
+            path: path.display().to_string(),
+        })?;
+    provenance
+        .get("source")
+        .and_then(Value::as_str)
+        .ok_or_else(|| SnapshotError::IssuesProvenanceMissing {
+            path: path.display().to_string(),
+        })?;
+    if declared != tenant {
+        return Err(SnapshotError::IssuesTenantMismatch {
+            declared: declared.to_owned(),
+            requested: tenant.to_owned(),
+        });
+    }
+    issue_registry_hash(value)
+}
+
+/// The registry's `provenance`, with the SHA-256 of its serialized `issues` array added, so the
+/// published programme names the tenant, source and exact content it was built from.
+///
+/// The live view stamps the same registry the same way, which keeps its wrapper and the CLI's
+/// byte-identical. A registry with no `provenance` object is returned unchanged: the hash
+/// describes a provenance block, and the live fallback (an image carrying no registry) has none.
+pub(crate) fn issue_registry_hash(mut registry: Value) -> Result<Value, SnapshotError> {
+    if !registry.get("provenance").is_some_and(Value::is_object) {
+        return Ok(registry);
+    }
+    let issues = registry.get("issues").cloned().unwrap_or_else(|| json!([]));
+    let digest = sha256_hex(serde_json::to_string(&issues)?.as_bytes());
+    if let Some(provenance) = registry
+        .get_mut("provenance")
+        .and_then(Value::as_object_mut)
+    {
+        provenance.insert("sha256".to_owned(), Value::String(digest));
+    }
+    Ok(registry)
 }
 
 /// The rework register `--conformance` names.

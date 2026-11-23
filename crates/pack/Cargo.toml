@@ -22,3 +22,7 @@ sqlx = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }
+
+[dev-dependencies]
+# The snapshot integration tests reuse `apps/server/tests/common` (an ephemeral Postgres 18).
+tokio = { workspace = true }
