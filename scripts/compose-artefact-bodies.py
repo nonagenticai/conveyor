@@ -19,6 +19,7 @@ import importlib.util
 import json
 import re
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any, NoReturn
 
@@ -163,37 +164,6 @@ def source_summary(entry: dict[str, Any], category: str) -> dict[str, Any]:
     }
 
 
-def source_is_self_document(
-    source: dict[str, Any],
-    template: dict[str, Any],
-    subject: dict[str, Any],
-    category: str,
-    gen,
-) -> bool:
-    """Does this source cite the artefact's own document category?
-
-    A heading sourced only by the document it is part of has no facts of its own: the
-    business case's Why now, Benefit map, Cost and risk posture and Licensing frame
-    headings all resolved to the business case itself, which is how a heading without
-    evidence passed the zero-row refusal. The match defaults to ``$category``, which is
-    the artefact's own category, so an omitted category is also self-reference.
-    """
-    if str(source.get("kind") or "") != "documents":
-        return False
-    own = str(template.get("document_category") or "")
-    if not own:
-        return False
-    wanted = str(
-        gen.substitute(
-            (source.get("match") or {}).get("category", "$category"),
-            subject,
-            own or category,
-            subject.get("phase"),
-        )
-    )
-    return wanted == own
-
-
 def source_count(
     gen,
     template: dict[str, Any],
@@ -301,19 +271,6 @@ def compose(
                 f"required heading {heading!r} declares no source",
                 heading=heading,
             )
-        active = [source for source in declared if not source.get("optional")]
-        if active and all(
-            source_is_self_document(source, template, subject, category, gen)
-            for source in active
-        ):
-            refuse(
-                "SELF_REFERENCE",
-                f"required heading {heading!r} cites only its own document "
-                f"{template.get('document_category')!r}; a heading may not cite the "
-                "artefact it is part of",
-                heading=heading,
-                category=str(template.get("document_category") or ""),
-            )
         absences: list[str] = []
         fallback_absences: list[str] = []
         for source in declared:
@@ -418,6 +375,116 @@ def compose(
     }
 
 
+def self_test_compose(gen) -> None:
+    """The mechanism through `compose()` itself, not only its helpers.
+
+    A helper test leaves the refusal and fallback unproven: deleting the guard or reverting the
+    fallback kept the old self-test green. These cases fail when the behaviour changes.
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        snapshot = {
+            "manifest": {"git_sha": "0" * 40, "generated_at": "2026-11-20T00:00:00Z"},
+            "programme": {
+                "programme": [{"id": "pg1", "name": "Fixture", "status": "active"}],
+                "projects": [{
+                    "id": "p1", "key": "P1", "programme_id": "pg1", "status": "active",
+                    "meta": {"measured_status": "active"},
+                }],
+            },
+            "msp": {
+                "register_items": [{"id": "i1", "kind": "issue", "title": "One issue", "status": "open"}],
+                "project_baselines": [
+                    {"id": "b1", "project_id": "p1", "kind": "scope", "approved_by": "u1", "approved_by_name": "a"},
+                    {"id": "b2", "project_id": "p1", "kind": "schedule", "approved_by": "u1", "approved_by_name": "a"},
+                    {"id": "b3", "project_id": "p1", "kind": "cost", "approved_by": "u1", "approved_by_name": "a"},
+                ],
+            },
+            "work": {"approvals": [
+                {"id": "ap1", "project_id": "p1", "gate": "baseline", "status": "approved"},
+            ]},
+        }
+        for name, document in snapshot.items():
+            (root / f"{name}.json").write_text(json.dumps(document), encoding="utf-8")
+        standard = {"templates": {
+            "probe": {
+                "required": ["Alpha", "Beta"],
+                "skeleton": "# Probe\n\n## Alpha\n\nA.\n\n## Beta\n\nB.\n",
+                "standard": "MSP", "level": "programme", "subject_kind": "programme",
+                "mandatory": True, "spec": "§8.3", "document_category": "probe",
+                "sources": {
+                    "Alpha": [{"kind": "rows", "file": "msp.json",
+                               "pointer": "/register_items", "match": {"kind": "issue"}}],
+                    "Beta": [{"kind": "absence", "record": "the beta record"}],
+                },
+            },
+            "project-baseline": {
+                "required": ["Scope", "Schedule", "Cost", "Approval"],
+                "skeleton": (
+                    "# Project Baseline\n\n## Scope\n\nS.\n\n## Schedule\n\nS.\n\n"
+                    "## Cost\n\nC.\n\n## Approval\n\nA.\n"
+                ),
+                "standard": "PMP", "level": "project", "subject_kind": "project",
+                "mandatory": True, "spec": "§8.4", "document_category": "project-baseline",
+                "sources": {
+                    "Scope": [{"kind": "rows", "file": "msp.json", "pointer": "/project_baselines",
+                               "match": {"project_id": "$subject_id", "kind": "scope"}}],
+                    "Schedule": [
+                        {"kind": "rows", "file": "msp.json", "pointer": "/project_baselines",
+                         "match": {"project_id": "$subject_id", "kind": "schedule"}},
+                        {"kind": "absence", "fallback": True, "record": "the schedule baseline"},
+                    ],
+                    "Cost": [
+                        {"kind": "rows", "file": "msp.json", "pointer": "/project_baselines",
+                         "match": {"project_id": "$subject_id", "kind": "cost"}},
+                        {"kind": "absence", "fallback": True, "record": "the cost baseline"},
+                    ],
+                    "Approval": [{"kind": "rows", "file": "work.json", "pointer": "/approvals",
+                                  "match": {"project_id": "$subject_id", "gate": "baseline"}}],
+                },
+            },
+        }}
+        summary = compose(gen, standard, snapshot, root, "probe", "programme", "pg1")
+        assert "_Explicit absence — the beta record._" in summary["body"], summary["body"]
+        assert "One issue" in summary["body"], summary["body"]
+        standard["templates"]["probe"]["sources"] = {
+            "Alpha": [{"kind": "absence", "record": "alpha"}],
+            "Beta": [{"kind": "absence", "record": "beta"}],
+        }
+        try:
+            compose(gen, standard, snapshot, root, "probe", "programme", "pg1")
+        except Refusal as exc:
+            assert exc.code == "NO_EVIDENCE", exc.code
+        else:
+            raise AssertionError("an all-absence body must refuse NO_EVIDENCE")
+        def section_text(body: str, heading: str) -> str:
+            parts: list[str] = []
+            current = ""
+            for line in body.splitlines():
+                if line.startswith("## "):
+                    current = line[3:].strip()
+                elif current == heading:
+                    parts.append(line)
+            return "\n".join(parts)
+
+        body = compose(gen, standard, snapshot, root, "project-baseline", "project", "p1")["body"]
+        scope = section_text(body, "Scope")
+        schedule = section_text(body, "Schedule")
+        cost = section_text(body, "Cost")
+        approval = section_text(body, "Approval")
+        assert '"b1"' in scope and '"b2"' not in scope and '"b3"' not in scope, scope
+        assert '"b2"' in schedule and '"b1"' not in schedule, schedule
+        assert '"b3"' in cost and '"b1"' not in cost, cost
+        assert '"ap1"' in approval, approval
+        snapshot["msp"]["project_baselines"] = [
+            row for row in snapshot["msp"]["project_baselines"] if row["kind"] != "schedule"
+        ]
+        body = compose(gen, standard, snapshot, root, "project-baseline", "project", "p1")["body"]
+        assert "_Explicit absence — the schedule baseline._" in body, body
+        assert "b1" in body and "b3" in body, body
+    sys.stdout.write("PASS self-test compose\n")
+
+
 def self_test() -> None:
     gen = load_generator()
     checks: list[tuple[str, bool]] = []
@@ -442,27 +509,12 @@ def self_test() -> None:
         source_label({"kind": "rows", "file": "programme.json", "pointer": "/projects"})
         == "programme.json#/projects",
     ))
-    checks.append((
-        "self_reference",
-        source_is_self_document(
-            {"kind": "documents", "match": {"category": "business-case"}},
-            {"document_category": "business-case"},
-            {"kind": "programme", "phase": None}, "business-case", gen,
-        ),
-    ))
-    checks.append((
-        "not_self_reference",
-        not source_is_self_document(
-            {"kind": "documents", "match": {"category": "benefit-profile"}},
-            {"document_category": "business-case"},
-            {"kind": "programme", "phase": None}, "business-case", gen,
-        ),
-    ))
     for name, ok in checks:
         if not ok:
             sys.stderr.write(f"compose-artefact-bodies self-test: FAIL {name}\n")
             raise SystemExit(1)
         sys.stdout.write(f"PASS self-test {name}\n")
+    self_test_compose(gen)
     sys.stdout.write("PASS self-test\n")
 
 
