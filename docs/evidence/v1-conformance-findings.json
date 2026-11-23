@@ -2177,12 +2177,12 @@
       "spec": "\u00a78.5",
       "severity": "P1",
       "title": "The trace chain stops at card/project: no run, step, artefact or evidence end",
-      "problem": "The trace-edge whitelist is governed_asset | card | project. The spec chain continues WBS deliverable \u2192 card \u2192 run \u2192 step \u2192 artefact/evidence \u2192 acceptance \u2192 closure; none of run, step, artefact or evidence is an addressable end, and there is no view action joining them. Gate evidence edges also fire only for evidence items whose kind is governed_asset, so typed run/artefact evidence never leaves an edge at all.",
+      "problem": "The trace-edge whitelist is governed_asset | card | project | document (document added 2026-11-23). The spec chain continues WBS deliverable \u2192 card \u2192 run \u2192 step \u2192 artefact/evidence \u2192 acceptance \u2192 closure; run, step, artefact and evidence are not addressable ends, and there is no view action joining them. Gate evidence edges also fire only for evidence items whose kind is governed_asset, so typed run/artefact evidence still cannot be linked.",
       "evidence": [
         {
           "path": "crates/store/src/trace_link.rs",
-          "line": 24,
-          "quote": "pub const END_TYPES: [&str; 3] = [\"governed_asset\", \"card\", \"project\"];"
+          "line": 25,
+          "quote": "pub const END_TYPES: [&str; 4] = [\"governed_asset\", \"card\", \"project\", \"document\"];"
         },
         {
           "path": "crates/actions/src/governance/views.rs",
@@ -5672,6 +5672,56 @@
       "failure_scenario": "An owner decision is published from a Markdown file through the byte path: the row is published and active, the pack omits it, the public reader cannot see the ruling, and a later reader of the pack believes no such decision exists. Re-issuing it with a project still fails while the body stays object-backed.",
       "acceptance": "A published decision is either rendered in the output index or the publish refuses with a reason naming the missing text body; a programme-level decision can be created project-scoped to PLATFORM through a text compose path and appears in `docs/outputs.js`; a test proves a byte-backed published document is refused at publish or surfaced in the index.",
       "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-std-broken-source",
+      "area": "\u00a78.3",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "severity": "P1",
+      "title": "A template whose source cannot resolve is a warning, not a finding",
+      "problem": "Five artefact source pointers do not resolve at the head: measure.json#/inference/by_project (the business case's 'Investment appraisal and cash flow', the programme brief's cost section, the programme strategies' resource strategy) and architecture.json#/compliance_reviews (governance assurance, programme strategies quality). generate-standards.py prints WARNING broken source lines and exits 1 only for stale files; no finding is emitted, so the register counts the artefact as a record gap and the business case can publish with an empty investment appraisal.",
+      "evidence": [
+        {
+          "path": "seed/output-standard.json",
+          "line": 910,
+          "quote": "            \"pointer\": \"/inference/by_project\""
+        },
+        {
+          "path": "seed/output-standard.json",
+          "line": 1090,
+          "quote": "            \"pointer\": \"/compliance_reviews\""
+        }
+      ],
+      "failure_scenario": "publish-programme-artefacts.py composes the business case with the 'Investment appraisal and cash flow' heading resolved from zero rows; the body passes validate_body (the heading is present) and the published case carries no quantified appraisal while the board reports only RECORD gaps.",
+      "acceptance": "generate-standards.py --findings-out emits a STANDARD finding for every unresolved source, naming its category and heading, and the artefact is partial until the source resolves; the five current pointers are either projected in crates/store/src/snapshot.rs (measure.json gains inference.by_project; architecture.json gains compliance_reviews) or the standard is corrected, and --check exits 0 with no broken-source warning.",
+      "owner_project": "PLATFORM",
+      "kind": "STANDARD"
+    },
+    {
+      "id": "v1-std-token-kpi",
+      "area": "\u00a78.3",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "severity": "P1",
+      "title": "The benefit profiles carry no comparative target for token spend per accepted deliverable",
+      "problem": "The six seeded benefit profiles (B1-B6) each carry a prose target and no kpis array; none defines B7, the owner KPI 'tokens per accepted deliverable'. The evaluation can compute the actual (9,458,468 tokens over 23 accepted deliverables = 411,238 at the 2026-11-23 snapshot) but no profile states the target or denominator it is compared with, so the programme cannot evidence that conveyor reduces token spend for equivalent work.",
+      "evidence": [
+        {
+          "path": "seed/programme-definition.json",
+          "line": 12,
+          "quote": "      \"target\": \"every choice has a decision row\","
+        },
+        {
+          "path": "migrations/0044_plan_spine.sql",
+          "line": 275,
+          "quote": "    kpis                jsonb NOT NULL DEFAULT '[]'::jsonb,"
+        }
+      ],
+      "failure_scenario": "A tranche review reports the six benefits as on track from prose targets; the token KPI is measured but has no baseline/target pair, so no variance can be computed and a cost regression passes the review unnoticed.",
+      "acceptance": "A B7 benefit profile exists with a numeric target and denominator for tokens per accepted deliverable, a baseline reading taken before its transition, and a post reading after enacted_at; the benefit evaluation cites the target and computes the variance; the published benefits registry shows B7.",
+      "owner_project": "PLATFORM",
+      "kind": "STANDARD"
     }
   ]
 }
