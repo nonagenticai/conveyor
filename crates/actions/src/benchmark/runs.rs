@@ -24,6 +24,9 @@ use crate::views::Page;
 /// The arms a run may name. `conveyor` exists in the schema and is refused until S18.
 pub(crate) const ARMS: [&str; 4] = ["gold", "empty", "baseline", "conveyor"];
 
+/// The one named process the process arm measures (S18 §5; `seed/processes/named.yaml`).
+pub const PROCESS_ARM_KEY: &str = "swebench-fix";
+
 /// The job that produces one `conveyor` case's patch (S18 step 1).
 ///
 /// One job per case, like S19's `eval.case.run`: `agent.run` is a bounded but *long* call, so it
@@ -208,17 +211,28 @@ async fn benchmark_runs_start(
             (Some(agent.version), Some(id), None, Some(snapshot))
         }
         "process" => {
-            // S18 §5 allows a `swebench-fix` process as the producer. A process run is
-            // card-scoped (`process_runs.start` takes a card), and a benchmark instance is not a
-            // card, so the process producer needs a mapping that does not exist. Refusing here
-            // is honest and matches S17's `baseline` arm: a run that could never produce a patch
-            // would fail only in the driver, one case at a time.
-            return Err(ActionError::new(
-                409,
-                "arm_not_ready",
-                "the process arm's producer is not built; a capability_agent subject is what \
-                 this build can measure",
-            ));
+            // S18 §5: the process arm's only producer is the catalogue's `swebench-fix` named
+            // process. Resolve the published version once, here, and pin its id and version: the
+            // producer then executes exactly the version the run names, never a later edit.
+            let id = input.process_id.ok_or_else(|| {
+                ActionError::new(
+                    409,
+                    "arm_not_ready",
+                    "a process subject must name the published swebench-fix process",
+                )
+            })?;
+            let record = store::process::get_process_tx(&mut *tx, ctx.tenant, id)
+                .await
+                .map_err(|error| subject_read_error(error, ACTION))?
+                .filter(|record| record.key == PROCESS_ARM_KEY && record.status == "published");
+            let Some(record) = record else {
+                return Err(ActionError::new(
+                    409,
+                    "arm_not_ready",
+                    "the process arm measures only the published swebench-fix process",
+                ));
+            };
+            (Some(record.version), None, Some(record.id), None)
         }
         _ => unreachable!("validated above"),
     };
