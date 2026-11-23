@@ -3167,6 +3167,26 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let project = seed_parity_project(pg, ctx).await;
             ctx.push("architecture.maturity_plan", project);
         }
+        // ── tenant-asset authoring (SPEC_V2 §5.7, T17 #87) ─────────────────────────────
+        "authoring.draft" => {
+            let intake = seed_parity_authoring_intake(pg, ctx).await;
+            ctx.push("authoring.draft", intake);
+        }
+        "authoring.review" => {
+            let (asset, approval) = seed_parity_authoring_draft(pg, ctx).await;
+            ctx.push("authoring.review.asset", asset);
+            ctx.push("authoring.review.approval", approval);
+        }
+        "authoring.publish" => {
+            let (asset, approval) = seed_parity_authoring_draft(pg, ctx).await;
+            scoped(pg, ctx, async move |conn| {
+                store::authoring::asset_review_tx(conn, ctx.tenant, asset, approval)
+                    .await
+                    .expect("review the prepared asset");
+            })
+            .await;
+            ctx.push("authoring.publish.asset", asset);
+        }
         _ => {}
     }
 }
