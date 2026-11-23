@@ -64,7 +64,7 @@ The route table is normative; `docs/SPEC_V2.md` §10.5 carries the same table, a
 | Destination | Route (app) | Screens | Owning slice | Spec |
 |---|---|---|---|---|
 | **Organisation** | `/organisation` | departments/jobs, catalogue + release, bindings, authority matrix, approval policies, refinements, laya config, job performance | T0, T2 | `organisation.spec.ts` |
-| **Procedures** | `/procedures` (V1: `/build/processes`, `/build/process-map`) | capability → procedure → step, SOP/RDF/OWL/BPMN intake, PDDL, PKO, pack pairing, process map, publish | T16 | `procedures.spec.ts` |
+| **Procedures** | `/procedures` (V1: `/build/processes`, `/build/process-map`) | capability → procedure → step, SOP/RDF/OWL/BPMN intake, PDDL, the knowledge-pack pairing, process map, publish | T16 | `procedures.spec.ts` |
 | **Authoring** | `/authoring` | intake queue, drafts, review/publish, dependency status | T17 | `authoring.spec.ts` |
 | **Portfolio** | `/portfolio`, `/portfolio/:programme_id` | in-flight set, shared config, dependency graph, WSJF, cadence, capacity, per-project metering, L1/L2 | T1, T10 | `portfolio.spec.ts` |
 | **Programme** | `/programme` | definition, benefits map/profiles, tranches/reviews, stakeholders, realisation | T10 | `programme.spec.ts` |
@@ -110,11 +110,19 @@ owning slice's existing actions or literal `GET`s; T18 adds neither. Write paths
   `refinements.list`, `laya_configs.list`, `ladder.list`; writes the create/update/release/retire
   verbs those families expose. Empty = no departments; denied = no `organisation:read`. Spec:
   `organisation.spec.ts`.
-- **Procedures** — reads `procedures.get/list`, `capabilities.get/list`, the process map and the
-  published pack; writes `procedures.create|update|publish|retire`, `procedures.ingest_*`,
-  `procedures.validate|review_source`, `capabilities.design|publish`. An unreviewed SOP-derived
-  procedure refuses publication (`409`); an unpublished pack refuses (`409 procedure_not_ready`).
-  Spec: `procedures.spec.ts`.
+- **Procedures** — reads `procedures.list|get`, `capabilities.list|get`, `processes.list|get`,
+  `approvals.list` and the published pack; writes `procedures.create|update|publish|retire`,
+  `procedures.ingest_sop|ingest_process|ingest_rdf`, `procedures.validate|review_source`, and the
+  two publication gates through `approvals.request|decide`. An unreviewed source refuses
+  publication (`422 source.unapproved`); an invalid judge contract refuses (`422
+  procedure.inspection`); a PDDL step the parser rejects refuses (`422 pddl.invalid`) and names
+  the step. `capabilities.design|publish` are not registered; T16's ingest creates the
+  capability. The PKO workspace was ruled out by the owner on 2026-11-19 (PR #419) and is
+  replaced by the knowledge-pack pairing. Spec: `procedures.spec.ts`.
+- **Execution** — reads `runs.list|get`; renders the run's steps, gates, process, inputs and tree
+  (the provenance and explain-context) at `/execution`. The executor kind, `job_binding_id` and
+  `release_hash` are not exposed by the run read model (T0/T4/S21), and the tools panel needs
+  `tool_calls.list` (T13); the screen names both gaps. Spec: `execution.spec.ts`.
 - **Authoring** — reads `authoring.assets`, the draft queue and dependency status; writes
   `authoring.intake|draft|review|publish`. A draft whose asset is unpublished refuses
   `422 asset_dependency_unpublished`. Spec: `authoring.spec.ts`.
@@ -185,9 +193,14 @@ render and write through their actions.
 
 ### W3 — Procedures, Capabilities, Authoring, Execution, Run history (issue #564)
 
-Files: `app.rs`, `screens/{procedures,capabilities,authoring,execution,runs}.rs`, `mod.rs`, e2e
-specs. Acceptance: SOP/RDF/OWL/BPMN intake, the PDDL/PKO workspace, the pack pairing and publish
-gates; the authoring draft/review/publish gates; the execution room's tools panel and explain-context.
+Files: `app.rs`, `screens/{procedures,execution}.rs`, `mod.rs`,
+`e2e/{procedures,authoring,execution}.spec.ts`. Acceptance: SOP/RDF/OWL/BPMN intake, the PDDL step
+workspace, the knowledge-pack pairing and the two publication gates from the real T16 actions; the
+capability catalogue as a read-only section (T16's ingest creates capabilities); the Authoring
+route is the honest gate naming T17 (no `authoring.*` action exists); the execution room renders
+the run's provenance and names the missing executor/pin and T13 tool ledger. The PKO workspace is
+not restored (owner decision 2026-11-19). Capabilities is not a separate route; `runs.rs` stays the
+V1 queue.
 
 ### W4 — Tools, Metering, Operations, Improve (issue #565)
 
@@ -208,7 +221,8 @@ The §12 T18 gate, proved by the five units together: every destination route ex
 destination has its spec, the V2 coverage record reports `exists` from real routes and specs, and
 the T12 loop runs from the app. A unit's own gate is its spec plus `web.yml`; the project closes
 when all five are merged and the coverage record has no destination `new`/`extend` without a named
-owner.
+owner. A gate is not a destination: `build-v2-coverage.py` reports `extend` for a `*Gate` view even
+when its gate spec exists, naming the owning slice; only a real screen reports `exists`.
 
 ## 9. Dependencies
 

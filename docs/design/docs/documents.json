@@ -42,8 +42,8 @@
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "eb3dd5dfb95629956ba6b4b23d19b160dec27a72d4ab6af10615664331442482",
-      "bytes": 195885,
+      "sha256": "53e9f4d033bfa9fa6d05677494a24a983dd660be05741ffac33edc74e6d30f5d",
+      "bytes": 196027,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -600,8 +600,8 @@
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "2543e7b16d80afee1090d8694c1fe11207f955a9f327589c3929a56dfbb0ee20",
-      "bytes": 13992,
+      "sha256": "fc5e16d4b6d351e1d45eff56951dd6917f761da80a82ce3227e9c27d9c73cb70",
+      "bytes": 14715,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -726,8 +726,8 @@
       "path": "docs/plans/T18-real-v2-ui.html",
       "source": "docs/plans/T18-real-v2-ui.md",
       "section": "Plans",
-      "sha256": "d7788d99bef64cd2988433c5deb0ebdf60cbafde34453b04718ec9985ebfe75e",
-      "bytes": 15774,
+      "sha256": "856f35830ac643e60d42be2a90794287823f15e82a535bbe19f88cfbc63dfa1f",
+      "bytes": 17090,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18-real-v2-ui.md"
     },
     {
@@ -735,8 +735,8 @@
       "path": "docs/plans/T18/architecture-design.html",
       "source": "docs/plans/T18/architecture-design.md",
       "section": "Plans",
-      "sha256": "f106e4bc5763a242a949f56afb79206d9d37ba1e4d917730ce8b500f6cb2e182",
-      "bytes": 5908,
+      "sha256": "8f6e0b4e433229ef620dd6a5ea5a3948035183361bd7d013d80ce4925324ee28",
+      "bytes": 6641,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18/architecture-design.md"
     },
     {

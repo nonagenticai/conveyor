@@ -21,6 +21,7 @@ use crate::screens::cockpit::Cockpit;
 use crate::screens::copilot::CopilotScreen;
 use crate::screens::decision_inbox::DecisionInboxScreen;
 use crate::screens::evals::{EvalDetail, Evals};
+use crate::screens::execution::ExecutionScreen;
 use crate::screens::improvement::Improvement;
 use crate::screens::inference::InferenceEndpoint;
 use crate::screens::jobs::JobsScreen;
@@ -29,6 +30,7 @@ use crate::screens::models::{ModelDetail, ModelsScreen};
 use crate::screens::organisation::OrganisationScreen;
 use crate::screens::plan::PlanScreen;
 use crate::screens::platform::Platform;
+use crate::screens::procedures::ProceduresScreen;
 use crate::screens::process_map::{ProcessMapDetail, ProcessMapList};
 use crate::screens::processes::{ProcessDetail, ProcessesScreen};
 use crate::screens::project_types::ProjectTypesScreen;
@@ -43,7 +45,7 @@ use crate::screens::today::Today;
 use crate::screens::usage::Usage;
 use crate::screens::v2::{
     AdmGate, AuthoringGate, ImproveGate, KnowledgeGate, OperationsGate, PortfolioScreen,
-    ProceduresGate, ProgrammeScreen, ToolsGate,
+    ProgrammeScreen, ToolsGate,
 };
 use crate::screens::validation::ValidationScreen;
 use crate::state::AppCtx;
@@ -186,7 +188,8 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/agents") view=AgentsScreen/>
                             <Route path=path!("/decisions") view=DecisionInboxScreen/>
                             <Route path=path!("/project-types") view=ProjectTypesScreen/>
-                            <Route path=path!("/procedures") view=ProceduresGate/>
+                            <Route path=path!("/procedures") view=ProceduresScreen/>
+                            <Route path=path!("/execution") view=ExecutionScreen/>
                             <Route path=path!("/authoring") view=AuthoringGate/>
                             <Route path=path!("/plan") view=PlanScreen/>
                             <Route path=path!("/validation") view=ValidationScreen/>
@@ -302,6 +305,9 @@ fn Sidebar() -> impl IntoView {
                 })}
                 <li><A href="/boards"><span class="nav-item">"Board"</span></A></li>
                 <li><A href="/runs"><span class="nav-item">"Runs"</span></A></li>
+                {move || ctx.has_action("runs.list").then(|| view! {
+                    <li><A href="/execution"><span class="nav-item">"Execution room"</span></A></li>
+                })}
                 {move || ctx.has_action("approvals.list").then(|| view! {
                     <li><A href="/approvals"><span class="nav-item">"Approvals"</span></A></li>
                 })}

@@ -40,6 +40,9 @@ OUT_MD = ROOT / "docs/evidence/v2-coverage.md"
 
 BACKTICK = re.compile(r"`([^`]+)`")
 ROUTE = re.compile(r'path!\(\s*"([^"]+)"\s*\)')
+ROUTE_VIEW = re.compile(
+    r'<Route\s+path=path!\(\s*"([^"]+)"\s*\)\s+view=([A-Za-z_][A-Za-z0-9_]*)\s*/>'
+)
 
 
 def section(text: str, start: str, end: str) -> str:
@@ -139,6 +142,16 @@ def app_route_paths(text: str) -> set[str]:
     return set(ROUTE.findall(text))
 
 
+def app_route_views(text: str) -> dict[str, str]:
+    """The component each `<Route … view=…/>` renders, by route pattern.
+
+    A route whose view ends in `Gate` is the honest "not yet live" page for a destination whose
+    owning slice is absent; it keeps the route honest but it is not the destination (SPEC_V2
+    §10.5.2 and D65). The spec file alone must not turn a gate into `exists`.
+    """
+    return {path: view for path, view in ROUTE_VIEW.findall(text)}
+
+
 def app_routes() -> set[str]:
     return app_route_paths(APP.read_text())
 
@@ -169,14 +182,17 @@ def destination_rows(body: str) -> list[dict]:
                 "destination": destination,
                 "v2": v2_routes,
                 "v1": v1_routes,
+                "owner": cells[3].replace("*", "").replace("`", "").strip(),
                 "spec": specs[0] if specs else "",
             }
         )
     return rows
 
 
-def destination_verdict(row: dict, routes: set[str], specs: set[str]) -> tuple[str, list[str]]:
-    """`exists` needs the real route and its spec; an ancestor can only justify `extend`."""
+def destination_verdict(
+    row: dict, routes: set[str], specs: set[str], views: dict[str, str]
+) -> tuple[str, list[str]]:
+    """`exists` needs the real route and its spec; an ancestor or a gate is only `extend`."""
     v2_found = [path for path in row["v2"] if path in routes]
     v1_found = [path for path in row["v1"] if path in routes]
     spec = row["spec"]
@@ -196,6 +212,17 @@ def destination_verdict(row: dict, routes: set[str], specs: set[str]) -> tuple[s
     if page:
         evidence.append(f"docs/design/v2.js: page {page!r} — design reference, not implementation")
     v2_all = len(v2_found) == len(row["v2"])
+    # A gate keeps a deep link honest, but it is not the destination. Even with its own spec it
+    # cannot be `exists`: the spec asserts the gate, not the screen (SPEC_V2 §10.5.2/D65).
+    gate_views = [views.get(path, "") for path in v2_found]
+    all_gates = v2_all and bool(gate_views) and all(view.endswith("Gate") for view in gate_views)
+    if all_gates:
+        for path, view in zip(v2_found, gate_views):
+            evidence.append(
+                f"apps/web/src/app.rs: route {path!r} renders {view} "
+                f"(a gate; owner: {row['owner'] or 'unassigned'})"
+            )
+        return "extend", evidence
     if v2_all and spec_present:
         return "exists", evidence
     if v2_all or v1_found:
@@ -215,6 +242,7 @@ def build() -> dict:
     migrations = migration_text()
     names = action_names()
     routes = app_routes()
+    views = app_route_views(APP.read_text())
     specs = e2e_specs()
     overrides = load_overrides()
 
@@ -255,7 +283,7 @@ def build() -> dict:
 
     ui_body = section(text, "### 10.5 UI additions", "### 10.6")
     for row in destination_rows(ui_body):
-        verdict, evidence = destination_verdict(row, routes, specs)
+        verdict, evidence = destination_verdict(row, routes, specs, views)
         add(f"destination:{row['destination']}", "§10.5", "destination", row["destination"], verdict, evidence)
 
     counts: dict[str, int] = {}
@@ -274,7 +302,7 @@ def build() -> dict:
         ],
         "verdicts": {
             "exists": "the real route and its Playwright spec exist",
-            "extend": "a V1 ancestor route exists, or the V2 route exists without its spec",
+            "extend": "a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner",
             "new": "neither the route nor an ancestor exists",
         },
         "counts": dict(sorted(counts.items())),
@@ -328,10 +356,16 @@ def self_test() -> None:
         ("Gamma", {"gamma.spec.ts"}, "new"),
     ]
     for destination, specs, expected in cases:
-        verdict, evidence = destination_verdict(rows[destination], routes, specs)
+        verdict, evidence = destination_verdict(rows[destination], routes, specs, {})
         assert verdict == expected, (destination, verdict, evidence)
     app = 'view! { <Route path=path!("/alpha") view=A/> <Route path=path!("/alpha/:id") view=B/> }'
     assert app_route_paths(app) == {"/alpha", "/alpha/:id"}, app_route_paths(app)
+    assert app_route_views(app) == {"/alpha": "A", "/alpha/:id": "B"}, app_route_views(app)
+    gate_app = 'view! { <Route path=path!("/gamma") view=GammaGate/> }'
+    gate_views = app_route_views(gate_app)
+    verdict, evidence = destination_verdict(rows["Gamma"], {"/gamma"}, {"gamma.spec.ts"}, gate_views)
+    assert verdict == "extend", (verdict, evidence)
+    assert any("a gate; owner: T2" in line for line in evidence), evidence
     print("build-v2-coverage: self-test OK")
 
 
