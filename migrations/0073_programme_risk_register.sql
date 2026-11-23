@@ -1,4 +1,4 @@
--- 0072_programme_risk_register.sql — a risk belongs to a project OR a programme
+-- 0073_programme_risk_register.sql — a risk belongs to a project OR a programme
 -- (SPEC_V2 §8.3, §8.4; ADR 0010 docs/decisions/0010-no-deferrals.md; plan v5 §4.1).
 --
 -- 0044's `project_register_item.project_id` was NOT NULL, so the programme's operated risk

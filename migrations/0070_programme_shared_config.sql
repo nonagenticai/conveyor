@@ -1,4 +1,4 @@
--- 0069_programme_shared_config.sql — the programme's shared configuration (SPEC_V2 §8.2).
+-- 0070_programme_shared_config.sql — the programme's shared configuration (SPEC_V2 §8.2).
 --
 -- A programme carries `shared_config` beside its dependency graph, cadence and standing
 -- backlog. The shape is `{ "values": { key: value }, "locked": [key, ...] }`; a flat object is
