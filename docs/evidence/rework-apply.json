@@ -36,6 +36,12 @@
       "card_id": "01a1ffe9-557f-7390-bc56-8d70f35106c5",
       "severity": "P0"
     },
+    "dr-w3-gov-assets-1:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:24:59+00:00",
+      "card_id": "01a207b9-12c6-7e14-a2b8-86b7771ab0d8",
+      "severity": "P1"
+    },
     "pi_plan_missing:tranche-2": {
       "apply_to": "PLATFORM",
       "at": "2026-11-21T21:01:52+00:00",
@@ -84,6 +90,42 @@
       "card_id": "01a1ffea-3d79-7ae4-9f9a-423047c00ab8",
       "severity": "P0"
     },
+    "v1-outputs-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:24:59+00:00",
+      "card_id": "01a207b9-1449-7c88-aabb-451d89da3ffa",
+      "severity": "P1"
+    },
+    "v1-p101-1:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:24:59+00:00",
+      "card_id": "01a207b9-148b-76ef-b1a8-a2e383d9036c",
+      "severity": "P1"
+    },
+    "v1-p112-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:24:59+00:00",
+      "card_id": "01a207b9-14ca-7212-ad77-220b4086dd58",
+      "severity": "P1"
+    },
+    "v1-p116-1:T13": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:24:59+00:00",
+      "card_id": "01a207b9-150a-7092-8d04-06e34b5ef782",
+      "severity": "P1"
+    },
+    "v1-p119-1:T5": {
+      "apply_to": "T5",
+      "at": "2026-11-23T09:24:59+00:00",
+      "card_id": "01a207b9-15bc-73b8-8dd7-7a2dd48475d0",
+      "severity": "P1"
+    },
+    "v1-p45-1:T0": {
+      "apply_to": "T0",
+      "at": "2026-11-23T09:25:00+00:00",
+      "card_id": "01a207b9-166e-7eea-8092-99970253a994",
+      "severity": "P1"
+    },
     "v1-p5-1:PLATFORM": {
       "apply_to": "PLATFORM",
       "at": "2026-11-21T21:02:02+00:00",
@@ -96,17 +138,65 @@
       "card_id": "01a1ffea-af57-7cc4-b680-6314108c9947",
       "severity": "P0"
     },
+    "v1-p5-5:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:00+00:00",
+      "card_id": "01a207b9-16b0-7ce7-a139-9d1e32412402",
+      "severity": "P1"
+    },
+    "v1-p52-1:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:00+00:00",
+      "card_id": "01a207b9-16f0-7dc9-a1ae-609075b5f8ba",
+      "severity": "P1"
+    },
+    "v1-p54-2:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:00+00:00",
+      "card_id": "01a207b9-1731-7571-9735-c61717e8a2c2",
+      "severity": "P1"
+    },
     "v1-p6-1:T4": {
       "apply_to": "PLATFORM",
       "at": "2026-11-21T21:01:55+00:00",
       "card_id": "01a1ffea-6b7c-7b9d-9a97-d747bd6c91ac",
       "severity": "P0"
     },
+    "v1-p6-3:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:24:59+00:00",
+      "card_id": "01a207b9-1409-7043-a5df-4a2c69ce25d8",
+      "severity": "P1"
+    },
+    "v1-p61-1:T3": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:00+00:00",
+      "card_id": "01a207b9-1771-7cdc-88a9-848659b82976",
+      "severity": "P1"
+    },
+    "v1-p66-1:T0": {
+      "apply_to": "T0",
+      "at": "2026-11-23T09:25:00+00:00",
+      "card_id": "01a207b9-17b4-7e3f-bc8c-d5cf02fd6907",
+      "severity": "P1"
+    },
     "v1-p75-1:T11": {
       "apply_to": "T11",
       "at": "2026-11-21T21:02:24+00:00",
       "card_id": "01a1ffea-dc29-7042-a1e6-6650cd4e214b",
       "severity": "P0"
+    },
+    "v1-p75-5:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:00+00:00",
+      "card_id": "01a207b9-17f4-73f9-bad7-6284f90be6f1",
+      "severity": "P1"
+    },
+    "v1-p76-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:00+00:00",
+      "card_id": "01a207b9-1834-7fcc-afc2-ab938883ec84",
+      "severity": "P1"
     },
     "v1-p81-1:T9": {
       "apply_to": "PLATFORM",
@@ -126,11 +216,71 @@
       "card_id": "01a1ffeb-5fd8-7f91-adfd-fbe5716a699c",
       "severity": "P0"
     },
+    "v1-p81-4:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-2054-7a1f-8e2e-721411173ec2",
+      "severity": "P1"
+    },
+    "v1-p81-5:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-2094-7170-9b51-0dabf24a9c44",
+      "severity": "P1"
+    },
     "v1-p82-1:T10": {
       "apply_to": "PLATFORM",
       "at": "2026-11-21T21:01:59+00:00",
       "card_id": "01a1ffea-79b1-79e3-bfef-b22726135492",
       "severity": "P0"
+    },
+    "v1-p83-1:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:24:59+00:00",
+      "card_id": "01a207b9-1307-75b2-8d11-7e43f6fddaf8",
+      "severity": "P1"
+    },
+    "v1-p83-3:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:24:59+00:00",
+      "card_id": "01a207b9-1347-721a-8f9a-673974bc6a07",
+      "severity": "P1"
+    },
+    "v1-p83-4:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:24:59+00:00",
+      "card_id": "01a207b9-1385-75dc-97df-24d70f0408d4",
+      "severity": "P1"
+    },
+    "v1-p83-5:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:24:59+00:00",
+      "card_id": "01a207b9-13c6-7846-9963-ccc68d7acf79",
+      "severity": "P1"
+    },
+    "v1-p91-1:T6": {
+      "apply_to": "T6",
+      "at": "2026-11-23T09:25:00+00:00",
+      "card_id": "01a207b9-1920-7189-b023-896b6c68ec5c",
+      "severity": "P1"
+    },
+    "v1-p93-1:T5": {
+      "apply_to": "T5",
+      "at": "2026-11-23T09:25:00+00:00",
+      "card_id": "01a207b9-1961-7749-ad73-ca9e121b4aa7",
+      "severity": "P1"
+    },
+    "v1-p93-2:T6": {
+      "apply_to": "T6",
+      "at": "2026-11-23T09:25:00+00:00",
+      "card_id": "01a207b9-19a1-7eaa-873d-42f5faacd63e",
+      "severity": "P1"
+    },
+    "v1-pack-5:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:01+00:00",
+      "card_id": "01a207b9-19e1-74bc-b1f6-0d780adb68c8",
+      "severity": "P1"
     },
     "v1-pack-6:PLATFORM": {
       "apply_to": "PLATFORM",
@@ -138,17 +288,125 @@
       "card_id": "01a1ffea-e7c0-7e2f-b3c0-ecf72a9eb689",
       "severity": "P0"
     },
+    "v1-s05-1:S05": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:01+00:00",
+      "card_id": "01a207b9-1a23-74a2-8616-53391e653484",
+      "severity": "P1"
+    },
+    "v1-s06-2:S06": {
+      "apply_to": "S06",
+      "at": "2026-11-23T09:24:59+00:00",
+      "card_id": "01a207b9-120a-7df7-876d-ff575dd3ba69",
+      "severity": "P0"
+    },
+    "v1-s06-4:S06": {
+      "apply_to": "S06",
+      "at": "2026-11-23T09:25:01+00:00",
+      "card_id": "01a207b9-1a66-7635-ba2b-9fefa8af0a9d",
+      "severity": "P1"
+    },
+    "v1-s07-1:S07": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:01+00:00",
+      "card_id": "01a207b9-1aa6-7fc7-bd3b-a0bcc21c93ba",
+      "severity": "P1"
+    },
+    "v1-s08-1:S08": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:01+00:00",
+      "card_id": "01a207b9-1ae6-743f-a003-db19c9f3e28a",
+      "severity": "P1"
+    },
+    "v1-s09-1:S09": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:01+00:00",
+      "card_id": "01a207b9-1b26-7dbe-8eb1-67af51d019e5",
+      "severity": "P1"
+    },
+    "v1-s10-2:S10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:01+00:00",
+      "card_id": "01a207b9-1b67-7368-910c-d0c4540f0fab",
+      "severity": "P1"
+    },
+    "v1-s13-1:S13": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:01+00:00",
+      "card_id": "01a207b9-1ba9-76d2-aad9-deee79210102",
+      "severity": "P1"
+    },
+    "v1-s17-1:S17": {
+      "apply_to": "S17",
+      "at": "2026-11-23T09:25:01+00:00",
+      "card_id": "01a207b9-1c96-7a25-a2b6-9a3c54e39927",
+      "severity": "P1"
+    },
+    "v1-std-broken-source:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:26:09+00:00",
+      "card_id": "01a207ba-2418-7549-9037-6126bb368854",
+      "severity": "P1"
+    },
+    "v1-std-token-kpi:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:26:09+00:00",
+      "card_id": "01a207ba-245e-7a5d-bb34-2305f0823167",
+      "severity": "P1"
+    },
     "v1-w1a-2:T0": {
       "apply_to": "T0",
       "at": "2026-11-21T21:02:38+00:00",
       "card_id": "01a1ffeb-10fc-721d-a1f9-308a4b7c3b4b",
       "severity": "P0"
     },
+    "v1-w1a-4:T0": {
+      "apply_to": "T0",
+      "at": "2026-11-23T09:25:01+00:00",
+      "card_id": "01a207b9-1cd7-73b0-9d06-46c371ca8aa0",
+      "severity": "P1"
+    },
+    "v1-w1a-5:T0": {
+      "apply_to": "T0",
+      "at": "2026-11-23T09:25:01+00:00",
+      "card_id": "01a207b9-1d17-7003-bc5c-3b6bb1a6e81f",
+      "severity": "P1"
+    },
+    "v1-w1b-3:T5": {
+      "apply_to": "T5",
+      "at": "2026-11-23T09:25:01+00:00",
+      "card_id": "01a207b9-1d56-73d3-950c-f195d834b52d",
+      "severity": "P1"
+    },
+    "v1-w1b-4:T7": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-1da3-7ff2-a05b-d0ac26fbc1d3",
+      "severity": "P1"
+    },
+    "v1-w1b-5:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-1de6-7251-a215-a340afb2ecec",
+      "severity": "P1"
+    },
     "v1-w1c-2:T2": {
       "apply_to": "PLATFORM",
       "at": "2026-11-21T21:02:41+00:00",
       "card_id": "01a1ffeb-1c16-76f9-be67-5dea3016b303",
       "severity": "P0"
+    },
+    "v1-w2a-3:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-20d5-75f7-a01a-ca13320b40ed",
+      "severity": "P1"
+    },
+    "v1-w2a-4:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-2116-7024-abf2-2392ba34112f",
+      "severity": "P1"
     },
     "v1-w2b-2:T10": {
       "apply_to": "PLATFORM",
@@ -162,11 +420,47 @@
       "card_id": "01a1ffea-53c7-7da2-a240-7d2a6c6fe796",
       "severity": "P0"
     },
+    "v1-w2c-5:S07": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-2158-768a-ac48-32c9cfd75dd5",
+      "severity": "P1"
+    },
+    "v1-w2c-6:S07": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:03+00:00",
+      "card_id": "01a207b9-2199-7287-8652-0e41afd26507",
+      "severity": "P1"
+    },
     "v1-w3a-1:T7": {
       "apply_to": "PLATFORM",
       "at": "2026-11-21T21:03:23+00:00",
       "card_id": "01a1ffeb-c188-7619-bc69-536eccded212",
       "severity": "P0"
+    },
+    "v1-w3a-5:T7": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-1e25-7a96-8e43-68beffc6c194",
+      "severity": "P1"
+    },
+    "v1-w3b-2:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-1e66-74f6-8101-cb358390553a",
+      "severity": "P1"
+    },
+    "v1-w3c-2:T14": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-1eaa-7317-82b9-bd46d22db05e",
+      "severity": "P1"
+    },
+    "v1-w3c-4:T8": {
+      "apply_to": "T8",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-1f94-71be-a639-cdb9de27e989",
+      "severity": "P1"
     },
     "v1-w4a-1:T13": {
       "apply_to": "PLATFORM",
@@ -179,13 +473,45 @@
       "at": "2026-11-21T21:02:49+00:00",
       "card_id": "01a1ffeb-3da6-7093-a936-be6c79576976",
       "severity": "P0"
+    },
+    "v1-w4a-6:T13": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-1fd3-7b1e-99fc-e0cf7347e6b5",
+      "severity": "P1"
+    },
+    "v1-w4b-3:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:25:02+00:00",
+      "card_id": "01a207b9-2013-7ed9-a6eb-ed90f51b87f6",
+      "severity": "P1"
     }
   },
   "cleared": [
-    "closed_without_closure_review:DESIGN-PUBLISH"
+    "closed_without_closure_review:DESIGN-PUBLISH",
+    "closed_without_closure_review:T2",
+    "pi_plan_missing:tranche-2",
+    "project_in_unauthorised_tranche:tranche-3",
+    "project_in_unauthorised_tranche:tranche-4",
+    "v1-p5-1:PLATFORM",
+    "v1-p5-2:T1",
+    "v1-p6-1:T4",
+    "v1-p75-1:T11",
+    "v1-p81-1:T9",
+    "v1-p81-2:T9",
+    "v1-p81-3:T9",
+    "v1-p82-1:T10",
+    "v1-pack-6:PLATFORM",
+    "v1-w1a-2:T0",
+    "v1-w1c-2:T2",
+    "v1-w2b-2:T10",
+    "v1-w2c-3:T3",
+    "v1-w3a-1:T7",
+    "v1-w4a-1:T13",
+    "v1-w4a-2:T13"
   ],
   "failures": [],
   "schema": "conveyor-rework-apply/v1",
   "tenant": "nonagentic",
-  "updated_at": "2026-11-21T21:03:23+00:00"
+  "updated_at": "2026-11-23T09:26:09+00:00"
 }

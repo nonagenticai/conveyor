@@ -7320,6 +7320,158 @@
       "title": "Closure bypasses the closure review and the realisation plan"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-std-broken-source:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "§8.3",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "generate-standards.py --findings-out emits a STANDARD finding for every unresolved source, naming its category and heading, and the artefact is partial until the source resolves; the five current pointers are either projected in crates/store/src/snapshot.rs (measure.json gains inference.by_project; architecture.json gains compliance_reviews) or the standard is corrected, and --check exits 0 with no broken-source warning.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 910,
+              "path": "seed/output-standard.json",
+              "quote": "            \"pointer\": \"/inference/by_project\"",
+              "source": "code"
+            },
+            {
+              "line": 1090,
+              "path": "seed/output-standard.json",
+              "quote": "            \"pointer\": \"/compliance_reviews\"",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-std-broken-source",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-std-broken-source:PLATFORM",
+      "kind": "STANDARD",
+      "owner_project": "PLATFORM",
+      "rule": "v1-std-broken-source",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "Five artefact source pointers do not resolve at the head: measure.json#/inference/by_project (the business case's 'Investment appraisal and cash flow', the programme brief's cost section, the programme strategies' resource strategy) and architecture.json#/compliance_reviews (governance assurance, programme strategies quality). generate-standards.py prints WARNING broken source lines and exits 1 only for stale files; no finding is emitted, so the register counts the artefact as a record gap and the business case can publish with an empty investment appraisal.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 910,
+                  "path": "seed/output-standard.json",
+                  "quote": "            \"pointer\": \"/inference/by_project\"",
+                  "source": "code"
+                },
+                {
+                  "line": 1090,
+                  "path": "seed/output-standard.json",
+                  "quote": "            \"pointer\": \"/compliance_reviews\"",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-std-broken-source",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "A template whose source cannot resolve is a warning, not a finding"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-std-token-kpi:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "§8.3",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A B7 benefit profile exists with a numeric target and denominator for tokens per accepted deliverable, a baseline reading taken before its transition, and a post reading after enacted_at; the benefit evaluation cites the target and computes the variance; the published benefits registry shows B7.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 12,
+              "path": "seed/programme-definition.json",
+              "quote": "      \"target\": \"every choice has a decision row\",",
+              "source": "code"
+            },
+            {
+              "line": 275,
+              "path": "migrations/0044_plan_spine.sql",
+              "quote": "    kpis                jsonb NOT NULL DEFAULT '[]'::jsonb,",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-std-token-kpi",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-std-token-kpi:PLATFORM",
+      "kind": "STANDARD",
+      "owner_project": "PLATFORM",
+      "rule": "v1-std-token-kpi",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The six seeded benefit profiles (B1-B6) each carry a prose target and no kpis array; none defines B7, the owner KPI 'tokens per accepted deliverable'. The evaluation can compute the actual (9,458,468 tokens over 23 accepted deliverables = 411,238 at the 2026-11-23 snapshot) but no profile states the target or denominator it is compared with, so the programme cannot evidence that conveyor reduces token spend for equivalent work.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 12,
+                  "path": "seed/programme-definition.json",
+                  "quote": "      \"target\": \"every choice has a decision row\",",
+                  "source": "code"
+                },
+                {
+                  "line": 275,
+                  "path": "migrations/0044_plan_spine.sql",
+                  "quote": "    kpis                jsonb NOT NULL DEFAULT '[]'::jsonb,",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-std-token-kpi",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "The benefit profiles carry no comparative target for token spend per accepted deliverable"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-pmp-closure-review-design-publish:DESIGN-PUBLISH",
       "apply_to": "PLATFORM",
       "artefact": "closure-review",
@@ -18139,9 +18291,9 @@
         {
           "evidence": [
             {
-              "line": 709,
+              "line": 703,
               "path": "crates/actions/src/ops/incidents.rs",
-              "quote": "    if meta.get(META_MITIGATED_AT).is_none() {",
+              "quote": "async fn ops_postmortem(",
               "source": "code"
             },
             {
@@ -18151,9 +18303,9 @@
               "source": "code"
             },
             {
-              "line": 846,
+              "line": 851,
               "path": "crates/actions/src/ops/incidents.rs",
-              "quote": "    if meta.get(META_MITIGATED_AT).is_none() {",
+              "quote": "            \"a resolution follows a mitigation; none has been recorded\",",
               "source": "code"
             },
             {
@@ -18185,9 +18337,9 @@
             {
               "evidence": [
                 {
-                  "line": 709,
+                  "line": 703,
                   "path": "crates/actions/src/ops/incidents.rs",
-                  "quote": "    if meta.get(META_MITIGATED_AT).is_none() {",
+                  "quote": "async fn ops_postmortem(",
                   "source": "code"
                 },
                 {
@@ -18197,9 +18349,9 @@
                   "source": "code"
                 },
                 {
-                  "line": 846,
+                  "line": 851,
                   "path": "crates/actions/src/ops/incidents.rs",
-                  "quote": "    if meta.get(META_MITIGATED_AT).is_none() {",
+                  "quote": "            \"a resolution follows a mitigation; none has been recorded\",",
                   "source": "code"
                 },
                 {
@@ -30246,9 +30398,9 @@
         {
           "evidence": [
             {
-              "line": 24,
+              "line": 25,
               "path": "crates/store/src/trace_link.rs",
-              "quote": "pub const END_TYPES: [&str; 3] = [\"governed_asset\", \"card\", \"project\"];",
+              "quote": "pub const END_TYPES: [&str; 4] = [\"governed_asset\", \"card\", \"project\", \"document\"];",
               "source": "code"
             },
             {
@@ -30274,15 +30426,15 @@
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The trace-edge whitelist is governed_asset | card | project. The spec chain continues WBS deliverable → card → run → step → artefact/evidence → acceptance → closure; none of run, step, artefact or evidence is an addressable end, and there is no view action joining them. Gate evidence edges also fire only for evidence items whose kind is governed_asset, so typed run/artefact evidence never leaves an edge at all.",
+          "detail": "The trace-edge whitelist is governed_asset | card | project | document (document added 2026-11-23). The spec chain continues WBS deliverable → card → run → step → artefact/evidence → acceptance → closure; run, step, artefact and evidence are not addressable ends, and there is no view action joining them. Gate evidence edges also fire only for evidence items whose kind is governed_asset, so typed run/artefact evidence still cannot be linked.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "line": 24,
+                  "line": 25,
                   "path": "crates/store/src/trace_link.rs",
-                  "quote": "pub const END_TYPES: [&str; 3] = [\"governed_asset\", \"card\", \"project\"];",
+                  "quote": "pub const END_TYPES: [&str; 4] = [\"governed_asset\", \"card\", \"project\", \"document\"];",
                   "source": "code"
                 },
                 {
@@ -51984,9 +52136,9 @@
               "source": "code"
             },
             {
-              "line": 1114,
+              "line": 1121,
               "path": "crates/actions/src/metrics/mod.rs",
-              "quote": "    store::metrics::record_reconciliation_tx(",
+              "quote": "            conveyor_usd: Some(conveyor_usd),",
               "source": "code"
             }
           ],
@@ -52030,9 +52182,9 @@
                   "source": "code"
                 },
                 {
-                  "line": 1114,
+                  "line": 1121,
                   "path": "crates/actions/src/metrics/mod.rs",
-                  "quote": "    store::metrics::record_reconciliation_tx(",
+                  "quote": "            conveyor_usd: Some(conveyor_usd),",
                   "source": "code"
                 }
               ],
@@ -90323,12 +90475,12 @@
   "schema": "conveyor-rework/v1",
   "scorecard": {
     "MSP": {
-      "findings": 4,
+      "findings": 6,
       "gaps": 83,
       "p0": 14,
       "p1": 65,
       "p2": 4,
-      "packages": 81,
+      "packages": 83,
       "rules": 13,
       "rules_clean": 7,
       "rules_with_gaps": 6,
@@ -90388,28 +90540,28 @@
     "by_kind": {
       "CODE": 78,
       "RECORD": 712,
-      "STANDARD": 1
+      "STANDARD": 3
     },
     "by_severity": {
       "P0": 27,
-      "P1": 247,
+      "P1": 249,
       "P2": 517
     },
     "by_standard": {
-      "MSP": 81,
+      "MSP": 83,
       "PMP": 156,
       "SAFe": 28,
       "SPEC": 70,
       "TOGAF": 456
     },
     "by_status": {
-      "open": 791
+      "open": 793
     },
     "duplicates": 0,
-    "open": 791,
-    "packages": 791,
+    "open": 793,
+    "packages": 793,
     "resolved": 114,
-    "subjects": 868,
+    "subjects": 870,
     "suppressed": 0
   }
 }
