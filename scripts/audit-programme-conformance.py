@@ -1876,7 +1876,12 @@ def _subject_record(
 # A deep-review finding names the artefact it reviewed, not a ledger id: the converter prefixes
 # its key, maps its three kinds onto the register's package kinds, and takes the section from
 # the review. An unknown kind is refused rather than guessed.
-DEEP_REVIEW_KINDS = {"code": "CODE", "record+code": "CODE", "standard": "STANDARD"}
+DEEP_REVIEW_KINDS = {
+    "code": "CODE",
+    "record+code": "CODE",
+    "record": "RECORD",
+    "standard": "STANDARD",
+}
 # `record+code` names a finding whose code capability may already exist. At this head
 # `programmes.update` accepts `shared_config` and `lessons.propose`/`retros.*` exist, so the
 # blocker is the record write, not new code. The override is per finding and evidence-backed;
@@ -3199,6 +3204,10 @@ def self_test() -> None:
             fail("a resolved deep-review finding still produced a package")
         if resolved_register["summary"]["resolved"] != 1:
             fail("a resolved deep-review finding was not counted as resolved")
+        write_sidecar("record")
+        converted_record = deep_review_findings(sidecar, output_standard)
+        if converted_record[0]["kind"] != "RECORD":
+            fail("a deep-review record finding did not convert to RECORD")
         write_sidecar("prose")
         try:
             deep_review_findings(sidecar, output_standard)
@@ -3210,22 +3219,22 @@ def self_test() -> None:
         fail("the scorecard has no MSP rules")
 
     # WP11: every standard rule is covered by exactly one category, source and verifier. The
-    # coverage instrument owns that property; the auditor does not self-test green without it.
+    # coverage instrument owns that property; this self-test proves that instrument's offline
+    # mechanism. The repository-wide `--check` runs in the repository gate — never here, because
+    # a self-test that reads the generated pack turns a stale pack into an instrument failure.
     coverage = ROOT / "scripts" / "check-standards-coverage.py"
     if not coverage.is_file():
         raise SystemExit(
             "audit-programme-conformance: scripts/check-standards-coverage.py is missing"
         )
-    for argv in (
-        [sys.executable, str(coverage)],
-        [sys.executable, str(coverage), "--self-test"],
-    ):
-        completed = subprocess.run(argv, capture_output=True, text=True)
-        if completed.returncode != 0:
-            tail = (completed.stdout + completed.stderr).strip().splitlines()[-3:]
-            raise SystemExit(
-                "audit-programme-conformance: standards coverage failed: " + " ".join(tail)
-            )
+    completed = subprocess.run(
+        [sys.executable, str(coverage), "--self-test"], capture_output=True, text=True
+    )
+    if completed.returncode != 0:
+        tail = (completed.stdout + completed.stderr).strip().splitlines()[-3:]
+        raise SystemExit(
+            "audit-programme-conformance: standards coverage failed: " + " ".join(tail)
+        )
     print("audit-programme-conformance: self-test OK")
 
 
