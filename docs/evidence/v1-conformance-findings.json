@@ -566,24 +566,34 @@
       "problem": "The seed inserts tranches with a state but no authorisation_review_id (tranche 1 is seeded authorised), and the start gate accepts authorised/in_review/closed without ever checking a review exists. The review evidence check accepts any non-null, non-empty-array value for three free-text keys, so baselines, benefit status and risk register need not reference rows.",
       "evidence": [
         {
-          "path": "crates/store/src/seed_programme.rs",
-          "line": 350,
-          "quote": "                (tenant_id, programme_id, number, state, entry_criteria, exit_criteria, review_at)"
-        },
-        {
-          "path": "crates/store/src/seed_programme.rs",
-          "line": 359,
-          "quote": "        .bind(&tranche.state)"
+          "path": "crates/store/src/spine.rs",
+          "line": 1287,
+          "quote": "async fn resolve_tranche_review_evidence_tx("
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 4073,
-          "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
+          "line": 4549,
+          "quote": "                       AND r.decision = 'continue'"
+        },
+        {
+          "path": "crates/store/src/seed_programme.rs",
+          "line": 385,
+          "quote": "        let state = \"planned\";"
+        },
+        {
+          "path": "crates/store/tests/tranche_review.rs",
+          "line": 591,
+          "quote": "async fn a_project_cannot_start_on_a_tranche_without_an_authorisation_review() {"
         }
       ],
       "failure_scenario": "A fresh tenant seeds tranche 1 as authorised with no programme_tranche_review; every tranche-1 project passes assert_project_tranche_authorised_tx and starts. A reviewer can submit evidence {\"baselines\":\"none\",\"benefit_status\":\"none\",\"risk_register\":\"none\"} and the continue/pause/stop gate records it.",
       "acceptance": "A start gate refuses any tranche whose authorisation_review_id is NULL; evidence must cite existing baseline, benefit-status and risk-register row ids; seeded authorised/closed tranches carry a review row or are refused.",
-      "owner_project": "T10"
+      "owner_project": "T10",
+      "resolved_by": {
+        "commit": "5ec72628d89e11c6d90c73be09ece2f9db28c546",
+        "test": "crates/store/tests/tranche_review.rs",
+        "evidence": "cargo-guard test -p conveyor-store --test tranche_review: 13 passed, 0 failed, EXIT=0. The predecessor continue review authorises the start; an authorised state with no review and a pause review are refused; unknown, unapproved and foreign-programme ids are refused; the seed inserts every tranche planned."
+      }
     },
     {
       "id": "v1-p83-2",
@@ -5805,7 +5815,7 @@
       "spec": "§8.3",
       "severity": "P1",
       "title": "The business case has no quantified investment appraisal or cash-flow schedule",
-      "problem": "The owner assessment found no quantified investment appraisal or cash-flow schedule in the published business case. The standard's 'Investment appraisal and cash flow' section resolves only measure.json#/inference/by_project and /inference/by_model — token-spend rows, not an appraisal — and the first pointer does not resolve at the snapshot, so the section publishes empty. No standard or seed row carries a cost/benefit appraisal, a net position, a payback or an NPV, and no cash-flow schedule exists by period. This is the STANDARD gap behind v1-std-broken-source: fixing the pointer would fill the heading with token counts and still leave no appraisal.",
+      "problem": "The standard now names the programme cost model as the Investment appraisal and cash flow source, but no cost-model record exists in the live record, so the published business case carries an explicit absence rather than a quantified appraisal. No seed or live row carries a cost/benefit appraisal, a net position, a payback or an NPV, and no cash-flow schedule exists; the section cannot render one.",
       "evidence": [
         {
           "path": "seed/output-standard.json",
@@ -5814,8 +5824,8 @@
         },
         {
           "path": "seed/output-standard.json",
-          "line": 923,
-          "quote": "            \"pointer\": \"/inference/by_model\""
+          "line": 934,
+          "quote": "            \"record\": \"the programme cost model: the investment appraisal and cash-flow schedule with its basis\""
         }
       ],
       "failure_scenario": "A tranche or sponsor decision approves the programme on a business case whose appraisal section is empty or holds token counts; cost and benefit posture are prose, so no actual can be compared with a plan and a cost regression passes the review unnoticed.",
