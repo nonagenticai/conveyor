@@ -173,6 +173,40 @@ pub(crate) async fn capability_readiness_tx(
     Ok(Readiness { blocking })
 }
 
+/// The ONE pre-run readiness guard every run-start seam calls **before** its run row.
+///
+/// `capability_id` is the capability the seam resolved — a process's own or its card type's, a
+/// workflow executor's capability, a generic run's card-type capability. `None` means the run
+/// declares no capability, so there is nothing to check. `bound_agents` are the executors the
+/// process's steps name (`process_step.process_agent_id`, D29) or the single
+/// `capability_agent_id` a workflow run names. `action` names the refusing seam in the message.
+///
+/// The refusal is the existing `409 capability_not_ready` envelope, carrying the SAME
+/// `readiness_fields` array `capabilities.get` returns as `blocking[]`. It runs before the run
+/// row, so a refusal leaves zero run rows and zero steps.
+pub(crate) async fn ensure_run_start_ready_tx(
+    tx: &mut PgConnection,
+    tenant: TenantId,
+    capability_id: Option<Uuid>,
+    bound_agents: &[Uuid],
+    action: &str,
+) -> Result<(), ActionError> {
+    let Some(capability_id) = capability_id else {
+        return Ok(());
+    };
+    let readiness = capability_readiness_tx(&mut *tx, tenant, capability_id, bound_agents).await?;
+    if readiness.is_ready() {
+        Ok(())
+    } else {
+        Err(ActionError::new(
+            409,
+            "capability_not_ready",
+            format!("{action}: the capability is not ready to run"),
+        )
+        .with_errors(readiness_fields(&readiness)))
+    }
+}
+
 /// The per-executor half of readiness: the prompt pin and the action list. Shared by the bound
 /// path and the unique-active-agent path so the two can never disagree about a given agent.
 async fn check_executor(
