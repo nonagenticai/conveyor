@@ -526,7 +526,8 @@
           7,
           136,
           179,
-          198
+          198,
+          620
         ],
         "depends_on": [
           "S03",
@@ -746,7 +747,7 @@
       "key": "S20",
       "name": "Eval hillclimb",
       "description": "Plan: docs/plans/slices/S20-eval-hillclimb.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S20-eval-hillclimb.md",
