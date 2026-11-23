@@ -1712,17 +1712,33 @@ pub async fn update_tranche_tx(
         return Err(PlanStoreError::Stale { what: "tranche" });
     }
     if let Some(baseline_ref) = patch.baseline_ref {
-        let present: bool = sqlx::query_scalar(
-            "SELECT EXISTS (SELECT 1 FROM programme_baseline WHERE tenant_id = $1 AND id = $2)",
+        // A cited baseline is a citation only when it is this programme's, approved, and one
+        // of the three MSP programme-baseline kinds. The review resolver applies the same rule
+        // to the review's `baselines` evidence; this is the tranche row's own pointer.
+        let row: Option<(Uuid, String, Option<Uuid>)> = sqlx::query_as(
+            "SELECT programme_id, kind, approved_by FROM programme_baseline
+              WHERE tenant_id = $1 AND id = $2",
         )
         .bind(tenant.as_uuid())
         .bind(baseline_ref)
-        .fetch_one(&mut *conn)
+        .fetch_optional(&mut *conn)
         .await?;
-        if !present {
+        let Some((programme_id, kind, approved_by)) = row else {
             return Err(PlanStoreError::NotFound {
                 what: "programme baseline",
             });
+        };
+        if programme_id != current.programme_id {
+            return Err(PlanStoreError::NotFound {
+                what: "programme baseline",
+            });
+        }
+        if approved_by.is_none()
+            || !matches!(kind.as_str(), "management" | "governance" | "boundary")
+        {
+            return Err(PlanStoreError::Illegal(
+                PlanError::TrancheBaselineNotApproved { kind },
+            ));
         }
         // A re-baseline is a change, never an edit: the new baseline cites an approved change
         // request of a project in the same programme (SPEC §8.3's tranche rule).
