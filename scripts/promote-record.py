@@ -130,6 +130,12 @@ WRITE_ACTIONS = {
     # The architecture compliance review: one row per contract, and the table is unique per
     # (project, contract), so the replay reads the row it already wrote before recording one.
     "architecture.reviews_record",
+    # The governed-asset family (SPEC_V2 §8.3, §10.4): the MSP programme artefacts no fixed
+    # family owns are composed on the programme-definition project and stepped through
+    # draft → in_review → approved. Without these three the MSP rows cannot replay at all.
+    "governed_assets.compose",
+    "governed_assets.submit",
+    "governed_assets.approve",
 }
 
 # The ADR register's 57 source rows are NOT journaled one entry per row: the seed
@@ -193,6 +199,15 @@ CARD_COMMENT_KEY_RE = re.compile(r"^card-comment:([0-9a-f-]{36}):([0-9a-f]{8,64}
 CARD_MOVE_KEY_RE = re.compile(r"^card-move:([0-9a-f-]{36}):(intake|active|waiting|done|archive)$")
 BENEFIT_LINK_KEY_RE = re.compile(rf"^benefit-link:({TOKEN}):(.+)$")
 DECISION_KEY_RE = re.compile(rf"^decision:({TOKEN})(?:/(draft|in_review|approved|superseded|archived))?$")
+# The governed-asset family (SPEC_V2 §8.3).  Compose keys by its content — kind, owning
+# project, title — because the staging id is not portable.  A lifecycle act keys by the
+# asset id, with the act itself as the suffix: submit and approve are two distinct writes on
+# the one asset, and a bare id would collide on the duplicate-key check and collapse their
+# verdicts into one.
+GOVERNED_ASSET_KEY_RE = re.compile(rf"^governed-asset:({TOKEN}):([0-9a-f-]{{36}}):(.+)$")
+GOVERNED_ASSET_LIFECYCLE_KEY_RE = re.compile(
+    rf"^governed-asset:({TOKEN})/(submit|approve)$"
+)
 # The tr3 SAFe family.  `cadence:<period>/<kind>` is the row; `/meta` is the update that puts the
 # PI plan, the refinement and the retro's board into its meta.  The tranche chain keys carry the
 # tranche NUMBER, because the staging tranche id is not portable and production has its own rows.
@@ -265,6 +280,10 @@ class NaturalKey:
             return f"benefit-link:{self.first}:{self.second}"
         if self.kind == "decision":
             return f"decision:{self.first}" + (f"/{self.second}" if self.second else "")
+        if self.kind == "governed_asset":
+            return f"governed-asset:{self.first}:{self.second}"
+        if self.kind == "governed_asset_lifecycle":
+            return f"governed-asset:{self.first}/{self.second}"
         if self.kind == "cadence":
             return f"cadence:{self.first}/{self.second}"
         if self.kind == "cadence_meta":
@@ -294,6 +313,19 @@ def parse_natural_key(value: str) -> NaturalKey:
     match = RISK_KEY_RE.match(value)
     if match:
         return NaturalKey("risk", match.group(1), match.group(2))
+    match = GOVERNED_ASSET_KEY_RE.match(value)
+    if match:
+        title = match.group(3).strip()
+        if not title or any(ord(char) < 0x20 for char in title):
+            raise PromoteError(f"malformed governed-asset natural key: {value!r}")
+        # The project id is the key's fixed second part; the kind is the first, so a keyed
+        # compose row and its input can be checked against each other in validate_entries.
+        return NaturalKey(
+            "governed_asset", f"{match.group(1)}:{match.group(2)}", title
+        )
+    match = GOVERNED_ASSET_LIFECYCLE_KEY_RE.match(value)
+    if match:
+        return NaturalKey("governed_asset_lifecycle", match.group(1), match.group(2))
     match = DECISION_KEY_RE.match(value)
     if match:
         return NaturalKey("decision", match.group(1), match.group(2))
@@ -402,6 +434,10 @@ class Entry:
     # the project whose WBS names the demo's deliverable, the tranche number an approval chain
     # reviews.  Optional; validated as an object, read only by the matchers that need it.
     meta: dict = field(default_factory=dict)
+    # Set on a journal row that cannot be replayed at all (an unknown action, a missing or
+    # malformed natural key).  Such a row is carried as an Entry with `key=None` so it becomes
+    # an `unreplayable_input` verdict in the promotion document — never a silent drop.
+    unreplayable: str | None = None
 
 
 def resolve_path(value: str) -> Path:
@@ -433,19 +469,45 @@ def load_journal(path: Path) -> tuple[dict | None, list[tuple[int, dict]], list[
     return header, raws, errors
 
 
-def build_entries(raws: list[tuple[int, dict]]) -> tuple[list[Entry], list[str]]:
+def unreplayable_entry(lineno: int, raw: dict, reason: str) -> Entry:
+    """A journal row that cannot be replayed, carried so it becomes a verdict, not a drop."""
+    def text(name: str) -> str:
+        value = raw.get(name)
+        return value if isinstance(value, str) else ""
+
+    action = raw.get("action")
+    return Entry(
+        lineno=lineno,
+        action=action if isinstance(action, str) else "",
+        natural_key=text("natural_key"),
+        output_id=text("output_id"),
+        input_path=text("input"),
+        payload={},
+        raw=raw,
+        key=None,
+        unreplayable=reason,
+    )
+
+
+def build_entries(
+    raws: list[tuple[int, dict]]
+) -> tuple[list[Entry], list[Entry], list[str]]:
+    """The replayable entries, the rows that cannot be replayed, and the hard errors."""
     entries: list[Entry] = []
+    unreplayable: list[Entry] = []
     errors: list[str] = []
     for lineno, raw in raws:
         action = raw.get("action")
         if not isinstance(action, str) or action not in WRITE_ACTIONS:
-            errors.append(f"line {lineno}: unknown action {action!r}")
+            unreplayable.append(
+                unreplayable_entry(lineno, raw, f"unknown action {action!r}")
+            )
             continue
         natural_key = raw.get("natural_key")
         try:
             key = parse_natural_key(natural_key)
         except PromoteError as error:
-            errors.append(f"line {lineno}: {error}")
+            unreplayable.append(unreplayable_entry(lineno, raw, str(error)))
             continue
         output_id = raw.get("output_id")
         if not isinstance(output_id, str) or not output_id.strip():
@@ -486,7 +548,7 @@ def build_entries(raws: list[tuple[int, dict]]) -> tuple[list[Entry], list[str]]
                 meta=meta,
             )
         )
-    return entries, errors
+    return entries, unreplayable, errors
 
 
 def validate_entries(entries: list[Entry]) -> list[str]:
@@ -678,6 +740,42 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                 )
             if not entry.payload.get("id"):
                 errors.append(f"line {entry.lineno}: transition input has no id")
+        elif entry.action == "governed_assets.compose":
+            if key.kind != "governed_asset":
+                errors.append(
+                    f"line {entry.lineno}: governed_assets.compose key must be "
+                    "governed-asset:<kind>:<project id>:<title>"
+                )
+                continue
+            kind, _, project_id = key.first.partition(":")
+            if entry.payload.get("kind") != kind:
+                errors.append(
+                    f"line {entry.lineno}: natural key kind {kind!r} does not match "
+                    f"input kind {entry.payload.get('kind')!r}"
+                )
+            if entry.payload.get("project_id") != project_id:
+                errors.append(
+                    f"line {entry.lineno}: natural key project {project_id!r} does not "
+                    f"match input project_id {entry.payload.get('project_id')!r}"
+                )
+            if entry.payload.get("title") != key.second:
+                errors.append(
+                    f"line {entry.lineno}: natural key title {key.second!r} does not match "
+                    f"input title {entry.payload.get('title')!r}"
+                )
+        elif entry.action in ("governed_assets.submit", "governed_assets.approve"):
+            act = entry.action.rsplit(".", 1)[-1]
+            if key.kind != "governed_asset_lifecycle" or key.second != act:
+                errors.append(
+                    f"line {entry.lineno}: {entry.action} key must be "
+                    f"governed-asset:<asset id>/{act}"
+                )
+                continue
+            if entry.payload.get("id") != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input id {entry.payload.get('id')!r}"
+                )
         elif entry.action == "projects.close_request":
             if key.kind != "project_closure":
                 errors.append(
@@ -1051,16 +1149,16 @@ def validate_entries(entries: list[Entry]) -> list[str]:
     return errors
 
 
-def check_journal(path: Path) -> tuple[list[Entry], list[str]]:
+def check_journal(path: Path) -> tuple[list[Entry], list[Entry], list[str]]:
     header, raws, errors = load_journal(path)
     if header is not None and header.get("schema") != JOURNAL_SCHEMA:
         errors.append(
             f"journal header schema is {header.get('schema')!r}, expected {JOURNAL_SCHEMA!r}"
         )
-    entries, entry_errors = build_entries(raws)
+    entries, unreplayable, entry_errors = build_entries(raws)
     errors.extend(entry_errors)
     errors.extend(validate_entries(entries))
-    return entries, errors
+    return entries, unreplayable, errors
 
 
 # ── action transports ───────────────────────────────────────────────────────────────────
@@ -1289,6 +1387,9 @@ class State:
     links: list[dict] = field(default_factory=list)
     # The document family's production rows, by (project, category) as listed.
     documents: list[dict] = field(default_factory=list)
+    # The governed-asset family's production rows: the MSP artefacts composed on the
+    # programme-definition project and stepped through draft → in_review → approved.
+    governed_assets: list[dict] = field(default_factory=list)
     # The architecture decision register's production rows, by key.
     decisions: list[dict] = field(default_factory=list)
     # The tr3 SAFe family's production rows.  A cadence is read per programme and matched by
@@ -2475,6 +2576,17 @@ def remap_payload(
                 f"decision {key.first!r} has no production row to transition"
             )
         payload["id"] = row["id"]
+    elif entry.action in ("governed_assets.submit", "governed_assets.approve"):
+        # The lifecycle entry names the compose entry's staging asset id; the write and its
+        # read-back both take the production id the compose act mapped.
+        staging = payload.get("id")
+        production = id_map.get(str(staging)) if staging else None
+        if not production:
+            raise PromoteError(
+                f"{entry.action}: asset {staging!r} has no production id; the compose "
+                "entry must create or find it first"
+            )
+        payload["id"] = production
     elif entry.action == "documents.publish":
         staging = payload.get("id")
         production = id_map.get(staging) if staging else None
@@ -3103,6 +3215,32 @@ def readback_entry(
                 )
             return row
         raise ReadbackError("tranches.list: the authorised tranche is not readable")
+    if entry.action == "governed_assets.compose":
+        # The compose output is the asset itself, so the generic output-id helper already
+        # handed us its id; `get` flattens AssetOut, so it reads back through `read_row`.
+        row = read_row(client, "governed_assets.get", production_id)
+        if row.get("kind") != entry.payload.get("kind"):
+            raise ReadbackError(
+                f"governed_assets.get: kind is {row.get('kind')!r}, not "
+                f"{entry.payload.get('kind')!r}"
+            )
+        if row.get("title") != entry.payload.get("title"):
+            raise ReadbackError(
+                f"governed_assets.get: title is {row.get('title')!r}, not "
+                f"{entry.payload.get('title')!r}"
+            )
+        return row
+    if entry.action in ("governed_assets.submit", "governed_assets.approve"):
+        # The input id is the staging asset id; the write went to its mapped production id.
+        staging = str(entry.payload.get("id") or "")
+        asset_id = (id_map or {}).get(staging, staging)
+        row = read_row(client, "governed_assets.get", asset_id)
+        wanted = "in_review" if entry.action == "governed_assets.submit" else "approved"
+        if row.get("status") != wanted:
+            raise ReadbackError(
+                f"governed_assets.get: status is {row.get('status')!r}, not {wanted!r}"
+            )
+        return row
     raise PromoteError(f"{entry.action}: no readback is defined")
 
 
@@ -3511,6 +3649,27 @@ class FakeClient:
                 if row.get("id") == payload.get("id"):
                     return copy.deepcopy(row)
             return None
+        if action == "governed_assets.compose":
+            row = copy.deepcopy(payload)
+            row.update(
+                id=self._id("governed-asset"), key=payload.get("title"),
+                status="draft", version=1,
+            )
+            self.state.governed_assets.append(row)
+            return copy.deepcopy(row)
+        if action == "governed_assets.get":
+            for row in self.state.governed_assets:
+                if row.get("id") == payload.get("id"):
+                    return copy.deepcopy(row)
+            return None
+        if action in ("governed_assets.submit", "governed_assets.approve"):
+            wanted = "in_review" if action.endswith("submit") else "approved"
+            for row in self.state.governed_assets:
+                if row.get("id") == payload.get("id"):
+                    row["status"] = wanted
+                    row["version"] = int(row.get("version") or 1) + 1
+                    return copy.deepcopy(row)
+            raise AssertionError(f"{action}: no governed asset {payload.get('id')}")
         if action == "registers.update":
             for row in self.state.registers:
                 if row.get("id") == payload.get("id"):
@@ -4151,7 +4310,7 @@ def self_test() -> int:
         paths = _fixture_inputs(root)
 
         # 1. the parser accepts a well-formed fixture.
-        entries, errors = build_entries(_fixture_entries(paths, full))
+        entries, unreplayable, errors = build_entries(_fixture_entries(paths, full))
         ok(not errors, f"fixture journal should parse: {errors}")
         ok(not validate_entries(entries), "fixture journal should validate")
         ok(
@@ -4166,14 +4325,15 @@ def self_test() -> int:
 
         # 2. duplicate refusal.
         duplicate = _fixture_entries(paths, ("risk", "risk"))
-        entries, errors = build_entries(duplicate)
+        entries, unreplayable, errors = build_entries(duplicate)
         ok(not errors, "duplicate fixture parses")
         ok(
             any("duplicate natural key" in error for error in validate_entries(entries)),
             "a duplicate natural key is refused",
         )
 
-        # 3. malformed keys and unknown actions are refused.
+        # 3. a malformed key and an unknown action become unreplayable verdicts, never a
+        #    silent drop; a missing input file stays a hard check error.
         malformed = [
             (2, {"action": "registers.create", "input": str(paths["risk"]),
                  "natural_key": "risk:", "output_id": "x"}),
@@ -4182,11 +4342,13 @@ def self_test() -> int:
             (4, {"action": "registers.create", "input": "/does/not/exist.json",
                  "natural_key": "risk:R1", "output_id": "x"}),
         ]
-        _, errors = build_entries(malformed)
-        ok(any("malformed natural key" in error for error in errors),
-           "a malformed natural key is refused")
-        ok(any("unknown action" in error for error in errors),
-           "an unknown action is refused")
+        _, unreplayable, errors = build_entries(malformed)
+        reasons = " | ".join(entry.unreplayable or "" for entry in unreplayable)
+        ok(len(unreplayable) == 2, f"two rows are unreplayable, not dropped: {reasons}")
+        ok("malformed natural key" in reasons,
+           "a malformed natural key is unreplayable")
+        ok("unknown action" in reasons,
+           "an unknown action is unreplayable")
         ok(any("does/not/exist" in error for error in errors),
            "a missing input is refused")
 
@@ -4196,7 +4358,7 @@ def self_test() -> int:
             {"id": "prod-risk", "kind": "risk", "code": "R1",
              "programme_id": "p", "version": 1}
         )
-        entries, _ = build_entries(_fixture_entries(paths, ("risk",)))
+        entries, unreplayable, _ = build_entries(_fixture_entries(paths, ("risk",)))
         index = build_change_index(entries, state)
         existing = existing_for(entries[0], state, index)
         ok(existing is not None and existing["id"] == "prod-risk",
@@ -4209,7 +4371,7 @@ def self_test() -> int:
             json.dumps({"benefit_measurements": [], "benefit_profiles": []}),
             encoding="utf-8",
         )
-        entries, _ = build_entries(_fixture_entries(paths, full))
+        entries, unreplayable, _ = build_entries(_fixture_entries(paths, full))
         state = State()
         # The fixture's change cites a STAGING baseline id; production has its own row.
         state.baselines["01a1dcb8-d24b-76de-b901-56fd56e001bc"] = [
@@ -4263,7 +4425,7 @@ def self_test() -> int:
         # 5b. A decide keyed by the staging change id must find the approved gate on a
         # replay. Otherwise it re-invokes the decide, and the server refuses a decided gate
         # (measured on the production rehearsal, 2026-11-23 — seven such entries).
-        replay_entries, _ = build_entries(
+        replay_entries, unreplayable, _ = build_entries(
             _fixture_entries(paths, ("change",)) + [(9, {
                 "action": "approvals.decide", "input": str(paths["decide"]),
                 "natural_key":
@@ -4281,7 +4443,7 @@ def self_test() -> int:
         )
 
         # 6. a created row that cannot be read back is a failure, never a pass.
-        entries, _ = build_entries(_fixture_entries(paths, ("risk",)))
+        entries, unreplayable, _ = build_entries(_fixture_entries(paths, ("risk",)))
         state = State()
         _, outcomes = apply_entries(
             FakeClient(state, unreadable={"registers.get"}),
@@ -4291,7 +4453,7 @@ def self_test() -> int:
            f"an unreadable row is readback_failed: {outcomes[0].verdict}")
 
         # 7. a measurement is read back through benefits.measurement_list, not the export.
-        entries, _ = build_entries(_fixture_entries(paths, ("benefit", "measure")))
+        entries, unreplayable, _ = build_entries(_fixture_entries(paths, ("benefit", "measure")))
         state = State()
         _, outcomes = apply_entries(FakeClient(state), entries, state, None)
         ok(
@@ -4320,7 +4482,7 @@ def self_test() -> int:
         production_done = "01a1d3e7-0000-4000-8000-00000000d0e5"
         closure_names = ("closure", "close_gate", "decide_close", "close",
                          "comment", "move")
-        entries, errors = build_entries(_fixture_entries(paths, closure_names))
+        entries, unreplayable, errors = build_entries(_fixture_entries(paths, closure_names))
         ok(not errors, f"the closure fixture parses: {errors}")
         ok(not validate_entries(entries), "the closure fixture validates")
         state = State()
@@ -4461,7 +4623,7 @@ def self_test() -> int:
                  "natural_key": "benefit-link:B7:01a20277-8d10-702f-a975-4dd6469e7b1d",
                  "output_id": "staging-link"}),
         ]
-        entries, errors = build_entries(raw_entries)
+        entries, unreplayable, errors = build_entries(raw_entries)
         ok(not errors, f"the tr3 record fixture parses: {errors}")
         ok(not validate_entries(entries), "the tr3 record fixture validates")
         state = State()
@@ -4516,7 +4678,7 @@ def self_test() -> int:
                  "natural_key": "document-publish:tranche-3:pi-plan:Fixture Plan",
                  "output_id": "staging-document"}),
         ]
-        entries, errors = build_entries(doc_entries)
+        entries, unreplayable, errors = build_entries(doc_entries)
         ok(not errors, f"the document fixture parses: {errors}")
         state = State()
         client = FakeClient(state)
@@ -4558,7 +4720,7 @@ def self_test() -> int:
         decide_create_path.write_text(json.dumps(decision_payload), encoding="utf-8")
         state = State()
         client = FakeClient(state)
-        entries, errors = build_entries([
+        entries, unreplayable, errors = build_entries([
             (2, {"action": "decisions.create", "input": str(decide_create_path),
                  "natural_key": "decision:adr-9999", "output_id": "staging-decision"}),
         ])
@@ -4569,7 +4731,7 @@ def self_test() -> int:
         transition_payload = {"id": production_id, "to": "approved"}
         transition_path = root / "inputs" / "decision_transition.json"
         transition_path.write_text(json.dumps(transition_payload), encoding="utf-8")
-        entries, errors = build_entries([
+        entries, unreplayable, errors = build_entries([
             (2, {"action": "decisions.transition", "input": str(transition_path),
                  "natural_key": "decision:adr-9999/approved",
                  "output_id": production_id}),
@@ -4580,7 +4742,7 @@ def self_test() -> int:
         ok(state.decisions[0]["status"] == "approved", "the transition landed")
         _, second = apply_entries(FakeClient(state), entries, state, None)
         ok([o.verdict for o in second] == ["skipped"], f"a transition replay skips: {second}")
-        create_entries, errors = build_entries([
+        create_entries, unreplayable, errors = build_entries([
             (2, {"action": "decisions.create", "input": str(decide_create_path),
                  "natural_key": "decision:adr-9999", "output_id": "staging-decision"}),
         ])
@@ -4715,7 +4877,7 @@ def self_test() -> int:
              "natural_key": "tranche-authorise:10", "output_id": "staging-tranche-10",
              "meta": scope},
         ]
-        entries, errors = build_entries(
+        entries, unreplayable, errors = build_entries(
             [(index + 2, raw) for index, raw in enumerate(raw_new)]
         )
         ok(not errors, f"the cadence fixture parses: {errors}")
@@ -4794,23 +4956,26 @@ def self_test() -> int:
             {"action": "retros.close", "input": paths_new["close"],
              "natural_key": "retro:tranche-9/close", "output_id": "x", "meta": scope},
         ]
-        entries, errors = build_entries([(2, raw) for raw in lessonless])
+        entries, unreplayable, errors = build_entries([(2, raw) for raw in lessonless])
         ok(not errors, "the lesson-free close parses")
         ok(
             any("no lesson" in error for error in validate_entries(entries)),
             "a retro close with no lesson for its finding is refused",
         )
-        _, errors = build_entries([
+        _, unreplayable, errors = build_entries([
             (2, {"action": "cadences.create", "input": paths_new["create_pi"],
                  "natural_key": "cadence:", "output_id": "x"}),
         ])
-        ok(any("malformed natural key" in error for error in errors),
-           "a malformed cadence key is refused")
+        ok(
+            any("malformed natural key" in (entry.unreplayable or "")
+                for entry in unreplayable),
+            "a malformed cadence key is unreplayable",
+        )
         broken = [dict(raw) for raw in raw_new]
         for index, raw in enumerate(broken):
             if raw["action"] == "tranches.review":
                 broken[index] = {**raw, "approval_id": "some-other-gate"}
-        entries, errors = build_entries(
+        entries, unreplayable, errors = build_entries(
             [(index + 2, raw) for index, raw in enumerate(broken)]
         )
         ok(not errors, "the broken-chain fixture parses")
@@ -4904,7 +5069,7 @@ def self_test() -> int:
              "natural_key": f"wbs-accept:{chain_project}:The accepted deliverable",
              "output_id": "staging-wbs"},
         ]
-        chain_entries, chain_errors = build_entries(
+        chain_entries, chain_unreplayable, chain_errors = build_entries(
             [(index + 2, raw) for index, raw in enumerate(chain_raw)]
         )
         ok(not chain_errors, f"the construction chain parses: {chain_errors}")
@@ -4931,6 +5096,97 @@ def self_test() -> int:
             f"a replay skips the whole construction chain: "
             f"{[(o.entry.natural_key, o.verdict, o.detail) for o in chain_second]}",
         )
+
+    # 14. the governed-asset family: compose → submit → approve replays, every read-back is
+    #     `governed_assets.get`, and an unknown action is a verdict and a non-zero run, never
+    #     a silent drop.
+    with tempfile.TemporaryDirectory(prefix="promote-record-governed-") as tmp:
+        governed_dir = Path(tmp)
+        project = "01a1dcb8-d24b-76de-b901-56fd56e001bc"
+        compose_path = governed_dir / "compose.json"
+        compose_path.write_text(json.dumps({
+            "kind": "mandate", "project_id": project,
+            "title": "Fixture mandate", "body": "# Mandate",
+            "meta": {"number": "M1"},
+        }), encoding="utf-8")
+        submit_path = governed_dir / "submit.json"
+        submit_path.write_text(json.dumps({"id": "staging-mandate"}), encoding="utf-8")
+        approve_path = governed_dir / "approve.json"
+        approve_path.write_text(json.dumps({"id": "staging-mandate"}), encoding="utf-8")
+        governed_raw = [
+            (2, {"action": "governed_assets.compose", "input": str(compose_path),
+                 "natural_key": f"governed-asset:mandate:{project}:Fixture mandate",
+                 "output_id": "staging-mandate"}),
+            (3, {"action": "governed_assets.submit", "input": str(submit_path),
+                 "natural_key": "governed-asset:staging-mandate/submit",
+                 "output_id": "staging-mandate"}),
+            (4, {"action": "governed_assets.approve", "input": str(approve_path),
+                 "natural_key": "governed-asset:staging-mandate/approve",
+                 "output_id": "staging-mandate"}),
+        ]
+        governed_entries, governed_unreplayable, governed_errors = build_entries(
+            governed_raw
+        )
+        ok(
+            not governed_errors and not governed_unreplayable,
+            f"the governed-asset trio parses: {governed_errors} "
+            f"{[entry.unreplayable for entry in governed_unreplayable]}",
+        )
+        ok(not validate_entries(governed_entries), "the governed-asset trio validates")
+        governed_state = State()
+        governed_client = FakeClient(governed_state)
+        governed_map, governed_outcomes = apply_entries(
+            governed_client, governed_entries, governed_state, None
+        )
+        ok(
+            [outcome.verdict for outcome in governed_outcomes] == ["created"] * 3,
+            f"the governed-asset trio applies: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in governed_outcomes]}",
+        )
+        asset_id = governed_map["staging-mandate"]
+        get_calls = [
+            payload for action, payload, _, _ in governed_client.calls
+            if action == "governed_assets.get"
+        ]
+        ok(
+            get_calls == [{"id": asset_id}] * 3,
+            f"every governed-asset read-back is governed_assets.get: {get_calls}",
+        )
+        ok(
+            governed_state.governed_assets
+            and governed_state.governed_assets[0]["status"] == "approved",
+            "the composed asset reaches `approved` in production",
+        )
+
+        bad_path = governed_dir / "bad-journal.jsonl"
+        bad_path.write_text(json.dumps({
+            "action": "risks.create", "input": str(compose_path),
+            "natural_key": "risk:R1", "output_id": "x",
+        }) + "\n", encoding="utf-8")
+        _, bad_unreplayable, bad_errors = build_entries(
+            [(2, json.loads(bad_path.read_text(encoding="utf-8")))]
+        )
+        ok(
+            not bad_errors and len(bad_unreplayable) == 1,
+            f"an unknown action becomes an unreplayable row: {bad_errors}",
+        )
+        bad_outcome = Outcome(
+            bad_unreplayable[0], bad_unreplayable[0].output_id, None,
+            "unreplayable_input", bad_unreplayable[0].unreplayable or "",
+        )
+        ok(bad_outcome.verdict == "unreplayable_input",
+           "the unknown action's verdict is unreplayable_input")
+        document = build_promotion(
+            bad_unreplayable, {}, [bad_outcome], bad_path, None, None
+        )
+        ok(
+            [entry["verdict"] for entry in document["entries"]]
+            == ["unreplayable_input"],
+            "the verdict JSON lists the unreplayable row",
+        )
+        ok(not document["complete"], "an unreplayable row makes the promotion incomplete")
+        ok(main(["--check", "--journal", str(bad_path)]) == 1,
+           "a check run with an unreplayable row exits non-zero")
 
     print(f"self-test: {checks} checks passed (offline; no network, no database)")
     return 0
@@ -4992,15 +5248,46 @@ def main(argv: list[str] | None = None) -> int:
         return self_test()
 
     journal_path = resolve_path(args.journal)
-    entries, errors = check_journal(journal_path)
+    entries, unreplayable, errors = check_journal(journal_path)
     if errors:
         for error in errors:
             print(f"error: {error}", file=sys.stderr)
         print(f"check: {len(errors)} error(s); refusing to continue", file=sys.stderr)
         return 1
+    # A row that cannot be replayed is a verdict of its own: it is listed in the promotion
+    # document and it fails the run, so a malformed entry is never dropped in silence.
+    unreplayable_outcomes = [
+        Outcome(entry, entry.output_id, None, "unreplayable_input",
+                entry.unreplayable or "")
+        for entry in unreplayable
+    ]
+
+    def report_unreplayable() -> None:
+        for outcome in unreplayable_outcomes:
+            print(
+                f"line {outcome.entry.lineno}: unreplayable_input: {outcome.detail}",
+                file=sys.stderr,
+            )
+        print(
+            f"{len(unreplayable_outcomes)} unreplayable journal row(s); refusing",
+            file=sys.stderr,
+        )
 
     if args.dry_run:
-        print(json.dumps(dry_run_plan(entries), indent=2))
+        plan = dry_run_plan(entries) + [
+            {
+                "action": outcome.entry.action,
+                "natural_key": outcome.entry.natural_key,
+                "will_create": False,
+                "verdict": outcome.verdict,
+                "detail": outcome.detail,
+            }
+            for outcome in unreplayable_outcomes
+        ]
+        print(json.dumps(plan, indent=2))
+        if unreplayable_outcomes:
+            report_unreplayable()
+            return 1
         print(
             f"dry-run: {len(entries)} entries ({summary(entries)}); no network",
             file=sys.stderr,
@@ -5008,6 +5295,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if not args.apply:
+        if unreplayable_outcomes:
+            report_unreplayable()
+            return 1
         print(f"check: {len(entries)} entries ({summary(entries)}); journal is well formed")
         return 0
 
@@ -5044,9 +5334,14 @@ def main(argv: list[str] | None = None) -> int:
     except PromoteError as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
+    # The promotion document is the journal's whole verdict, in journal order: replayable
+    # outcomes and the unreplayable rows the check refused to drop.
+    outcomes = sorted(
+        unreplayable_outcomes + outcomes, key=lambda outcome: outcome.entry.lineno
+    )
 
     document = build_promotion(
-        entries, id_map, outcomes, journal_path, args.url, snapshot,
+        entries + unreplayable, id_map, outcomes, journal_path, args.url, snapshot,
         local_bin=args.local_bin,
     )
     output_path = resolve_path(args.output)
@@ -5057,8 +5352,9 @@ def main(argv: list[str] | None = None) -> int:
     ]
     for outcome in outcomes:
         detail = f": {outcome.detail}" if outcome.detail else ""
+        label = outcome.entry.natural_key or f"line {outcome.entry.lineno}"
         print(
-            f"{outcome.entry.natural_key}: {outcome.verdict} "
+            f"{label}: {outcome.verdict} "
             f"-> {outcome.production_id}{detail}",
             file=sys.stderr,
         )
