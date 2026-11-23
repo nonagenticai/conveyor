@@ -2181,8 +2181,8 @@
       "evidence": [
         {
           "path": "crates/store/src/trace_link.rs",
-          "line": 24,
-          "quote": "pub const END_TYPES: [&str; 3] = [\"governed_asset\", \"card\", \"project\"];"
+          "line": 25,
+          "quote": "pub const END_TYPES: [&str; 4] = [\"governed_asset\", \"card\", \"project\", \"document\"];"
         },
         {
           "path": "crates/actions/src/governance/views.rs",
