@@ -293,13 +293,17 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     let issues_path = dir.join("issues.json");
     std::fs::write(
         &issues_path,
-        serde_json::to_string(&json!({"issues": [{
-            "number": 900,
-            "title": "Feedback on the organisation page",
-            "state": "OPEN",
-            "labels": [{"name": "feedback"}],
-            "url": "https://example.test/issues/900"
-        }]}))
+        serde_json::to_string(&json!({
+            "schema": "issue-registry/v1",
+            "provenance": {"tenant": "snap", "source": "github:nonagenticai/conveyor"},
+            "issues": [{
+                "number": 900,
+                "title": "Feedback on the organisation page",
+                "state": "OPEN",
+                "labels": [{"name": "feedback"}],
+                "url": "https://example.test/issues/900"
+            }]
+        }))
         .expect("issues json"),
     )
     .expect("write issues");
@@ -508,7 +512,11 @@ async fn the_rework_register_rides_the_conformance_flag() {
     let dir = std::env::temp_dir().join(format!("conveyor-rework-{}", Uuid::now_v7()));
     std::fs::create_dir_all(&dir).expect("snapshot dir");
     let issues_path = dir.join("issues.json");
-    std::fs::write(&issues_path, r#"{"issues": []}"#).expect("write issues");
+    std::fs::write(
+        &issues_path,
+        r#"{"provenance":{"tenant":"rework","source":"github:nonagenticai/conveyor"},"issues": []}"#,
+    )
+    .expect("write issues");
 
     // The register carries an email and a token-shaped string: the same safety net every other
     // public section passes must mask them here too.
@@ -687,7 +695,11 @@ async fn organisation_is_populated_for_a_seeded_tenant() {
     let dir = std::env::temp_dir().join(format!("conveyor-organisation-{}", Uuid::now_v7()));
     std::fs::create_dir_all(&dir).expect("snapshot dir");
     let issues_path = dir.join("issues.json");
-    std::fs::write(&issues_path, r#"{"issues": []}"#).expect("write issues");
+    std::fs::write(
+        &issues_path,
+        r#"{"provenance":{"tenant":"nonagentic","source":"github:nonagenticai/conveyor"},"issues": []}"#,
+    )
+    .expect("write issues");
     let args = SnapshotArgs {
         tenant: "nonagentic".to_owned(),
         out: dir.clone(),
@@ -826,8 +838,9 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
     let dir = std::env::temp_dir().join(format!("conveyor-live-parity-{}", Uuid::now_v7()));
     std::fs::create_dir_all(&dir).expect("snapshot dir");
     let issues_path = dir.join("issues.json");
-    std::fs::write(&issues_path, r#"{"issues": []}"#).expect("write issues");
-    let issues: Value = serde_json::from_str(r#"{"issues": []}"#).expect("issues json");
+    let issues_json = r#"{"provenance":{"tenant":"snap-live","source":"github:nonagenticai/conveyor"},"issues": []}"#;
+    std::fs::write(&issues_path, issues_json).expect("write issues");
+    let issues: Value = serde_json::from_str(issues_json).expect("issues json");
     // The rework register rides both producers: the wrapper's `rework` section is part of the
     // byte-for-byte parity the live route and the CLI must keep.
     let rework = json!({

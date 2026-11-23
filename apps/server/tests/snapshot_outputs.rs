@@ -103,7 +103,11 @@ async fn only_published_outputs_are_public_and_rendered_safely() {
     std::fs::create_dir_all(&data).expect("data dir");
     std::fs::create_dir_all(&docs).expect("docs dir");
     let issues = data.join("issues.json");
-    std::fs::write(&issues, "{\"issues\":[]}").expect("issues");
+    std::fs::write(
+        &issues,
+        r#"{"provenance":{"tenant":"out","source":"github:nonagenticai/conveyor"},"issues":[]}"#,
+    )
+    .expect("issues");
     let report = run_with_pool(
         &db.runtime,
         SnapshotArgs {
