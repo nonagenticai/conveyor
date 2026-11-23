@@ -251,7 +251,11 @@ mod tests {
                 // #579: the async invocation record, so a caller behind the CDN's ~100 s cap
                 // can submit and poll instead of holding one response open
                 // (0063_async_invocation.sql).
-                (63, "async invocation".to_owned())
+                (63, "async invocation".to_owned()),
+                // T5 (#77): the kata itself, and the gate a second kata for an open signature
+                // passes through (0064_kata.sql, 0065_kata_gate.sql).
+                (64, "kata".to_owned()),
+                (65, "kata gate".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
