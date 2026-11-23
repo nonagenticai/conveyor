@@ -286,6 +286,67 @@ pub struct Seeded {
     pub user_id: Uuid,
 }
 
+/// The three §8.3 evidence classes as real programme rows, for a tranche review in a test.
+///
+/// The review's evidence is citation, not prose: the store resolves every cited id. This
+/// creates an approved management baseline, a benefit profile and a risk row (with its own
+/// fixture project) in the tranche's programme and returns them as the review's evidence.
+pub async fn tranche_review_evidence(pg: &Pg, seeded: &Seeded, tranche: Uuid) -> serde_json::Value {
+    let programme: Uuid = sqlx::query_scalar(
+        "SELECT programme_id FROM programme_tranche WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(tranche)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the tranche's programme");
+    let project: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name, programme_id, meta)
+         VALUES ($1, $2, 'Review evidence', $3, '{}'::jsonb) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(format!("EVID-{}", Uuid::now_v7().simple()))
+    .bind(programme)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the evidence project");
+    let baseline: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_baseline
+             (tenant_id, programme_id, kind, snapshot, taken_by, approved_by)
+         VALUES ($1, $2, 'management', '{}'::jsonb, $3, $3) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(programme)
+    .bind(seeded.user_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the approved baseline");
+    let benefit: Uuid = sqlx::query_scalar(
+        "INSERT INTO benefit_profile (tenant_id, programme_id, reference, description, status)
+         VALUES ($1, $2, $3, 'Review evidence', 'active') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(programme)
+    .bind(format!("B-{}", Uuid::now_v7().simple()))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the benefit profile");
+    let risk: Uuid = sqlx::query_scalar(
+        "INSERT INTO project_register_item (tenant_id, project_id, kind, title, status)
+         VALUES ($1, $2, 'risk', 'Review evidence risk', 'open') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the risk row");
+    json!({
+        "baselines": [baseline],
+        "benefit_status": [benefit],
+        "risk_register": [risk],
+    })
+}
+
 /// Seed `dev-a`/`alice` (and optionally another tenant) exactly as `migrate --dev-seed`
 /// does, including the active entitlement the licence gate requires.
 /// The second human every fixture can rely on: a distinct reviewer in the same tenant, so a gate

@@ -111,22 +111,23 @@ async fn create_tranche(running: &support::Running, programme: &str, number: i64
 }
 
 async fn review_tranche(
+    pg: &support::Pg,
     running: &support::Running,
+    seeded: &support::Seeded,
     tranche: &str,
     decision: &str,
     delegation: &str,
 ) -> (u16, Value) {
+    let mut evidence =
+        support::tranche_review_evidence(pg, seeded, Uuid::parse_str(tranche).expect("tranche id"))
+            .await;
+    // v1-tr2-2: the review names the snapshot it judged.
+    evidence["snapshot_sha"] = json!("0123456789abcdef0123456789abcdef01234567");
     let input = json!({
         "id": tranche,
         "decision": decision,
         "delegation_ref": delegation,
-        "evidence": {
-            // v1-tr2-2: the review names the snapshot it judged.
-            "snapshot_sha": "0123456789abcdef0123456789abcdef01234567",
-            "baselines": ["B0"],
-            "benefit_status": {"B1": "tracking"},
-            "risk_register": ["risk-1"]
-        }
+        "evidence": evidence
     });
     let gate = support::review_gate(running, TOKEN, &input).await;
     running
@@ -323,7 +324,8 @@ async fn activate_requires_authorised_tranche() {
     // A continue review authorises the next tranche in the same write; then activation passes.
     let t0 = create_tranche(&running, &programme, 0).await;
     let delegation = support::delegation_ref(&running, TOKEN).await;
-    let (status, _body) = review_tranche(&running, &t0, "continue", &delegation).await;
+    let (status, _body) =
+        review_tranche(&pg, &running, &seeded, &t0, "continue", &delegation).await;
     assert_eq!(status, 200);
     assert_eq!(
         tranche_state(&running, &programme, 1).await["state"],
@@ -566,7 +568,7 @@ async fn legacy_contract_requester_flagged() {
 
 #[tokio::test]
 async fn tranche_authorise_links_review() {
-    let (pg, running, _seeded) = fixture().await;
+    let (pg, running, seeded) = fixture().await;
     let programme = create_programme(&running, "Repair programme").await;
     let t0 = create_tranche(&running, &programme, 0).await;
     let t1 = create_tranche(&running, &programme, 1).await;
@@ -574,7 +576,8 @@ async fn tranche_authorise_links_review() {
     // historical review whose authorisation never landed, so the fixture withdraws it after the
     // fact: the review row stays, the next tranche reads planned, and the repair re-links it.
     let delegation = support::delegation_ref(&running, TOKEN).await;
-    let (status, _body) = review_tranche(&running, &t0, "continue", &delegation).await;
+    let (status, _body) =
+        review_tranche(&pg, &running, &seeded, &t0, "continue", &delegation).await;
     assert_eq!(status, 200);
     let review = latest_review(&running, &programme).await;
     sqlx::query(
@@ -611,11 +614,11 @@ async fn tranche_authorise_links_review() {
 
 #[tokio::test]
 async fn tranche_authorise_refuses_non_continue_and_unknown() {
-    let (_pg, running, _seeded) = fixture().await;
+    let (pg, running, seeded) = fixture().await;
     let programme = create_programme(&running, "Refusal programme").await;
     let t0 = create_tranche(&running, &programme, 0).await;
     let delegation = support::delegation_ref(&running, TOKEN).await;
-    let (status, _body) = review_tranche(&running, &t0, "pause", &delegation).await;
+    let (status, _body) = review_tranche(&pg, &running, &seeded, &t0, "pause", &delegation).await;
     assert_eq!(status, 200);
     let review = latest_review(&running, &programme).await;
     create_tranche(&running, &programme, 1).await;
@@ -652,12 +655,13 @@ async fn tranche_authorise_refuses_non_continue_and_unknown() {
 
 #[tokio::test]
 async fn tranche_authorise_is_idempotent() {
-    let (_pg, running, _seeded) = fixture().await;
+    let (pg, running, seeded) = fixture().await;
     let programme = create_programme(&running, "Idempotent programme").await;
     let t0 = create_tranche(&running, &programme, 0).await;
     let _t1 = create_tranche(&running, &programme, 1).await;
     let delegation = support::delegation_ref(&running, TOKEN).await;
-    let (status, _body) = review_tranche(&running, &t0, "continue", &delegation).await;
+    let (status, _body) =
+        review_tranche(&pg, &running, &seeded, &t0, "continue", &delegation).await;
     assert_eq!(status, 200);
     let review = latest_review(&running, &programme).await;
 

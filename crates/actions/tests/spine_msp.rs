@@ -411,7 +411,7 @@ async fn benefit_links_are_listable_and_removable() {
 /// reviewed tranche cannot be deleted.
 #[tokio::test(flavor = "multi_thread")]
 async fn tranche_review_persists_decision_and_evidence() {
-    let (_pg, running, _seeded) = fixture().await;
+    let (pg, running, seeded) = fixture().await;
     let programme = create_programme(&running, "Review programme").await;
     let (tranche, etag) = create_tranche(&running, &programme, 0).await;
     // U4: a `continue` authorises the next tranche, so the plan needs one to authorise.
@@ -439,17 +439,20 @@ async fn tranche_review_persists_decision_and_evidence() {
         "{updated}"
     );
     let delegation = support::delegation_ref(&running, "dev:alice").await;
+    let mut evidence = support::tranche_review_evidence(
+        &pg,
+        &seeded,
+        uuid::Uuid::parse_str(&tranche).expect("tranche id"),
+    )
+    .await;
+    // v1-tr2-2: the review names the snapshot it judged.
+    evidence["snapshot_sha"] = json!("0123456789abcdef0123456789abcdef01234567");
+    let baseline = evidence["baselines"][0].clone();
     let input = json!({
         "id": tranche,
         "decision": "continue",
         "delegation_ref": delegation,
-        "evidence": {
-            // v1-tr2-2: the review names the snapshot it judged.
-            "snapshot_sha": "0123456789abcdef0123456789abcdef01234567",
-            "baselines": ["B0"],
-            "benefit_status": {"BEN-T": "tracking"},
-            "risk_register": ["risk-1"]
-        }
+        "evidence": evidence
     });
     let gate = support::review_gate(&running, "dev:alice", &input).await;
     let (status, reviewed) = running
@@ -474,7 +477,7 @@ async fn tranche_review_persists_decision_and_evidence() {
     assert_eq!(rows.len(), 1, "{reviews}");
     assert_eq!(rows[0]["tranche_id"], tranche);
     assert_eq!(rows[0]["decision"], "continue");
-    assert_eq!(rows[0]["evidence"]["baselines"][0], "B0");
+    assert_eq!(rows[0]["evidence"]["baselines"][0], baseline);
 
     let tranche_etag = format!("\"{review_version}\"");
     // #283: the gate fires before the handler, so the refusal under test is reached through one.

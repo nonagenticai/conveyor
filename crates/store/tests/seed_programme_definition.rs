@@ -180,29 +180,53 @@ async fn a_seeded_tranche_one_project_starts_after_the_continue_review() {
     .expect("the seeded T1 project");
     let tenant = TenantId::from_uuid(seeded.tenant).expect("tenant id");
 
-    let mut tx = begin_scoped(&db.owner, tenant).await.expect("scope");
-    let allowed = assert_project_tranche_authorised_tx(&mut tx, tenant, project).await;
-    tx.commit().await.expect("commit");
-    assert!(
-        allowed.is_ok(),
-        "a seeded tranche-1 project starts: {allowed:?}"
-    );
-
-    // The negative arm: the same project is refused while its tranche is still planned.
-    sqlx::query(
-        "UPDATE programme_tranche SET state = 'planned'
-          WHERE tenant_id = $1 AND number = 1",
-    )
-    .bind(seeded.tenant)
-    .execute(&db.super_pool)
-    .await
-    .expect("put tranche 1 back to planned");
+    // The seed asserts no authorisation: every tranche starts planned, so the tranche-1
+    // project is refused until a review authorises it.
     let mut tx = begin_scoped(&db.owner, tenant).await.expect("scope");
     let refused = assert_project_tranche_authorised_tx(&mut tx, tenant, project).await;
     tx.rollback().await.expect("rollback");
     assert!(
         refused.is_err(),
-        "a planned tranche cannot start: {refused:?}"
+        "a seeded planned tranche cannot start: {refused:?}"
+    );
+
+    // The continue review's effect: a review row of the tranche, named by
+    // authorisation_review_id, is what authorises the start. The review's own evidence
+    // resolution is proved in tranche_review.rs.
+    let reviewer: uuid::Uuid =
+        sqlx::query_scalar("SELECT id FROM app_user WHERE tenant_id = $1 ORDER BY id LIMIT 1")
+            .bind(seeded.tenant)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("a seeded app_user");
+    let review: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche_review
+             (tenant_id, tranche_id, decision, evidence, reviewed_by)
+         SELECT $1, id, 'continue', '{\"fixture\": true}'::jsonb, $2
+           FROM programme_tranche WHERE tenant_id = $1 AND number = 1
+         RETURNING id",
+    )
+    .bind(seeded.tenant)
+    .bind(reviewer)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the authorising review");
+    sqlx::query(
+        "UPDATE programme_tranche
+            SET state = 'authorised', authorisation_review_id = $2, authorised_at = now()
+          WHERE tenant_id = $1 AND number = 1",
+    )
+    .bind(seeded.tenant)
+    .bind(review)
+    .execute(&db.super_pool)
+    .await
+    .expect("authorise tranche 1");
+    let mut tx = begin_scoped(&db.owner, tenant).await.expect("scope");
+    let allowed = assert_project_tranche_authorised_tx(&mut tx, tenant, project).await;
+    tx.commit().await.expect("commit");
+    assert!(
+        allowed.is_ok(),
+        "the reviewed tranche-1 project starts: {allowed:?}"
     );
 }
 

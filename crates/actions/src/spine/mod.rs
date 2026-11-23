@@ -151,6 +151,19 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "tranche_evidence_missing",
             "a tranche review needs baselines, benefit status and the risk register",
         ),
+        PlanStoreError::Illegal(PlanError::TrancheReviewEvidenceUnresolved { class }) => invalid(
+            "evidence",
+            "tranche_review_evidence_unresolved",
+            format!("the tranche review cites {class} ids that name no row of this programme"),
+        ),
+        PlanStoreError::Illegal(PlanError::TrancheBaselineNotApproved { kind }) => invalid(
+            "evidence",
+            "tranche_baseline_not_approved",
+            format!(
+                "a {kind} baseline is not approved; cite an approved management, governance or \
+                 boundary baseline"
+            ),
+        ),
         PlanStoreError::Illegal(PlanError::TrancheReviewNotContinue) => ActionError::new(
             409,
             "tranche_review_not_continue",

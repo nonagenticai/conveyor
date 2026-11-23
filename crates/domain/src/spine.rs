@@ -117,6 +117,18 @@ pub enum PlanError {
     /// A tranche review with no baselines, benefit status or risk evidence is refused.
     #[error("a tranche review needs baselines, benefit status and the risk register as evidence")]
     TrancheReviewEvidenceMissing,
+    /// A review cites an evidence id that names no row of its programme.
+    #[error("tranche_review_evidence_unresolved: {class}")]
+    TrancheReviewEvidenceUnresolved {
+        /// The evidence class: `baselines`, `benefit_status` or `risk_register`.
+        class: &'static str,
+    },
+    /// A review cites a baseline that is not an approved management/governance/boundary baseline.
+    #[error("tranche_baseline_not_approved: {kind}")]
+    TrancheBaselineNotApproved {
+        /// The kind the baseline row carries.
+        kind: String,
+    },
     /// Only a `continue` decision authorises the next tranche.
     #[error("only a continue review authorises the next tranche")]
     TrancheReviewNotContinue,
@@ -445,12 +457,22 @@ pub struct BenefitMapFields {
 }
 
 /// Whether a tranche review carries the three evidence classes §8.3 requires.
+///
+/// Each class is a non-empty array of UUID strings: the review cites rows, never a prose
+/// summary of them. Whether the ids resolve is a store question; this predicate is DB-free.
 pub fn tranche_review_has_evidence(evidence: &Value) -> bool {
     ["baselines", "benefit_status", "risk_register"]
         .iter()
         .all(|key| {
             evidence
                 .get(*key)
-                .is_some_and(|value| !value.is_null() && value != &Value::Array(Vec::new()))
+                .and_then(Value::as_array)
+                .is_some_and(|ids| {
+                    !ids.is_empty()
+                        && ids.iter().all(|id| {
+                            id.as_str()
+                                .is_some_and(|text| Uuid::parse_str(text).is_ok())
+                        })
+                })
         })
 }
