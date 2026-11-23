@@ -167,12 +167,13 @@ fn request_as_kind(actor: Uuid, actor_kind: &str, action: &str, input: Value) ->
         actor_kind: actor_kind.to_owned(),
         role: Role::Admin,
         policy: Default::default(),
-        authority: conveyor_actions::Authority::Role,
+        authority: conveyor_actions::Authority::Internal,
         request_id: Some("rid-approval-policies".to_owned()),
         trace_id: Some("trace-approval-policies".to_owned()),
         depth: 0,
         app_key: "conveyor-test".to_owned(),
         usage: None::<conveyor_actions::UsageContext>,
+        credential_alias: None,
     }
 }
 
