@@ -3,9 +3,9 @@
 //! CONTRACT §19 "Sandbox isolation").
 //!
 //! One `batch/v1` Job per `(run, instance)`: a ConfigMap carrying `patch.diff`, `eval.sh` and
-//! `run.sh`, a small wrapper ConfigMap carrying the `gs` shim; the instance image by digest;
-//! **no service-account token**; CPU/memory/ephemeral caps; a pod deadline. The conveyor never
-//! executes test code in its own pod.
+//! `run.sh`, a small wrapper ConfigMap carrying the `gs` shim and its relay; the instance image
+//! by digest; **no service-account token**; CPU/memory/ephemeral caps; a pod deadline. The
+//! conveyor never executes test code in its own pod.
 //!
 //! **Client choice (recorded deviation from S17 §6's "kube client").** This talks to the
 //! Kubernetes API over the workspace `reqwest` instead of the generated `kube` client: the
@@ -38,14 +38,22 @@ pub const SA_DIR: &str = "/var/run/secrets/kubernetes.io/serviceaccount";
 pub const GS_WRAPPER_DIR: &str = "/bench-bin";
 /// The `gs` shim for matplotlib's Ghostscript image comparisons.
 ///
-/// The instance images call the system Ghostscript (9.55), whose default policy refuses to
-/// read or write under `/testbed` from the sandbox pod: matplotlib passes the result path as
-/// an operand and the comparison dies with `invalidfileaccess in --run--`. The shim grants
-/// exactly the `/testbed/` tree and passes every other argument through unchanged.
+/// The instance images call the system Ghostscript (9.55), whose SAFER policy refuses every
+/// read and write under `/testbed` from the sandbox pod — measured in the image: the
+/// `--permit-file-*` flags are ineffective in that build and `-dNOSAFER` is ignored, while
+/// `/tmp` is allowed. The shim therefore runs [`GS_RELAY`], which mirrors the `/testbed`
+/// paths named in matplotlib's interactive PostScript stream under a private `/tmp` root and
+/// copies the produced files back. Every other argument passes through unchanged.
 pub const GS_WRAPPER: &str = concat!(
     "#!/bin/sh\n",
-    "exec /usr/bin/gs --permit-file-read=/testbed/ --permit-file-write=/testbed/ \"$@\"\n",
+    "PY=/opt/miniconda3/envs/testbed/bin/python3\n",
+    "[ -x \"$PY\" ] || PY=python3\n",
+    "exec \"$PY\" /bench-bin/gs-relay.py \"$@\"\n",
 );
+/// The relay behind [`GS_WRAPPER`]: it stages `/testbed` under `/tmp` for the image's
+/// Ghostscript, which cannot reach `/testbed` at all, and copies the outputs back before it
+/// forwards Ghostscript's prompt (matplotlib checks the destination as soon as it reads it).
+pub const GS_RELAY: &str = include_str!("gs_relay.py");
 
 /// swebench 5.0.2's `GIT_APPLY_CMDS`, read from the pinned sdist (`run_evaluation.py:54`).
 pub const GIT_APPLY_CMDS: [&str; 4] = [
@@ -325,8 +333,8 @@ impl Sandbox {
     /// The ConfigMaps and Job for one instance.
     ///
     /// The inputs ConfigMap carries `patch.diff`, `eval.sh` and `run.sh` and is refused over
-    /// [`CONFIGMAP_LIMIT`]; the wrapper ConfigMap carries [`GS_WRAPPER`] and is mounted first
-    /// on the grader's `PATH`. The Job runs the runner script as a non-root, token-less pod
+    /// [`CONFIGMAP_LIMIT`]; the wrapper ConfigMap carries [`GS_WRAPPER`] and [`GS_RELAY`] and is
+    /// mounted first on the grader's `PATH`. The Job runs the runner script as a non-root, token-less pod
     /// with CPU/memory/ephemeral caps and the instance image by digest — an unpinned image (a
     /// mutable tag) is refused before anything is created.
     pub fn manifests(
@@ -416,7 +424,7 @@ impl Sandbox {
                 "namespace": self.config.namespace,
                 "labels": labels.clone(),
             },
-            "data": { "gs": GS_WRAPPER },
+            "data": { "gs": GS_WRAPPER, "gs-relay.py": GS_RELAY },
         });
         let job = json!({
             "apiVersion": "batch/v1",

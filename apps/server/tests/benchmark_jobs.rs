@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use conveyor_domain::benchmark::{APPLY_PATCH_FAIL, APPLY_PATCH_PASS, EVAL_MARKER, TIMEOUT_MARKER};
 use conveyor_server::sandbox::{
-    CONFIGMAP_LIMIT, DEFAULT_PULL_SECRET, EVAL_TIMEOUT_S, GIT_APPLY_CMDS, GS_WRAPPER,
+    CONFIGMAP_LIMIT, DEFAULT_PULL_SECRET, EVAL_TIMEOUT_S, GIT_APPLY_CMDS, GS_RELAY, GS_WRAPPER,
     GS_WRAPPER_DIR, NodeSelector, POD_DEADLINE_S, Sandbox, SandboxConfig, SandboxError, Toleration,
     runner_script,
 };
@@ -154,8 +154,10 @@ fn the_manifest_carries_the_isolation_contract() {
     assert_eq!(pod["containers"][0]["resources"]["limits"]["cpu"], "2");
     assert_eq!(pod["volumes"][0]["configMap"]["defaultMode"], 0o555);
 
-    // The `gs` shim: matplotlib's `[pdf]`/`[eps]` comparisons call the image's system
-    // Ghostscript, which refuses the sandbox's `/testbed` paths without the permit flags.
+    // The `gs` relay: the image's Ghostscript 9.55 refuses every `/testbed` read and write
+    // (the `--permit-file-*` flags are ineffective in that build and `-dNOSAFER` is ignored),
+    // while `/tmp` is allowed. The shim runs the relay, which mirrors the paths it is handed
+    // under `/tmp` and copies the results back.
     let bin_name = Sandbox::wrapper_configmap_name(&name);
     assert_eq!(bin_configmap["metadata"]["name"], bin_name.as_str());
     let wrapper = bin_configmap["data"]["gs"]
@@ -163,14 +165,20 @@ fn the_manifest_carries_the_isolation_contract() {
         .expect("the gs wrapper is a string");
     assert_eq!(wrapper, GS_WRAPPER, "the ConfigMap ships the shim verbatim");
     assert!(
-        wrapper.starts_with("#!/bin/sh\n") && wrapper.contains("exec /usr/bin/gs"),
-        "the shim must exec the image's Ghostscript: {wrapper:?}"
+        wrapper.starts_with("#!/bin/sh\n")
+            && wrapper.contains("exec \"$PY\" /bench-bin/gs-relay.py \"$@\""),
+        "the shim must exec the relay and pass its arguments through: {wrapper:?}"
     );
+    let relay = bin_configmap["data"]["gs-relay.py"]
+        .as_str()
+        .expect("the gs relay is a string");
+    assert_eq!(relay, GS_RELAY, "the ConfigMap ships the relay verbatim");
     assert!(
-        wrapper.contains("--permit-file-read=/testbed/")
-            && wrapper.contains("--permit-file-write=/testbed/")
-            && wrapper.contains("\"$@\""),
-        "the shim must grant only /testbed and pass its arguments through: {wrapper:?}"
+        relay.contains("GS = \"/usr/bin/gs\"")
+            && relay.contains("ROOT = \"/testbed\"")
+            && relay.contains("tempfile.mkdtemp")
+            && relay.contains("setpagedevice"),
+        "the relay must stage /testbed under /tmp around the real Ghostscript: {relay:?}"
     );
 
     let volumes = pod["volumes"].as_array().expect("volumes");

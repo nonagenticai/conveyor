@@ -2955,6 +2955,7 @@
         },
         {
             "id": "v1-p45-1",
+            "resolved_by": "fixed in #612 before merge; the Memory source renders the run's prior steps, the card's hot rows and one digest, and a required memory source with nothing to select still refuses by name (crates/domain/tests/prompt_memory.rs, crates/store/tests/prompt_catalogue.rs)",
             "area": "§4.5",
             "standard": "SPEC",
             "spec": "§4.5",
@@ -3456,6 +3457,7 @@
         },
         {
             "id": "v1-p76-2",
+            "resolved_by": "fixed in #612 before merge; hot_for_card_tx excludes digest rows, so memory.recall's hot is the record and the digest is reachable only through the prompt selector's include_digest and the cold read (crates/store/tests/memory.rs)",
             "area": "§7.6",
             "standard": "SPEC",
             "spec": "§7.6",

@@ -111,5 +111,5 @@ are in the tests' doc comments.
   budget gate, not a second loop check.
 - `v1-p66-1`'s lane-refusal clause ("moving a delivery card into a work lane without a binding is
   refused 422") needs a delivery-card marker that does not exist.
-- Auto-start from a claim or lane move; prior-step memory in the prompt; `run.execute`'s retry
-  after a handler DB fault (#581 residual).
+- Auto-start from a claim or lane move; prior-step memory in the prompt (**now built in #612**);
+  `run.execute`'s retry after a handler DB fault (#581 residual).

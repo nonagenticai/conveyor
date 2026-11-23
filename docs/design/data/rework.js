@@ -9251,81 +9251,6 @@ window.CONVEYOR_REWORK = {
       "title": "A new binding goes live with no decision"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p45-1:T0",
-      "apply_to": "PLATFORM",
-      "artefact": "§4.5",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The prompt compiler gains a Memory source fed by memory.recall (hot rows plus digest) and the run's prior steps; a test compiles a prompt for a card with a hot row and asserts the text contains it, and an absent memory source is a named refusal.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 38,
-              "path": "crates/domain/src/prompt.rs",
-              "quote": "    Knowledge,",
-              "source": "code"
-            },
-            {
-              "line": 2,
-              "path": "crates/actions/src/memory/recall.rs",
-              "quote": "//! `memory.recall` — hot rows first, then the semantic digest derived from them.",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p45-1",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p45-1:T0",
-      "owner_project": "T0",
-      "rule": "v1-p45-1",
-      "scope": "T0",
-      "severity": "P1",
-      "spec": "§4.5",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "§4.5 assembles the agent prompt from Knowledge, Memory, Request and Tools, but PromptSource has no memory variant and no memory section is rendered, so hot rows and digests never reach an agent.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 38,
-                  "path": "crates/domain/src/prompt.rs",
-                  "quote": "    Knowledge,",
-                  "source": "code"
-                },
-                {
-                  "line": 2,
-                  "path": "crates/actions/src/memory/recall.rs",
-                  "quote": "//! `memory.recall` — hot rows first, then the semantic digest derived from them.",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p45-1",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T0"
-        }
-      ],
-      "title": "The compiled prompt has no Memory source"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p5-3:T1",
       "apply_to": "PLATFORM",
       "artefact": "§5.5",
@@ -21415,93 +21340,6 @@ window.CONVEYOR_REWORK = {
       "title": "Unpriced calls become zero in the billing/reconciliation figure"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p76-2:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "§7.6",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The hot query or recall excludes kind digest; a test consolidates a card and asserts the hot list carries no digest row or body and that the digest is read only from the cold store.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 346,
-              "path": "crates/store/src/memory.rs",
-              "quote": "         VALUES ($1, $2, $3, 'digest', 'system', $4, now(), $5)",
-              "source": "code"
-            },
-            {
-              "line": 229,
-              "path": "crates/store/src/memory.rs",
-              "quote": "          WHERE tenant_id = $1 AND card_id = $2",
-              "source": "code"
-            },
-            {
-              "line": 20,
-              "path": "crates/actions/src/memory/mod.rs",
-              "quote": "/// One memory row as an action returns it. Never carries a digest body: that is read from strata.",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p76-2",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p76-2:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "v1-p76-2",
-      "scope": "PLATFORM",
-      "severity": "P2",
-      "spec": "§7.6",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "§7.6 separates hot rows from the cold digest; consolidation writes the digest into work_package_memory as kind digest and the hot query has no kind filter, so recall returns a derived digest body as a hot row.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 346,
-                  "path": "crates/store/src/memory.rs",
-                  "quote": "         VALUES ($1, $2, $3, 'digest', 'system', $4, now(), $5)",
-                  "source": "code"
-                },
-                {
-                  "line": 229,
-                  "path": "crates/store/src/memory.rs",
-                  "quote": "          WHERE tenant_id = $1 AND card_id = $2",
-                  "source": "code"
-                },
-                {
-                  "line": 20,
-                  "path": "crates/actions/src/memory/mod.rs",
-                  "quote": "/// One memory row as an action returns it. Never carries a digest body: that is read from strata.",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p76-2",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "memory.recall serves the consolidated digest inside the hot rows"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p77-2:PLATFORM",
       "apply_to": "PLATFORM",
       "artefact": "§7.7",
@@ -29738,12 +29576,12 @@ window.CONVEYOR_REWORK = {
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 88,
+      "findings": 86,
       "gaps": 41,
       "p0": 0,
       "p1": 6,
       "p2": 35,
-      "packages": 109,
+      "packages": 107,
       "rules": 8,
       "rules_clean": 2,
       "rules_with_gaps": 6,
@@ -29766,25 +29604,25 @@ window.CONVEYOR_REWORK = {
   "summary": {
     "by_severity": {
       "P0": 26,
-      "P1": 150,
-      "P2": 155
+      "P1": 149,
+      "P2": 154
     },
     "by_standard": {
       "MSP": 66,
       "PMP": 49,
       "SAFe": 16,
-      "SPEC": 109,
+      "SPEC": 107,
       "TOGAF": 91
     },
     "by_status": {
-      "open": 328,
+      "open": 326,
       "suppressed": 3
     },
     "duplicates": 0,
-    "open": 328,
-    "packages": 331,
-    "resolved": 12,
-    "subjects": 432,
+    "open": 326,
+    "packages": 329,
+    "resolved": 14,
+    "subjects": 430,
     "suppressed": 3
   }
 };
