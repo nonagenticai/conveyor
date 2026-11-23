@@ -123,8 +123,10 @@ use serde_json::{Value, json};
 /// **#526 register gaps add 1 internal**: `benefits.measurement_list` — the read-back of the
 /// measurements a `benefits.measure` write records. 540 → **541**.
 /// **#560 (T14) adds 5 external**: `scientific_stats.meta_analysis|confidence_interval|trend`
-/// and `scientific_formal.translate|verify` — the estate toolkit's scientific reads. 541 → **546**.
-const EXPECTED: [&str; 546] = [
+/// and `scientific_formal.translate|verify` — the estate toolkit's scientific reads (546).
+/// **#556/#590 add 8 internal**: `storage.get|put`, `tool_bindings.create|list|retire|update`
+/// and `tools.resume|retire`. 546 → **554**.
+const EXPECTED: [&str; 554] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -615,6 +617,8 @@ const EXPECTED: [&str; 546] = [
     "stakeholders.profile_list",
     "stakeholders.profile_update",
     "stakeholders.update",
+    "storage.get",
+    "storage.put",
     "task_lists.create",
     "task_lists.delete",
     "task_lists.update",
@@ -624,9 +628,15 @@ const EXPECTED: [&str; 546] = [
     "tasks.update",
     "tenants.get",
     "tenants.update_settings",
+    "tool_bindings.create",
+    "tool_bindings.list",
+    "tool_bindings.retire",
+    "tool_bindings.update",
     "toolkits.publish",
     "tools.call",
     "tools.probe",
+    "tools.resume",
+    "tools.retire",
     "tools.usage",
     "trace_links.create",
     "trace_links.delete",
@@ -766,8 +776,10 @@ fn the_registry_is_exactly_the_declared_set() {
     // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
     // 520 -> 525; external stays 14.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
-    // `trend` and `scientific_formal.translate|verify`: internal stays 526, external 14 -> 19.
-    assert_eq!((internal, external), (526, 19));
+    // `trend` and `scientific_formal.translate|verify`. #556/#590 add eight internal actions
+    // (`storage.get|put`, `tool_bindings.create|list|retire|update`, `tools.resume|retire`).
+    // The merged registry is 554: 535 internal, 19 external.
+    assert_eq!((internal, external), (535, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

@@ -12,59 +12,59 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "baseline 01a2052e-061f-7570-b780-d94101449bef approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1efd4-c3e5-7b74-b32b-1b15683a8c4e, snapshot frozen",
+      "detail": "no project baseline",
       "id": "T3-baseline",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d33-7915-8833-75f4dc31cc07\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 0",
-      "exit": 0,
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "exit": 1,
       "id": "T3-charter",
       "kind": "command",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0",
-      "stderr": "",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
       "check": "closure_outputs",
       "description": "the declared closure outputs are declared and published",
-      "detail": "1 closure outputs published",
+      "detail": "declared closure outputs are not published: closure-review",
       "id": "T3-closure-outputs",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "contract 01a2052f-29da-76c4-9bda-e45e0f408fe8 approved by board decision 01a2052f-5a18-7607-b2c4-a6e3f89015e6 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
+      "detail": "no live board-approved delivery contract",
       "id": "T3-contract",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a2052f-cc4e-7b73-a427-9b26fcad1d68 (conformant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+      "detail": "no Phase-G compliance review for the project's live contract",
       "id": "T3-review",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a20530-bae5-7a3b-af1d-bce4e12ebb85 decided by a distinct approver",
+      "detail": "no approved closure gate for the project",
       "id": "T3-closure-gate",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
@@ -106,25 +106,25 @@
     {
       "check": "wsjf",
       "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
-      "detail": "5 WBS node(s) carry the four WSJF inputs",
+      "detail": "no WBS deliverable carries the plan",
       "id": "T3-wsjf",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
       "check": "demo_credits",
       "description": "every accepted deliverable has a demo credit carrying its evidence",
-      "detail": "5 accepted deliverable(s), each with a demo credit",
+      "detail": "no accepted deliverable to demo",
       "id": "T3-demo-credits",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a2051b-442c-7b07-a8b4-4c7a1f518b74 carries a statement and evidence from the tranche-3 retro",
+      "detail": "lesson 01a2075f-4f24-7383-aa6d-3eeb88b0faf6 carries a statement and evidence from the tranche-3 retro",
       "id": "T3-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -133,35 +133,56 @@
     {
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "no open P0 package for this project",
+      "detail": "4 open P0 package(s): closed_without_closure_review:T3, std-pmp-change-control-t3:T3, std-pmp-project-baseline-t3:T3, std-togaf-compliance-review-t3:T3",
       "id": "T3-product",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "gate discharged by executable checks: T3-project, T3-baseline, T3-charter, T3-closure-outputs, T3-contract, T3-review, T3-closure-gate, T3-waivers, T3-pi-cadence, T3-pi-plan, T3-pi-objectives, T3-wsjf, T3-demo-credits, T3-lessons, T3-product",
+      "detail": "the gate check 'T3-baseline' did not pass; the gate check 'T3-charter' did not pass; the gate check 'T3-closure-outputs' did not pass; the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass; the gate check 'T3-closure-gate' did not pass; the gate check 'T3-wsjf' did not pass; the gate check 'T3-demo-credits' did not pass; the gate check 'T3-product' did not pass",
       "id": "gate",
       "kind": "manifest",
-      "result": "pass",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "a closed project must not carry a red acceptance manifest",
+      "detail": "the project is closed while its manifest is red",
+      "id": "closed-on-red",
+      "kind": "snapshot",
+      "result": "fail",
       "severity": "P0"
     }
   ],
-  "failures": [],
+  "failures": [
+    "T3-baseline (P0): no project baseline",
+    "T3-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "T3-closure-outputs (P0): declared closure outputs are not published: closure-review",
+    "T3-contract (P0): no live board-approved delivery contract",
+    "T3-review (P0): no Phase-G compliance review for the project's live contract",
+    "T3-closure-gate (P0): no approved closure gate for the project",
+    "T3-wsjf (P0): no WBS deliverable carries the plan",
+    "T3-demo-credits (P0): no accepted deliverable to demo",
+    "T3-product (P0): 4 open P0 package(s): closed_without_closure_review:T3, std-pmp-change-control-t3:T3, std-pmp-project-baseline-t3:T3, std-togaf-compliance-review-t3:T3",
+    "gate (P0): the gate check 'T3-baseline' did not pass; the gate check 'T3-charter' did not pass; the gate check 'T3-closure-outputs' did not pass; the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass; the gate check 'T3-closure-gate' did not pass; the gate check 'T3-wsjf' did not pass; the gate check 'T3-demo-credits' did not pass; the gate check 'T3-product' did not pass",
+    "closed-on-red (P0): the project is closed on a red manifest"
+  ],
   "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request",
-  "generated_at": "2026-11-22T21:40:58.454213+00:00",
+  "generated_at": "2026-11-23T07:48:36.046792+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T3.toml",
   "name": "PM job",
   "project": "T3",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-22T21:40:15.060081+00:00",
-    "git_sha": "cdfb0d8e9dea3a0e7bb887746ca2169f6def3740",
-    "path": "retained-snapshot/cdfb0d8e9dea3a0e7bb887746ca2169f6def3740"
+    "generated_at": "2026-11-23T07:38:20.287935+00:00",
+    "git_sha": "46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7",
+    "path": "retained-snapshot/46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7"
   },
-  "verdict": "green",
+  "verdict": "red",
   "warnings": []
 }

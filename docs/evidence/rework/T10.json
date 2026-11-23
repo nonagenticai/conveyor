@@ -3,7 +3,7 @@
     {
       "check": "project",
       "description": "T10 is closed",
-      "detail": "project T10 is closed",
+      "detail": "project T10 is active",
       "id": "T10-project",
       "kind": "snapshot",
       "result": "pass",
@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d36-70c1-a5e8-f50956c5e3f9\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 0",
-      "exit": 0,
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "exit": 1,
       "id": "T10-charter",
       "kind": "command",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0",
-      "stderr": "",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a20533-e89b-7e17-88de-114e2497c7d2 decided by a distinct approver",
+      "detail": "latest closure gate 01a20757-5dba-7e93-9dff-51b400a4e910 decided by a distinct approver",
       "id": "T10-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -88,19 +88,19 @@
     {
       "check": "pi_plan",
       "description": "the project tranche's PI plan is published",
-      "detail": "the tranche-4 PI plan is published",
+      "detail": "no published pi-plan output for tranche-4",
       "id": "T10-pi-plan",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
       "check": "pi_objectives",
       "description": "the project tranche's PI objectives are published",
-      "detail": "the tranche-4 PI objectives are published",
+      "detail": "no published pi-objectives output for tranche-4",
       "id": "T10-pi-objectives",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
@@ -124,44 +124,51 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a2053c-333c-77b8-943e-ec3d8768fd62 carries a statement and evidence from the tranche-4 retro",
+      "detail": "the tranche-4 retro produced no lesson",
       "id": "T10-lessons",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P1"
     },
     {
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "no open P0 package for this project",
+      "detail": "1 open P0 package(s): pi_plan_missing:tranche-4",
       "id": "T10-product",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "gate discharged by executable checks: T10-project, T10-baseline, T10-charter, T10-closure-outputs, T10-contract, T10-review, T10-closure-gate, T10-waivers, T10-pi-cadence, T10-pi-plan, T10-pi-objectives, T10-wsjf, T10-demo-credits, T10-lessons, T10-product",
+      "detail": "the gate check 'T10-charter' did not pass; the gate check 'T10-pi-plan' did not pass; the gate check 'T10-pi-objectives' did not pass; the gate check 'T10-lessons' did not pass; the gate check 'T10-product' did not pass",
       "id": "gate",
       "kind": "manifest",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     }
   ],
-  "failures": [],
+  "failures": [
+    "T10-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "T10-pi-plan (P0): no published pi-plan output for tranche-4",
+    "T10-pi-objectives (P0): no published pi-objectives output for tranche-4",
+    "T10-lessons (P1): the tranche-4 retro produced no lesson",
+    "T10-product (P0): 1 open P0 package(s): pi_plan_missing:tranche-4",
+    "gate (P0): the gate check 'T10-charter' did not pass; the gate check 'T10-pi-plan' did not pass; the gate check 'T10-pi-objectives' did not pass; the gate check 'T10-lessons' did not pass; the gate check 'T10-product' did not pass"
+  ],
   "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized",
-  "generated_at": "2026-11-22T21:50:24.122521+00:00",
+  "generated_at": "2026-11-23T07:48:35.370413+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T10.toml",
   "name": "SAFe cadence and MSP tranches",
   "project": "T10",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-22T21:49:57.491717+00:00",
-    "git_sha": "cdfb0d8e9dea3a0e7bb887746ca2169f6def3740",
-    "path": "retained-snapshot/cdfb0d8e9dea3a0e7bb887746ca2169f6def3740"
+    "generated_at": "2026-11-23T07:38:20.287935+00:00",
+    "git_sha": "46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7",
+    "path": "retained-snapshot/46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7"
   },
-  "verdict": "green",
+  "verdict": "red",
   "warnings": []
 }
