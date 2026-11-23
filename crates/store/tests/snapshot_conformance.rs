@@ -403,3 +403,58 @@ async fn the_snapshot_projects_governed_asset_meta_and_contract_citations() {
     assert_eq!(bare["links"], serde_json::json!({}), "{bare}");
     assert_eq!(bare["meta"], serde_json::json!({}), "{bare}");
 }
+
+/// A published output is projected with the publish state the filter admits it for. The query
+/// reads `published_at IS NOT NULL AND status = 'active'`; a projection that then drops
+/// `published_at` makes every consumer read a published output as unpublished — the standards
+/// generator scored every document-category artefact absent on exactly that (2026-11-23).
+#[tokio::test]
+async fn the_snapshot_projects_published_documents_with_their_publish_state() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    // `document` is tenant-scoped by RLS: the insert needs the tenant set on its connection,
+    // which is what the product's own write path does.
+    let mut tx = store::begin_scoped(&db.owner, f.tenant)
+        .await
+        .expect("scope the document insert");
+    let published: Uuid = sqlx::query_scalar(
+        "INSERT INTO document
+             (tenant_id, project_id, title, category, unit, publishable, status,
+              published_at, body)
+         VALUES ($1, $2, 'A published output', 'project-brief', 'T-snapshot', true,
+                 'active', now(), 'the body')
+         RETURNING id",
+    )
+    .bind(f.tenant_id)
+    .bind(f.bound_project)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert the published document");
+    let draft: Uuid = sqlx::query_scalar(
+        "INSERT INTO document
+             (tenant_id, project_id, title, category, unit, publishable, status)
+         VALUES ($1, $2, 'A draft output', 'project-brief', 'T-snapshot', true, 'active')
+         RETURNING id",
+    )
+    .bind(f.tenant_id)
+    .bind(f.bound_project)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert the draft document");
+    tx.commit().await.expect("commit the documents");
+
+    let data = snapshot(&db, f.tenant).await;
+    let documents = data.artefacts["documents"]
+        .as_array()
+        .expect("the documents projection");
+    let row = documents
+        .iter()
+        .find(|row| row["id"] == published.to_string())
+        .expect("the published document is projected");
+    assert!(row["published_at"].is_string(), "{row}");
+    assert_eq!(row["status"], "active", "{row}");
+    assert!(
+        documents.iter().all(|row| row["id"] != draft.to_string()),
+        "a draft is never projected"
+    );
+}
