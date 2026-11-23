@@ -398,6 +398,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S18-B.md"
     },
     {
+      "title": "S18-loop-29cc3820 — the real improvement loop at one deployed revision",
+      "path": "docs/evidence/S18-loop-29cc3820.html",
+      "source": "docs/evidence/S18-loop-29cc3820.md",
+      "section": "Evidence",
+      "sha256": "38f4ea475bfd481ff05fa76bca25ff3dd1e4d437823575bb3d1d28cb5d2d2427",
+      "bytes": 9299,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S18-loop-29cc3820.md"
+    },
+    {
       "title": "S19 Part B — run, grade, capture (steps 8–12)",
       "path": "docs/evidence/S19-B.html",
       "source": "docs/evidence/S19-B.md",
