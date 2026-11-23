@@ -174,7 +174,7 @@ fn PlanDetailBody(detail: PlanDetail, project_id: String, refresh: Callback<()>)
             let impact = impact.get();
             leptos::task::spawn_local(async move {
                 let Ok(impact) = impact.parse::<i64>() else {
-                    notice.set(Some("impact must be a whole number".to_owned()));
+                    notice.set(Some("cost impact must be a whole number".to_owned()));
                     return;
                 };
                 let input = json!({
@@ -183,7 +183,9 @@ fn PlanDetailBody(detail: PlanDetail, project_id: String, refresh: Callback<()>)
                     "baseline_id": baseline,
                     "title": title,
                     "body": body,
-                    "impact": impact,
+                    // SPEC_V2 §5.5: the change carries a scope/schedule/cost/risk block. This
+                    // form's single number is the cost delta, so it is sent under that key.
+                    "impact": {"cost": impact},
                 });
                 match ctx
                     .invoke("changes.request", input, InvokeOptions::default())
@@ -405,7 +407,7 @@ fn PlanDetailBody(detail: PlanDetail, project_id: String, refresh: Callback<()>)
                 <textarea class="input" placeholder="why this change is needed"
                     on:input=move |event| rationale.set(event_target_value(&event))></textarea></label>
             <label class="field">
-                <span>"Impact"</span>
+                <span>"Cost impact"</span>
                 <input class="input mono" placeholder="1"
                     on:input=move |event| impact.set(event_target_value(&event))/></label>
             <button class="btn" on:click=submit>"Request change"</button>
