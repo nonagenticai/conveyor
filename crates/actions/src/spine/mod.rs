@@ -631,36 +631,50 @@ fn register_out(record: &RegisterRecord) -> RegisterOut {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct RegisterCreateIn {
     /// The owning project; exactly one of this and `programme_id` is set.
+    #[serde(default)]
     pub project_id: Option<Uuid>,
     /// The owning programme; exactly one of this and `project_id` is set.
+    #[serde(default)]
     pub programme_id: Option<Uuid>,
     /// `risk | issue | assumption | dependency | benefit | change`.
     pub kind: String,
     /// The human code.
+    #[serde(default)]
     pub code: Option<String>,
     /// The title.
     pub title: String,
     /// The body.
+    #[serde(default)]
     pub body: Option<String>,
     /// The owning job.
+    #[serde(default)]
     pub owner_job_id: Option<Uuid>,
     /// The status.
+    #[serde(default)]
     pub status: Option<String>,
     /// The severity.
+    #[serde(default)]
     pub severity: Option<String>,
     /// The probability.
+    #[serde(default)]
     pub probability: Option<String>,
     /// The impact.
+    #[serde(default)]
     pub impact: Option<i32>,
     /// Related links.
+    #[serde(default)]
     pub links: Option<Value>,
     /// The baseline a change changes.
+    #[serde(default)]
     pub baseline_ref: Option<Uuid>,
     /// When the row is next reviewed (required for a risk).
+    #[serde(default)]
     pub review_at: Option<NaiveDate>,
     /// The recorded response.
+    #[serde(default)]
     pub response: Option<String>,
     /// Metadata; a change's impact block lives here.
+    #[serde(default)]
     pub meta: Option<Value>,
 }
 
@@ -670,28 +684,40 @@ pub struct RegisterUpdateIn {
     /// The row to edit.
     pub id: Uuid,
     /// Move the row to a programme (a project-scoped row cannot gain one).
+    #[serde(default)]
     pub programme_id: Option<Uuid>,
     /// The new status.
+    #[serde(default)]
     pub status: Option<String>,
     /// The new title.
+    #[serde(default)]
     pub title: Option<String>,
     /// The new body.
+    #[serde(default)]
     pub body: Option<String>,
     /// The new severity.
+    #[serde(default)]
     pub severity: Option<String>,
     /// The new probability.
+    #[serde(default)]
     pub probability: Option<String>,
     /// The new owning job.
+    #[serde(default)]
     pub owner_job_id: Option<Uuid>,
     /// The new impact.
+    #[serde(default)]
     pub impact: Option<i32>,
     /// New related links (a risk must keep at least one).
+    #[serde(default)]
     pub links: Option<Value>,
     /// The new review date.
+    #[serde(default)]
     pub review_at: Option<NaiveDate>,
     /// The recorded response.
+    #[serde(default)]
     pub response: Option<String>,
     /// New metadata.
+    #[serde(default)]
     pub meta: Option<Value>,
 }
 
@@ -699,11 +725,14 @@ pub struct RegisterUpdateIn {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct RegisterListIn {
     /// The project whose register is read; exactly one of this and `programme_id` is set.
+    #[serde(default)]
     pub project_id: Option<Uuid>,
     /// The programme whose register is read (the programme-level rows).
+    #[serde(default)]
     pub programme_id: Option<Uuid>,
     /// Narrow the page to one `kind` (`risk | issue | assumption | dependency | benefit |
     /// change`).
+    #[serde(default)]
     pub kind: Option<String>,
 }
 
