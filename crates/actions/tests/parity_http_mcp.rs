@@ -2792,7 +2792,13 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let id = seed_site_document(pg, ctx).await;
             ctx.push(sample.name, id);
         }
-        "documents.publish" | "documents.request_publish" => {
+        "documents.publish" => {
+            // v1-outputs-1: a published output is rendered from its text body, so the success
+            // sample publishes a text row; a bytes-backed row is refused at publish.
+            let id = seed_document_history(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
+        "documents.request_publish" => {
             let id = seed_document_bytes(pg, ctx).await;
             ctx.push(sample.name, id);
         }
