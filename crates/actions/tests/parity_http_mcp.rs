@@ -2412,7 +2412,7 @@ async fn seed_arch_artifact(pg: &support::Pg, ctx: &Ctx) -> Uuid {
 /// One governance body row per round (the key is unique, so two rounds never share a row).
 async fn seed_arch_board(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     scoped(pg, ctx, async move |conn| {
-        store::architecture::open_body_tx(
+        let body = store::architecture::open_body_tx(
             conn,
             ctx.tenant,
             &store::architecture::NewBody {
@@ -2422,12 +2422,27 @@ async fn seed_arch_board(pg: &support::Pg, ctx: &Ctx) -> Uuid {
                 charter: "parity charter".to_owned(),
                 commissioning_authority: "parity programme".to_owned(),
                 decision_limits: json!({}),
-                members: json!([]),
+                members: json!([{ "role": "parity architect" }]),
             },
         )
         .await
-        .expect("seed a governance body")
-        .id
+        .expect("seed a governance body");
+        // A contract or artefact decision needs an active board; its own approval convenes it.
+        store::architecture::decide_board_tx(
+            conn,
+            ctx.tenant,
+            body.id,
+            "approved",
+            json!({ "charter": "parity" }),
+            ctx.alice_user,
+            store::architecture::BoardSubject {
+                kind: Some("board"),
+                id: None,
+            },
+        )
+        .await
+        .expect("convene the parity board");
+        body.id
     })
     .await
 }
@@ -2592,11 +2607,26 @@ async fn seed_arch_profile(pg: &support::Pg, ctx: &Ctx, project: Uuid) {
                 charter: "parity: adopt the ADM profile".to_owned(),
                 commissioning_authority: "parity programme".to_owned(),
                 decision_limits: json!({}),
-                members: json!([]),
+                members: json!([{ "role": "parity architect" }]),
             },
         )
         .await
         .expect("open the profile board");
+        // The ADM profile decision needs an active board; its own approval convenes it.
+        store::architecture::decide_board_tx(
+            &mut *conn,
+            ctx.tenant,
+            board.id,
+            "approved",
+            json!({ "charter": "parity" }),
+            ctx.alice_user,
+            store::architecture::BoardSubject {
+                kind: Some("board"),
+                id: None,
+            },
+        )
+        .await
+        .expect("convene the profile board");
         let decision = store::architecture::decide_board_tx(
             &mut *conn,
             ctx.tenant,

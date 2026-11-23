@@ -377,6 +377,19 @@ pub async fn tailor(f: &Fixture, requirements: Value, contract_kinds: Value) -> 
         None,
     )
     .await;
+    // The profile decision needs an active board; the board's own approval convenes it.
+    created(
+        &f.running,
+        "architecture.board_decide",
+        json!({
+            "body_id": id_of(&board),
+            "decision": "approved",
+            "evidence": { "charter": "convene the profile board" },
+            "subject_kind": "board",
+        }),
+        None,
+    )
+    .await;
     let decision = created(
         &f.running,
         "architecture.board_decide",
@@ -480,7 +493,7 @@ pub async fn approve_contract(f: &Fixture, id: &str) -> Value {
                 "charter": "Approve the delivery contract",
                 "commissioning_authority": "P0 programme board",
                 "decision_limits": {},
-                "members": [],
+                "members": [{ "role": "reviewer" }],
             }),
             None,
             None,
@@ -489,6 +502,19 @@ pub async fn approve_contract(f: &Fixture, id: &str) -> Value {
         .await;
     assert_eq!(status, 201, "architecture.board_open: {opened}");
     let body_id = id_of(output(&opened));
+    // The contract decision needs an active board; the board's own approval convenes it.
+    created(
+        &f.running,
+        "architecture.board_decide",
+        json!({
+            "body_id": body_id,
+            "decision": "approved",
+            "evidence": { "charter": "convene the contract board" },
+            "subject_kind": "board",
+        }),
+        None,
+    )
+    .await;
     let (status, board) = f
         .running
         .invoke(
@@ -554,7 +580,7 @@ pub async fn advance(running: &support::Running, project: &str, phase: &str) -> 
 
 /// Open the Architecture Board and return the row.
 pub async fn open_board(running: &support::Running) -> Value {
-    created(
+    let board = created(
         running,
         "architecture.board_open",
         json!({
@@ -568,7 +594,22 @@ pub async fn open_board(running: &support::Running) -> Value {
         }),
         None,
     )
-    .await
+    .await;
+    // A board decides only once it is active, and its own approval is the one way a draft board
+    // is convened.
+    created(
+        running,
+        "architecture.board_decide",
+        json!({
+            "body_id": id_of(&board),
+            "decision": "approved",
+            "evidence": { "charter": "convene the board" },
+            "subject_kind": "board",
+        }),
+        None,
+    )
+    .await;
+    board
 }
 
 /// Insert a document row the artefact can point at; returns its id.

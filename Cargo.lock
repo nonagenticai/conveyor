@@ -827,6 +827,7 @@ dependencies = [
  "conveyor-domain",
  "conveyor-pack",
  "conveyor-render",
+ "conveyor-server",
  "conveyor-store",
  "metrics",
  "metrics-exporter-prometheus",
