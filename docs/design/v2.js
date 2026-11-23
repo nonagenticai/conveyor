@@ -3918,7 +3918,7 @@ window.installV2 = function (api, enterprise) {
       mandate: { state: "Draft", approved: "—", version: "v3" },
       fields: [
         ["Strategic fit", "One operating model for every conveyor work stream; the programme contributes to the mission of a self-operating organisation."],
-        ["Current position", "V1 is live; T0's organisation spine is merged; 49 projects are in flight. The programme's definition set is at tranche 0."],
+        ["Current position", "V1 is live; T0's organisation spine is merged; 50 projects are in the programme. The programme's definition set is at tranche 0."],
         ["Drivers", "One-off tooling cost, duplicated project machinery and unmeasured outcomes across the estate."],
         ["Deliverables and boundaries", "The organisation spine, the plan spine, the decision ladder, the tool estate and benefits realization. Out of scope: customer-facing applications."],
         ["Delivery and assurance", "Iterative delivery inside tranches; each tranche review decides continue, pause or stop on evidence."],
