@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — S03 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Closure review — S03 Domain and schema (retrospective, 2026-11-21)</h1>
+<h2>Outcome vs acceptance</h2>
+<p>The SPEC §8 S3 gate, clause by clause:</p>
+<ul>
+<li><strong>Proptest on transitions (property a).</strong> Pass. <code>board.rs::archived_implies_the_card_sits_in_an_archive_list</code> and <code>::restore_off_a_non_archive_list_is_an_error</code>: <code>archived_at.is_some()</code> implies the card sits in an archive list; restore off a non-archive list is <code>Err</code>.</li>
+<li><strong>Claim (property b).</strong> Pass as tested, with the P1 package recorded. <code>claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic</code> produces exactly one grant, fence 1 then strictly increasing renewals, and a stale-fence completion writes nothing. The lease-exclusivity half is not exercised: all 32 racers use <code>seed.user</code> and <code>Version::INITIAL</code>, and <code>claim_card_tx</code> lets the same assignee re-claim an unexpired lease, so the test would pass with the lease arm deleted (v1-s03-1, P1).</li>
+<li><strong>One pending approval per (run, gate) (property c).</strong> Pass. <code>approval_race.rs::sixteen_racers_create_exactly_one_pending_approval</code> — one <code>Ok</code>, fifteen <code>ApprovalConflict</code>, pending count 1; the partial unique <code>uq_appr_pending</code> is the guarantee, and <code>dual_control_needs_two_distinct_approvers_and_one_decision_each</code> adds the two-approver rule.</li>
+<li><strong>Terminal-run and revision invariants (property d).</strong> Pass. <code>transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense</code>; <code>is_prunable('model')</code> is true past 50 and false for <code>requirement</code> at any depth.</li>
+<li><strong>Schema review.</strong> Pass with two admitted findings. The 14 tables are §2.3/§2.4 column-for-column, with 14 FORCE RLS policies and no <code>CREATE TYPE</code>. The archive-exclusion statement over-reaches: only <code>card_board_list_position_idx</code> and <code>card_board_position_idx</code> carry <code>archived_at IS NULL</code>; <code>card_assignee_lease_idx</code> and <code>card_tsv_idx</code> include stamped cards, and later <code>card_name_trgm_idx</code> and <code>card_wbs_node_idx</code> add no predicate (v1-s03-2, P2).</li>
+<li><strong>Tenant isolation.</strong> Pass. <code>rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser</code>: runtime scoped to A sees no B rows; a forged <code>tenant_id=B</code> insert fails <code>WITH CHECK</code>; owner 0; superuser both.</li>
+<li><strong>Migrations.</strong> Pass. A fresh database applies 2; the second run exits 0 with <code>_sqlx_migrations</code> unchanged; no <code>IF NOT EXISTS</code>; <code>migrate.rs</code> asserts <code>[(1,"platform"),(2,"domain")]</code>.</li>
+<li><strong>Card-state proof.</strong> Pass. <code>information_schema.columns</code> for <code>card</code> and <code>(state,status)</code> returns zero rows; the <code>insta</code> snapshot pins <code>Card</code>'s field set; the word-boundary grep returns 0.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li>Commit <code>96a3d47b0e43ef871ae42c0bfafac6a677f7a418</code> (2026-11-12T22:38:46+01:00), 'conveyor: public source snapshot (2026-11-12)' — <code>migrations/0002_domain.sql</code> (459 lines, 14 tables, 14 FORCE RLS), <code>crates/domain/src/board.rs</code> (629 lines), <code>crates/store/src/card.rs</code>, and <code>crates/store/tests/{claim_race,approval_race,transitions,rls_domain}.rs</code>.</li>
+<li>Published evidence document <code>01a1e686-d031-739d-ac30-9c0d4d8edffb</code> (2026-11-16T22:42:37Z, main@cc88052): 0/0 actions, 2/2 modules, 14/14 tables; inventory only, not an acceptance run.</li>
+<li>Project <code>01a1d039-0d28-743b-86c7-0d0698ed69c1</code>; programme <code>01a1d039-0d24-7d16-ae52-4841e96ccfac</code>; tranche 2 <code>01a1e9e0-e2ac-786b-ac48-3b8bcdf12188</code>.</li>
+<li>Accepted P0 issue <code>U3-EXC-S03</code> (<code>01a1fbac-8ec9-717c-be79-6d1b97980743</code>): 'Closed in an unauthorised tranche before the tranche review; accepted by the delegate as a retrospective exception under the standing delegation. The project is reworked in its batch and re-closed through the gates.'</li>
+<li>The snapshot's only tranche review is <code>01a1ed84-e111-7082-9fa8-7fe77ccc9024</code> (2026-11-18T07:17:50Z, decision <code>continue</code>) for tranche <code>01a1e9e0-ced2-7769-b12f-f6fba0997914</code>; no tranche-2 review exists.</li>
+<li>This rework records the charter, the Statement of Architecture Work, the delivery contract, the seven A–D artefacts, the scope baseline, the Phase-G review and this closure review; it declares the closure output <code>closure-review</code> and publishes the expected outputs <code>project-brief</code> and <code>evidence</code>.</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li><strong>v1-s03-1 (P1, package owned by S03).</strong> Either add a race of 32 distinct <code>app_user</code>s against one live lease and assert exactly one grant, or remove the same-assignee arm from <code>claim_card_tx</code>; restate property (b) to match the renewal semantics. A P1 does not block closure under this programme's manifest.</li>
+<li><strong>v1-s03-2 (P2, package owned by S03).</strong> Restate the archive claim to name the two board-scan indexes and list the lease and search indexes that deliberately include stamped cards; add <code>archived_at IS NULL</code> only where exclusion is intended.</li>
+<li><strong>The run-tree amendment is later than the plan says.</strong> The 2026-11-09 amendment places the tree in migration 0033; the repository settles it in <code>0037_run_tree_workflow_step.sql</code> around <code>parent_run_id</code> with <code>workflow_step_id</code> rather than the plan's <code>step_id</code>.</li>
+<li><strong>No contemporaneous schema-review record.</strong> The plan requires a second reader against §2.3/§2.4; none exists at the snapshot. This retrospective review re-performs the check and admits the two findings.</li>
+<li><strong>Tranche 2 is <code>planned</code> and unauthorised</strong> at the 2026-11-21T19:24:46Z snapshot (<code>authorised_at</code> null, <code>authorisation_review_id</code> null). The closure stands on the standing delegation and the accepted P0 exception U3-EXC-S03, not on a tranche-2 review.</li>
+<li><strong>No project-brief document existed</strong>; this rework publishes it. The plan frontmatter remains <code>status: planned</code> although <code>meta.measured_status</code> is <code>built</code>.</li>
+</ul>
+<h2>Decision</h2>
+<p>Record the compliance level <strong>compliant</strong> and close S03 under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code> on the P0-only gate of <code>acceptance/programme/S03.toml</code>. The two admitted findings are packages owned by S03; a P1 is not a P0 and does not block closure. Re-close the project through the one gate with the closure output <code>closure-review</code> and the expected outputs <code>project-brief</code> and <code>evidence</code>, decided by an approver other than its requester. This is a retrospective record: it states the evidence that exists and does not claim a contemporaneous review that was never written.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Domain and schema — aggregates, state machines, baseline domain migration · conveyor output · published 2026-11-23T09:26:49Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

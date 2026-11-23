@@ -1,5 +1,816 @@
 {
-  "files": [],
-  "generated_at": "2026-11-20T11:50:50.848127361+00:00",
+  "files": [
+    {
+      "bytes": 12349,
+      "path": "docs/KNOWLEDGE-MEMORY.md",
+      "sha256": "98d6dba3f72aa51651d1f3ab242579385273d35ce75245736f91195513362405"
+    },
+    {
+      "bytes": 78175,
+      "path": "docs/SPEC.md",
+      "sha256": "af821f73b2a20f8edb2d3fc98949348eaac2a59ab472767b9756c916b0401c6a"
+    },
+    {
+      "bytes": 179888,
+      "path": "docs/SPEC_V2.md",
+      "sha256": "54641394bc00f676f0a0fe4f028488fe2d06dd0407258ee108b9dc5a9d2b5966"
+    },
+    {
+      "bytes": 11057,
+      "path": "docs/decisions/0001-ui-stack.md",
+      "sha256": "9f9d0f8d6e2f178372cce6eff66d5f3f89e4ef9d01a868f012c95776f641a91f"
+    },
+    {
+      "bytes": 3374,
+      "path": "docs/decisions/0002-editor.md",
+      "sha256": "4aec70b6119c818076f7cd5ef9549cd050151d87d14dd047c0190b87e2cd68e8"
+    },
+    {
+      "bytes": 4931,
+      "path": "docs/decisions/0003-public-ci.md",
+      "sha256": "ddbb902c8814ca9018f4d5feae3f4c19ad9d5db30af6a388ddbd543d6e4118be"
+    },
+    {
+      "bytes": 4357,
+      "path": "docs/decisions/0004-tool-estate.md",
+      "sha256": "27d87a5b30989cc1436397cd13ea1fa49e6abe463f974c980d9a10929f448d65"
+    },
+    {
+      "bytes": 4254,
+      "path": "docs/decisions/0005-absorption-sequence-and-repo-scope.md",
+      "sha256": "497cfc30bfe9f8e98637c6a98fd408e5d24a47688571fb864f908a5589247ee3"
+    },
+    {
+      "bytes": 8138,
+      "path": "docs/decisions/0006-tool-absorption-grouping.md",
+      "sha256": "ca641a316c68edef63cc3fed5b9c7d00f19ace9246ad3a91b52576cad3fb349b"
+    },
+    {
+      "bytes": 7854,
+      "path": "docs/decisions/0007-tool-estate-conveyor-and-coding.md",
+      "sha256": "fe7224b056433270bf6b367692cf4b700b1e119fd82c3ed5eadd4f03e14f03c4"
+    },
+    {
+      "bytes": 4517,
+      "path": "docs/decisions/0008-card-ledger.md",
+      "sha256": "29f2cf04c0128dc652a3e64a13b43eba4456e78ac499a207b12193840966dd52"
+    },
+    {
+      "bytes": 4223,
+      "path": "docs/decisions/0009-prompt-selection-and-recipe-authoring.md",
+      "sha256": "f9900bfe8e8870119e0e335fa7d51020459d91a548b0c2f43701794b9097a4c3"
+    },
+    {
+      "bytes": 9045,
+      "path": "docs/decisions/0010-internal-agent-executor-runtime.md",
+      "sha256": "322a3262014c4ff44299af7977dc501bcbef9407539f37960665017de1d0b65c"
+    },
+    {
+      "bytes": 6341,
+      "path": "docs/decisions/0011-applying-gate.md",
+      "sha256": "33cd8c2783d3d65b1a4998dcca1866788e1c08c7d7c568ac34d65b3bba42b547"
+    },
+    {
+      "bytes": 3961,
+      "path": "docs/decisions/0012-no-deferrals.md",
+      "sha256": "2b57f4a79a4b4fe3c48d5e9eebadee4ac5453aa1474764bb622a1185ddbfcccc"
+    },
+    {
+      "bytes": 3686,
+      "path": "docs/decisions/0013-real-v2-ui.md",
+      "sha256": "36f048c336414c3935a808810b696c751727bc2a7986dd82a11a99e446c18f88"
+    },
+    {
+      "bytes": 6614,
+      "path": "docs/decisions/0014-work-package-run.md",
+      "sha256": "844653aa52f5f68de2eb38a28151d502e37711d9e322376c49517fd6ac37b7b7"
+    },
+    {
+      "bytes": 13342,
+      "path": "docs/design/Program_Architecture_and_Benefits_Realization.md",
+      "sha256": "b04c408f23e99cecc79ab12c285544d533dd7454797a78c000a739826b1f9474"
+    },
+    {
+      "bytes": 27726,
+      "path": "docs/design/README.md",
+      "sha256": "385938f37db98b800ef02cfae9b757fe7e9ec0e3c61f59537a93e53ad4ec4ffa"
+    },
+    {
+      "bytes": 82514,
+      "path": "docs/design/STUDIO-SPEC.md",
+      "sha256": "ec86aa608d7319aa0455fef75343a545acbfbe3079c31e541ff6c20178b5611e"
+    },
+    {
+      "bytes": 21848,
+      "path": "docs/design/data/conformance.md",
+      "sha256": "6a9f93f2bc3a2c96ebf45b80eb5996ec794f508f965c64801c00355d45ac8b5f"
+    },
+    {
+      "bytes": 10909,
+      "path": "docs/design/legacy/UI-SPEC.md",
+      "sha256": "f012ce1bcaef6fbbeda0caf5e33c9e029ab49796d825a56daa6a2a7dd22de57f"
+    },
+    {
+      "bytes": 29672,
+      "path": "docs/evidence/2026-11-10-plan-audit.md",
+      "sha256": "f7e61718c7e96b91576d32ef3eabf77cd260d200b0a02f3e8a707fdc80a855b2"
+    },
+    {
+      "bytes": 6136,
+      "path": "docs/evidence/2026-11-12-delivery-system.md",
+      "sha256": "2ddf18ce6543b39dd519e3efa9a26a97785c26155858453acf6a10a1e11d717c"
+    },
+    {
+      "bytes": 8155,
+      "path": "docs/evidence/2026-11-13-inference-router-absorption.md",
+      "sha256": "dc005f38374c32cb622e0a627c97330f4a9df0917f32b58aba7d3113ef1040d0"
+    },
+    {
+      "bytes": 32802,
+      "path": "docs/evidence/2026-11-14-licenses-absorption.md",
+      "sha256": "ca136b1ef3af72f58660da24da2375a2d396d1297b2585f59534a1abaa838634"
+    },
+    {
+      "bytes": 8600,
+      "path": "docs/evidence/2026-11-16-research-cutover.md",
+      "sha256": "1cce823150b032a7fd913de3d6ed93f040e0ca36297b7adede9055181e93eeea"
+    },
+    {
+      "bytes": 5052,
+      "path": "docs/evidence/2026-11-16-scientific-cutover.md",
+      "sha256": "3ff5371ed71656f5bb7f15a0d19b967ccddc168d6667b0c63c582788704d02d8"
+    },
+    {
+      "bytes": 7049,
+      "path": "docs/evidence/2026-11-16-w2v-retirement.md",
+      "sha256": "73b797dde36368a70b0638521278cc4b1ad79a7ee511a679893307fe789ac026"
+    },
+    {
+      "bytes": 3396,
+      "path": "docs/evidence/2026-11-18-card-ledger-call-sites.md",
+      "sha256": "f64e2d4078b652db873ce41bf8872fbe0e27662ae40efd8fcaf4587bb9673ec8"
+    },
+    {
+      "bytes": 7795,
+      "path": "docs/evidence/2026-11-18-evidence-review-cutover.md",
+      "sha256": "cc6d3023bff6f404bf70fe577adc9f1b425ab32e541a72d03c1f38fa4c996b0b"
+    },
+    {
+      "bytes": 1882,
+      "path": "docs/evidence/2026-11-19-console-live-engine.md",
+      "sha256": "4c48e32f1b37ed25893cc87174797043a9d4ba5fcdabf546435ad7bd971c5e69"
+    },
+    {
+      "bytes": 2498,
+      "path": "docs/evidence/2026-11-19-start-agent-ready.md",
+      "sha256": "fe723d50f632b9dcf2760cc6638d95c63d6919e93dda7ff65bbb13e506743e23"
+    },
+    {
+      "bytes": 3211,
+      "path": "docs/evidence/D23-EVAL-CALLER.md",
+      "sha256": "30117d6388af44ef6a6fe142130f72d2b8adbe618a91c3df00d2ae334b7ee9bd"
+    },
+    {
+      "bytes": 30537,
+      "path": "docs/evidence/IMPROVE-01.md",
+      "sha256": "a9ae41cec8fad2eccb69360d58042654f634fcd09cc3ace859aa157ff031f3ee"
+    },
+    {
+      "bytes": 7532,
+      "path": "docs/evidence/S06b-agent-task.md",
+      "sha256": "dde40135739a3b106bd8f657b7aa9346f991a09c17601666bd59a774fcf5dae0"
+    },
+    {
+      "bytes": 61851,
+      "path": "docs/evidence/S13-ENGINE.md",
+      "sha256": "b1230ed4cf6c58616aef23ad0450770c6e36a5fe1c8d7d2007bab7863608c368"
+    },
+    {
+      "bytes": 18575,
+      "path": "docs/evidence/S13-PROCESS.md",
+      "sha256": "4eab5d86b7b2947985056213f18ca987189be25abed0f0c7229f4766fb4db5ec"
+    },
+    {
+      "bytes": 5795,
+      "path": "docs/evidence/S13-TRACE-EXPECT.md",
+      "sha256": "c7890e59159a8c2e13163cb61641e3e9d6f986f23385aaef4c85ae7d09323e44"
+    },
+    {
+      "bytes": 6845,
+      "path": "docs/evidence/S15-READINESS.md",
+      "sha256": "73c668ec0368e5ce831cb31d7eb53babb9b09da49aebd1a05518bdd2ed9aa4b7"
+    },
+    {
+      "bytes": 4833,
+      "path": "docs/evidence/S15-RUNTIME.md",
+      "sha256": "a8e6c72285ab9aac044a19d265a418b5dc8d340aee6d809237d3aa760b2be367"
+    },
+    {
+      "bytes": 20263,
+      "path": "docs/evidence/S17-CORE.md",
+      "sha256": "cb40b63ab1fbe75fa90142a73f723522c6a7cff927b725df8c8f241d49bef66c"
+    },
+    {
+      "bytes": 6913,
+      "path": "docs/evidence/S18-A.md",
+      "sha256": "054b6dae3af241a132158dd0fd398f3dc5b31c20469ac59048c2551414336da3"
+    },
+    {
+      "bytes": 6895,
+      "path": "docs/evidence/S18-B.md",
+      "sha256": "b587959cf368573f414979b43df3b837112589f1198da935ff85b53155ce1314"
+    },
+    {
+      "bytes": 5596,
+      "path": "docs/evidence/S19-B.md",
+      "sha256": "b43d57101275c0dd4770616a0f44f8ac2b98c1c96e8b825a4ca638ba10647bbe"
+    },
+    {
+      "bytes": 12885,
+      "path": "docs/evidence/S19-C.md",
+      "sha256": "727d3a786551b947325487c3fb61623b89fff77c969267e3748255fd809b2080"
+    },
+    {
+      "bytes": 10768,
+      "path": "docs/evidence/S20.md",
+      "sha256": "cdc60f71460560138467ad0319401d83b9e233795c403580e8d1551c6137c624"
+    },
+    {
+      "bytes": 3906,
+      "path": "docs/evidence/S21-APPLY.md",
+      "sha256": "9e6164bf9105f29da2dfce274f546251a29b474009726cb28144113c0c0076d0"
+    },
+    {
+      "bytes": 6219,
+      "path": "docs/evidence/S21-BUDGET.md",
+      "sha256": "a224e5e114622e9ac2420ab0234f6b88bdd663225eff274dbdfcc28388936927"
+    },
+    {
+      "bytes": 5241,
+      "path": "docs/evidence/S21-EXECUTOR.md",
+      "sha256": "5b86488e0e1a049d3b2afd58f4d7918d2b03e7d2e3f81caa4343a86b091dda2c"
+    },
+    {
+      "bytes": 9316,
+      "path": "docs/evidence/S21-PLAN.md",
+      "sha256": "d443636e29dde0a62fbc76c71113ff2e6cdaa2e9d8bdd64135d26e9bd73213f1"
+    },
+    {
+      "bytes": 7406,
+      "path": "docs/evidence/S21-RUN.md",
+      "sha256": "d02376ff2af8864e85be31e6bea6b654dec8ec859d63fbc66ef1f9e4c162de8f"
+    },
+    {
+      "bytes": 5255,
+      "path": "docs/evidence/S21-WORKPACKAGE.md",
+      "sha256": "d7ce665d7ac7e8ce18f9ca8434a3324ef83061e1d0651fe6ecf16c26a3177cab"
+    },
+    {
+      "bytes": 28868,
+      "path": "docs/evidence/analysis-capture-2026-11-15.md",
+      "sha256": "6c5b53d667640bb8531b7dbd336742d364518e2c7b7733de9f4971c1148e8307"
+    },
+    {
+      "bytes": 2927,
+      "path": "docs/evidence/benefits/token-spend-baseline.md",
+      "sha256": "ab5219fe8f61cc74ed63eff6d44c2ffa0492d6e2ae4cabb898c54614c0198f24"
+    },
+    {
+      "bytes": 21848,
+      "path": "docs/evidence/conformance-gap-register.md",
+      "sha256": "6a9f93f2bc3a2c96ebf45b80eb5996ec794f508f965c64801c00355d45ac8b5f"
+    },
+    {
+      "bytes": 33072,
+      "path": "docs/evidence/evidence-review-capture-2026-11-18.md",
+      "sha256": "9f0b74db05893cbdb93bbbdb37b3bbb09b0e64c997c2cd79bc782bd1f78ae6ac"
+    },
+    {
+      "bytes": 3241,
+      "path": "docs/evidence/media-frontend_test_runner_service.md",
+      "sha256": "1fa8ef82bd83ac39536f58a7bfe61b1624fb8149e8f3cb2f794100efdbfdb405"
+    },
+    {
+      "bytes": 2634,
+      "path": "docs/evidence/media-html_render_service.md",
+      "sha256": "ab92b97ede2a3144d03db3ad066f34f2cd0502ec9aed082b12daa30a2fee14fe"
+    },
+    {
+      "bytes": 1626,
+      "path": "docs/evidence/media-tts_gateway.md",
+      "sha256": "d8694ea57fe760beb365e5a288bf04cfab78250b9df711feff206009bcfa3865"
+    },
+    {
+      "bytes": 2998,
+      "path": "docs/evidence/media-video_analyzer_service.md",
+      "sha256": "70ebcd571d865d8d22d3e523cbfd0322334eacd3ddb7e946ec499a46f9e2195d"
+    },
+    {
+      "bytes": 2720,
+      "path": "docs/evidence/media-video_compiler_service.md",
+      "sha256": "a25a873737821bef07958e290acf2267df376d059021221d5c695d9678e8b394"
+    },
+    {
+      "bytes": 3536,
+      "path": "docs/evidence/media-video_production_service.md",
+      "sha256": "5862ba2f4bd2587b6bacd61da05e5210f82c1c9b3949bc27003b049b43a83b2b"
+    },
+    {
+      "bytes": 1473,
+      "path": "docs/evidence/media-youtube_upload_service.md",
+      "sha256": "4cb5ee8e83a8a17b152990abedc1061c9aba76badbb3dbdfa8fa8a790cf3cdd4"
+    },
+    {
+      "bytes": 4420,
+      "path": "docs/evidence/produce-capture-2026-11-16.md",
+      "sha256": "077ef6e3f3ba3fad737cc65bb288092663d58dc22e7d70192af9b5f21638afed"
+    },
+    {
+      "bytes": 2654,
+      "path": "docs/evidence/record/inputs/safe-tr3/inspect-adapt.md",
+      "sha256": "886f74f06a74d940f1f14344c652cacad8321dcb56cc5979645009474d3b460e"
+    },
+    {
+      "bytes": 2377,
+      "path": "docs/evidence/record/inputs/safe-tr3/pi-objectives.md",
+      "sha256": "36c63fdec345d49ed4670e7a13ae20b428852b748cd85068a7a4306d16fc7711"
+    },
+    {
+      "bytes": 3368,
+      "path": "docs/evidence/record/inputs/safe-tr3/pi-plan.md",
+      "sha256": "119b5ddd2d17537a885f81229a0ea430e01eefd873f7544346d9b501ff3edb50"
+    },
+    {
+      "bytes": 1587,
+      "path": "docs/evidence/record/inputs/safe-tr3/system-demo.md",
+      "sha256": "598e60361b43f5fa0bff696db4ae4c0cbe30a3ab1499bc38ffdc59a21c753eac"
+    },
+    {
+      "bytes": 210,
+      "path": "docs/evidence/rework/DESIGN-PUBLISH/acts.md",
+      "sha256": "3901f1fc89b48ac444cb17656498001ac435dad98e2fedea6c3a350f1100789c"
+    },
+    {
+      "bytes": 1073,
+      "path": "docs/evidence/rework/DESIGN-PUBLISH.md",
+      "sha256": "2a9b17b3ca28bc518dde5f77d2b3cc8bbbcc03a7c2f4eb20188e3c990e15bc6f"
+    },
+    {
+      "bytes": 1109,
+      "path": "docs/evidence/rework/P0.md",
+      "sha256": "476617563b448a2e336ca05b8b5b538c822b5728b59a593d954905ebde9d12f1"
+    },
+    {
+      "bytes": 490,
+      "path": "docs/evidence/rework/PLATFORM/acts.md",
+      "sha256": "28267762f6593a3b0c20aa110119a8962afa96f772b4ea934239742aab044fb8"
+    },
+    {
+      "bytes": 823,
+      "path": "docs/evidence/rework/PLATFORM.md",
+      "sha256": "47950a2528083fd6740fd8bfd5708abbeb955196872b9f30e5ba4d317738cacc"
+    },
+    {
+      "bytes": 199,
+      "path": "docs/evidence/rework/S00/acts.md",
+      "sha256": "e4ae08cf7d42f5282ceaf52d2e4a0bdd8d815de1a2188129cd2076905c52cbc3"
+    },
+    {
+      "bytes": 997,
+      "path": "docs/evidence/rework/S00.md",
+      "sha256": "b2e42b232ae47a156c94a9f9f5ed40a4e8e18c0766b1175e3693236386dd85fd"
+    },
+    {
+      "bytes": 199,
+      "path": "docs/evidence/rework/S01/acts.md",
+      "sha256": "8200bd9968fc0dc72efde91e0a4e29c830076d9d22a0bdb93152ab7a17b09720"
+    },
+    {
+      "bytes": 1138,
+      "path": "docs/evidence/rework/S01.md",
+      "sha256": "5a838cba86e1850befbeb4b913b326f4a9ea061c2c6d6dfa82f5d46cc8529755"
+    },
+    {
+      "bytes": 208,
+      "path": "docs/evidence/rework/S02/acts.md",
+      "sha256": "e4224027f0a45b55c18c24de92fb901a07b8f63af5dd34af3bb87584de3aab68"
+    },
+    {
+      "bytes": 114,
+      "path": "docs/evidence/rework/S03/acts.md",
+      "sha256": "6f9cac7b549b401d8fe5dc3867ccd05849835d25e60caf7de3d121496045c8e0"
+    },
+    {
+      "bytes": 203,
+      "path": "docs/evidence/rework/SPEC-V2/acts.md",
+      "sha256": "bc63295d14d532022accf9bb60db5e9d293386414eecda2cc5a4dff2cd71293c"
+    },
+    {
+      "bytes": 1059,
+      "path": "docs/evidence/rework/SPEC-V2.md",
+      "sha256": "481aaadae294b845de126a4b9ed2a80c7391795ed589b3ad9e7c00aa85704a0b"
+    },
+    {
+      "bytes": 198,
+      "path": "docs/evidence/rework/T0/acts.md",
+      "sha256": "806b7de781b9c8eed32518898d0654b03dcfbf3ac2b62ac7a03901639a51f29c"
+    },
+    {
+      "bytes": 1140,
+      "path": "docs/evidence/rework/T0.md",
+      "sha256": "e74e602354ff0c787034201a7daeaa3b00d2f71049ed03a6d95f609d923864c4"
+    },
+    {
+      "bytes": 206,
+      "path": "docs/evidence/rework/T1/acts.md",
+      "sha256": "6959ada52d0dd78f7e217dc380a2045c56285274d6ad92ec2d122df1d06b3698"
+    },
+    {
+      "bytes": 934,
+      "path": "docs/evidence/rework/T10/acts.md",
+      "sha256": "498c85898ed29a8e10f9bb7f790c28761162aec827f8a37a4676fcfc2a0b05ef"
+    },
+    {
+      "bytes": 208,
+      "path": "docs/evidence/rework/T11/acts.md",
+      "sha256": "9dbde481a2c8a7d1ef38bf70131b1eaf3789d40478289911c3d60af15ef772d0"
+    },
+    {
+      "bytes": 1450,
+      "path": "docs/evidence/rework/T13/acts.md",
+      "sha256": "86c0a74e3862b0ee47033fff5d2ff6d9ae132e7a5322c0356bb06f753ec86d91"
+    },
+    {
+      "bytes": 113,
+      "path": "docs/evidence/rework/T2/acts.md",
+      "sha256": "786025e18c85c0704d20dc2212bfd6f36b9f113602881c90cd1926a5338bfc88"
+    },
+    {
+      "bytes": 975,
+      "path": "docs/evidence/rework/T4/acts.md",
+      "sha256": "fd33c15247f2ae9b606254bb6dfc5c98687ef3cf974c5dd0be870143afa393b5"
+    },
+    {
+      "bytes": 1041,
+      "path": "docs/evidence/rework/T9/acts.md",
+      "sha256": "f36d1f1268240d7d8094e99be5ccec6f8498c7eb429b36890aac9f01f8ea811b"
+    },
+    {
+      "bytes": 7461,
+      "path": "docs/evidence/rework/full-fidelity-snapshot.md",
+      "sha256": "cdcade5af26cc716355263c0e0d3c4af64a549a60aa11e250e1c331e05a52804"
+    },
+    {
+      "bytes": 2443,
+      "path": "docs/evidence/rework/s04-phase-g.md",
+      "sha256": "bcdc051e358717417cba1b679a5eb133f512f75b0b1fe74920509611da0acc2e"
+    },
+    {
+      "bytes": 1564,
+      "path": "docs/evidence/rework/tr3-cadences.md",
+      "sha256": "bc971218428530a4924787e059f58fccce3194b8a8d2dea4093320aeb2c9ad07"
+    },
+    {
+      "bytes": 2118,
+      "path": "docs/evidence/rework/tranche-0/acts.md",
+      "sha256": "ae8185dbafc1c1d273f455622a8972513ac29722f69342c257b4ab7eec01f059"
+    },
+    {
+      "bytes": 5510,
+      "path": "docs/evidence/rework/tranche-1/acts.md",
+      "sha256": "6e9d9c19adaf042df7534aa90232d73747763618cddc8d7c3649177dbaecb189"
+    },
+    {
+      "bytes": 3871,
+      "path": "docs/evidence/rework/tranche-2/T2-recontract.md",
+      "sha256": "afab38bbfac1680bd43f7842ac574baaa3b08610e0e2356273551dad747e7807"
+    },
+    {
+      "bytes": 7532,
+      "path": "docs/evidence/rework/tranche-2/acts.md",
+      "sha256": "004fbf3c23db7b9448068107194445dc0d38e35053379447f1df5246406f3453"
+    },
+    {
+      "bytes": 4576,
+      "path": "docs/evidence/rework/tranche-2/lessons.md",
+      "sha256": "a63136f8953dd645d439f5b438ee4c0e00d2281c154b4ae149e243e2098228fc"
+    },
+    {
+      "bytes": 13291,
+      "path": "docs/evidence/v2-coverage.md",
+      "sha256": "51cdef94334244015abcb3e76a1d6d063304c7f47ec0650d86e3514bd49729c6"
+    },
+    {
+      "bytes": 255219,
+      "path": "docs/plans/00-INDEX.md",
+      "sha256": "a2d35832d9795c80438a3505d039999d0b1bfed411e7755746c399d74cdf8af8"
+    },
+    {
+      "bytes": 77290,
+      "path": "docs/plans/01-CONTRACT.md",
+      "sha256": "a0663367c870a1edfa8a6121490a62a400ce8ffc8feeaa2f483b61b7783d787e"
+    },
+    {
+      "bytes": 147521,
+      "path": "docs/plans/02-DATA-ARCHITECTURE.md",
+      "sha256": "e02d8f71ec61e14676795c5cc8e969adf73f14c1c0f1ca88f222ab01fd263621"
+    },
+    {
+      "bytes": 17526,
+      "path": "docs/plans/02-source-map/10-agent-patterns.md",
+      "sha256": "42fa4a68ea971ad71f05bfc88887851ba314cea8e7d30dab9e22c4cb9f264bdd"
+    },
+    {
+      "bytes": 20022,
+      "path": "docs/plans/02-source-map/20-fr.md",
+      "sha256": "da8016febdfe16a47398e1a31550fe032806caa280a5562eb4a0a2a098c54797"
+    },
+    {
+      "bytes": 19481,
+      "path": "docs/plans/02-source-map/30-rm-planka-mcp-n8n.md",
+      "sha256": "a439f8d294a3d4311a82c1d5ffa58a7286d4cc5e6fe6ae68f5d594f47c2c9df4"
+    },
+    {
+      "bytes": 5547,
+      "path": "docs/plans/02-source-map/40-live-state.md",
+      "sha256": "8eb81df1c8c6bb09727b371f4f33e1b80bf721fb4da6a13e6474a53e63f5dacb"
+    },
+    {
+      "bytes": 5488,
+      "path": "docs/plans/02-source-map/50-schema-inventory.md",
+      "sha256": "13ff55fd014b32d4f0464e37b3624e2e37883d91450bd6a0cbf9701d9edff76e"
+    },
+    {
+      "bytes": 25084,
+      "path": "docs/plans/03-DELIVERY.md",
+      "sha256": "9413f92167d008328c5d294de4abbb6f33784b0a30ca6bcfb31832257fcc4533"
+    },
+    {
+      "bytes": 10911,
+      "path": "docs/plans/04-TOOL-ESTATE-INVENTORY.md",
+      "sha256": "616c908515a17f02bbb15156970a91c47c203518d1120734495ccc416b04302d"
+    },
+    {
+      "bytes": 8865,
+      "path": "docs/plans/05-W2V-ABSORPTION.md",
+      "sha256": "87944ed8238aec57213b48968950d68ef80c72820c2852d0349fe5e4a5a79461"
+    },
+    {
+      "bytes": 6451,
+      "path": "docs/plans/06-TOOL-PROVENANCE.md",
+      "sha256": "16b6910f7805ff530b8a75c1d7211a2d1df5789d0188145d0b84ba41c56822ad"
+    },
+    {
+      "bytes": 13658,
+      "path": "docs/plans/P0-programme-definition.md",
+      "sha256": "538f4aa69586234a3a03c4adb93a51fb30dac859e0b6dc7681ef04988f18cd50"
+    },
+    {
+      "bytes": 5908,
+      "path": "docs/plans/T18/architecture-design.md",
+      "sha256": "f106e4bc5763a242a949f56afb79206d9d37ba1e4d917730ce8b500f6cb2e182"
+    },
+    {
+      "bytes": 4318,
+      "path": "docs/plans/T18/inception-analysis.md",
+      "sha256": "f68b03b787e41ba3f2a7cb2ec53a57994ac302c8d19953180c12ed83b06428fa"
+    },
+    {
+      "bytes": 3462,
+      "path": "docs/plans/T18/project-brief.md",
+      "sha256": "a532c8aab5ef93d8bd5b13d390544ed18050c2fe205ee026fd51e6f0f53b0cc4"
+    },
+    {
+      "bytes": 15774,
+      "path": "docs/plans/T18-real-v2-ui.md",
+      "sha256": "d7788d99bef64cd2988433c5deb0ebdf60cbafde34453b04718ec9985ebfe75e"
+    },
+    {
+      "bytes": 18552,
+      "path": "docs/plans/T9-architecture-capability.md",
+      "sha256": "ea086f6278a33091a43d09cf46f29491e10a8b9610897a29801d7cacda96bb09"
+    },
+    {
+      "bytes": 17028,
+      "path": "docs/plans/development-process-speed.md",
+      "sha256": "0fd6fbcd6407105487ab6c6eb5db8815323059273cf15cdc63ac225219b30fb3"
+    },
+    {
+      "bytes": 5235,
+      "path": "docs/plans/handoffs/S12-connectors.md",
+      "sha256": "2d398cbda882ed09ff88ba036d01cf3c011aac24869f9c904a923e2461c50ed7"
+    },
+    {
+      "bytes": 4151,
+      "path": "docs/plans/inception/README.md",
+      "sha256": "ae117fb25d2a4df7d0a1fc0da5936a233a00c2f8c21dd171ce4748cc919ebf9a"
+    },
+    {
+      "bytes": 5379,
+      "path": "docs/plans/inception/T12/00-project-brief.md",
+      "sha256": "d2e7f63c6b77c7e11157a31ab9bb654d1611eb8efb3b2e0e516aaa2171e7acd5"
+    },
+    {
+      "bytes": 9507,
+      "path": "docs/plans/inception/T12/01-inception-analysis.md",
+      "sha256": "dff731d10db43f15985b5c84db029266b6988433c686f8ca7be259cdbbc1aa55"
+    },
+    {
+      "bytes": 12615,
+      "path": "docs/plans/inception/T12/02-architecture-design.md",
+      "sha256": "e7b08206631ad38be00550d13c76cf8b692c8ced237e3766108986ebdb9a6695"
+    },
+    {
+      "bytes": 5140,
+      "path": "docs/plans/inception/T15/00-project-brief.md",
+      "sha256": "fe3917e9d6f1381fc31dc42e6ace96225672470e02831b8ffe2608f03ad75309"
+    },
+    {
+      "bytes": 8542,
+      "path": "docs/plans/inception/T15/01-inception-analysis.md",
+      "sha256": "f895c183bb6cb18ae889e4613ca14583cdb9c41da2d8ca6f7a2c229d63a992bc"
+    },
+    {
+      "bytes": 15480,
+      "path": "docs/plans/inception/T15/02-architecture-design.md",
+      "sha256": "1e69b1f3ad2c252310ee8690556ca792ced61ddc1065cd6786db1b1691b571cd"
+    },
+    {
+      "bytes": 5131,
+      "path": "docs/plans/inception/T17/00-project-brief.md",
+      "sha256": "d93c168904196ed3533ebfb90b991ec5e45485e9468a867e3ff560a142c040aa"
+    },
+    {
+      "bytes": 8536,
+      "path": "docs/plans/inception/T17/01-inception-analysis.md",
+      "sha256": "79bf45414e45ff91d922de559e1c65fde071708d71af593f7e3f94ff70a86f0e"
+    },
+    {
+      "bytes": 12450,
+      "path": "docs/plans/inception/T17/02-architecture-design.md",
+      "sha256": "0f2df7beb5c520a5f7d65fb4a9369aae9445b1ba7f5c25d61f68dd0d898bd358"
+    },
+    {
+      "bytes": 5495,
+      "path": "docs/plans/inception/T5/00-project-brief.md",
+      "sha256": "c2d519527e772922fa6f66e729ce2cfa8d69fd305f84ea4e78593838a6a46a50"
+    },
+    {
+      "bytes": 8496,
+      "path": "docs/plans/inception/T5/01-inception-analysis.md",
+      "sha256": "9f92bd5193def589a00f3db0a8e2b727a411d1eb0395dcd896027941840850f8"
+    },
+    {
+      "bytes": 14985,
+      "path": "docs/plans/inception/T5/02-architecture-design.md",
+      "sha256": "1f73aaac2c15375299d27bdf36ea23e9b975dc56b9afdd3934d78cfd425dcf5b"
+    },
+    {
+      "bytes": 4820,
+      "path": "docs/plans/inception/T6/00-project-brief.md",
+      "sha256": "1f9e65d281e540e9e6867213053dbb63f9d405a8f5e4977ea016da955d36e23f"
+    },
+    {
+      "bytes": 8816,
+      "path": "docs/plans/inception/T6/01-inception-analysis.md",
+      "sha256": "0cf51afcbee040facc466f695c57a12f4e166f7ae33058df26e0ea32b56a6646"
+    },
+    {
+      "bytes": 12860,
+      "path": "docs/plans/inception/T6/02-architecture-design.md",
+      "sha256": "3f2deb4ca854b810454e95b7242962d19e87eb91fceb1486931cbcda3bcbbbf1"
+    },
+    {
+      "bytes": 15740,
+      "path": "docs/plans/slices/S00-usage-inventory.md",
+      "sha256": "c697558e4f64f5ea521c60973c68c65a24afdbe1760e8441c08826f4943cea29"
+    },
+    {
+      "bytes": 16981,
+      "path": "docs/plans/slices/S01-ui-spike.md",
+      "sha256": "f99d5a06b17daa4e2e2298e07c9c77f8ea9b5894a852b725aeebd66191d62918"
+    },
+    {
+      "bytes": 19853,
+      "path": "docs/plans/slices/S02-skeleton.md",
+      "sha256": "aff1bb9c11aff26bf4eda2c84d16e50f8fbfbe2f327e120ed2a120184bcc07e4"
+    },
+    {
+      "bytes": 16946,
+      "path": "docs/plans/slices/S03-domain-schema.md",
+      "sha256": "9a2335a54bf8d155f6ccbda7db2471717b497e9f025bbab0b97c8302839d93c6"
+    },
+    {
+      "bytes": 17629,
+      "path": "docs/plans/slices/S04-action-registry.md",
+      "sha256": "e1f3896cecea77e4238ddddfb91d73829499c9ad358f7fd124699eaed9be6672"
+    },
+    {
+      "bytes": 18455,
+      "path": "docs/plans/slices/S05-board.md",
+      "sha256": "b8adbc2670bca5a8da8ec4957297afd7f0af7b9215bc828e39466fc2b8328da8"
+    },
+    {
+      "bytes": 18362,
+      "path": "docs/plans/slices/S06-control-plane.md",
+      "sha256": "c13315ed10f9e70528377e93c7ffc958edb36129f827b4f904b5100d13d92a32"
+    },
+    {
+      "bytes": 21947,
+      "path": "docs/plans/slices/S06a-mcp-server-channel.md",
+      "sha256": "1e6595731de94df7288b3e85c853976889494dc33f657947afae940aea868835"
+    },
+    {
+      "bytes": 13217,
+      "path": "docs/plans/slices/S06b-agent-direct-interface.md",
+      "sha256": "7a0354acb12292ded1a952669d7c464519f76999c3045ce9fd49c8d34631dde8"
+    },
+    {
+      "bytes": 15810,
+      "path": "docs/plans/slices/S06c-mcp-tasks.md",
+      "sha256": "bb1b382eb97ef286ffd7deecd948b766c97c59651d625c17b52e9d1af54c71e2"
+    },
+    {
+      "bytes": 7402,
+      "path": "docs/plans/slices/S06d-connector-standard.md",
+      "sha256": "fd5af704226ac75fca1f845e2931bce976c2a1aff7f08a2fc9f55744540fffb4"
+    },
+    {
+      "bytes": 21171,
+      "path": "docs/plans/slices/S07-requirements-search.md",
+      "sha256": "f24fe45011897994d243ec838c493e42445d4f3fb9406d58cb0c41ffcc08fbc2"
+    },
+    {
+      "bytes": 36053,
+      "path": "docs/plans/slices/S08-governance-modelling.md",
+      "sha256": "752d05cca4c9d26b6c4667b8f1a0172252752b3b215be7bf046befcec3309c0c"
+    },
+    {
+      "bytes": 23001,
+      "path": "docs/plans/slices/S09-documents-integrations.md",
+      "sha256": "f22757af3303bfeb36eb2aac979b8cacc9d74533c8ad3d49fa5bcca61cde083a"
+    },
+    {
+      "bytes": 15964,
+      "path": "docs/plans/slices/S10-copilot-ag-ui.md",
+      "sha256": "8ece4fe88e38fa7e8fc1e4e5bdaaeb24e31b566fa70956547afcec94e51532b3"
+    },
+    {
+      "bytes": 29001,
+      "path": "docs/plans/slices/S11-procedures.md",
+      "sha256": "b2772c10d7808e7462a3ec25ef2c7f2f0b062db1d9ceb413a576720f422c9d5d"
+    },
+    {
+      "bytes": 15913,
+      "path": "docs/plans/slices/S12-ui-buildout.md",
+      "sha256": "5b40673f6c4691085759d2be1fd35bc8581bbd43309279ba20bf9e8b93623517"
+    },
+    {
+      "bytes": 28611,
+      "path": "docs/plans/slices/S13-n8n-engine.md",
+      "sha256": "215b89f9e03249df69ab88f11541c6b06baad27fc35cbca1c53195662fe08c9e"
+    },
+    {
+      "bytes": 26519,
+      "path": "docs/plans/slices/S14-cutover.md",
+      "sha256": "7a923f572c995f29cf1a9a6f27721a889cfea273c4786a211e4f8670109aa1df"
+    },
+    {
+      "bytes": 30282,
+      "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
+      "sha256": "9067a85b1b1d9537a588c523d3e41d3ec6ffa23aaf0b96b1cc2a4956e30ec3cd"
+    },
+    {
+      "bytes": 24524,
+      "path": "docs/plans/slices/S16-inference-audit.md",
+      "sha256": "12069dba85c8f59e3823ffbd23d0cad329ab8c56791a645fd451f8cfd177b695"
+    },
+    {
+      "bytes": 16779,
+      "path": "docs/plans/slices/S17-benchmark-harness.md",
+      "sha256": "457a40697cf3216490bcf0bf718616cfa94c79105495b127a431bb3a08f8d523"
+    },
+    {
+      "bytes": 10151,
+      "path": "docs/plans/slices/S18-kata-improvement.md",
+      "sha256": "93b3fe4b71821936ef4b1766a2d3d2abf9cdcc2d759340567ab14102da36acb8"
+    },
+    {
+      "bytes": 22950,
+      "path": "docs/plans/slices/S19-eval-builder.md",
+      "sha256": "bc3ae71d4d2be786a099497e55a6c81cb31c34969f193bcda8a25c3b899510c9"
+    },
+    {
+      "bytes": 16078,
+      "path": "docs/plans/slices/S20-eval-hillclimb.md",
+      "sha256": "d27a21c0cf30bc3d5fe25b4a06f27d39bf94d1f3c7093a7acfcbbc0df7731191"
+    },
+    {
+      "bytes": 42454,
+      "path": "docs/plans/slices/S21-message-construction.md",
+      "sha256": "40f53201039af39e6ecbdc1a49e73fc43e93506e529add04ae46a05d34f51f23"
+    }
+  ],
+  "generated_at": "2026-11-23T09:26:49Z",
   "schema": "design-snapshot/v1"
 }

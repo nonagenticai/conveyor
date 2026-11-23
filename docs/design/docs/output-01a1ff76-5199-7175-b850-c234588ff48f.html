@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>PI objectives — tranche 1 (retrospective) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>PI objectives — tranche 1 (retrospective)</h1>
+<p><strong>Period:</strong> <code>tranche-1</code> · <strong>Retrospective record written 2026-11-21.</strong></p>
+<h2>Objectives</h2>
+<table><thead><tr><th>#</th><th>Objective</th><th>Project</th></tr></thead><tbody>
+<tr><td>1</td><td>The workspace runs with forced RLS, auth, a fail-closed licence gate and a fenced job runner</td><td>S02</td></tr>
+<tr><td>2</td><td>The plan spine exists as rows and recomputes</td><td>T1</td></tr>
+<tr><td>3</td><td>Metrics and metering are computed from rows, never stored opinions</td><td>T11</td></tr>
+</tbody></table>
+<h2>Business value</h2>
+<p>Planned and actual value are integers on the SAFe 0–10 scale. They are retrospective assessments,
+not benefit measurements; measured benefits, including token spend per accepted deliverable, are
+U6's unit.</p>
+<table><thead><tr><th>#</th><th>Objective</th><th style="text-align: right">Planned BV</th><th style="text-align: right">Actual BV</th><th>Why the actual is what it is</th></tr></thead><tbody>
+<tr><td>1</td><td>S02 workspace skeleton</td><td style="text-align: right">8</td><td style="text-align: right">6</td><td>the lease and recovery proof is outstanding (issue #2); the tranche carried it forward rather than counting it delivered</td></tr>
+<tr><td>2</td><td>T1 plan spine</td><td style="text-align: right">8</td><td style="text-align: right">8</td><td>the spine exists as rows and recomputes; issue #72 closed</td></tr>
+<tr><td>3</td><td>T11 metrics and metering</td><td style="text-align: right">5</td><td style="text-align: right">5</td><td>the read models compute from rows; issues #84 and #458 closed</td></tr>
+</tbody></table>
+<h2>Measurement</h2>
+<table><thead><tr><th>#</th><th>Judged by</th></tr></thead><tbody>
+<tr><td>1</td><td><code>acceptance/programme/S02.toml</code> on a fresh live snapshot; the plan's §5 deliverables present in the tree</td></tr>
+<tr><td>2</td><td><code>acceptance/programme/T1.toml</code>; the spine tables and actions in the compiled registry</td></tr>
+<tr><td>3</td><td><code>acceptance/programme/T11.toml</code>; the measure read model and the actions that feed it</td></tr>
+</tbody></table>
+<h2>Evidence</h2>
+<table><thead><tr><th>#</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>1</td><td>the 11 platform tables in <code>migrations/0001_platform.sql</code>; the compiled actions; issue #2 open</td></tr>
+<tr><td>2</td><td>issue #72 closed; the spine tables and actions in <code>docs/design/data/actions.json</code>; coverage measured <code>built</code></td></tr>
+<tr><td>3</td><td>issues #84 and #458 closed; coverage measured <code>built</code>; the measure projection in the published snapshot</td></tr>
+</tbody></table>
+<h2>Risks</h2>
+<table><thead><tr><th>Risk</th><th>Effect</th><th>Mitigation</th></tr></thead><tbody>
+<tr><td>S02's #2 proof never lands</td><td>the skeleton's lease safety stays unproven</td><td>S02 stays active; the open issue is the record</td></tr>
+<tr><td>Retrospective business values are judgement</td><td>the assessment is not reproducible from measurement</td><td>they are stated as assessments; U6 measures the real benefits</td></tr>
+</tbody></table>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-23T09:26:49Z · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

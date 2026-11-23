@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T9 — Project WBS (rework, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project WBS — T9 TOGAF ADM capability</h1>
+<h2>Work packages</h2>
+<table><thead><tr><th>Deliverable</th><th>Business value</th><th>Time criticality</th><th>Risk reduction</th><th>Job size</th><th>Status</th></tr></thead><tbody>
+<tr><td>The TOGAF ADM capability — eleven tables, 26 actions, phase gates, contracts and compliance</td><td>13</td><td>8</td><td>13</td><td>13</td><td>accepted</td></tr>
+</tbody></table>
+<p>WSJF = (13+8+13)/13 = 2.615, computed from the four integers and never stored (§8.2). The
+risk-reduction input is the highest because the gates and waivers are the programme's control
+surface; the size is large at eleven tables and 26 actions.</p>
+<h2>Acceptance</h2>
+<p>The §12 T9 gate, clause by clause, proved at review scope by the named real-Postgres tests in
+the Phase-G review: <code>togaf_architecture_phases.rs::phases_a_to_f_pass_in_order</code> and its refusal
+cases; <code>togaf_delivery_design_gate.rs</code>; <code>architecture_compliance.rs::one_level_and_a_dated_waiver</code>;
+<code>togaf_h_change.rs::a_scope_change_produces_a_change_register_row</code> and
+<code>an_unrecorded_review_refuses_the_gate</code>. The deviations this batch admits are named in the
+review (v1-p81-4, v1-p81-5, v1-p81-6 and the rest of T9's open findings), not waived.</p>
+<h2>Status</h2>
+<p>Accepted as the retrospective WBS deliverable; six P1/P2 findings remain open against T9 and
+are carried as work. The project's acceptance instrument is <code>acceptance/programme/T9.toml</code>.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-23T09:26:49Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

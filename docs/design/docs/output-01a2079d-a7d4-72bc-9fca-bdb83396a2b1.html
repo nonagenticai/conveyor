@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>PI Objectives — conveyor buildout, tranche 4 · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>PI Objectives — conveyor buildout, tranche 4</h1>
+<p>The six objectives of tranche 4, their planned business value and the measurement that decides
+whether each was met.</p>
+<h2>Objectives</h2>
+<ul>
+<li><strong>O1.</strong> The tranche-4 record sets are evidenced and their manifests green; T9 and T10 first.</li>
+<li><strong>O2.</strong> The seven deep-review findings are packages and their fixes land.</li>
+<li><strong>O3.</strong> The v1 verdict is re-executed at the head; every gap is packaged.</li>
+<li><strong>O4.</strong> The CODE P0 and P1 bundles execute with a commit and a named test.</li>
+<li><strong>O5.</strong> The pack is republished from the live rows; coverage 74/74; viability re-run.</li>
+<li><strong>O6.</strong> The next tranche is prepared only where the record supports it.</li>
+</ul>
+<h2>Business value</h2>
+<p>O1 10, O2 9, O3 8, O4 7, O5 6, O6 5. The committed set is O1–O4 (34 of 45 planned points); O5 and
+O6 are stretch items for the tranche.</p>
+<h2>Measurement</h2>
+<ul>
+<li>O1: <code>verify-project.py --project T9|T10</code> exits 0 at the tranche snapshot; the pi-plan,
+pi-objectives and lesson checks pass.</li>
+<li>O2: every <code>dr-w3-*</code> package is closed or named open with its acceptance command; the two record
+writes are read back through their actions.</li>
+<li>O3: <code>verify-slices.py --all</code> publishes the table; the table's own negative self-test proves a
+failing gate is reported absent.</li>
+<li>O4: each closed CODE package names a commit ancestor and a real test; the register's open CODE
+count falls.</li>
+<li>O5: <code>generate-standards.py --check</code>, <code>check-standards-coverage.py --check</code>, <code>publish-data.sh</code>
+strict and <code>verify-viability.py</code> are re-run at the head.</li>
+<li>O6: no artefact is generated from rows that do not exist; the handoff names the next batch.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li>Cadence <code>01a202a1-dbb9-7e49-b64a-cf97c3fab095</code>; the approved plan gate on this cadence.</li>
+<li>The v1 findings ledger at <code>docs/evidence/v1-conformance-findings.json</code> (188 findings, 110
+resolved) and the deep-review sidecar.</li>
+<li>The clean replay journal and the board commit <code>bf41733f</code>.</li>
+</ul>
+<h2>Risks</h2>
+<ul>
+<li>R2 record theatre: a section resolving thinly is not evidence; the deep review samples it.</li>
+<li>R10 v1 quality unknown: the verdict table may find real work; that is the instrument working.</li>
+<li>R13 evidence theatre: every claim here is read back from the record, not asserted.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Plan: <code>docs/plans/00-INDEX.md</code> and the tranche-4 slice plans.</li>
+<li>Tranche: <code>01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce</code>.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-23T09:26:49Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

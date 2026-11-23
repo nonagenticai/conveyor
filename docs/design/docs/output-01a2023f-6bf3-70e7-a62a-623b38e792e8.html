@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Business Capability Map — T2 Decision ladder (Phase B) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Business Capability Map — T2 Decision ladder (Phase B)</li>
+<li>Phase: b</li>
+<li>Kind: diagram</li>
+<li>Purpose: The capabilities T2 installs and how far each is live at the 2026-11-21 rework.</li>
+<li>Scope: the one audit shape, the version pins, tenant refinement, the human gate, the draft gate, laya evaluation, authored options, budget enforcement and tenant isolation.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>One decision audit shape / L0, L1 and L3 recorded through one row and one projected view</strong> - {"evidence": "migration 0046 columns and CHECKs; <code>decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape</code>", "maturity": "live"}</li>
+<li><strong>Version-pinned decisions / a decision is reproducible after the policy or refinement moves</strong> - {"evidence": "policy/refinement/laya-config pins; <code>422 pins_incomplete</code>; <code>decision_ladder.rs::every_decision_pins_the_refinement_and_laya_config_versions</code>", "maturity": "live"}</li>
+<li><strong>Tenant refinement without a build / a threshold override changes behaviour at once</strong> - {"evidence": "<code>refinements.publish</code>; one-refinement index; <code>decision_ladder.rs::a_refinement_changes_a_threshold_without_a_code_change</code>", "maturity": "live"}</li>
+<li><strong>Gated policy change / a refinement is approved before it takes effect</strong> - {"evidence": "v1-t2-3: <code>refinements.publish</code> is <code>confirm = \"none\"</code> with no approval", "maturity": "not built"}</li>
+<li><strong>L1 laya evaluation / the ladder asks laya and records its answer</strong> - {"evidence": "v1-t2-2: the row, threshold comparison and config pins are live; no client calls <code>POST /v1/systemone</code>", "maturity": "partial"}</li>
+<li><strong>L3 human gate / a person decides, on an approved approval</strong> - {"evidence": "<code>ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision</code>, <code>::a_human_decision_without_an_approved_human_gate_is_refused</code>; gate identity is missing (v1-t2-6)", "maturity": "partial"}</li>
+<li><strong>Draft gate / a generated draft reaches a card only through a human <code>draft.apply</code> decision</strong> - {"evidence": "<code>ladder.apply_draft</code> and the <code>documents.update</code> refusal are live; <code>documents.compose</code> attaches without a gate (v1-t2-1, P0)", "maturity": "partial"}</li>
+<li><strong>Generation split / L2 is an <code>inference_call</code> plus a draft, never a rung</strong> - {"evidence": "the <code>decision_rung_check</code> admits only rule|laya|human and the <code>compile_fail</code> doctest in <code>conveyor_domain::ladder</code> forbids a transition; the call path is T13", "maturity": "partial"}</li>
+<li><strong>Authored options and questions / options and questions are tenant-versioned rows</strong> - {"evidence": "v1-t2-4: inline <code>options</code> and a free <code>question</code> string; <code>decision_policy</code> has no question, <code>fire_when</code> or <code>min_confidence</code>", "maturity": "not built"}</li>
+<li><strong>Budget enforcement / an over-budget run is refused before the next call</strong> - {"evidence": "v1-t2-5: no inference budget; the only refusal is <code>429 tool_budget_exceeded</code>", "maturity": "not built"}</li>
+<li><strong>Tenant isolation and audit event / every ladder row is tenant-scoped and every mutation emits an event</strong> - {"evidence": "T0's tenant tables with FORCE RLS; tenant-leading indexes in 0046; <code>decision.changed</code> on every mutation", "maturity": "live"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision ladder · conveyor output · published 2026-11-23T09:26:49Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

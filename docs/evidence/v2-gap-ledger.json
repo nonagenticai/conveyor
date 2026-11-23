@@ -1,14 +1,14 @@
 {
   "schema": "v2-gap-ledger/v1",
-  "lane_pin": "1e571b27",
+  "lane_pin": "bfdd6d2c",
   "generated_from": {
     "artefact_record": {
-      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-board/scripts/generate-standards.py --snapshot /tmp/snap-526-0738/data --outputs-dir /tmp/snap-526-0738/docs --register /tmp/conf-0738/rework.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-cf82p1bl --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-cf82p1bl/findings.json",
+      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-board/scripts/generate-standards.py --snapshot /tmp/snap-526-0738/data --outputs-dir /tmp/snap-526-0738/docs --register /tmp/conf-0738/rework.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-hvap289t --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-hvap289t/findings.json",
       "summary": {
         "absent": 428,
         "artefacts": 888,
         "evidenced": 156,
-        "findings": 553,
+        "findings": 555,
         "mandatory": 805,
         "partial": 304
       }
@@ -36,12 +36,12 @@
       },
       {
         "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-board/docs/evidence/conformance-baseline.json",
-        "sha256": "a5acacc6f9e46463f8a3c19b8a79a5b9db7473d7cbfdb6eecadf068c9dba7a99",
+        "sha256": "319f605c7a7bdb5d8fc90b6b61480e0676ecfb79012157cbdd68ccf93581d49a",
         "role": "baseline entries; stale set"
       },
       {
         "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-board/docs/evidence/v1-conformance-findings.json",
-        "sha256": "cc591766618b4595d0abdc6ac20b5949f6621df1d79eca505f2e22e5c7eb484f",
+        "sha256": "33ea52acb07844306d03fad10f0381c89711951912e108236296774c2c332b76",
         "role": "v1 findings; open ledger"
       },
       {
@@ -51,7 +51,7 @@
       },
       {
         "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-board/seed/programme.json",
-        "sha256": "97fdb00e4068e8ccb308af2902d2f415a1cb5f0951b77b4c5b6aa5e974fb89ba",
+        "sha256": "6595882a3bb05a9551a8f6e5f7c1e5f09ec790d46d3f0fcef76b31d2b632483e",
         "role": "project ADM phase and archived set"
       }
     ]
@@ -83,15 +83,15 @@
     "deploy_bound": "the not-yet-deployed set is migrations 0062-0066 and the authoring.* family 0066 creates"
   },
   "counts": {
-    "rows": 456,
+    "rows": 440,
     "by_kind": {
       "artefact": 363,
-      "baseline": 16,
-      "ledger": 77
+      "baseline": 3,
+      "ledger": 74
     },
     "by_severity": {
-      "P1": 232,
-      "P0": 20,
+      "P1": 220,
+      "P0": 16,
       "P2": 204
     },
     "by_kind_severity": {
@@ -101,28 +101,26 @@
         "P2": 178
       },
       "baseline": {
-        "P1": 12,
-        "P0": 4
+        "P1": 3
       },
       "ledger": {
-        "P1": 50,
+        "P1": 47,
         "P2": 26,
         "P0": 1
       }
     },
     "by_deploy_bound": {
-      "false": 456
+      "false": 440
     },
     "by_status": {
       "absent": 363,
-      "stale": 16,
-      "open": 77
+      "stale": 3,
+      "open": 74
     },
     "by_fix_card_resolution": {
-      "published_package": 301,
-      "finding_id": 137,
-      "artefact_package": 2,
-      "baseline_key": 16
+      "published_package": 303,
+      "finding_id": 134,
+      "baseline_key": 3
     },
     "declared_package_keys_absent_from_register": [
       "std-msp-benefits-registry-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
@@ -187,9 +185,8 @@
       "std-togaf-project-context-diagram-t9:T9"
     ],
     "artefact_fix_card_resolution": {
-      "published_package": 301,
-      "finding_id": 60,
-      "artefact_package": 2
+      "published_package": 303,
+      "finding_id": 60
     }
   },
   "rows": [
@@ -4507,8 +4504,8 @@
       "severity": "P2",
       "owner": "PLATFORM",
       "fix_card": "std-togaf-compliance-review-t10:T10",
-      "fix_card_resolution": "artefact_package",
-      "standard_id": "",
+      "fix_card_resolution": "published_package",
+      "standard_id": "std-togaf-compliance-review-t10",
       "declared_package_key": "std-togaf-compliance-review-t10:T10",
       "target_phase": "G",
       "deploy_bound": false
@@ -4543,8 +4540,8 @@
       "severity": "P0",
       "owner": "PLATFORM",
       "fix_card": "std-togaf-compliance-review-t13:T13",
-      "fix_card_resolution": "artefact_package",
-      "standard_id": "",
+      "fix_card_resolution": "published_package",
+      "standard_id": "std-togaf-compliance-review-t13",
       "declared_package_key": "std-togaf-compliance-review-t13:T13",
       "target_phase": "G",
       "deploy_bound": false
@@ -6728,78 +6725,6 @@
       "deploy_bound": false
     },
     {
-      "key": "baseline:backlog_refinement_missing:tranche 2",
-      "kind": "baseline",
-      "standard": "SAFe",
-      "spec": "§8.2",
-      "subject": "tranche 2",
-      "project": "unassigned",
-      "title": "Stale baseline entry: backlog_refinement_missing (tranche 2)",
-      "status": "stale",
-      "severity": "P1",
-      "owner": "unassigned",
-      "fix_card": "baseline:backlog_refinement_missing:tranche 2",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "unassigned",
-      "deploy_bound": false
-    },
-    {
-      "key": "baseline:closed_without_closure_review:S03",
-      "kind": "baseline",
-      "standard": "MSP",
-      "spec": "§8.4",
-      "subject": "S03",
-      "project": "S03",
-      "title": "Stale baseline entry: closed_without_closure_review (S03)",
-      "status": "stale",
-      "severity": "P1",
-      "owner": "unassigned",
-      "fix_card": "baseline:closed_without_closure_review:S03",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "baseline:closed_without_closure_review:T2",
-      "kind": "baseline",
-      "standard": "MSP",
-      "spec": "§8.4",
-      "subject": "T2",
-      "project": "T2",
-      "title": "Stale baseline entry: closed_without_closure_review (T2)",
-      "status": "stale",
-      "severity": "P0",
-      "owner": "unassigned",
-      "fix_card": "baseline:closed_without_closure_review:T2",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "baseline:closure_outputs_undeclared:S03",
-      "kind": "baseline",
-      "standard": "MSP",
-      "spec": "§8.3",
-      "subject": "S03",
-      "project": "S03",
-      "title": "Stale baseline entry: closure_outputs_undeclared (S03)",
-      "status": "stale",
-      "severity": "P1",
-      "owner": "unassigned",
-      "fix_card": "baseline:closure_outputs_undeclared:S03",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
       "key": "baseline:compliance_review_missing:T1",
       "kind": "baseline",
       "standard": "TOGAF",
@@ -6836,179 +6761,17 @@
       "deploy_bound": false
     },
     {
-      "key": "baseline:contract_missing:T2",
+      "key": "baseline:seed_live_drift:T4",
       "kind": "baseline",
-      "standard": "TOGAF",
-      "spec": "§8.1",
-      "subject": "T2",
-      "project": "T2",
-      "title": "Stale baseline entry: contract_missing (T2)",
+      "standard": "SPEC",
+      "spec": "§5.3",
+      "subject": "T4",
+      "project": "T4",
+      "title": "Stale baseline entry: seed_live_drift (T4)",
       "status": "stale",
       "severity": "P1",
       "owner": "unassigned",
-      "fix_card": "baseline:contract_missing:T2",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "baseline:mandatory_artefacts:S03",
-      "kind": "baseline",
-      "standard": "TOGAF",
-      "spec": "§8.1",
-      "subject": "S03",
-      "project": "S03",
-      "title": "Stale baseline entry: mandatory_artefacts (S03)",
-      "status": "stale",
-      "severity": "P1",
-      "owner": "unassigned",
-      "fix_card": "baseline:mandatory_artefacts:S03",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "baseline:pi_cadence_missing:tranche 2",
-      "kind": "baseline",
-      "standard": "SAFe",
-      "spec": "§8.2",
-      "subject": "tranche 2",
-      "project": "unassigned",
-      "title": "Stale baseline entry: pi_cadence_missing (tranche 2)",
-      "status": "stale",
-      "severity": "P1",
-      "owner": "unassigned",
-      "fix_card": "baseline:pi_cadence_missing:tranche 2",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "unassigned",
-      "deploy_bound": false
-    },
-    {
-      "key": "baseline:pi_objectives_missing:tranche 2 PI",
-      "kind": "baseline",
-      "standard": "SAFe",
-      "spec": "§8.2",
-      "subject": "tranche 2 PI",
-      "project": "unassigned",
-      "title": "Stale baseline entry: pi_objectives_missing (tranche 2 PI)",
-      "status": "stale",
-      "severity": "P1",
-      "owner": "unassigned",
-      "fix_card": "baseline:pi_objectives_missing:tranche 2 PI",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "unassigned",
-      "deploy_bound": false
-    },
-    {
-      "key": "baseline:pi_plan_missing:tranche 2 PI",
-      "kind": "baseline",
-      "standard": "SAFe",
-      "spec": "§8.2",
-      "subject": "tranche 2 PI",
-      "project": "unassigned",
-      "title": "Stale baseline entry: pi_plan_missing (tranche 2 PI)",
-      "status": "stale",
-      "severity": "P0",
-      "owner": "unassigned",
-      "fix_card": "baseline:pi_plan_missing:tranche 2 PI",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "unassigned",
-      "deploy_bound": false
-    },
-    {
-      "key": "baseline:project_in_unauthorised_tranche:S04",
-      "kind": "baseline",
-      "standard": "MSP",
-      "spec": "§8.3",
-      "subject": "S04",
-      "project": "S04",
-      "title": "Stale baseline entry: project_in_unauthorised_tranche (S04)",
-      "status": "stale",
-      "severity": "P1",
-      "owner": "unassigned",
-      "fix_card": "baseline:project_in_unauthorised_tranche:S04",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "baseline:project_in_unauthorised_tranche:T13",
-      "kind": "baseline",
-      "standard": "MSP",
-      "spec": "§8.3",
-      "subject": "T13",
-      "project": "T13",
-      "title": "Stale baseline entry: project_in_unauthorised_tranche (T13)",
-      "status": "stale",
-      "severity": "P0",
-      "owner": "unassigned",
-      "fix_card": "baseline:project_in_unauthorised_tranche:T13",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "baseline:project_in_unauthorised_tranche:T3",
-      "kind": "baseline",
-      "standard": "MSP",
-      "spec": "§8.3",
-      "subject": "T3",
-      "project": "T3",
-      "title": "Stale baseline entry: project_in_unauthorised_tranche (T3)",
-      "status": "stale",
-      "severity": "P0",
-      "owner": "unassigned",
-      "fix_card": "baseline:project_in_unauthorised_tranche:T3",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "baseline:unpublished_declared_output:S03",
-      "kind": "baseline",
-      "standard": "MSP",
-      "spec": "§8.3",
-      "subject": "S03",
-      "project": "S03",
-      "title": "Stale baseline entry: unpublished_declared_output (S03)",
-      "status": "stale",
-      "severity": "P1",
-      "owner": "unassigned",
-      "fix_card": "baseline:unpublished_declared_output:S03",
-      "fix_card_resolution": "baseline_key",
-      "standard_id": "",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "baseline:unpublished_declared_output:T2",
-      "kind": "baseline",
-      "standard": "MSP",
-      "spec": "§8.3",
-      "subject": "T2",
-      "project": "T2",
-      "title": "Stale baseline entry: unpublished_declared_output (T2)",
-      "status": "stale",
-      "severity": "P1",
-      "owner": "unassigned",
-      "fix_card": "baseline:unpublished_declared_output:T2",
+      "fix_card": "baseline:seed_live_drift:T4",
       "fix_card_resolution": "baseline_key",
       "standard_id": "",
       "declared_package_key": "",
@@ -7173,24 +6936,6 @@
       "fix_card": "v1-p119-1",
       "fix_card_resolution": "finding_id",
       "standard_id": "v1-p119-1",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "ledger:v1-p44-2",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§4.4",
-      "subject": "§4.4",
-      "project": "T0",
-      "title": "A new binding goes live with no decision",
-      "status": "open",
-      "severity": "P1",
-      "owner": "T0",
-      "fix_card": "v1-p44-2",
-      "fix_card_resolution": "finding_id",
-      "standard_id": "v1-p44-2",
       "declared_package_key": "",
       "target_phase": "G",
       "deploy_bound": false
@@ -7430,24 +7175,6 @@
       "deploy_bound": false
     },
     {
-      "key": "ledger:v1-p75-2",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§7.5",
-      "subject": "§7.5",
-      "project": "T11",
-      "title": "Tool spend is a stored column and is absent from every usage roll-up",
-      "status": "open",
-      "severity": "P1",
-      "owner": "T11",
-      "fix_card": "v1-p75-2",
-      "fix_card_resolution": "finding_id",
-      "standard_id": "v1-p75-2",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
       "key": "ledger:v1-p75-5",
       "kind": "ledger",
       "standard": "SPEC",
@@ -7641,24 +7368,6 @@
       "fix_card": "v1-p83-1",
       "fix_card_resolution": "finding_id",
       "standard_id": "v1-p83-1",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "ledger:v1-p83-2",
-      "kind": "ledger",
-      "standard": "MSP",
-      "spec": "§8.3",
-      "subject": "§8.3",
-      "project": "T10",
-      "title": "Benefit measurement is presence-only and realized needs only two timestamps",
-      "status": "open",
-      "severity": "P1",
-      "owner": "T10",
-      "fix_card": "v1-p83-2",
-      "fix_card_resolution": "finding_id",
-      "standard_id": "v1-p83-2",
       "declared_package_key": "",
       "target_phase": "G",
       "deploy_bound": false

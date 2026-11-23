@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Business Capability Map — T11 Metrics, metering and maturity (Phase B) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Business Capability Map — T11 Metrics, metering and maturity (Phase B)</li>
+<li>Phase: b</li>
+<li>Kind: diagram</li>
+<li>Purpose: The capabilities T11 installs and the honest maturity of each, including what remains with the eval and knowledge slices.</li>
+<li>Scope: The metric families, the metering levels and drill-down, the maturity ladder, the reconciliation and the console.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Flow metrics / WIP, throughput, lead/cycle/queue/block time, flow efficiency</strong> - {"evidence": "metrics.flow; crates/store/src/metrics.rs::flow_tx; crates/actions/tests/metrics.rs::flow_recomputes_and_a_missing_ledger_is_unavailable", "maturity": "live"}</li>
+<li><strong>Cost metrics / tokens, derived cost, priced vs unpriced calls</strong> - {"evidence": "metrics.usage; the commercial_price join at read time; billing.summary's derived total", "maturity": "live"}</li>
+<li><strong>Governance metrics / approval rate, evidence completeness, gate latency, never-refused gates</strong> - {"evidence": "metrics.programme and metrics.maturity; crates/store/src/metrics.rs::gate_counts_tx; the never-refused test", "maturity": "live"}</li>
+<li><strong>Quality metrics — approval- and run-derived / approval rate, rejection count, runs failed</strong> - {"evidence": "the nine-name evidence vocabulary; metrics.maturity and metrics.programme", "maturity": "live"}</li>
+<li><strong>Quality metrics — eval- and benchmark-backed / first-pass yield, rework rate, defect escapes, eval score, benchmark delta</strong> - {"evidence": "SPEC_V2 \u00a77.5 sources <code>eval*</code> and <code>benchmark*</code>; the eval slices S17\u2013S20 own those ledgers and T11 does not claim them", "maturity": "elsewhere"}</li>
+<li><strong>MSP programme metrics / benefits realised vs planned, benefit-at-risk, tranche decisions, tokens and runs</strong> - {"evidence": "metrics.programme; tests realised_versus_planned_recomputes_and_an_unmeasured_baseline_is_not_zero and a_dependency_slip_names_the_benefits_it_puts_at_risk", "maturity": "live"}</li>
+<li><strong>Metering roll-ups / tenant, department, programme, project, job</strong> - {"evidence": "metrics.usage; every_metering_level_sums_to_its_children; department through the primary job_department", "maturity": "live"}</li>
+<li><strong>Drill-down / run, step, call</strong> - {"evidence": "metrics.job; the_run_drilldown_sums_to_the_call_rows", "maturity": "live"}</li>
+<li><strong>C0–C5 maturity / contiguous ladder over versioned thresholds</strong> - {"evidence": "metrics.threshold_get, metrics.threshold_update and metrics.maturity; a_level_moves_only_when_the_evidence_crosses_the_recorded_threshold", "maturity": "live"}</li>
+<li><strong>Billing reconciliation / matched, difference or unavailable; incident on divergence</strong> - {"evidence": "metrics.reconcile; reconciliation_is_exact_or_opens_an_incident; migration 0059's shape constraint", "maturity": "live"}</li>
+<li><strong>Console reporting / live inference aggregates from the published snapshot</strong> - {"evidence": "docs/design/v2.js meteringLive(); #458; check-v2.cjs 9b\u20139d; measure.inference", "maturity": "live"}</li>
+<li><strong>Knowledge metrics / pack hit rate, lesson promotion rate</strong> - {"evidence": "no lesson or knowledge-retrieval ledger exists; metrics.flow reports both with a reason, never zero (T8)", "maturity": "unavailable"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Metrics, metering and maturity · conveyor output · published 2026-11-23T09:26:49Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

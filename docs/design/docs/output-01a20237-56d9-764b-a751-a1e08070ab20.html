@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Stakeholder Map — T2 Decision ladder (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Stakeholder Map — T2 Decision ladder (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: matrix</li>
+<li>Purpose: Who is affected by the decision ladder, what each needs from it, and how the rework engages them.</li>
+<li>Scope: the ladder, its tenant configuration and the generation split delivered by issue #73, and the tranche-2 governance around it.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Sponsoring group / tranche-2 authorisation, the tranche exit and the benefit decision</strong> - {"engagement": "decide", "influence": "high", "interest": "high"}</li>
+<li><strong>SRO / accountable for the coherent capability and the tranche-2 exit criteria</strong> - {"engagement": "accountable", "influence": "high", "interest": "high"}</li>
+<li><strong>Architecture Board / conformance of the seven A–D artefacts, the charter and the delivery contract</strong> - {"engagement": "approve", "influence": "high", "interest": "high"}</li>
+<li><strong>Tenant policy owner (admin) / publishes <code>decision_policy_refinement</code> and <code>laya_inference_config</code> rows; needs the publish action to be a gated policy change</strong> - {"engagement": "consult", "influence": "high", "interest": "high"}</li>
+<li><strong>PM job (T3) / consumes ladder decisions for gate routing and must not decide its own gate</strong> - {"engagement": "consult", "influence": "high", "interest": "high"}</li>
+<li><strong>Delivery jobs (T4, T5, T7, T13, T16) / consume L1 triage, routing, severity and gate pre-check answers</strong> - {"engagement": "consult", "influence": "medium", "interest": "high"}</li>
+<li><strong>Laya operator (DGX jev bridge) / serves <code>POST /v1/systemone</code> for L1; T2 records the config but never calls it (v1-t2-2)</strong> - {"engagement": "inform", "influence": "medium", "interest": "medium"}</li>
+<li><strong>Security and audit / <code>actor_kind</code>/<code>actor_id</code>, <code>input_hash</code>, <code>approval_id</code> and the append-only <code>decision.changed</code> event</strong> - {"engagement": "consult", "influence": "high", "interest": "medium"}</li>
+<li><strong>Operators and tenants / tenant-scoped policies, refinements and the decision audit read</strong> - {"engagement": "inform", "influence": "low", "interest": "high"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision ladder · conveyor output · published 2026-11-23T09:26:49Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — S02 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Closure review — S02 Skeleton (retrospective, 2026-11-21)</h1>
+<h2>Outcome vs acceptance</h2>
+<ul>
+<li><strong>Two tenants isolated including RLS.</strong> Pass. <code>apps/server/tests/rls.rs</code> proves the runtime role sees only its tenant, the owner sees 0, and the superuser sees both; <code>migrations/0001_platform.sql</code> carries ENABLE + FORCE RLS with USING and WITH CHECK on the nine tenant-owned tables.</li>
+<li><strong>Login works.</strong> Pass. The dev principal resolves <code>dev:&lt;login&gt;</code> through <code>membership</code> (<code>crates/auth/src/dev.rs</code>) and the OIDC validator enforces <code>aud</code>/<code>azp</code> (<code>crates/auth/src/jwks.rs</code>); <code>apps/server/tests/rls.rs</code> carries the dev path.</li>
+<li><strong>A job survives a kill.</strong> Pass. <code>apps/server/tests/jobs_kill.rs</code> kills a worker mid-handler, reclaims on lease expiry and proves the stale token writes nothing.</li>
+<li><strong>A long handler is not reclaimed under two workers (issue #2 P2).</strong> Pass at the branch head. <code>apps/server/tests/jobs_lease_two_workers.rs</code> runs two real workers with <code>JOB_LEASE_SECS=2</code> against a handler held for four leases: attempts stays 1, the stub is called once, the finish is <code>succeeded</code>, and the lease is cleared and not resurrected. Local PASS (11.878 s) at d367a4a9; preflight 44938697512 (success).</li>
+<li><strong>SSE replay.</strong> Pass. <code>apps/server/tests/events.rs</code> resumes from <code>Last-Event-ID</code> in <code>seq</code> order without tenant B's rows.</li>
+<li><strong>Audit append-only; licence fails closed.</strong> Pass. <code>crates/store/tests/audit_idempotency.rs</code> and <code>crates/auth/tests/licence.rs</code>.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li><code>acceptance/programme/S02.toml</code> run by <code>scripts/verify-project.py</code> against the published snapshot at d367a4a9.</li>
+<li><code>apps/server/tests/jobs_lease_two_workers.rs</code> (P2.1–P2.3), local PASS 11.878 s; preflight run 44938697512 (success) on the same SHA.</li>
+<li>The published project brief and evidence outputs (S02), corrected by this batch so they no longer claim issue #2 is an open acceptance item; the closure review you are reading.</li>
+<li>Phase-G review under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li>The PR's CI shards have not yet run <code>jobs_lease_two_workers</code>, and the deployed image is not this branch; the merge and deploy gates are the delivery path. Issue #2 closes with the PR. No other item.</li>
+</ul>
+<h2>Decision</h2>
+<p>Close. S02's acceptance is met at the named SHA; the only outstanding item is the delivery gate (PR, CI, deploy), which is outside the project's acceptance record.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-23T09:26:49Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>PI objectives — tranche 2 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>PI objectives — tranche 2 (retrospective, 2026-11-21)</h1>
+<h2>Objectives</h2>
+<ul>
+<li><strong>O1 — S03 carries the programme's own evidence and closes on it.</strong> After this increment, S03's
+charter, Statement of Architecture Work, seven Phase A–D artefacts, delivery contract, Phase-G
+review, two expected outputs and closure review exist as published rows, and
+<code>acceptance/programme/S03.toml</code> is green at the closing snapshot.</li>
+<li><strong>O2 — T2's record exists and its blocking gate is named.</strong> The same record is produced for T2,
+and its Phase-G review records that <code>v1-t2-1</code> blocks closure: a generated draft can be attached
+to a card by <code>documents.compose</code>, so §7.4's "only through a gated action" is not enforceable.</li>
+<li><strong>O3 — tranche 2 is reviewed on evidence, not on summary.</strong> The review cites each project's
+manifest result at the closing snapshot and ends in one typed outcome.</li>
+</ul>
+<h2>Business value</h2>
+<table><thead><tr><th>Objective</th><th>Planned business value</th><th>Basis</th></tr></thead><tbody>
+<tr><td>O1</td><td>8</td><td>S03 is the schema and invariant layer every later slice builds on; an unproven claim here is inherited by all of them</td></tr>
+<tr><td>O2</td><td>8</td><td>the decision ladder is V2's "laya first, LLM last" promise; an ungated attach path voids it</td></tr>
+<tr><td>O3</td><td>5</td><td>the tranche gate is what makes the rest of the programme's reviews credible</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>21</strong></td><td></td></tr>
+</tbody></table>
+<p>Achieved value is assessed at the tranche review against the same measures, and is not claimed
+here. An objective whose proof did not land is scored zero, not partially.</p>
+<h2>Measurement</h2>
+<ul>
+<li><strong>O1</strong> — <code>python3 scripts/verify-project.py --project S03</code> against the closing snapshot: every
+check green, exit 0, with the evidence file at <code>docs/evidence/rework/S03.json</code>.</li>
+<li><strong>O2</strong> — the same verifier for T2 reports the record checks green and <code>T2-product</code> red on
+<code>v1-t2-1</code>; that red is the objective's evidence, not a failure of the increment.</li>
+<li><strong>O3</strong> — the tranche review row names the decision and carries the two manifest results in its
+evidence.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li><code>docs/evidence/rework/tranche-2/findings.json</code> — the audit, quote-verified at <code>7fa223b6</code>.</li>
+<li><code>docs/evidence/rework/tranche-2/acts.md</code> — every live write of this increment with its row id.</li>
+<li><code>acceptance/programme/S03.toml</code>, <code>acceptance/programme/T2.toml</code> — the two gates.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-23T09:26:49Z · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

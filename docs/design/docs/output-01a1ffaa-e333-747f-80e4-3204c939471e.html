@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Inspect Adapt — tranche 1 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Inspect and adapt — tranche 1 (retrospective, 2026-11-21)</h1>
+<p>The retro record for the increment: what the evidence showed, the lessons it produced and the
+actions it set.</p>
+<h2>What went well</h2>
+<ul>
+<li>The batch refused to record S02 as accepted while issue #2's proof did not exist, and landed the
+missing test instead of granting a waiver.</li>
+<li>The audit caught three instrument defects before they reached another project: the SoAW-vs-
+delivery-contract review rule, the stale-output skip, and the missing artefact type binding.</li>
+<li>Every act was written through an action and read back; the resumed runs converged to one closed
+state per project.</li>
+</ul>
+<h2>What did not</h2>
+<ul>
+<li>S02 carried an acceptance issue whose central proof had never been written, while the project was
+recorded active; the gap was invisible to the manifest until it was checked against the issue.</li>
+<li>The rework runner skipped an existing published output, so a stale claim could survive a closure;
+the corrected path is unpublish → update → publish with the heading gate re-run.</li>
+<li>Created artefacts carried no standard key, so the conformance audit could not see them.</li>
+<li>T1 and T11 have no contemporaneous governance record; the retrospective records are honest about
+what is not recoverable.</li>
+</ul>
+<h2>Lessons</h2>
+<ul>
+<li><code>01a1ff82-cc70-7b18-bb12-6501ac4239e4</code> — T1 has no contemporaneous governance record.</li>
+<li><code>01a1ff82-e836-7867-981f-4bdfcfa860f0</code> — T11 has no calibrated C0–C5 threshold row.</li>
+<li><code>01a1ff83-06d1-7ff1-84c4-1f0d7957efc7</code> — a named Verify with no test is a finding, not a waiver.</li>
+<li><code>01a1ff83-23de-713d-8099-d3e9ec8d74ea</code> — a rework must correct stale public claims.</li>
+<li><code>01a1ff83-3f5c-7734-830a-c8bb6c45024f</code> — a list read-back needs its own input and an id match.</li>
+</ul>
+<h2>Actions</h2>
+<ul>
+<li>U6 owns the six benefit instruments and the token-spend KPI; no benefit is claimed realized
+before the measurement.</li>
+<li>Tranche 2 (S03, T2) starts from conformance baseline v5 (182 P0/P1 entries).</li>
+<li>The product conformance audit is the next unit: verified findings become WSJF-scored work
+packages that change the code, not prose.</li>
+<li>The S02 proof runs in the PR's test shards; issue #2 closes with that PR.</li>
+<li>The P2 <code>seed_live_drift</code> for S02 is recorded: the definition seed still says active.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-23T09:26:49Z · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

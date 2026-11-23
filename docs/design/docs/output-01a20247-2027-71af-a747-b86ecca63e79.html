@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Technology Standards Catalog — S03 Domain and schema (Phase D) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Technology Standards Catalog — S03 Domain and schema (Phase D)</li>
+<li>Phase: d</li>
+<li>Kind: catalog</li>
+<li>Purpose: The standards S03's schema and store primitives fix for every later slice.</li>
+<li>Scope: Postgres 18 and RLS, the migration set, the partial-index guarantee, time and position types, the <code>_tx</code> convention and the error vocabulary.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>PostgreSQL / 18 with ENABLE and FORCE row-level security</strong> - {"usage": "every domain table carries tenant_id, ENABLE and FORCE ROW LEVEL SECURITY, and the tenant_isolation policy on app_current_tenant(); 14/14 in migrations/0002_domain.sql"}</li>
+<li><strong>Enumeration storage / text + CHECK, never CREATE TYPE</strong> - {"usage": "ALTER TYPE \u2026 ADD VALUE cannot share a transaction with an index on the new label, and each migration file is one transaction (data-arch \u00a71.8); the file has zero CREATE TYPE"}</li>
+<li><strong>Concurrency guarantee / a partial unique index, never check-then-insert</strong> - {"usage": "uq_appr_pending and uq_run_live are the guarantee; 23505 maps to a stable conflict; a refused decision writes no row"}</li>
+<li><strong>Time / timestamptz in UTC; lease tests in SQL</strong> - {"usage": "every lease test is <code>lease_expires_at &lt; now()</code> in SQL, never a Rust clock (plan trap 6); claim TTL is a store parameter, DEFAULT_CLAIM_TTL 900 s (S3-D5)"}</li>
+<li><strong>Position / numeric midpoint, never double precision</strong> - {"usage": "(a+b)/2 between neighbours and max+1024 on append; Planka's double precision loses precision after ~50 halvings; a move writes list_id, prev_list_id, list_changed_at and position in one statement (plan trap 2)"}</li>
+<li><strong>Store convention / <code>_tx</code> functions taking TenantId and a connection</strong> - {"usage": "every store function takes TenantId and a PgConnection, never a pool; the caller owns the transaction; the stratum of tenant scope is begin_scoped"}</li>
+<li><strong>Migration set / forward-only, numbered, embedded, no IF NOT EXISTS</strong> - {"usage": "store/src/migrate.rs asserts [(1,"platform"),(2,"domain")]; a file outside the embedded set is a silent no-op (plan trap 9); no IF NOT EXISTS masks failure as a no-op"}</li>
+<li><strong>Error vocabulary / stable refusals at the action boundary</strong> - {"usage": "409 card-move-not-allowed for a refused matrix move; a stale version is refused; ApprovalConflict from 23505; the domain errors are typed in crates/domain and mapped once in the store"}</li>
+<li><strong>Rust domain crate / total functions, no I/O</strong> - {"usage": "crates/domain depends on serde, uuid, time and thiserror only \u2014 no sqlx, tokio or axum; the machines are pure and the store carries the SQL"}</li>
+<li><strong>Verification / real Postgres, then the hosted preflight</strong> - {"usage": "crates/store/tests run against real Postgres 18 on the plan's port 5439 (never 5432, never 8000); the compile/test verdict is preflight.yml; the local gate is cargo fmt --all -- --check and cargo metadata --locked --format-version 1"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Domain and schema — aggregates, state machines, baseline domain migration · conveyor output · published 2026-11-23T09:26:49Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

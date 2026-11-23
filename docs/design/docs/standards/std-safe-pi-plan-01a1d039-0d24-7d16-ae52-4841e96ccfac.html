@@ -37,27 +37,112 @@
         <div><dt>Standard</dt><dd>SAFe</dd></div>
         <div><dt>Level</dt><dd>programme</dd></div>
         <div><dt>Subject</dt><dd>conveyor buildout</dd></div>
-        <div><dt>Status</dt><dd>absent</dd></div>
+        <div><dt>Status</dt><dd>evidenced</dd></div>
         <div><dt>SPEC</dt><dd>§8.2</dd></div>
         <div><dt>Gate</dt><dd>not recorded</dd></div>
         <div><dt>Package</dt><dd><code>std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-20T11:50:50.848127361+00:00 · a33e6562e80d</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-23T09:26:49Z · bfdd6d2c</dd></div>
       </dl>
       <h2>Objectives</h2>
 <p class="std-intent">The PI objectives this plan is judged against, with their planned business value.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Objectives&#x27;; a document exists but lacks the heading (see <code>std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p><h2>Plan</h2>
+<p class="std-source">Source: <code>artefacts.json#/documents</code> — 5 row(s)</p>
+<ul>
+<li>PI plan — tranche 0 (retrospective)</li>
+<li>PI plan — tranche 1 (retrospective)</li>
+<li>PI plan — tranche 2 (retrospective, 2026-11-21)</li>
+<li>PI Plan — conveyor buildout, tranche 3</li>
+<li>PI Plan — conveyor buildout, tranche 4</li>
+</ul><h2>Plan</h2>
 <p class="std-intent">The deliverables materialised for this increment, one per WBS node, with their project and acceptance.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Plan&#x27;; a document exists but lacks the heading (see <code>std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p><h2>WSJF order</h2>
+<p class="std-source">Source: <code>msp.json#/wbs_nodes</code> — 37 row(s)</p>
+<ul>
+<li>The usage inventory and its evidence record <span class="std-state">accepted</span></li>
+<li>The UI-stack decision record <span class="std-state">accepted</span></li>
+<li>S02 — Skeleton: tenancy, auth, jobs and SSE on Postgres 18 <span class="std-state">accepted</span></li>
+<li>The domain and schema — aggregates, state machines, leases and the baseline domain migration <span class="std-state">accepted</span></li>
+<li>ActionSpec derive crate <span class="std-state">accepted</span></li>
+<li>Registry and spec vocabularies <span class="std-state">accepted</span></li>
+<li>The 16 internal actions <span class="std-state">open</span></li>
+<li>Invocation path with idempotency and audit <span class="std-state">open</span></li>
+<li>Store transaction helpers <span class="std-state">open</span></li>
+<li>Migration 0003 action registry <span class="std-state">open</span></li>
+<li>Manifest endpoint <span class="std-state">open</span></li>
+<li>MCP endpoint <span class="std-state">open</span></li>
+</ul><h2>WSJF order</h2>
 <p class="std-intent">The four typed inputs per candidate — business value, time criticality, risk reduction and job size — in the order the plan takes them. The score is computed, never stored.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;WSJF order&#x27;; a document exists but lacks the heading (see <code>std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p><h2>Capacity and WIP</h2>
+<p class="std-source">Source: <code>wsjf_order</code> — 23 row(s)</p>
+<ul>
+<li>A baseline change travels as a change request with its impact and its own gate <span class="std-state">accepted</span></li>
+<li>Closure against the frozen baseline: close_request, a distinct decision and projects.close <span class="std-state">accepted</span></li>
+<li>Dual control on every PM gate: charter, baseline and change are approved by a distinct approver <span class="std-state">accepted</span></li>
+<li>Publish the studio design pack and its retrospective closure record <span class="std-state">accepted</span></li>
+<li>The PM request-to-plan path: pm.plan writes the WBS and the scope baseline <span class="std-state">accepted</span></li>
+<li>The T3 acceptance record: the manifest&#x27;s checks execute against the live rows <span class="std-state">accepted</span></li>
+<li>ActionSpec derive crate <span class="std-state">accepted</span></li>
+<li>The model and contracts — organisation spine, decision-ladder types and the Executor seam <span class="std-state">accepted</span></li>
+<li>The coach loop — one card, one triage, one remedy, per-signature escalation and the depth cap <span class="std-state">accepted</span></li>
+<li>Registry and spec vocabularies <span class="std-state">accepted</span></li>
+<li>The tool platform — one governed call path, the call ledger, the schema and effect gates, and tenant-prefixed storage <span class="std-state">accepted</span></li>
+<li>The decision ladder — four rungs, the laya contract and the draft gate <span class="std-state">accepted</span></li>
+</ul><h2>Capacity and WIP</h2>
 <p class="std-intent">The capacity the plan is bounded by and the WIP limit it respects.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Capacity and WIP&#x27;; a document exists but lacks the heading (see <code>std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p><h2>Evidence</h2>
+<p class="std-source">Source: <code>msp.json#/cadences</code> — 5 row(s)</p>
+<ul>
+<li>01a1ff21-33f0-7e5a-bafc-b09b6fc73c13 <span class="std-state">planned</span></li>
+<li>01a1ff73-df1f-78c5-8793-101de5a3dd60 <span class="std-state">planned</span></li>
+<li>01a2004a-51f4-7482-b5f8-455a4bd371b5 <span class="std-state">planned</span></li>
+<li>01a20280-a739-7bb9-823f-232f34b32aaa <span class="std-state">awaiting_approval</span></li>
+<li>01a202a1-dbb9-7e49-b64a-cf97c3fab095 <span class="std-state">awaiting_approval</span></li>
+</ul><h2>Evidence</h2>
 <p class="std-intent">The backlog rows, the cadence row and the approval that made this the plan.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Evidence&#x27;; a document exists but lacks the heading (see <code>std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p><h2>Dependencies</h2>
+<p class="std-source">Source: <code>artefacts.json#/documents</code> — 5 row(s)</p>
+<ul>
+<li>PI plan — tranche 0 (retrospective)</li>
+<li>PI plan — tranche 1 (retrospective)</li>
+<li>PI plan — tranche 2 (retrospective, 2026-11-21)</li>
+<li>PI Plan — conveyor buildout, tranche 3</li>
+<li>PI Plan — conveyor buildout, tranche 4</li>
+</ul>
+<p class="std-source">Source: <code>msp.json#/cadences</code> — 20 row(s)</p>
+<ul>
+<li>01a1ff21-7354-7777-996b-4c8cb12f25e9 <span class="std-state">materialised</span></li>
+<li>01a1ff74-9819-72dc-a1f2-e102c73e9672 <span class="std-state">materialised</span></li>
+<li>01a2004a-87d8-77e9-b06a-171361548e38 <span class="std-state">materialised</span></li>
+<li>01a20280-ef3f-7aac-8fad-3840a7995847 <span class="std-state">materialised</span></li>
+<li>01a202a1-f4ee-7acc-8e57-50ac6f0417fd <span class="std-state">materialised</span></li>
+<li>01a1ff21-33f0-7e5a-bafc-b09b6fc73c13 <span class="std-state">planned</span></li>
+<li>01a1ff73-df1f-78c5-8793-101de5a3dd60 <span class="std-state">planned</span></li>
+<li>01a2004a-51f4-7482-b5f8-455a4bd371b5 <span class="std-state">planned</span></li>
+<li>01a20280-a739-7bb9-823f-232f34b32aaa <span class="std-state">awaiting_approval</span></li>
+<li>01a202a1-dbb9-7e49-b64a-cf97c3fab095 <span class="std-state">awaiting_approval</span></li>
+<li>01a1ff21-547f-73e8-b256-4bee7fdc9c70 <span class="std-state">planned</span></li>
+<li>01a1ff74-8982-77b9-971e-e4517c55d09a <span class="std-state">planned</span></li>
+</ul><h2>Dependencies</h2>
 <p class="std-intent">The cross-project dependencies the order is constrained by.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Dependencies&#x27;; a document exists but lacks the heading (see <code>std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p><h2>Backlog refinement</h2>
+<p class="std-source">Source: <code>dependency_graph</code> — 151 row(s)</p>
+<ul>
+<li>S02 → S00 (untyped)</li>
+<li>S03 → S02 (untyped)</li>
+<li>S04 → S02 (untyped)</li>
+<li>S04 → S03 (untyped)</li>
+<li>S05 → S03 (untyped)</li>
+<li>S05 → S04 (untyped)</li>
+<li>S06 → S03 (untyped)</li>
+<li>S06 → S04 (untyped)</li>
+<li>S06 → S05 (untyped)</li>
+<li>S06a → S04 (untyped)</li>
+<li>S06a → S05 (untyped)</li>
+<li>S06a → S06 (untyped)</li>
+</ul><h2>Backlog refinement</h2>
 <p class="std-intent">The refinement cadence that re-scored the backlog before this plan was taken.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Backlog refinement&#x27;; a document exists but lacks the heading (see <code>std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p>
+<p class="std-source">Source: <code>refinement_cadence</code> — 5 row(s)</p>
+<ul>
+<li>Refinement — tranche-0 (planned) <span class="std-state">planned</span></li>
+<li>Refinement — tranche-1 (planned) <span class="std-state">planned</span></li>
+<li>Refinement — tranche-2 (planned) <span class="std-state">planned</span></li>
+<li>Refinement — tranche-3 (planned) <span class="std-state">planned</span></li>
+<li>Refinement — tranche-4 (planned) <span class="std-state">planned</span></li>
+</ul>
     </main>
   </body>
 </html>

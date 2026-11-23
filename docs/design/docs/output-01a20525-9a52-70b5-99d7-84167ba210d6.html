@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T13 — Benefits diagram (rework, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Benefits Diagram — T13 Tool platform</h1>
+<p>The diagram is derived from the T13 inception analysis and architecture design: every goal below
+is a capability the tool spine adds, and every measure is a check the project's scenario table
+already executes.</p>
+<h2>Goals and outcomes</h2>
+<ul>
+<li><strong>One governed call path.</strong> A job reaches a backend only through <code>tools.call</code>; the eight V1
+external actions move onto toolkit operations. <em>Outcome:</em> no handler calls a service directly.</li>
+<li><strong>An effect ceiling that is data.</strong> <code>tool.effect</code> is the maximum and <code>tool_binding.effect_ceiling</code>
+narrows it; a destructive call without the tenant's approvals is refused before dispatch.
+<em>Outcome:</em> a job cannot widen its own authority.</li>
+<li><strong>A closed input schema.</strong> Undeclared properties, patterns and bounds are refused with zero
+network calls. <em>Outcome:</em> a backend receives only input the operator approved.</li>
+<li><strong>Sealed credentials and tenant-prefixed storage.</strong> A binding names a credential alias; the
+compiled prompt carries no key or URL. <em>Outcome:</em> the audit trail cannot leak the secret.</li>
+<li><strong>One ledger row per call.</strong> <code>tool_call</code> records the run, step, tool version, input hash, sizes,
+latency and error class. <em>Outcome:</em> the tool estate is countable and retirable.</li>
+</ul>
+<h2>Measures</h2>
+<ul>
+<li>Direct handler calls from a job: <strong>0</strong> (the <code>externals_declared</code> guard and the zero-hit grep).</li>
+<li>Ledger rows per call: <strong>1</strong> (the <code>one_call_is_one_ledger_row</code> scenario).</li>
+<li>A ceiling raise at run time: <strong>403 <code>tool_effect_forbidden</code></strong>.</li>
+<li>An undeclared property or bound: <strong>422 <code>tool_input_invalid</code> with zero requests</strong>.</li>
+<li>An object round-trip: tenant-prefixed key, server-side encryption, content hash; the compiled
+prompt contains no S3 key.</li>
+<li>A toolkit with no calls in a cycle: retired or justified (the B2 census).</li>
+</ul>
+<h2>Benefits and sub-benefits</h2>
+<ul>
+<li><strong>B2 — Less bespoke tooling (primary).</strong> The benefit profile's target is: every service a job
+uses is a toolkit; a toolkit with no calls in a cycle is retired or justified. T13's contribution
+is the mechanism — the binding, the ledger and the ceiling that make the census possible.
+<ul>
+<li>Sub-benefit: the eight V1 external actions stop being bespoke dispatch paths.</li>
+<li>Sub-benefit: a toolkit version is pinned; editing a service cannot silently change a run.</li>
+</ul>
+</li>
+<li><strong>B1 — Auditable decisions (secondary).</strong> The <code>tool_call</code> ledger and the <code>tool.called</code> event give
+the decision ladder the call-level evidence it cites when a gate judges a tool effect.</li>
+<li>The programme's benefit map links B2's output (the tool estate census) to its capability
+(governed calls), operational outcome (retirement or justification of unused tools) and strategic
+objective (less bespoke tooling); this document names the T13 outputs that feed that chain.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-23T09:26:49Z · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
