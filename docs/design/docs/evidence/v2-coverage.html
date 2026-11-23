@@ -37,17 +37,17 @@
 <tr>
 <td><code>exists</code></td>
 <td>the real route and its Playwright spec exist</td>
-<td>44</td>
+<td>46</td>
 </tr>
 <tr>
 <td><code>extend</code></td>
 <td>a V1 ancestor route exists, or the V2 route exists without its spec</td>
-<td>7</td>
+<td>12</td>
 </tr>
 <tr>
 <td><code>new</code></td>
 <td>neither the route nor an ancestor exists</td>
-<td>18</td>
+<td>11</td>
 </tr>
 </tbody>
 </table>
@@ -533,8 +533,8 @@
 <td>§10.5</td>
 <td>destination</td>
 <td>Organisation</td>
-<td><code>new</code></td>
-<td>apps/web/src/app.rs: route '/organisation' absent<br>apps/web/e2e/organisation.spec.ts: absent<br>docs/design/v2.js: page 'organisation' — design reference, not implementation<br><em>The mock page is a design study; the app has no /organisation route, and the organisation read/write actions are T0/T2.</em></td>
+<td><code>extend</code></td>
+<td>apps/web/src/app.rs: route '/organisation' found<br>apps/web/e2e/organisation.spec.ts: absent<br>docs/design/v2.js: page 'organisation' — design reference, not implementation<br><em>The mock page is a design study; the app has no /organisation route, and the organisation read/write actions are T0/T2.</em></td>
 </tr>
 <tr>
 <td><code>destination:Procedures</code></td>
@@ -542,23 +542,23 @@
 <td>destination</td>
 <td>Procedures</td>
 <td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/procedures' absent<br>apps/web/e2e/procedures.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/build/processes', '/build/process-map' found<br>docs/design/v2.js: page 'procedures' — design reference, not implementation<br><em>V1 has the process list/detail and the process map at /build/processes and /build/process-map; V2 adds SOP/RDF/OWL/BPMN intake, PDDL/PKO and the publish gates (T16).</em></td>
+<td>apps/web/src/app.rs: route '/procedures' found<br>apps/web/e2e/procedures.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/build/processes', '/build/process-map' found<br>docs/design/v2.js: page 'procedures' — design reference, not implementation<br><em>V1 has the process list/detail and the process map at /build/processes and /build/process-map; V2 adds SOP/RDF/OWL/BPMN intake, PDDL/PKO and the publish gates (T16).</em></td>
 </tr>
 <tr>
 <td><code>destination:Authoring</code></td>
 <td>§10.5</td>
 <td>destination</td>
 <td>Authoring</td>
-<td><code>new</code></td>
-<td>apps/web/src/app.rs: route '/authoring' absent<br>apps/web/e2e/authoring.spec.ts: absent<br>docs/design/v2.js: page 'authoring' — design reference, not implementation<br><em>No route and no authoring actions; the destination is T17.</em></td>
+<td><code>extend</code></td>
+<td>apps/web/src/app.rs: route '/authoring' found<br>apps/web/e2e/authoring.spec.ts: absent<br>docs/design/v2.js: page 'authoring' — design reference, not implementation<br><em>No route and no authoring actions; the destination is T17.</em></td>
 </tr>
 <tr>
 <td><code>destination:Portfolio</code></td>
 <td>§10.5</td>
 <td>destination</td>
 <td>Portfolio</td>
-<td><code>new</code></td>
-<td>apps/web/src/app.rs: route '/portfolio' absent<br>apps/web/src/app.rs: route '/portfolio/:programme_id' absent<br>apps/web/e2e/portfolio.spec.ts: absent<br>docs/design/v2.js: page 'portfolio' — design reference, not implementation<br><em>The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10.</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/portfolio' found<br>apps/web/src/app.rs: route '/portfolio/:programme_id' found<br>apps/web/e2e/portfolio.spec.ts: present<br>docs/design/v2.js: page 'portfolio' — design reference, not implementation<br><em>The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10.</em></td>
 </tr>
 <tr>
 <td><code>destination:Meetings</code></td>
@@ -573,16 +573,16 @@
 <td>§10.5</td>
 <td>destination</td>
 <td>Programme</td>
-<td><code>new</code></td>
-<td>apps/web/src/app.rs: route '/programme' absent<br>apps/web/e2e/programme.spec.ts: absent<br>docs/design/v2.js: page 'programme' — design reference, not implementation<br><em>No route; the MSP definition reads are T10.</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/programme' found<br>apps/web/e2e/programme.spec.ts: present<br>docs/design/v2.js: page 'programme' — design reference, not implementation<br><em>No route; the MSP definition reads are T10.</em></td>
 </tr>
 <tr>
 <td><code>destination:Architecture</code></td>
 <td>§10.5</td>
 <td>destination</td>
 <td>Architecture</td>
-<td><code>new</code></td>
-<td>apps/web/src/app.rs: route '/design/adm' absent<br>apps/web/e2e/adm.spec.ts: absent<br>docs/design/v2.js: page 'adm' — design reference, not implementation<br><em>V1 /architecture is the system map; the ADM capability at /design/adm and its actions are T9.</em></td>
+<td><code>extend</code></td>
+<td>apps/web/src/app.rs: route '/design/adm' found<br>apps/web/e2e/adm.spec.ts: absent<br>docs/design/v2.js: page 'adm' — design reference, not implementation<br><em>V1 /architecture is the system map; the ADM capability at /design/adm and its actions are T9.</em></td>
 </tr>
 <tr>
 <td><code>destination:Plan</code></td>
@@ -590,7 +590,7 @@
 <td>destination</td>
 <td>Plan</td>
 <td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/plan' absent<br>apps/web/e2e/plan.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/boards' found<br>docs/design/v2.js: page 'plan' — design reference, not implementation<br><em>The live Boards tab joins real cards at /boards; WBS, baseline, registers and change control are T1.</em></td>
+<td>apps/web/src/app.rs: route '/plan' found<br>apps/web/e2e/plan.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/boards' found<br>docs/design/v2.js: page 'plan' — design reference, not implementation<br><em>The live Boards tab joins real cards at /boards; WBS, baseline, registers and change control are T1.</em></td>
 </tr>
 <tr>
 <td><code>destination:Improve</code></td>
@@ -598,23 +598,23 @@
 <td>destination</td>
 <td>Improve</td>
 <td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/improve' absent<br>apps/web/e2e/improve.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/evals/improvement' found<br>docs/design/v2.js: page 'improve' — design reference, not implementation<br><em>V1 /evals/improvement carries the improvement campaigns; the coach/kata/lessons path is T4/T5.</em></td>
+<td>apps/web/src/app.rs: route '/improve' found<br>apps/web/e2e/improve.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/evals/improvement' found<br>docs/design/v2.js: page 'improve' — design reference, not implementation<br><em>V1 /evals/improvement carries the improvement campaigns; the coach/kata/lessons path is T4/T5.</em></td>
 </tr>
 <tr>
 <td><code>destination:Operations</code></td>
 <td>§10.5</td>
 <td>destination</td>
 <td>Operations</td>
-<td><code>new</code></td>
-<td>apps/web/src/app.rs: route '/operations' absent<br>apps/web/e2e/operations.spec.ts: absent<br>docs/design/v2.js: page 'operations' — design reference, not implementation<br><em>No route and no operations actions; the incident/runbook/postmortem path is T7.</em></td>
+<td><code>extend</code></td>
+<td>apps/web/src/app.rs: route '/operations' found<br>apps/web/e2e/operations.spec.ts: absent<br>docs/design/v2.js: page 'operations' — design reference, not implementation<br><em>No route and no operations actions; the incident/runbook/postmortem path is T7.</em></td>
 </tr>
 <tr>
 <td><code>destination:Tools</code></td>
 <td>§10.5</td>
 <td>destination</td>
 <td>Tools</td>
-<td><code>new</code></td>
-<td>apps/web/src/app.rs: route '/tools' absent<br>apps/web/e2e/tools.spec.ts: absent<br>docs/design/v2.js: page 'toolkits' — design reference, not implementation<br><em>V1 /tools is a legacy coding-action catalogue; the tool/toolkit/binding/call rows are T13–T15.</em></td>
+<td><code>extend</code></td>
+<td>apps/web/src/app.rs: route '/tools' found<br>apps/web/e2e/tools.spec.ts: absent<br>docs/design/v2.js: page 'toolkits' — design reference, not implementation<br><em>V1 /tools is a legacy coding-action catalogue; the tool/toolkit/binding/call rows are T13–T15.</em></td>
 </tr>
 </tbody>
 </table>
