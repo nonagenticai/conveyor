@@ -1093,15 +1093,6 @@
     },
     {
       "rule": "seed_live_drift",
-      "subject": "S21",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
       "subject": "T0",
       "severity": "P1",
       "disposition": "rework",
@@ -1353,15 +1344,15 @@
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
     }
   ],
-  "accepted_at": "2026-11-23T09:21:58.020688+00:00",
+  "accepted_at": "2026-11-23T09:26:31.372080+00:00",
   "accepted_by": "conveyor-e2e",
   "approver": "conveyor-approver",
-  "acceptance_ref": "01a207b5-c791-7297-a316-d560252d6fd1",
+  "acceptance_ref": "01a207ba-0bba-75b4-8368-90938771d409",
   "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
   "snapshot": {
-    "git_sha": "a2c48db0f811941e6cf4f003482bad461922b90f",
-    "generated_at": "2026-11-23T08:55:06.875453+00:00",
-    "manifest_sha256": "5824dd9e7bc30fa3d30f3ede6e7118ec0e00c6a8d97a675632c3aa19dc23d1aa",
-    "outputs": 279
+    "git_sha": "d7e2e4fb6faba5fcde78024d0b7f4990fa80f051",
+    "generated_at": "2026-11-23T09:21:23.338525+00:00",
+    "manifest_sha256": "d03e7a1ea3269b37a1c152de99d60dfdb50ca27852b2dac0c7248a1a6b4f0463",
+    "outputs": 280
   }
 }

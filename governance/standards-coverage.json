@@ -501,10 +501,8 @@
         "compliance-review"
       ],
       "source": {
-        "available": "live",
         "file": "architecture.json",
-        "pointer": "/compliance_reviews",
-        "reason": "projected by the store's live snapshot; the committed pack is frozen at a33e6562"
+        "pointer": "/compliance_reviews"
       },
       "spec": "\u00a78.1",
       "standard": "TOGAF",
@@ -549,10 +547,8 @@
         "pi-objectives"
       ],
       "source": {
-        "available": "live",
         "file": "msp.json",
-        "pointer": "/demo_credits",
-        "reason": "projected by the store's live snapshot; the committed pack is frozen at a33e6562"
+        "pointer": "/demo_credits"
       },
       "spec": "\u00a78.2",
       "standard": "SAFe",
@@ -787,10 +783,8 @@
         "inspect-adapt"
       ],
       "source": {
-        "available": "live",
         "file": "msp.json",
-        "pointer": "/lessons",
-        "reason": "projected by the store's live snapshot; the committed pack is frozen at a33e6562"
+        "pointer": "/lessons"
       },
       "spec": "\u00a78.2",
       "standard": "SAFe",
@@ -907,10 +901,8 @@
         "waiver"
       ],
       "source": {
-        "available": "live",
         "file": "architecture.json",
-        "pointer": "/waivers",
-        "reason": "projected by the store's live snapshot; the committed pack is frozen at a33e6562"
+        "pointer": "/waivers"
       },
       "spec": "\u00a78.1",
       "standard": "TOGAF",
@@ -924,10 +916,8 @@
         "waiver"
       ],
       "source": {
-        "available": "live",
         "file": "architecture.json",
-        "pointer": "/waivers",
-        "reason": "projected by the store's live snapshot; the committed pack is frozen at a33e6562"
+        "pointer": "/waivers"
       },
       "spec": "ADR 0012 \u00a7Decision 1",
       "standard": "MSP",
