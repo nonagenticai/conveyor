@@ -486,7 +486,12 @@
       ],
       "failure_scenario": "A draft, never-approved governance_body issues an approved architecture_board decision for a delivery contract; contracts_approve accepts it and the contract goes live under a board with empty charter and no members.",
       "acceptance": "decide_board_tx returns 409 unless body status is active, except a subject_kind board self-approval; board approval refuses empty charter/commissioning_authority/members; contract approval resolves body_id from approval meta and requires active status; tests added.",
-      "owner_project": "T9"
+      "owner_project": "T9",
+      "resolved_by": {
+        "commit": "ca05c8a429385f23f16d0259eb1632751b454a2f",
+        "test": "crates/store/tests/architecture_board.rs",
+        "evidence": "decide_board_tx refuses a non-active body except a board self-decision, refuses an empty charter/commissioning_authority/members, and resolves the contract body from approval meta; architecture_board 3 passed/0 failed."
+      }
     },
     {
       "id": "v1-p81-5",
@@ -3399,7 +3404,12 @@
       ],
       "failure_scenario": "Validation could emit no findings, or run inside the mutation transaction, while the gate stays green.",
       "acceptance": "Add the dangling-relationship test asserting the findings id and the post-commit timing.",
-      "owner_project": "S08"
+      "owner_project": "S08",
+      "resolved_by": {
+        "commit": "ca05c8a429385f23f16d0259eb1632751b454a2f",
+        "test": "crates/api/tests/model_profile.rs",
+        "evidence": "The dangling-relationship test asserts status=findings, the id it names and the post-commit timing; model_profile 10 passed/0 failed; write_path 20/20."
+      }
     },
     {
       "id": "v1-s09-1",

@@ -1,10 +1,10 @@
 {
   "schema": "verify-slices/v1",
-  "audited_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+  "audited_sha": "b208c54b9b48f06c6cb9aa06f47cb0da89b8679b",
   "snapshot": {
-    "path": "/tmp/snap-526v7/data",
-    "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
-    "generated_at": "2026-11-23T08:09:50.563209+00:00"
+    "path": "/tmp/snap-final/data",
+    "git_sha": "b208c54b9b48f06c6cb9aa06f47cb0da89b8679b",
+    "generated_at": "2026-11-23T09:41:16.455014+00:00"
   },
   "slices": [
     {
@@ -104,8 +104,8 @@
       "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
       "evidence": {
         "path": "docs/evidence/rework/T0.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:26.916783+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:23.689051+00:00"
       },
       "findings": {
         "total": 15,
@@ -230,8 +230,8 @@
       "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
       "evidence": {
         "path": "docs/evidence/rework/T1.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:27.036525+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:23.814456+00:00"
       },
       "findings": {
         "total": 18,
@@ -356,8 +356,8 @@
       "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
       "evidence": {
         "path": "docs/evidence/rework/T2.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:28.330381+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:25.228036+00:00"
       },
       "findings": {
         "total": 18,
@@ -482,8 +482,8 @@
       "reason": "gate check 'T3-closure-outputs' did not pass: declared closure outputs are not published: closure-review",
       "evidence": {
         "path": "docs/evidence/rework/T3.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:28.459230+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:25.375444+00:00"
       },
       "findings": {
         "total": 18,
@@ -608,8 +608,8 @@
       "reason": "gate check 'T4-review' did not pass: the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver",
       "evidence": {
         "path": "docs/evidence/rework/T4.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:28.611630+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:25.514758+00:00"
       },
       "findings": {
         "total": 18,
@@ -734,8 +734,8 @@
       "reason": "gate check 'T5-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/T5.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:28.743527+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:25.672930+00:00"
       },
       "findings": {
         "total": 18,
@@ -860,8 +860,8 @@
       "reason": "gate check 'T6-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/T6.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:28.874690+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:25.826616+00:00"
       },
       "findings": {
         "total": 18,
@@ -986,8 +986,8 @@
       "reason": "gate check 'T7-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/T7.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:29.011254+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:25.983924+00:00"
       },
       "findings": {
         "total": 18,
@@ -1112,8 +1112,8 @@
       "reason": "gate check 'T8-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/T8.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:29.148485+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:26.140237+00:00"
       },
       "findings": {
         "total": 18,
@@ -1238,8 +1238,8 @@
       "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
       "evidence": {
         "path": "docs/evidence/rework/T9.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:29.273671+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:26.285147+00:00"
       },
       "findings": {
         "total": 18,
@@ -1364,8 +1364,8 @@
       "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
       "evidence": {
         "path": "docs/evidence/rework/T10.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:27.156973+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:23.972012+00:00"
       },
       "findings": {
         "total": 18,
@@ -1490,8 +1490,8 @@
       "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
       "evidence": {
         "path": "docs/evidence/rework/T11.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:27.279454+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:24.103163+00:00"
       },
       "findings": {
         "total": 18,
@@ -1616,8 +1616,8 @@
       "reason": "gate check 'T12-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/T12.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:27.414034+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:24.250509+00:00"
       },
       "findings": {
         "total": 18,
@@ -1742,8 +1742,8 @@
       "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
       "evidence": {
         "path": "docs/evidence/rework/T13.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:27.557072+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:24.436504+00:00"
       },
       "findings": {
         "total": 18,
@@ -1868,8 +1868,8 @@
       "reason": "gate check 'T14-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/T14.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:27.689077+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:24.624745+00:00"
       },
       "findings": {
         "total": 19,
@@ -1994,8 +1994,8 @@
       "reason": "gate check 'T15-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/T15.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:27.856738+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:24.775362+00:00"
       },
       "findings": {
         "total": 18,
@@ -2120,8 +2120,8 @@
       "reason": "gate check 'T16-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/T16.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:28.027039+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:24.928589+00:00"
       },
       "findings": {
         "total": 18,
@@ -2246,8 +2246,8 @@
       "reason": "gate check 'T17-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/T17.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:28.210497+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:25.084433+00:00"
       },
       "findings": {
         "total": 18,
@@ -2370,8 +2370,8 @@
       "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
       "evidence": {
         "path": "docs/evidence/rework/S00.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:23.333192+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:19.523656+00:00"
       },
       "findings": {
         "total": 15,
@@ -2482,8 +2482,8 @@
       "reason": "non-record check(s) S01-decision-record exercise the gate text and pass; receipt green",
       "evidence": {
         "path": "docs/evidence/rework/S01.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:23.487659+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:19.734489+00:00"
       },
       "findings": {
         "total": 16,
@@ -2601,8 +2601,8 @@
       "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
       "evidence": {
         "path": "docs/evidence/rework/S02.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:23.612720+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:19.903686+00:00"
       },
       "findings": {
         "total": 17,
@@ -2727,8 +2727,8 @@
       "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
       "evidence": {
         "path": "docs/evidence/rework/S03.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:23.736406+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:20.070228+00:00"
       },
       "findings": {
         "total": 18,
@@ -2853,8 +2853,8 @@
       "reason": "gate check 'S04-project' did not pass: status is 'active', expected 'closed'",
       "evidence": {
         "path": "docs/evidence/rework/S04.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:23.852074+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:20.224667+00:00"
       },
       "findings": {
         "total": 18,
@@ -2979,8 +2979,8 @@
       "reason": "gate check 'S05-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S05.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:23.984801+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:20.454780+00:00"
       },
       "findings": {
         "total": 18,
@@ -3105,8 +3105,8 @@
       "reason": "gate check 'S06-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S06.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:24.114709+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:20.632025+00:00"
       },
       "findings": {
         "total": 18,
@@ -3250,8 +3250,8 @@
       "reason": "gate check 'S06b-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S06b.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:24.251049+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:20.789319+00:00"
       },
       "findings": {
         "total": 18,
@@ -3376,8 +3376,8 @@
       "reason": "gate check 'S06c-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S06c.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:24.389272+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:20.956587+00:00"
       },
       "findings": {
         "total": 18,
@@ -3502,8 +3502,8 @@
       "reason": "gate check 'S06d-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S06d.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:24.525801+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:21.120519+00:00"
       },
       "findings": {
         "total": 18,
@@ -3628,8 +3628,8 @@
       "reason": "gate check 'S07-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S07.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:24.660627+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:21.277768+00:00"
       },
       "findings": {
         "total": 18,
@@ -3754,8 +3754,8 @@
       "reason": "gate check 'S08-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S08.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:24.796398+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:21.434767+00:00"
       },
       "findings": {
         "total": 18,
@@ -3880,8 +3880,8 @@
       "reason": "gate check 'S09-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S09.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:24.925151+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:21.602847+00:00"
       },
       "findings": {
         "total": 18,
@@ -4006,8 +4006,8 @@
       "reason": "gate check 'S10-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S10.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:25.058518+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:21.751168+00:00"
       },
       "findings": {
         "total": 18,
@@ -4132,8 +4132,8 @@
       "reason": "gate check 'S11-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S11.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:25.212015+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:21.945363+00:00"
       },
       "findings": {
         "total": 18,
@@ -4258,8 +4258,8 @@
       "reason": "gate check 'S12-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S12.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:25.351252+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:22.098608+00:00"
       },
       "findings": {
         "total": 18,
@@ -4384,8 +4384,8 @@
       "reason": "gate check 'S13-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S13.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:25.488572+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:22.242430+00:00"
       },
       "findings": {
         "total": 18,
@@ -4510,8 +4510,8 @@
       "reason": "gate check 'S14-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S14.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:25.631678+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:22.391479+00:00"
       },
       "findings": {
         "total": 18,
@@ -4636,8 +4636,8 @@
       "reason": "gate check 'S15-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S15.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:25.780778+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:22.540546+00:00"
       },
       "findings": {
         "total": 18,
@@ -4762,8 +4762,8 @@
       "reason": "gate check 'S16-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S16.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:25.911413+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:22.682258+00:00"
       },
       "findings": {
         "total": 18,
@@ -4888,8 +4888,8 @@
       "reason": "gate check 'S17-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S17.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:26.041058+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:22.823988+00:00"
       },
       "findings": {
         "total": 18,
@@ -5014,8 +5014,8 @@
       "reason": "gate check 'S18-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S18.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:26.179856+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:22.965943+00:00"
       },
       "findings": {
         "total": 18,
@@ -5140,8 +5140,8 @@
       "reason": "gate check 'S19-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S19.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:26.362020+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:23.115044+00:00"
       },
       "findings": {
         "total": 18,
@@ -5266,8 +5266,8 @@
       "reason": "gate check 'S20-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S20.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:26.499342+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:23.266219+00:00"
       },
       "findings": {
         "total": 18,
@@ -5392,8 +5392,8 @@
       "reason": "gate check 'S21-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/S21.json",
-        "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-        "generated_at": "2026-11-23T08:10:26.673625+00:00"
+        "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+        "generated_at": "2026-11-23T09:20:23.418684+00:00"
       },
       "findings": {
         "total": 18,

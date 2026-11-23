@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-23T09:33:09.616076+00:00",
-  "git_sha": "5357636052c528d1f9e1d6c817b25deedb3f56c7",
+  "generated_at": "2026-11-23T09:41:16.455014+00:00",
+  "git_sha": "b208c54b9b48f06c6cb9aa06f47cb0da89b8679b",
   "packages": [
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check closed_without_closure_review:T14",
@@ -6940,156 +6940,8 @@
       "title": "The benefit profiles carry no comparative target for token spend per accepted deliverable"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-pmp-closure-review-p0:P0",
-      "apply_to": "PLATFORM",
-      "artefact": "closure-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-pmp-closure-review-p0: evidence the missing section(s) Outcome vs acceptance, Evidence, Open items, Decision of Closure Review — Programme-level unit (plan: docs/plans/P0-programme-definition.md) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-closure-review-p0",
-              "section": "Outcome vs acceptance",
-              "snapshot": [
-                [
-                  "artefacts.json",
-                  "/documents",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-pmp-closure-review-p0",
-              "section": "Evidence",
-              "snapshot": [
-                [
-                  "artefacts.json",
-                  "/documents",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-pmp-closure-review-p0",
-              "section": "Open items",
-              "snapshot": [
-                [
-                  "artefacts.json",
-                  "/documents",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-pmp-closure-review-p0",
-              "section": "Decision",
-              "snapshot": [
-                [
-                  "artefacts.json",
-                  "/documents",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-closure-review-p0",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-closure-review-p0:P0",
-      "kind": "RECORD",
-      "owner_project": "P0",
-      "rule": "std-pmp-closure-review-p0",
-      "scope": "P0",
-      "severity": "P1",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The closure-review artefact for Programme-level unit (plan: docs/plans/P0-programme-definition.md) is absent; missing required sections: Outcome vs acceptance, Evidence, Open items, Decision.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-closure-review-p0",
-                  "section": "Outcome vs acceptance",
-                  "snapshot": [
-                    [
-                      "artefacts.json",
-                      "/documents",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-pmp-closure-review-p0",
-                  "section": "Evidence",
-                  "snapshot": [
-                    [
-                      "artefacts.json",
-                      "/documents",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-pmp-closure-review-p0",
-                  "section": "Open items",
-                  "snapshot": [
-                    [
-                      "artefacts.json",
-                      "/documents",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-pmp-closure-review-p0",
-                  "section": "Decision",
-                  "snapshot": [
-                    [
-                      "artefacts.json",
-                      "/documents",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-closure-review-p0",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0"
-        }
-      ],
-      "title": "PMP artefact absent: closure-review"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-pmp-project-brief-p0:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "project-brief",
       "baseline": null,
       "depends_on": [],
@@ -9878,7 +9730,7 @@
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 5,
+        "entries": 6,
         "owners": [
           "programme owner"
         ]
@@ -9901,6 +9753,7 @@
           "rule": "seed_live_drift",
           "source": "snapshot",
           "subjects": [
+            "P0",
             "T0",
             "T4",
             "S02",
@@ -9918,8 +9771,18 @@
       "spec": "§5.3",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 5,
+      "subject_count": 6,
       "subjects": [
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "P0"
+        },
         {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
@@ -11636,94 +11499,6 @@
         }
       ],
       "title": "S07 project_request.timeout is absent"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-s08-1:S08",
-      "apply_to": "PLATFORM",
-      "artefact": "S08 governance/modelling",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Add the dangling-relationship test asserting the findings id and the post-commit timing.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 334,
-              "path": "docs/plans/slices/S08-governance-modelling.md",
-              "quote": "| g | validation post-commit | dangling relationship → `status='findings'` naming its id; no run row inside the mutation tx |",
-              "source": "code"
-            },
-            {
-              "line": 323,
-              "path": "docs/plans/slices/S08-governance-modelling.md",
-              "quote": "# validation job are `model_profile` (api) and `s08_models` (store); the portfolio aggregates are `s08_portfolio`.",
-              "source": "code"
-            },
-            {
-              "line": 639,
-              "path": "crates/api/tests/model_profile.rs",
-              "quote": "    assert_eq!(status, 422, \"an unknown version has no profile: {body}\");",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-s08-1",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-s08-1:S08",
-      "kind": "CODE",
-      "owner_project": "S08",
-      "rule": "v1-s08-1",
-      "scope": "S08",
-      "severity": "P1",
-      "spec": "§5.4",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "Property g requires a dangling relationship to yield status='findings' naming its id and no run row in the mutation transaction; the named targets model_profile.rs and s08_models.rs contain no findings/dangling assertion.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 334,
-                  "path": "docs/plans/slices/S08-governance-modelling.md",
-                  "quote": "| g | validation post-commit | dangling relationship → `status='findings'` naming its id; no run row inside the mutation tx |",
-                  "source": "code"
-                },
-                {
-                  "line": 323,
-                  "path": "docs/plans/slices/S08-governance-modelling.md",
-                  "quote": "# validation job are `model_profile` (api) and `s08_models` (store); the portfolio aggregates are `s08_portfolio`.",
-                  "source": "code"
-                },
-                {
-                  "line": 639,
-                  "path": "crates/api/tests/model_profile.rs",
-                  "quote": "    assert_eq!(status, 422, \"an unknown version has no profile: {body}\");",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-s08-1",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S08"
-        }
-      ],
-      "title": "S08 validation-findings proof has no assertion"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-s09-1:S09",
@@ -13570,7 +13345,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check mandatory_artefacts:tranche-0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "phase_artefacts",
       "baseline": {
         "disposition": "rework",
@@ -14918,7 +14693,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-benefits-diagram-p0:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "benefits-diagram",
       "baseline": null,
       "depends_on": [],
@@ -16654,7 +16429,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-candidate-solutions-p0:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "candidate-solutions",
       "baseline": null,
       "depends_on": [],
@@ -19020,7 +18795,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-phase-g-p0-g:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "phase-g",
       "baseline": null,
       "depends_on": [],
@@ -20226,7 +20001,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-phase-h-p0-h:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "phase-h",
       "baseline": null,
       "depends_on": [],
@@ -21422,7 +21197,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-project-context-diagram-p0:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "project-context-diagram",
       "baseline": null,
       "depends_on": [],
@@ -23031,130 +22806,6 @@
         }
       ],
       "title": "TOGAF artefact absent: project-context-diagram"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-p81-4:T9",
-      "apply_to": "PLATFORM",
-      "artefact": "§8.1",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "decide_board_tx returns 409 unless body status is active, except a subject_kind board self-approval; board approval refuses empty charter/commissioning_authority/members; contract approval resolves body_id from approval meta and requires active status; tests added.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 1381,
-              "path": "crates/store/src/architecture.rs",
-              "quote": "    get_body_tx(&mut *conn, tenant, body_id)",
-              "source": "code"
-            },
-            {
-              "line": 1423,
-              "path": "crates/store/src/architecture.rs",
-              "quote": "    if subject_kind == Some(\"board\") && decision == \"approved\" {",
-              "source": "code"
-            },
-            {
-              "line": 82,
-              "path": "migrations/0054_architecture.sql",
-              "quote": "    charter                 text NOT NULL DEFAULT '',",
-              "source": "code"
-            },
-            {
-              "line": 574,
-              "path": "docs/design/data/architecture.json",
-              "quote": "      \"status\": \"draft\",",
-              "source": "code"
-            },
-            {
-              "line": 563,
-              "path": "docs/design/data/architecture.json",
-              "quote": "      \"kind\": \"architecture_board\",",
-              "source": "code"
-            },
-            {
-              "line": 6204,
-              "path": "docs/design/data/programme.json",
-              "quote": "        \"gate\": \"an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata\",",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p81-4",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p81-4:T9",
-      "kind": "CODE",
-      "owner_project": "T9",
-      "rule": "v1-p81-4",
-      "scope": "T9",
-      "severity": "P1",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "decide_board_tx verifies only that the body row exists, then inserts an architecture_board approval for any subject, including a delivery contract, without requiring the body's status to be active. Only a board-subject approval activates a draft body. Contract approval checks the approval row's gate/status but not the body behind it. Charter, commissioning authority and members default to empty.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 1381,
-                  "path": "crates/store/src/architecture.rs",
-                  "quote": "    get_body_tx(&mut *conn, tenant, body_id)",
-                  "source": "code"
-                },
-                {
-                  "line": 1423,
-                  "path": "crates/store/src/architecture.rs",
-                  "quote": "    if subject_kind == Some(\"board\") && decision == \"approved\" {",
-                  "source": "code"
-                },
-                {
-                  "line": 82,
-                  "path": "migrations/0054_architecture.sql",
-                  "quote": "    charter                 text NOT NULL DEFAULT '',",
-                  "source": "code"
-                },
-                {
-                  "line": 574,
-                  "path": "docs/design/data/architecture.json",
-                  "quote": "      \"status\": \"draft\",",
-                  "source": "code"
-                },
-                {
-                  "line": 563,
-                  "path": "docs/design/data/architecture.json",
-                  "quote": "      \"kind\": \"architecture_board\",",
-                  "source": "code"
-                },
-                {
-                  "line": 6204,
-                  "path": "docs/design/data/programme.json",
-                  "quote": "        \"gate\": \"an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata\",",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p81-4",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T9"
-        }
-      ],
-      "title": "A draft Architecture Board can govern, and can be approved with an empty charter"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-p81-5:T9",
@@ -31292,7 +30943,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-pmp-project-registers-p0:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
@@ -42908,7 +42559,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-architecture-artifact-instance-01a1fdd3-277c-7981-8250-d90b42b2e6a9:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "architecture-artifact-instance",
       "baseline": null,
       "depends_on": [],
@@ -43008,7 +42659,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-architecture-artifact-instance-01a1fdd3-a386-7391-9598-1927726a516f:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "architecture-artifact-instance",
       "baseline": null,
       "depends_on": [],
@@ -43108,7 +42759,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-architecture-artifact-instance-01a1fdd3-ca91-7736-8b1e-508ce1e1e802:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "architecture-artifact-instance",
       "baseline": null,
       "depends_on": [],
@@ -43208,7 +42859,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-architecture-artifact-instance-01a1fdd3-f0c5-79cb-a7ff-89f03eeb266b:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "architecture-artifact-instance",
       "baseline": null,
       "depends_on": [],
@@ -43308,7 +42959,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-architecture-artifact-instance-01a1fdd4-1773-7c7c-a999-8fe5523fa255:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "architecture-artifact-instance",
       "baseline": null,
       "depends_on": [],
@@ -43408,7 +43059,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-architecture-artifact-instance-01a1fdd4-3fbc-7365-831e-c117e32bbc80:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "architecture-artifact-instance",
       "baseline": null,
       "depends_on": [],
@@ -43508,7 +43159,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-architecture-artifact-instance-01a1fdd4-6703-7161-9b82-1883b610f7f7:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "architecture-artifact-instance",
       "baseline": null,
       "depends_on": [],
@@ -60452,7 +60103,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-architecture-artifact-p0:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -61463,84 +61114,8 @@
       "title": "TOGAF artefact partial: architecture-governance-log"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-design-publish:DESIGN-PUBLISH",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-togaf-compliance-review-design-publish: evidence the missing section(s) Waivers of Compliance Review — Programme-level unit (plan: docs/design/STUDIO-SPEC.md) from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-compliance-review-design-publish",
-              "section": "Waivers",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/waivers",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-compliance-review-design-publish",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-compliance-review-design-publish:DESIGN-PUBLISH",
-      "kind": "RECORD",
-      "owner_project": "DESIGN-PUBLISH",
-      "rule": "std-togaf-compliance-review-design-publish",
-      "scope": "DESIGN-PUBLISH",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The compliance-review artefact for Programme-level unit (plan: docs/design/STUDIO-SPEC.md) is partial; missing required sections: Waivers.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-compliance-review-design-publish",
-                  "section": "Waivers",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/waivers",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-compliance-review-design-publish",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "DESIGN-PUBLISH"
-        }
-      ],
-      "title": "TOGAF artefact partial: compliance-review"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-p0:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "compliance-review",
       "baseline": null,
       "depends_on": [],
@@ -61610,310 +61185,6 @@
           "reason": null,
           "severity": "P2",
           "subject": "P0"
-        }
-      ],
-      "title": "TOGAF artefact partial: compliance-review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-s00:S00",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-togaf-compliance-review-s00: evidence the missing section(s) Waivers of Compliance Review — Plan: docs/plans/slices/S00-usage-inventory.md from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-compliance-review-s00",
-              "section": "Waivers",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/waivers",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-compliance-review-s00",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-compliance-review-s00:S00",
-      "kind": "RECORD",
-      "owner_project": "S00",
-      "rule": "std-togaf-compliance-review-s00",
-      "scope": "S00",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The compliance-review artefact for Plan: docs/plans/slices/S00-usage-inventory.md is partial; missing required sections: Waivers.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-compliance-review-s00",
-                  "section": "Waivers",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/waivers",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-compliance-review-s00",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S00"
-        }
-      ],
-      "title": "TOGAF artefact partial: compliance-review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-s01:S01",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-togaf-compliance-review-s01: evidence the missing section(s) Waivers of Compliance Review — Plan: docs/plans/slices/S01-ui-spike.md from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-compliance-review-s01",
-              "section": "Waivers",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/waivers",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-compliance-review-s01",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-compliance-review-s01:S01",
-      "kind": "RECORD",
-      "owner_project": "S01",
-      "rule": "std-togaf-compliance-review-s01",
-      "scope": "S01",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The compliance-review artefact for Plan: docs/plans/slices/S01-ui-spike.md is partial; missing required sections: Waivers.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-compliance-review-s01",
-                  "section": "Waivers",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/waivers",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-compliance-review-s01",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S01"
-        }
-      ],
-      "title": "TOGAF artefact partial: compliance-review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-s02:S02",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-togaf-compliance-review-s02: evidence the missing section(s) Waivers of Compliance Review — Plan: docs/plans/slices/S02-skeleton.md from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-compliance-review-s02",
-              "section": "Waivers",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/waivers",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-compliance-review-s02",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-compliance-review-s02:S02",
-      "kind": "RECORD",
-      "owner_project": "S02",
-      "rule": "std-togaf-compliance-review-s02",
-      "scope": "S02",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The compliance-review artefact for Plan: docs/plans/slices/S02-skeleton.md is partial; missing required sections: Waivers.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-compliance-review-s02",
-                  "section": "Waivers",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/waivers",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-compliance-review-s02",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S02"
-        }
-      ],
-      "title": "TOGAF artefact partial: compliance-review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-s03:S03",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-togaf-compliance-review-s03: evidence the missing section(s) Waivers of Compliance Review — Plan: docs/plans/slices/S03-domain-schema.md from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-compliance-review-s03",
-              "section": "Waivers",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/waivers",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-compliance-review-s03",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-compliance-review-s03:S03",
-      "kind": "RECORD",
-      "owner_project": "S03",
-      "rule": "std-togaf-compliance-review-s03",
-      "scope": "S03",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The compliance-review artefact for Plan: docs/plans/slices/S03-domain-schema.md is partial; missing required sections: Waivers.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-compliance-review-s03",
-                  "section": "Waivers",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/waivers",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-compliance-review-s03",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S03"
         }
       ],
       "title": "TOGAF artefact partial: compliance-review"
@@ -64511,310 +63782,6 @@
       "title": "TOGAF artefact absent: compliance-review"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-spec-v2:SPEC-V2",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-togaf-compliance-review-spec-v2: evidence the missing section(s) Waivers of Compliance Review — Programme-level unit (plan: docs/SPEC_V2.md) from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-compliance-review-spec-v2",
-              "section": "Waivers",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/waivers",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-compliance-review-spec-v2",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-compliance-review-spec-v2:SPEC-V2",
-      "kind": "RECORD",
-      "owner_project": "SPEC-V2",
-      "rule": "std-togaf-compliance-review-spec-v2",
-      "scope": "SPEC-V2",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The compliance-review artefact for Programme-level unit (plan: docs/SPEC_V2.md) is partial; missing required sections: Waivers.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-compliance-review-spec-v2",
-                  "section": "Waivers",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/waivers",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-compliance-review-spec-v2",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "SPEC-V2"
-        }
-      ],
-      "title": "TOGAF artefact partial: compliance-review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-t0:T0",
-      "apply_to": "T0",
-      "artefact": "compliance-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-togaf-compliance-review-t0: evidence the missing section(s) Waivers of Compliance Review — SPEC_V2 slice T0 (docs/SPEC_V2.md §12) from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-compliance-review-t0",
-              "section": "Waivers",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/waivers",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-compliance-review-t0",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-compliance-review-t0:T0",
-      "kind": "RECORD",
-      "owner_project": "T0",
-      "rule": "std-togaf-compliance-review-t0",
-      "scope": "T0",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The compliance-review artefact for SPEC_V2 slice T0 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-compliance-review-t0",
-                  "section": "Waivers",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/waivers",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-compliance-review-t0",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T0"
-        }
-      ],
-      "title": "TOGAF artefact partial: compliance-review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-t10:T10",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-togaf-compliance-review-t10: evidence the missing section(s) Waivers of Compliance Review — SPEC_V2 slice T10 (docs/SPEC_V2.md §12) from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-compliance-review-t10",
-              "section": "Waivers",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/waivers",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-compliance-review-t10",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-compliance-review-t10:T10",
-      "kind": "RECORD",
-      "owner_project": "T10",
-      "rule": "std-togaf-compliance-review-t10",
-      "scope": "T10",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The compliance-review artefact for SPEC_V2 slice T10 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-compliance-review-t10",
-                  "section": "Waivers",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/waivers",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-compliance-review-t10",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T10"
-        }
-      ],
-      "title": "TOGAF artefact partial: compliance-review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-t11:T11",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-togaf-compliance-review-t11: evidence the missing section(s) Waivers of Compliance Review — SPEC_V2 slice T11 (docs/SPEC_V2.md §12) from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-compliance-review-t11",
-              "section": "Waivers",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/waivers",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-compliance-review-t11",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-compliance-review-t11:T11",
-      "kind": "RECORD",
-      "owner_project": "T11",
-      "rule": "std-togaf-compliance-review-t11",
-      "scope": "T11",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The compliance-review artefact for SPEC_V2 slice T11 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-compliance-review-t11",
-                  "section": "Waivers",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/waivers",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-compliance-review-t11",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T11"
-        }
-      ],
-      "title": "TOGAF artefact partial: compliance-review"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-t12:T12",
       "apply_to": "T12",
       "artefact": "compliance-review",
@@ -64961,82 +63928,6 @@
         }
       ],
       "title": "TOGAF artefact absent: compliance-review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-t13:T13",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-togaf-compliance-review-t13: evidence the missing section(s) Waivers of Compliance Review — SPEC_V2 slice T13 (docs/SPEC_V2.md §12) from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-compliance-review-t13",
-              "section": "Waivers",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/waivers",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-compliance-review-t13",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-compliance-review-t13:T13",
-      "kind": "RECORD",
-      "owner_project": "T13",
-      "rule": "std-togaf-compliance-review-t13",
-      "scope": "T13",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The compliance-review artefact for SPEC_V2 slice T13 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-compliance-review-t13",
-                  "section": "Waivers",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/waivers",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-compliance-review-t13",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T13"
-        }
-      ],
-      "title": "TOGAF artefact partial: compliance-review"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-t15:T15",
@@ -65333,158 +64224,6 @@
         }
       ],
       "title": "TOGAF artefact absent: compliance-review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-t1:T1",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-togaf-compliance-review-t1: evidence the missing section(s) Waivers of Compliance Review — SPEC_V2 slice T1 (docs/SPEC_V2.md §12) from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-compliance-review-t1",
-              "section": "Waivers",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/waivers",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-compliance-review-t1",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-compliance-review-t1:T1",
-      "kind": "RECORD",
-      "owner_project": "T1",
-      "rule": "std-togaf-compliance-review-t1",
-      "scope": "T1",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The compliance-review artefact for SPEC_V2 slice T1 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-compliance-review-t1",
-                  "section": "Waivers",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/waivers",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-compliance-review-t1",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T1"
-        }
-      ],
-      "title": "TOGAF artefact partial: compliance-review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-t2:T2",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance-review",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-togaf-compliance-review-t2: evidence the missing section(s) Waivers of Compliance Review — SPEC_V2 slice T2 (docs/SPEC_V2.md §12) from architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-compliance-review-t2",
-              "section": "Waivers",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/waivers",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-compliance-review-t2",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-compliance-review-t2:T2",
-      "kind": "RECORD",
-      "owner_project": "T2",
-      "rule": "std-togaf-compliance-review-t2",
-      "scope": "T2",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The compliance-review artefact for SPEC_V2 slice T2 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-compliance-review-t2",
-                  "section": "Waivers",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/waivers",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-compliance-review-t2",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T2"
-        }
-      ],
-      "title": "TOGAF artefact partial: compliance-review"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-compliance-review-t4:T4",
@@ -68364,7 +67103,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-gap-analysis-p0:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "gap-analysis",
       "baseline": null,
       "depends_on": [],
@@ -69740,7 +68479,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-phase-b-p0-b:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "phase-b",
       "baseline": null,
       "depends_on": [],
@@ -71032,7 +69771,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-phase-c-p0-c:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "phase-c",
       "baseline": null,
       "depends_on": [],
@@ -72324,7 +71063,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-phase-d-p0-d:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "phase-d",
       "baseline": null,
       "depends_on": [],
@@ -73770,7 +72509,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-phase-e-p0-e:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "phase-e",
       "baseline": null,
       "depends_on": [],
@@ -77560,7 +76299,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-phase-f-p0-f:P0",
-      "apply_to": "PLATFORM",
+      "apply_to": "P0",
       "artefact": "phase-f",
       "baseline": null,
       "depends_on": [],
@@ -79527,7 +78266,7 @@
       "p0": 0,
       "p1": 0,
       "p2": 0,
-      "packages": 122,
+      "packages": 121,
       "rules": 0,
       "rules_clean": 0,
       "rules_with_gaps": 0,
@@ -79546,57 +78285,57 @@
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 57,
-      "gaps": 21,
+      "findings": 56,
+      "gaps": 22,
       "p0": 0,
-      "p1": 2,
+      "p1": 3,
       "p2": 19,
-      "packages": 69,
+      "packages": 68,
       "rules": 8,
       "rules_clean": 4,
       "rules_with_gaps": 4,
       "suppressed": 0
     },
     "TOGAF": {
-      "findings": 8,
+      "findings": 7,
       "gaps": 51,
       "p0": 0,
       "p1": 51,
       "p2": 0,
-      "packages": 438,
+      "packages": 425,
       "rules": 9,
       "rules_clean": 6,
       "rules_with_gaps": 3,
       "suppressed": 0
     }
   },
-  "snapshot": "/tmp/snap-526v7b/data",
+  "snapshot": "/tmp/snap-final/data",
   "summary": {
     "by_kind": {
-      "CODE": 77,
-      "RECORD": 641,
+      "CODE": 75,
+      "RECORD": 628,
       "STANDARD": 3
     },
     "by_severity": {
       "P0": 27,
-      "P1": 209,
-      "P2": 485
+      "P1": 206,
+      "P2": 473
     },
     "by_standard": {
       "MSP": 67,
-      "PMP": 122,
+      "PMP": 121,
       "SAFe": 25,
-      "SPEC": 69,
-      "TOGAF": 438
+      "SPEC": 68,
+      "TOGAF": 425
     },
     "by_status": {
-      "open": 721
+      "open": 706
     },
     "duplicates": 0,
-    "open": 721,
-    "packages": 721,
-    "resolved": 116,
-    "subjects": 797,
+    "open": 706,
+    "packages": 706,
+    "resolved": 118,
+    "subjects": 783,
     "suppressed": 0
   }
 }

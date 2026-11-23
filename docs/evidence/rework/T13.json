@@ -151,16 +151,16 @@
   ],
   "failures": [],
   "gate": "a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt",
-  "generated_at": "2026-11-23T09:20:24.436504+00:00",
+  "generated_at": "2026-11-23T09:44:10.488513+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T13.toml",
   "name": "Tool platform",
   "project": "T13",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T08:09:50.563209+00:00",
-    "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
-    "path": "retained-snapshot/65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8"
+    "generated_at": "2026-11-23T09:41:16.455014+00:00",
+    "git_sha": "b208c54b9b48f06c6cb9aa06f47cb0da89b8679b",
+    "path": "retained-snapshot/b208c54b9b48f06c6cb9aa06f47cb0da89b8679b"
   },
   "verdict": "green",
   "warnings": []

@@ -172,16 +172,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "the feature-list items are green \u2014 a 1 MiB round-trip whose sha256 equals `content_hash` with the object key gone after delete, a 10 MiB upload refused `413`, secrets never returning plaintext, the workers page rendering live rows, every report number equal to its SQL count, `timeout_ms` on every external, and billing with no write action and no metering event",
-  "generated_at": "2026-11-23T09:20:21.602847+00:00",
+  "generated_at": "2026-11-23T09:44:07.046622+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S09.toml",
   "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",
   "project": "S09",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T08:09:50.563209+00:00",
-    "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
-    "path": "retained-snapshot/65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8"
+    "generated_at": "2026-11-23T09:41:16.455014+00:00",
+    "git_sha": "b208c54b9b48f06c6cb9aa06f47cb0da89b8679b",
+    "path": "retained-snapshot/b208c54b9b48f06c6cb9aa06f47cb0da89b8679b"
   },
   "verdict": "red",
   "warnings": []

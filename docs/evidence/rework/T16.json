@@ -172,16 +172,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds",
-  "generated_at": "2026-11-23T09:20:24.928589+00:00",
+  "generated_at": "2026-11-23T09:44:10.961347+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T16.toml",
   "name": "SOP, RDF/OWL and process-document ingestion",
   "project": "T16",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T08:09:50.563209+00:00",
-    "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
-    "path": "retained-snapshot/65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8"
+    "generated_at": "2026-11-23T09:41:16.455014+00:00",
+    "git_sha": "b208c54b9b48f06c6cb9aa06f47cb0da89b8679b",
+    "path": "retained-snapshot/b208c54b9b48f06c6cb9aa06f47cb0da89b8679b"
   },
   "verdict": "red",
   "warnings": []
