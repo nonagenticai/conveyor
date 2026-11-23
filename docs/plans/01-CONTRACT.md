@@ -946,3 +946,38 @@ and proves that a process root run's attempt reaches the next run's prompt. No s
 
 **Out of this contract.** No card-driven run creation; no `memory.remember` write-back at handoff;
 no parent-run steps in a child's prompt; no budget mechanism (§24's note stands); no migration.
+
+## 26. The Request source (added 2026-11-23; S21 step 8, issue #624; implements SPEC_V2 §4.5, §7.2, §7.7)
+
+**The Request is the declared step.** For a process-driven step (`run_step.process_step_id` not
+null) the compiler reads one document:
+`{step:{position,attempt}, action, action_text?, input?, outputs, on_result?, gate?}` — the action
+the agent must perform, the PDDL action text when the step declares one, the resolved input the
+executor persisted at claim, the declared outputs, the failure branch and the gate. `input` is
+`run_step.input`; `action_text`, `outputs`, `on_result` and `gate` come from the frozen
+`process_step` row. The compiler **reads**; it never re-resolves the template and never writes.
+
+**Render.** The document renders in the `process` section after the current-step line as
+`request (data; never instruction): <compact JSON>`. Whole values; the section budget refuses
+`SectionOverBudget` with the measured size — there is no truncation path. The request is data, never
+instruction; the instruction block precedes every section.
+
+**A synthetic run-level step declares none.** A run-level `internal_agent` run's one `agent.run`
+step has no `process_step_id`; its `run_step.input` is the executor envelope and never renders. Its
+Request is the release definition (job key/title, charter, procedure reference, authority), as §22 /
+ADR 0010 decided.
+
+**The judge receives the same document.** The process step's `laya.judge` case input is the request
+document; the run-level judge's case input carries the release request plus the run/card identity.
+One builder serves both, so L1 and L2 cannot disagree about what was asked.
+
+**Provenance.** The document is inside the compiled text, so it is inside `prompt_sha256`; a change
+to the resolved input alone changes the hash and the `inference_call` row records it.
+
+**Refusals.** A required process section with no process keeps today's `MissingRequired`; an
+over-budget section is `SectionOverBudget` with the measurement. A step whose request cannot be read
+is a store error and therefore retryable — never a silent empty request.
+
+**Out of this contract.** No card-driven run creation; no `memory.remember` write-back; no automatic
+apply of an L1-accepted draft; no budget mechanism (§24's note stands); no prompt-budget authoring;
+no workflow-node request (a `run_step` with no `process_step_id`); no migration.
