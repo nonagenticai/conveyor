@@ -821,8 +821,9 @@ async fn start_run(
     (status, body)
 }
 
-/// A job, its release and a `procedure` binding pinned to `process_id`.
-/// Returns `(binding_id, release_hash, binding_version)`.
+/// A job, its release and an APPROVED `procedure` binding pinned to `process_id`.
+/// Returns `(binding_id, release_hash, binding_version)` — the version after activation, which
+/// is what an `If-Match` on the retire must carry (v1-p44-2).
 async fn bind_process(
     running: &support::Running,
     process_id: &str,
@@ -898,10 +899,59 @@ async fn bind_process(
         )
         .await;
     assert!(status == 200 || status == 201, "{binding}");
+    let binding_id = field(&binding, "id").to_owned();
+    assert_eq!(
+        output(&binding)["status"],
+        "draft",
+        "a binding is born draft (v1-p44-2): {binding}"
+    );
+    // v1-p44-2: the create opened the activation gate; a second principal approves it, and only
+    // then is the binding usable by a run.
+    let (status, gates) = running
+        .invoke(
+            "approvals.list",
+            TOKEN,
+            json!({"status": "pending", "limit": 50}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{gates}");
+    let gate = output(&gates)["items"]
+        .as_array()
+        .expect("items")
+        .iter()
+        .find(|item| item["gate"] == "job_bindings.create" && item["kind"] == "job_binding")
+        .unwrap_or_else(|| panic!("no pending binding gate in {gates}"));
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            REVIEWER,
+            json!({"approval_id": gate["id"], "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+    // Activation moves the version past the create's, so the caller's If-Match must be re-read.
+    let (status, active) = running
+        .invoke(
+            "job_bindings.get",
+            TOKEN,
+            json!({"id": binding_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{active}");
+    assert_eq!(output(&active)["status"], "active", "{active}");
     (
-        field(&binding, "id").to_owned(),
+        binding_id,
         field(&binding, "release_hash").to_owned(),
-        output(&binding)["version"].as_i64().unwrap_or(1),
+        output(&active)["version"].as_i64().unwrap_or(2),
     )
 }
 
