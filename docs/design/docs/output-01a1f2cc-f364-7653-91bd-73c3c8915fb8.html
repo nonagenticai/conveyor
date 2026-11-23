@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T13 — Closure review · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T13 — Closure review</h1>
+<p>Project: T13 — Tool platform · Track: v2 · Tranche: 3 · Plan: docs/SPEC_V2.md §12
+Unit: issue #76; delivered by PR #352
+Measured at: main@f14b7d36, 2026-11-19 · Project row: closed</p>
+<h2>Outcome vs acceptance</h2>
+<p>The acceptance set is the <code>docs/SPEC_V2.md</code> §12 row T13; the project brief declares the same five clauses.</p>
+<table><thead><tr><th>Acceptance clause</th><th>Evidence</th><th>Verdict</th></tr></thead><tbody>
+<tr><td>A development job calls coding through the broker (not <code>nonagenticai_mcp_server</code>)</td><td><code>crates/actions/src/tools.rs:57</code> (<code>tools.call</code>, <code>HandlerRef::Broker</code>), dispatch <code>crates/actions/src/invoke.rs:843</code>, <code>crates/actions/src/broker.rs:invoke_broker</code>; <code>crates/actions/tests/tool_platform.rs::a_bound_job_calls_coding_through_the_broker</code></td><td>pass — proved against a counted stub of the declared <code>coding_jobs.create</code> destination, not the live coding service</td></tr>
+<tr><td>A <code>tool_call</code> is recorded</td><td><code>migrations/0055_tool_platform.sql::tool_call</code>; <code>crates/actions/src/broker.rs::write_ledger</code>; <code>tool_platform.rs::one_call_is_one_ledger_row</code></td><td>pass</td></tr>
+<tr><td>A destructive call without the tenant's configured approvals is refused</td><td><code>crates/actions/src/broker.rs</code> destructive gate through <code>require_approval_tx</code>; <code>tool_platform.rs::a_destructive_call_without_approvals_is_refused</code> (403 <code>approval_required</code>, zero destination hits, no ledger row)</td><td>pass</td></tr>
+<tr><td>Schema-invalid input is refused before the backend call</td><td><code>crates/actions/src/spec.rs:validate_input</code> plus pattern/bounds; <code>crates/actions/src/broker.rs:invalid_tool_input</code>; <code>tool_platform.rs::a_closed_schema_refuses_before_the_call</code> (422 <code>tool_input_invalid</code>, zero hits)</td><td>pass</td></tr>
+<tr><td>A job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt</td><td><code>crates/actions/src/storage.rs:key_for</code>/<code>::put</code>/<code>::get_verified</code>; <code>tool_platform.rs::a_job_round_trips_a_tenant_prefixed_object</code>; <code>::the_compiled_prompt_carries_no_s3_key</code></td><td>partial — adapter-level only, in-memory by default, no job-facing action; the prompt proof is a static compile</td></tr>
+</tbody></table>
+<p>Beyond the five clauses, the SPEC row also names the coding toolkit and one kag-era toolkit, credential profiles, and the migration of V1's external actions. None of those three landed as described: no toolkit or tool data exists (tests seed rows directly), <code>credential_alias</code> is stored but never read, and the external actions remain registered and directly invocable while the broker dispatches through them. The effect classes and the four tables are delivered.</p>
+<h2>Evidence</h2>
+<ul>
+<li><code>migrations/0055_tool_platform.sql</code>: <code>toolkit</code>, <code>tool</code>, <code>tool_binding</code>, <code>tool_call</code>, all tenant-scoped and FORCE RLS; the effect enum, the binding's XOR target, the default-<code>read</code> ceiling and the append-only ledger's 64-hex input hash.</li>
+<li><code>crates/actions/src/broker.rs:invoke_broker</code>: the seven-step order, typed <code>409 tool_not_ready</code>/<code>403 tool_effect_forbidden</code>/<code>422 tool_input_invalid</code>, approval before dispatch, one external dispatch after the read transaction closes, redaction, 1 MiB cap, one <code>tool_call</code> row and one <code>tool.called</code> event.</li>
+<li><code>crates/store/src/tool.rs</code> and <code>crates/actions/src/storage.rs</code> (<code>tenant/&lt;tenant&gt;/…</code>, SHA-256, 64 MiB cap, hash-checked read-back, no bucket administration).</li>
+<li>Seven merged scenarios in <code>crates/actions/tests/tool_platform.rs</code>; the wire-level <code>crates/actions/tests/s3_wire.rs</code>; HTTP/MCP parity for the 409 in <code>crates/actions/tests/parity_http_mcp.rs:5435</code>; the externals guard <code>crates/api/tests/externals_declared.rs:31</code>.</li>
+<li>CI at merge sha <code>a409efe3</code>: <code>ci</code> push run 44378450546 <code>success</code>, <code>merge_group</code> <code>ci</code> run 44374460558 <code>success</code>, CodeQL/delivery/board/issue-registry <code>success</code>.</li>
+<li>Programme record: issue #76 CLOSED 2026-11-18T19:14:49Z; PR #352 MERGED 2026-11-18T19:14:47Z at <code>a409efe3</code>; <code>main@f14b7d36</code> contains the merge.</li>
+</ul>
+<h2>Open items</h2>
+<ol>
+<li>Catalogue actions: eleven of the design's twelve are unbuilt. No claim checked — <code>gh issue list</code>/<code>git ls-remote</code> were not run by this review. Candidate homes: T14 for import, T15 for authoring/publication; the design assigned them to T13.</li>
+<li>The coding and kag-era toolkits as published rows with probes: absent; T14's row is the import wave.</li>
+<li>Direct invocation of the external actions: still possible; decide whether the broker is the only job path or the externals remain engine actions. The guard covers handlers, not callers.</li>
+<li>Credential-profile resolution from <code>secret</code> by alias and the <code>sealed-profile</code> auth adapter: unimplemented; <code>credential_alias</code> has no consumer.</li>
+<li>Spend budget (<code>429 tool_budget_exceeded</code>) and <code>rate_limit_per_min</code>: unimplemented and unenforced.</li>
+<li>Job-facing storage: no action or tool calls <code>JobStorage</code>; the round-trip is in-process (in-memory by default) and the prompt proof is a static compile.</li>
+<li><code>input_schema</code> need not be closed (<code>additionalProperties:false</code> unenforced by the migration); published-toolkit immutability has no trigger.</li>
+</ol>
+<h2>Decision</h2>
+<p>T13 is CLOSED, measured today: issue #76 closed 2026-11-18T19:14:49Z, two seconds after PR #352 merged at <code>a409efe3</code>. Four of the five gate clauses pass on merged tests; the storage clause is partial; the SPEC row's two toolkits, the external-action migration and the credential-profile mechanism did not land in this slice. The close records the core the gate was written for — one governed call path, a ledger, a data ceiling, a pre-dispatch refusal and a keyless storage adapter — and is not re-opened here. This review adds no new approval and makes no new close. The gaps above remain open items for T14/T15 and are not treated as satisfied.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>DESIGN-PUBLISH — Publish the SPEC_V2 studio design pack, live · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>DESIGN-PUBLISH — Publish the SPEC_V2 studio design pack, live</h1>
+<p><strong>Track:</strong> programme · <strong>Tranche:</strong> 0 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/design/STUDIO-SPEC.md</code>
+<strong>Dependencies:</strong> none · <strong>Issues:</strong> #32, #33, #36, #37, #89, #97, #103, #149</p>
+<h2>Outcome</h2>
+<p>The SPEC_V2 studio design pack is live and operates as the programme console: live programme, boards, outputs and the public site.</p>
+<h2>Boundary</h2>
+<p>In scope: the design pack and console. Out of scope: the V2 product pages that remain design studies; they are signed-in only.</p>
+<h2>Reuse sources</h2>
+<p><code>docs/design/</code> (the pack), <code>data/snapshot.js</code>, <code>data/coverage.js</code>, <code>docs/design/console.js</code> and the server's live routes.</p>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: none.</p>
+<h2>Acceptance</h2>
+<p>The public site renders the programme from Postgres; a published output appears at its stable URL; signed out there is no API request and no write control.</p>
+<p>Verify: <code>node docs/design/scripts/check-console.cjs</code> and <code>check-v2.cjs</code></p>
+<h2>Capabilities</h2>
+<p><code>design</code></p>
+<h2>Gaps</h2>
+<ul>
+<li>None recorded beyond the inception units themselves.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Publish the SPEC_V2 studio design pack, live · conveyor output · published 2026-11-20T11:50:50.848127361+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
