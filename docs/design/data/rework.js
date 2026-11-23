@@ -1,6 +1,6 @@
 window.CONVEYOR_REWORK = {
-  "generated_at": "2026-11-23T09:26:49Z",
-  "git_sha": "bfdd6d2c",
+  "generated_at": "2026-11-23T09:36:22Z",
+  "git_sha": "2067e01a",
   "packages": [
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check closed_without_closure_review:T14",
@@ -23305,9 +23305,9 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 24,
+              "line": 25,
               "path": "crates/store/src/trace_link.rs",
-              "quote": "pub const END_TYPES: [&str; 3] = [\"governed_asset\", \"card\", \"project\"];",
+              "quote": "pub const END_TYPES: [&str; 4] = [\"governed_asset\", \"card\", \"project\", \"document\"];",
               "source": "code"
             },
             {
@@ -23339,9 +23339,9 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 24,
+                  "line": 25,
                   "path": "crates/store/src/trace_link.rs",
-                  "quote": "pub const END_TYPES: [&str; 3] = [\"governed_asset\", \"card\", \"project\"];",
+                  "quote": "pub const END_TYPES: [&str; 4] = [\"governed_asset\", \"card\", \"project\", \"document\"];",
                   "source": "code"
                 },
                 {

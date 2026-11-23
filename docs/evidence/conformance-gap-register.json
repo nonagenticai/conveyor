@@ -1425,8 +1425,8 @@
     }
   ],
   "snapshot": {
-    "generated_at": "2026-11-23T09:26:49Z",
-    "git_sha": "bfdd6d2c",
+    "generated_at": "2026-11-23T09:36:22Z",
+    "git_sha": "2067e01a",
     "path": "docs/design/data",
     "tenant": "nonagentic"
   },

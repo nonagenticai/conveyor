@@ -200,6 +200,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {
+      "title": "MSP/TOGAF conformance gap register",
+      "path": "docs/design/data/conformance.html",
+      "source": "docs/design/data/conformance.md",
+      "section": "Design",
+      "sha256": "37671c0350d52dceb75ed4c31e78e39a4b4fc7e3278899f0753ecd1050e67017",
+      "bytes": 21848,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
+    },
+    {
       "title": "Remaining development work — corrected assessment, 2026-11-10",
       "path": "docs/evidence/2026-11-10-plan-audit.html",
       "source": "docs/evidence/2026-11-10-plan-audit.md",
@@ -501,7 +510,7 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "6a9f93f2bc3a2c96ebf45b80eb5996ec794f508f965c64801c00355d45ac8b5f",
+      "sha256": "37671c0350d52dceb75ed4c31e78e39a4b4fc7e3278899f0753ecd1050e67017",
       "bytes": 21848,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
