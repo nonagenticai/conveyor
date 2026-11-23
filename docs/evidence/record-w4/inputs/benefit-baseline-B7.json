@@ -1,0 +1,20 @@
+{
+  "id": "01a2076b-057d-7374-8117-d1736ee75603",
+  "baseline": {
+    "definition": "9,458,468 inference tokens / 15 demo-credited deliverables at 2026-11-22",
+    "value": 630565,
+    "unit": "tokens per demo-credited deliverable",
+    "measured_at": "2026-11-22",
+    "method": "inference ledger total tokens / demo-credited deliverables",
+    "evidence": {
+      "detail": {
+        "demo_credited_deliverables": 15,
+        "tokens": 9458468
+      },
+      "instrument": "inference ledger total tokens / demo-credited deliverables",
+      "reference": "B7",
+      "value": 630565.0
+    }
+  },
+  "change_id": "01a2076b-1e7a-77ee-beaa-82c207ed2109"
+}
