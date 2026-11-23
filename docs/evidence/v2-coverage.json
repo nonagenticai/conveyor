@@ -14,9 +14,9 @@
     "new": "neither the route nor an ancestor exists"
   },
   "counts": {
-    "exists": 44,
-    "extend": 6,
-    "new": 12
+    "exists": 46,
+    "extend": 11,
+    "new": 5
   },
   "rows": [
     {
@@ -571,9 +571,9 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Organisation",
-      "verdict": "new",
+      "verdict": "extend",
       "evidence": [
-        "apps/web/src/app.rs: route '/organisation' absent",
+        "apps/web/src/app.rs: route '/organisation' found",
         "apps/web/e2e/organisation.spec.ts: absent",
         "docs/design/v2.js: page 'organisation' — design reference, not implementation"
       ],
@@ -586,7 +586,7 @@
       "concept": "Procedures",
       "verdict": "extend",
       "evidence": [
-        "apps/web/src/app.rs: route '/procedures' absent",
+        "apps/web/src/app.rs: route '/procedures' found",
         "apps/web/e2e/procedures.spec.ts: absent",
         "apps/web/src/app.rs: V1 ancestor '/build/processes', '/build/process-map' found",
         "docs/design/v2.js: page 'procedures' — design reference, not implementation"
@@ -598,9 +598,9 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Authoring",
-      "verdict": "new",
+      "verdict": "extend",
       "evidence": [
-        "apps/web/src/app.rs: route '/authoring' absent",
+        "apps/web/src/app.rs: route '/authoring' found",
         "apps/web/e2e/authoring.spec.ts: absent",
         "docs/design/v2.js: page 'authoring' — design reference, not implementation"
       ],
@@ -611,11 +611,11 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Portfolio",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "apps/web/src/app.rs: route '/portfolio' absent",
-        "apps/web/src/app.rs: route '/portfolio/:programme_id' absent",
-        "apps/web/e2e/portfolio.spec.ts: absent",
+        "apps/web/src/app.rs: route '/portfolio' found",
+        "apps/web/src/app.rs: route '/portfolio/:programme_id' found",
+        "apps/web/e2e/portfolio.spec.ts: present",
         "docs/design/v2.js: page 'portfolio' — design reference, not implementation"
       ],
       "note": "The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10."
@@ -625,10 +625,10 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Programme",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "apps/web/src/app.rs: route '/programme' absent",
-        "apps/web/e2e/programme.spec.ts: absent",
+        "apps/web/src/app.rs: route '/programme' found",
+        "apps/web/e2e/programme.spec.ts: present",
         "docs/design/v2.js: page 'programme' — design reference, not implementation"
       ],
       "note": "No route; the MSP definition reads are T10."
@@ -638,9 +638,9 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Architecture",
-      "verdict": "new",
+      "verdict": "extend",
       "evidence": [
-        "apps/web/src/app.rs: route '/design/adm' absent",
+        "apps/web/src/app.rs: route '/design/adm' found",
         "apps/web/e2e/adm.spec.ts: absent",
         "docs/design/v2.js: page 'adm' — design reference, not implementation"
       ],
@@ -653,7 +653,7 @@
       "concept": "Plan",
       "verdict": "extend",
       "evidence": [
-        "apps/web/src/app.rs: route '/plan' absent",
+        "apps/web/src/app.rs: route '/plan' found",
         "apps/web/e2e/plan.spec.ts: absent",
         "apps/web/src/app.rs: V1 ancestor '/boards' found",
         "docs/design/v2.js: page 'plan' — design reference, not implementation"
@@ -667,7 +667,7 @@
       "concept": "Improve",
       "verdict": "extend",
       "evidence": [
-        "apps/web/src/app.rs: route '/improve' absent",
+        "apps/web/src/app.rs: route '/improve' found",
         "apps/web/e2e/improve.spec.ts: absent",
         "apps/web/src/app.rs: V1 ancestor '/evals/improvement' found",
         "docs/design/v2.js: page 'improve' — design reference, not implementation"
@@ -679,9 +679,9 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Operations",
-      "verdict": "new",
+      "verdict": "extend",
       "evidence": [
-        "apps/web/src/app.rs: route '/operations' absent",
+        "apps/web/src/app.rs: route '/operations' found",
         "apps/web/e2e/operations.spec.ts: absent",
         "docs/design/v2.js: page 'operations' — design reference, not implementation"
       ],
@@ -692,9 +692,9 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Tools",
-      "verdict": "new",
+      "verdict": "extend",
       "evidence": [
-        "apps/web/src/app.rs: route '/tools' absent",
+        "apps/web/src/app.rs: route '/tools' found",
         "apps/web/e2e/tools.spec.ts: absent",
         "docs/design/v2.js: page 'toolkits' — design reference, not implementation"
       ],
