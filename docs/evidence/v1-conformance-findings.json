@@ -2258,7 +2258,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/ops/incidents.rs",
-          "line": 709,
+          "line": 710,
           "quote": "    if meta.get(META_MITIGATED_AT).is_none() {"
         },
         {
@@ -2268,7 +2268,7 @@
         },
         {
           "path": "crates/actions/src/ops/incidents.rs",
-          "line": 846,
+          "line": 847,
           "quote": "    if meta.get(META_MITIGATED_AT).is_none() {"
         },
         {
@@ -2754,7 +2754,7 @@
         },
         {
           "path": "crates/actions/src/metrics/mod.rs",
-          "line": 1114,
+          "line": 1115,
           "quote": "    store::metrics::record_reconciliation_tx("
         }
       ],
