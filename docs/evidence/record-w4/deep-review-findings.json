@@ -112,6 +112,86 @@
       "evidence": "Both headings carry the literal skeleton sentence plus raw JSON; the solution intent is a programme summary whose 28 closed plus 19 active equals 47 of 48 projects, and the charter's owner is null. A skeleton sentence beside a JSON block is not evidence of an ART charter or a solution intent.",
       "acceptance": "The ART charter resolves from a charter record with an owner, and the solution intent resolves from a solution-intent record (or an explicit absence naming it); neither heading publishes the skeleton sentence as its content.",
       "artifact": "seed/output-standard.json#safe-art"
+    },
+    {
+      "key": "w4-proj-probe-row",
+      "kind": "record",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "A retired test row 'schema probe — delete me' is published across baselines and change-control sections",
+      "evidence": "A frozen baseline publishes a register row titled 'schema probe — delete me' with code '', and the same probe block repeats under Scope, Schedule, Cost and Approval in P0 and other projects. Test data has reached published governance artefacts, and a published row with an empty code is admitted.",
+      "acceptance": "The probe row is retired from the live record (or replaced by a real row with a code); no published baseline or change-control body contains the probe title; a read-time query refuses a published register row whose code is empty.",
+      "artifact": "seed/output-standard.json#project-baseline"
+    },
+    {
+      "key": "w4-proj-baseline-scope-repeats",
+      "kind": "standard",
+      "severity": "P1",
+      "owner_project": "T13",
+      "title": "Schedule, Cost and Approval baseline headings all publish the same two kind=scope rows",
+      "evidence": "T13's baseline artefact publishes the same two kind=scope baseline rows under Schedule, Cost and Approval; no schedule, cost or approval baseline is present. The template's per-heading source does not filter by baseline kind.",
+      "acceptance": "Each baseline heading maps to rows of its own kind (schedule/cost/approval) or an explicit absence naming the record; a fixture with one row per kind asserts each heading receives only its kind.",
+      "artifact": "seed/output-standard.json#project-baseline"
+    },
+    {
+      "key": "w4-proj-compliance-waivers",
+      "kind": "record",
+      "severity": "P1",
+      "owner_project": "T2",
+      "title": "The Waivers heading in all twelve sampled compliance reviews is the template sentence only",
+      "evidence": "Required heading Waivers carries no JSON block and no waiver statement in every sampled compliance review. The composer published a heading with no facts because the waiver source resolved to an empty list presented as content.",
+      "acceptance": "The Waivers heading resolves from the project's waiver rows with their reason and reassessment date, or states an explicit 'none' with the count that proves it; the composer refuses a heading whose source list is empty unless the template declares an explicit-none form.",
+      "artifact": "seed/output-standard.json#compliance-review"
+    },
+    {
+      "key": "w4-proj-compliance-decision",
+      "kind": "record",
+      "severity": "P1",
+      "owner_project": "T2",
+      "title": "Compliance review Decision publishes non_conformant and compliant reviews with no governing outcome",
+      "evidence": "T2's Decision section publishes non_conformant and compliant reviews together, each with outcome null, no conditions, and no statement of which decision governs. A review with no outcome cannot govern a phase.",
+      "acceptance": "Each published review carries a typed outcome and its conditions; the Decision heading selects the governing review (the latest per project) and names it; a read-time query refuses a review row with a null outcome.",
+      "artifact": "seed/output-standard.json#compliance-review"
+    },
+    {
+      "key": "w4-proj-wbs-empty",
+      "kind": "record",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "Every published work package carries empty acceptance and evidence arrays presented as content",
+      "evidence": "PLATFORM's five WBS nodes carry acceptance [] and evidence [] with body '', and the same zero-row block is presented under both Acceptance and Work packages. Empty arrays are not acceptance evidence.",
+      "acceptance": "A published work package carries a non-empty acceptance and at least one evidence reference, or the WBS row is refused at creation; the body never renders a zero-row block as its acceptance content.",
+      "artifact": "seed/output-standard.json#project-wbs"
+    },
+    {
+      "key": "w4-proj-change-control-impact",
+      "kind": "standard",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "Change-control Impact publishes impact null although meta.impact carries the text",
+      "evidence": "Four of five change rows publish impact:null while meta.impact holds the text; the same block repeats under Change requests and Decisions. The source projection reads the column, not the meta field the record actually uses.",
+      "acceptance": "The change-control heading maps to the field that carries the impact (meta.impact) or the row carries a typed impact column; a fixture with meta.impact set asserts the body shows it.",
+      "artifact": "seed/output-standard.json#change-control"
+    },
+    {
+      "key": "w4-proj-change-control-placeholder",
+      "kind": "record",
+      "severity": "P2",
+      "owner_project": "P0",
+      "title": "A published change row admits that B1-B6 carry a placeholder baseline",
+      "evidence": "P0's change-control body states 'B1-B6 carry a placeholder baseline and incomplete groups' and the B4 row publishes body:'' and code:''. Placeholder baseline data is published as change content.",
+      "acceptance": "The B1-B6 benefit profiles carry measured baselines with complete groups, or the change record names the missing measurement as an open action; no published body states that its own data is a placeholder.",
+      "artifact": "seed/output-standard.json#change-control"
+    },
+    {
+      "key": "w4-proj-delivery-contract-commitments",
+      "kind": "standard",
+      "severity": "P2",
+      "owner_project": "T13",
+      "title": "All three delivery-contract commitment headings publish the identical contract record",
+      "evidence": "T13's delivery contract publishes one contract record under all three required headings; its body has no commitments field or commitment text, so the headings duplicate the row.",
+      "acceptance": "Each commitment heading maps to its own field (commitments, conditions, acceptance criteria) or an explicit absence; the published contract names its commitments, not a repeated contract row.",
+      "artifact": "seed/output-standard.json#delivery-contract"
     }
   ]
 }
