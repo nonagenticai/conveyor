@@ -328,3 +328,74 @@ async fn a_digest_covers_the_unconsolidated_rows_once() {
     assert!(hot[1].consolidated_at.is_some());
     assert!(hot[2].consolidated_at.is_some());
 }
+
+/// v1-s15-1 property (d), the half no shipped test carried: the write shares its caller's
+/// transaction. Inside one transaction the row is visible to the hot recall, and a rollback
+/// removes it with the run — that is what "a run records its memory in the run's transaction"
+/// means at this seam. Nothing here opens a second connection.
+#[tokio::test]
+async fn a_memory_write_shares_the_run_transaction() {
+    let db = support::TestDb::fresh().await;
+    let seed = support::seed_tenant(&db.super_pool, "s15-mem-tx").await;
+    // `uq_run_live` allows one live run per card, and the fixture already seeds one: use it
+    // rather than inventing a second, so the memory row names the run the card actually has.
+    let run: Uuid = sqlx::query_scalar(
+        "SELECT id FROM run WHERE tenant_id = $1 AND card_id = $2 AND status = 'queued'",
+    )
+    .bind(seed.tenant)
+    .bind(seed.card)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("the fixture's live run");
+
+    let mut tx = begin_scoped(&db.runtime, tenant(&seed))
+        .await
+        .expect("scope");
+    insert_memory_tx(
+        &mut tx,
+        tenant(&seed),
+        &NewMemory {
+            card_id: seed.card,
+            run_id: Some(run),
+            capability_id: None,
+            kind: MemoryKind::Fact,
+            source: MemorySource::Agent,
+            body: "the run wrote this inside its transaction",
+            supersedes_id: None,
+            meta: json!({"run": run}),
+        },
+    )
+    .await
+    .expect("insert memory in the run's transaction");
+    let hot = hot_for_card_tx(&mut tx, tenant(&seed), seed.card, 10)
+        .await
+        .expect("hot rows");
+    assert_eq!(
+        hot.len(),
+        1,
+        "the run's memory is visible inside the transaction"
+    );
+    assert_eq!(hot[0].run_id, Some(run));
+    tx.rollback().await.expect("rollback");
+
+    let mut tx = begin_scoped(&db.runtime, tenant(&seed))
+        .await
+        .expect("scope");
+    let hot = hot_for_card_tx(&mut tx, tenant(&seed), seed.card, 10)
+        .await
+        .expect("hot rows");
+    tx.commit().await.expect("commit");
+    assert!(
+        hot.is_empty(),
+        "the rollback removed the memory with its run"
+    );
+    let runs: i64 = sqlx::query_scalar("SELECT count(*) FROM run WHERE tenant_id = $1")
+        .bind(seed.tenant)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("count runs");
+    assert_eq!(
+        runs, 1,
+        "the run row itself was seeded outside the transaction"
+    );
+}

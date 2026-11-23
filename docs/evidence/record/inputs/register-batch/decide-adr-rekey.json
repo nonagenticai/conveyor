@@ -1,0 +1,6 @@
+{
+ "approval_id": "01a2052b-0497-7ce5-9f56-cb934def34b6",
+ "decision": "approve",
+ "note": "Rule approval under the standing delegation: the ADR register is re-keyed to its adr-NNNN grammar; the stem-keyed rows are archived as history",
+ "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+}

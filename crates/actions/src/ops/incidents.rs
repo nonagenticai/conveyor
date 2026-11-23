@@ -362,6 +362,7 @@ async fn ops_incident(
             name,
             description: None,
             card_type_code: INCIDENT_CARD_TYPE.to_owned(),
+            internal_coach_card: false,
             due_at: None,
             parent_card_id: None,
             meta: Some(json!({

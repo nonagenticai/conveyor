@@ -103,6 +103,10 @@ pub struct ProjectCreateIn {
     /// An explicit key; absent means derived (`slug(title)`, uppercased, collision-suffixed).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub key: Option<String>,
+    /// Mark this row as test residue: the public pack excludes it and lists it under
+    /// `programme.test_projects` (v1-e2e-1). A real project never sets this.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub test_row: Option<bool>,
 }
 
 /// `projects.programme_meta` — the programme-owned keys, written under `portfolio:write`.
@@ -482,6 +486,14 @@ pub struct CardsMoveIn {
     /// Land immediately after this card of the target lane; absent appends.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub after_id: Option<Uuid>,
+    /// Set by `err.card` and the coach's `move` remedy: the engine is moving the card while
+    /// handling an interruption that already exists, so this move is not itself observed as a
+    /// §6.2 flow event. A person's move never sets it (v1-p6-5); the invocation boundary refuses
+    /// any caller that names it, and `schemars(skip)` keeps it out of the public contract while
+    /// the two engine paths still deserialize it.
+    #[serde(default)]
+    #[schemars(skip)]
+    pub internal_coach: bool,
 }
 
 /// `cards.duplicate`.
@@ -863,6 +875,13 @@ pub struct CardCreateIn {
     /// real intake records its `issue` / `unit_key` / `process_key` / `plan` link.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<Value>,
+    /// Internal only: set by `coach.interrupt` for the one card it is allowed to create
+    /// (SPEC_V2 §6.2). `serde(skip)` keeps it out of the wire document and `schemars(skip)`
+    /// keeps it out of the served schema, so no caller of the public action can name it — a
+    /// coach card can never be an orphan (T4, v1-p6-6).
+    #[serde(skip)]
+    #[schemars(skip)]
+    pub internal_coach_card: bool,
 }
 
 /// `cards.update`. Absent members are unchanged.

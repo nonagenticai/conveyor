@@ -8,7 +8,11 @@
   "status": "published",
   "health_path": "/health",
   "tools": [
-    { "key": "jobs_create", "action": "coding_jobs.create" },
+    {
+      "key": "jobs_create",
+      "action": "coding_jobs.create",
+      "verify": { "read_back": "jobs_get" }
+    },
     { "key": "jobs_get", "action": "coding_jobs.get" }
   ]
 }

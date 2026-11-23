@@ -21,7 +21,6 @@ use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
-use crate::approval_policy;
 use crate::parent::{Parent, ParentError, ensure_optional_parent_tx};
 use crate::run::{RunStoreError, transition_run_tx};
 use crate::version_of;
@@ -120,6 +119,9 @@ pub enum ApprovalStoreError {
     /// `approvals.decide` path must not be a weaker door into the same row.
     #[error("an eval sign-off requires the evals:approve scope")]
     EvalScopeRequired,
+    /// A gate marked `requires_answer` was decided with no note: an empty answer is no answer.
+    #[error("this gate requires an answer; a decision with no note answers nothing")]
+    AnswerMissing,
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -859,9 +861,13 @@ pub async fn record_decision_tx(
         .fetch_optional(&mut *conn)
         .await?;
     let row = row.ok_or(ApprovalStoreError::NotFound)?;
-    // T1 P1.3 / SPEC_V2 §5.4: the requester cannot decide the gate that judges their own work.
-    // This is the one writer every decision path traverses, so the exclusion lives here rather
-    // than in a UI or in `approvals.decide` alone.
+    // T1 P1.3 / SPEC_V2 §5.4 / P4: the requester cannot decide the gate that judges their own
+    // work. This is the one writer every decision path traverses, so the exclusion lives here
+    // rather than in a UI or in `approvals.decide` alone.
+    //
+    // ⛔ Unconditional (ledger v1-w4b-4): no policy row can relax it. A historical
+    // `self_approval='allowed'` row is inert — it still reads, but this writer never consults it,
+    // so the value can neither authorize a decision nor break a read of old data.
     let requested_by: Option<Uuid> =
         sqlx::query_scalar("SELECT requested_by FROM approval WHERE tenant_id = $1 AND id = $2")
             .bind(tenant.as_uuid())
@@ -869,25 +875,24 @@ pub async fn record_decision_tx(
             .fetch_one(&mut *conn)
             .await?;
     if requested_by == Some(decision.approver_id) {
-        // #282: §5.4 is the DEFAULT, not a hardcode. A tenant may allow the requester to decide
-        // its own gate for this action, and that decision is a row — never a caller's claim.
-        // Everything else fails closed: a missing row, an unreadable row and a corrupt value all
-        // keep the refusal, because the alternative is granting a permission nobody recorded.
-        // The gate name IS the action name for a destructive gate, which is what makes this read
-        // need no second lookup.
-        let allowed =
-            match approval_policy::allows_self_approval(&mut *conn, tenant, &row.gate).await {
-                Ok(allowed) => allowed,
-                Err(approval_policy::ApprovalPolicyStoreError::Database(error)) => {
-                    return Err(error.into());
-                }
-                Err(_) => false,
-            };
-        if !allowed {
-            return Err(ApprovalStoreError::Illegal(
-                ApprovalError::RequesterCannotDecide,
-            ));
-        }
+        return Err(ApprovalStoreError::Illegal(
+            ApprovalError::RequesterCannotDecide,
+        ));
+    }
+    // A free-text question must be answered. `approvals.request` marks one with
+    // `meta.requires_answer`; a decision that records no note answers nothing. This is the one
+    // writer every decision path traverses, so no channel can lose the answer. A yes/no gate
+    // does not set the marker and is unchanged.
+    let requires_answer: bool = sqlx::query_scalar(
+        "SELECT COALESCE(meta->>'requires_answer' = 'true', false)
+           FROM approval WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if requires_answer && decision.note.trim().is_empty() {
+        return Err(ApprovalStoreError::AnswerMissing);
     }
     // W1 (S06d): an eval gate is a person's act, and only a person holding `evals:approve` may
     // decide it. This check lives HERE — the one writer every decision path traverses — so
@@ -1044,17 +1049,18 @@ pub async fn expire_due_tx(conn: &mut PgConnection, tenant: TenantId) -> Result<
 /// `run.cancelled` after it. Both are the same status-guarded write, so this is the
 /// id-returning twin rather than a second sweep with a subtly different predicate.
 ///
-/// `run_id` is `None` for a card-level gate; the caller must not invent a run for it.
+/// `run_id` is `None` for a card-level gate; the caller must not invent a run for it. `card_id`
+/// is `None` for a project-scoped gate, which has no card a coach interruption could attach to.
 pub async fn expire_due_ids_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
-) -> Result<Vec<(Uuid, Option<Uuid>)>, sqlx::Error> {
+) -> Result<Vec<(Uuid, Option<Uuid>, Option<Uuid>)>, sqlx::Error> {
     sqlx::query_as(
         "UPDATE approval
             SET status = 'expired', version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND status = 'pending'
             AND expires_at IS NOT NULL AND expires_at <= now()
-        RETURNING id, run_id",
+        RETURNING id, run_id, card_id",
     )
     .bind(tenant.as_uuid())
     .fetch_all(&mut *conn)

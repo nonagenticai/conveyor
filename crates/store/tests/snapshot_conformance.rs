@@ -14,6 +14,7 @@ use uuid::Uuid;
 
 struct Fixture {
     tenant: TenantId,
+    tenant_id: Uuid,
     programme: Uuid,
     reviewer: Uuid,
     review: Uuid,
@@ -45,8 +46,9 @@ async fn architecture_tree(
 ) -> (Uuid, Uuid) {
     let contract: Uuid = sqlx::query_scalar(
         "INSERT INTO architecture_contract
-             (tenant_id, project_id, kind, phase_code, title, status, approved_by, approved_at)
-         VALUES ($1, $2, 'statement_of_architecture_work', 'a', 'SAW', 'live', $3, now())
+             (tenant_id, project_id, kind, phase_code, title, status, approved_by,
+              requested_by, approved_at)
+         VALUES ($1, $2, 'statement_of_architecture_work', 'a', 'SAW', 'live', $3, $3, now())
          RETURNING id",
     )
     .bind(tenant)
@@ -58,7 +60,8 @@ async fn architecture_tree(
     let review: Uuid = sqlx::query_scalar(
         "INSERT INTO architecture_compliance_review
              (tenant_id, project_id, contract_id, level, findings, evidence, reviewed_by)
-         VALUES ($1, $2, $3, 'compliant', '[]'::jsonb, '[]'::jsonb, $4)
+         VALUES ($1, $2, $3, 'compliant',
+                 '[{\"code\": \"ARCH-1\"}]'::jsonb, '[{\"ref\": \"saw-doc\"}]'::jsonb, $4)
          RETURNING id",
     )
     .bind(tenant)
@@ -150,6 +153,7 @@ async fn fixture(db: &support::TestDb) -> Fixture {
     architecture_tree(&db.super_pool, tenant_id, unbound_project, reviewer).await;
     Fixture {
         tenant,
+        tenant_id,
         programme,
         reviewer,
         review,
@@ -225,4 +229,177 @@ async fn the_snapshot_carries_the_tranche_link_reviews_and_waivers() {
         );
     }
     let _ = (f.programme, f.reviewer, f.unbound_project);
+}
+
+/// The cadence projection and the audit fields: a cadence's demo credits and lessons travel in
+/// the `msp` object beside it, and the contract/review rows carry the requester, findings and
+/// evidence an MSP/TOGAF conformance audit must read back.
+#[tokio::test]
+async fn the_snapshot_carries_the_cadence_credits_lessons_and_audit_fields() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    let cadence: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_cadence (tenant_id, programme_id, kind, period)
+         VALUES ($1, $2, 'sprint', 'S-1') RETURNING id",
+    )
+    .bind(f.tenant_id)
+    .bind(f.programme)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the cadence");
+    let deliverable: Uuid = sqlx::query_scalar(
+        "INSERT INTO wbs_node (tenant_id, project_id, kind, title)
+         VALUES ($1, $2, 'deliverable', 'Increment') RETURNING id",
+    )
+    .bind(f.tenant_id)
+    .bind(f.bound_project)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the deliverable");
+    sqlx::query(
+        "INSERT INTO programme_demo_credit (tenant_id, cadence_id, deliverable_id, evidence)
+         VALUES ($1, $2, $3, '[{\"ref\": \"demo-1\"}]'::jsonb)",
+    )
+    .bind(f.tenant_id)
+    .bind(cadence)
+    .bind(deliverable)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the demo credit");
+    sqlx::query(
+        "INSERT INTO lesson (tenant_id, programme_id, cadence_id, finding_key, statement)
+         VALUES ($1, $2, $3, 'L-1', 'Demo arrived a day late')",
+    )
+    .bind(f.tenant_id)
+    .bind(f.programme)
+    .bind(cadence)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the lesson");
+
+    let data = snapshot(&db, f.tenant).await;
+
+    let credits = data.msp["demo_credits"].as_array().expect("demo credits");
+    assert_eq!(credits.len(), 1, "{credits:?}");
+    assert_eq!(credits[0]["cadence_id"], cadence.to_string());
+    assert_eq!(credits[0]["deliverable_id"], deliverable.to_string());
+    assert_eq!(credits[0]["evidence"][0]["ref"], "demo-1");
+    assert!(credits[0]["credited_at"].is_string(), "{}", credits[0]);
+
+    let lessons = data.msp["lessons"].as_array().expect("lessons");
+    assert_eq!(lessons.len(), 1, "{lessons:?}");
+    assert_eq!(lessons[0]["programme_id"], f.programme.to_string());
+    assert_eq!(lessons[0]["cadence_id"], cadence.to_string());
+    assert_eq!(lessons[0]["finding_key"], "L-1");
+    assert_eq!(lessons[0]["state"], "proposed");
+    assert_eq!(lessons[0]["source"], "retro");
+
+    let contracts = data.architecture["contracts"]
+        .as_array()
+        .expect("contracts");
+    assert!(
+        contracts
+            .iter()
+            .all(|row| row["requested_by"] == f.reviewer.to_string()),
+        "{contracts:?}"
+    );
+    let reviews = data.architecture["compliance_reviews"]
+        .as_array()
+        .expect("reviews");
+    assert!(
+        reviews
+            .iter()
+            .all(|row| row["findings"][0]["code"] == "ARCH-1"),
+        "{reviews:?}"
+    );
+    assert!(
+        reviews
+            .iter()
+            .all(|row| row["evidence"][0]["ref"] == "saw-doc"),
+        "{reviews:?}"
+    );
+}
+
+/// The register checker can only assess what the public projection shows: the governed
+/// asset's `meta` (the ADR content hash, deciders and decided_at) and a contract's `links`/`meta`
+/// (its ADR citations). The keys are always present — an authored-away value is `{}`, not omitted.
+#[tokio::test]
+async fn the_snapshot_projects_governed_asset_meta_and_contract_citations() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+
+    sqlx::query(
+        "INSERT INTO governed_asset (tenant_id, kind, key, title, status, meta)
+         VALUES ($1, 'adr', 'adr-9001', 'Projection ADR', 'approved', $2)",
+    )
+    .bind(f.tenant_id)
+    .bind(serde_json::json!({
+        "content_sha256": "0f0f",
+        "deciders": ["architecture-board"],
+        "decided_at": "2026-11-01T00:00:00Z",
+    }))
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the ADR asset");
+    // Negative control: a row that never set meta must project `{}`, not drop the key.
+    sqlx::query(
+        "INSERT INTO governed_asset (tenant_id, kind, key, title, status)
+         VALUES ($1, 'requirement', 'req-9001', 'No meta', 'draft')",
+    )
+    .bind(f.tenant_id)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the meta-less asset");
+
+    sqlx::query(
+        "INSERT INTO architecture_contract (tenant_id, project_id, kind, phase_code, title, body)
+         VALUES ($1, $2, 'delivery_contract', 'b', 'Cite ADRs', $3)",
+    )
+    .bind(f.tenant_id)
+    .bind(f.bound_project)
+    .bind(serde_json::json!({
+        "links": {"adr": ["adr-0001"]},
+        "meta": {"deciders": ["architecture-board"]},
+    }))
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the citing contract");
+
+    let data = snapshot(&db, f.tenant).await;
+
+    let assets = data.artefacts["governed_assets"]
+        .as_array()
+        .expect("governed assets");
+    let adr = assets
+        .iter()
+        .find(|row| row["key"] == "adr-9001")
+        .expect("the ADR asset");
+    assert_eq!(adr["meta"]["content_sha256"], "0f0f", "{adr}");
+    assert_eq!(adr["meta"]["deciders"][0], "architecture-board", "{adr}");
+    assert_eq!(adr["meta"]["decided_at"], "2026-11-01T00:00:00Z", "{adr}");
+    let no_meta = assets
+        .iter()
+        .find(|row| row["key"] == "req-9001")
+        .expect("the meta-less asset");
+    assert_eq!(no_meta["meta"], serde_json::json!({}), "{no_meta}");
+
+    let contracts = data.architecture["contracts"]
+        .as_array()
+        .expect("contracts");
+    let citing = contracts
+        .iter()
+        .find(|row| row["title"] == "Cite ADRs")
+        .expect("the citing contract");
+    assert_eq!(citing["links"]["adr"][0], "adr-0001", "{citing}");
+    assert_eq!(
+        citing["meta"]["deciders"][0], "architecture-board",
+        "{citing}"
+    );
+    // The fixture's contract has an empty body: both keys are present and empty.
+    let bare = contracts
+        .iter()
+        .find(|row| row["title"] == "SAW")
+        .expect("the fixture contract");
+    assert_eq!(bare["links"], serde_json::json!({}), "{bare}");
+    assert_eq!(bare["meta"], serde_json::json!({}), "{bare}");
 }

@@ -283,24 +283,118 @@ pub async fn raw_project(pg: &support::Pg, tenant_id: Uuid, name: &str) -> Uuid 
     .expect("insert the project")
 }
 
-pub async fn tailor(
-    running: &support::Running,
-    requirements: Value,
-    contract_kinds: Value,
-) -> Value {
-    ok(
-        running,
+/// Seed the tenant's `artifact_type` standard through the store.
+///
+/// The served `profile_tailor` seeds it too, but only after validating the payload; the fixture
+/// must read the standard's mandatory rows BEFORE it can keep them in that payload.
+async fn seed_standard(f: &Fixture) {
+    let mut tx = conveyor_store::begin_scoped(&f.pg.owner, f.seeded.tenant)
+        .await
+        .expect("scope the standard seed");
+    conveyor_store::architecture::seed_standard_tx(&mut tx, f.seeded.tenant)
+        .await
+        .expect("seed the artifact_type standard");
+    tx.commit().await.expect("commit the standard seed");
+}
+
+/// Add every `artifact_type.mandatory` row of a covered phase to the caller's requirement map.
+///
+/// A tailored profile may add work but never subtract the standard's mandatory artefacts; the
+/// phase gate joins those rows to every set anyway, so a fixture that omitted them would tailor
+/// a profile the action refuses.
+fn with_mandatory(standard: &[Value], requirements: Value) -> Value {
+    let mut map = match requirements {
+        Value::Object(map) => map,
+        other => panic!("tailor requirements must be an object: {other}"),
+    };
+    for row in standard {
+        if row["mandatory"].as_bool() != Some(true) {
+            continue;
+        }
+        let phase = row["phase_code"].as_str().expect("a phase_code").to_owned();
+        let plateau = row["plateau"].as_str().expect("a plateau").to_owned();
+        let key = row["key"].as_str().expect("a key").to_owned();
+        let entry = map.entry(phase.clone()).or_insert_with(|| json!({}));
+        match entry {
+            Value::Array(items) => {
+                if !items.iter().any(|item| item.as_str() == Some(key.as_str())) {
+                    items.push(Value::String(key));
+                }
+            }
+            Value::Object(plateaus) => {
+                let set = plateaus.entry(plateau.clone()).or_insert_with(|| json!([]));
+                let Value::Array(items) = set else {
+                    panic!("phase {phase}'s plateau {plateau} must be an array");
+                };
+                if !items.iter().any(|item| item.as_str() == Some(key.as_str())) {
+                    items.push(Value::String(key));
+                }
+            }
+            other => {
+                panic!("phase {phase}'s requirements must be an array or a plateau map: {other}")
+            }
+        }
+    }
+    Value::Object(map)
+}
+
+/// Tailor the tenant's ADM profile, then adopt it through the Board.
+///
+/// The profile action refuses a payload that drops a mandatory type or names an unknown key, so
+/// the standard's mandatory rows are merged into the caller's map first. Adoption is the Board's
+/// act: a unique board records an approved decision about this profile, and the same action call
+/// carries that decision id.
+pub async fn tailor(f: &Fixture, requirements: Value, contract_kinds: Value) -> Value {
+    seed_standard(f).await;
+    let read = ok(&f.running, "architecture.profile_get", json!({}), None).await;
+    let standard = read["standard"].as_array().expect("the standard").to_vec();
+    let input = json!({
+        "key": "adm",
+        "name": "Tailored ADM",
+        "phase_set": ["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"],
+        "artifact_requirements": with_mandatory(&standard, requirements),
+        "contract_kinds": contract_kinds,
+    });
+    let draft = ok(
+        &f.running,
         "architecture.profile_tailor",
+        input.clone(),
+        None,
+    )
+    .await;
+    let board = created(
+        &f.running,
+        "architecture.board_open",
         json!({
-            "key": "adm",
-            "name": "Tailored ADM",
-            "phase_set": ["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"],
-            "artifact_requirements": requirements,
-            "contract_kinds": contract_kinds,
+            "kind": "architecture_board",
+            "key": format!("profile-board-{}", Uuid::now_v7().simple()),
+            "name": "Profile adoption board",
+            "charter": "PF-1: adopt the tailored ADM profile",
+            "commissioning_authority": "P0 programme board",
+            "decision_limits": { "spend": "none" },
+            "members": [{ "role": "chief architect" }],
         }),
         None,
     )
-    .await
+    .await;
+    let decision = created(
+        &f.running,
+        "architecture.board_decide",
+        json!({
+            "body_id": id_of(&board),
+            "decision": "approved",
+            "evidence": { "charter": "PF-1" },
+            "subject_kind": "adm_profile",
+            "subject_id": id_of(&draft),
+        }),
+        None,
+    )
+    .await;
+    let mut adopt = input;
+    adopt["adopt_with_decision_id"] = decision["approval_id"].clone();
+    let adopted = ok(&f.running, "architecture.profile_tailor", adopt, None).await;
+    assert_eq!(adopted["status"], "adopted", "{adopted}");
+    adopted
 }
 
 /// The row id of one seeded `artifact_type` key.

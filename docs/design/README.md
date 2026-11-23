@@ -115,14 +115,43 @@ come from `governance/conformance.json`, not from the view.
 
 **The MSP, TOGAF, SAFe and PMP artefacts are generated documents.** `seed/output-standard.json`
 v3 names, for every artefact, its standard, level, subject kind (programme, project, tranche,
-benefit, capability, phase or card), mandatory flag, SPEC clause and the source each required
-section derives from. `scripts/generate-standards.py` resolves every applicable artefact against
-the snapshot, its published documents and the gap register, then publishes `data/standards.json`,
-one page per artefact under `docs/standards/` and an index. A section with a named row or document
-renders that record and its provenance; a section without one is *absent*, with the fixed line
-naming the record that would satisfy it. The four levels link to the artefacts they own, and an
-absent or partial artefact names the rework package that must close. The generator never calls a
-model: the artefact record is derived, not drafted.
+benefit, capability, phase, artifact or card), mandatory flag, SPEC clause and the source each
+required section derives from. `scripts/generate-standards.py` resolves every applicable artefact
+against the snapshot, its published documents and the gap register, then publishes
+`data/standards.json`, one page per artefact under `docs/standards/` and an index. A section with a
+named row or document renders that record, its provenance and the catalogue's own explanation of
+what the section is for; a section without one is *absent*, with the fixed line naming the record
+that would satisfy it. The generator never calls a model: the artefact record is derived, not
+drafted.
+
+**Every mandatory artefact is instanced, even when nothing evidences it.** A PMP artefact is
+generated for every live project (an archived project is history, not work); every project's
+declared A–H phase in `seed/programme.json` produces its own phase page even before a contract
+exists (Preliminary is the programme-level capability, not a per-project phase); and every
+`architecture_artifact` row is its own typed page (catalog, matrix or diagram)
+with its metadata, entries, links and document, rather than one summary page per project. The
+result is a larger and more honest record: at the committed snapshot it is **505 artefacts — 75
+evidenced, 57 partial, 373 absent** — where the earlier generator omitted the absent ones and a
+single unfiltered contract made 48 statements of architecture work look evidenced. Absence is the
+work queue, not a failure of the page.
+
+**The findings are the rework register.** Each unresolved mandatory artefact is a finding with a
+specific Definition of Done — the missing heading, the exact snapshot container or document that
+would satisfy it, and the `generate-standards.py --check` command that must stop reporting it. The
+audit merges the artefact ledger with the checked-in v1 code ledger and the data-gap rules; a gap
+rule that already owns a defect keeps the package (`COVERED_BY`), so one defect never becomes two
+cards. `docs/evidence/rework-register.json` is the committed register; a project in a still-planned
+tranche is *not yet due* and its package is planning work (P2), while an authorised tranche keeps
+the full severity. The four levels link to the artefacts they own, show the missing headings on
+partial and absent rows, and the L2 programme page rolls every project's record up worst-first.
+
+**The source pointers are a gate, not a convention.** `generate-standards.py --check` refuses a
+catalogue whose declared row source names a snapshot file or JSON pointer that does not resolve, so
+a typo fails instead of rendering as a permanent `absent`. A container the current snapshot
+projection does not carry yet (compliance reviews, waivers, lessons, demo credits) is marked
+`optional` in the source, which is honest and removable when the projection lands; it does not
+silence a typo. `check-standards.cjs`, `check-data.cjs` and `scripts/ci/tests/standards_pack.sh`
+gate the published record, its page hashes, its package linkage and two-run byte identity.
 
 **The record is committed, not only buildable.** `docs/design/scripts/publish-standards.sh` runs
 the same pass-1/pass-2 pipeline against the committed snapshot with no database and installs

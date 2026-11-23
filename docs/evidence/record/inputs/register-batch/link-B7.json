@@ -1,0 +1,10 @@
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "benefit_id": "01a204d2-dbf6-750a-a031-9f00f5fe7754",
+ "output_ref": "01a20277-8d10-702f-a975-4dd6469e7b1d",
+ "capability_ref": "the inference ledger",
+ "operational_outcome": "fewer inference tokens per demo-credited deliverable without a higher run-failure rate",
+ "strategic_objective": "an auditable and economical programme",
+ "kind": "benefit",
+ "benefit_ref": "B7"
+}

@@ -57,7 +57,8 @@ impl From<CopilotStoreError> for ApiError {
 /// `GET /api/copilot/actions` — the surface this caller's model may call (S10 §5.2).
 ///
 /// The same projection `/mcp` renders as `tools/list`: an action outside it is absent here and
-/// absent there, and calling it is `action-not-found` (S04-D6), never `403`.
+/// absent there, and calling it is `403 action-forbidden` (S10 §5.2 property e), never a 404
+/// that would hide the refusal.
 #[utoipa::path(
     get,
     path = "/api/copilot/actions",

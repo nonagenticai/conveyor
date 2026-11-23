@@ -20,6 +20,9 @@ pub use sqlx;
 pub mod agent_surface;
 // ADR 0007 §5: the `analyse.*` family — the analysis library's invocable surface.
 pub mod analysis;
+// T17 (#526, SPEC_V2 §5.7, §10.4): tenant asset authoring — intake, drafts, review and
+// publication.
+pub mod authoring;
 // T9 (SPEC_V2 §8.1, §10.3, §10.4, D63): the TOGAF ADM action family.
 pub mod architecture;
 // S17: the benchmark harness — suites, runs, cases.
@@ -51,6 +54,9 @@ pub mod inference;
 pub mod ingest;
 pub mod integrations;
 pub mod invoke;
+// T5 (#77, SPEC_V2 §6.3, §9.3–§9.4, §12 T5): the kata loop — the pinned hypothesis, the
+// held-out measurement, the human adoption gate, propagation and the revert outcome.
+pub mod kata;
 // S15: capability-bound retrieval from strata platform packs.
 pub mod knowledge;
 pub mod lock;
@@ -93,6 +99,7 @@ pub mod spec;
 pub mod spine;
 // T13 (SPEC_V2 §11.10): the job object-storage adapter — tenant-prefixed, hashed, capped.
 pub mod storage;
+pub mod storage_actions;
 // T13 (SPEC_V2 §11.3): the `tools.call` action declaration (the broker enforces it).
 pub mod tools;
 // T2 (SPEC_V2 §7): the decision ladder — `ladder.*` over `decision_policies.*`,

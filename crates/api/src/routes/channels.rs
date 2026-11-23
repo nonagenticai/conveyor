@@ -158,6 +158,7 @@ pub async fn channel_inbound(
     };
 
     let request = InvokeRequest {
+        credential_alias: None,
         action: action.clone(),
         input,
         precondition: None,

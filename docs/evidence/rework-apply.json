@@ -5,11 +5,187 @@
       "at": "2026-11-21T18:37:12+00:00",
       "card_id": "01a1ff65-ef71-7ccb-96de-373594bc2670",
       "severity": "P0"
+    },
+    "closed_without_closure_review:T14": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:00:33+00:00",
+      "card_id": "01a1ffe9-2a40-715f-96cd-743a858d709a",
+      "severity": "P0"
+    },
+    "closed_without_closure_review:T16": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:00:36+00:00",
+      "card_id": "01a1ffe9-3514-7a53-b44c-118fedc6bd5a",
+      "severity": "P0"
+    },
+    "closed_without_closure_review:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:00:39+00:00",
+      "card_id": "01a1ffe9-3fcf-7bd6-a9ec-647eb8182158",
+      "severity": "P0"
+    },
+    "closed_without_closure_review:T3": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:00:41+00:00",
+      "card_id": "01a1ffe9-4a90-7c9e-bf88-afb3f1bf68fa",
+      "severity": "P0"
+    },
+    "closed_without_closure_review:T7": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:00:44+00:00",
+      "card_id": "01a1ffe9-557f-7390-bc56-8d70f35106c5",
+      "severity": "P0"
+    },
+    "pi_plan_missing:tranche-2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:01:52+00:00",
+      "card_id": "01a1ffea-6016-74b3-a32c-31e0e598c037",
+      "severity": "P0"
+    },
+    "project_in_unauthorised_tranche:tranche-10": {
+      "apply_to": "T5",
+      "at": "2026-11-21T21:00:55+00:00",
+      "card_id": "01a1ffe9-803d-7264-b4d3-853dfc66338d",
+      "severity": "P0"
+    },
+    "project_in_unauthorised_tranche:tranche-3": {
+      "apply_to": "S04",
+      "at": "2026-11-21T21:01:06+00:00",
+      "card_id": "01a1ffe9-a930-7688-a409-a4ab5cb86e02",
+      "severity": "P0"
+    },
+    "project_in_unauthorised_tranche:tranche-4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:01:08+00:00",
+      "card_id": "01a1ffe9-b41d-70b4-8b7a-fa5533e0f485",
+      "severity": "P0"
+    },
+    "project_in_unauthorised_tranche:tranche-5": {
+      "apply_to": "S06",
+      "at": "2026-11-21T21:01:19+00:00",
+      "card_id": "01a1ffe9-de67-7e7d-802a-7f2e76aae912",
+      "severity": "P0"
+    },
+    "project_in_unauthorised_tranche:tranche-6": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:01:22+00:00",
+      "card_id": "01a1ffe9-ea22-76cb-9cee-369d1ac8db4f",
+      "severity": "P0"
+    },
+    "project_in_unauthorised_tranche:tranche-7": {
+      "apply_to": "S15",
+      "at": "2026-11-21T21:01:33+00:00",
+      "card_id": "01a1ffea-1497-7292-a2a7-93aff9094684",
+      "severity": "P0"
+    },
+    "project_in_unauthorised_tranche:tranche-8": {
+      "apply_to": "S19",
+      "at": "2026-11-21T21:01:44+00:00",
+      "card_id": "01a1ffea-3d79-7ae4-9f9a-423047c00ab8",
+      "severity": "P0"
+    },
+    "v1-p5-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:02:02+00:00",
+      "card_id": "01a1ffea-85db-765e-8830-fa70cf58acdb",
+      "severity": "P0"
+    },
+    "v1-p5-2:T1": {
+      "apply_to": "T1",
+      "at": "2026-11-21T21:02:13+00:00",
+      "card_id": "01a1ffea-af57-7cc4-b680-6314108c9947",
+      "severity": "P0"
+    },
+    "v1-p6-1:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:01:55+00:00",
+      "card_id": "01a1ffea-6b7c-7b9d-9a97-d747bd6c91ac",
+      "severity": "P0"
+    },
+    "v1-p75-1:T11": {
+      "apply_to": "T11",
+      "at": "2026-11-21T21:02:24+00:00",
+      "card_id": "01a1ffea-dc29-7042-a1e6-6650cd4e214b",
+      "severity": "P0"
+    },
+    "v1-p81-1:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:02:52+00:00",
+      "card_id": "01a1ffeb-4900-7007-b262-2e7959803552",
+      "severity": "P0"
+    },
+    "v1-p81-2:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:02:55+00:00",
+      "card_id": "01a1ffeb-5445-733d-af3b-a320b82fe4d6",
+      "severity": "P0"
+    },
+    "v1-p81-3:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:02:58+00:00",
+      "card_id": "01a1ffeb-5fd8-7f91-adfd-fbe5716a699c",
+      "severity": "P0"
+    },
+    "v1-p82-1:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:01:59+00:00",
+      "card_id": "01a1ffea-79b1-79e3-bfef-b22726135492",
+      "severity": "P0"
+    },
+    "v1-pack-6:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:02:27+00:00",
+      "card_id": "01a1ffea-e7c0-7e2f-b3c0-ecf72a9eb689",
+      "severity": "P0"
+    },
+    "v1-w1a-2:T0": {
+      "apply_to": "T0",
+      "at": "2026-11-21T21:02:38+00:00",
+      "card_id": "01a1ffeb-10fc-721d-a1f9-308a4b7c3b4b",
+      "severity": "P0"
+    },
+    "v1-w1c-2:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:02:41+00:00",
+      "card_id": "01a1ffeb-1c16-76f9-be67-5dea3016b303",
+      "severity": "P0"
+    },
+    "v1-w2b-2:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:01:46+00:00",
+      "card_id": "01a1ffea-48b5-7eb2-ab4f-eb59d2670fac",
+      "severity": "P0"
+    },
+    "v1-w2c-3:T3": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:01:49+00:00",
+      "card_id": "01a1ffea-53c7-7da2-a240-7d2a6c6fe796",
+      "severity": "P0"
+    },
+    "v1-w3a-1:T7": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:03:23+00:00",
+      "card_id": "01a1ffeb-c188-7619-bc69-536eccded212",
+      "severity": "P0"
+    },
+    "v1-w4a-1:T13": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:02:46+00:00",
+      "card_id": "01a1ffeb-311e-708e-a994-83eb40fd3a69",
+      "severity": "P0"
+    },
+    "v1-w4a-2:T13": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T21:02:49+00:00",
+      "card_id": "01a1ffeb-3da6-7093-a936-be6c79576976",
+      "severity": "P0"
     }
   },
-  "cleared": [],
+  "cleared": [
+    "closed_without_closure_review:DESIGN-PUBLISH"
+  ],
   "failures": [],
   "schema": "conveyor-rework-apply/v1",
   "tenant": "nonagentic",
-  "updated_at": "2026-11-21T18:37:12+00:00"
+  "updated_at": "2026-11-21T21:03:23+00:00"
 }

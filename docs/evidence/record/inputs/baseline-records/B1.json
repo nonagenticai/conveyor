@@ -1,0 +1,10 @@
+{
+ "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+ "baseline": {
+  "value": 0.15861,
+  "unit": "decisions per run",
+  "measured_at": "2026-11-22",
+  "method": "approval_decision rows / run rows read from the product's own tables at the recorded snapshot",
+  "definition": "105 approval_decision / 662 run at 2026-11-22"
+ }
+}

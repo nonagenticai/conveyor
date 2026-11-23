@@ -1,0 +1,95 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "PLATFORM is active",
+      "detail": "project PLATFORM is active",
+      "id": "PLATFORM-project",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the standing row carries a project baseline",
+      "detail": "1 project baseline(s); 1 approved",
+      "id": "PLATFORM-baseline",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d39-79ce-84b6-1173b94bc67f\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "PLATFORM-charter",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "PI cadence 01a1ff21-33f0-7e5a-bafc-b09b6fc73c13 and refinement 01a1ff21-547f-73e8-b256-4bee7fdc9c70 for tranche-0",
+      "id": "PLATFORM-pi-cadence",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "5 WBS node(s) carry the four WSJF inputs",
+      "id": "PLATFORM-wsjf",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
+      "id": "PLATFORM-demo-credits",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "no open P0 package for this project",
+      "id": "PLATFORM-product",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "gate discharged by executable checks: PLATFORM-project, PLATFORM-baseline, PLATFORM-charter, PLATFORM-pi-cadence, PLATFORM-wsjf, PLATFORM-demo-credits, PLATFORM-product",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "pass",
+      "severity": "P0"
+    }
+  ],
+  "failures": [],
+  "gate": "The standing platform row carries an approved charter and a baseline; it does not close.",
+  "generated_at": "2026-11-23T08:10:23.207291+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/PLATFORM.toml",
+  "name": "CI, runners and platform",
+  "project": "PLATFORM",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-23T08:09:50.563209+00:00",
+    "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
+    "path": "retained-snapshot/4727213b8c204ec69d825d24129f6b506ebb2a2e"
+  },
+  "verdict": "green",
+  "warnings": []
+}

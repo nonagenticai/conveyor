@@ -11,8 +11,9 @@
 mod support;
 
 use conveyor_domain::TenantId;
+use conveyor_domain::spine::PlanError;
 use conveyor_store::begin_scoped;
-use conveyor_store::spine;
+use conveyor_store::spine::{self, PlanStoreError};
 use serde_json::json;
 use uuid::Uuid;
 
@@ -96,13 +97,46 @@ async fn fixture(db: &support::TestDb, wip_limit: Option<i32>) -> Fixture {
     .fetch_one(&db.super_pool)
     .await
     .expect("insert the cadence");
-    Fixture {
+    let fixture = Fixture {
         tenant,
         cadence,
         active_list,
         card_type,
         project,
-    }
+    };
+    // A PI plan materialises only after a person approves it; the suite is about the plan.
+    approve_plan(db, &fixture).await;
+    fixture
+}
+
+/// The approved human PI-plan gate `materialise_pi_tx` now requires.
+async fn approve_plan(db: &support::TestDb, f: &Fixture) {
+    let mut tx = conveyor_store::scope::begin_scoped(&db.owner, f.tenant)
+        .await
+        .expect("scope the plan gate");
+    let mut new = conveyor_store::approval::NewApproval::new(
+        conveyor_store::spine::PI_PLAN_APPROVAL_GATE,
+        "plan",
+    );
+    new.meta = json!({ "target": f.cadence.to_string() });
+    let approval = conveyor_store::approval::insert_approval_tx(&mut tx, f.tenant, &new)
+        .await
+        .expect("insert the plan gate");
+    let approver: Uuid =
+        sqlx::query_scalar("INSERT INTO app_user (display_name) VALUES ('Approver') RETURNING id")
+            .fetch_one(&mut *tx)
+            .await
+            .expect("insert the approver");
+    conveyor_store::approval::record_decision_tx(
+        &mut tx,
+        f.tenant,
+        approval.id,
+        &conveyor_domain::Decision::approve(approver),
+        false,
+    )
+    .await
+    .expect("approve the plan");
+    tx.commit().await.expect("commit the plan gate");
 }
 
 /// One backlog row with the four typed WSJF inputs.
@@ -241,5 +275,174 @@ async fn a_zero_job_size_is_refused() {
     assert!(
         materialise(&db, &f).await.is_empty(),
         "no draft is created from a refused row"
+    );
+}
+
+/// The cadence state as the fixture's row carries it.
+async fn state_of(db: &support::TestDb, f: &Fixture) -> String {
+    sqlx::query_scalar("SELECT state FROM programme_cadence WHERE id = $1")
+        .bind(f.cadence)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("read the cadence state")
+}
+
+/// Move the fixture's cadence through the PI-plan gate, committing the move.
+async fn gate_state(db: &support::TestDb, f: &Fixture, state: &str) {
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    spine::set_pi_cadence_approval_state_tx(&mut tx, f.tenant, f.cadence, state)
+        .await
+        .expect("a legal move");
+    tx.commit().await.expect("commit the move");
+}
+
+/// A cadence's state is not an editable string: the one transition table refuses a jump no
+/// writer makes, and the database refuses a value outside the closed set.
+#[tokio::test]
+async fn an_illegal_cadence_jump_is_refused() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db, Some(4)).await;
+
+    // `materialised` is the materialiser's outcome: an edit cannot skip the cards.
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let refused = spine::update_cadence_tx(
+        &mut tx,
+        f.tenant,
+        f.cadence,
+        1,
+        &spine::CadencePatch {
+            state: Some("materialised".to_owned()),
+            ..Default::default()
+        },
+    )
+    .await;
+    tx.rollback().await.expect("roll back the refusal");
+    assert!(
+        matches!(
+            &refused,
+            Err(PlanStoreError::Illegal(PlanError::CadenceIllegalTransition { from, to }))
+                if from == "planned" && to == "materialised"
+        ),
+        "planned -> materialised through an edit must be refused: {refused:?}"
+    );
+    assert_eq!(
+        state_of(&db, &f).await,
+        "planned",
+        "the refusal wrote nothing"
+    );
+
+    // The CHECK is the second lock: raw SQL cannot store a value outside the closed set.
+    let programme: Uuid =
+        sqlx::query_scalar("SELECT programme_id FROM programme_cadence WHERE id = $1")
+            .bind(f.cadence)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("read the programme");
+    let inserted = sqlx::query(
+        "INSERT INTO programme_cadence (tenant_id, programme_id, kind, period, state)
+         VALUES ($1, $2, 'pi', 'PI 2', 'paused')",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(programme)
+    .execute(&db.super_pool)
+    .await;
+    assert!(
+        inserted.is_err(),
+        "a state outside the set must not be storable"
+    );
+    let updated = sqlx::query("UPDATE programme_cadence SET state = 'paused' WHERE id = $1")
+        .bind(f.cadence)
+        .execute(&db.super_pool)
+        .await;
+    assert!(
+        updated.is_err(),
+        "a raw update outside the set must be refused"
+    );
+    assert_eq!(
+        state_of(&db, &f).await,
+        "planned",
+        "the refused update wrote nothing"
+    );
+
+    // Every value the closed set names is storable, so the CHECK and `CADENCE_STATES` agree.
+    for (index, state) in spine::CADENCE_STATES.iter().enumerate() {
+        sqlx::query(
+            "INSERT INTO programme_cadence (tenant_id, programme_id, kind, period, state)
+             VALUES ($1, $2, 'pi', $3, $4)",
+        )
+        .bind(f.tenant.as_uuid())
+        .bind(programme)
+        .bind(format!("PI accepted {index}"))
+        .bind(state)
+        .execute(&db.super_pool)
+        .await
+        .unwrap_or_else(|error| panic!("the CHECK must accept {state}: {error}"));
+    }
+}
+
+/// Every move the gate and the materialiser make is in the table and succeeds; a closed cadence
+/// has no way out.
+#[tokio::test]
+async fn the_cadence_states_move_only_along_the_table() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db, Some(4)).await;
+
+    // planned -> awaiting_approval (the gate opens); awaiting_approval -> awaiting_approval
+    // (a person approves while the gate still waits).
+    gate_state(&db, &f, spine::CADENCE_AWAITING_APPROVAL).await;
+    gate_state(&db, &f, spine::CADENCE_AWAITING_APPROVAL).await;
+    // awaiting_approval -> rejected, then rejected -> awaiting_approval (the gate re-opens).
+    gate_state(&db, &f, spine::CADENCE_REJECTED).await;
+    gate_state(&db, &f, spine::CADENCE_AWAITING_APPROVAL).await;
+    assert_eq!(
+        state_of(&db, &f).await,
+        spine::CADENCE_AWAITING_APPROVAL,
+        "the gate re-opens a rejected plan"
+    );
+
+    // awaiting_approval -> materialised is the materialiser's move.
+    let cards = materialise(&db, &f).await;
+    assert!(cards.is_empty(), "the fixture has no backlog rows to draft");
+    assert_eq!(state_of(&db, &f).await, "materialised");
+
+    // materialised -> closed is the retired cadence's move.
+    let version: i64 = sqlx::query_scalar("SELECT version FROM programme_cadence WHERE id = $1")
+        .bind(f.cadence)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("read the version");
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    spine::update_cadence_tx(
+        &mut tx,
+        f.tenant,
+        f.cadence,
+        version,
+        &spine::CadencePatch {
+            state: Some("closed".to_owned()),
+            ..Default::default()
+        },
+    )
+    .await
+    .expect("a materialised cadence closes");
+    tx.commit().await.expect("commit the close");
+    assert_eq!(state_of(&db, &f).await, "closed");
+
+    // closed is terminal: no writer resurrects it.
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let refused = spine::set_pi_cadence_approval_state_tx(
+        &mut tx,
+        f.tenant,
+        f.cadence,
+        spine::CADENCE_AWAITING_APPROVAL,
+    )
+    .await;
+    tx.rollback().await.expect("roll back the refusal");
+    assert!(
+        matches!(
+            &refused,
+            Err(PlanStoreError::Illegal(PlanError::CadenceIllegalTransition { from, .. }))
+                if from == "closed"
+        ),
+        "a closed cadence cannot re-open: {refused:?}"
     );
 }

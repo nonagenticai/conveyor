@@ -47,7 +47,8 @@ pub struct GateCount {
     pub latency_seconds: Option<f64>,
 }
 
-/// One benefit profile and its latest transition.
+/// One benefit profile, its latest transition and its latest reading (0071). The evaluation
+/// fields are `None` when the profile has no `benefit_measurement` row.
 #[derive(Debug, Clone, sqlx::FromRow)]
 pub struct BenefitRow {
     pub id: Uuid,
@@ -57,6 +58,31 @@ pub struct BenefitRow {
     pub target: Option<Value>,
     pub baseline_measured_at: Option<DateTime<Utc>>,
     pub post_measured_at: Option<DateTime<Utc>>,
+    /// When the transition was enacted; a `post` reading after this makes the benefit realised.
+    pub enacted_at: Option<DateTime<Utc>>,
+    /// The kind of the latest measurement (`baseline | interim | post`).
+    pub measurement_kind: Option<String>,
+    /// The latest measurement's target and actual values.
+    pub measurement_target: Option<f64>,
+    pub measurement_actual: Option<f64>,
+    /// When the latest measurement was taken.
+    pub measurement_measured_at: Option<DateTime<Utc>>,
+    /// The latest `baseline` reading's actual value, used to orient a reduction target.
+    pub baseline_actual: Option<f64>,
+}
+
+/// One programme risk row and its review date.
+#[derive(Debug, Clone, sqlx::FromRow)]
+pub struct ProgrammeRiskRow {
+    pub id: Uuid,
+    pub code: String,
+    pub title: String,
+    pub severity: Option<String>,
+    pub probability: Option<String>,
+    pub impact: Option<i32>,
+    pub status: String,
+    pub owner_job_id: Option<Uuid>,
+    pub review_at: Option<chrono::NaiveDate>,
 }
 
 /// One benefit put at risk by a non-met project dependency.
@@ -166,26 +192,67 @@ pub async fn gate_counts_tx(
     )
 }
 
-/// The programme's benefit profiles with their latest transition.
+/// The programme's benefit profiles with their latest transition and latest measurement.
 pub async fn benefit_rows_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     programme_id: Uuid,
 ) -> Result<Vec<BenefitRow>, MetricsStoreError> {
     let sql = "SELECT b.id, b.reference, b.status, b.baseline, b.target,
-                      t.baseline_measured_at, t.post_measured_at
+                      t.baseline_measured_at, t.post_measured_at, t.enacted_at,
+                      m.kind AS measurement_kind,
+                      m.target_value AS measurement_target,
+                      m.actual_value AS measurement_actual,
+                      m.measured_at AS measurement_measured_at,
+                      bm.actual_value AS baseline_actual
                  FROM benefit_profile b
                  LEFT JOIN LATERAL (
-                     SELECT baseline_measured_at, post_measured_at
+                     SELECT baseline_measured_at, post_measured_at, enacted_at
                        FROM benefit_transition
                       WHERE benefit_id = b.id AND tenant_id = b.tenant_id
                       ORDER BY created_at DESC, id DESC
                       LIMIT 1
                  ) t ON true
+                 LEFT JOIN LATERAL (
+                     SELECT kind, target_value::double precision AS target_value,
+                            actual_value::double precision AS actual_value, measured_at
+                       FROM benefit_measurement
+                      WHERE benefit_id = b.id AND tenant_id = b.tenant_id
+                      ORDER BY measured_at DESC, id DESC
+                      LIMIT 1
+                 ) m ON true
+                 LEFT JOIN LATERAL (
+                     SELECT actual_value::double precision AS actual_value
+                       FROM benefit_measurement
+                      WHERE benefit_id = b.id AND tenant_id = b.tenant_id AND kind = 'baseline'
+                      ORDER BY measured_at DESC, id DESC
+                      LIMIT 1
+                 ) bm ON true
                 WHERE b.tenant_id = $1 AND b.programme_id = $2 AND b.status <> 'retired'
                 ORDER BY b.reference";
     Ok(
         sqlx::query_as::<_, BenefitRow>(AssertSqlSafe(sql.to_owned()))
+            .bind(tenant.as_uuid())
+            .bind(programme_id)
+            .fetch_all(&mut *conn)
+            .await?,
+    )
+}
+
+/// The programme's risk register (0070), reviewed by date. A risk with no review date sorts
+/// last: it is not overdue, but it is not scheduled either.
+pub async fn programme_risk_rows_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<Vec<ProgrammeRiskRow>, MetricsStoreError> {
+    let sql = "SELECT id, code, title, severity, probability, impact, status, owner_job_id,
+                      review_at
+                 FROM project_register_item
+                WHERE tenant_id = $1 AND programme_id = $2 AND kind = 'risk'
+                ORDER BY review_at NULLS LAST, created_at DESC, id DESC";
+    Ok(
+        sqlx::query_as::<_, ProgrammeRiskRow>(AssertSqlSafe(sql.to_owned()))
             .bind(tenant.as_uuid())
             .bind(programme_id)
             .fetch_all(&mut *conn)
@@ -387,7 +454,8 @@ impl MeteringLevel {
     }
 
     /// The grouping expression over the attributed CTEs. `priced` exposes `id`, `run_id`,
-    /// `run_step_id`, `project_id`, `job_binding_id`, `programme_id` and `department`.
+    /// `run_step_id`, `caller_kind`, `project_id`, `job_binding_id`, `programme_id` and
+    /// `department`.
     fn key(self) -> &'static str {
         match self {
             Self::Tenant => "'tenant'",
@@ -427,11 +495,20 @@ pub async fn usage_by_level_tx(
     filter: Option<Uuid>,
 ) -> Result<Vec<UsageRow>, MetricsStoreError> {
     let key = level.key();
+    // `caller_kind = 'other'` is the synthetic/administrative caller: it is its own explicit
+    // bucket, never a project's usage, even when the call carries a run.
+    let inference_key = match level {
+        MeteringLevel::Project => {
+            "CASE WHEN caller_kind = 'other' THEN 'unattributed' \
+             ELSE coalesce(project_id::text, 'unattributed') END"
+        }
+        _ => key,
+    };
     let (filter_clause, has_filter) = level_filter(level, filter);
     let inference = format!(
         "WITH priced AS (
-             SELECT ic.id, ic.run_id, ic.run_step_id, r.project_id, r.job_binding_id,
-                    p.programme_id,
+             SELECT ic.id, ic.run_id, ic.run_step_id, ic.caller_kind, r.project_id,
+                    r.job_binding_id, p.programme_id,
                     coalesce(dep.name, 'unattributed') AS department,
                     (ic.prompt_tokens + ic.completion_tokens)::bigint AS tokens,
                     CASE
@@ -453,7 +530,7 @@ pub async fn usage_by_level_tx(
                      AND ((pr.unit = 'token' AND ic.usage_unit IS NULL) OR pr.unit = ic.usage_unit)
               WHERE ic.tenant_id = $1 AND ic.created_at >= $2 AND ic.created_at < $3{filter_clause}
          )
-         SELECT {key} AS key,
+         SELECT {inference_key} AS key,
                 count(*)::bigint AS calls,
                 coalesce(sum(tokens), 0)::bigint AS tokens,
                 coalesce(round(sum(cost), 6), 0)::double precision AS cost_usd,

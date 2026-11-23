@@ -83,7 +83,7 @@
 <li><strong>The improvement job</strong> <code>benchmark.improvement.run</code>: <code>{suite_id, candidate_subject, baseline_run_id}</code> → starts a run, waits on <code>benchmark_run.changed</code>/<code>get</code>, compares with the baseline, and records <code>keep | revert | inconclusive</code> with the McNemar delta. It invokes <code>benchmark_runs.start</code>, <code>benchmark_runs.get</code>, <code>benchmark_runs.compare</code> — never SQL and never a private path.</li>
 <li><strong>Screen 14</strong> declared for S12: version → rate, baseline line, control badges, regression flags, and the Start-candidate control (<code>improvement.spec.ts</code>).</li>
 </ul>
-<p>Tests: <code>apps/server/tests/benchmark_arm.rs</code>, <code>crates/api/tests/benchmark_trend.rs</code>, <code>apps/server/tests/benchmark_improvement.rs</code> — the gate's three named targets.</p>
+<p>Tests: <code>crates/api/tests/benchmark_arm.rs</code>, <code>crates/api/tests/benchmark_trend.rs</code> — the gate's shipped targets. <strong>No <code>benchmark_improvement</code> target exists:</strong> the job body (<code>apps/server/src/benchmark_improvement.rs</code>) ships with no test target and no <code>#[cfg(test)]</code>; <code>benchmark_arm</code> proves only that a baseline enqueues <code>benchmark.improvement.run</code>. Named gap (§7).</p>
 <h2 id="6-build-order">6. Build order</h2>
 <ol type="1">
 <li>The producer seam: a function that, given an instance and a subject, starts the run through the action layer and returns the patch; unit tests for the three failure classes (<code>no_attempt</code>, <code>fail</code>, typed refusal).</li>
@@ -98,11 +98,12 @@
 source ~/.cargo/env
 cd $HOME/Movies/conveyor
 
-# the arm refuses before S13/S15 data exists, and runs when it does
-cargo test -p conveyor-server --test benchmark_arm
+# the arm refuses before S13/S15 data exists, and runs when it does (the shipped package is conveyor-api)
+cargo test -p conveyor-api --test benchmark_arm
 # two versions of one subject compare with an exact McNemar delta
 cargo test -p conveyor-api --test benchmark_trend
-# the improvement job performs the same calls a person does
+# v1-s18-1 closed: the improvement body has its own target — the permanent refusal of an empty
+# payload, the no-op on an already judged candidate, and the scheduled next look for a live one.
 cargo test -p conveyor-server --test benchmark_improvement
 # the workspace is still green and the lock still matches
 cargo run -q -p conveyor-server -- --print-openapi --check-lock &gt;/dev/null

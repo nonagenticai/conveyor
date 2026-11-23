@@ -22,7 +22,9 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -37,7 +39,30 @@ REGISTER_SCHEMA = "conveyor-rework/v1"
 REGISTER_STANDARDS = ("MSP", "TOGAF", "SAFe", "PMP", "SPEC")
 REGISTER_SCOPES = ("project", "tranche", "programme")
 REGISTER_MAX_SUBJECTS = 20
-REGISTER_SUPPRESSED = ("waiver", "unprovable")
+# No disposition suppresses a package (ADR 0012): a baseline row recorded as a waiver is
+# still an open gap. The tuple is kept as the one extension point so a future legal
+# suppression has a single place to be declared.
+REGISTER_SUPPRESSED = ()
+
+# A test row is not a programme project. The marker is `meta.test_row = true`; the two known
+# keys predate the marker and are named explicitly rather than matched by prefix, so a future
+# unmarked row stays visible as a finding (`v1-e2e-1`) instead of disappearing silently.
+TEST_ROW_MARKER = "test_row"
+LEGACY_TEST_PROJECT_KEYS = (
+    "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+    "AAA-UI-PROOF-285-2026-11-19T07-4",
+)
+
+
+def test_row_reason(row: dict[str, Any]) -> str | None:
+    """Why this project row is test residue, or None when it is a real project."""
+    meta = row.get("meta")
+    if isinstance(meta, dict) and meta.get(TEST_ROW_MARKER) is True:
+        return f"meta.{TEST_ROW_MARKER} is true"
+    key = str(row.get("key") or "")
+    if key in LEGACY_TEST_PROJECT_KEYS:
+        return "a known pre-marker e2e project key"
+    return None
 def register_acceptance(key: str) -> str:
     """The command that proves one package is closed, not a whole-programme report.
 
@@ -49,6 +74,7 @@ def register_acceptance(key: str) -> str:
         "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data "
         "--findings docs/evidence/v1-conformance-findings.json "
         "--findings docs/evidence/standards-findings.json "
+        "--deep-review docs/evidence/record-w3/deep-review-findings.json "
         f"--rework-check {key}"
     )
 PLACEHOLDER = re.compile(
@@ -150,9 +176,17 @@ class Dataset:
         self.output_standard = output_standard
         self.standard = standard
         self.repo_root = repo_root
-        self.projects = [
+        all_projects = [
             row for row in programme.get("projects", []) if isinstance(row, dict)
         ]
+        # Test residue is excluded from every rule's subject set, and named in the report, so
+        # the exclusion is visible rather than a silent filter.
+        self.excluded_test_projects = [
+            {"key": row.get("key"), "reason": test_row_reason(row)}
+            for row in all_projects
+            if test_row_reason(row)
+        ]
+        self.projects = [row for row in all_projects if not test_row_reason(row)]
         self.by_key = {row.get("key"): row for row in self.projects if row.get("key")}
         self.by_id = {row.get("id"): row for row in self.projects if row.get("id")}
         self.seed_by_key = {
@@ -250,6 +284,15 @@ class Dataset:
         phase = entry.get("adm_phase") or meta.get("adm_phase")
         plateau = entry.get("plateau") or meta.get("plateau")
         return (str(phase).lower() if phase else None, plateau)
+
+    def projection(self, name: str) -> list[dict[str, Any]] | None:
+        """A published MSP projection: None when the section is absent, a list otherwise."""
+        value = self.msp.get(name)
+        if value is None:
+            return None
+        if not isinstance(value, list):
+            return []
+        return [row for row in value if isinstance(row, dict)]
 
 
 class Audit:
@@ -390,6 +433,282 @@ class Audit:
                     "no WBS node is published for the active project",
                 )
 
+    # ── SAFe §8.2 ────────────────────────────────────────────────────────────────────
+
+    def safe(self) -> None:
+        """The SAFe planning, demonstration and learning controls on the tranche record."""
+        authorising = set(
+            self.standard.get("programme", {}).get("tranche_states_authorising_delivery", [])
+        )
+        cadences = self.data.projection("cadences")
+        carrying = self.carrying_tranches()
+
+        for tranche in carrying:
+            subject = self.tranche_subject(tranche)
+            # cadence_absent owns the globally-empty case; these rules are per tranche.
+            if cadences and not self.cadence_for(cadences, tranche, "pi"):
+                self.add(
+                    "pi_cadence_missing",
+                    "P1",
+                    subject,
+                    "the tranche carries projects but has no PI cadence for its period",
+                )
+            if cadences and not self.cadence_for(cadences, tranche, "refinement"):
+                self.add(
+                    "backlog_refinement_missing",
+                    "P1",
+                    subject,
+                    "the tranche has no refinement cadence for its period",
+                )
+
+        for tranche in carrying:
+            if tranche.get("state") not in authorising:
+                continue
+            subject = self.tranche_subject(tranche) + " PI"
+            if not self.pi_output("pi-plan", tranche):
+                self.add(
+                    "pi_plan_missing",
+                    "P0",
+                    subject,
+                    "the PI carried by an authorised tranche has no published pi-plan output",
+                )
+            if not self.pi_output("pi-objectives", tranche):
+                self.add(
+                    "pi_objectives_missing",
+                    "P1",
+                    subject,
+                    "the PI carried by an authorised tranche has no published pi-objectives output",
+                )
+
+        self.demo_credits(authorising)
+        self.retro_lessons(cadences)
+        self.wsjf_inputs()
+
+    def pi_output(self, category: str, tranche: dict[str, Any]) -> bool:
+        """The PI artefact must name this tranche, not merely exist somewhere."""
+        programme_key = self.standard.get("programme", {}).get("project_key", "P0")
+        needle = self.tranche_subject(tranche).replace(" ", "-").lower()
+        rows = self.data.outputs.get("outputs", []) if isinstance(self.data.outputs, dict) else []
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            if row.get("category") != category or row.get("project_key") != programme_key:
+                continue
+            label = f"{row.get('title') or ''} {row.get('unit') or ''}".lower()
+            if needle in label:
+                return True
+        return False
+
+    def carrying_tranches(self) -> list[dict[str, Any]]:
+        declared = set()
+        for project in self.data.projects:
+            try:
+                declared.add(int((project.get("meta") or {}).get("tranche")))
+            except (TypeError, ValueError):
+                continue
+        carrying = []
+        for tranche in self.data.tranches:
+            try:
+                number = int(tranche.get("number"))
+            except (TypeError, ValueError):
+                continue
+            if number in declared:
+                carrying.append(tranche)
+        return carrying
+
+    @staticmethod
+    def tranche_subject(tranche: dict[str, Any]) -> str:
+        return f"tranche {tranche.get('number')}"
+
+    @staticmethod
+    def cadence_kind(cadence: dict[str, Any]) -> str:
+        return str(cadence.get("kind") or "").lower()
+
+    @staticmethod
+    def tranche_periods(tranche: dict[str, Any]) -> set[str]:
+        """The tranche projection has no period column today; accept one, plus its number."""
+        values: set[str] = set()
+        meta = tranche.get("meta") if isinstance(tranche.get("meta"), dict) else {}
+        for source in (tranche, meta):
+            for field in ("period", "pi", "pi_number"):
+                value = source.get(field)
+                if value not in (None, ""):
+                    values.add(str(value))
+        if tranche.get("number") is not None:
+            values.add(str(tranche.get("number")))
+        return values
+
+    def cadence_covers(self, cadence: dict[str, Any], tranche: dict[str, Any]) -> bool:
+        """The cadence projection carries a period and optional meta, not a tranche column."""
+        meta = cadence.get("meta") if isinstance(cadence.get("meta"), dict) else {}
+        identifiers = {str(tranche.get("id")), str(tranche.get("number"))}
+        periods = self.tranche_periods(tranche)
+        for source in (cadence, meta):
+            for field in ("tranche_id", "tranche_number", "tranche"):
+                value = source.get(field)
+                if value not in (None, "") and str(value) in identifiers:
+                    return True
+            for field in ("period", "pi", "pi_number"):
+                value = source.get(field)
+                if value not in (None, "") and str(value) in periods:
+                    return True
+        return False
+
+    def cadence_for(
+        self,
+        cadences: list[dict[str, Any]] | None,
+        tranche: dict[str, Any],
+        kind: str,
+    ) -> bool:
+        if not cadences:
+            return False
+        return any(
+            self.cadence_kind(row) == kind and self.cadence_covers(row, tranche)
+            for row in cadences
+        )
+
+    def demo_credits(self, authorising: set[str]) -> None:
+        nodes = self.data.projection("wbs_nodes")
+        if nodes is None:
+            self.unprovable(
+                "demo_credit_missing",
+                "msp.wbs_nodes",
+                "the snapshot does not carry the WBS projection",
+            )
+            return
+        credits = self.data.projection("demo_credits")
+        if credits is None:
+            self.unprovable(
+                "demo_credit_missing",
+                "msp.demo_credits",
+                "the snapshot does not carry the demo-credit projection",
+            )
+            return
+        for node in nodes:
+            if node.get("kind") != "deliverable" or node.get("status") != "accepted":
+                continue
+            tranche = self.node_tranche(node)
+            if tranche is None or tranche.get("state") not in authorising:
+                continue
+            subject = self.node_project_key(node)
+            linked = [row for row in credits if row.get("deliverable_id") == node.get("id")]
+            if not linked:
+                self.add(
+                    "demo_credit_missing",
+                    "P1",
+                    subject,
+                    f"accepted deliverable {self.wbs_subject(node)} in an authorised tranche has no demo credit",
+                )
+            for credit in linked:
+                if not non_empty(credit.get("evidence")):
+                    self.add(
+                        "demo_credit_missing",
+                        "P1",
+                        subject,
+                        f"the demo credit for {self.wbs_subject(node)} carries empty evidence",
+                    )
+
+    def retro_lessons(self, cadences: list[dict[str, Any]] | None) -> None:
+        # cadence_absent owns the globally-empty case; these rules are per tranche.
+        if not cadences:
+            return
+        lessons = self.data.projection("lessons")
+        if lessons is None:
+            self.unprovable(
+                "retro_lesson_missing",
+                "msp.lessons",
+                "the snapshot does not carry the lessons projection",
+            )
+            return
+        for tranche in self.data.tranches:
+            if tranche.get("state") != "closed":
+                continue
+            subject = self.tranche_subject(tranche)
+            retro = [
+                row
+                for row in cadences
+                if self.cadence_kind(row) == "retro" and self.cadence_covers(row, tranche)
+            ]
+            if not retro:
+                self.add(
+                    "retro_lesson_missing",
+                    "P1",
+                    subject,
+                    "the closed tranche has no retro cadence for its period",
+                )
+                continue
+            retro_ids = {str(row.get("id")) for row in retro if row.get("id") is not None}
+            taught = any(
+                str(row.get("cadence_id")) in retro_ids and non_empty(row.get("statement"))
+                for row in lessons
+            )
+            if not taught:
+                self.add(
+                    "retro_lesson_missing",
+                    "P1",
+                    subject,
+                    "the tranche's retro produced no lesson",
+                )
+
+    def wsjf_inputs(self) -> None:
+        nodes = self.data.projection("wbs_nodes")
+        if nodes is None:
+            self.unprovable(
+                "wsjf_inputs_missing",
+                "msp.wbs_nodes",
+                "the snapshot does not carry the WBS projection",
+            )
+            return
+        for node in nodes:
+            if node.get("kind") != "deliverable":
+                continue
+            problems = []
+            size = self.as_number(node.get("job_size"))
+            if size is None or size < 1:
+                problems.append("job_size is missing or below 1")
+            values = [
+                self.as_number(node.get(field))
+                for field in ("business_value", "time_criticality", "risk_reduction")
+            ]
+            if all(value is None or value <= 0 for value in values):
+                problems.append("business_value, time_criticality and risk_reduction are all zero")
+            if problems:
+                self.add(
+                    "wsjf_inputs_missing",
+                    "P1",
+                    self.node_project_key(node),
+                    f"{self.wbs_subject(node)}: " + "; ".join(problems),
+                )
+
+    def node_tranche(self, node: dict[str, Any]) -> dict[str, Any] | None:
+        project = self.data.by_id.get(node.get("project_id"))
+        if project is None:
+            return None
+        try:
+            number = int((project.get("meta") or {}).get("tranche"))
+        except (TypeError, ValueError):
+            return None
+        return self.data.tranche_by_number.get(number)
+
+    def node_project_key(self, node: dict[str, Any]) -> str:
+        project = self.data.by_id.get(node.get("project_id"))
+        if project is not None and project.get("key"):
+            return str(project.get("key"))
+        return self.wbs_subject(node)
+
+    @staticmethod
+    def wbs_subject(node: dict[str, Any]) -> str:
+        return str(node.get("id") or node.get("title") or "?")
+
+    @staticmethod
+    def as_number(value: Any) -> float | None:
+        if value is None or isinstance(value, bool):
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
     def run(self) -> list[dict[str, Any]]:
         self.snapshot_schema()
         self.programme_outputs()
@@ -411,6 +730,7 @@ class Audit:
         self.dependencies()
         self.cadence()
         self.wbs()
+        self.safe()
         self.gaps.sort(
             key=lambda gap: (
                 SEVERITY_ORDER.get(gap["severity"], 9),
@@ -906,6 +1226,12 @@ class Audit:
                     active_waiver = any(
                         row.get("review_id") == review.get("id")
                         and row.get("status") == "active"
+                        and str(
+                            row.get("kind")
+                            or row.get("waiver_type")
+                            or "architecture_waiver"
+                        )
+                        == "architecture_waiver"
                         and parse_time(row.get("reassessment_at"))
                         and parse_time(row.get("reassessment_at")) > datetime.now(timezone.utc)
                         for row in self.data.waivers
@@ -921,8 +1247,25 @@ class Audit:
     def waivers(self) -> None:
         if "waivers" not in self.data.architecture:
             return
+        review_ids = {str(row.get("id")) for row in self.data.reviews_arch}
         for waiver in self.data.waivers:
             subject = str(waiver.get("id"))
+            kind = str(
+                waiver.get("kind") or waiver.get("waiver_type") or "architecture_waiver"
+            )
+            if kind != "architecture_waiver" or str(
+                waiver.get("review_id") or ""
+            ) not in review_ids:
+                # Only an architecture_waiver — one attached to a compliance review — is a
+                # legal TOGAF deviation. A programme waiver is a finding, never a permit.
+                self.add(
+                    "waiver_not_permitted",
+                    "P1",
+                    subject,
+                    "the waiver is a programme waiver or is not attached to an architecture "
+                    "compliance review; programme work permits no waiver",
+                )
+                continue
             missing = [
                 field
                 for field in ("owner_user_id", "reason", "reassessment_at")
@@ -933,7 +1276,7 @@ class Audit:
                     "waiver_invalid",
                     "P1",
                     subject,
-                    "waiver is missing " + ", ".join(missing),
+                    "architecture waiver is missing " + ", ".join(missing),
                 )
                 continue
             if waiver.get("status") == "active":
@@ -943,7 +1286,7 @@ class Audit:
                         "waiver_invalid",
                         "P2",
                         subject,
-                        "active waiver is past its reassessment date",
+                        "active architecture waiver is past its reassessment date",
                     )
 
     def capability_artefacts(self) -> None:
@@ -1127,11 +1470,15 @@ def render_markdown(
     for gap in gaps:
         counts[gap["severity"]] = counts.get(gap["severity"], 0) + 1
     manifest = dataset.manifest
+    # The published page must not carry the operator's home directory: name the retained snapshot
+    # by its last two path components (`issue-526-2a1ff31d/data`), which identifies it without a
+    # machine-specific absolute path.
+    snapshot_label = "/".join(Path(snapshot).parts[-2:])
     lines = [
         "# MSP/TOGAF conformance gap register",
         "",
         f"Snapshot: `{manifest.get('git_sha', 'unknown')}` generated `{manifest.get('generated_at', 'unknown')}` "
-        f"from `{snapshot}`.",
+        f"from `{snapshot_label}`.",
         "",
         "| Severity | Count |",
         "|---|---:|",
@@ -1149,6 +1496,21 @@ def render_markdown(
         lines.append(
             f"| `{gap['rule']}` | `{gap['subject']}` | {gap['severity']} | {detail} |"
         )
+    if dataset.excluded_test_projects:
+        lines.extend(
+            [
+                "",
+                "## Excluded test rows",
+                "",
+                "These rows are test residue, not programme projects. They are excluded by the",
+                "predicate in `test_row_reason` and are listed here so the exclusion is visible.",
+                "",
+                "| Key | Reason |",
+                "|---|---|",
+            ]
+        )
+        for row in dataset.excluded_test_projects:
+            lines.append(f"| `{row.get('key')}` | {row.get('reason')} |")
     lines.extend(
         [
             "",
@@ -1215,10 +1577,57 @@ def baseline_entries(gaps: list[dict[str, Any]], standard: dict[str, Any]) -> di
     }
 
 
+def accepted_baseline(
+    gaps: list[dict[str, Any]],
+    standard: dict[str, Any],
+    dataset: Dataset,
+    snapshot_dir: Path,
+    *,
+    accepted_by: str,
+    approver: str,
+    acceptance_ref: str,
+    delegation_ref: str,
+    accepted_at: str | None = None,
+) -> dict[str, Any]:
+    """A proposal plus the record of who accepted it, and of what snapshot.
+
+    The strict gate refuses a ledger without this header, so an accepted ledger can only be
+    produced by naming the decision that accepted it and the bytes it was taken from.  A
+    proposal is produced by ``baseline_entries`` and must never be copied over the accepted
+    file: that is how a report silently becomes an acceptance.
+    """
+    document = baseline_entries(gaps, standard)
+    manifest_path = Path(snapshot_dir) / "manifest.json"
+    if not manifest_path.exists():
+        fail(f"cannot accept a baseline: no manifest at {manifest_path}")
+    document["accepted_at"] = accepted_at or datetime.now(timezone.utc).isoformat()
+    document["accepted_by"] = accepted_by
+    document["approver"] = approver
+    document["acceptance_ref"] = acceptance_ref
+    document["delegation_ref"] = delegation_ref
+    document["snapshot"] = {
+        "git_sha": dataset.manifest.get("git_sha"),
+        "generated_at": dataset.manifest.get("generated_at"),
+        "manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        "outputs": len(dataset.outputs.get("outputs") or []),
+    }
+    return document
+
+
 def check_strict(
     gaps: list[dict[str, Any]], baseline: dict[str, Any], fail_on: set[str]
 ) -> list[str]:
     failures: list[str] = []
+    # The header is the acceptance: a baseline without one is a list, not an accepted record.
+    for field in (
+        "version", "accepted_at", "accepted_by", "approver", "acceptance_ref", "delegation_ref",
+    ):
+        if not baseline.get(field):
+            failures.append(f"baseline header is missing {field}")
+    snapshot = baseline.get("snapshot") or {}
+    for field in ("git_sha", "generated_at", "manifest_sha256", "outputs"):
+        if not snapshot.get(field):
+            failures.append(f"baseline snapshot is missing {field}")
     current = {gap_key(gap): gap for gap in gaps}
     recorded: dict[tuple[str, str], dict[str, Any]] = {}
     today = datetime.now(timezone.utc).date()
@@ -1228,6 +1637,8 @@ def check_strict(
         key = (str(entry.get("rule")), str(entry.get("subject")))
         recorded[key] = entry
         name = f"{entry.get('rule')} {entry.get('subject')}"
+        if not str(entry.get("owner") or "").strip():
+            failures.append(f"baseline entry has no owner: {name}")
         if entry.get("disposition") not in DISPOSITIONS:
             failures.append(
                 f"baseline entry has no valid disposition: {name} ({entry.get('disposition')!r})"
@@ -1288,6 +1699,7 @@ def standard_checks(standard: dict[str, Any], seed_dir: Path) -> None:
         "requester_is_approver",
         "compliance_review_missing",
         "waiver_invalid",
+        "waiver_not_permitted",
         "capability_artefacts",
         "mandatory_artefacts",
         "closed_without_closure_review",
@@ -1300,6 +1712,13 @@ def standard_checks(standard: dict[str, Any], seed_dir: Path) -> None:
         "dependency_untyped",
         "cadence_absent",
         "wbs_absent",
+        "pi_plan_missing",
+        "pi_cadence_missing",
+        "pi_objectives_missing",
+        "demo_credit_missing",
+        "retro_lesson_missing",
+        "wsjf_inputs_missing",
+        "backlog_refinement_missing",
     }
     unknown = sorted(set(rules) - known)
     missing = sorted(known - set(rules))
@@ -1454,6 +1873,81 @@ def _subject_record(
     }
 
 
+# A deep-review finding names the artefact it reviewed, not a ledger id: the converter prefixes
+# its key, maps its three kinds onto the register's package kinds, and takes the section from
+# the review. An unknown kind is refused rather than guessed.
+DEEP_REVIEW_KINDS = {"code": "CODE", "record+code": "CODE", "standard": "STANDARD"}
+# `record+code` names a finding whose code capability may already exist. At this head
+# `programmes.update` accepts `shared_config` and `lessons.propose`/`retros.*` exist, so the
+# blocker is the record write, not new code. The override is per finding and evidence-backed;
+# it never widens an unknown kind.
+DEEP_REVIEW_KIND_OVERRIDES = {
+    "w3-shared-config-1": "RECORD",
+    "w3-lessons-1": "RECORD",
+}
+DEEP_REVIEW_SPEC = {
+    "w3-action-registry-projection-1": "§8.5",
+    "w3-licensing-frame-1": "§8.5",
+    "w3-verdict-t18-1": "§12",
+}
+
+
+def deep_review_findings(path: Path, output_standard: dict[str, Any]) -> list[dict[str, Any]]:
+    """Convert a deep-review sidecar into the findings-ledger shape the register reads.
+
+    The sidecar's `evidence` is one prose paragraph, so it becomes both the ledger `problem`
+    and the single evidence quote. `standard` comes from the artefact's template in
+    `seed/output-standard.json`; an artefact with no template is SPEC. The section derives
+    from the template's standard (MSP → §8.3), except where the review names it, and is §8
+    otherwise.
+    """
+    document = read_json(path)
+    findings = document.get("findings")
+    if not isinstance(findings, list):
+        fail(f"the deep-review sidecar {path} has no findings list")
+    try:
+        evidence_path = path.resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        evidence_path = str(path)
+    converted: list[dict[str, Any]] = []
+    for finding in findings:
+        if not isinstance(finding, dict):
+            fail(f"the deep-review sidecar {path} contains a non-object finding")
+        key = str(finding.get("key") or "").strip()
+        if not key:
+            fail(f"the deep-review sidecar {path} contains a finding with no key")
+        raw_kind = str(finding.get("kind") or "").strip()
+        kind = DEEP_REVIEW_KINDS.get(raw_kind)
+        if kind is None:
+            fail(
+                f"the deep-review finding {key!r} has unknown kind {raw_kind!r}; "
+                f"expected one of {', '.join(sorted(DEEP_REVIEW_KINDS))}"
+            )
+        kind = DEEP_REVIEW_KIND_OVERRIDES.get(key, kind)
+        _, _, template_key = str(finding.get("artifact") or "").partition("#")
+        template = (output_standard.get("templates") or {}).get(template_key) or {}
+        standard = str(template.get("standard") or "SPEC")
+        spec = DEEP_REVIEW_SPEC.get(key) or ("§8.3" if standard == "MSP" else "§8")
+        evidence = str(finding.get("evidence") or "")
+        converted.append(
+            {
+                "id": f"dr-{key}",
+                "standard": standard,
+                "spec": spec,
+                "severity": finding.get("severity"),
+                "title": finding.get("title"),
+                "problem": evidence,
+                "evidence": [
+                    {"source": "deep-review", "path": evidence_path, "quote": evidence}
+                ],
+                "acceptance": finding.get("acceptance"),
+                "owner_project": finding.get("owner_project"),
+                "kind": kind,
+            }
+        )
+    return converted
+
+
 def build_register(
     gaps: list[dict[str, Any]],
     baseline: dict[str, Any],
@@ -1465,10 +1959,10 @@ def build_register(
     """Project the gap register into labelled rework packages, deterministically.
 
     P0 is never grouped (one package per rule and subject). P1–P3 are grouped by the rule's
-    scope (project / tranche / programme) and split at [`REGISTER_MAX_SUBJECTS`]. Baseline
-    dispositions are respected: `waiver` and `unprovable` packages are `suppressed` and counted,
-    never hidden. A checked-in v1 finding is dropped only when it names the data gap it
-    duplicates with `duplicate_of`.
+    scope (project / tranche / programme) and split at [`REGISTER_MAX_SUBJECTS`]. No
+    disposition suppresses a package: every open row computes as an open gap (ADR 0012). A
+    checked-in v1 finding is dropped only when it names the data gap it duplicates with
+    `duplicate_of`.
     """
     entries = {
         (str(entry.get("rule")), str(entry.get("subject"))): entry
@@ -1523,13 +2017,71 @@ def build_register(
         if duplicate_of and str(duplicate_of) in data_keys:
             duplicates.append(identifier)
             continue
+        # The residual-waiver legality check survives: a waiver names who accepted it, the
+        # decision that records it, why, and when it must be reassessed, and anything less is
+        # refused. A legal programme waiver is still not a disposition (ADR 0012): the finding
+        # stays open and the waiver itself becomes a `waiver_not_permitted` finding.
+        disposition = "rework"
+        waiver = finding.get("waiver")
+        if waiver is not None:
+            if not isinstance(waiver, dict):
+                fail(f"the finding {identifier} has a non-object waiver")
+            missing = [
+                field
+                for field in ("accepted_by", "accepted_at", "decision_ref", "expires", "reason")
+                if not str(waiver.get(field) or "").strip()
+            ]
+            if missing:
+                fail(f"the finding {identifier} waiver is missing " + ", ".join(missing))
+            try:
+                expires = datetime.fromisoformat(
+                    str(waiver["expires"]).replace("Z", "+00:00")
+                ).date()
+            except ValueError:
+                fail(
+                    f"the finding {identifier} waiver expires is not a date: "
+                    f"{waiver.get('expires')!r}"
+                )
+            if expires < datetime.now(timezone.utc).date():
+                fail(f"the finding {identifier} waiver expired at {waiver['expires']}")
         owner = str(finding["owner_project"])
         scope = owner if owner in dataset.by_key else "programme"
+        if waiver is not None:
+            add(
+                f"waiver_not_permitted:{scope}",
+                "waiver_not_permitted",
+                rule_row(standard, "waiver_not_permitted"),
+                scope,
+                {
+                    "rule": "waiver_not_permitted",
+                    "severity": str(finding["severity"]),
+                    "subject": identifier,
+                    "detail": (
+                        f"finding {identifier} carries an owner-accepted waiver; "
+                        "programme work permits no waiver"
+                    ),
+                    "disposition": "rework",
+                    "evidence": [
+                        {"source": "code", **item}
+                        for item in finding["evidence"]
+                        if isinstance(item, dict)
+                    ],
+                },
+                False,
+            )
         row = {
             "severity": str(finding["severity"]),
             "standard": str(finding["standard"]),
             "spec": str(finding["spec"]),
             "artefact": str(finding.get("area", "code")),
+            # R11's package kind. A ledger finding is a product defect (CODE); an artefact
+            # finding states its own cause (STANDARD when the template cannot resolve the
+            # section, RECORD when the rows or documents are missing). A finding written by an
+            # older generator carries no kind and reads as RECORD.
+            "kind": str(
+                finding.get("kind")
+                or ("CODE" if identifier.startswith("v1-") else "RECORD")
+            ),
             "scope": "project" if owner in dataset.by_key else "programme",
             "owner_project": owner,
             "rework": {
@@ -1542,7 +2094,7 @@ def build_register(
             "severity": str(finding["severity"]),
             "subject": owner,
             "detail": str(finding["problem"]),
-            "disposition": "rework",
+            "disposition": disposition,
             "evidence": [
                 {"source": "code", **item}
                 for item in finding["evidence"]
@@ -1609,6 +2161,7 @@ def build_register(
                 {
                     "key": key,
                     "rule": rule,
+                    "kind": str(row.get("kind") or "RECORD"),
                     "standard": str(row.get("standard", "SPEC")),
                     "spec": str(row.get("spec", "")),
                     "artefact": str(row.get("artefact", "")),
@@ -1709,10 +2262,13 @@ def _summary(
     by_standard: dict[str, int] = {}
     by_severity: dict[str, int] = {}
     by_status: dict[str, int] = {}
+    by_kind: dict[str, int] = {}
     for package in packages:
         by_standard[package["standard"]] = by_standard.get(package["standard"], 0) + 1
         by_severity[package["severity"]] = by_severity.get(package["severity"], 0) + 1
         by_status[package["status"]] = by_status.get(package["status"], 0) + 1
+        kind = str(package.get("kind") or "RECORD")
+        by_kind[kind] = by_kind.get(kind, 0) + 1
     return {
         "packages": len(packages),
         "open": by_status.get("open", 0),
@@ -1723,6 +2279,7 @@ def _summary(
         "by_standard": dict(sorted(by_standard.items())),
         "by_severity": {key: by_severity[key] for key in sorted(by_severity)},
         "by_status": dict(sorted(by_status.items())),
+        "by_kind": dict(sorted(by_kind.items())),
     }
 
 
@@ -1785,6 +2342,10 @@ def self_test() -> None:
                 {"project_key": "P0", "category": category} for category in p0["now"]
             ]
             + [
+                {"project_key": "P0", "category": "pi-plan", "title": "tranche-0 PI plan"},
+                {"project_key": "P0", "category": "pi-objectives", "title": "tranche-0 PI objectives"},
+                {"project_key": "P0", "category": "pi-plan", "title": "tranche-1 PI plan"},
+                {"project_key": "P0", "category": "pi-objectives", "title": "tranche-1 PI objectives"},
                 {"project_key": "P0", "category": "closure-review"},
                 {"project_key": "T1", "category": "project-brief"},
                 {"project_key": "T1", "category": "evidence"},
@@ -1811,6 +2372,20 @@ def self_test() -> None:
             "benefit_transitions": [],
             "programme_baselines": [
                 {"kind": "management"}, {"kind": "governance"}, {"kind": "boundary"}
+            ],
+            "cadences": [
+                {"id": "cd0-pi", "kind": "pi", "tranche_number": "0"},
+                {"id": "cd0-ref", "kind": "refinement", "tranche_number": "0"},
+                {"id": "cd0-retro", "kind": "retro", "tranche_number": "0"},
+                {"id": "cd1-pi", "kind": "pi", "tranche_number": "1"},
+                {"id": "cd1-ref", "kind": "refinement", "tranche_number": "1"},
+            ],
+            "wbs_nodes": [
+                {"id": "w0", "project_id": "t1", "kind": "epic", "status": "open"}
+            ],
+            "demo_credits": [],
+            "lessons": [
+                {"id": "l0", "cadence_id": "cd0-retro", "statement": "keep the gate green"}
             ],
         }
         architecture = {
@@ -1902,6 +2477,47 @@ def self_test() -> None:
     if base_gaps:
         fail(f"the self-test base is not conformant: {base_gaps}")
 
+    # A report is evidence, not an acceptance: the proposal carries no header and strict
+    # refuses it; only the accepted form, which names the decision and the snapshot bytes,
+    # passes. This is the trap that let `--report` overwrite an accepted ledger.
+    proposal = baseline_entries(base_gaps, base().standard)
+    if "accepted_at" in proposal or "snapshot" in proposal:
+        fail("a proposal must not carry an acceptance header")
+    proposal_failures = check_strict(base_gaps, proposal, {"P0", "P1"})
+    if not any("header is missing accepted_at" in item for item in proposal_failures):
+        fail(f"strict accepted a proposal: {proposal_failures}")
+    with tempfile.TemporaryDirectory() as snapshot_dir:
+        fixture = base()
+        Path(snapshot_dir, "manifest.json").write_text(
+            json.dumps(fixture.manifest), encoding="utf-8"
+        )
+        accepted = accepted_baseline(
+            base_gaps,
+            fixture.standard,
+            fixture,
+            Path(snapshot_dir),
+            accepted_by="self-test",
+            approver="self-test-approver",
+            acceptance_ref="ref",
+            delegation_ref="delegation",
+            accepted_at="2026-11-22T00:00:00Z",
+        )
+        accepted_failures = check_strict(base_gaps, accepted, {"P0", "P1"})
+        if accepted_failures:
+            fail(f"strict refused the accepted ledger: {accepted_failures}")
+        if accepted["snapshot"]["manifest_sha256"] != hashlib.sha256(
+            Path(snapshot_dir, "manifest.json").read_bytes()
+        ).hexdigest():
+            fail("the accepted ledger does not pin the manifest it was taken from")
+
+    # Test residue is excluded by a named predicate and stays visible in the report.
+    if not test_row_reason({"key": "AAA-UI-PROOF-285-2026-11-19T07-3-2"}):
+        fail("a known pre-marker e2e project was not recognised as test residue")
+    if not test_row_reason({"key": "X", "meta": {"test_row": True}}):
+        fail("meta.test_row was not recognised")
+    if test_row_reason({"key": "PLATFORM", "meta": {"test_row": False}}):
+        fail("a real project was excluded as test residue")
+
     def expect(mutate, rule: str, severity: str | None = None) -> None:
         data = base()
         mutate(data)
@@ -1991,6 +2607,72 @@ def self_test() -> None:
 
     expect(no_baselines, "programme_baselines")
 
+    # SAFe §8.2: the PI controls are per tranche and must refuse, not merely report.
+    def drop_pi_output(data: Dataset, category: str, needle: str) -> None:
+        text = lambda row: f"{row.get('title') or ''} {row.get('unit') or ''}".lower()
+        data.outputs["outputs"][:] = [
+            row
+            for row in data.outputs["outputs"]
+            if not (row.get("category") == category and needle in text(row))
+        ]
+
+    expect(lambda data: drop_pi_output(data, "pi-plan", "tranche-1"),
+           "pi_plan_missing", "P0")
+    expect(lambda data: drop_pi_output(data, "pi-objectives", "tranche-0"),
+           "pi_objectives_missing", "P1")
+
+    def drop_cadence_for(data: Dataset, kind: str, tranche: str) -> None:
+        data.msp["cadences"][:] = [
+            row
+            for row in data.msp["cadences"]
+            if not (row.get("kind") == kind and row.get("tranche_number") == tranche)
+        ]
+
+    expect(lambda data: drop_cadence_for(data, "pi", "1"),
+           "pi_cadence_missing", "P1")
+    expect(lambda data: drop_cadence_for(data, "refinement", "1"),
+           "backlog_refinement_missing", "P1")
+
+    def add_deliverable(data: Dataset, **overrides: Any) -> None:
+        node = {
+            "id": "w1",
+            "project_id": "t1",
+            "kind": "deliverable",
+            "status": "accepted",
+            "job_size": 1,
+            "business_value": 5,
+            "time_criticality": 3,
+            "risk_reduction": 2,
+        }
+        node.update(overrides)
+        data.msp["wbs_nodes"].append(node)
+
+    expect(add_deliverable, "demo_credit_missing", "P1")
+
+    def empty_credit(data: Dataset) -> None:
+        add_deliverable(data)
+        data.msp["demo_credits"].append(
+            {"id": "cr1", "deliverable_id": "w1", "evidence": []}
+        )
+
+    expect(empty_credit, "demo_credit_missing", "P1")
+
+    def no_lessons(data: Dataset) -> None:
+        data.msp["lessons"].clear()
+
+    expect(no_lessons, "retro_lesson_missing", "P1")
+
+    def empty_lesson(data: Dataset) -> None:
+        data.msp["lessons"][0]["statement"] = ""
+
+    expect(empty_lesson, "retro_lesson_missing", "P1")
+
+    def zeroed_wsjf(data: Dataset) -> None:
+        add_deliverable(data, job_size=0, business_value=0,
+                        time_criticality=0, risk_reduction=0)
+
+    expect(zeroed_wsjf, "wsjf_inputs_missing", "P1")
+
     def seed_drift(data: Dataset) -> None:
         data.seed_by_key["T1"]["status"] = "closed"
 
@@ -2017,11 +2699,46 @@ def self_test() -> None:
     expect(transition_without_baseline, "transition_order")
 
     def invalid_waiver(data: Dataset) -> None:
-        row = {"id": "w1", "status": "active"}
+        row = {"id": "w1", "status": "active", "review_id": "r1"}
         data.architecture["waivers"].append(row)
         data.waivers.append(row)
 
     expect(invalid_waiver, "waiver_invalid")
+
+    def programme_waiver(data: Dataset) -> None:
+        # A waiver not attached to an architecture compliance review is programme work; it is
+        # a finding, not a legal deviation.
+        row = {"id": "w2", "status": "active", "review_id": "no-such-review"}
+        data.architecture["waivers"].append(row)
+        data.waivers.append(row)
+
+    expect(programme_waiver, "waiver_not_permitted")
+
+    def review_waiver(kind: str):
+        def mutate(data: Dataset) -> None:
+            data.by_key["T1"]["status"] = "closed"
+            data.published["T1"].add("closure-review")
+            data.reviews_arch[0]["level"] = "non_conformant"
+            row = {
+                "id": f"w-{kind}",
+                "status": "active",
+                "review_id": "r1",
+                "kind": kind,
+                "owner_user_id": "u1",
+                "reason": "self-test",
+                "reassessment_at": "2099-01-01T00:00:00+00:00",
+            }
+            data.architecture["waivers"].append(row)
+            data.waivers.append(row)
+
+        return mutate
+
+    # A programme waiver never suppresses a non-conformant compliance review; only an
+    # architecture_waiver on that review may.
+    expect(review_waiver("programme"), "waiver_not_permitted")
+    expect(review_waiver("programme"), "compliance_review_missing", "P0")
+    expect_absent(review_waiver("architecture_waiver"), "compliance_review_missing")
+    expect_absent(review_waiver("architecture_waiver"), "waiver_not_permitted")
 
     # capability_artefacts: the Preliminary set is checked once, at capability level.
     expect(lambda data: drop_artefact(data, "type-principles"), "capability_artefacts", "P1")
@@ -2073,16 +2790,59 @@ def self_test() -> None:
     drop_artefact(sample, "type-solution")
     sample_gaps = audit(sample)
     ledger = baseline_entries(sample_gaps, standard)
-    if check_strict(sample_gaps, ledger, {"P0", "P1"}):
+    accepted_ledger = dict(ledger)
+    accepted_ledger.update(
+        {
+            "accepted_at": "2026-11-21T00:00:00Z",
+            "accepted_by": "conveyor-e2e",
+            "approver": "conveyor-approver",
+            "acceptance_ref": "01a1ff54-eb5c-7581-91c6-4e1ea2cde8c7",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "snapshot": {
+                "git_sha": "d7293f96",
+                "generated_at": "2026-11-21T18:17:55Z",
+                "manifest_sha256": "ba8129",
+                "outputs": 116,
+            },
+        }
+    )
+    if check_strict(sample_gaps, accepted_ledger, {"P0", "P1"}):
         fail("strict rejects its own generated ledger")
     if [entry["disposition"] for entry in ledger["entries"]] != ["rework"]:
         fail(f"the base ledger carries {ledger['entries']}")
 
+    def accepted(entries: list[dict[str, Any]]) -> dict[str, Any]:
+        return {
+            "version": 1,
+            "accepted_at": "2026-11-21T00:00:00Z",
+            "accepted_by": "conveyor-e2e",
+            "approver": "conveyor-approver",
+            "acceptance_ref": "01a1ff54-eb5c-7581-91c6-4e1ea2cde8c7",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "snapshot": {
+                "git_sha": "d7293f96",
+                "generated_at": "2026-11-21T18:17:55Z",
+                "manifest_sha256": "ba8129",
+                "outputs": 116,
+            },
+            "entries": entries,
+        }
+
     def strict_failures(entries: list[dict[str, Any]]) -> str:
-        found = check_strict(sample_gaps, {"version": 1, "entries": entries}, {"P0", "P1"})
+        found = check_strict(sample_gaps, accepted(entries), {"P0", "P1"})
         if not found:
             fail(f"strict accepted {entries}")
         return " | ".join(found)
+
+    headerless = check_strict(
+        sample_gaps, {"version": 1, "entries": ledger["entries"]}, {"P0", "P1"}
+    )
+    if not any("header is missing accepted_by" in failure for failure in headerless):
+        fail("strict accepted a baseline without its acceptance header")
+    ownerless = [dict(entry) for entry in ledger["entries"]]
+    ownerless[0]["owner"] = ""
+    if "has no owner" not in strict_failures(ownerless):
+        fail("strict accepted an entry without an owner")
 
     missing_disposition = [dict(entry) for entry in ledger["entries"]]
     del missing_disposition[0]["disposition"]
@@ -2141,8 +2901,9 @@ def self_test() -> None:
     second = json.dumps([gap for gap in audit(base())], sort_keys=True)
     if first != second:
         fail("two audits of the same input differ")
-    # The rework register: P0 is never grouped, P1 splits deterministically at the cap, a waiver
-    # suppresses its package, a duplicate finding is folded, and a re-run is byte-identical.
+    # The rework register: P0 is never grouped, P1 splits deterministically at the cap, a
+    # waiver is refused as a disposition, a duplicate finding is folded, and a re-run is
+    # byte-identical.
     register_data = base()
     register_gaps = [
         {
@@ -2253,17 +3014,186 @@ def self_test() -> None:
         fail("a P0 gap was grouped")
     if not any(
         package["key"].startswith("benefit_baseline_placeholder")
-        and package["status"] == "suppressed"
+        and package["status"] == "open"
         for package in first["packages"]
     ):
-        fail("a waiver did not suppress its package")
+        fail("a baseline waiver suppressed its package; no disposition may suppress a gap")
+    # A finding's waiver is refused as a disposition: the finding stays open and the waiver is
+    # itself a `waiver_not_permitted` finding. A malformed waiver is still refused outright.
+    def with_waiver(waiver: dict[str, Any]) -> dict[str, Any]:
+        document = json.loads(json.dumps(register_findings))
+        document["findings"][0]["waiver"] = waiver
+        return document
+
+    valid_waiver = {
+        "accepted_by": "programme owner",
+        "accepted_at": "2026-11-22",
+        "decision_ref": "fixture-decision",
+        "expires": "2027-02-18",
+        "reason": "self-test residual",
+    }
+    waived = build_register(
+        register_gaps,
+        register_baseline,
+        with_waiver(valid_waiver),
+        standard,
+        register_data,
+        "fixture",
+    )
+    if not any(
+        package["rule"] == "v1-x-1" and package["status"] == "open"
+        for package in waived["packages"]
+    ):
+        fail("a finding waiver suppressed its package")
+    waiver_packages = [
+        package for package in waived["packages"] if package["rule"] == "waiver_not_permitted"
+    ]
+    if not waiver_packages:
+        fail("a programme waiver did not become a waiver_not_permitted finding")
+    if "v1-x-1" not in {
+        str(subject.get("subject"))
+        for package in waiver_packages
+        for subject in package["subjects"]
+    }:
+        fail("the waiver_not_permitted finding does not name the waivered finding")
+
+    def refused_waiver(waiver: dict[str, Any], why: str) -> None:
+        try:
+            build_register(
+                register_gaps,
+                register_baseline,
+                with_waiver(waiver),
+                standard,
+                register_data,
+                "fixture",
+            )
+        except SystemExit:
+            return
+        fail(f"an invalid finding waiver was accepted ({why})")
+
+    ownerless = dict(valid_waiver)
+    del ownerless["accepted_by"]
+    refused_waiver(ownerless, "no owner")
+    expired_waiver = dict(valid_waiver)
+    expired_waiver["expires"] = "2020-01-01"
+    refused_waiver(expired_waiver, "expired")
+
     if first["summary"]["duplicates"] != 1:
         fail("duplicate_of did not fold the finding")
     if not any(package["rule"] == "v1-x-1" for package in first["packages"]):
         fail("the v1 finding is not a package")
+    # R11's package kind: a ledger finding is CODE, a conformance gap is RECORD, and a kind the
+    # generator states (a template defect) is carried through as STANDARD.
+    kinds = {package["rule"]: package["kind"] for package in first["packages"]}
+    if kinds.get("v1-x-1") != "CODE":
+        fail(f"a v1 ledger finding is not a CODE package: {kinds.get('v1-x-1')}")
+    if not any(package["kind"] == "RECORD" for package in first["packages"]):
+        fail("a conformance gap is not a RECORD package")
+    if first["summary"]["by_kind"].get("CODE", 0) < 1:
+        fail("the summary does not count package kinds")
+    kinded = json.loads(json.dumps(register_findings))
+    kinded["findings"][0]["kind"] = "STANDARD"
+    standard_register = build_register(
+        register_gaps, register_baseline, kinded, standard, register_data, "fixture"
+    )
+    if not any(
+        package["rule"] == "v1-x-1" and package["kind"] == "STANDARD"
+        for package in standard_register["packages"]
+    ):
+        fail("a generator-declared STANDARD finding did not become a STANDARD package")
+
+    # A deep-review sidecar converts into the ledger shape the register reads: the template
+    # names the standard, the section derives from it, and the sidecar's kind becomes the
+    # package kind. A kind the converter does not know is refused, never guessed.
+    with tempfile.TemporaryDirectory() as sidecar_dir:
+        sidecar = Path(sidecar_dir) / "deep-review-findings.json"
+
+        def write_sidecar(kind: str) -> None:
+            sidecar.write_text(
+                json.dumps(
+                    {
+                        "schema": "w3-deep-review/v1",
+                        "findings": [
+                            {
+                                "key": "x-1",
+                                "kind": kind,
+                                "severity": "P1",
+                                "owner_project": "T1",
+                                "title": "a deep-review title",
+                                "evidence": "a deep-review paragraph",
+                                "acceptance": "a deep-review acceptance",
+                                "artifact": "seed/output-standard.json#mandate",
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+        write_sidecar("record+code")
+        converted = deep_review_findings(sidecar, output_standard)
+        if len(converted) != 1:
+            fail(f"a one-finding deep-review sidecar converted to {len(converted)} findings")
+        finding = converted[0]
+        if (
+            finding["id"] != "dr-x-1"
+            or finding["standard"] != "MSP"
+            or finding["spec"] != "§8.3"
+            or finding["kind"] != "CODE"
+            or finding["problem"] != "a deep-review paragraph"
+            or finding["evidence"]
+            != [
+                {
+                    "source": "deep-review",
+                    "path": str(sidecar),
+                    "quote": "a deep-review paragraph",
+                }
+            ]
+        ):
+            fail(f"the deep-review conversion is wrong: {finding}")
+        deep_register = build_register(
+            register_gaps,
+            register_baseline,
+            {"findings": converted},
+            standard,
+            register_data,
+            "fixture",
+        )
+        if not any(
+            package["rule"] == "dr-x-1"
+            and package["kind"] == "CODE"
+            and package["standard"] == "MSP"
+            and package["spec"] == "§8.3"
+            for package in deep_register["packages"]
+        ):
+            fail("a deep-review finding did not become its package with its kind")
+        write_sidecar("prose")
+        try:
+            deep_review_findings(sidecar, output_standard)
+        except SystemExit:
+            pass
+        else:
+            fail("an unknown deep-review kind was accepted")
     if first["scorecard"]["MSP"]["rules"] < 1:
         fail("the scorecard has no MSP rules")
 
+    # WP11: every standard rule is covered by exactly one category, source and verifier. The
+    # coverage instrument owns that property; the auditor does not self-test green without it.
+    coverage = ROOT / "scripts" / "check-standards-coverage.py"
+    if not coverage.is_file():
+        raise SystemExit(
+            "audit-programme-conformance: scripts/check-standards-coverage.py is missing"
+        )
+    for argv in (
+        [sys.executable, str(coverage)],
+        [sys.executable, str(coverage), "--self-test"],
+    ):
+        completed = subprocess.run(argv, capture_output=True, text=True)
+        if completed.returncode != 0:
+            tail = (completed.stdout + completed.stderr).strip().splitlines()[-3:]
+            raise SystemExit(
+                "audit-programme-conformance: standards coverage failed: " + " ".join(tail)
+            )
     print("audit-programme-conformance: self-test OK")
 
 
@@ -2284,6 +3214,18 @@ def main() -> None:
     parser.add_argument("--fail-on", default="P0,P1")
     parser.add_argument("--write-baseline", type=Path, default=None)
     parser.add_argument(
+        "--accept-baseline",
+        action="store_true",
+        help=(
+            "write the accepted ledger to --baseline; requires --accepted-by, --approver, "
+            "--acceptance-ref and --delegation-ref, and records the snapshot it was taken from"
+        ),
+    )
+    parser.add_argument("--accepted-by", default=None)
+    parser.add_argument("--approver", default=None)
+    parser.add_argument("--acceptance-ref", default=None)
+    parser.add_argument("--delegation-ref", default=None)
+    parser.add_argument(
         "--findings",
         type=Path,
         action="append",
@@ -2291,6 +3233,16 @@ def main() -> None:
         help=(
             "a findings ledger to merge into the rework register; repeatable, so the checked-in "
             "v1 ledger and the generated artefact findings are merged together"
+        ),
+    )
+    parser.add_argument(
+        "--deep-review",
+        type=Path,
+        action="append",
+        default=None,
+        help=(
+            "a deep-review sidecar whose findings are converted to ledger findings and merged "
+            "into the rework register; repeatable"
         ),
     )
     parser.add_argument(
@@ -2311,10 +3263,12 @@ def main() -> None:
     parser.add_argument("--check-standard", action="store_true")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
-    if args.findings and not (args.rework_out or args.rework_check):
-        parser.error("--findings is only meaningful with --rework-out or --rework-check")
-    if args.rework_check and not args.findings:
-        parser.error("--rework-check needs the findings ledgers via --findings")
+    if (args.findings or args.deep_review) and not (args.rework_out or args.rework_check):
+        parser.error(
+            "--findings and --deep-review are only meaningful with --rework-out or --rework-check"
+        )
+    if args.rework_check and not (args.findings or args.deep_review):
+        parser.error("--rework-check needs the findings ledgers via --findings or --deep-review")
 
     if args.self_test:
         self_test()
@@ -2339,6 +3293,8 @@ def main() -> None:
         for path in args.findings or []:
             ledger = read_json(path)
             merged_findings.extend(ledger.get("findings", []))
+        for path in args.deep_review or []:
+            merged_findings.extend(deep_review_findings(path, dataset.output_standard))
         findings_doc = {"findings": merged_findings}
         register = build_register(
             gaps, baseline_doc, findings_doc, standard, dataset, str(args.snapshot)
@@ -2384,6 +3340,7 @@ def main() -> None:
                 severity: sum(1 for gap in gaps if gap["severity"] == severity)
                 for severity in SEVERITY_ORDER
             },
+            "excluded_test_projects": dataset.excluded_test_projects,
             "gaps": gaps,
         }
         (args.out / "conformance-gap-register.json").write_text(
@@ -2392,21 +3349,53 @@ def main() -> None:
         (args.out / "conformance-gap-register.md").write_text(
             render_markdown(gaps, dataset, args.snapshot), encoding="utf-8"
         )
-        if args.report:
-            # The canonical regeneration writes the ledger beside its register, so the accepted
-            # set and the evidence are always produced by the same audit of the same snapshot.
-            (args.out / "conformance-baseline.json").write_text(
-                json.dumps(baseline_entries(gaps, standard), indent=2, sort_keys=False) + "\n",
-                encoding="utf-8",
+        # A report is evidence, not an acceptance: it must never write the accepted ledger.
+        # The accepted file is produced only by --accept-baseline, which names the decision.
+
+    if args.accept_baseline:
+        missing = [
+            flag
+            for flag, value in (
+                ("--accepted-by", args.accepted_by),
+                ("--approver", args.approver),
+                ("--acceptance-ref", args.acceptance_ref),
+                ("--delegation-ref", args.delegation_ref),
             )
+            if not str(value or "").strip()
+        ]
+        if missing:
+            parser.error("--accept-baseline requires " + ", ".join(missing))
+        accepted = accepted_baseline(
+            gaps,
+            standard,
+            dataset,
+            args.snapshot,
+            accepted_by=args.accepted_by,
+            approver=args.approver,
+            acceptance_ref=args.acceptance_ref,
+            delegation_ref=args.delegation_ref,
+        )
+        args.baseline.parent.mkdir(parents=True, exist_ok=True)
+        args.baseline.write_text(
+            json.dumps(accepted, indent=2, sort_keys=False) + "\n", encoding="utf-8"
+        )
+        print(
+            f"audit-programme-conformance: accepted {len(accepted['entries'])} entries from "
+            f"{args.snapshot} into {args.baseline}"
+        )
 
     if args.write_baseline:
         args.write_baseline.parent.mkdir(parents=True, exist_ok=True)
         baseline = baseline_entries(gaps, standard)
+        # Marked, so nobody can mistake a proposal for the accepted ledger.
+        baseline["status"] = "proposed"
         args.write_baseline.write_text(
             json.dumps(baseline, indent=2, sort_keys=False) + "\n", encoding="utf-8"
         )
-        print(f"audit-programme-conformance: wrote {len(baseline['entries'])} baseline entries")
+        print(
+            f"audit-programme-conformance: wrote {len(baseline['entries'])} proposed entries "
+            "(not an acceptance)"
+        )
 
     if args.strict:
         if not args.baseline.exists():

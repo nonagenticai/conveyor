@@ -277,6 +277,7 @@ async fn decided_by_kind_is_derived_from_the_actor_never_from_the_input() {
             conveyor_actions::registry::registry(),
             seeded.tenant,
             conveyor_actions::InvokeRequest {
+                credential_alias: None,
                 action: "approvals.decide".to_owned(),
                 input: json!({"approval_id": approval_id, "decision": "approve"}),
                 precondition: None,
@@ -331,6 +332,7 @@ async fn decided_by_kind_is_derived_from_the_actor_never_from_the_input() {
             conveyor_actions::registry::registry(),
             seeded.tenant,
             conveyor_actions::InvokeRequest {
+                credential_alias: None,
                 action: "approvals.decide".to_owned(),
                 input: json!({"approval_id": service_gate, "decision": "reject"}),
                 precondition: None,

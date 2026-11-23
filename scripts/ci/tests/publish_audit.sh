@@ -22,6 +22,7 @@ printf '# no-op: the publish test does not rebuild the pack\n' > "$tmp/docs/desi
 printf '#!/usr/bin/env bash\nprintf %%s "{\\"issues\\": []}" > "$1"\n' > "$tmp/scripts/fetch-issues.sh"
 cp "$repo/scripts/audit-programme-conformance.py" "$tmp/scripts/audit-programme-conformance.py"
 cp "$repo/scripts/generate-standards.py" "$tmp/scripts/generate-standards.py"
+cp "$repo/scripts/redact-public-register.py" "$tmp/scripts/redact-public-register.py"
 cp "$repo/governance/conformance.json" "$tmp/governance/conformance.json"
 cp "$repo/seed/programme.json" "$tmp/seed/programme.json"
 cp "$repo/seed/programme-definition.json" "$tmp/seed/programme-definition.json"
@@ -80,14 +81,18 @@ set -euo pipefail
 out=""
 docs=""
 conf=""
+manifest_only=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --out) out="$2"; shift 2 ;;
     --outputs-dir) docs="$2"; shift 2 ;;
     --conformance) conf="$2"; shift 2 ;;
+    --manifest-only) manifest_only=1; shift ;;
     *) shift ;;
   esac
 done
+# The finalise pass only rehashes the pack; it writes no snapshot and needs no outputs dir.
+[ "$manifest_only" = 1 ] && exit 0
 mkdir -p "$out" "$docs"
 cp "$FIXTURE"/*.json "$out/"
 cp "$FIXTURE_DOCS/outputs.js" "$docs/"

@@ -111,6 +111,7 @@ pub fn service_ctx(tenant: TenantId, app_key: &str) -> HandlerCtx {
         action: "workflow_runs.start",
         app_key: app_key.to_owned(),
         approval_id: None,
+        usage: None,
     }
 }
 

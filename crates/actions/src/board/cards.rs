@@ -60,6 +60,17 @@ pub(crate) async fn cards_create(
     if name.is_empty() {
         return Err(invalid("name", "required", "must not be empty"));
     }
+    // A coach card is the coach's own record of an interruption (SPEC_V2 §6.2): only
+    // `coach.interrupt` creates one, atomically with the interruption row that references it.
+    // Every other path — a person, an agent, the API — is refused, so an orphan coach card
+    // that no interruption can ever triage is impossible (T4, v1-p6-6).
+    if input.card_type_code.trim() == store::coach::COACH_CARD_TYPE && !input.internal_coach_card {
+        return Err(ActionError::new(
+            422,
+            "coach_card_internal",
+            "a coach card is created by coach.interrupt with its interruption, never by cards.create",
+        ));
+    }
 
     let meta = match input.meta {
         None => serde_json::Value::Object(serde_json::Map::new()),
@@ -465,6 +476,21 @@ async fn cards_move(
                 card_json(&current),
             )
             .await?;
+            // §6.2: a move is itself a flow observation — unless the engine is moving the card
+            // while handling an interruption that already exists (`err.card`, the coach's
+            // `move` remedy). A move inside one lane is a reorder, not a flow event (v1-p6-5).
+            if !input.internal_coach && from.list.id != to.list.id {
+                crate::coach::flow_inputs_after_move(
+                    &mut *tx,
+                    ctx,
+                    record.card.id,
+                    from.list.kind,
+                    to.list.kind,
+                    to.list.wip_limit,
+                    to.list.id,
+                )
+                .await;
+            }
             Ok(HandlerOutput::ok(card_out(&record)).with_etag(record.card.version.etag()))
         }
         None => Err(stale_card(tx, ctx.tenant, current.card.id, "cards.move").await?),

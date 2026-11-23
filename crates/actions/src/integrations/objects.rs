@@ -5,9 +5,11 @@
 //! through `GET /api/documents/{id}/content` (and the `documents.download` action) after the same tenant check
 //! as every other read. The store credential never reaches a client.
 //!
-//! The key is `t/<tenant>/<document>/<content-hash-prefix>`: tenant-scoped so a bucket listing is not a data
-//! leak, and content-addressed enough that two identical uploads in one tenant share a key only if they share
-//! every byte (the row still gets its own id and its own key suffix when the hash repeats — see `key_for`).
+//! The key is `tenant/<tenant>/<document>/<content-hash-prefix>`: tenant-scoped so a bucket listing is not a
+//! data leak, and content-addressed enough that two identical uploads in one tenant share a key only if they
+//! share every byte (the row still gets its own id and its own key suffix when the hash repeats — see
+//! `key_for`). The prefix is the same one the job-storage adapter uses (§11.10); a key outside it is refused
+//! before it reaches the store.
 //!
 //! Configuration is environment-only, in the same spirit as `service_url`:
 //!
@@ -150,6 +152,7 @@ impl Objects {
 
     /// Store `bytes` at `key`, replacing any object already there.
     pub async fn put(&self, key: &str, bytes: Bytes) -> Result<(), ObjectError> {
+        validate_key(key)?;
         let path = ObjectPath::from(key);
         self.store
             .put(&path, bytes.into())
@@ -160,6 +163,7 @@ impl Objects {
 
     /// Read the object at `key`.
     pub async fn get(&self, key: &str) -> Result<Bytes, ObjectError> {
+        validate_key(key)?;
         let path = ObjectPath::from(key);
         let result = self.store.get(&path).await.map_err(map_error)?;
         result.bytes().await.map_err(map_error)
@@ -167,6 +171,7 @@ impl Objects {
 
     /// Delete the object at `key`. A missing object is success: the caller is deleting a tombstone.
     pub async fn delete(&self, key: &str) -> Result<(), ObjectError> {
+        validate_key(key)?;
         let path = ObjectPath::from(key);
         match self.store.delete(&path).await {
             Ok(()) => Ok(()),
@@ -177,6 +182,7 @@ impl Objects {
 
     /// True when an object exists at `key`.
     pub async fn head(&self, key: &str) -> Result<bool, ObjectError> {
+        validate_key(key)?;
         let path = ObjectPath::from(key);
         match self.store.head(&path).await {
             Ok(_) => Ok(true),
@@ -186,13 +192,29 @@ impl Objects {
     }
 }
 
-/// The key for one document: `t/<tenant>/<document>/<hash-prefix>`.
+/// The key for one document: `tenant/<tenant>/<document>/<hash-prefix>`.
 ///
 /// The document id makes the key unique even when two uploads are byte-identical (a re-upload after a delete
 /// must not resurrect the deleted object), and the hash prefix makes an operator's listing legible.
 pub fn key_for(tenant: Uuid, document: Uuid, content_hash: &str) -> String {
     let prefix: String = content_hash.chars().take(16).collect();
-    format!("t/{tenant}/{document}/{prefix}")
+    format!(
+        "{}/{tenant}/{document}/{prefix}",
+        crate::storage::TENANT_PREFIX
+    )
+}
+
+/// Every key this adapter serves starts `tenant/` (§11.10). A key outside the scheme is refused
+/// before it reaches the store, so the bucket cannot carry a second tenant convention.
+fn validate_key(key: &str) -> Result<(), ObjectError> {
+    let prefix = format!("{}/", crate::storage::TENANT_PREFIX);
+    if key.starts_with(&prefix) {
+        Ok(())
+    } else {
+        Err(ObjectError::Store(format!(
+            "object key {key:?} lacks the {prefix:?} tenant prefix"
+        )))
+    }
 }
 
 fn map_error(error: object_store::Error) -> ObjectError {
@@ -210,4 +232,28 @@ fn non_empty(key: &str) -> Option<String> {
         .ok()
         .map(|value| value.trim().to_owned())
         .filter(|value| !value.is_empty())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_document_key_uses_the_shared_tenant_prefix() {
+        let tenant = Uuid::now_v7();
+        let key = key_for(tenant, Uuid::now_v7(), &"a".repeat(64));
+        let prefix = format!("{}/{tenant}/", crate::storage::TENANT_PREFIX);
+        assert!(
+            key.starts_with(&prefix),
+            "document key {key:?} must start {prefix:?}"
+        );
+    }
+
+    #[test]
+    fn a_key_outside_the_tenant_prefix_is_refused() {
+        let prefix = format!("{}/", crate::storage::TENANT_PREFIX);
+        assert!(validate_key(&format!("{prefix}t1/doc/hash")).is_ok());
+        assert!(validate_key("t/t1/doc/hash").is_err());
+        assert!(validate_key("../t1/doc/hash").is_err());
+    }
 }

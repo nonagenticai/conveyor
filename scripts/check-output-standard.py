@@ -10,6 +10,9 @@ and writes `docs/design/data/output-standard.js` for the console. This gate refu
   * a class that matches no project;
   * a category with no template, an empty or duplicate required heading, a required heading
     absent from the skeleton, or a URL in a skeleton;
+  * a mandatory template with no source or no document category;
+  * a SPEC_V2 §8.1, §8.2 or §8.3 named artefact with no category or template, or one of the
+    stream's new categories missing;
   * a console copy that is not byte-for-byte the standard's JSON.
 
 Run it before every push: `python3 scripts/check-output-standard.py`. `--self-test` proves the
@@ -34,8 +37,89 @@ ON_DEMAND = "decision"
 DEFAULT_ON_DEMAND = [ON_DEMAND]
 STANDARDS = {"MSP", "TOGAF", "SAFe", "PMP", "SPEC", "Delivery"}
 LEVELS = {"portfolio", "programme", "project", "work_package"}
-SUBJECT_KINDS = {"programme", "project", "tranche", "benefit", "capability", "phase", "card"}
+SUBJECT_KINDS = {"programme", "project", "tranche", "benefit", "capability", "phase", "artifact", "card"}
 SOURCE_KINDS = {"rows", "documents", "computed", "register"}
+# SPEC_V2 §8.1, §8.2 and §8.3 name the artefacts each standard requires. The prose is not a
+# parser (the programme seed follows the same rule), so the named lists are data: every named
+# artefact must resolve to a category, and the category must have a template.
+SPEC_ARTEFACT_CATEGORIES = {
+    "§8.1": (
+        "architecture-principles",
+        "adm-profile",
+        "artifact-standard",
+        "architecture-capability",
+        "architecture-governance-log",
+        "waiver",
+        "maturity-assessment",
+        "skills-assessment",
+        "phase-preliminary",
+        "phase-a",
+        "phase-b",
+        "phase-c",
+        "phase-d",
+        "phase-e",
+        "phase-f",
+        "phase-g",
+        "phase-h",
+        "statement-of-architecture-work",
+        "requirements-catalog",
+        "compliance-review",
+        "gap-analysis",
+        "candidate-solutions",
+        "project-context-diagram",
+        "benefits-diagram",
+        "architecture-artifact",
+        "architecture-artifact-instance",
+        "delivery-contract",
+        "statement-of-intent",
+        "request-for-architecture-work",
+        "adr-register",
+    ),
+    "§8.2": (
+        "safe-portfolio",
+        "safe-art",
+        "safe-cadence",
+        "pi-plan",
+        "pi-objectives",
+        "system-demo",
+        "inspect-adapt",
+    ),
+    "§8.3": (
+        "mandate",
+        "programme-brief",
+        "blueprint",
+        "business-case",
+        "benefit-profile",
+        "benefits-map",
+        "benefits-registry",
+        "benefit-evaluation",
+        "benefits-strategy",
+        "realization-plan",
+        "projects-dossier",
+        "programme-plan",
+        "tranche-plan",
+        "tranche-review",
+        "refined-vision",
+        "programme-baselines",
+        "programme-strategies",
+        "programme-risk-register",
+        "stakeholder-profiles",
+        "benefit-transition",
+    ),
+}
+# The operated registers, the programme mandate, benefits registry and evaluation, and TOGAF
+# phase E's named artefacts: the categories this standard used to omit.
+NEW_CATEGORIES = {
+    "programme-risk-register",
+    "adr-register",
+    "benefits-registry",
+    "benefit-evaluation",
+    "mandate",
+    "candidate-solutions",
+    "project-context-diagram",
+    "benefits-diagram",
+    "gap-analysis",
+}
 FENCE = re.compile(r"^\s*(```+|~~~+)")
 ATX = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
 
@@ -275,6 +359,30 @@ def validate(std: dict, seed: dict, console: dict) -> list[str]:
                     errors.append(
                         f"template {category!r} section {heading!r} computed source has no name"
                     )
+        if template.get("mandatory") is True:
+            # A mandatory artefact must be resolvable: at least one named source, and the
+            # document category the generator falls back to when its rows are empty. Without
+            # either, the artefact is permanently absent and no record can satisfy it.
+            if not sources:
+                errors.append(f"mandatory template {category!r} has no sources")
+            if not isinstance(document_category, str) or not document_category:
+                errors.append(f"mandatory template {category!r} has no document_category")
+
+    for clause, named in SPEC_ARTEFACT_CATEGORIES.items():
+        for category in named:
+            if category not in categories:
+                errors.append(
+                    f"SPEC_V2 {clause} names artefact category {category!r}, which does not exist"
+                )
+            elif category not in templates:
+                errors.append(
+                    f"SPEC_V2 {clause} names artefact category {category!r}, which has no template"
+                )
+    for category in sorted(NEW_CATEGORIES):
+        if category not in categories:
+            errors.append(f"new category {category!r} is missing from categories")
+        elif category not in templates:
+            errors.append(f"new category {category!r} has no template")
 
     if not isinstance(seed.get("projects"), list) or not seed["projects"]:
         errors.append("seed has no projects")
@@ -388,6 +496,22 @@ def self_test(std: dict, seed: dict, console: dict) -> int:
     bad = copy.deepcopy(std)
     bad["templates"]["benefit-profile"].pop("subject_kind", None)
     cases.append(("a template without a subject kind", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["tranche-review"].pop("sources", None)
+    cases.append(("a mandatory template without sources", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["tranche-review"].pop("document_category", None)
+    cases.append(("a mandatory template without a document category", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["templates"].pop("programme-risk-register", None)
+    cases.append(("a new category without a template", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["templates"].pop("safe-portfolio", None)
+    cases.append(("a SPEC_V2 named artefact without a template", bad, seed, console))
 
     failures = 0
     for label, case_std, case_seed, case_console in cases:

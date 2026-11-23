@@ -1,0 +1,20 @@
+{
+ "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+ "kind": "delivery_contract",
+ "phase_code": "g",
+ "title": "S04 \u2014 delivery contract: the action registry",
+ "body": {
+  "scope": "one declaration per action, served over HTTP, MCP, OpenAPI and the admin CLI; the invocation path; external ingest",
+  "obligations": [
+   "one registry, no per-transport declaration",
+   "the served spec locked by hash",
+   "idempotency and audit on every invocation"
+  ],
+  "acceptance": "SPEC_V2 \u00a712 S04: the derive crate, the registry and vocabularies, the parity test, the lock check and the ingest round-trip",
+  "evidence": [
+   "crates/actions-derive",
+   "crates/actions/tests/parity_http_mcp.rs",
+   "served-spec.lock.json"
+  ]
+ }
+}

@@ -38,7 +38,7 @@ const dataPath = path.join(dataDir, "standards.json");
 const STATUSES = new Set(["evidenced", "partial", "absent"]);
 const STANDARDS = new Set(["MSP", "TOGAF", "SAFe", "PMP", "SPEC"]);
 const LEVELS = new Set(["portfolio", "programme", "project", "work_package"]);
-const SUBJECTS = new Set(["programme", "project", "tranche", "benefit", "capability", "phase", "card"]);
+const SUBJECTS = new Set(["programme", "project", "tranche", "benefit", "capability", "phase", "artifact", "card"]);
 const SOURCE_KINDS = new Set(["rows", "documents", "computed", "register"]);
 
 function validate(record, documentsRoot, registerKeys) {

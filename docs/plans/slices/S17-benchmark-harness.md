@@ -21,6 +21,13 @@ adds_modules: [benchmark, sandbox]
 parity_ids: PENDING-S0   # net-new: this slice ports no old surface, so S0 has no id for it
 ---
 
+<!-- historical-rbuild -->
+> ⚠️ **Historical build order.** `rbuild` was retired on 2026-11-20 (CONTRACT §16). The
+> `rbuild -- …` lines below record how this slice was gated then, not a route to run now. The
+> current route is the GitHub-hosted `preflight.yml` for the compile/lint verdict and
+> `~/.claude/scripts/cargo-guard.py` on m4 for interactive feedback; never a local gate.
+
+
 # S17 — Native benchmark harness
 
 Programme project: S17 · issues #21
@@ -79,7 +86,10 @@ artifact writer), `crates/domain/src/benchmark/{mod,arm,grade,parsers,mcnemar,sp
 `crates/actions/src/benchmark/{mod,runs,cases}.rs`,
 `apps/server/src/sandbox.rs`, `apps/server/src/worker.rs` (the driver + reaper). Tests:
 `crates/actions/tests/benchmark_parity.rs` (+ its frozen fixtures), `crates/api/tests/benchmark_rls.rs`,
-`apps/server/tests/benchmark_jobs.rs`, `apps/server/tests/sandbox_live.rs` (`#[ignore]`, needs the cluster). Plus
+`apps/server/tests/benchmark_jobs.rs` (the shipped sandbox proof: manifest/isolation contract,
+fail-closed config, and the driver against a stubbed API). **No live sandbox test exists at this
+baseline:** `apps/server/tests/sandbox_live.rs` is absent and no `#[ignore]` sandbox test exists in
+the workspace — the live proof is a named gap (§7), not a target. Plus
 `spec.rs` (two scopes), `crates/actions-derive/src/lib.rs` (the wire table), `served-spec.lock.json`, and the S12
 screen declaration.
 
@@ -124,7 +134,9 @@ Screens declared for S12: **#13 Benchmarks** (`benchmark_runs.*`, `benchmark_cas
 9. `actions::benchmark` — the eight handlers; scopes at the five code sites; registry `EXPECTED` and the api-lib
    count; a `parity_http_mcp` sample for each action.
 10. `apps/server/src/sandbox.rs` — `kube` client, ConfigMap + Job, pod log, delete; deterministic names; fail-closed
-    config. Unit-test the manifest builder; one `#[ignore]` live proof against the cluster.
+    config. The manifest builder, isolation contract and fail-closed config are proved in
+    `apps/server/tests/benchmark_jobs.rs`; the live cluster proof does not exist (named gap, §7) — do not
+    cite a `sandbox_live` target.
 11. Worker: `benchmark.run.poll` (start ≤ concurrency, poll, grade, finalise, re-enqueue per tick with
     `max_attempts=1`) and `benchmark.reap` in `DEFAULT_SCHEDULES` + `prune.rs`'s exact list.
 12. `--write-lock`; schema/action/op counts in the index; `cargo test --workspace`; clippy; `/tmp/s17-gate.sh`.
@@ -136,7 +148,8 @@ set -euo pipefail
 cd $HOME/Movies/conveyor
 step() { printf '\n=== %s ===\n' "$1"; }
 
-# Rust runs on the build host (CONTRACT §16): `~/.local/bin/cargo` refuses inside a Cargo project on the dev box.
+# CONTRACT §16 (amended 2026-11-20): rbuild is retired. Read every `rbuild -- test` below as the
+# same command run by the GitHub-hosted preflight; locally it is cargo-guard.py for feedback only.
 step "fmt + clippy"
 rbuild -- fmt --all -- --check
 rbuild -- clippy --workspace --all-targets -- -D warnings
@@ -183,8 +196,13 @@ rbuild -- test -p conveyor-server --test benchmark_jobs
 printf '\nGATE_GREEN\n'
 ```
 
-A live sandbox proof is **not** in this block: it needs the grading node (§10). It is one `#[ignore]` test,
-`rbuild -- test -p conveyor-server --test sandbox_live -- --ignored`, run once when the node exists.
+A live sandbox proof is **not in this block and has no test artifact**. It needs the grading node
+(§10). ⚠️ **NAMED GAP (v1-s17-1, 2026-11-21):** `apps/server/tests/sandbox_live.rs` is absent and no
+`#[ignore]` sandbox test exists anywhere in the workspace, so the documented command
+`rbuild -- test -p conveyor-server --test sandbox_live -- --ignored` exits target-not-found. The
+shipped proof is `apps/server/tests/benchmark_jobs.rs` (manifest, isolation contract, fail-closed
+config, stubbed driver). The live cluster proof stays **NOT PROVEN** until that ignored test and the
+grading node exist; no runnable command is claimed here.
 
 ## 8. Traps
 

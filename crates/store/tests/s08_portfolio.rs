@@ -73,6 +73,7 @@ async fn every_family_round_trips_and_the_update_bumps_the_version() {
                 name: "Transformation".to_owned(),
                 status: None,
                 owner_user_id: Some(seed.user),
+                shared_config: serde_json::json!({}),
             },
         )
         .await

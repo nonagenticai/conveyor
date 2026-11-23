@@ -755,8 +755,8 @@ async fn an_over_budget_request_is_refused_with_the_measured_body() {
 }
 
 #[tokio::test]
-async fn a_budget_that_is_not_armed_for_this_tenant_fails_open() {
-    // `no_active_budget` arrives as a 429 but is NOT a breach: the request is served.
+async fn a_budget_that_is_not_armed_for_this_tenant_is_refused() {
+    // `no_active_budget` is a refusal now: a tenant with no armed budget does not spend.
     let db = common::fresh().await;
     conveyor_inference_router::db::migrate(&db.pool)
         .await
@@ -780,8 +780,8 @@ async fn a_budget_that_is_not_armed_for_this_tenant_fails_open() {
         )
         .await
         .expect("router answers");
-    assert_eq!(response.status(), axum::http::StatusCode::OK);
-    assert_eq!(recorder.0.lock().expect("recorder").len(), 1);
+    assert_eq!(response.status(), axum::http::StatusCode::TOO_MANY_REQUESTS);
+    assert_eq!(recorder.0.lock().expect("recorder").len(), 0);
 }
 
 #[tokio::test]

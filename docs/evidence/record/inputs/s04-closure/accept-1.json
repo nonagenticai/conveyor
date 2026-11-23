@@ -1,0 +1,16 @@
+{
+ "status": "accepted",
+ "evidence": [
+  {
+   "ref": "the ActionSpec derive macro",
+   "kind": "crate",
+   "path": "crates/actions-derive"
+  },
+  {
+   "ref": "one declaration served over HTTP and MCP",
+   "kind": "test",
+   "path": "crates/actions/tests/parity_http_mcp.rs"
+  }
+ ],
+ "change_id": "01a2054b-3f86-7959-b2ad-f1edc5b0bb55"
+}

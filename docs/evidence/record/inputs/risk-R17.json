@@ -1,0 +1,17 @@
+{
+ "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+ "kind": "risk",
+ "code": "R17",
+ "title": "Tranches 5 and 10-13 cannot deliver on proposed projects",
+ "body": "T5, T6, T12, T15 and T17 are proposed, not built. Their tranches must end in pause or stop rather than a fabricated continue, and no project is chartered or closed on unbuilt work.",
+ "severity": "medium",
+ "probability": "high",
+ "impact": 4,
+ "status": "open",
+ "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+ "review_at": "2026-11-29",
+ "links": [
+  "https://github.com/nonagenticai/conveyor/issues/80",
+  "https://github.com/nonagenticai/conveyor/issues/86"
+ ]
+}

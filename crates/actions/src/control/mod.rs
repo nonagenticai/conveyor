@@ -215,6 +215,13 @@ pub fn approval_error(error: store::ApprovalStoreError, action: &str) -> ActionE
         store::ApprovalStoreError::Illegal(illegal) => {
             ActionError::new(409, "conflict", illegal.to_string())
         }
+        // A gate that requires an answer refuses an empty one as a typed input error: the caller
+        // can fix it by sending the answer, unlike a state conflict.
+        store::ApprovalStoreError::AnswerMissing => invalid(
+            "note",
+            "missing",
+            "this gate requires an answer; a decision with no note answers nothing",
+        ),
         store::ApprovalStoreError::Vocabulary { what, value } => {
             tracing::error!(what, value = %value, "a stored approval value is outside the domain");
             ActionError::internal()

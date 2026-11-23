@@ -8,15 +8,100 @@ mod arch;
 #[path = "../../actions/tests/support/mod.rs"]
 mod support;
 
-use serde_json::json;
+use serde_json::{Value, json};
+use sqlx::PgPool;
 use uuid::Uuid;
 
-const PHASES: [&str; 8] = ["preliminary", "a", "b", "c", "d", "e", "f", "g"];
+/// The full tailored ADM: every phase the test advances names a requirement set.
+fn blueprint() -> Value {
+    json!({
+        "preliminary": {
+            "psa": ["principles_catalog", "principle_derivation", "principle_realization"]
+        },
+        "a": {
+            "psa": ["stakeholder_map", "driver_goal_objective", "requirements_catalog",
+                    "solution_concept"]
+        },
+        "b": { "hld": ["business_capability_map"] },
+        "c": { "hld": ["data_entity_catalog"] },
+        "d": { "hld": ["technology_standards"] },
+        "e": { "sd": ["solution_concept"] },
+        "f": { "sd": ["business_capability_map"] },
+        "g": { "sd": ["technology_standards"] },
+        "h": { "sd": ["solution_concept"] },
+    })
+}
+
+/// Create one approved artefact of a seeded type.
+async fn approved(
+    f: &arch::Fixture,
+    project: &str,
+    key: &str,
+    phase: &str,
+    plateau: &str,
+    kind: &str,
+) {
+    let artifact_type_id = arch::type_id(&f.running, key).await;
+    let created = arch::artifact(
+        &f.running,
+        phase,
+        plateau,
+        kind,
+        key,
+        json!({ "project_id": project, "artifact_type_id": artifact_type_id }),
+    )
+    .await;
+    arch::approve_artifact(&f.running, &arch::id_of(&created)).await;
+}
+
+async fn process_id(pool: &PgPool, tenant: Uuid, key: &str) -> Uuid {
+    sqlx::query(
+        "INSERT INTO process (tenant_id, key, title, status, version)
+         SELECT $1, $2, 'Kata process', 'published',
+                (SELECT COALESCE(MAX(version), 0) + 1
+                   FROM process WHERE tenant_id = $1 AND key = $2)
+         ON CONFLICT DO NOTHING",
+    )
+    .bind(tenant)
+    .bind(key)
+    .execute(pool)
+    .await
+    .expect("insert the published process");
+    sqlx::query_scalar(
+        "SELECT id FROM process
+          WHERE tenant_id = $1 AND key = $2 AND status = 'published'",
+    )
+    .bind(tenant)
+    .bind(key)
+    .fetch_one(pool)
+    .await
+    .expect("read the published process")
+}
+
+async fn run_of(pool: &PgPool, tenant: Uuid, project: Uuid, process: Uuid) -> Uuid {
+    sqlx::query_scalar(
+        "INSERT INTO run (tenant_id, project_id, process_id, status)
+         VALUES ($1, $2, $3, 'succeeded')
+         RETURNING id",
+    )
+    .bind(tenant)
+    .bind(project)
+    .bind(process)
+    .fetch_one(pool)
+    .await
+    .expect("insert the run")
+}
+
+/// The project's live kata candidate: a `kata.open` run of THIS project.
+async fn kata_candidate(f: &arch::Fixture, project: Uuid) -> Uuid {
+    let kata = process_id(&f.pg.super_pool, f.seeded.tenant_id, "kata.open").await;
+    run_of(&f.pg.super_pool, f.seeded.tenant_id, project, kata).await
+}
 
 #[tokio::test]
 async fn a_scope_change_produces_a_change_register_row() {
     let f = arch::fixture().await;
-    arch::tailor(&f.running, json!({}), json!({})).await;
+    arch::tailor(&f, json!({}), json!({})).await;
     let project = arch::project(&f.running, "architecture").await;
     let project_uuid = Uuid::parse_str(&project).expect("project id");
     let contract =
@@ -48,6 +133,7 @@ async fn a_scope_change_produces_a_change_register_row() {
     let before = arch::change_rows(&f.pg, f.seeded.tenant_id).await;
     let kata_contract =
         arch::request_contract(&f.running, &project, "statement_of_intent", "h").await;
+    let candidate = kata_candidate(&f, project_uuid).await;
     let kata = arch::created_as(
         &f.running,
         support::REVIEWER,
@@ -58,12 +144,17 @@ async fn a_scope_change_produces_a_change_register_row() {
             "level": "non_conformant",
             "delegation_ref": f.delegation,
             "findings": [{ "finding": "systemic: the review ritual itself failed" }],
-            "outcome": { "kind": "kata", "candidate": "review-ritual" },
+            "outcome": { "kind": "kata", "kata_candidate_id": candidate },
         }),
         None,
     )
     .await;
     assert_eq!(kata["outcome"]["kind"], "kata", "{kata}");
+    assert_eq!(
+        kata["outcome"]["kata_candidate_id"],
+        candidate.to_string(),
+        "the kata outcome does not name its candidate: {kata}"
+    );
     assert_eq!(
         arch::change_rows(&f.pg, f.seeded.tenant_id).await,
         before,
@@ -74,13 +165,93 @@ async fn a_scope_change_produces_a_change_register_row() {
 #[tokio::test]
 async fn an_unrecorded_review_refuses_the_gate() {
     let f = arch::fixture().await;
-    arch::tailor(&f.running, json!({}), json!({})).await;
+    arch::tailor(&f, blueprint(), json!({})).await;
     let project = arch::project(&f.running, "architecture").await;
-    for phase in PHASES {
-        let (status, out) = arch::advance(&f.running, &project, phase).await;
-        assert_eq!(status, 200, "advance {phase}: {out}");
-    }
+    let project_uuid = Uuid::parse_str(&project).expect("project id");
 
+    for (key, kind) in [
+        ("principles_catalog", "principles_catalog"),
+        ("principle_derivation", "diagram"),
+        ("principle_realization", "diagram"),
+    ] {
+        approved(&f, &project, key, "preliminary", "psa", kind).await;
+    }
+    let (status, out) = arch::advance(&f.running, &project, "preliminary").await;
+    assert_eq!(status, 200, "advance preliminary: {out}");
+
+    let (status, out) = arch::advance(&f.running, &project, "a").await;
+    assert_eq!(status, 409, "phase A has no approved set yet: {out}");
+    assert_eq!(out["type"], "architecture_artifact_missing", "{out}");
+    for (key, kind) in [
+        ("stakeholder_map", "matrix"),
+        ("driver_goal_objective", "catalog"),
+        ("requirements_catalog", "catalog"),
+        ("solution_concept", "diagram"),
+    ] {
+        approved(&f, &project, key, "a", "psa", kind).await;
+    }
+    let (status, out) = arch::advance(&f.running, &project, "a").await;
+    assert_eq!(status, 200, "advance a: {out}");
+
+    approved(
+        &f,
+        &project,
+        "business_capability_map",
+        "b",
+        "hld",
+        "diagram",
+    )
+    .await;
+    let (status, out) = arch::advance(&f.running, &project, "b").await;
+    assert_eq!(status, 200, "advance b: {out}");
+
+    approved(&f, &project, "data_entity_catalog", "c", "hld", "catalog").await;
+    let (status, out) = arch::advance(&f.running, &project, "c").await;
+    assert_eq!(status, 200, "advance c: {out}");
+
+    approved(&f, &project, "technology_standards", "d", "hld", "catalog").await;
+    let (status, out) = arch::advance(&f.running, &project, "d").await;
+    assert_eq!(status, 200, "advance d: {out}");
+
+    approved(&f, &project, "solution_concept", "e", "sd", "diagram").await;
+    let (status, out) = arch::advance(&f.running, &project, "e").await;
+    assert_eq!(status, 200, "advance e: {out}");
+
+    approved(
+        &f,
+        &project,
+        "business_capability_map",
+        "f",
+        "sd",
+        "diagram",
+    )
+    .await;
+    let (status, out) = arch::advance(&f.running, &project, "f").await;
+    assert_eq!(status, 200, "advance f: {out}");
+
+    // Phase G is a gate for every delivery project: a live delivery contract and its compliance
+    // review are what open it.
+    let contract = arch::live_contract(&f, &project, "delivery_contract", "f").await;
+    arch::created_as(
+        &f.running,
+        support::REVIEWER,
+        "architecture.reviews_record",
+        json!({
+            "project_id": project,
+            "contract_id": contract,
+            "level": "compliant",
+            "delegation_ref": f.delegation,
+            "findings": [{ "finding": "the delivery is judged at Phase G" }],
+            "evidence": { "ref": "phase G" },
+        }),
+        None,
+    )
+    .await;
+    approved(&f, &project, "technology_standards", "g", "sd", "catalog").await;
+    let (status, out) = arch::advance(&f.running, &project, "g").await;
+    assert_eq!(status, 200, "advance g: {out}");
+
+    approved(&f, &project, "solution_concept", "h", "sd", "diagram").await;
     let (status, refused) = arch::advance(&f.running, &project, "h").await;
     assert_eq!(status, 409, "{refused}");
     assert_eq!(
@@ -90,6 +261,7 @@ async fn an_unrecorded_review_refuses_the_gate() {
 
     let contract =
         arch::request_contract(&f.running, &project, "request_for_architecture", "h").await;
+    let candidate = kata_candidate(&f, project_uuid).await;
     arch::created_as(
         &f.running,
         support::REVIEWER,
@@ -99,7 +271,7 @@ async fn an_unrecorded_review_refuses_the_gate() {
             "contract_id": arch::id_of(&contract),
             "level": "compliant",
             "delegation_ref": f.delegation,
-            "outcome": { "kind": "kata", "candidate": "phase-h-review" },
+            "outcome": { "kind": "kata", "kata_candidate_id": candidate },
         }),
         None,
     )

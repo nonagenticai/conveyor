@@ -35,9 +35,27 @@ fn programme_out(record: &ProgrammeRecord) -> ProgrammeOut {
         name: record.name.clone(),
         status: record.status.clone(),
         owner_user_id: record.owner_user_id.map(|id| id.to_string()),
+        shared_config: record.shared_config.clone(),
         version: version_i64(record.version),
         created_at: record.created_at,
         updated_at: record.updated_at,
+    }
+}
+
+/// A shared configuration from the wire: `{}` when absent, a 422 when it is not an object.
+fn shared_config_value(value: Option<Value>) -> Result<Value, ActionError> {
+    let value = value.unwrap_or_else(|| serde_json::json!({}));
+    if !value.is_object() {
+        return Err(invalid("shared_config", "invalid", "must be a JSON object"));
+    }
+    Ok(value)
+}
+
+/// The update form: `None` leaves the column alone, `Some` is validated.
+fn shared_config_patch(value: Option<Value>) -> Result<Option<Value>, ActionError> {
+    match value {
+        Some(value) => Ok(Some(shared_config_value(Some(value))?)),
+        None => Ok(None),
     }
 }
 
@@ -80,6 +98,7 @@ async fn programmes_create(
     if name.is_empty() {
         return Err(invalid("name", "required", "must not be empty"));
     }
+    let shared_config = shared_config_value(input.shared_config)?;
     let record = store::portfolio::create_programme_tx(
         &mut *tx,
         ctx.tenant,
@@ -87,6 +106,7 @@ async fn programmes_create(
             name: name.to_owned(),
             status: trimmed(input.status),
             owner_user_id: input.owner_user_id,
+            shared_config,
         },
     )
     .await
@@ -161,6 +181,7 @@ async fn programmes_update(
         name,
         status: trimmed(input.status),
         owner_user_id: input.owner_user_id,
+        shared_config: shared_config_patch(input.shared_config)?,
     };
 
     let after = match update_programme_tx(&mut *tx, ctx.tenant, input.id, expected, &patch).await {

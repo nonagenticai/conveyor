@@ -1,0 +1,181 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "T17 is active",
+      "detail": "project T17 is active",
+      "id": "T17-project",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "no project baseline",
+      "id": "T17-baseline",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d38-7db1-b685-d76bd4cebf47\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "exit": 1,
+      "id": "T17-charter",
+      "kind": "command",
+      "result": "fail",
+      "severity": "P0",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stdout": ""
+    },
+    {
+      "check": "closure_outputs",
+      "description": "the declared closure outputs are declared and published",
+      "detail": "declared closure outputs are not published: evidence, closure-review",
+      "id": "T17-closure-outputs",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "no live board-approved delivery contract",
+      "id": "T17-contract",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "no Phase-G compliance review for the project's live contract",
+      "id": "T17-review",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "closure_gate",
+      "description": "the closure gate was decided by an approver other than its requester",
+      "detail": "no approved closure gate for the project",
+      "id": "T17-closure-gate",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "T17-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "no PI cadence row for tranche-5",
+      "id": "T17-pi-cadence",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_plan",
+      "description": "the project tranche's PI plan is published",
+      "detail": "no published pi-plan output for tranche-5",
+      "id": "T17-pi-plan",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_objectives",
+      "description": "the project tranche's PI objectives are published",
+      "detail": "no published pi-objectives output for tranche-5",
+      "id": "T17-pi-objectives",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "no WBS deliverable carries the plan",
+      "id": "T17-wsjf",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "no accepted deliverable to demo",
+      "id": "T17-demo-credits",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "lessons",
+      "description": "the tranche retro produced at least one lesson",
+      "detail": "no retro cadence row for tranche-5",
+      "id": "T17-lessons",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "no open P0 package for this project",
+      "id": "T17-product",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "the gate check 'T17-baseline' did not pass; the gate check 'T17-charter' did not pass; the gate check 'T17-closure-outputs' did not pass; the gate check 'T17-contract' did not pass; the gate check 'T17-review' did not pass; the gate check 'T17-closure-gate' did not pass; the gate check 'T17-pi-cadence' did not pass; the gate check 'T17-pi-plan' did not pass; the gate check 'T17-pi-objectives' did not pass; the gate check 'T17-wsjf' did not pass; the gate check 'T17-demo-credits' did not pass; the gate check 'T17-lessons' did not pass",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "fail",
+      "severity": "P0"
+    }
+  ],
+  "failures": [
+    "T17-baseline (P0): no project baseline",
+    "T17-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+    "T17-closure-outputs (P0): declared closure outputs are not published: evidence, closure-review",
+    "T17-contract (P0): no live board-approved delivery contract",
+    "T17-review (P0): no Phase-G compliance review for the project's live contract",
+    "T17-closure-gate (P0): no approved closure gate for the project",
+    "T17-pi-cadence (P0): no PI cadence row for tranche-5",
+    "T17-pi-plan (P0): no published pi-plan output for tranche-5",
+    "T17-pi-objectives (P0): no published pi-objectives output for tranche-5",
+    "T17-wsjf (P0): no WBS deliverable carries the plan",
+    "T17-demo-credits (P0): no accepted deliverable to demo",
+    "T17-lessons (P1): no retro cadence row for tranche-5",
+    "gate (P0): the gate check 'T17-baseline' did not pass; the gate check 'T17-charter' did not pass; the gate check 'T17-closure-outputs' did not pass; the gate check 'T17-contract' did not pass; the gate check 'T17-review' did not pass; the gate check 'T17-closure-gate' did not pass; the gate check 'T17-pi-cadence' did not pass; the gate check 'T17-pi-plan' did not pass; the gate check 'T17-pi-objectives' did not pass; the gate check 'T17-wsjf' did not pass; the gate check 'T17-demo-credits' did not pass; the gate check 'T17-lessons' did not pass"
+  ],
+  "gate": "A tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant.",
+  "generated_at": "2026-11-23T08:10:28.210497+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/T17.toml",
+  "name": "Tenant asset authoring",
+  "project": "T17",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-23T08:09:50.563209+00:00",
+    "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
+    "path": "retained-snapshot/4727213b8c204ec69d825d24129f6b506ebb2a2e"
+  },
+  "verdict": "red",
+  "warnings": []
+}

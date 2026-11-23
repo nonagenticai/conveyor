@@ -66,6 +66,7 @@ async fn answering_host() -> String {
 
 fn request(user_id: Uuid, key: &str) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: "media.generate_image".to_owned(),
         input: json!({"prompt": "a cat", "size": "512x512", "seed": 7, "steps": 4}),
         precondition: None,

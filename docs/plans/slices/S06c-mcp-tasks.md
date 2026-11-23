@@ -165,8 +165,12 @@ cargo test -p conveyor-api --test approval_dual
 cargo test -p conveyor-actions --test parity_http_mcp
 cargo clippy --workspace --all-targets -- -D warnings
 cargo run -q -p conveyor-server -- --print-openapi --check-lock
-# no task-capable action beyond projects.execute
-test "$(grep -c 'task_capable: true' crates/actions/src/board/projects.rs)" -eq 1
+# Exactly one task-capable action, read from the compiled registry: projects.execute.
+# v1-s06-3: the old grep for `task_capable: true` could never match — the derive writes
+# `task = true`, and neither `conveyor admin actions dump --json` nor the committed
+# `docs/design/data/actions.json` carries the flag (both are a sorted name list). The
+# compiled-registry assertion below is the one source of truth; no second list is created.
+cargo test -p conveyor-actions --test mcp_tasks_contract only_projects_execute_is_task_capable
 ```
 
 Property table:

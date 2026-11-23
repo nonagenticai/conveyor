@@ -450,6 +450,7 @@ fn handler_ctx(tenant: TenantId, app_key: &str) -> HandlerCtx {
         action: ACTION,
         app_key: app_key.to_owned(),
         approval_id: None,
+        usage: None,
     }
 }
 
@@ -611,6 +612,7 @@ impl Host<'_> {
             return self.run_agent(request, row_id).await;
         }
         let invoke_request = InvokeRequest {
+            credential_alias: None,
             action,
             input: request.input.clone(),
             precondition: None,
@@ -711,6 +713,7 @@ impl Host<'_> {
             map.insert(DEPTH_KEY.to_owned(), json!(self.depth + 1));
         }
         let invoke_request = InvokeRequest {
+            credential_alias: None,
             action: "process_runs.start".to_owned(),
             input: json!({
                 "card_id": card_id,

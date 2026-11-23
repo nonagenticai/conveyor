@@ -287,19 +287,25 @@ fn parse_limits(value: &Value, errors: &mut Vec<AnatomyFieldError>) -> ReleaseLi
                     "max_tokens must be a positive integer",
                 )),
             },
-            "budget_usd" => match value.as_f64().filter(|value| *value >= 0.0) {
-                Some(number) => limits.budget_usd = Some(number),
-                None => errors.push(field_error(
-                    "limits.budget_usd",
-                    "out_of_range",
-                    "budget_usd must be a non-negative number",
-                )),
-            },
+            // The spend ceiling is the ONE budget the store resolver, the broker and the run
+            // admission gate read, and all three read it as `limits.cost_budget_usd` (the
+            // seeded jobs' name). `budget_usd` is accepted as the historical spelling so an
+            // already-published release snapshot stays parseable; both set the same field.
+            "cost_budget_usd" | "budget_usd" => {
+                match value.as_f64().filter(|value| *value >= 0.0) {
+                    Some(number) => limits.budget_usd = Some(number),
+                    None => errors.push(field_error(
+                        format!("limits.{key}"),
+                        "out_of_range",
+                        format!("{key} must be a non-negative number"),
+                    )),
+                }
+            }
             other => errors.push(field_error(
                 format!("limits.{other}"),
                 "unknown_field",
                 "unknown limit; the loop caps are max_iterations, timeout_secs, max_tool_calls, \
-                 max_tokens and budget_usd",
+                 max_tokens and cost_budget_usd",
             )),
         }
     }

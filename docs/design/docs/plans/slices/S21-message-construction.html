@@ -24,6 +24,11 @@
       >
     </header>
     <main class="doc-body"><h1 id="s21--message-construction-the-compiled-prompt">S21 — Message construction (the compiled prompt)</h1>
+<!-- historical-rbuild -->
+
+<blockquote>
+<p>⚠️ <strong>Historical build order.</strong> <code>rbuild</code> was retired on 2026-11-20 (CONTRACT §16). The <code>rbuild -- …</code> lines below record how this slice was gated then, not a route to run now. The current route is the GitHub-hosted <code>preflight.yml</code> for the compile/lint verdict and <code>~/.claude/scripts/cargo-guard.py</code> on m4 for interactive feedback; never a local gate.</p>
+</blockquote>
 <p>Programme project: S21 · issues #15, #581</p>
 <p><strong>Status:</strong> <code>plan written 2026-11-09</code>; the v1 seam is built (D27) and steps 1–2 are built. Step 3 (the work-package prompt envelope — recipe authoring, memory selection, knowledge content) is <strong>built, #574, 2026-11-22</strong>; the design is §12 and the build record is §13. Step 4 (the <code>internal_agent</code> executor runtime and its dynamic tool grant) is <strong>built, #581, 2026-11-22</strong>; the design is §14 and the build record is §15. <strong>Depends on:</strong> S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps), S09 (<code>retrieval.query</code> / <code>strata</code> packs). <strong>Owner ruling:</strong> George, 2026-11-09 — <em>a prompt is a run-time compilation from the procedure and the other system/tenant/project sources, stored in Postgres; prompt-engineering is 2024, context-engineering 2025.</em></p>
 <h2 id="1-what-is-already-true-the-seam-this-slice-extends">1. What is already true (the seam this slice extends)</h2>

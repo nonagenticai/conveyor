@@ -10,6 +10,7 @@
 
 use base64::Engine as _;
 use chrono::{DateTime, Utc};
+use conveyor_domain::inference::CallerKind;
 use conveyor_store as store;
 use conveyor_store::document::{DocumentFilter, DocumentPage, DocumentPatch, NewDocument};
 use schemars::JsonSchema;
@@ -63,7 +64,9 @@ pub struct DocumentCreateIn {
     /// The output-standard slot (`project-brief`, `evidence`, …).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub category: Option<String>,
-    /// The programme unit (a project key or an issue number).
+    /// The programme unit (a project key, an issue number, or a planning period such as
+    /// `tranche-0` for a PI artefact; the conformance audit and the verifier read the period
+    /// from here).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unit: Option<String>,
     /// Free metadata merged into the row's `meta` beside `content_type`/`size_bytes`.
@@ -517,7 +520,9 @@ pub struct DocumentComposeIn {
     /// The output-standard slot (`project-brief`, `evidence`, …).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub category: Option<String>,
-    /// The programme unit (a project key or an issue number).
+    /// The programme unit (a project key, an issue number, or a planning period such as
+    /// `tranche-0` for a PI artefact; the conformance audit and the verifier read the period
+    /// from here).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unit: Option<String>,
     /// Whether the public snapshot may carry this output. Default false; only an admin may set it.
@@ -564,6 +569,38 @@ async fn documents_compose(
                 "the output body is {} bytes; the cap is {MAX_OUTPUT_BYTES}",
                 input.body.len()
             ),
+        ));
+    }
+    // §7.1/§7.4: the generated class is derived from the request's model-call attribution, never
+    // from caller-supplied meta alone — an agent that omits the flag is still a model. A declared
+    // `generated: true` is honoured too.
+    //
+    // `prompt_ref` is deliberately NOT a discriminator: every process step carries
+    // `prompt_ref = process:<key>` (the compiled-prompt identity, `process/step.rs`), so a
+    // deterministic step composing its declared output would be misread as a model draft. The
+    // direct model paths are the copilot/agent-run callers and any turn-scoped call.
+    let attributed = ctx.usage.as_ref().is_some_and(|usage| {
+        usage.conversation_turn_id.is_some()
+            || matches!(
+                usage.caller_kind,
+                CallerKind::Copilot | CallerKind::AgentRun
+            )
+    });
+    let declared = input
+        .meta
+        .as_ref()
+        .and_then(|meta| meta.get("generated"))
+        .and_then(Value::as_bool)
+        == Some(true);
+    let generated = attributed || declared;
+    // A generated draft is applied only through `ladder.apply_draft`, whose gate is an accepted L3
+    // human decision of the dedicated `draft.apply` gate. `documents.update` refuses to attach one
+    // after the fact; compose must refuse to create it attached, or this one call is the bypass.
+    if generated && input.card_id.is_some() {
+        return Err(ActionError::new(
+            409,
+            "draft_requires_gate",
+            "a generated draft is applied through ladder.apply_draft with an accepted decision",
         ));
     }
     // Existence is not publication, and publication is an admin decision. A member composes a
@@ -617,6 +654,31 @@ async fn documents_compose(
     }
     if let Some(unit) = &unit {
         meta["unit"] = json!(unit);
+    }
+    if generated {
+        // The marker is server-owned: the attribution wins over a caller's `generated: false`,
+        // and the facts identify the model call even when the caller declared nothing.
+        meta["generated"] = json!(true);
+        let mut generated_by = serde_json::Map::new();
+        if let Some(usage) = &ctx.usage {
+            generated_by.insert("caller_kind".to_owned(), json!(usage.caller_kind.as_str()));
+            if let Some(run_id) = usage.run_id {
+                generated_by.insert("run_id".to_owned(), json!(run_id));
+            }
+            if let Some(turn_id) = usage.conversation_turn_id {
+                generated_by.insert("conversation_turn_id".to_owned(), json!(turn_id));
+            }
+            if let Some(prompt_ref) = &usage.prompt_ref {
+                generated_by.insert("prompt_ref".to_owned(), json!(prompt_ref));
+            }
+            if let Some(prompt_version) = &usage.prompt_version {
+                generated_by.insert("prompt_version".to_owned(), json!(prompt_version));
+            }
+            if let Some(prompt_sha256) = &usage.prompt_sha256 {
+                generated_by.insert("prompt_sha256".to_owned(), json!(prompt_sha256));
+            }
+        }
+        meta["generated_by"] = Value::Object(generated_by);
     }
     let mut created = store::document::create_document_tx(
         &mut *tx,
@@ -954,8 +1016,9 @@ async fn documents_update(
             .unwrap_or(Value::Null),
     )?;
     // §7.1/§7.4: a generated draft is applied only through `ladder.apply_draft`, whose gate is
-    // an accepted L1/L3 decision. The ordinary edit path cannot attach one to a card, so the
-    // ladder's decision record cannot be bypassed by an update.
+    // an accepted L3 human decision of the dedicated `draft.apply` gate. The ordinary edit path
+    // cannot attach one to a card, so the ladder's decision record cannot be bypassed by an
+    // update.
     if input
         .card_id
         .is_some_and(|card| Some(card) != current.card_id)

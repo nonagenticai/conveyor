@@ -1030,7 +1030,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <p>Allowed generation: draft answer, draft charter/WBS, draft procedure, draft prompt/patch, code patch, status narrative, postmortem narrative, lesson draft. Forbidden generation: tool selection, routing, state transitions, gate decisions, scoring a submission, approving.</p>
 <h3 id="75-budgets-and-the-ledger">7.5 Budgets and the ledger</h3>
 <ul>
-<li>Every run declares a token/cost budget; every job binding declares a default; exceeding it is a refusal (<code>429 budget_exceeded</code>) before the next call, not a silent truncation.</li>
+<li>Every run declares a token/cost budget; every job binding declares a default; exceeding it is a refusal (<code>429 tool_budget_exceeded</code>) before the next call, not a silent truncation.</li>
 <li><code>inference_call</code> keeps the prompt identity and usage, never the prompt/response bodies; the router keeps the text.</li>
 <li>The cache classes are defined (V1 D23): <code>cache_read &gt; 0</code> = hit, <code>cache_read = 0 ∧ cache_creation &gt; 0</code> = write, neither = miss, no usage = unknown.</li>
 <li>Cost is a read-time derivation over the ledger, never a stored column.</li>

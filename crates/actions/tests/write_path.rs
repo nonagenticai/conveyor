@@ -121,6 +121,8 @@ async fn review_tranche(
         "decision": decision,
         "delegation_ref": delegation,
         "evidence": {
+            // v1-tr2-2: the review names the snapshot it judged.
+            "snapshot_sha": "0123456789abcdef0123456789abcdef01234567",
             "baselines": ["B0"],
             "benefit_status": {"B1": "tracking"},
             "risk_register": ["risk-1"]

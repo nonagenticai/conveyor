@@ -64,7 +64,8 @@ pub async fn snapshot_tx(
     let programme = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.name), '[]'::jsonb) FROM (
-             SELECT id, name, status, owner_user_id, version, created_at, updated_at
+             SELECT id, name, status, owner_user_id, shared_config, version, created_at,
+                    updated_at
                FROM programme WHERE tenant_id = $1
          ) t",
         tenant_id,
@@ -198,7 +199,7 @@ pub async fn snapshot_tx(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.created_at, t.id), '[]'::jsonb) FROM (
              SELECT id, run_id, card_id, project_id, gate, kind, status, required_decisions,
-                    requested_by, expires_at, version, created_at, updated_at
+                    requested_by, expires_at, meta, version, created_at, updated_at
                FROM approval WHERE tenant_id = $1
          ) t",
         tenant_id,
@@ -333,7 +334,7 @@ pub async fn snapshot_tx(
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.kind, t.key), '[]'::jsonb) FROM (
              SELECT id, kind, key, title, status, version, supersedes_id,
                     superseded_by_id, project_id, owner_user_id, phase_code, effort, reach,
-                    impact, confidence, links, created_at, updated_at
+                    impact, confidence, links, meta, created_at, updated_at
                FROM governed_asset WHERE tenant_id = $1
          ) t",
         tenant_id,
@@ -355,8 +356,32 @@ pub async fn snapshot_tx(
     )
     .await?;
 
+    // The metering totals. Money is never a stored ledger column (SPEC_V2 D52): `inference_call`
+    // stores tokens and the cost is derived at read time from `commercial_price`, with the exact
+    // formula `metrics.usage` and `inference_usage.report` use — a token-priced model by prompt
+    // and completion tokens, a unit-priced model by `usage_units`. A call the price join cannot
+    // price contributes NULL (zero to the sum) and is counted in `unpriced_calls`, mirroring
+    // `metrics.usage`, so "no price" never renders as "free". `tool_cost_usd` is the
+    // `tool_call` ledger's own recorded cost. Money is rounded to 6 decimals and stays a JSON
+    // number in the snapshot (the per-project/per-card rows keep the report's decimal string).
     let inference_totals: Value = sqlx::query_scalar(
-        "SELECT jsonb_build_object(
+        "WITH priced AS (
+             SELECT ic.*,
+                    CASE
+                        WHEN p.model IS NULL THEN NULL
+                        WHEN p.unit = 'token' THEN
+                            (ic.prompt_tokens::numeric * p.input_usd_per_1m
+                             + ic.completion_tokens::numeric * p.output_usd_per_1m) / 1000000
+                        WHEN ic.usage_units IS NOT NULL THEN ic.usage_units * p.unit_usd
+                        ELSE NULL
+                    END AS row_cost
+               FROM inference_call ic
+               LEFT JOIN commercial_price p
+                      ON p.model = coalesce(ic.served_model, ic.model)
+                     AND ((p.unit = 'token' AND ic.usage_unit IS NULL) OR p.unit = ic.usage_unit)
+              WHERE ic.tenant_id = $1
+         )
+         SELECT jsonb_build_object(
              'calls', count(*),
              'prompt_tokens', COALESCE(sum(prompt_tokens), 0),
              'completion_tokens', COALESCE(sum(completion_tokens), 0),
@@ -365,8 +390,14 @@ pub async fn snapshot_tx(
              'cache_write_calls', COALESCE(sum((cache_status = 'write')::int), 0),
              'cache_miss_calls', COALESCE(sum((cache_status = 'miss')::int), 0),
              'unknown_cache_calls', COALESCE(sum((cache_status = 'unknown')::int), 0),
-             'non_ok_calls', COALESCE(sum((outcome <> 'ok')::int), 0)
-         ) FROM inference_call WHERE tenant_id = $1",
+             'non_ok_calls', COALESCE(sum((outcome <> 'ok')::int), 0),
+             'cost_usd', COALESCE(round(sum(row_cost), 6), 0),
+             'unpriced_calls', count(*) - count(row_cost),
+             'tool_cost_usd', (
+                 SELECT COALESCE(round(sum(cost), 6), 0)
+                   FROM tool_call WHERE tenant_id = $1
+             )
+         ) FROM priced",
     )
     .bind(tenant_id)
     .fetch_one(&mut *conn)
@@ -497,6 +528,28 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
+    // The cadence record's two satellites: the demo credits a cadence issued and the lessons its
+    // retros raised. They travel beside `cadences` in `msp`; a credit names its cadence and a
+    // lesson names its programme, so neither needs a programme column of its own.
+    let demo_credits = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.cadence_id, t.deliverable_id, t.id), '[]'::jsonb) FROM (
+             SELECT id, cadence_id, deliverable_id, evidence, credited_at, version
+               FROM programme_demo_credit WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let lessons = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.programme_id, t.cadence_id, t.finding_key, t.id), '[]'::jsonb) FROM (
+             SELECT id, programme_id, cadence_id, finding_key, statement, evidence,
+                    independent_count, state, source, meta, version, created_at, updated_at
+               FROM lesson WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
     let wbs_nodes = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.project_id, t.parent_id, t.position, t.id), '[]'::jsonb) FROM (
@@ -525,9 +578,23 @@ pub async fn snapshot_tx(
     let register_items = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.project_id, t.created_at, t.id), '[]'::jsonb) FROM (
-             SELECT id, project_id, kind, code, title, body, owner_job_id, status, severity,
-                    probability, impact, links, baseline_ref, meta, version, created_at, updated_at
+             SELECT id, project_id, programme_id, kind, code, title, body, owner_job_id, status,
+                    severity, probability, impact, response, review_at, links, baseline_ref, meta,
+                    version, created_at, updated_at
                FROM project_register_item WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    // §8.3 benefit evaluation: the measurements a profile is judged against. One row per reading
+    // (baseline | interim | post), so the pack can compute a variance rather than trusting the two
+    // nullable timestamps on `benefit_transition`.
+    let benefit_measurements = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.benefit_id, t.measured_at, t.id), '[]'::jsonb) FROM (
+             SELECT id, benefit_id, programme_id, tranche_id, kind, target_value, actual_value,
+                    unit, method, measured_at, evidence
+               FROM benefit_measurement WHERE tenant_id = $1
          ) t",
         tenant_id,
     )
@@ -591,8 +658,10 @@ pub async fn snapshot_tx(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.phase_code, t.kind, t.created_at, t.id), '[]'::jsonb) FROM (
              SELECT id, project_id, kind, phase_code, title, body, status, approval_id,
-                    approved_by, approved_at, supersedes_id, superseded_by_id, version,
-                    created_at, updated_at
+                    approved_by, requested_by, approved_at, supersedes_id, superseded_by_id,
+                    COALESCE(body -> 'links', '{}'::jsonb) AS links,
+                    COALESCE(body -> 'meta', '{}'::jsonb) AS meta,
+                    version, created_at, updated_at
                FROM architecture_contract WHERE tenant_id = $1
          ) t",
         tenant_id,
@@ -601,9 +670,9 @@ pub async fn snapshot_tx(
     let mut architecture_reviews = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.reviewed_at DESC, t.project_id, t.id), '[]'::jsonb) FROM (
-             SELECT r.id, r.project_id, r.contract_id, r.level, r.outcome, r.reviewed_by,
-                    u.display_name AS reviewed_by_name, r.reviewed_at, r.version,
-                    r.created_at, r.updated_at
+             SELECT r.id, r.project_id, r.contract_id, r.level, r.findings, r.evidence,
+                    r.outcome, r.reviewed_by, u.display_name AS reviewed_by_name,
+                    r.reviewed_at, r.version, r.created_at, r.updated_at
                FROM architecture_compliance_review r
                LEFT JOIN app_user u ON u.id = r.reviewed_by
               WHERE r.tenant_id = $1
@@ -686,6 +755,27 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
+    // Test residue is not the programme's portfolio. The e2e/UI-proof rows named below created
+    // projects in the live tenant with no marker; the public pack must neither count them as
+    // programme projects nor let their boards, cards, runs, documents or architecture rows in.
+    // They are listed under `programme.test_projects` with the reason, so the exclusion is
+    // visible rather than silent. The authenticated API (`GET /api/projects`) is unaffected: an
+    // operator still sees every row.
+    let mut test_projects: Vec<Value> = Vec::new();
+    if let Some(rows) = projects.as_array_mut() {
+        rows.retain(|row| match test_row_reason(row) {
+            Some(reason) => {
+                test_projects.push(json!({
+                    "key": row.get("key").cloned().unwrap_or(Value::Null),
+                    "name": row.get("name").cloned().unwrap_or(Value::Null),
+                    "status": row.get("status").cloned().unwrap_or(Value::Null),
+                    "reason": reason,
+                }));
+                false
+            }
+            None => true,
+        });
+    }
     // ⛔ The public pack is the TENANT'S PORTFOLIO (SPEC_V2 §5.1; owner brief 2026-11-21). Every
     // programme-bound project is public. A standalone project is public only when it is a real
     // change initiative: status `active`/`paused` AND it carries a board or a card. A standalone
@@ -719,7 +809,20 @@ pub async fn snapshot_tx(
     retain_ids(&mut run_steps, "run_id", &bound_runs);
     retain_ids(&mut comments, "card_id", &bound_cards);
     // An approval belongs to the programme when it names a bound project or hangs from a card
-    // of one; a gate with neither parent is an orphan and is not public.
+    // of one; a gate with neither parent is an orphan and is not public. The one exception is a
+    // gate a public record CITES: a contract's approval is an `architecture_board` decision with
+    // no project or card parent, and it is the contract's evidence — dropping it made every
+    // contract unprovable from the public record. It is kept because it is cited, never because
+    // it is parented, and its decisions follow through `bound_approvals`.
+    let cited_approvals: std::collections::HashSet<String> = architecture_contracts
+        .as_array()
+        .map(|rows| {
+            rows.iter()
+                .filter_map(|row| row.get("approval_id").and_then(Value::as_str))
+                .map(str::to_owned)
+                .collect()
+        })
+        .unwrap_or_default();
     if let Some(rows) = approvals.as_array_mut() {
         rows.retain(|row| {
             row.get("project_id")
@@ -729,6 +832,10 @@ pub async fn snapshot_tx(
                     .get("card_id")
                     .and_then(Value::as_str)
                     .is_some_and(|id| bound_cards.contains(id))
+                || row
+                    .get("id")
+                    .and_then(Value::as_str)
+                    .is_some_and(|id| cited_approvals.contains(id))
         });
     }
     let bound_approvals = ids_where(&approvals, "id", |_| true);
@@ -824,7 +931,11 @@ pub async fn snapshot_tx(
     );
 
     Ok(SnapshotData {
-        programme: json!({"programme": programme, "projects": projects}),
+        programme: json!({
+            "programme": programme,
+            "projects": projects,
+            "test_projects": test_projects,
+        }),
         // T0: the organisation spine (§4) — industries, the placed departments, the job
         // catalogue with its latest release's anatomy flattened onto each row, releases and
         // bindings. Structural fields only (the publication privacy contract).
@@ -857,11 +968,14 @@ pub async fn snapshot_tx(
             "benefit_profiles": benefit_profiles,
             "benefit_links": benefit_links,
             "benefit_transitions": benefit_transitions,
+            "benefit_measurements": benefit_measurements,
             "stakeholder_profiles": stakeholder_profiles,
             "tranches": tranches,
             "tranche_reviews": tranche_reviews,
             "programme_baselines": programme_baselines,
             "cadences": cadences,
+            "demo_credits": demo_credits,
+            "lessons": lessons,
             "wbs_nodes": wbs_nodes,
             "project_baselines": project_baselines,
             "register_items": register_items,
@@ -913,6 +1027,30 @@ fn inference_error(error: crate::inference::InferenceStoreError) -> sqlx::Error 
 
 /// The public project keys by row id. A derived section names a project by key: the key is the
 /// reader's name for it, and an id would dangle outside the tenant.
+/// The two e2e/UI-proof projects that predate the `meta.test_row` marker.
+const LEGACY_TEST_PROJECT_KEYS: [&str; 2] = [
+    "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+    "AAA-UI-PROOF-285-2026-11-19T07-4",
+];
+
+/// Why a project row is test residue, or `None` when it is a real project.
+fn test_row_reason(row: &Value) -> Option<&'static str> {
+    let marked = row
+        .get("meta")
+        .and_then(Value::as_object)
+        .and_then(|meta| meta.get("test_row"))
+        .and_then(Value::as_bool)
+        == Some(true);
+    if marked {
+        return Some("meta.test_row is true");
+    }
+    let key = row.get("key").and_then(Value::as_str).unwrap_or_default();
+    if LEGACY_TEST_PROJECT_KEYS.contains(&key) {
+        return Some("a known pre-marker e2e project key");
+    }
+    None
+}
+
 fn project_key_by_id(projects: &Value) -> HashMap<String, String> {
     projects
         .as_array()

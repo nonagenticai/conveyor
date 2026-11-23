@@ -1,0 +1,16 @@
+{
+ "status": "accepted",
+ "evidence": [
+  {
+   "ref": "changes.request: impact block and gate",
+   "kind": "action",
+   "path": "crates/actions/src/pm/mod.rs"
+  },
+  {
+   "ref": "a baseline mutation requires its change",
+   "kind": "test",
+   "path": "crates/actions/tests/rework_path.rs"
+  }
+ ],
+ "change_id": "01a2052e-5648-7350-a30d-06514a69eced"
+}

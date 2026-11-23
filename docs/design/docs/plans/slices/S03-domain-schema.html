@@ -186,8 +186,8 @@ test &quot;$(grep -c &#39;FORCE ROW LEVEL SECURITY&#39; migrations/0002_domain.s
 </tr>
 <tr>
 <td>b</td>
-<td>a claim never succeeds twice without release or expiry</td>
-<td>32 concurrent tasks on one card: exactly one <code>Some</code>; sequential claims strictly increase <code>claim_fence</code>; a stale-fence completion writes nothing</td>
+<td>one live claim per card; a distinct user cannot claim a leased card; the holder renews with the fence</td>
+<td>32 distinct users race one card: exactly one <code>Some</code>, 31 <code>None</code>; the holder's same-assignee re-claim and fence renew succeed while a stranger at the current version is refused; sequential renewals strictly increase <code>claim_fence</code>; a stale-fence completion writes nothing</td>
 </tr>
 <tr>
 <td>c</td>

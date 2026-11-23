@@ -22,8 +22,13 @@ Environment (real transport):
   CONVEYOR_DEPLOY                   default deploy/conveyor
   TENANT                            default nonagentic
 
+`--local-bin PATH` (or PROGRAMME_RECORD_LOCAL_BIN) runs `PATH admin action invoke` in-process
+instead of in the pod, for actions or output categories the deployed image does not serve yet;
+the process reads DATABASE_MIGRATE_URL and APP_KEY from the environment.
+
 PROGRAMME_RECORD_CMD (or --command) replaces the transport with a stub command; --self-test
-uses that hook and never touches the estate.
+uses that hook and never touches the estate. `--quiet` prints only the action's JSON, so a
+script can read a created id; the read-back still runs and still refuses an unverified write.
 
 Read-back map (write -> read), used when --read-action is not given:
   tranches.authorise        -> tranches.list            (needs programme_id)
@@ -32,9 +37,29 @@ Read-back map (write -> read), used when --read-action is not given:
   architecture.board_decide -> architecture.board_get
   approvals.decide          -> approvals.list
   documents.publish         -> documents.get
+  documents.create          -> documents.get            (read id from the write output)
+  documents.update          -> documents.get
+  pm.plan                   -> pm.get
   pm.close                  -> pm.get
   projects.reopen           -> projects.get
   projects.charter          -> pm.get
+  projects.baseline         -> baselines.get            (read id from the write output)
+  projects.close            -> projects.get
+  architecture.contracts_request  -> architecture.contracts_get
+  architecture.contracts_approve  -> architecture.contracts_get
+  architecture.artifacts_create   -> architecture.artifacts_get
+  architecture.artifacts_approve  -> architecture.artifacts_get
+  architecture.reviews_record     -> architecture.reviews_get
+
+When the deployed engine cannot yet serve a review read action, pass `--snapshot DIR`
+(built with `conveyor snapshot --out DIR` AFTER the write, against the live database) and
+the review is read back from `DIR/architecture.json`'s `compliance_reviews`; the output
+prints the snapshot's `generated_at` (unless `--quiet` is given) so the evidence names the
+snapshot that proved the row.
+
+A create whose read input is the created row's id needs no --read-id-from-output: the
+READBACK_ID_FROM_OUTPUT table supplies the field, unless --read-input (or an explicit
+--read-id-from-output) overrides it.
 
 Python 3 stdlib only; no shell strings, no network libraries.
 """
@@ -63,16 +88,57 @@ READBACK_MAP = {
     "approvals.decide": "approvals.list",
     "documents.publish": "documents.get",
     "documents.compose": "documents.get",
+    "documents.create": "documents.get",
+    "documents.update": "documents.get",
     "registers.create": "registers.get",
     "registers.update": "registers.get",
+    "benefits.measure": "benefits.measurement_list",
+    "pm.plan": "pm.get",
     "pm.close": "pm.get",
     "projects.close_request": "projects.get",
+    "projects.close": "projects.get",
     "projects.reopen": "projects.get",
     "projects.charter": "pm.get",
+    "projects.baseline": "baselines.get",
+    "architecture.contracts_request": "architecture.contracts_get",
+    "architecture.contracts_approve": "architecture.contracts_get",
+    "architecture.artifacts_create": "architecture.artifacts_get",
+    "architecture.artifacts_approve": "architecture.artifacts_get",
+    "architecture.reviews_record": "architecture.reviews_get",
+    "cadences.create": "cadences.list",
+    "cadences.update": "cadences.list",
+    "cadences.credit_demo": "cadences.credit_list",
+    "lessons.propose": "lessons.list",
+    "wbs.create": "wbs.get",
+    "wbs.update": "wbs.get",
+    "tranches.review": "tranches.review_list",
+}
+
+# A create whose read-back is the row it just made. The write output's field is the read
+# input's `id`; --read-input and an explicit --read-id-from-output both override this.
+READBACK_ID_FROM_OUTPUT = {
+    "documents.create": "id",
+    "documents.compose": "id",
+    "registers.create": "id",
+    "wbs.create": "id",
+    "projects.baseline": "baseline_id",
+    "architecture.contracts_request": "id",
+    "architecture.artifacts_create": "id",
+    "architecture.reviews_record": "id",
 }
 
 # A read-back that needs identifiers different from the write's input.
-READBACK_REQUIRED_INPUT = {"tranches.list": ("programme_id",)}
+READBACK_REQUIRED_INPUT = {
+    "tranches.list": ("programme_id",),
+    "benefits.measurement_list": ("benefit_id",),
+}
+
+# A write whose row is read back from the product's own snapshot of the live database,
+# because the deployed engine serves no read action for it yet. The directory must be
+# built AFTER the write; the value is (snapshot file, collection).
+READBACK_SNAPSHOT = {
+    "architecture.reviews_record": ("architecture.json", "compliance_reviews"),
+}
 
 # Explicit allowlist; the suffix rule below keeps list/get actions read-only without
 # having to enumerate every read action in the registry.
@@ -84,7 +150,6 @@ READ_ONLY_ACTIONS = {
     "projects.get",
     "architecture.board_get",
     "approvals.list",
-    "approvals.get",
     "documents.get",
     "pm.get",
 }
@@ -136,25 +201,32 @@ def shell_join(command):
 
 
 class Transport:
-    """Builds the argv for the deployed CLI (or the self-test stub)."""
+    """Builds the argv for the deployed CLI, a local binary, or the self-test stub."""
 
-    def __init__(self, command=None):
+    def __init__(self, command=None, local_bin=None):
         self.command = command or os.environ.get("PROGRAMME_RECORD_CMD")
+        self.local_bin = local_bin or os.environ.get("PROGRAMME_RECORD_LOCAL_BIN")
         self.tenant = os.environ.get("TENANT") or DEFAULT_TENANT
 
     def build(self, action, approval_id=None, actor_id=None, if_match=None):
-        tail = [
-            "conveyor", "admin", "action", "invoke",
+        args = [
+            "admin", "action", "invoke",
             "--tenant", self.tenant,
             "--name", action,
             "--input", "/dev/stdin",
         ]
         if approval_id:
-            tail += ["--approval-id", approval_id]
+            args += ["--approval-id", approval_id]
         if actor_id:
-            tail += ["--actor-id", actor_id]
+            args += ["--actor-id", actor_id]
         if if_match is not None:
-            tail += ["--if-match", str(if_match)]
+            args += ["--if-match", str(if_match)]
+        if self.local_bin:
+            # A branch-built binary runs the same action layer against the live database
+            # (`DATABASE_MIGRATE_URL`, `APP_KEY`); used only for actions and output categories
+            # the deployed image does not serve yet.
+            return [self.local_bin] + args
+        tail = ["conveyor"] + args
         if self.command:
             return shlex.split(self.command) + tail
         key = os.environ.get("CONVEYOR_SSH_KEY")
@@ -177,6 +249,15 @@ def execute(transport, action, payload, approval_id=None, actor_id=None, if_matc
         action, approval_id=approval_id, actor_id=actor_id, if_match=if_match
     )
     stdin = json.dumps(payload, separators=(",", ":")) + "\n"
+    if isinstance(payload, dict) and "input" in payload:
+        # The admin CLI unwraps a top-level "input" as its envelope; an action whose own input
+        # carries that key (`approvals.request`) must be wrapped so the key survives.
+        stdin = json.dumps({"input": payload}, separators=(",", ":")) + "\n"
+    env = None
+    if transport.local_bin:
+        # The binary logs to stdout; the harness requires stdout to be the action's JSON alone.
+        env = dict(os.environ)
+        env.setdefault("RUST_LOG", "error")
     try:
         completed = subprocess.run(
             command,
@@ -185,6 +266,7 @@ def execute(transport, action, payload, approval_id=None, actor_id=None, if_matc
             text=True,
             encoding="utf-8",
             errors="replace",
+            env=env,
         )
     except OSError as error:
         fail(f"{action}: cannot run transport: {error}")
@@ -224,6 +306,40 @@ def resolve_readback(action, write_input, read_action_arg, read_input_arg):
     return read_action, read_input
 
 
+def load_snapshot_row(snapshot_dir, filename, collection, row_id):
+    """The row the product's own snapshot shows, or None when it is absent."""
+    path = os.path.join(snapshot_dir, filename)
+    try:
+        with open(path, encoding="utf-8") as handle:
+            document = json.load(handle)
+    except OSError as error:
+        fail(f"snapshot: cannot read {path}: {error}")
+    except ValueError as error:
+        fail(f"snapshot: {path} is not JSON: {error}")
+    if not isinstance(document, dict):
+        fail(f"snapshot: {path} must be a JSON object")
+    rows = document.get(collection)
+    if not isinstance(rows, list):
+        fail(f"snapshot: {path} has no {collection} list")
+    for row in rows:
+        if isinstance(row, dict) and row.get("id") == row_id:
+            return row
+    return None
+
+
+def snapshot_generated_at(snapshot_dir):
+    """When the snapshot was built; evidence must show which snapshot proved the row."""
+    path = os.path.join(snapshot_dir, "programme.json")
+    try:
+        with open(path, encoding="utf-8") as handle:
+            document = json.load(handle)
+    except (OSError, ValueError):
+        return None
+    if isinstance(document, dict):
+        return document.get("generated_at")
+    return None
+
+
 def has_row(value):
     """A read-back row exists: non-null, non-empty, and not an empty list/get payload."""
     if value is None:
@@ -240,6 +356,27 @@ def has_row(value):
             if isinstance(candidate, (list, dict)):
                 return bool(candidate)
     return True
+
+
+def match_row(value, pairs):
+    """The one row in a list read-back that matches every FIELD=VALUE pair."""
+    rows = None
+    if isinstance(value, dict):
+        for key in ("items", "rows", "results"):
+            if isinstance(value.get(key), list):
+                rows = value[key]
+                break
+    elif isinstance(value, list):
+        rows = value
+    if rows is None:
+        return None, "the read-back is not a list; --read-match cannot apply"
+    for row in rows:
+        if isinstance(row, dict) and all(
+            str(row.get(field)) == expected for field, expected in pairs
+        ):
+            return row, None
+    rendered = ", ".join(f"{field}={expected}" for field, expected in pairs)
+    return None, f"no row matches {rendered}"
 
 
 def print_result(kind, action, value):
@@ -266,7 +403,10 @@ def run_check(args, transport):
         print_plan("check", action, payload, command)
         return 0
     result = execute(transport, action, payload, actor_id=actor_id)
-    print_result("check", action, result)
+    if args.quiet:
+        print(json.dumps(result, separators=(",", ":")))
+    else:
+        print_result("check", action, result)
     return 0
 
 
@@ -291,14 +431,22 @@ def run_record(args, transport):
         return 0
 
     require_evidence(args.evidence)
-    read_action, read_input = resolve_readback(
-        action, payload, args.read_action, args.read_input
-    )
+    snapshot_source = READBACK_SNAPSHOT.get(action) if args.snapshot else None
+    if snapshot_source:
+        read_action = f"snapshot:{snapshot_source[1]}"
+        read_input = {}
+    else:
+        read_action, read_input = resolve_readback(
+            action, payload, args.read_action, args.read_input
+        )
+    read_id_field = args.read_id_from_output
+    if read_id_field is None and args.read_input is None:
+        read_id_field = READBACK_ID_FROM_OUTPUT.get(action)
 
     if args.dry_run:
         planned_read = (
-            {"id": f"<from write output: {args.read_id_from_output}>"}
-            if args.read_id_from_output
+            {"id": f"<from write output: {read_id_field}>"}
+            if read_id_field
             else read_input
         )
         print_plan(
@@ -308,6 +456,10 @@ def run_record(args, transport):
             ),
             evidence=args.evidence,
         )
+        if snapshot_source:
+            print(f"== dry-run read-back: {read_action} ==")
+            print(f"snapshot: {args.snapshot}")
+            return 0
         print_plan(
             "read-back", read_action, planned_read,
             transport.build(read_action, actor_id=actor_id),
@@ -318,18 +470,64 @@ def run_record(args, transport):
         transport, action, payload, approval_id=approval_id, actor_id=actor_id,
         if_match=if_match,
     )
-    print_result("write", action, write_result)
-    if args.read_id_from_output:
-        created_id = write_result.get(args.read_id_from_output)
+    if args.quiet:
+        print(json.dumps(write_result, separators=(",", ":")))
+    else:
+        print_result("write", action, write_result)
+    created_id = None
+    created_match: list[str] = []
+    if read_id_field:
+        created_id = write_result.get(read_id_field)
         if not isinstance(created_id, str) or not created_id:
-            fail(
-                f"the write returned no {args.read_id_from_output!r}; cannot read it back"
+            fail(f"the write returned no {read_id_field!r}; cannot read it back")
+        if args.read_input is None:
+            read_input = {"id": created_id}
+        else:
+            # The read action's schema is its own (a list read takes the parent id, not the
+            # child's); the created id is proved by matching it in the rows returned.
+            created_match = [f"id={created_id}"]
+    if snapshot_source:
+        if not created_id:
+            fail(f"{action}: a snapshot read-back needs the created id (--read-id-from-output)")
+        filename, collection = snapshot_source
+        if args.snapshot_command:
+            refreshed = subprocess.run(
+                shlex.split(args.snapshot_command), capture_output=True, text=True
             )
-        read_input = {"id": created_id}
+            if refreshed.returncode != 0:
+                fail(
+                    f"{action}: --snapshot-command exited {refreshed.returncode}: "
+                    f"{refreshed.stderr.strip()[:400]}"
+                )
+        row = load_snapshot_row(args.snapshot, filename, collection, created_id)
+        if not has_row(row):
+            fail(
+                f"snapshot read-back found no {collection} row {created_id}; "
+                f"the {action} write is unverified"
+            )
+        generated_at = snapshot_generated_at(args.snapshot)
+        if not generated_at:
+            fail(f"snapshot {args.snapshot} has no generated_at; rebuild it and retry")
+        if not args.quiet:
+            print(f"snapshot: {args.snapshot} generated_at={generated_at}")
+            print_result("read-back", read_action, row)
+        return 0
     read_result = execute(transport, read_action, read_input, actor_id=actor_id)
+    if args.read_match or created_match:
+        pairs = []
+        for item in list(args.read_match or []) + created_match:
+            if "=" not in item:
+                fail(f"--read-match needs FIELD=VALUE, got {item!r}", 2)
+            field, expected = item.split("=", 1)
+            pairs.append((field.strip(), expected))
+        row, error = match_row(read_result, pairs)
+        if error:
+            fail(f"read-back {read_action}: {error}; the {action} write is unverified")
+        read_result = row
     if not has_row(read_result):
         fail(f"read-back {read_action} returned no row; the {action} write is unverified")
-    print_result("read-back", read_action, read_result)
+    if not args.quiet:
+        print_result("read-back", read_action, read_result)
     return 0
 
 
@@ -355,8 +553,10 @@ if name and os.environ.get("PROGRAMME_RECORD_EMPTY") == name:
     print("null")
 elif name == "documents.compose":
     print(json.dumps({"id": "doc-1", "title": "composed"}))
+elif name and name.endswith(".list") and os.environ.get("PROGRAMME_RECORD_LIST"):
+    print(json.dumps({"items": [{"id": "row-1", "kind": "pi", "period": "tranche-0"}]}))
 else:
-    print(json.dumps({"ok": True, "action": name, "input": payload}))
+    print(json.dumps({"ok": True, "id": "row-1", "baseline_id": "row-1", "action": name, "input": payload}))
 """
 
 
@@ -554,7 +754,6 @@ def self_test():
             "--action", "documents.compose",
             "--input", '{"title":"t","body":"body"}',
             "--evidence", evidence,
-            "--read-id-from-output", "id",
         ],
         fake_env,
         True,
@@ -626,11 +825,292 @@ def self_test():
         ),
     )
 
+    list_env = dict(fake_env)
+    list_env["PROGRAMME_RECORD_LIST"] = "1"
+
+    def verify_list_readback(completed):
+        problems = []
+        reads = [
+            call for call in calls()
+            if call["argv"][call["argv"].index("--name") + 1] == "cadences.list"
+        ]
+        if not reads:
+            problems.append("the list read-back never ran")
+        elif reads[0]["input"] != {"programme_id": "p1"}:
+            problems.append(f"the read input was {reads[0]['input']!r}")
+        return problems
+
+    run_case(
+        "a list read-back keeps its own input and matches the created id",
+        [
+            "--action", "cadences.create",
+            "--input", '{"programme_id":"p1","kind":"pi","period":"tranche-1"}',
+            "--read-action", "cadences.list",
+            "--read-input", '{"programme_id":"p1"}',
+            "--read-id-from-output", "id",
+            "--evidence", evidence,
+            "--quiet",
+        ],
+        list_env,
+        True,
+        verify_list_readback,
+    )
+
+    def verify_local_bin(completed):
+        problems = []
+        if "command: /opt/conveyor admin action invoke" not in completed.stdout:
+            problems.append("the local binary was not planned as the transport")
+        if "ssh -i" in completed.stdout:
+            problems.append("the local-binary plan still used ssh")
+        return problems
+
+    run_case(
+        "local binary transport is planned without ssh",
+        write_argv + ["--local-bin", "/opt/conveyor", "--dry-run"],
+        fake_env,
+        True,
+        verify_local_bin,
+    )
+
+    def verify_quiet(completed):
+        problems = []
+        if actions() != ["tranches.authorise", "tranches.list"]:
+            problems.append(f"calls were {actions()!r}")
+        body = completed.stdout.strip()
+        if not body.startswith("{"):
+            problems.append(f"stdout is not JSON: {body[:120]!r}")
+        if "==" in completed.stdout:
+            problems.append("--quiet printed a section header")
+        return problems
+
+    run_case(
+        "--quiet prints only the JSON",
+        write_argv + ["--quiet"],
+        fake_env,
+        True,
+        verify_quiet,
+    )
+
+    def verify_wrapped(completed):
+        problems = []
+        if not calls():
+            problems.append("the transport was not called")
+        else:
+            inner = calls()[0]["input"].get("input", {})
+            if inner.get("gate") != "projects.close":
+                problems.append(f"the nested input was not preserved: {calls()[0]['input']!r}")
+        return problems
+
+    run_case(
+        "an input field is wrapped in the admin envelope",
+        [
+            "--action", "approvals.request",
+            "--input",
+            '{"gate":"projects.close","kind":"action","action":"projects.close","input":{"id":"p1"}}',
+            "--evidence", evidence,
+            "--read-action", "approvals.list",
+            "--read-input", "{}",
+            "--read-id-from-output", "id",
+        ],
+        dict(fake_env, PROGRAMME_RECORD_LIST="1"),
+        True,
+        verify_wrapped,
+    )
+
+    # A list read-back proves the created row when it matches the row's own fields.
+    list_env = dict(fake_env)
+    list_env["PROGRAMME_RECORD_LIST"] = "1"
+    cadence_argv = [
+        "--action", "cadences.create",
+        "--input", '{"programme_id":"p1","kind":"pi","period":"tranche-0"}',
+        "--evidence", evidence,
+    ]
+    run_case(
+        "read-match finds the created row",
+        cadence_argv + ["--read-match", "kind=pi", "--read-match", "period=tranche-0"],
+        list_env,
+        True,
+        lambda completed: (
+            [] if '"kind": "pi"' in completed.stdout
+            else ["the matched row was not printed"]
+        ),
+    )
+    run_case(
+        "read-match refuses a missing row",
+        cadence_argv + ["--read-match", "period=tranche-9"],
+        list_env,
+        False,
+        lambda completed: (
+            [] if "unverified" in (completed.stdout + completed.stderr).lower()
+            else ["failure does not say the claim is unverified"]
+        ),
+    )
+
+    # The deployed engine serves no review read action yet; a review reads back from the
+    # product's own snapshot of the live database when --snapshot is given.
+    snapshot_dir = os.path.join(workdir, "snapshot")
+    os.makedirs(snapshot_dir)
+    with open(os.path.join(snapshot_dir, "architecture.json"), "w", encoding="utf-8") as handle:
+        json.dump({"compliance_reviews": [{"id": "row-1", "level": "compliant"}]}, handle)
+    with open(os.path.join(snapshot_dir, "programme.json"), "w", encoding="utf-8") as handle:
+        json.dump({"generated_at": "2026-11-21T00:00:00Z"}, handle)
+    review_argv = [
+        "--action", "architecture.reviews_record",
+        "--input", '{"project_id":"p","contract_id":"c","level":"compliant","delegation_ref":"d"}',
+        "--evidence", evidence,
+        "--snapshot", snapshot_dir,
+    ]
+
+    def verify_snapshot_readback(completed):
+        problems = []
+        if actions() != ["architecture.reviews_record"]:
+            problems.append(f"calls were {actions()!r}")
+        for needle in ("snapshot:", "generated_at=2026-11-21T00:00:00Z", '"id": "row-1"'):
+            if needle not in completed.stdout:
+                problems.append(f"stdout is missing {needle!r}")
+        return problems
+
+    run_case(
+        "a review reads back from the snapshot",
+        review_argv,
+        fake_env,
+        True,
+        verify_snapshot_readback,
+    )
+
+    empty_snapshot = os.path.join(workdir, "snapshot-empty")
+    os.makedirs(empty_snapshot)
+    with open(os.path.join(empty_snapshot, "architecture.json"), "w", encoding="utf-8") as handle:
+        json.dump({"compliance_reviews": []}, handle)
+    with open(os.path.join(empty_snapshot, "programme.json"), "w", encoding="utf-8") as handle:
+        json.dump({"generated_at": "2026-11-21T00:00:00Z"}, handle)
+    run_case(
+        "a snapshot with no row fails",
+        [empty_snapshot if part == snapshot_dir else part for part in review_argv],
+        fake_env,
+        False,
+        lambda completed: (
+            [] if "unverified" in (completed.stdout + completed.stderr).lower()
+            else ["failure does not say the claim is unverified"]
+        ),
+    )
+
+    # A write whose row cannot be read in the same transaction refreshes the snapshot first.
+    writer = os.path.join(workdir, "snapshot-writer.py")
+    with open(writer, "w", encoding="utf-8") as handle:
+        handle.write(
+            "import json, os, sys\n"
+            "d = sys.argv[1]\n"
+            "os.makedirs(d, exist_ok=True)\n"
+            "json.dump({'compliance_reviews': [{'id': 'row-1'}]}, "
+            "open(os.path.join(d, 'architecture.json'), 'w'))\n"
+            "json.dump({'generated_at': '2026-11-21T00:00:00Z'}, "
+            "open(os.path.join(d, 'programme.json'), 'w'))\n"
+        )
+    fresh_dir = os.path.join(workdir, "snapshot-fresh")
+    refreshed_argv = [
+        fresh_dir if part == snapshot_dir else part for part in review_argv
+    ] + ["--snapshot-command", shlex.join([sys.executable, "-I", writer, fresh_dir])]
+    run_case(
+        "snapshot-command refreshes the read-back",
+        refreshed_argv,
+        fake_env,
+        True,
+        lambda completed: (
+            [] if '"id": "row-1"' in completed.stdout
+            else ["the refreshed row was not printed"]
+        ),
+    )
+
+    # The lifecycle's writes must each resolve a read-back; a create whose read input is the
+    # row it made reads the id from the write output unless --read-input overrides it.
+    lifecycle = {
+        "projects.close": "projects.get",
+        "projects.close_request": "projects.get",
+        "projects.reopen": "projects.get",
+        "projects.baseline": "baselines.get",
+        "pm.plan": "pm.get",
+        "architecture.contracts_request": "architecture.contracts_get",
+        "architecture.contracts_approve": "architecture.contracts_get",
+        "architecture.artifacts_create": "architecture.artifacts_get",
+        "architecture.artifacts_approve": "architecture.artifacts_get",
+        "architecture.reviews_record": "architecture.reviews_get",
+        "documents.create": "documents.get",
+        "documents.compose": "documents.get",
+        "documents.update": "documents.get",
+    }
+    mapping_failures = []
+    for write_action, read_action in lifecycle.items():
+        if os.path.exists(log):
+            os.remove(log)
+        completed = child(
+            [
+                "--action", write_action,
+                "--input", '{"id":"00000000-0000-0000-0000-000000000001"}',
+                "--evidence", evidence,
+            ],
+            fake_env,
+        )
+        if completed.returncode != 0:
+            mapping_failures.append(
+                f"{write_action}: exit {completed.returncode}: "
+                f"{completed.stderr.strip()[:200]}"
+            )
+            continue
+        calls_for_action = actions()
+        if calls_for_action != [write_action, read_action]:
+            mapping_failures.append(f"{write_action}: calls were {calls_for_action!r}")
+            continue
+        if write_action in READBACK_ID_FROM_OUTPUT:
+            expected_id = "doc-1" if write_action == "documents.compose" else "row-1"
+            if calls()[1]["input"] != {"id": expected_id}:
+                mapping_failures.append(
+                    f"{write_action}: read input was {calls()[1]['input']!r}"
+                )
+    if mapping_failures:
+        failures.append("lifecycle mappings")
+        print("FAIL lifecycle mappings")
+        for problem in mapping_failures:
+            print(f"  - {problem}")
+    else:
+        print("PASS lifecycle mappings")
+
+    # Every action this harness names must exist in the product's registry. The read-back map
+    # and the read-only allowlist are hand-maintained; a typo used to surface only at the live
+    # engine, after the write (approvals.get, 2026-11-22).
+    registry_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "docs", "design", "data", "actions.json",
+    )
+    named = (
+        set(READBACK_MAP)
+        | set(READBACK_MAP.values())
+        | set(READ_ONLY_ACTIONS)
+        | set(lifecycle)
+        | set(lifecycle.values())
+    )
+    try:
+        with open(registry_path, encoding="utf-8") as handle:
+            registry = set(json.load(handle)["actions"])
+    except (OSError, ValueError, KeyError) as error:
+        failures.append("registry resolution")
+        print("FAIL registry resolution")
+        print(f"  - cannot read {registry_path}: {error}")
+    else:
+        missing = sorted(named - registry)
+        if missing:
+            failures.append("registry resolution")
+            print("FAIL registry resolution")
+            for action in missing:
+                print(f"  - {action} is not a registered action")
+        else:
+            print(f"PASS registry resolution ({len(named)} actions)")
+
     print()
     if failures:
-        print(f"SELF-TEST FAILED: {len(failures)} of 10 cases: {', '.join(failures)}")
+        print(f"SELF-TEST FAILED: {len(failures)} of 20 cases: {', '.join(failures)}")
         return 1
-    print("SELF-TEST OK: 10 cases passed")
+    print("SELF-TEST OK: 20 cases passed")
     return 0
 
 
@@ -643,6 +1123,23 @@ def main(argv=None):
     parser.add_argument("--input", metavar="JSON|@FILE", help="action input")
     parser.add_argument("--read-action", metavar="NAME", help="read-back action")
     parser.add_argument("--read-input", metavar="JSON|@FILE", help="read-back input")
+    parser.add_argument(
+        "--read-match",
+        action="append",
+        default=[],
+        metavar="FIELD=VALUE",
+        help="require a row in a list read-back to match (repeatable)",
+    )
+    parser.add_argument(
+        "--snapshot",
+        metavar="DIR",
+        help="read the created row from this snapshot (built after the write)",
+    )
+    parser.add_argument(
+        "--snapshot-command",
+        metavar="CMD",
+        help="run this command after the write to refresh --snapshot before the read-back",
+    )
     parser.add_argument("--evidence", metavar="PATH", help="required for a write")
     parser.add_argument("--approval-id", metavar="UUID", help="approved gate for the write")
     parser.add_argument("--actor-id", metavar="UUID", help="act as this actor")
@@ -655,15 +1152,25 @@ def main(argv=None):
         "--if-match", type=int, metavar="VERSION", help="the row version the write is made against"
     )
     parser.add_argument("--dry-run", action="store_true", help="print the plan; invoke nothing")
+    parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="print only the action's JSON on stdout (the read-back still runs)",
+    )
     parser.add_argument("--check", action="store_true", help="read-only probe")
     parser.add_argument("--self-test", action="store_true", help="run the fake-transport tests")
     parser.add_argument("--command", metavar="CMD", help="transport override (self-test hook)")
+    parser.add_argument(
+        "--local-bin",
+        metavar="PATH",
+        help="run the action in a locally built binary (needs DATABASE_MIGRATE_URL and APP_KEY)",
+    )
     args = parser.parse_args(argv)
 
     if args.self_test:
         return self_test()
 
-    transport = Transport(command=args.command)
+    transport = Transport(command=args.command, local_bin=args.local_bin)
     if args.check:
         return run_check(args, transport)
     return run_record(args, transport)

@@ -31,7 +31,7 @@ State labels: `built | partial | planned | absent | proposed`. Every citation re
 - **absent** — no action beginning `kata.` in `docs/design/data/actions.json`; the measurement entry points are the built `benchmark_runs.start|get|compare` and `eval_runs.start`.
 - **absent** — no candidate, measurement, propagation or outcome table in `migrations/`.
 - **absent** — no decision-time held-out enforcement: the split label exists, but no action refuses an adoption measured on `train`.
-- **absent** — no `lesson` table and no `lessons.*` action; §7.6 promotion has no mechanism.
+- **partial** — `migrations/0056_cadence_tranche.sql:10` creates the `lesson` table and `lessons.propose`/`lessons.list` are registered, so a lesson can be recorded and read; the §7.6 **promotion mechanism** — an evidence-gated promotion of a lesson into a job, prompt or knowledge change — is absent.
 - **absent** — no kata-tenant policy of D45: tenancy exists, but nothing gives a kata its own approvals and budget.
 - **refused** — a kata may not edit its instrument, approve its own adoption, measure on the training split only, or open a second kata for an open signature (§6.3, §9.3).
 

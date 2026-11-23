@@ -271,6 +271,13 @@ pub struct ApprovalDecideIn {
     /// Per-item decisions, when the gate covers several items.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub item_decisions: Option<Value>,
+    /// The published owner decision that delegates this approval.
+    ///
+    /// A delegated decision is recorded as `decided_by_kind='rule'` with the reference in
+    /// `via`, never as a human decision: the audit says a policy acted under a named decision,
+    /// and a gate that requires a person accepts it only by naming its delegation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub delegation_ref: Option<Uuid>,
 }
 
 /// `approvals.request` — a question posed for a human to decide (S06b §5).
@@ -307,6 +314,12 @@ pub struct ApprovalRequestIn {
     /// The answer the requester proposes; stored in `meta.proposed_answer`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub proposed_answer: Option<String>,
+    /// Whether a decision must carry an answer in its note.
+    ///
+    /// A free-text question sets this; a yes/no gate does not. The decision writer refuses an
+    /// empty note on such a gate, on every channel, so the answer cannot be lost.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub requires_answer: Option<bool>,
     /// The decisions a responder may give; stored in `meta.allowed_decisions`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allowed_decisions: Option<Value>,
@@ -349,8 +362,19 @@ pub struct ApprovalRequestIn {
     #[serde(default)]
     pub evidence: Vec<crate::pm::EvidenceRef>,
     /// Refuse an empty evidence list when true.
+    ///
+    /// A caller can only **add** this requirement. A gate for a destructive action (one with an
+    /// `approval_policy` row) requires evidence whatever this says; `false` cannot remove it.
     #[serde(default)]
     pub require_evidence: bool,
+    /// Why this gate carries no evidence — the explicit §5.4 override.
+    ///
+    /// Ignored when the gate does not require evidence or when `evidence` is non-empty. A reason
+    /// that is non-empty after trim opens an evidence-less gate and is stored in
+    /// `meta.evidence_waiver`; an empty or whitespace-only reason is not a waiver, so a gate that
+    /// requires evidence is refused (`422 gate_evidence_missing`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evidence_waiver_reason: Option<String>,
 }
 
 /// `approvals.list` — the gate filters plus the shared page envelope.
@@ -414,6 +438,12 @@ pub struct ApprovalOut {
     /// The answer the requester proposed (`meta.proposed_answer`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub proposed_answer: Option<String>,
+    /// Whether a decision must carry an answer in its note (`meta.requires_answer`).
+    ///
+    /// A free-text question sets it, and the decision writer refuses an empty note on such a
+    /// gate, so the approvals screen renders an answer box instead of a bare approve/reject.
+    #[serde(default)]
+    pub requires_answer: bool,
     /// The decisions a responder may give (`meta.allowed_decisions`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allowed_decisions: Option<Value>,
@@ -817,7 +847,8 @@ pub struct ApprovalPolicyOut {
     pub action: String,
     /// `required` — an approved approval naming the exact target is needed; `waived` — it is not.
     pub approval: String,
-    /// `forbidden` — the requester cannot decide its own gate (§5.4); `allowed` — they may.
+    /// **Always `forbidden`.** SPEC_V2 §5.4 makes the requester's exclusion an invariant; a
+    /// historical `allowed` row still reads, but this answer is the invariant (ledger v1-w4b-4).
     pub self_approval: String,
 }
 
@@ -831,8 +862,9 @@ pub struct ApprovalPolicyGetIn {
 
 /// `approval_policies.set` input — the complete decision for one action.
 ///
-/// Both settings are required: a `set` replaces the whole policy, so leaving one out would mean
-/// silently resetting it to the default rather than leaving it alone.
+/// Both fields are required: a `set` replaces the whole policy, so leaving one out would mean
+/// silently resetting it to the default rather than leaving it alone. `self_approval` accepts
+/// only `forbidden`; `allowed` is refused 422 because §5.4 is an invariant (ledger v1-w4b-4).
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ApprovalPolicySetIn {
@@ -840,6 +872,6 @@ pub struct ApprovalPolicySetIn {
     pub action: String,
     /// `required` or `waived`.
     pub approval: String,
-    /// `forbidden` or `allowed`.
+    /// `forbidden` only: `allowed` is refused 422 (SPEC_V2 §5.4, ledger v1-w4b-4).
     pub self_approval: String,
 }
