@@ -88,7 +88,8 @@ window.ArchitecturePack = (function () {
   participant BR as Tool broker
   participant G as Approval gate
   participant EV as Evidence
-  P->>API: start a run for a card and binding
+  P->>API: start a run for a card
+  API->>B: inherit the card's job_binding_id (or refuse a conflict)
   API->>WF: enqueue the run
   WF->>B: check the pinned release_hash
   alt retired binding, stale pin or unknown kind
@@ -120,6 +121,7 @@ window.ArchitecturePack = (function () {
         G->>WF: cancel the run, draft unattached
       end
     end
+    WF->>KM: one attempt hot row, in the terminal transaction (root card runs)
     WF->>EV: run, step, tool_call and inference_call rows
     WF-->>P: terminal result
   end`,

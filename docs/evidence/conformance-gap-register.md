@@ -6,7 +6,7 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 |---|---:|
 | P0 | 22 |
 | P1 | 132 |
-| P2 | 35 |
+| P2 | 37 |
 | P3 | 0 |
 
 ## P0 and P1
@@ -207,8 +207,8 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 | T10 | closed | 4 | 1 | 2 | 0 | 0 |
 | T11 | active | 1 | 0 | 5 | 1 | 0 |
 | T12 | active | 13 | 0 | 3 | 2 | 0 |
-| T13 | closed | 3 | 1 | 2 | 0 | 0 |
-| T14 | closed | 4 | 2 | 3 | 0 | 0 |
+| T13 | closed | 3 | 1 | 2 | 1 | 0 |
+| T14 | closed | 4 | 2 | 3 | 1 | 0 |
 | T15 | active | 12 | 0 | 3 | 2 | 0 |
 | T16 | active | 4 | 0 | 5 | 1 | 0 |
 | T17 | active | 5 | 0 | 3 | 2 | 0 |

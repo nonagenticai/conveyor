@@ -155,6 +155,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0013-real-v2-ui.md"
     },
     {
+      "title": "0014 — The work package's run: the card names the binding, the terminal run records its memory",
+      "path": "docs/decisions/0014-work-package-run.html",
+      "source": "docs/decisions/0014-work-package-run.md",
+      "section": "Decisions",
+      "sha256": "844653aa52f5f68de2eb38a28151d502e37711d9e322376c49517fd6ac37b7b7",
+      "bytes": 6614,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0014-work-package-run.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
@@ -443,6 +452,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-PLAN.md"
     },
     {
+      "title": "S21 step 6 — the work package's run: card binding, terminal memory, live proof",
+      "path": "docs/evidence/S21-RUN.html",
+      "source": "docs/evidence/S21-RUN.md",
+      "section": "Evidence",
+      "sha256": "d02376ff2af8864e85be31e6bea6b654dec8ec859d63fbc66ef1f9e4c162de8f",
+      "bytes": 7406,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-RUN.md"
+    },
+    {
       "title": "S21 step 3 — the work-package prompt envelope (issue #15)",
       "path": "docs/evidence/S21-WORKPACKAGE.html",
       "source": "docs/evidence/S21-WORKPACKAGE.md",
@@ -474,7 +492,7 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "aa21da69c78b166169d06e4d2d6ab4c403eecd991339a0bc78b283560d1be7e7",
+      "sha256": "3af146911c2fcaf363e9f386cb4ebd5639dca2de449fe60b4a4f71d67cf31c4d",
       "bytes": 23231,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
@@ -573,8 +591,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "503545ddefd2ab768da6a4c6b7b788e5c64b0d0b0a821703a3c147d133e5556c",
-      "bytes": 254568,
+      "sha256": "62d4dea53aa6abcbd9c2df2c501266f6dc9b200c6fb31a57b6bf702057e8f560",
+      "bytes": 255541,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -582,8 +600,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "18e99a0cd84c55bf66c5a8e398e4234b3c9bf525736a24aaa691c383bf32b02a",
-      "bytes": 73959,
+      "sha256": "85fe038c0ab33a2d2fe7edb48318a9668e4f8cd3fcf75f20fa1b2ecdf2a42cc0",
+      "bytes": 77277,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -591,8 +609,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "dd2d079da26506ec845df4cf0ae2bec6146b5ce909d25e41b32244213118b59f",
-      "bytes": 145573,
+      "sha256": "e02d8f71ec61e14676795c5cc8e969adf73f14c1c0f1ca88f222ab01fd263621",
+      "bytes": 147521,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -1185,8 +1203,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "352669eb90ffde211202ef2774c2eb2dff5f91cf96d368b4265d1c59a17b64f3",
-      "bytes": 37491,
+      "sha256": "a5cbb76e65c766ad4848e3451838b0df51c5272ef41f13755c8868e37b62f990",
+      "bytes": 42061,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

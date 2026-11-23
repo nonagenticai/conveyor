@@ -994,6 +994,7 @@ async fn metrics_reconcile(
                 card_type_code: "incident".to_owned(),
                 due_at: None,
                 parent_card_id: None,
+                job_binding_id: None,
                 meta: Some(serde_json::json!({
                     "period_start": input.period_start.to_string(),
                     "period_end": input.period_end.to_string(),
