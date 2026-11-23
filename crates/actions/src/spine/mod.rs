@@ -181,6 +181,17 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "benefit_baseline_missing",
             "a benefit with no measured baseline cannot record a post-transition measurement",
         ),
+        PlanStoreError::Illegal(PlanError::BenefitMeasurementInvalid { field }) => invalid(
+            field,
+            "benefit_measurement_invalid",
+            "a baseline or post reading is a number and a unit; a missing value, a blank unit \
+             and a placeholder unit are not measurements",
+        ),
+        PlanStoreError::Illegal(PlanError::BenefitMeasurementEvidenceMissing) => invalid(
+            "evidence",
+            "benefit_measurement_evidence_missing",
+            "the readings a realized claim cites must each carry the evidence behind them",
+        ),
         PlanStoreError::Illegal(PlanError::BenefitPostMeasurementMissing) => invalid(
             "post_measured_at",
             "benefit_post_measurement_missing",
