@@ -2909,6 +2909,12 @@ fn ClimbTab(
             .unwrap_or_else(|| "correct".to_owned()),
     );
     let delta = RwSignal::new("0.05".to_owned());
+    // The goal kind decides the start payload: a quality target climbs a metric upward, while
+    // a cost goal is `cost_usd` downward with a quality hold as its guardrail.
+    let goal_kind = RwSignal::new("quality".to_owned());
+    let hold_metric = RwSignal::new(String::new());
+    let hold_min = RwSignal::new(String::new());
+    let ceiling_cents = RwSignal::new(String::new());
     let detail = RwSignal::new(Option::<Result<EvalClimb, ApiError>>::None);
     let can_start = move || ctx.has_action("eval_climbs.start");
     let can_round = ctx.has_action("eval_climbs.round");
@@ -3041,19 +3047,59 @@ fn ClimbTab(
         let eval_id = eval_id.clone();
         move |_| {
             let eval_id = eval_id.clone();
-            let goal_target = target.get_untracked();
             let delta_value = delta.get_untracked().parse::<f64>().unwrap_or(0.05);
+            // A cost goal is `cost_usd` with at least one quality hold: the hold is the
+            // guardrail that stops a saving being bought with a quality drop. The action
+            // refuses the same shape, but the form can refuse it before the round trip.
+            let goal = if goal_kind.get_untracked() == "cost" {
+                let metric = hold_metric.get_untracked().trim().to_owned();
+                let floor_raw = hold_min.get_untracked().trim().to_owned();
+                if metric.is_empty() || floor_raw.is_empty() {
+                    notice.set(Some(
+                        "A cost climb needs a quality guardrail: set its metric and floor."
+                            .to_owned(),
+                    ));
+                    return;
+                }
+                let floor = match floor_raw.parse::<f64>() {
+                    Ok(value) if value.is_finite() => value,
+                    _ => {
+                        notice.set(Some("The guardrail floor must be a number.".to_owned()));
+                        return;
+                    }
+                };
+                json!({
+                    "target": "cost_usd",
+                    "direction": "lower",
+                    "hold": [{"metric": metric, "min": floor}],
+                })
+            } else {
+                json!({
+                    "target": target.get_untracked(),
+                    "direction": "higher",
+                    "hold": [],
+                })
+            };
+            let mut input = json!({
+                "eval_id": eval_id,
+                "goal": goal,
+                "delta": delta_value,
+            });
+            let ceiling = ceiling_cents.get_untracked().trim().to_owned();
+            if !ceiling.is_empty() {
+                match ceiling.parse::<i32>() {
+                    Ok(cents) if cents >= 0 => input["cost_ceiling_cents"] = json!(cents),
+                    _ => {
+                        notice.set(Some(
+                            "The spend ceiling must be a whole number of cents.".to_owned(),
+                        ));
+                        return;
+                    }
+                }
+            }
             leptos::task::spawn_local(async move {
                 match ctx
-                    .invoke(
-                        "eval_climbs.start",
-                        json!({
-                            "eval_id": eval_id,
-                            "goal": {"target": goal_target, "direction": "higher", "hold": []},
-                            "delta": delta_value,
-                        }),
-                        InvokeOptions::default(),
-                    )
+                    .invoke("eval_climbs.start", input, InvokeOptions::default())
                     .await
                 {
                     Ok(_) => refresh.run(()),
@@ -3072,7 +3118,7 @@ fn ClimbTab(
                 view! {
                     <table class="wtbl">
                         <thead><tr>
-                            <th>"Climb"</th><th>"Target"</th><th>"Status"</th>
+                            <th>"Climb"</th><th>"Goal"</th><th>"Guardrail"</th><th>"Status"</th>
                             <th class="n">"Round"</th><th class="n">"Best"</th><th class="n">"Spend"</th><th></th>
                         </tr></thead>
                         <tbody>
@@ -3089,7 +3135,8 @@ fn ClimbTab(
                                 view! {
                                     <tr>
                                         <td class="mono">{short_id(Some(&id))}</td>
-                                        <td class="mono">{climb.target.clone()}</td>
+                                        <td class="mono">{format!("{} · {}", climb.target, climb.direction)}</td>
+                                        <td class="mono">{climb_guardrails(&climb)}</td>
                                         <td><StatusPill status=climb.status.clone()/></td>
                                         <td class="n">{format!("{}/{}", climb.current_round, climb.max_rounds.unwrap_or(0))}</td>
                                         <td class="n">{climb.best_round.map(|round| round.to_string()).unwrap_or_else(|| "—".to_owned())}</td>
@@ -3129,11 +3176,27 @@ fn ClimbTab(
                 }.into_any()
             }}
             {can_start().then(|| view! {
+                <>
                 <div class="filterbar" style="margin-top:10px">
+                    <label class="filter">
+                        <span>"Goal"</span>
+                        <select
+                            aria-label="Goal kind"
+                            on:change=move |event| goal_kind.set(event_target_value(&event))
+                        >
+                            <option value="quality" selected=move || goal_kind.get() == "quality">
+                                "quality (higher is better)"
+                            </option>
+                            <option value="cost" selected=move || goal_kind.get() == "cost">
+                                "cost (lower is better)"
+                            </option>
+                        </select>
+                    </label>
                     <label class="filter">
                         <span>"Target metric"</span>
                         <input
                             type="text"
+                            disabled=move || goal_kind.get() == "cost"
                             prop:value=move || target.get()
                             on:input=move |event| {
                                 if let Some(input) = event.target().and_then(|target| target.dyn_into::<web_sys::HtmlInputElement>().ok()) {
@@ -3154,14 +3217,49 @@ fn ClimbTab(
                             }
                         />
                     </label>
+                    <label class="filter">
+                        <span>"Spend ceiling (cents)"</span>
+                        <input
+                            type="number" step="1" min="0" placeholder="optional"
+                            prop:value=move || ceiling_cents.get()
+                            on:input=move |event| ceiling_cents.set(event_target_value(&event))
+                        />
+                    </label>
                     <button class="btn pri small" on:click=on_start>"Start climb"</button>
                 </div>
+                {move || (goal_kind.get() == "cost").then(|| view! {
+                    <div class="filterbar" style="margin-top:8px">
+                        <label class="filter">
+                            <span>"Guardrail metric"</span>
+                            <input
+                                type="text" placeholder="a quality metric that must not fall"
+                                prop:value=move || hold_metric.get()
+                                on:input=move |event| hold_metric.set(event_target_value(&event))
+                            />
+                        </label>
+                        <label class="filter">
+                            <span>"Guardrail floor"</span>
+                            <input
+                                type="number" step="0.01"
+                                prop:value=move || hold_min.get()
+                                on:input=move |event| hold_min.set(event_target_value(&event))
+                            />
+                        </label>
+                        <span class="muted">"a cost climb is refused without a held quality metric"</span>
+                    </div>
+                }.into_any())}
+                </>
             })}
             {move || detail.get().map(|outcome| match outcome {
                 Err(error) => view! { <div class="callout bad"><p>{error.to_string()}</p></div> }.into_any(),
                 Ok(climb) => view! {
                     <section class="panel" style="margin-top:10px">
-                        <div class="ph"><span>"Rounds"</span><span class="muted">{format!("{} · {}", climb.status, climb.direction)}</span></div>
+                        <div class="ph">
+                            <span>"Rounds"</span>
+                            <span class="muted">
+                                {format!("{} · {} {} · {}", climb.status, climb.target, climb.direction, climb_guardrails(&climb))}
+                            </span>
+                        </div>
                         {if climb.rounds.is_empty() {
                             view! { <Empty message="This climb has no rounds yet.".to_owned()/> }.into_any()
                         } else {
@@ -3341,6 +3439,32 @@ fn ClimbTab(
 }
 
 // ── helpers ─────────────────────────────────────────────────────────────────────────────
+
+/// A climb's guardrails, as the start form recorded them: every hold floor, then the spend
+/// ceiling. A cost climb's holds are what keep a saving honest; a quality climb's ceiling caps
+/// the bill. Either can be absent, so an empty answer is `—`, never a blank cell.
+fn climb_guardrails(climb: &EvalClimb) -> String {
+    let mut parts = Vec::new();
+    if let Some(holds) = climb.goal.get("hold").and_then(Value::as_array) {
+        for hold in holds {
+            let Some(metric) = hold.get("metric").and_then(Value::as_str) else {
+                continue;
+            };
+            match hold.get("min").and_then(Value::as_f64) {
+                Some(min) => parts.push(format!("{metric} ≥ {min:.2}")),
+                None => parts.push(metric.to_owned()),
+            }
+        }
+    }
+    if let Some(cents) = climb.cost_ceiling_cents {
+        parts.push(format!("spend ≤ ${:.2}", f64::from(cents) / 100.0));
+    }
+    if parts.is_empty() {
+        "—".to_owned()
+    } else {
+        parts.join(" · ")
+    }
+}
 
 /// The value of an input, textarea or select, whichever the event's target is.
 fn event_target_value(event: &web_sys::Event) -> String {
