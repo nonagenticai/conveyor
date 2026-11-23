@@ -291,6 +291,11 @@ fn plan_approval_error(error: store::ApprovalStoreError, action: &str) -> Action
             "human_only",
             format!("{action:?}: a PI plan is approved by a person"),
         ),
+        store::ApprovalStoreError::ExecutorGateHumanOnly => ActionError::new(
+            403,
+            "executor_gate_requires_human",
+            format!("{action:?}: an executor gate must be decided by a person"),
+        ),
         store::ApprovalStoreError::EvalScopeRequired => ActionError::new(
             403,
             "eval_scope_required",

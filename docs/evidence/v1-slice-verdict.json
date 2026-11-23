@@ -1,10 +1,10 @@
 {
   "schema": "verify-slices/v1",
-  "audited_sha": "5d7d5439e0f41c1bbf122f8dfa69951366ae0e4c",
+  "audited_sha": "46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7",
   "snapshot": {
-    "path": "/tmp/snap-w3d/data",
-    "git_sha": "5d7d5439e0f41c1bbf122f8dfa69951366ae0e4c",
-    "generated_at": "2026-11-22T20:25:14.132907+00:00"
+    "path": "/tmp/snap-r0/data",
+    "git_sha": "46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7",
+    "generated_at": "2026-11-23T07:38:20.287935+00:00"
   },
   "slices": [
     {
@@ -444,14 +444,14 @@
         {
           "id": "T3-pi-plan",
           "kind": "generic",
-          "result": "fail",
-          "detail": "no published pi-plan output for tranche-3"
+          "result": "pass",
+          "detail": "the tranche-3 PI plan is published"
         },
         {
           "id": "T3-pi-objectives",
           "kind": "generic",
-          "result": "fail",
-          "detail": "no published pi-objectives output for tranche-3"
+          "result": "pass",
+          "detail": "the tranche-3 PI objectives are published"
         },
         {
           "id": "T3-wsjf",
@@ -468,8 +468,8 @@
         {
           "id": "T3-lessons",
           "kind": "generic",
-          "result": "fail",
-          "detail": "the tranche-3 retro produced no lesson"
+          "result": "pass",
+          "detail": "lesson 01a2075f-4f24-7383-aa6d-3eeb88b0faf6 carries a statement and evidence from the tranche-3 retro"
         },
         {
           "id": "T3-product",
@@ -482,12 +482,12 @@
       "reason": "gate check 'T3-baseline' did not pass: no project baseline",
       "evidence": {
         "path": "docs/evidence/rework/T3.json",
-        "git_sha": "97d45aa63832ccfcd03cfac5b8a5014bc63155fb",
-        "generated_at": "2026-11-22T19:42:05.145323+00:00"
+        "git_sha": "cdfb0d8e9dea3a0e7bb887746ca2169f6def3740",
+        "generated_at": "2026-11-22T21:40:58.454213+00:00"
       },
       "findings": {
         "total": 18,
-        "unresolved": 12
+        "unresolved": 9
       }
     },
     {
@@ -600,8 +600,8 @@
         {
           "id": "T4-product",
           "kind": "generic",
-          "result": "pass",
-          "detail": "no open P0 package for this project"
+          "result": "fail",
+          "detail": "1 open P0 package(s): std-pmp-change-control-t4:T4"
         }
       ],
       "status": "absent",
@@ -613,7 +613,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 5
+        "unresolved": 6
       }
     },
     {
@@ -1182,8 +1182,8 @@
         {
           "id": "T9-closure-gate",
           "kind": "generic",
-          "result": "fail",
-          "detail": "no approved closure gate for the project"
+          "result": "pass",
+          "detail": "latest closure gate 01a20757-61dd-7df2-a800-91c68dd5f337 decided by a distinct approver"
         },
         {
           "id": "T9-waivers",
@@ -1235,15 +1235,15 @@
         }
       ],
       "status": "absent",
-      "reason": "gate check 'T9-closure-gate' did not pass: no approved closure gate for the project",
+      "reason": "gate check 'T9-pi-plan' did not pass: no published pi-plan output for tranche-4",
       "evidence": {
         "path": "docs/evidence/rework/T9.json",
-        "git_sha": "97d45aa63832ccfcd03cfac5b8a5014bc63155fb",
-        "generated_at": "2026-11-22T19:42:05.790540+00:00"
+        "git_sha": "df7d648894ecedceffef7b3fe2923b6235c34f44",
+        "generated_at": "2026-11-22T21:53:06.626201+00:00"
       },
       "findings": {
         "total": 18,
-        "unresolved": 4
+        "unresolved": 3
       }
     },
     {
@@ -1308,8 +1308,8 @@
         {
           "id": "T10-closure-gate",
           "kind": "generic",
-          "result": "fail",
-          "detail": "no approved closure gate for the project"
+          "result": "pass",
+          "detail": "latest closure gate 01a20757-5dba-7e93-9dff-51b400a4e910 decided by a distinct approver"
         },
         {
           "id": "T10-waivers",
@@ -1357,19 +1357,19 @@
           "id": "T10-product",
           "kind": "generic",
           "result": "fail",
-          "detail": "1 open P0 package(s): pi_plan_missing:tranche-3"
+          "detail": "1 open P0 package(s): pi_plan_missing:tranche-4"
         }
       ],
       "status": "absent",
-      "reason": "gate check 'T10-closure-gate' did not pass: no approved closure gate for the project",
+      "reason": "gate check 'T10-pi-plan' did not pass: no published pi-plan output for tranche-4",
       "evidence": {
         "path": "docs/evidence/rework/T10.json",
-        "git_sha": "97d45aa63832ccfcd03cfac5b8a5014bc63155fb",
-        "generated_at": "2026-11-22T19:42:04.032081+00:00"
+        "git_sha": "cdfb0d8e9dea3a0e7bb887746ca2169f6def3740",
+        "generated_at": "2026-11-22T21:50:24.122521+00:00"
       },
       "findings": {
         "total": 18,
-        "unresolved": 5
+        "unresolved": 4
       }
     },
     {
@@ -1609,7 +1609,7 @@
           "id": "T12-product",
           "kind": "generic",
           "result": "fail",
-          "detail": "6 open P0 package(s): project_in_unauthorised_tranche:tranche-10, project_in_unauthorised_tranche:tranche-4, project_in_unauthorised_tranche:tranche-5, project_in_unauthorised_tranche:tranche-6, project_in_unauthorised_tranche:tranche-7, project_in_unauthorised_tranche:tranche-8"
+          "detail": "5 open P0 package(s): project_in_unauthorised_tranche:tranche-10, project_in_unauthorised_tranche:tranche-5, project_in_unauthorised_tranche:tranche-6, project_in_unauthorised_tranche:tranche-7, project_in_unauthorised_tranche:tranche-8"
         }
       ],
       "status": "absent",
@@ -1686,8 +1686,8 @@
         {
           "id": "T13-closure-gate",
           "kind": "generic",
-          "result": "fail",
-          "detail": "no approved closure gate for the project"
+          "result": "pass",
+          "detail": "latest closure gate 01a20757-5927-7991-b030-d8880c95eedf decided by a distinct approver"
         },
         {
           "id": "T13-waivers",
@@ -1704,14 +1704,14 @@
         {
           "id": "T13-pi-plan",
           "kind": "generic",
-          "result": "fail",
-          "detail": "no published pi-plan output for tranche-3"
+          "result": "pass",
+          "detail": "the tranche-3 PI plan is published"
         },
         {
           "id": "T13-pi-objectives",
           "kind": "generic",
-          "result": "fail",
-          "detail": "no published pi-objectives output for tranche-3"
+          "result": "pass",
+          "detail": "the tranche-3 PI objectives are published"
         },
         {
           "id": "T13-wsjf",
@@ -1728,8 +1728,8 @@
         {
           "id": "T13-lessons",
           "kind": "generic",
-          "result": "fail",
-          "detail": "the tranche-3 retro produced no lesson"
+          "result": "pass",
+          "detail": "lesson 01a2075f-4f24-7383-aa6d-3eeb88b0faf6 carries a statement and evidence from the tranche-3 retro"
         },
         {
           "id": "T13-product",
@@ -1738,16 +1738,16 @@
           "detail": "no open P0 package for this project"
         }
       ],
-      "status": "absent",
-      "reason": "gate check 'T13-closure-gate' did not pass: no approved closure gate for the project",
+      "status": "partial",
+      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
       "evidence": {
         "path": "docs/evidence/rework/T13.json",
-        "git_sha": "97d45aa63832ccfcd03cfac5b8a5014bc63155fb",
-        "generated_at": "2026-11-22T19:42:04.373327+00:00"
+        "git_sha": "206668306197e6bb69f06a0d5332e4ca03256053",
+        "generated_at": "2026-11-22T21:28:59.150654+00:00"
       },
       "findings": {
         "total": 18,
-        "unresolved": 4
+        "unresolved": 0
       }
     },
     {
@@ -1861,7 +1861,7 @@
           "id": "T14-product",
           "kind": "generic",
           "result": "fail",
-          "detail": "1 open P0 package(s): closed_without_closure_review:T14"
+          "detail": "4 open P0 package(s): closed_without_closure_review:T14, std-pmp-change-control-t14:T14, std-pmp-project-baseline-t14:T14, std-togaf-compliance-review-t14:T14"
         }
       ],
       "status": "absent",
@@ -2113,7 +2113,7 @@
           "id": "T16-product",
           "kind": "generic",
           "result": "fail",
-          "detail": "1 open P0 package(s): closed_without_closure_review:T16"
+          "detail": "4 open P0 package(s): closed_without_closure_review:T16, std-pmp-change-control-t16:T16, std-pmp-project-baseline-t16:T16, std-togaf-compliance-review-t16:T16"
         }
       ],
       "status": "absent",
@@ -2252,6 +2252,25 @@
       "findings": {
         "total": 18,
         "unresolved": 12
+      }
+    },
+    {
+      "id": "T18",
+      "spec_gate": "a signed-in tenant drives portfolio \u2192 programme \u2192 project \u2192 work package, organisation \u2192 release \u2192 binding, procedures intake \u2192 publish, tools call \u2192 ledger, improve \u2192 kata \u2192 adoption, operations incident \u2192 postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports `exists` only from a real route + spec; no production screen renders a fixture",
+      "plan": null,
+      "manifest": null,
+      "gate_checks": [],
+      "checks": [],
+      "status": "absent",
+      "reason": "no manifest at acceptance/programme/T18.toml",
+      "evidence": {
+        "path": null,
+        "git_sha": null,
+        "generated_at": null
+      },
+      "findings": {
+        "total": 3,
+        "unresolved": 2
       }
     },
     {
@@ -2742,8 +2761,8 @@
         {
           "id": "S04-project",
           "kind": "generic",
-          "result": "pass",
-          "detail": "project S04 is active"
+          "result": "fail",
+          "detail": "status is 'active', expected 'closed'"
         },
         {
           "id": "S04-baseline",
@@ -2796,20 +2815,20 @@
         {
           "id": "S04-pi-plan",
           "kind": "generic",
-          "result": "fail",
-          "detail": "no published pi-plan output for tranche-3"
+          "result": "pass",
+          "detail": "the tranche-3 PI plan is published"
         },
         {
           "id": "S04-pi-objectives",
           "kind": "generic",
-          "result": "fail",
-          "detail": "no published pi-objectives output for tranche-3"
+          "result": "pass",
+          "detail": "the tranche-3 PI objectives are published"
         },
         {
           "id": "S04-lessons",
           "kind": "generic",
-          "result": "fail",
-          "detail": "the tranche-3 retro produced no lesson"
+          "result": "pass",
+          "detail": "lesson 01a2075f-4f24-7383-aa6d-3eeb88b0faf6 carries a statement and evidence from the tranche-3 retro"
         },
         {
           "id": "S04-wsjf",
@@ -2831,15 +2850,15 @@
         }
       ],
       "status": "absent",
-      "reason": "gate check 'S04-closure-outputs' did not pass: the project declares no closure_outputs",
+      "reason": "gate check 'S04-project' did not pass: status is 'active', expected 'closed'",
       "evidence": {
         "path": "docs/evidence/rework/S04.json",
-        "git_sha": "97d45aa63832ccfcd03cfac5b8a5014bc63155fb",
-        "generated_at": "2026-11-22T19:42:01.370819+00:00"
+        "git_sha": "a9a5f20ac37b195b94127996537de4cc332867c9",
+        "generated_at": "2026-11-22T22:08:29.467389+00:00"
       },
       "findings": {
         "total": 18,
-        "unresolved": 6
+        "unresolved": 4
       }
     },
     {
@@ -2952,8 +2971,8 @@
         {
           "id": "S05-product",
           "kind": "generic",
-          "result": "pass",
-          "detail": "no open P0 package for this project"
+          "result": "fail",
+          "detail": "3 open P0 package(s): std-pmp-change-control-s05:S05, std-pmp-project-baseline-s05:S05, std-togaf-compliance-review-s05:S05"
         }
       ],
       "status": "absent",
@@ -2965,7 +2984,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 11
+        "unresolved": 12
       }
     },
     {
@@ -3601,8 +3620,8 @@
         {
           "id": "S07-product",
           "kind": "generic",
-          "result": "pass",
-          "detail": "no open P0 package for this project"
+          "result": "fail",
+          "detail": "3 open P0 package(s): std-pmp-change-control-s07:S07, std-pmp-project-baseline-s07:S07, std-togaf-compliance-review-s07:S07"
         }
       ],
       "status": "absent",
@@ -3614,7 +3633,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 11
+        "unresolved": 12
       }
     },
     {
@@ -3853,8 +3872,8 @@
         {
           "id": "S09-product",
           "kind": "generic",
-          "result": "pass",
-          "detail": "no open P0 package for this project"
+          "result": "fail",
+          "detail": "3 open P0 package(s): std-pmp-change-control-s09:S09, std-pmp-project-baseline-s09:S09, std-togaf-compliance-review-s09:S09"
         }
       ],
       "status": "absent",
@@ -3866,7 +3885,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 11
+        "unresolved": 12
       }
     },
     {
@@ -5384,7 +5403,7 @@
   ],
   "summary": {
     "implemented": 1,
-    "partial": 7,
+    "partial": 8,
     "absent": 36,
     "broken": 0
   }

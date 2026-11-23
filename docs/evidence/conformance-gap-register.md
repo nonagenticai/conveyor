@@ -1,11 +1,11 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `97d45aa63832ccfcd03cfac5b8a5014bc63155fb` generated `2026-11-22T09:46:52.711627+00:00` from `conveyor-w0-526-snap/data`.
+Snapshot: `46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7` generated `2026-11-23T07:38:20.287935+00:00` from `snap-r0/data`.
 
 | Severity | Count |
 |---|---:|
-| P0 | 20 |
-| P1 | 148 |
+| P0 | 15 |
+| P1 | 146 |
 | P2 | 22 |
 | P3 | 0 |
 
@@ -17,21 +17,16 @@ Snapshot: `97d45aa63832ccfcd03cfac5b8a5014bc63155fb` generated `2026-11-22T09:46
 | `closed_without_closure_review` | `T16` | P0 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `T3` | P0 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `T7` | P0 | project is closed but its closure review is not published |
-| `pi_plan_missing` | `tranche 3 PI` | P0 | the PI carried by an authorised tranche has no published pi-plan output |
-| `project_in_unauthorised_tranche` | `S05` | P0 | project is closed in tranche 4 whose state is 'planned' |
+| `pi_plan_missing` | `tranche 4 PI` | P0 | the PI carried by an authorised tranche has no published pi-plan output |
 | `project_in_unauthorised_tranche` | `S06b` | P0 | project is closed in tranche 6 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S06c` | P0 | project is closed in tranche 7 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S06d` | P0 | project is closed in tranche 8 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `S07` | P0 | project is closed in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S08` | P0 | project is closed in tranche 5 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `S09` | P0 | project is closed in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S10` | P0 | project is closed in tranche 6 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S11` | P0 | project is closed in tranche 6 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S12` | P0 | project is closed in tranche 10 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S13` | P0 | project is closed in tranche 8 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S16` | P0 | project is closed in tranche 7 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `T14` | P0 | project is closed in tranche 4 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `T16` | P0 | project is closed in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T7` | P0 | project is closed in tranche 5 whose state is 'planned' |
 | `backlog_refinement_missing` | `tranche 10` | P1 | the tranche has no refinement cadence for its period |
 | `backlog_refinement_missing` | `tranche 11` | P1 | the tranche has no refinement cadence for its period |
@@ -42,13 +37,13 @@ Snapshot: `97d45aa63832ccfcd03cfac5b8a5014bc63155fb` generated `2026-11-22T09:46
 | `backlog_refinement_missing` | `tranche 7` | P1 | the tranche has no refinement cadence for its period |
 | `backlog_refinement_missing` | `tranche 8` | P1 | the tranche has no refinement cadence for its period |
 | `backlog_refinement_missing` | `tranche 9` | P1 | the tranche has no refinement cadence for its period |
-| `benefit_baseline_placeholder` | `B1` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
-| `benefit_baseline_placeholder` | `B2` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
+| `benefit_baseline_placeholder` | `B1` | P1 | measurement record is missing measured_at, method |
+| `benefit_baseline_placeholder` | `B2` | P1 | measurement record is missing measured_at, method |
 | `benefit_baseline_placeholder` | `B3` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
-| `benefit_baseline_placeholder` | `B4` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
-| `benefit_baseline_placeholder` | `B5` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
-| `benefit_baseline_placeholder` | `B6` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
-| `benefit_profile_incomplete` | `B1` | P1 | missing operational_area |
+| `benefit_baseline_placeholder` | `B4` | P1 | measurement record is missing measured_at, method |
+| `benefit_baseline_placeholder` | `B5` | P1 | measurement record is missing measured_at, method |
+| `benefit_baseline_placeholder` | `B6` | P1 | measurement record is missing measured_at, method |
+| `benefit_baseline_placeholder` | `B7` | P1 | measurement record is missing measured_at, method |
 | `closed_without_closure_review` | `S05` | P1 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `S06b` | P1 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `S06c` | P1 | project is closed but its closure review is not published |
@@ -133,7 +128,7 @@ Snapshot: `97d45aa63832ccfcd03cfac5b8a5014bc63155fb` generated `2026-11-22T09:46
 | `pi_cadence_missing` | `tranche 7` | P1 | the tranche carries projects but has no PI cadence for its period |
 | `pi_cadence_missing` | `tranche 8` | P1 | the tranche carries projects but has no PI cadence for its period |
 | `pi_cadence_missing` | `tranche 9` | P1 | the tranche carries projects but has no PI cadence for its period |
-| `pi_objectives_missing` | `tranche 3 PI` | P1 | the PI carried by an authorised tranche has no published pi-objectives output |
+| `pi_objectives_missing` | `tranche 4 PI` | P1 | the PI carried by an authorised tranche has no published pi-objectives output |
 | `project_in_unauthorised_tranche` | `S06` | P1 | project is active in tranche 5 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S14` | P1 | project is active in tranche 11 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S15` | P1 | project is active in tranche 7 whose state is 'planned' |
@@ -142,15 +137,13 @@ Snapshot: `97d45aa63832ccfcd03cfac5b8a5014bc63155fb` generated `2026-11-22T09:46
 | `project_in_unauthorised_tranche` | `S19` | P1 | project is active in tranche 8 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S20` | P1 | project is active in tranche 9 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S21` | P1 | project is active in tranche 9 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `T10` | P1 | project is active in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T12` | P1 | project is active in tranche 13 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T15` | P1 | project is active in tranche 12 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T17` | P1 | project is active in tranche 5 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `T4` | P1 | project is active in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T5` | P1 | project is active in tranche 10 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T6` | P1 | project is active in tranche 11 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T8` | P1 | project is active in tranche 11 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `T9` | P1 | project is active in tranche 4 whose state is 'planned' |
+| `seed_live_drift` | `S21` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T0` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T10` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T4` | P1 | seed status 'closed' != live status 'active' |
@@ -194,15 +187,15 @@ Snapshot: `97d45aa63832ccfcd03cfac5b8a5014bc63155fb` generated `2026-11-22T09:46
 | S02 | closed | 1 | 0 | 1 | 1 | 0 |
 | S03 | closed | 2 | 0 | 0 | 0 | 0 |
 | S04 | active | 3 | 0 | 2 | 0 | 0 |
-| S05 | closed | 4 | 1 | 4 | 0 | 0 |
+| S05 | closed | 4 | 0 | 4 | 0 | 0 |
 | S06 | active | 5 | 0 | 3 | 1 | 0 |
 | S06a | archived | 6 | 0 | 0 | 1 | 0 |
 | S06b | closed | 6 | 1 | 4 | 0 | 0 |
 | S06c | closed | 7 | 1 | 4 | 0 | 0 |
 | S06d | closed | 8 | 1 | 4 | 0 | 0 |
-| S07 | closed | 4 | 1 | 4 | 0 | 0 |
+| S07 | closed | 4 | 0 | 4 | 0 | 0 |
 | S08 | closed | 5 | 1 | 4 | 0 | 0 |
-| S09 | closed | 4 | 1 | 4 | 1 | 0 |
+| S09 | closed | 4 | 0 | 4 | 0 | 0 |
 | S10 | closed | 6 | 1 | 4 | 0 | 0 |
 | S11 | closed | 6 | 1 | 4 | 0 | 0 |
 | S12 | closed | 10 | 1 | 4 | 0 | 0 |
@@ -214,23 +207,23 @@ Snapshot: `97d45aa63832ccfcd03cfac5b8a5014bc63155fb` generated `2026-11-22T09:46
 | S18 | active | 9 | 0 | 3 | 1 | 0 |
 | S19 | active | 8 | 0 | 3 | 1 | 0 |
 | S20 | active | 9 | 0 | 3 | 1 | 0 |
-| S21 | active | 9 | 0 | 3 | 1 | 0 |
+| S21 | active | 9 | 0 | 4 | 1 | 0 |
 | SPEC-V2 | closed | 0 | 0 | 0 | 0 | 0 |
 | T0 | active | 0 | 0 | 2 | 0 | 0 |
 | T1 | closed | 1 | 0 | 2 | 0 | 0 |
-| T10 | active | 4 | 0 | 2 | 0 | 0 |
+| T10 | active | 4 | 0 | 1 | 0 | 0 |
 | T11 | closed | 1 | 0 | 2 | 0 | 0 |
 | T12 | active | 13 | 0 | 3 | 1 | 0 |
 | T13 | active | 3 | 0 | 0 | 0 | 0 |
-| T14 | closed | 4 | 2 | 3 | 1 | 0 |
+| T14 | closed | 4 | 1 | 3 | 1 | 0 |
 | T15 | active | 12 | 0 | 3 | 1 | 0 |
-| T16 | closed | 4 | 2 | 3 | 0 | 0 |
+| T16 | closed | 4 | 1 | 3 | 0 | 0 |
 | T17 | active | 5 | 0 | 3 | 1 | 0 |
 | T2 | closed | 2 | 0 | 2 | 0 | 0 |
 | T3 | closed | 3 | 1 | 3 | 0 | 0 |
-| T4 | active | 4 | 0 | 2 | 0 | 0 |
+| T4 | active | 4 | 0 | 1 | 0 | 0 |
 | T5 | active | 10 | 0 | 3 | 1 | 0 |
 | T6 | active | 11 | 0 | 3 | 1 | 0 |
 | T7 | closed | 5 | 2 | 3 | 0 | 0 |
 | T8 | active | 11 | 0 | 4 | 1 | 0 |
-| T9 | active | 4 | 0 | 2 | 0 | 0 |
+| T9 | active | 4 | 0 | 1 | 0 | 0 |

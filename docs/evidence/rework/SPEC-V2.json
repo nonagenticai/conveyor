@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d39-7f3b-bd04-211f7dfe1e50\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 0",
-      "exit": 0,
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "exit": 1,
       "id": "SPEC-V2-charter",
       "kind": "command",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0",
-      "stderr": "",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -115,26 +115,39 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "gate discharged by executable checks: SPEC-V2-project, SPEC-V2-baseline, SPEC-V2-charter, SPEC-V2-closure-outputs, SPEC-V2-contract, SPEC-V2-review, SPEC-V2-closure-gate, SPEC-V2-waivers, SPEC-V2-pi-cadence, SPEC-V2-wsjf, SPEC-V2-demo-credits, SPEC-V2-product",
+      "detail": "the gate check 'SPEC-V2-charter' did not pass",
       "id": "gate",
       "kind": "manifest",
-      "result": "pass",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "a closed project must not carry a red acceptance manifest",
+      "detail": "the project is closed while its manifest is red",
+      "id": "closed-on-red",
+      "kind": "snapshot",
+      "result": "fail",
       "severity": "P0"
     }
   ],
-  "failures": [],
+  "failures": [
+    "SPEC-V2-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "gate (P0): the gate check 'SPEC-V2-charter' did not pass",
+    "closed-on-red (P0): the project is closed on a red manifest"
+  ],
   "gate": "The closure review exists and every declared closure output is published; the project re-closes through the one gate.",
-  "generated_at": "2026-11-22T19:42:03.664752+00:00",
+  "generated_at": "2026-11-23T07:48:35.157916+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/SPEC-V2.toml",
   "name": "SPEC V2 \u2014 the organisational operating model",
   "project": "SPEC-V2",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-22T09:46:52.711627+00:00",
-    "git_sha": "97d45aa63832ccfcd03cfac5b8a5014bc63155fb",
-    "path": "retained-snapshot/97d45aa63832ccfcd03cfac5b8a5014bc63155fb"
+    "generated_at": "2026-11-23T07:38:20.287935+00:00",
+    "git_sha": "46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7",
+    "path": "retained-snapshot/46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7"
   },
-  "verdict": "green",
+  "verdict": "red",
   "warnings": []
 }

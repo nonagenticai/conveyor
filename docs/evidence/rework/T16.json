@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d38-76fb-9394-b75934d16fcd\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
       "exit": 1,
       "id": "T16-charter",
       "kind": "command",
       "result": "fail",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -133,7 +133,7 @@
     {
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "1 open P0 package(s): closed_without_closure_review:T16",
+      "detail": "4 open P0 package(s): closed_without_closure_review:T16, std-pmp-change-control-t16:T16, std-pmp-project-baseline-t16:T16, std-togaf-compliance-review-t16:T16",
       "id": "T16-product",
       "kind": "snapshot",
       "result": "fail",
@@ -160,7 +160,7 @@
   ],
   "failures": [
     "T16-baseline (P0): no project baseline",
-    "T16-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+    "T16-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "T16-closure-outputs (P0): declared closure outputs are not published: closure-review",
     "T16-contract (P0): no live board-approved delivery contract",
     "T16-review (P0): no Phase-G compliance review for the project's live contract",
@@ -170,21 +170,21 @@
     "T16-wsjf (P0): no WBS deliverable carries the plan",
     "T16-demo-credits (P0): no accepted deliverable to demo",
     "T16-lessons (P1): the tranche-4 retro produced no lesson",
-    "T16-product (P0): 1 open P0 package(s): closed_without_closure_review:T16",
+    "T16-product (P0): 4 open P0 package(s): closed_without_closure_review:T16, std-pmp-change-control-t16:T16, std-pmp-project-baseline-t16:T16, std-togaf-compliance-review-t16:T16",
     "gate (P0): the gate check 'T16-baseline' did not pass; the gate check 'T16-charter' did not pass; the gate check 'T16-closure-outputs' did not pass; the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-closure-gate' did not pass; the gate check 'T16-pi-plan' did not pass; the gate check 'T16-pi-objectives' did not pass; the gate check 'T16-wsjf' did not pass; the gate check 'T16-demo-credits' did not pass; the gate check 'T16-lessons' did not pass; the gate check 'T16-product' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds",
-  "generated_at": "2026-11-22T19:42:04.812500+00:00",
+  "generated_at": "2026-11-23T07:48:35.829339+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T16.toml",
   "name": "SOP, RDF/OWL and process-document ingestion",
   "project": "T16",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-22T09:46:52.711627+00:00",
-    "git_sha": "97d45aa63832ccfcd03cfac5b8a5014bc63155fb",
-    "path": "retained-snapshot/97d45aa63832ccfcd03cfac5b8a5014bc63155fb"
+    "generated_at": "2026-11-23T07:38:20.287935+00:00",
+    "git_sha": "46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7",
+    "path": "retained-snapshot/46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7"
   },
   "verdict": "red",
   "warnings": []
