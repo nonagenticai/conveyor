@@ -348,6 +348,13 @@ pub fn RequirementDetail() -> impl IntoView {
     let id = move || params.get().get("id").unwrap_or_default();
     let data = load_detail(ctx, id);
     let refresh = Callback::new(move |_| data.refetch());
+    // The save's notice lives above the resource-driven body: a local signal there is reset
+    // when `refresh` recreates the body, hiding the success the action just returned.
+    let notice = RwSignal::new(Option::<String>::None);
+    Effect::new(move |_| {
+        let _ = id();
+        notice.set(None);
+    });
 
     view! {
         <section class="screen">
@@ -363,7 +370,7 @@ pub fn RequirementDetail() -> impl IntoView {
                             <ErrorPanel error=error on_retry=refresh/>
                         }.into_any(),
                         Some(Ok(body)) => view! {
-                            <RequirementBody data=body refresh=refresh/>
+                            <RequirementBody data=body refresh=refresh notice=notice/>
                         }.into_any(),
                     }}
                 }
@@ -374,7 +381,11 @@ pub fn RequirementDetail() -> impl IntoView {
 }
 
 #[component]
-fn RequirementBody(data: DetailData, refresh: Callback<()>) -> impl IntoView {
+fn RequirementBody(
+    data: DetailData,
+    refresh: Callback<()>,
+    notice: RwSignal<Option<String>>,
+) -> impl IntoView {
     let ctx = expect_context::<AppCtx>();
     let asset = data.detail.asset.clone();
     let revisions = data.detail.revisions.clone();
@@ -383,7 +394,6 @@ fn RequirementBody(data: DetailData, refresh: Callback<()>) -> impl IntoView {
     let version = asset.version;
     let status = asset.status.clone();
 
-    let notice = RwSignal::new(Option::<String>::None);
     let title = RwSignal::new(asset.title.clone());
     let body = RwSignal::new(asset.body.clone());
     let busy = RwSignal::new(false);

@@ -34,8 +34,10 @@ test("a signed-out V2 route gets the sign-in gate", async ({ browser, baseURL })
 });
 
 test("an unwired V2 destination names its owning slice", async ({ page }) => {
-  await page.goto("/organisation");
-  await expect(page.getByRole("heading", { name: "Organisation" })).toBeVisible();
+  // /organisation became the real screen in T18-2; /tools is still a gate, so it is the honest
+  // fixture for this assertion now.
+  await page.goto("/tools");
+  await expect(page.getByRole("heading", { name: "Tools" })).toBeVisible();
   await expect(page.getByText("Not yet live")).toBeVisible();
-  await expect(page.getByText(/owner: T0/)).toBeVisible();
+  await expect(page.getByText(/owner: T13/)).toBeVisible();
 });
