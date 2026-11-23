@@ -336,7 +336,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category project-brief"
     },
     "inception-analysis": {
       "required": [
@@ -401,7 +402,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category inception-analysis"
     },
     "architecture-design": {
       "required": [
@@ -478,7 +480,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-design"
     },
     "decision": {
       "required": [
@@ -543,7 +546,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category decision"
     },
     "evidence": {
       "required": [
@@ -617,7 +621,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category evidence"
     },
     "closure-review": {
       "required": [
@@ -679,7 +684,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category closure-review"
     },
     "vision": {
       "required": [
@@ -744,7 +750,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category vision"
     },
     "blueprint": {
       "required": [
@@ -840,7 +847,8 @@
             "pointer": "/project_baselines"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category blueprint"
     },
     "business-case": {
       "required": [
@@ -944,7 +952,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category business-case"
     },
     "programme-plan": {
       "required": [
@@ -1026,7 +1035,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category programme-plan"
     },
     "governance": {
       "required": [
@@ -1102,7 +1112,8 @@
             "pointer": "/lists"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category governance"
     },
     "reuse-map": {
       "required": [
@@ -1154,7 +1165,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category reuse-map"
     },
     "brief-template": {
       "required": [
@@ -1204,7 +1216,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category brief-template"
     },
     "architecture-analysis": {
       "required": [
@@ -1269,7 +1282,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-analysis"
     },
     "spec": {
       "required": [
@@ -1331,7 +1345,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category spec"
     },
     "benefit-profile": {
       "required": [
@@ -1411,7 +1426,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefit-profile"
     },
     "benefits-map": {
       "required": [
@@ -1447,7 +1463,8 @@
             "name": "benefit_map"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefits-map"
     },
     "benefits-registry": {
       "required": [
@@ -1487,7 +1504,8 @@
             "pointer": "/benefit_profiles"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefits-registry"
     },
     "benefit-evaluation": {
       "required": [
@@ -1545,7 +1563,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefit-evaluation"
     },
     "projects-dossier": {
       "required": [
@@ -1604,7 +1623,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category projects-dossier"
     },
     "tranche-plan": {
       "required": [
@@ -1662,7 +1682,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category tranche-plan"
     },
     "tranche-review": {
       "required": [
@@ -1717,7 +1738,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category tranche-review"
     },
     "benefits-strategy": {
       "required": [
@@ -1779,7 +1801,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefits-strategy"
     },
     "realization-plan": {
       "required": [
@@ -1841,7 +1864,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category realization-plan"
     },
     "stakeholder-profiles": {
       "required": [
@@ -1895,7 +1919,8 @@
             "pointer": "/stakeholder_profiles"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category stakeholder-profiles"
     },
     "architecture-principles": {
       "required": [
@@ -1940,7 +1965,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-principles"
     },
     "adm-profile": {
       "required": [
@@ -1982,7 +2008,8 @@
             "name": "architecture_capability"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category adm-profile"
     },
     "artifact-standard": {
       "required": [
@@ -2040,7 +2067,8 @@
             "pointer": "/artifacts"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category artifact-standard"
     },
     "architecture-artifact": {
       "required": [
@@ -2095,7 +2123,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-artifact"
     },
     "architecture-artifact-instance": {
       "required": [
@@ -2137,7 +2166,8 @@
             "name": "artifact_document"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-artifact-instance"
     },
     "statement-of-architecture-work": {
       "required": [
@@ -2216,7 +2246,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category statement-of-architecture-work"
     },
     "compliance-review": {
       "required": [
@@ -2278,7 +2309,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category compliance-review"
     },
     "waiver": {
       "required": [
@@ -2339,7 +2371,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category waiver"
     },
     "maturity-assessment": {
       "required": [
@@ -2385,7 +2418,8 @@
             "pointer": "/maturity"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category maturity-assessment"
     },
     "skills-assessment": {
       "required": [
@@ -2431,7 +2465,8 @@
             "pointer": "/skills"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category skills-assessment"
     },
     "programme-brief": {
       "required": [
@@ -2514,7 +2549,8 @@
             "pointer": "/tranches"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category programme-brief"
     },
     "mandate": {
       "required": [
@@ -2635,7 +2671,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category mandate"
     },
     "refined-vision": {
       "required": [
@@ -2679,7 +2716,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category refined-vision"
     },
     "programme-baselines": {
       "required": [
@@ -2728,7 +2766,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category programme-baselines"
     },
     "programme-strategies": {
       "required": [
@@ -2822,7 +2861,8 @@
             "pointer": "/inference/by_project"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category programme-strategies"
     },
     "programme-risk-register": {
       "required": [
@@ -2882,7 +2922,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category programme-risk-register"
     },
     "benefit-transition": {
       "required": [
@@ -2953,7 +2994,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefit-transition"
     },
     "programme-report": {
       "required": [
@@ -2998,7 +3040,8 @@
             "name": "programme_summary"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category programme-report"
     },
     "requirements-catalog": {
       "required": [
@@ -3042,7 +3085,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category requirements-catalog"
     },
     "architecture-capability": {
       "required": [
@@ -3100,7 +3144,8 @@
             "name": "architecture_maturity_skills"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-capability"
     },
     "architecture-governance-log": {
       "required": [
@@ -3142,7 +3187,8 @@
             "optional": true
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category architecture-governance-log"
     },
     "adr-register": {
       "required": [
@@ -3191,7 +3237,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category adr-register"
     },
     "delivery-contract": {
       "required": [
@@ -3243,7 +3290,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category delivery-contract"
     },
     "statement-of-intent": {
       "required": [
@@ -3294,7 +3342,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category statement-of-intent"
     },
     "request-for-architecture-work": {
       "required": [
@@ -3345,7 +3394,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category request-for-architecture-work"
     },
     "safe-portfolio": {
       "required": [
@@ -3384,7 +3434,8 @@
             "pointer": "/benefit_links"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category safe-portfolio"
     },
     "safe-art": {
       "required": [
@@ -3434,7 +3485,8 @@
             "severity": "P1"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category safe-art"
     },
     "safe-cadence": {
       "required": [
@@ -3507,7 +3559,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category safe-cadence"
     },
     "project-wbs": {
       "required": [
@@ -3556,7 +3609,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category project-wbs"
     },
     "project-baseline": {
       "required": [
@@ -3616,7 +3670,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category project-baseline"
     },
     "project-registers": {
       "required": [
@@ -3704,7 +3759,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category project-registers"
     },
     "change-control": {
       "required": [
@@ -3756,7 +3812,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category change-control"
     },
     "phase-preliminary": {
       "required": [
@@ -3804,7 +3861,8 @@
             "pointer": "/profiles"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-preliminary"
     },
     "phase-a": {
       "required": [
@@ -3859,7 +3917,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-a"
     },
     "phase-b": {
       "required": [
@@ -3914,7 +3973,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-b"
     },
     "phase-c": {
       "required": [
@@ -3969,7 +4029,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-c"
     },
     "phase-d": {
       "required": [
@@ -4024,7 +4085,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-d"
     },
     "candidate-solutions": {
       "required": [
@@ -4076,7 +4138,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category candidate-solutions"
     },
     "project-context-diagram": {
       "required": [
@@ -4126,7 +4189,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category project-context-diagram"
     },
     "benefits-diagram": {
       "required": [
@@ -4176,7 +4240,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category benefits-diagram"
     },
     "gap-analysis": {
       "required": [
@@ -4222,7 +4287,8 @@
             "severity": "P1"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category gap-analysis"
     },
     "phase-e": {
       "required": [
@@ -4336,7 +4402,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-e"
     },
     "phase-f": {
       "required": [
@@ -4391,7 +4458,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-f"
     },
     "phase-g": {
       "required": [
@@ -4446,7 +4514,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-g"
     },
     "phase-h": {
       "required": [
@@ -4501,7 +4570,8 @@
             }
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category phase-h"
     },
     "pi-plan": {
       "required": [
@@ -4592,7 +4662,8 @@
             "severity": "P1"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category pi-plan"
     },
     "pi-objectives": {
       "required": [
@@ -4658,7 +4729,8 @@
             "projection": "live"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category pi-objectives"
     },
     "system-demo": {
       "required": [
@@ -4717,7 +4789,8 @@
             "pointer": "/documents"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category system-demo"
     },
     "inspect-adapt": {
       "required": [
@@ -4785,7 +4858,8 @@
             "severity": "P1"
           }
         ]
-      }
+      },
+      "verifier": "generate-standards.py --check-category inspect-adapt"
     }
   },
   "on_demand": [
