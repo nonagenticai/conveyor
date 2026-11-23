@@ -631,7 +631,12 @@
       ],
       "failure_scenario": "The programme's benefits are owned by the string \"BCM\"; any job or no job can own a benefit through the action path, and the seeded rows cannot be edited because benefit_owner_job_id is NULL.",
       "acceptance": "Roles are seeded as job_keys; benefit_owner_job_id must resolve to the BCM job; the seed uses insert_benefit_tx or supplies a real job id.",
-      "owner_project": "T10"
+      "owner_project": "T10",
+      "resolved_by": {
+        "commit": "81a8b0ed2759947ef8baff4e31a88b6672fd8b1e",
+        "test": "crates/store/tests/seed_programme_definition.rs",
+        "evidence": "The seed creates the programme_governance industry and sro/bcm/sponsoring_group/board jobs; every benefit owner_job_id and benefit_owner_job_id resolves to the bcm job; seed tests 5 and 4 passed/0 failed; check-programme-definition 6 benefits/49 projects OK."
+      }
     },
     {
       "id": "v1-p83-4",
@@ -3496,7 +3501,12 @@
       ],
       "failure_scenario": "A hung router holds a worker five minutes instead of the accepted sixty seconds; outage tests stay green because they assert the deviating constant.",
       "acceptance": "Implement 60 s/models:invoke or amend S10 with the rationale; the test asserts the agreed bound.",
-      "owner_project": "S10"
+      "owner_project": "S10",
+      "resolved_by": {
+        "commit": "81a8b0ed2759947ef8baff4e31a88b6672fd8b1e",
+        "test": "crates/actions/tests/image_budgets.rs",
+        "evidence": "completions.create is 60_000 ms (inference.chat keeps 300_000 ms for the agent row); image_budgets 2 passed/0 failed; the S10 plan now names the admitted model:write scope with the rationale."
+      }
     },
     {
       "id": "v1-s11-1",
