@@ -778,6 +778,7 @@ mod tests {
                     text: "the pinned passage".to_owned(),
                 }],
             },
+            prior_steps: Vec::new(),
             memory: vec![MemoryLine {
                 id: Uuid::from_u128(7),
                 kind: MemoryKind::Fact,
