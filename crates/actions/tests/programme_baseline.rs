@@ -210,3 +210,111 @@ async fn a_foreign_tenant_cannot_approve() {
     assert_eq!(status, 404, "{refused}");
     assert_eq!(refused["type"], "not_found", "{refused}");
 }
+
+// ── v1-shared-config-writer: the programmes family reads and writes `shared_config` ──────
+
+/// `programmes.update` writes the shared configuration under an optimistic version,
+/// `programmes.get` reads it back, and the row's version advanced exactly once.
+#[tokio::test(flavor = "multi_thread")]
+async fn shared_config_round_trips_and_the_version_advances() {
+    let (_pg, running, _seeded) = fixture().await;
+    let programme = create_programme(&running).await;
+    let initial = json!({"values": {"pi_length_weeks": 8}, "locked": ["pi_length_weeks"]});
+
+    let (status, body) = running
+        .invoke(
+            "programmes.update",
+            "dev:alice",
+            json!({"id": programme.as_str(), "shared_config": initial}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(output(&body)["shared_config"], initial, "{body}");
+    assert_eq!(
+        output(&body)["version"],
+        2,
+        "the write advances the version: {body}"
+    );
+
+    let (status, read) = running
+        .invoke(
+            "programmes.get",
+            "dev:alice",
+            json!({"id": programme.as_str()}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{read}");
+    assert_eq!(output(&read)["shared_config"], initial, "{read}");
+    assert_eq!(output(&read)["version"], 2, "{read}");
+}
+
+/// A document the column cannot hold — a non-object, a non-object `values`, a non-array
+/// `locked` — is a `422` at the edge, never the store's constraint violation as a `500`.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_malformed_shared_config_is_refused() {
+    let (_pg, running, _seeded) = fixture().await;
+    let programme = create_programme(&running).await;
+
+    for malformed in [
+        json!([1, 2, 3]),
+        json!({"values": 3}),
+        json!({"locked": "pi_length_weeks"}),
+    ] {
+        let (status, body) = running
+            .invoke(
+                "programmes.update",
+                "dev:alice",
+                json!({"id": programme.as_str(), "shared_config": malformed}),
+                Some("\"1\""),
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 422, "{malformed} was not refused: {body}");
+        assert!(
+            body.to_string().contains("shared_config_invalid"),
+            "{malformed} did not name shared_config_invalid: {body}"
+        );
+    }
+}
+
+/// Another tenant's programme is invisible to both the read and the write: `404`, never a
+/// cross-tenant read or a cross-tenant write.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_foreign_tenant_cannot_read_or_write_the_shared_config() {
+    let (_pg, running, _seeded) = fixture().await;
+    let programme = create_programme(&running).await;
+
+    let (status, refused) = running
+        .invoke(
+            "programmes.get",
+            "dev:bob",
+            json!({"id": programme.as_str()}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 404, "{refused}");
+
+    let (status, refused) = running
+        .invoke(
+            "programmes.update",
+            "dev:bob",
+            json!({
+                "id": programme.as_str(),
+                "shared_config": {"values": {"pi_length_weeks": 2}}
+            }),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 404, "{refused}");
+}
