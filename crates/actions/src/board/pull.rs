@@ -356,6 +356,9 @@ pub async fn err_card(
                     "id": card_id,
                     "list_id": waiting.list.id,
                     "_version": version,
+                    // The failure is already being coached; blocking the card must not open a
+                    // second interruption as a "board event" (v1-p6-5).
+                    "internal_coach": true,
                 }),
                 format!("err.card:move:{run_id}"),
             );
@@ -462,7 +465,7 @@ async fn lane_and_version(
 }
 
 /// The executor's invocation for one computed step (the same principal a process step uses).
-fn service_request(
+pub(crate) fn service_request(
     app_key: &str,
     action: &str,
     input: Value,

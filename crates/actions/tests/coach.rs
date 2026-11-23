@@ -1585,3 +1585,90 @@ async fn a_flow_input_must_name_its_cause_and_signature() {
     assert_eq!(status, 400, "{body}");
     assert_eq!(body["type"], json!("coach.no_signature"));
 }
+
+/// v1-p6-5: a card moved into a blocked lane is a §6.2 board event, and the move opens exactly
+/// one interruption — inside the move's own transaction.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_move_into_a_blocked_lane_opens_one_board_event_interruption() {
+    let (pg, running, seeded) = fixture().await;
+    publish_processes(&running).await;
+    let (board, active, waiting) = board_lanes(&pg, &seeded).await;
+    let card = create_card(&running, &board, &active, "feature", "block me").await;
+
+    let (status, body) = running
+        .invoke(
+            "cards.move",
+            TOKEN,
+            json!({ "id": card, "list_id": waiting, "_version": 1 }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+
+    let rows: Vec<(String, Option<Uuid>, String)> = sqlx::query_as(
+        "SELECT trigger_kind, failed_run_id, signature FROM coach_interruption
+          WHERE tenant_id = $1 AND interrupted_card_id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(Uuid::parse_str(&card).expect("card"))
+    .fetch_all(&pg.super_pool)
+    .await
+    .expect("the interruptions");
+    assert_eq!(rows.len(), 1, "one move, one interruption: {rows:?}");
+    assert_eq!(rows[0].0, "board_event");
+    assert_eq!(rows[0].1, None, "a flow input carries no failed run");
+    assert_eq!(rows[0].2, format!("board_event|card.moved|to:{waiting}"));
+    assert_eq!(count_cards_of_type(&pg, &seeded, &board, "coach").await, 1);
+}
+
+/// v1-p6-5: a move that takes its lane past `wip_limit` is a breach, and a breach pre-empts the
+/// blocked-lane event, so one move still yields one interruption.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_move_past_the_wip_limit_opens_one_breach_interruption() {
+    let (pg, running, seeded) = fixture().await;
+    publish_processes(&running).await;
+    let (board, active, waiting) = board_lanes(&pg, &seeded).await;
+    let waiting_id = Uuid::parse_str(&waiting).expect("waiting");
+    sqlx::query("UPDATE list SET wip_limit = 1 WHERE tenant_id = $1 AND id = $2")
+        .bind(seeded.tenant_id)
+        .bind(waiting_id)
+        .execute(&pg.super_pool)
+        .await
+        .expect("set the wip limit");
+
+    let first = create_card(&running, &board, &active, "feature", "first").await;
+    let second = create_card(&running, &board, &active, "feature", "second").await;
+    for card in [&first, &second] {
+        let (status, body) = running
+            .invoke(
+                "cards.move",
+                TOKEN,
+                json!({ "id": card, "list_id": waiting, "_version": 1 }),
+                None,
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 200, "{body}");
+    }
+
+    let rows: Vec<(String, String)> = sqlx::query_as(
+        "SELECT trigger_kind, signature FROM coach_interruption
+          WHERE tenant_id = $1 AND interrupted_card_id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(Uuid::parse_str(&second).expect("second"))
+    .fetch_all(&pg.super_pool)
+    .await
+    .expect("the interruptions");
+    assert_eq!(
+        rows,
+        vec![(
+            "wip_breach".to_owned(),
+            format!("wip_breach|list:{waiting}|limit:1")
+        )],
+        "a breach pre-empts the board event: one move, one interruption"
+    );
+}
