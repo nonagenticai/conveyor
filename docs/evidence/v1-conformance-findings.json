@@ -3994,13 +3994,13 @@
         }
       ],
       "failure_scenario": "Scenario 3's precondition cannot hold, and the T16/T13 blockers overstate what is missing.",
-      "acceptance": "Re-base on 0055, delete the false precondition, and keep only the procedures.draft/PDDL/PKO gaps.",
+      "acceptance": "Re-base on 0055, delete the false precondition, and keep only the procedures.draft, Visio/draw.io converter, batch-intake, configurable-review-gate and job-driven-conversion gaps; the PKO store is not a gap (D53).",
       "owner_project": "T17",
       "disposition": "correct-the-claim",
       "resolved_by": {
         "commit": "a151ef97d9c4ac556e78826f638c80538b2d9706",
         "test": "docs/plans/inception/T17/01-inception-analysis.md",
-        "evidence": "The dependency block now records the built SOP actions and tool estate, keeps T16's PKO surface as the blocker, and retires the grep precondition 0055 satisfies."
+        "evidence": "The dependency block now records the built SOP actions and tool estate. T16's blocker is not a PKO store: D53 (docs/SPEC_V2.md:1742, owner decision 2026-11-19) removed it, and RDF/OWL/Turtle imports as a strata knowledge pack recorded in procedure.knowledge_pack_ref (migrations/0060_procedure_ingestion.sql:22,38), never read at runtime. Remaining T16 gaps: procedures.draft, Visio/draw.io converters, batch intake, a configurable review gate and job-driven conversion. The grep precondition 0055 satisfies is retired."
       }
     },
     {
@@ -5691,7 +5691,12 @@
       ],
       "failure_scenario": "An owner decision is published from a Markdown file through the byte path: the row is published and active, the pack omits it, the public reader cannot see the ruling, and a later reader of the pack believes no such decision exists. Re-issuing it with a project still fails while the body stays object-backed.",
       "acceptance": "A published decision is either rendered in the output index or the publish refuses with a reason naming the missing text body; a programme-level decision can be created project-scoped to PLATFORM through a text compose path and appears in `docs/outputs.js`; a test proves a byte-backed published document is refused at publish or surfaced in the index.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "bc821f1c4209d7639b95f3f6396d532d38d7cdf5",
+        "test": "crates/actions/tests/documents_bodyless_publish.rs::a_published_document_without_a_text_body_is_refused",
+        "evidence": "documents.publish now refuses a publish transition whose document body is NULL with 409 text_body_missing (crates/actions/src/documents/revisions.rs:86-96), so a publication can never be invisible to the pack's body IS NOT NULL filter. The named test creates a byte-backed row, asserts the 409 and that published_at stays NULL; the parity publish sample now seeds a text body. `cargo test -p conveyor-actions --test documents_bodyless_publish`: 4 passed, 0 failed."
+      }
     },
     {
       "id": "v1-std-broken-source",
@@ -5766,7 +5771,12 @@
       "failure_scenario": "The programme-level SAFe ART artefact (safe-art) is mandatory and stays absent; a programme can never record the shared configuration (iteration length, capacity, WIP limits, demo cadence) that the ART's artefacts resolve against, and the gap is misclassified as a record the operator forgot.",
       "acceptance": "A served action family writes programme.shared_config scoped by tenant and programme, validating the object shape (values object, locked array) and taking an optimistic version; a read action returns it; a test writes then reads back and refuses a non-object; the safe-art body's Shared configuration section resolves from the row and the published document exists.",
       "owner_project": "PLATFORM",
-      "kind": "CODE"
+      "kind": "CODE",
+      "resolved_by": {
+        "commit": "36d67e374fe6520a0688b759bb8406ae12348223",
+        "test": "crates/actions/tests/programme_baseline.rs",
+        "evidence": "programmes.update writes and programmes.get reads shared_config with shape validation (values object, locked array) and an If-Match version; the writer test landed with 36d67e37. The programme row 01a1d039-0d24-7d16-ae52-4841e96ccfac was written on the staging copy at version 1 through programmes.update with values measured from the record (20 cadence rows over tranche-0..tranche-4; 14 tranches: 4 closed, 1 authorised, 9 planned) and read back. safe-art was composed (23207 bytes) and published as document 01a207f3-38dc-71e6-88d3-69e848360b1e; the next snapshot reports 323 evidenced / 409 absent and no safe-art finding — previously 322/410 with 'SAFe artefact absent: safe-art'."
+      }
     },
     {
       "id": "v1-std-investment-appraisal",

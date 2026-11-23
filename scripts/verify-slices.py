@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Audit every programme slice against its executable gate.
 
-The universe is SPEC_V2 section 12's T0-T17 rows plus every
+The universe is SPEC_V2 section 12's T0-T18 rows plus every
 ``docs/plans/slices/*.md`` plan's ``slice:`` key (S00-S21, including S06a-d).
 For a key K the sources are:
 
