@@ -229,7 +229,12 @@
       ],
       "failure_scenario": "Tenant and job spend exclude tool costs, so reported spend and budget utilisation understate actual consumption.",
       "acceptance": "The usage report derives tool spend at read time and includes it at tenant and run levels; a priced tool_call appears in both totals in tests.",
-      "owner_project": "T11"
+      "owner_project": "T11",
+      "resolved_by": {
+        "commit": "dbbeae4c80daf6af3da3348f8a7d7d32b19ba00c",
+        "test": "crates/store/tests/inference_.rs",
+        "evidence": "inference_ suite at the lane head: tool spend is derived at read time from the tool_call ledger (TOOL_CALL_PRICE) and appears in the inference usage report, metrics.usage and billing.summary totals."
+      }
     },
     {
       "id": "v1-p75-3",
@@ -592,7 +597,12 @@
       ],
       "failure_scenario": "benefits.transition_upsert accepts baseline_measured_at and post_measured_at with evidence [], then benefits.update sets status realized. No post-transition measurement exists, yet the benefit claims improvement.",
       "acceptance": "Completeness rejects empty/whitespace/non-measurement baselines and targets; realized requires a transition with baseline and post measurement values plus evidence, not timestamps alone.",
-      "owner_project": "T10"
+      "owner_project": "T10",
+      "resolved_by": {
+        "commit": "2ae699c8247bc94448efa111905d7e127c104f29",
+        "test": "crates/actions/tests/benefit_lifecycle.rs",
+        "evidence": "benefit_lifecycle suite at the lane head: realized is refused on timestamps alone (benefit_baseline_missing) and without evidence, and accepted only with typed baseline/post measurement values plus evidence."
+      }
     },
     {
       "id": "v1-p83-3",
@@ -4383,7 +4393,12 @@
       ],
       "failure_scenario": "The sole organisation:write holder publishes release R2 and calls job_bindings.create without a status. The binding is active immediately, runs pin it, and the audit contains no decision, approver or evidence for the activation.",
       "acceptance": "Creating or activating a binding opens a gated decision; only an approved decision flips it to active, and a direct status=active request is refused until then; tests cover the refusal and the approval.",
-      "owner_project": "T0"
+      "owner_project": "T0",
+      "resolved_by": {
+        "commit": "1d939a6a86aad568565a8b537dabe6371f8cf183",
+        "test": "crates/actions/tests/job_binding_gate.rs",
+        "evidence": "job_binding_gate suite at the lane head: an explicit status=active is refused 409 job_binding_approval_required, a binding is created draft with a gate, and only an approved decision flips it to active."
+      }
     },
     {
       "id": "v1-p45-1",
