@@ -63,20 +63,32 @@ def test_row_reason(row: dict[str, Any]) -> str | None:
     if key in LEGACY_TEST_PROJECT_KEYS:
         return "a known pre-marker e2e project key"
     return None
-def register_acceptance(key: str) -> str:
+def register_acceptance(
+    key: str,
+    snapshot: str = "docs/design/data",
+    findings: list[str] | None = None,
+    deep_review: list[str] | None = None,
+) -> str:
     """The command that proves one package is closed, not a whole-programme report.
 
     Rebuilding the register from the ledgers is the check: a finding marked `resolved_by` and a
     gap that no longer exists in the snapshot both drop the package, and `--rework-check` exits
-    1 while the key is still open.
+    1 while the key is still open. The command must mirror the inputs the register was built
+    from — the snapshot and every findings ledger and deep-review sidecar. A sidecar omitted
+    here makes its keys invisible to the check, which then exits 0 without proving anything.
     """
-    return (
-        "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data "
-        "--findings docs/evidence/v1-conformance-findings.json "
-        "--findings docs/evidence/standards-findings.json "
-        "--deep-review docs/evidence/record-w3/deep-review-findings.json "
-        f"--rework-check {key}"
-    )
+    findings = findings or [
+        "docs/evidence/v1-conformance-findings.json",
+        "docs/evidence/standards-findings.json",
+    ]
+    deep_review = deep_review or [
+        "docs/evidence/record-w3/deep-review-findings.json",
+    ]
+    parts = ["python3 scripts/audit-programme-conformance.py", f"--snapshot {snapshot}"]
+    parts.extend(f"--findings {path}" for path in findings)
+    parts.extend(f"--deep-review {path}" for path in deep_review)
+    parts.append(f"--rework-check {key}")
+    return " ".join(parts)
 PLACEHOLDER = re.compile(
     r"(not measured|no instrument|unknown|tbd|to be determined|n/?a|placeholder|none)",
     re.IGNORECASE,
@@ -1964,6 +1976,8 @@ def build_register(
     standard: dict[str, Any],
     dataset: Dataset,
     snapshot_label: str = "docs/design/data",
+    findings_paths: list[str] | None = None,
+    deep_review_paths: list[str] | None = None,
 ) -> dict[str, Any]:
     """Project the gap register into labelled rework packages, deterministically.
 
@@ -2186,7 +2200,9 @@ def build_register(
                     "owner_project": owner,
                     "apply_to": apply_to,
                     "depends_on": [],
-                    "acceptance_command": register_acceptance(key),
+                    "acceptance_command": register_acceptance(
+                        key, snapshot_label, findings_paths, deep_review_paths
+                    ),
                     "baseline": None
                     if group["finding"]
                     else {
@@ -3215,6 +3231,16 @@ def self_test() -> None:
             pass
         else:
             fail("an unknown deep-review kind was accepted")
+    command = register_acceptance("k:s", "snap", ["v1.json"], ["w3.json", "w4.json"])
+    for fragment in (
+        "--snapshot snap",
+        "--findings v1.json",
+        "--deep-review w3.json",
+        "--deep-review w4.json",
+        "--rework-check k:s",
+    ):
+        if fragment not in command:
+            fail(f"register_acceptance omits {fragment!r}")
     if first["scorecard"]["MSP"]["rules"] < 1:
         fail("the scorecard has no MSP rules")
 
@@ -3338,7 +3364,14 @@ def main() -> None:
             merged_findings.extend(deep_review_findings(path, dataset.output_standard))
         findings_doc = {"findings": merged_findings}
         register = build_register(
-            gaps, baseline_doc, findings_doc, standard, dataset, str(args.snapshot)
+            gaps,
+            baseline_doc,
+            findings_doc,
+            standard,
+            dataset,
+            str(args.snapshot),
+            [str(path) for path in (args.findings or [])],
+            [str(path) for path in (args.deep_review or [])],
         )
     if args.rework_out and register is not None:
         args.rework_out.parent.mkdir(parents=True, exist_ok=True)

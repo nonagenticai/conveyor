@@ -1,10 +1,10 @@
 {
   "schema": "verify-slices/v1",
-  "audited_sha": "a463f0eacd00069b595af86673c348a2a69edbc6",
+  "audited_sha": "d1b4e20c085df17a8c03d0dec997fab5c45968fa",
   "snapshot": {
-    "path": "/tmp/u5a-snapshot-r2/data",
-    "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
-    "generated_at": "2026-11-23T10:28:30.225766+00:00"
+    "path": "/tmp/u5a-v8/data",
+    "git_sha": "d1b4e20c085df17a8c03d0dec997fab5c45968fa",
+    "generated_at": "2026-11-23T20:08:09.847511+00:00"
   },
   "slices": [
     {
@@ -54,14 +54,14 @@
         {
           "id": "T0-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a1ff45-b2ce-7276-8a88-cf3d744e7976 approved by board decision 01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "T0-review",
           "kind": "generic",
-          "result": "pass",
-          "detail": "review 01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
         },
         {
           "id": "T0-closure-gate",
@@ -90,8 +90,8 @@
         {
           "id": "T0-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "1 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "1 accepted deliverable(s) have no demo credit with real evidence: 01a1ff47-4f70-70cd-add0-59feb9b25955: no evidence"
         },
         {
           "id": "T0-product",
@@ -100,8 +100,8 @@
           "detail": "no open P0 package for this project"
         }
       ],
-      "status": "partial",
-      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "status": "absent",
+      "reason": "gate check 'T0-contract' did not pass: the live contract has no approved board decision about this contract and no distinct requester/approver pair",
       "evidence": {
         "path": "docs/evidence/rework/T0.json",
         "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
@@ -109,7 +109,7 @@
       },
       "findings": {
         "total": 15,
-        "unresolved": 0
+        "unresolved": 3
       }
     },
     {
@@ -162,14 +162,14 @@
         {
           "id": "T1-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a1ff89-02bd-7b6d-902e-ffa5902cc7f5 approved by board decision 01a1ff89-1794-79d0-8707-f7614987ee7c about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "T1-review",
           "kind": "generic",
-          "result": "pass",
-          "detail": "review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
         },
         {
           "id": "T1-closure-gate",
@@ -210,14 +210,14 @@
         {
           "id": "T1-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "1 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "1 accepted deliverable(s) have no demo credit with real evidence: 01a1ff8a-b41e-739d-9398-1a910931746e: no evidence"
         },
         {
           "id": "T1-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a1ff83-3f5c-7734-830a-c8bb6c45024f carries a statement and evidence from the tranche-1 retro"
+          "result": "fail",
+          "detail": "the tranche-1 retro produced no lesson"
         },
         {
           "id": "T1-product",
@@ -226,8 +226,8 @@
           "detail": "no open P0 package for this project"
         }
       ],
-      "status": "partial",
-      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "status": "absent",
+      "reason": "gate check 'T1-contract' did not pass: the live contract has no approved board decision about this contract and no distinct requester/approver pair",
       "evidence": {
         "path": "docs/evidence/rework/T1.json",
         "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
@@ -235,7 +235,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 0
+        "unresolved": 4
       }
     },
     {
@@ -288,14 +288,14 @@
         {
           "id": "T2-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a2005a-7886-7f2d-9b49-53d174544ee9 approved by board decision 01a2005a-8c6e-708a-84df-ab16d175072e about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "T2-review",
           "kind": "generic",
-          "result": "pass",
-          "detail": "review 01a2009b-0768-72c1-bba1-2a8a3a8dae59 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
         },
         {
           "id": "T2-closure-gate",
@@ -336,14 +336,14 @@
         {
           "id": "T2-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "1 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "1 accepted deliverable(s) have no demo credit with real evidence: 01a2005c-5973-782b-b582-e8934bde20b8: no evidence"
         },
         {
           "id": "T2-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a20094-8c61-7174-82aa-bdd6f0816a62 carries a statement and evidence from the tranche-2 retro"
+          "result": "fail",
+          "detail": "the tranche-2 retro produced no lesson"
         },
         {
           "id": "T2-product",
@@ -352,8 +352,8 @@
           "detail": "no open P0 package for this project"
         }
       ],
-      "status": "partial",
-      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "status": "absent",
+      "reason": "gate check 'T2-contract' did not pass: the live contract has no approved board decision about this contract and no distinct requester/approver pair",
       "evidence": {
         "path": "docs/evidence/rework/T2.json",
         "git_sha": "c44b23fb1a5f866cabd1697fab977d240a2c6575",
@@ -361,7 +361,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 0
+        "unresolved": 4
       }
     },
     {
@@ -402,8 +402,8 @@
         {
           "id": "T3-charter",
           "kind": "record",
-          "result": "fail",
-          "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset"
+          "result": "pass",
+          "detail": "exit 0"
         },
         {
           "id": "T3-closure-outputs",
@@ -462,14 +462,14 @@
         {
           "id": "T3-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "5 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "5 accepted deliverable(s) have no demo credit with real evidence: 01a2076b-20d6-71c9-8f37-95ef40d23ecc: no evidence, 01a2076b-20d7-7726-aef1-c58ce73f027a: no evidence, 01a2076b-20d8-76bf-ba92-fdc58c10be9a: no evidence, 01a2076b-20d9-7512-b4be-cd86255108a3: no evidence, 01a2076b-20da-7a25-b6ca-e2ea74e3c919: no evidence"
         },
         {
           "id": "T3-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a2076b-52f9-78a7-a9da-ea7e3b4a8c18 carries a statement and evidence from the tranche-3 retro"
+          "result": "fail",
+          "detail": "the tranche-3 retro produced no lesson"
         },
         {
           "id": "T3-product",
@@ -479,7 +479,7 @@
         }
       ],
       "status": "absent",
-      "reason": "gate check 'T3-charter' did not pass: exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "reason": "gate check 'T3-closure-outputs' did not pass: declared closure outputs are not published: closure-review",
       "evidence": {
         "path": "docs/evidence/rework/T3.json",
         "git_sha": "c44b23fb1a5f866cabd1697fab977d240a2c6575",
@@ -487,7 +487,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 6
+        "unresolved": 7
       }
     },
     {
@@ -540,8 +540,8 @@
         {
           "id": "T4-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a2028b-dde6-7ed4-9e47-6e582f2341d8 approved by board decision 01a2028b-f63c-7c27-b580-d4cba2c1e70f about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "T4-review",
@@ -588,14 +588,14 @@
         {
           "id": "T4-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "1 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "1 accepted deliverable(s) have no demo credit with real evidence: 01a2028d-dec8-7b26-9bde-e4cd578eaa62: no evidence"
         },
         {
           "id": "T4-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+          "result": "fail",
+          "detail": "the tranche-4 retro produced no lesson"
         },
         {
           "id": "T4-product",
@@ -605,7 +605,7 @@
         }
       ],
       "status": "absent",
-      "reason": "gate check 'T4-review' did not pass: the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver",
+      "reason": "gate check 'T4-contract' did not pass: the live contract has no approved board decision about this contract and no distinct requester/approver pair",
       "evidence": {
         "path": "docs/evidence/rework/T4.json",
         "git_sha": "c44b23fb1a5f866cabd1697fab977d240a2c6575",
@@ -613,7 +613,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 3
+        "unresolved": 6
       }
     },
     {
@@ -1170,14 +1170,14 @@
         {
           "id": "T9-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a2023e-4e59-75ad-b2ab-fd7d014511d2 approved by board decision 01a2023f-11ac-7fe6-bf6f-101ced8f4ba2 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "T9-review",
           "kind": "generic",
-          "result": "pass",
-          "detail": "review 01a207b2-5e83-7b6c-a11e-4f0ee5821d4d (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
         },
         {
           "id": "T9-closure-gate",
@@ -1218,14 +1218,14 @@
         {
           "id": "T9-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "1 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "1 accepted deliverable(s) have no demo credit with real evidence: 01a20280-6f4b-77f0-87af-4e4a98414be5: no evidence"
         },
         {
           "id": "T9-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+          "result": "fail",
+          "detail": "the tranche-4 retro produced no lesson"
         },
         {
           "id": "T9-product",
@@ -1234,8 +1234,8 @@
           "detail": "no open P0 package for this project"
         }
       ],
-      "status": "partial",
-      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "status": "absent",
+      "reason": "gate check 'T9-contract' did not pass: the live contract has no approved board decision about this contract and no distinct requester/approver pair",
       "evidence": {
         "path": "docs/evidence/rework/T9.json",
         "git_sha": "c44b23fb1a5f866cabd1697fab977d240a2c6575",
@@ -1243,7 +1243,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 0
+        "unresolved": 4
       }
     },
     {
@@ -1296,14 +1296,14 @@
         {
           "id": "T10-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a20287-696c-76a4-a2db-28c6092b5813 approved by board decision 01a20287-813e-7abd-83c5-ddf3bb9e98b3 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "T10-review",
           "kind": "generic",
-          "result": "pass",
-          "detail": "review 01a207b2-5e09-701b-b59d-43bc0f385061 (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
         },
         {
           "id": "T10-closure-gate",
@@ -1344,14 +1344,14 @@
         {
           "id": "T10-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "1 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "1 accepted deliverable(s) have no demo credit with real evidence: 01a20289-78c8-70b5-98ce-784f39be9408: no evidence"
         },
         {
           "id": "T10-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+          "result": "fail",
+          "detail": "the tranche-4 retro produced no lesson"
         },
         {
           "id": "T10-product",
@@ -1360,8 +1360,8 @@
           "detail": "no open P0 package for this project"
         }
       ],
-      "status": "partial",
-      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "status": "absent",
+      "reason": "gate check 'T10-contract' did not pass: the live contract has no approved board decision about this contract and no distinct requester/approver pair",
       "evidence": {
         "path": "docs/evidence/rework/T10.json",
         "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
@@ -1369,7 +1369,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 0
+        "unresolved": 4
       }
     },
     {
@@ -1422,14 +1422,14 @@
         {
           "id": "T11-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a1ff8d-a0ad-7a91-b026-d9a2575daa3f approved by board decision 01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "T11-review",
           "kind": "generic",
-          "result": "pass",
-          "detail": "review 01a1ff90-4e19-7bcf-acbf-3f29d980572e (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
         },
         {
           "id": "T11-closure-gate",
@@ -1470,14 +1470,14 @@
         {
           "id": "T11-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "1 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "1 accepted deliverable(s) have no demo credit with real evidence: 01a1ff8f-46f3-7d8c-bac2-ee1ec2d1ac20: no evidence"
         },
         {
           "id": "T11-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a1ff83-3f5c-7734-830a-c8bb6c45024f carries a statement and evidence from the tranche-1 retro"
+          "result": "fail",
+          "detail": "the tranche-1 retro produced no lesson"
         },
         {
           "id": "T11-product",
@@ -1486,8 +1486,8 @@
           "detail": "no open P0 package for this project"
         }
       ],
-      "status": "partial",
-      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "status": "absent",
+      "reason": "gate check 'T11-contract' did not pass: the live contract has no approved board decision about this contract and no distinct requester/approver pair",
       "evidence": {
         "path": "docs/evidence/rework/T11.json",
         "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
@@ -1495,7 +1495,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 0
+        "unresolved": 4
       }
     },
     {
@@ -1674,14 +1674,14 @@
         {
           "id": "T13-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a20271-2a37-7329-b159-28031ddcb966 approved by board decision 01a20273-4f0f-77e6-8005-9744d1e3a574 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "T13-review",
           "kind": "generic",
-          "result": "pass",
-          "detail": "review 01a207b2-5d8c-7ecb-a7ad-af815b8fc70c (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
         },
         {
           "id": "T13-closure-gate",
@@ -1722,14 +1722,14 @@
         {
           "id": "T13-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "1 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "1 accepted deliverable(s) have no demo credit with real evidence: 01a20277-8d10-702f-a975-4dd6469e7b1d: no evidence"
         },
         {
           "id": "T13-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a2076b-52f9-78a7-a9da-ea7e3b4a8c18 carries a statement and evidence from the tranche-3 retro"
+          "result": "fail",
+          "detail": "the tranche-3 retro produced no lesson"
         },
         {
           "id": "T13-product",
@@ -1738,8 +1738,8 @@
           "detail": "no open P0 package for this project"
         }
       ],
-      "status": "partial",
-      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "status": "absent",
+      "reason": "gate check 'T13-contract' did not pass: the live contract has no approved board decision about this contract and no distinct requester/approver pair",
       "evidence": {
         "path": "docs/evidence/rework/T13.json",
         "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
@@ -1747,7 +1747,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 0
+        "unresolved": 4
       }
     },
     {
@@ -1854,8 +1854,8 @@
         {
           "id": "T14-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+          "result": "fail",
+          "detail": "the tranche-4 retro produced no lesson"
         },
         {
           "id": "T14-product",
@@ -1873,7 +1873,7 @@
       },
       "findings": {
         "total": 19,
-        "unresolved": 10
+        "unresolved": 11
       }
     },
     {
@@ -2106,8 +2106,8 @@
         {
           "id": "T16-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+          "result": "fail",
+          "detail": "the tranche-4 retro produced no lesson"
         },
         {
           "id": "T16-product",
@@ -2125,7 +2125,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 9
+        "unresolved": 10
       }
     },
     {
@@ -2290,6 +2290,25 @@
       }
     },
     {
+      "id": "T19",
+      "spec_gate": "a three-department board meeting decides its agenda items by recorded majority with a recorded dissent; an item missing a required department is deferred `inquorate` and cannot be decided; a meeting cannot lower a linked approval's dual control or waive its evidence; the owner decides one item in the web meeting room and another asynchronously from the agent front end over MCP, both recorded `via='meeting'`; minutes publish behind the chair's gate and every action becomes a card; a forum with no decision over a cycle is flagged",
+      "plan": null,
+      "manifest": null,
+      "gate_checks": [],
+      "checks": [],
+      "status": "absent",
+      "reason": "no manifest at acceptance/programme/T19.toml",
+      "evidence": {
+        "path": null,
+        "git_sha": null,
+        "generated_at": null
+      },
+      "findings": {
+        "total": 3,
+        "unresolved": 2
+      }
+    },
+    {
       "id": "S00",
       "spec_gate": null,
       "plan": "S00-usage-inventory.md",
@@ -2336,14 +2355,14 @@
         {
           "id": "S00-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a1ff37-e240-779b-aab5-74a3fa86ecad approved by board decision 01a1ff37-f693-7336-8c6d-fe98f6f5c7b7 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "S00-review",
           "kind": "generic",
-          "result": "pass",
-          "detail": "review 01a1ff3a-6a97-7c12-841c-1c4f803cffb6 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
         },
         {
           "id": "S00-closure-gate",
@@ -2372,8 +2391,8 @@
         {
           "id": "S00-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "1 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "1 accepted deliverable(s) have no demo credit with real evidence: 01a1ff39-8c90-73f2-b53c-6f51d8a8ebbb: no evidence"
         },
         {
           "id": "S00-product",
@@ -2382,8 +2401,8 @@
           "detail": "no open P0 package for this project"
         }
       ],
-      "status": "partial",
-      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "status": "absent",
+      "reason": "gate check 'S00-contract' did not pass: the live contract has no approved board decision about this contract and no distinct requester/approver pair",
       "evidence": {
         "path": "docs/evidence/rework/S00.json",
         "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
@@ -2391,7 +2410,7 @@
       },
       "findings": {
         "total": 15,
-        "unresolved": 0
+        "unresolved": 3
       }
     },
     {
@@ -2442,14 +2461,14 @@
         {
           "id": "S01-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a1ff2e-7974-74cd-be6d-377e3c0071a4 approved by board decision 01a1ff2f-c76b-7bfe-b71a-a39294a95644 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "S01-review",
           "kind": "generic",
-          "result": "pass",
-          "detail": "review 01a1ff32-159a-7028-a2d2-b4bcc1ce9eef (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
         },
         {
           "id": "S01-closure-gate",
@@ -2484,8 +2503,8 @@
         {
           "id": "S01-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "1 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "1 accepted deliverable(s) have no demo credit with real evidence: 01a1ff31-7218-73b4-ae18-fa34f76167c0: no evidence"
         },
         {
           "id": "S01-product",
@@ -2494,8 +2513,8 @@
           "detail": "no open P0 package for this project"
         }
       ],
-      "status": "implemented",
-      "reason": "non-record check(s) S01-decision-record exercise the gate text and pass; receipt green",
+      "status": "absent",
+      "reason": "gate check 'S01-contract' did not pass: the live contract has no approved board decision about this contract and no distinct requester/approver pair",
       "evidence": {
         "path": "docs/evidence/rework/S01.json",
         "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
@@ -2503,7 +2522,7 @@
       },
       "findings": {
         "total": 16,
-        "unresolved": 0
+        "unresolved": 3
       }
     },
     {
@@ -2555,14 +2574,14 @@
         {
           "id": "S02-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a1ff84-4425-75d9-8772-08e09cf71069 approved by board decision 01a1ff84-57c3-7f67-9229-94bf0188732d about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "S02-review",
           "kind": "generic",
-          "result": "pass",
-          "detail": "review 01a1ff87-19a4-783f-85c5-033d5f38cedf (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
         },
         {
           "id": "S02-waivers",
@@ -2597,14 +2616,14 @@
         {
           "id": "S02-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "1 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "1 accepted deliverable(s) have no demo credit with real evidence: 01a1ff85-f9d6-75b3-93cf-65b5df192376: no evidence"
         },
         {
           "id": "S02-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a1ff83-3f5c-7734-830a-c8bb6c45024f carries a statement and evidence from the tranche-1 retro"
+          "result": "fail",
+          "detail": "the tranche-1 retro produced no lesson"
         },
         {
           "id": "S02-product",
@@ -2613,8 +2632,8 @@
           "detail": "no open P0 package for this project"
         }
       ],
-      "status": "partial",
-      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "status": "absent",
+      "reason": "gate check 'S02-contract' did not pass: the live contract has no approved board decision about this contract and no distinct requester/approver pair",
       "evidence": {
         "path": "docs/evidence/rework/S02.json",
         "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
@@ -2622,7 +2641,7 @@
       },
       "findings": {
         "total": 17,
-        "unresolved": 0
+        "unresolved": 4
       }
     },
     {
@@ -2675,14 +2694,14 @@
         {
           "id": "S03-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a20061-bd73-7a89-b08c-bd8b867eb061 approved by board decision 01a20061-d19f-7269-9f5c-113f3aeb0001 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "S03-review",
           "kind": "generic",
-          "result": "pass",
-          "detail": "review 01a20066-3107-7b16-8835-6b6cd2aa8c84 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
         },
         {
           "id": "S03-closure-gate",
@@ -2717,8 +2736,8 @@
         {
           "id": "S03-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a20094-8c61-7174-82aa-bdd6f0816a62 carries a statement and evidence from the tranche-2 retro"
+          "result": "fail",
+          "detail": "the tranche-2 retro produced no lesson"
         },
         {
           "id": "S03-wsjf",
@@ -2729,8 +2748,8 @@
         {
           "id": "S03-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "1 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "1 accepted deliverable(s) have no demo credit with real evidence: 01a20063-7a23-7454-b5b6-0fedd41baf93: no evidence"
         },
         {
           "id": "S03-product",
@@ -2739,8 +2758,8 @@
           "detail": "no open P0 package for this project"
         }
       ],
-      "status": "partial",
-      "reason": "receipt green with only record/generic checks (generic, record); ids passing is not SPEC coverage",
+      "status": "absent",
+      "reason": "gate check 'S03-contract' did not pass: the live contract has no approved board decision about this contract and no distinct requester/approver pair",
       "evidence": {
         "path": "docs/evidence/rework/S03.json",
         "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
@@ -2748,7 +2767,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 0
+        "unresolved": 4
       }
     },
     {
@@ -2801,14 +2820,14 @@
         {
           "id": "S04-contract",
           "kind": "generic",
-          "result": "pass",
-          "detail": "contract 01a20256-6ede-7d70-aae8-5dbfe681a1b7 approved by board decision 01a20256-80ac-72f0-a310-d114488f1d7c about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d"
+          "result": "fail",
+          "detail": "the live contract has no approved board decision about this contract and no distinct requester/approver pair"
         },
         {
           "id": "S04-review",
           "kind": "generic",
-          "result": "pass",
-          "detail": "review 01a20284-e742-757a-ae91-0b8fb19ad3c0 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          "result": "fail",
+          "detail": "the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver"
         },
         {
           "id": "S04-closure-gate",
@@ -2843,8 +2862,8 @@
         {
           "id": "S04-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a2076b-52f9-78a7-a9da-ea7e3b4a8c18 carries a statement and evidence from the tranche-3 retro"
+          "result": "fail",
+          "detail": "the tranche-3 retro produced no lesson"
         },
         {
           "id": "S04-wsjf",
@@ -2855,8 +2874,8 @@
         {
           "id": "S04-demo-credits",
           "kind": "generic",
-          "result": "pass",
-          "detail": "2 accepted deliverable(s), each with a demo credit"
+          "result": "fail",
+          "detail": "2 accepted deliverable(s) have no demo credit with real evidence: 01a20255-94ae-76d9-9cbf-a9fe7eef56cb: no evidence, 01a20255-a3e5-7454-9f11-2ca19de99a6a: no evidence"
         },
         {
           "id": "S04-product",
@@ -2874,7 +2893,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 3
+        "unresolved": 7
       }
     },
     {
@@ -2969,8 +2988,8 @@
         {
           "id": "S05-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+          "result": "fail",
+          "detail": "the tranche-4 retro produced no lesson"
         },
         {
           "id": "S05-wsjf",
@@ -3000,7 +3019,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 9
+        "unresolved": 10
       }
     },
     {
@@ -3618,8 +3637,8 @@
         {
           "id": "S07-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+          "result": "fail",
+          "detail": "the tranche-4 retro produced no lesson"
         },
         {
           "id": "S07-wsjf",
@@ -3649,7 +3668,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 9
+        "unresolved": 10
       }
     },
     {
@@ -3870,8 +3889,8 @@
         {
           "id": "S09-lessons",
           "kind": "generic",
-          "result": "pass",
-          "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro"
+          "result": "fail",
+          "detail": "the tranche-4 retro produced no lesson"
         },
         {
           "id": "S09-wsjf",
@@ -3901,7 +3920,7 @@
       },
       "findings": {
         "total": 18,
-        "unresolved": 9
+        "unresolved": 10
       }
     },
     {
@@ -5418,9 +5437,9 @@
     }
   ],
   "summary": {
-    "implemented": 1,
-    "partial": 10,
-    "absent": 34,
+    "implemented": 0,
+    "partial": 0,
+    "absent": 46,
     "broken": 0
   }
 }
