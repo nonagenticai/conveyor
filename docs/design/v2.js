@@ -766,7 +766,7 @@ window.installV2 = function (api, enterprise) {
           view.artefacts,
         )}${D.reworkRail(data.rework, view.projects)}${D.artefactRail(data.standards, {
           programmeId: view.programme ? view.programme.id : "",
-        })}${D.governanceLine(
+        })}${D.projectArtefactRollup(data.standards, view.projects)}${D.governanceLine(
           view.artefacts,
           data.architecture,
         )}`
@@ -1226,6 +1226,84 @@ window.installV2 = function (api, enterprise) {
       B(`${list(source.documents).length} documents`),
     )}`;
   }
+  /* The programme's projects as one dossier table, read from the rows this destination already
+     loads: signed in the console's `/api/projects` read (`cs.projects`), published the snapshot's
+     `live.programme.projects`. Nothing is fetched here, no fixture is drawn on a store path, and
+     a column with no source says so instead of guessing. */
+  function mspDossier(source) {
+    const signed = consoleOn();
+    const rows = signed ? consoleProjects() : snapshotProjects();
+    const M = (live || {}).msp || {};
+    const mspState = signed ? msp() : null;
+    // `baselines.list` and `documents.list` are read for the definition-set project only.
+    const scopedProjectId = mspState ? mspState.projectId : null;
+    const trancheByNumber = new Map();
+    list(source.tranches).forEach((t) => {
+      const number = Number(t.number);
+      if (Number.isFinite(number)) trancheByNumber.set(number, t);
+    });
+    const baselines = list(source.baselines);
+    const baselinesLoaded = signed
+      ? !!(mspState && mspState.loaded)
+      : Array.isArray(M.project_baselines);
+    const documents = list(source.documents);
+    const documentsLoaded = signed
+      ? !!(mspState && mspState.loaded)
+      : Array.isArray(((live || {}).artefacts || {}).documents);
+    const statusToneOf = (status) =>
+      status === "active" ? "green" : status === "closed" || status === "archived" ? "" : "amber";
+    const trancheCell = (project) => {
+      const number = (project.meta || {}).tranche;
+      if (number == null || String(number).trim() === "") {
+        return `<span class="muted">not in this read</span>`;
+      }
+      // The tranche rows carry no project id; the number on the project's own row is the join.
+      const row = trancheByNumber.get(Number(number));
+      return `T${E(number)}${row ? ` · ${B(row.state || "planned", row.state === "closed" ? "green" : "amber")}` : ""}`;
+    };
+    const baselineCell = (project) => {
+      if (!baselinesLoaded) return `<span class="muted">not in this read</span>`;
+      if (signed && project.id !== scopedProjectId) {
+        // The console's baseline read is one project's, so another project's absence here is
+        // not evidence that it holds no baseline.
+        return `<span class="muted">not in this read</span>`;
+      }
+      const matches = baselines.filter((b) => b.project_id === project.id);
+      return matches.length
+        ? matches.map((b) => `<code>${E(b.kind || "—")}</code>`).join(" ")
+        : `<span class="muted">none recorded</span>`;
+    };
+    const evidenceCell = (project) => {
+      const issues = projectIssues(project).length;
+      const scoped = !signed || project.id === scopedProjectId;
+      const docs =
+        documentsLoaded && scoped
+          ? documents.filter((d) => d.project_id === project.id)
+          : null;
+      const evidence = docs ? docs.filter((d) => d.category === "evidence").length : 0;
+      const documentsText = docs
+        ? `${docs.length} document${docs.length === 1 ? "" : "s"}${evidence ? ` · ${evidence} evidence` : ""}`
+        : "documents not in this read";
+      return `<small>${E(documentsText)} · ${issues} linked issue${issues === 1 ? "" : "s"}</small>`;
+    };
+    const provenance = signed
+      ? "signed in · cs.projects, the console's own /api/projects read"
+      : live
+        ? "published snapshot · live.programme.projects"
+        : "no project store or snapshot is loaded on this pack";
+    return `${mspError()}${panel(
+      "Projects dossier",
+      `${table(
+        ["Project", "Status", "Tranche", "Baseline", "Evidence / output"],
+        rows.length
+          ? rows.map((project) => `<tr><td><strong>${E(project.key || "—")}</strong><small>${E(project.name || "")}</small></td><td>${B(project.status || "—", statusToneOf(project.status))}</td><td>${trancheCell(project)}</td><td>${baselineCell(project)}</td><td>${evidenceCell(project)}</td></tr>`)
+          : [`<tr><td colspan="5">No project rows in this store/snapshot.</td></tr>`],
+      )}${note(
+        `Source: <span class="mono">${E(provenance)}</span>. The tranche is the project row's own <span class="mono">meta.tranche</span>, matched by number to the programme's tranche rows; those rows carry no project id, so a project without one reads "not in this read". Baselines match <span class="mono">project_id</span> in the rows this destination already loads; signed in the MSP read is scoped to the definition-set project, so another project's baseline reads "not in this read", not "none". Documents are counted per project from the loaded document rows; linked issues are the project's own <span class="mono">meta.issues</span>. Nothing is fetched here and no fixture is rendered.`,
+      )}`,
+      B(`${rows.length} project${rows.length === 1 ? "" : "s"}`, rows.length ? "green" : ""),
+    )}`;
+  }
   function mspBenefits(source) {
     const rows = list(source.benefits);
     const chosen = rows.find((b) => b.id === v.mspBenefit) || rows[0] || {};
@@ -1355,7 +1433,7 @@ window.installV2 = function (api, enterprise) {
         : note("Select a stakeholder, or create the first one."),
     )}</div></div>`;
   }
-  const MSP_TABS = ["Definition", "Benefits map & profiles", "Tranches & reviews", "Benefits realization", "Stakeholders"];
+  const MSP_TABS = ["Definition", "Dossier", "Benefits map & profiles", "Tranches & reviews", "Benefits realization", "Stakeholders"];
   function mspDefinitionBody(tab) {
     const source = mspSource();
     if (consoleOn() && !msp().loaded && !msp().error) {
@@ -1364,13 +1442,15 @@ window.installV2 = function (api, enterprise) {
     return (
       tab === "Definition"
         ? mspDefinition(source)
-        : tab === "Benefits map & profiles"
-          ? mspBenefits(source)
-          : tab === "Tranches & reviews"
-            ? mspTranches(source)
-            : tab === "Benefits realization"
-              ? mspRealization(source)
-              : mspStakeholders(source)
+        : tab === "Dossier"
+          ? mspDossier(source)
+          : tab === "Benefits map & profiles"
+            ? mspBenefits(source)
+            : tab === "Tranches & reviews"
+              ? mspTranches(source)
+              : tab === "Benefits realization"
+                ? mspRealization(source)
+                : mspStakeholders(source)
     );
   }
   function programmeDefinitionLive() {
@@ -4129,6 +4209,14 @@ window.installV2 = function (api, enterprise) {
       { id: "CR-018", title: "Add delegated identity scope", baseline: "B3", impact: "scope +2 deliverables · schedule +9 d · cost +€0.8m · risk medium", rationale: "", state: "Draft" },
       { id: "CR-017", title: "Move portal gate to PI-2026.4", baseline: "B2", impact: "schedule −14 d · cost −€0.2m · risk low", rationale: "Programme board rationale recorded", state: "Approved" },
     ],
+    /* Stakeholder profiles in the shape the live store uses (`stakeholders.profile_list`:
+       name, importance, influence, interest, support_level, support_trend, engagement_target,
+       concerns, sensitivities, disbenefits); organisation and role are study-only columns. */
+    stakeholders: [
+      { id: "SH-01", name: "N. de Vries", organisation: "sponsoring group", role: "programme sponsor · chair", importance: "High", influence: "High · funds the tranche and decides continue, pause or stop", interest: "High · outcome and cost", support_level: "supportive", support_trend: "stable", engagement_target: "manage closely · every tranche review and mandate gate", concerns: "benefit profiles claim outcomes no baseline has measured yet", sensitivities: "public commitments", disbenefits: "sponsor attention is finite; a competing programme is paused" },
+      { id: "SH-02", name: "G. Dekker", organisation: "asset owners", role: "SRO · asset owner, operations", importance: "High", influence: "High · accepts waivers, operational risk and cost", interest: "High · run cost and reliability", support_level: "supportive", support_trend: "improving", engagement_target: "manage closely · every design gate and waiver", concerns: "a waiver without a reassessment date becomes permanent", sensitivities: "outage window", disbenefits: "extra maintenance load on the operations job" },
+      { id: "SH-03", name: "R. Slot", organisation: "delivery", role: "programme manager", importance: "Medium", influence: "Medium · owns the WBS, the cadence and the gate route", interest: "High · schedule and dependencies", support_level: "neutral", support_trend: "stable", engagement_target: "keep informed · weekly plan review", concerns: "a re-baseline after every forecast variance", sensitivities: "schedule slip", disbenefits: "rework when a baseline moves" },
+    ],
     sops: [
       { id: "SOP-01", name: "Tenant onboarding SOP", source: "PDF · tenant-supplied", pages: 18, state: "Draft · PDDL", provenance: "untrusted input · governed_asset(sop_source)" },
       { id: "SOP-02", name: "Release verification SOP", source: "URL · internal wiki", pages: 9, state: "Review", provenance: "untrusted input · provenance recorded" },
@@ -4693,6 +4781,177 @@ window.installV2 = function (api, enterprise) {
   // Signed in, the portfolio is the tenant's own programme read from the API. The public pack
   // keeps the snapshot's real rows through the live override below; a clean checkout keeps the
   // design study. The signed-in page never renders a fixture project or a fixture programme.
+  //
+  // The programme views beside the tabs — the ranked WSJF backlog, the cadence, lane capacity
+  // and per-project metering — read rows this pack already loads: signed in the console's own
+  // reads (`msp()`, `cs`), published the snapshot's (`live.msp`, `live.work`, `live.measure`).
+  // An absent source is one honest sentence; no fixture renders on either path and no cost or
+  // capacity figure is invented.
+  const countText = (value) => Number(value || 0).toLocaleString("en-US");
+  const portfolioWbs = () =>
+    consoleOn() ? list(msp().wbs) : list((((live || {}).msp || {}).wbs_nodes));
+  const portfolioCadences = () =>
+    consoleOn() ? list(msp().cadences) : list((((live || {}).msp || {}).cadences));
+  // `programme_cadence` carries no date column; a tenant-recorded review/next date rides in meta.
+  const cadenceWhen = (row) => {
+    const meta = (row || {}).meta || {};
+    return meta.review_at || meta.next_at || "";
+  };
+  const projectIdKey = (id) => (id ? projectKeyOf(id) : "—");
+
+  function portfolioBacklogPanel() {
+    const signed = consoleOn();
+    const ranked = portfolioWbs()
+      .map((node) => ({
+        node,
+        value: Number(node.business_value),
+        criticality: Number(node.time_criticality),
+        risk: Number(node.risk_reduction),
+        size: Number(node.job_size),
+      }))
+      .filter(
+        (row) =>
+          [row.value, row.criticality, row.risk, row.size].every(Number.isFinite) &&
+          row.size > 0,
+      )
+      .map((row) => ({
+        node: row.node,
+        score: wsjf({
+          value: row.value,
+          criticality: row.criticality,
+          risk: row.risk,
+          size: row.size,
+        }),
+      }))
+      .sort((a, b) => Number(b.score) - Number(a.score));
+    const body = ranked.length
+      ? `${table(
+          ["#", "Item", "Project", "WSJF", "Status"],
+          ranked.map(
+            (row, index) =>
+              `<tr><td>${index + 1}</td><td><strong>${E(row.node.title || "—")}</strong><small>${E(row.node.kind || "wbs node")}</small></td><td class="mono">${E(projectIdKey(row.node.project_id))}</td><td><strong>${E(row.score)}</strong></td><td>${B(row.node.status || "open")}</td></tr>`,
+          ),
+        )}${note("WSJF is arithmetic, not opinion: (business value + time criticality + risk reduction) ÷ job size, computed on read from the WBS node's four typed inputs and never stored.")}`
+      : note(
+          signed
+            ? "No WBS node carries all four WSJF inputs yet, so there is no ranked backlog to show. WSJF is computed on read from a node's business value, time criticality, risk reduction and job size; a node with job size 0 cannot score."
+            : "The published snapshot carries no WBS node with the four WSJF inputs, so there is no ranked backlog to show. WSJF would be computed on read from the snapshot's wbs_node rows; no score is invented here.",
+        );
+    return panel(
+      "WSJF backlog",
+      body,
+      ranked.length ? B(`${ranked.length} scored`, "green") : "",
+    );
+  }
+
+  function portfolioCadencePanel() {
+    const signed = consoleOn();
+    const cadences = portfolioCadences();
+    const rows = cadences.map(
+      (row) =>
+        `<tr><td>${B(row.kind || "—", row.kind === "pi" ? "green" : "")}</td><td>${E(row.period || "—")}</td><td>${B(row.state || "—", ["active", "running"].includes(row.state) ? "green" : "")}</td><td><small>${E(short(cadenceWhen(row), 19) || "—")}</small></td></tr>`,
+    );
+    return panel(
+      "Cadence",
+      rows.length
+        ? `${table(["Kind", "Period", "State", "Next / review"], rows)}${note("The programme's cadence rows: PI planning, sprint, demo, retro and refinement. A date appears only when the row's metadata carries one.")}`
+        : note(
+            signed
+              ? "No cadence row is recorded for this programme, so no PI, sprint, demo, retro or refinement rhythm is shown. A cadence is a programme_cadence row read by cadences.list."
+              : "The published snapshot carries no programme cadence row, so no PI, sprint, demo, retro or refinement rhythm is shown.",
+          ),
+      rows.length ? B(`${rows.length} cadence${rows.length === 1 ? "" : "s"}`, "green") : "",
+    );
+  }
+
+  function portfolioCapacityPanel() {
+    const signed = consoleOn();
+    const lanes = [];
+    if (signed) {
+      consoleProjects().forEach((project) => {
+        const data = cs.byProject[project.id];
+        if (!data || data.error || !data.lists) return;
+        const liveCards = new Map();
+        list(data.cards).forEach((card) => {
+          if (card.archived_at) return;
+          liveCards.set(card.list_id, (liveCards.get(card.list_id) || 0) + 1);
+        });
+        list(data.lists).forEach((lane) => {
+          if (lane.wip_limit == null) return;
+          lanes.push({ project: project.key, lane, onLane: liveCards.get(lane.id) || 0 });
+        });
+      });
+    } else {
+      const work = (live || {}).work || {};
+      const boardProject = new Map(list(work.boards).map((row) => [row.id, row.project_id]));
+      const liveCards = new Map();
+      list(work.cards).forEach((card) => {
+        if (card.archived_at) return;
+        liveCards.set(card.list_id, (liveCards.get(card.list_id) || 0) + 1);
+      });
+      list(work.lists).forEach((lane) => {
+        if (lane.wip_limit == null) return;
+        lanes.push({
+          project: projectIdKey(boardProject.get(lane.board_id)),
+          lane,
+          onLane: liveCards.get(lane.id) || 0,
+        });
+      });
+    }
+    const rows = lanes.map((row) => {
+      const headroom = row.lane.wip_limit - row.onLane;
+      return `<tr><td class="mono">${E(row.project)}</td><td>${E(row.lane.name || "—")}<small>${E(row.lane.kind || "lane")}</small></td><td>${E(row.lane.wip_limit)}</td><td>${E(row.onLane)}</td><td>${B(`${headroom} ${headroom < 0 ? "over cap" : "free"}`, headroom < 0 ? "amber" : "green")}</td></tr>`;
+    });
+    return panel(
+      "Capacity",
+      rows.length
+        ? `${table(["Project", "Lane", "WIP cap", "Live cards", "Headroom"], rows)}${note("A cap is the lane's own soft WIP limit (list.wip_limit) and a live card is a card on that lane that is not archived. This is lane capacity, not machine or model capacity.")}`
+        : note(
+            signed
+              ? "No lane on the boards loaded in this session carries a WIP cap, so no capacity figure is shown. Capacity reads each lane's list.wip_limit — open a project or load all boards from In flight — and run concurrency from runs.list; no percentage is invented."
+              : "No published lane carries a WIP cap, so no capacity figure is shown. The snapshot's work.lists carry list.wip_limit and its work.runs carry the runs; neither is reported here as a percentage.",
+          ),
+      rows.length ? B(`${rows.length} capped lane${rows.length === 1 ? "" : "s"}`, "green") : "",
+    );
+  }
+
+  function portfolioMeteringPanel() {
+    const signed = consoleOn();
+    const runs = signed ? list(cs.runs) : list((((live || {}).work || {}).runs));
+    const groups = new Map();
+    runs.forEach((run) => {
+      const key = run.project_id || "";
+      const entry = groups.get(key) || { key, runs: 0, active: 0, succeeded: 0, failed: 0 };
+      entry.runs += 1;
+      if (["queued", "running", "waiting_approval"].includes(run.status)) entry.active += 1;
+      else if (run.status === "succeeded") entry.succeeded += 1;
+      else if (run.status === "failed") entry.failed += 1;
+      groups.set(key, entry);
+    });
+    const rows = [...groups.values()]
+      .sort((a, b) => b.runs - a.runs)
+      .map(
+        (row) =>
+          `<tr><td class="mono">${E(projectIdKey(row.key))}</td><td>${E(countText(row.runs))}</td><td>${E(countText(row.active))}</td><td>${E(countText(row.succeeded))}</td><td>${E(countText(row.failed))}</td></tr>`,
+      );
+    // Cost is never recomputed here: the console does not fetch the project-level roll-up and the
+    // snapshot aggregates by caller and model only, so the panel names that source and stops.
+    const spendNote = signed
+      ? "Run counts are the runs.list page this console loaded. Cost and tool spend are read from metrics.usage at level=project; this page does not fetch that roll-up, so no cost is shown or estimated."
+      : "Run counts are the published snapshot's work.runs. Its measure.inference section aggregates calls and tokens by caller and model, not by project, so no per-project cost or tool spend is shown or estimated.";
+    return panel(
+      "Metering by project",
+      rows.length
+        ? `${table(["Project", "Runs", "Active", "Succeeded", "Failed"], rows)}${note(spendNote)}`
+        : note(
+            signed
+              ? `${cs.runsLoaded ? "The tenant has no run row yet." : "The tenant's run rows have not loaded in this session."} ${spendNote}`
+              : `The published snapshot carries no run row. ${spendNote}`,
+          ),
+      rows.length ? B(`${countText(runs.length)} runs`) : "",
+    );
+  }
+
   function consolePortfolio() {
     if (!cs.loaded && !cs.loading && !cs.error) consoleLoad();
     consoleLoadRegister();
@@ -4705,7 +4964,9 @@ window.installV2 = function (api, enterprise) {
     // The operator console opens on the in-flight queue it acts from; a programme drill
     // (`#portfolio/<id>`) is a timeline route and opens there directly. The public page renders
     // the timeline above its queue, so the visual is not console-only.
-    const tab = ["Timeline", "In flight", "Dependencies", "Programme"].includes(v.tab.portfolio)
+    const tab = ["Timeline", "In flight", "Dependencies", "Programme", "Backlog"].includes(
+      v.tab.portfolio,
+    )
       ? v.tab.portfolio
       : routeUuid(1)
         ? "Timeline"
@@ -4817,19 +5078,21 @@ window.installV2 = function (api, enterprise) {
               ])}${inFlightRows.length ? table(["Project", "Status"], inFlightRows.map((row) => `<tr><td><strong>${E(row.name || mspProjectName(row.id))}</strong><small>${E(row.key || "")}</small></td><td>${B(row.status || "—", row.status === "active" ? "green" : "amber")}</td></tr>`)) : note("portfolio.in_flight returned no project.")}${note("Programme configuration is a store row (programmes.update). The in-flight set is the tenant's portfolio configuration, read by portfolio.in_flight.")}`,
               `${button("Edit programme", "msp-programme-edit", "", "small", "edit")}${B(programmeRow.status || "no programme row", programmeRow.status === "active" ? "green" : "")}`,
             )
-          : panel(
-              "In-flight portfolio",
-              `${table(["Project", "Status", "Units", "Cards", "Blockers", "Plan"], inFlight)}${inFlightRows.length ? panel("portfolio.in_flight", table(["Project", "Key", "Status"], inFlightRows.map((row) => `<tr><td>${E(row.name || "—")}</td><td class="mono">${E(row.key || "—")}</td><td>${B(row.status || "—", row.status === "active" ? "green" : "amber")}</td></tr>`)), B(`${inFlightRows.length} in flight`)) : ""}${note(
-                "Every row is a tenant project. Units are the GitHub issues linked on the project; cards are the project's board; a card is complete when its lane kind is done or archive.",
-              )}`,
-              `${B(`${rows.length} projects`, "green")}${button(
-                "Load all boards",
-                "programme-load-boards",
-                "",
-                "small",
-                "board",
-              )}`,
-            );
+          : tab === "Backlog"
+            ? `${portfolioBacklogPanel()}${portfolioCadencePanel()}${portfolioCapacityPanel()}${portfolioMeteringPanel()}`
+            : panel(
+                "In-flight portfolio",
+                `${table(["Project", "Status", "Units", "Cards", "Blockers", "Plan"], inFlight)}${inFlightRows.length ? panel("portfolio.in_flight", table(["Project", "Key", "Status"], inFlightRows.map((row) => `<tr><td>${E(row.name || "—")}</td><td class="mono">${E(row.key || "—")}</td><td>${B(row.status || "—", row.status === "active" ? "green" : "amber")}</td></tr>`)), B(`${inFlightRows.length} in flight`)) : ""}${note(
+                  "Every row is a tenant project. Units are the GitHub issues linked on the project; cards are the project's board; a card is complete when its lane kind is done or archive.",
+                )}`,
+                `${B(`${rows.length} projects`, "green")}${button(
+                  "Load all boards",
+                  "programme-load-boards",
+                  "",
+                  "small",
+                  "board",
+                )}`,
+              );
     return `<div class="page enterprise">${heading(
       "Portfolio",
       "The programme's real projects, their linked units, their boards and their dependency edges.",
@@ -4839,7 +5102,7 @@ window.installV2 = function (api, enterprise) {
       "Projects, units, boards and dependency edges read from the platform's own rows.",
       true,
     )}${summary}${tabs(
-      ["Timeline", "In flight", "Dependencies", "Programme"],
+      ["Timeline", "In flight", "Dependencies", "Programme", "Backlog"],
       tab,
       "portfolio",
     )}${content}</div>`;
@@ -4890,7 +5153,7 @@ window.installV2 = function (api, enterprise) {
           ? depRows
           : [`<tr><td colspan="2">No dependency edges are published.</td></tr>`],
       )}`,
-    )}</div>`;
+    )}${portfolioBacklogPanel()}${portfolioCadencePanel()}${portfolioCapacityPanel()}${portfolioMeteringPanel()}</div>`;
   }
 
   /* ------------------------------------------------ Programme definition (MSP) */
@@ -4929,6 +5192,21 @@ window.installV2 = function (api, enterprise) {
             ["Tranche exit criteria", "3 of 4 met"],
           ]
         : [["First review is due on " + tranche.review, "not started"]];
+    // Stakeholders: the store's own profiles when present, the study fixture otherwise.
+    const stakeholderRows = list(mspSource().stakeholders).length
+      ? list(mspSource().stakeholders)
+      : F.stakeholders;
+    const stakeholdersPanel = panel(
+      "Stakeholder profiles",
+      `${table(
+        ["Name", "Organisation", "Role", "Influence", "Interest", "Support", "Disbenefits"],
+        stakeholderRows.map(
+          (s) =>
+            `<tr><td><strong>${E(s.name || "—")}</strong><small>${E(s.id || "")}</small></td><td>${E(s.organisation || "—")}</td><td><small>${E(s.role || s.engagement_target || "—")}</small></td><td><small>${E(s.influence || "—")}</small></td><td><small>${E(s.interest || "—")}</small></td><td>${B(s.support_level || "—", s.support_level === "supportive" ? "green" : s.support_level === "neutral" ? "amber" : "")}</td><td><small>${E(s.disbenefits || "—")}</small></td></tr>`,
+        ),
+      )}${note("A profile names what the programme wants from the engagement and what the engagement costs the stakeholder. Influence without interest is kept satisfied, interest without influence is kept informed, both high is managed closely; a disbenefit is tracked as evidence, not as a reason to omit the row.")}`,
+      B(`${stakeholderRows.length} profiles`, stakeholderRows.length ? "green" : ""),
+    );
 
     const definition =
       `${panel("Mandate · " + def.name, `${table(
@@ -5022,7 +5300,9 @@ window.installV2 = function (api, enterprise) {
             ? tranches
             : tab === "Benefits realization"
               ? realization
-              : panel("Stakeholders", note("The design study carries no stakeholder fixture. The live page reads stakeholder profiles from the programme store; the public snapshot carries the published profiles."));
+              : tab === "Dossier"
+                ? mspDossier(mspSource())
+                : stakeholdersPanel;
 
     return `<div class="page enterprise">${heading(
       "Programme definition",
@@ -5918,8 +6198,10 @@ window.installV2 = function (api, enterprise) {
     const snapshotMsp = !signed && !!(live && live.msp);
     const consoleCapable = !!(C && C.config());
     const names = signed || snapshotMsp
-      ? ["Boards", "WBS", "Baseline vs forecast", "Registers", "Cadence"]
-      : ["Boards"];
+      ? ["Boards", "WBS", "Baseline vs forecast", "Registers", "Cadence", "Change control"]
+      : studyOn()
+        ? ["Boards", "Change control"]
+        : ["Boards"];
     const tab = names.includes(v.tab.plan) ? v.tab.plan : "Boards";
     const content = tab === "Boards" ? planBoards(work) : planMspContent(tab);
     const planRibbon =
@@ -5928,7 +6210,7 @@ window.installV2 = function (api, enterprise) {
           ? `<div class="v2-ribbon live" role="note"><strong>LIVE</strong><span>Operator console · the platform's own projects, boards and cards, joined to the GitHub issue registry. Signed in as ${E(C.status().name)} · tenant ${E(C.status().tenant)}.</span><span class="v2-src">API · no snapshot</span></div>`
           : ribbon("LIVE · GitHub issues are read at publish and joined to the conveyor's own cards and runs. A unit with no real card is shown as not intaken; nothing is seeded.", liveBoards)
         : consoleRibbon("The plan spine reads the programme store: WBS nodes, baselines, registers and cadences. Signed out it is the published snapshot, read-only.", signed || snapshotMsp);
-    return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: WBS, frozen baselines, one six-kind register and cadence. Boards join GitHub issues to the conveyor's own cards and runs.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${planRibbon}${tabs(names, tab, "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${signed ? `${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}` : ""}<span class="muted">Change control is T10 and stays out of this surface.${snapshotMsp ? " The published snapshot is read-only." : ""}</span></div></div>`;
+    return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: WBS, frozen baselines, one six-kind register and cadence. Boards join GitHub issues to the conveyor's own cards and runs.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${planRibbon}${tabs(names, tab, "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${signed ? `${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}` : ""}<span class="muted">Change control is T10 and is on the Change control tab: a request names the baseline it moves, its impact and a decision with a rationale.${snapshotMsp ? " The published snapshot is read-only." : ""}</span></div></div>`;
   }
 
   function planMspContent(tab) {
@@ -5948,7 +6230,7 @@ window.installV2 = function (api, enterprise) {
         ["Kind", "Taken at", "Reference", "Version"],
         rows.length ? rows.map((b) => `<tr><td>${B(b.kind || "—")}</td><td>${E(b.taken_at || b.created_at || "—")}</td><td class="mono">${E(b.id || "—")}</td><td>${E(b.version == null ? "—" : "v" + b.version)}</td></tr>`)
           : [`<tr><td colspan="4">No baseline is recorded. A baseline is a frozen, approved snapshot and is never recomputed.</td></tr>`]
-      )}${note("A forecast is derived from current rows; a variance is not a change until change control (T10) approves it.")}`, source.readOnly ? "" : `<div class="toolbar">${["scope", "schedule", "cost"].map((kind) => button("Take " + kind, "msp-baseline-take", `data-kind="${kind}"`, "small", "shield")).join("")}</div>`)}${panel("Forecast", `${kv([["Scope", "computed from the WBS rows"], ["Schedule", "computed from the node dates"], ["Cost", "computed from the register and job rows"]])}${note("Change control is T10 and is not part of this surface; a forecast never rewrites an approved baseline.")}`)}`;
+      )}${note("A forecast is derived from current rows; a variance is not a change until change control (T10) approves it.")}`, source.readOnly ? "" : `<div class="toolbar">${["scope", "schedule", "cost"].map((kind) => button("Take " + kind, "msp-baseline-take", `data-kind="${kind}"`, "small", "shield")).join("")}</div>`)}${panel("Forecast", `${kv([["Scope", "computed from the WBS rows"], ["Schedule", "computed from the node dates"], ["Cost", "computed from the register and job rows"]])}${note("Change control is T10 and its approved requests are on the Change control tab; a forecast never rewrites an approved baseline.")}`)}`;
     }
     if (tab === "Registers") {
       const rows = list(source.registers);
@@ -5958,12 +6240,68 @@ window.installV2 = function (api, enterprise) {
           : [`<tr><td colspan="5">No register item is recorded.</td></tr>`]
       )}${note("A risk can open a mitigation card; a dependency can link two projects; a benefit is measured at closure.")}`, source.readOnly ? "" : button("New register item", "msp-register-new", "", "small", "plus"))}`;
     }
+    if (tab === "Change control") return planChanges(source);
     const rows = list(source.cadences);
     return `${mspError()}${panel("Cadence", `${table(
       ["Kind", "Period", "State", ""],
       rows.length ? rows.map((c) => `<tr><td>${B(c.kind || "—")}</td><td><strong>${E(c.period || "—")}</strong></td><td>${E(c.state || "—")}</td><td>${source.readOnly ? "" : `${button("Edit", "msp-cadence-edit", `data-id="${E(c.id)}"`, "small", "edit")}${button("Delete", "msp-delete", `data-kind="cadence" data-id="${E(c.id)}" data-version="${E(c.version)}"`, "small", "close")}`}</td></tr>`)
         : [`<tr><td colspan="4">No cadence is recorded.</td></tr>`]
     )}${note("A tranche is not a PI: the PI cadence is the delivery rhythm inside it; the review is the sponsoring group's decision to continue, pause or stop on evidence.")}`, source.readOnly ? "" : button("New cadence", "msp-cadence-new", "", "small", "plus"))}`;
+  }
+
+  /* Change control (T10) on the plan spine: the programme register's `change` rows when a
+     store is loaded; the design study's change-request fixture in reviewer mode only, so a
+     live or published store with no change row says so instead of rendering fiction. */
+  function planChanges(source) {
+    const register = list(source.registers).filter(
+      (r) => String(r.kind || "").toLowerCase() === "change",
+    );
+    const study = !consoleOn() && !(live && live.msp);
+    const rows = register.length
+      ? register.map((r) => ({
+          id: r.id || "—",
+          title: r.title || "—",
+          baseline: r.baseline || r.baseline_ref || "—",
+          impact:
+            typeof r.impact === "object" && r.impact
+              ? JSON.stringify(r.impact)
+              : r.body || r.impact || "—",
+          decision: r.status || r.decision || "Open",
+          rationale: r.rationale || r.note || "—",
+        }))
+      : study
+        ? F.changes.map((c) => ({
+            id: c.id,
+            title: c.title,
+            baseline: c.baseline,
+            impact: c.impact,
+            decision: c.state,
+            rationale: c.rationale || "—",
+          }))
+        : [];
+    const tone = (decision) =>
+      /approved/i.test(decision)
+        ? "green"
+        : /rejected|returned|refused/i.test(decision)
+          ? "bad"
+          : "amber";
+    const tableRows = rows.length
+      ? table(
+          ["ID", "Change request", "Baseline", "Impact", "Decision", "Rationale"],
+          rows.map(
+            (c) =>
+              `<tr><td class="mono">${E(c.id)}</td><td><strong>${E(c.title)}</strong></td><td>${E(c.baseline)}</td><td><small>${E(c.impact)}</small></td><td>${B(c.decision, tone(c.decision))}</td><td><small>${E(c.rationale)}</small></td></tr>`,
+          ),
+        )
+      : `<p class="muted">No change request is recorded against this programme.</p>`;
+    const decide = study
+      ? `<label class="field full"><span>Decision rationale</span><input data-v2-input="rationale" placeholder="Why the request is approved or returned; a decision with no rationale is refused" aria-label="Decision rationale"></label><div class="toolbar">${button("Approve the request", "change-approve", "", "small", "shield")}${button("Return for analysis", "change-return", "", "small", "replay")}</div>${v.review === "change-blocked" ? note("<strong>422 change_rationale_required</strong> · the decision was refused; the baseline is unchanged.", "bad") : v.review === "change-ok" ? note("<strong>Rationale recorded</strong> · the decision is recorded by the change gate; the baseline changes only through that gate, never through a forecast.", "ok") : ""}`
+      : "";
+    return `${mspError()}${panel(
+      "Change control",
+      `${tableRows}${note(study ? "Design study · <span class='mono'>F.changes</span> renders because no programme register row of kind <span class='mono'>change</span> is loaded. A change request names the baseline it moves and carries an impact block; only an approved request moves a baseline." : "A change request is a register row of kind <span class='mono'>change</span>: it names the baseline it moves and carries an impact block. Only an approved request moves a baseline.")}${decide}`,
+      B(`${rows.length} request${rows.length === 1 ? "" : "s"}`, rows.length ? "amber" : ""),
+    )}`;
   }
 
   /* The plan is a join, not a seed: the project's GitHub issues (the registry fetched at
@@ -7478,10 +7816,11 @@ window.installV2 = function (api, enterprise) {
   }
 
   /* ------------------------------------------------------------------ Metering */
-  // Live: the platform publishes `measure.inference` (calls, tokens and cache hits by caller and
-  // by model) and a `note` that fixes the cost rule. The screen renders those rows and nothing
-  // else; the design study's fixture roll-ups appear only where no snapshot is loaded, and a
-  // snapshot without the section says so rather than borrowing a fixture number (#458).
+  // Live: the platform publishes `measure.inference` (calls, tokens, derived cost, tool spend and
+  // cache hits by caller and by model) and a `note` that fixes the cost rule. The screen renders
+  // those rows and nothing else; the design study's fixture roll-ups appear only where no
+  // snapshot is loaded, and a snapshot without the section says so rather than borrowing a
+  // fixture number (#458).
   function metering() {
     if (live) return meteringLive();
     const tab = v.tab.metering || "Roll-ups";
@@ -7524,7 +7863,7 @@ window.installV2 = function (api, enterprise) {
     const num = (value) => Number(value || 0).toLocaleString("en-US");
     const stat = (label, value, sub) =>
       `<div class="metric"><div class="label"><i class="dot green"></i>${E(label)}</div><div class="metric-number">${E(value)}</div><small>${E(sub)}</small></div>`;
-    const head = `${heading("Metering", "The platform's own inference aggregates, read from the published snapshot: calls, tokens and cache hits by caller and by model.", `${route("Portfolio", "portfolio", "", "layers")}${route("Usage", "usage", "", "chart")}`, "MEASURE & IMPROVE")}${ribbon("Live measurement: <span class=\"mono\">measure.inference</span> from the published snapshot. Cost is a read-time derivation, never a stored figure.", true)}`;
+    const head = `${heading("Metering", "The platform's own inference aggregates, read from the published snapshot: calls, tokens, derived cost, tool spend and cache hits by caller and by model.", `${route("Portfolio", "portfolio", "", "layers")}${route("Usage", "usage", "", "chart")}`, "MEASURE & IMPROVE")}${ribbon("Live measurement: <span class=\"mono\">measure.inference</span> from the published snapshot. Cost is a read-time derivation, never a stored figure.", true)}`;
     const ruled = measure.note ? note(E(measure.note)) : "";
     if (!inference) {
       return `<div class="page enterprise">${head}${panel(
@@ -7533,6 +7872,14 @@ window.installV2 = function (api, enterprise) {
       )}${ruled}</div>`;
     }
     const totals = inference.totals || {};
+    // Money is a read-time derivation (D52), published as a rounded JSON number. Small spend is
+    // shown to four decimals so a real $0.00028 is not rendered as "$0.00"; an absent figure is
+    // "—", never a claimed zero.
+    const usd = (value) => {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "—";
+      return "$" + n.toFixed(n > 0 && n < 0.01 ? 4 : 2);
+    };
     const tiles = `<div class="metrics">${[
       stat("Calls", num(totals.calls), `${num(totals.non_ok_calls)} not ok`),
       stat(
@@ -7540,12 +7887,20 @@ window.installV2 = function (api, enterprise) {
         num(totals.total_tokens),
         `${num(totals.prompt_tokens)} prompt · ${num(totals.completion_tokens)} completion`,
       ),
+      stat("Cost", usd(totals.cost_usd), "derived at read time (D52)"),
+      stat("Tool spend", usd(totals.tool_cost_usd), "tool_call ledger"),
       stat(
         "Cache hits",
         num(totals.cache_hit_calls),
         `${num(totals.cache_miss_calls)} misses · ${num(totals.cache_write_calls)} writes · ${num(totals.unknown_cache_calls)} unknown`,
       ),
+      stat("Unpriced calls", num(totals.unpriced_calls), "no price row — counted, never free"),
     ].join("")}</div>`;
+    // The derivation is stated, not implied. A budget percentage needs a declared ceiling; the
+    // snapshot publishes no budget, so none is invented.
+    const derivation = note(
+      "Cost is derived at read time from <span class='mono'>inference_call</span> × <span class='mono'>commercial_price</span> — priced by token or by usage unit (D52) — and is never a stored column; tool spend is the <span class='mono'>tool_call</span> ledger's recorded cost. A call the price join cannot price is counted as unpriced, never rendered as free. Budget utilisation needs a declared ceiling: the snapshot publishes no budget, so no percentage is shown.",
+    );
     const callerRows = list(inference.by_caller).map(
       (row) =>
         `<tr><td>${E(row.caller_kind || "unknown")}</td><td>${num(row.calls)}</td><td>${num(row.total_tokens)}</td></tr>`,
@@ -7554,7 +7909,7 @@ window.installV2 = function (api, enterprise) {
       (row) =>
         `<tr><td>${E(row.model || "unknown")}</td><td>${num(row.calls)}</td><td>${num(row.prompt_tokens)}</td><td>${num(row.completion_tokens)}</td><td>${num(row.total_tokens)}</td><td>${num(row.cache_hits)}</td></tr>`,
     );
-    return `<div class="page enterprise">${head}${tiles}${panel(
+    return `<div class="page enterprise">${head}${tiles}${derivation}${panel(
       "By caller",
       callerRows.length
         ? table(["Caller", "Calls", "Tokens"], callerRows)

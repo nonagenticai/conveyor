@@ -24,7 +24,7 @@
       >
     </header>
     <main class="doc-body"><h1 id="msptogaf-conformance-gap-register">MSP/TOGAF conformance gap register</h1>
-<p>Snapshot: <code>a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b</code> generated <code>2026-11-20T11:50:50.848127361+00:00</code> from <code>docs/design/data</code>.</p>
+<p>Snapshot: <code>a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b</code> generated <code>2026-11-20T11:50:50.848127361+00:00</code> from <code>design/data</code>.</p>
 <table>
 <thead>
 <tr>
@@ -35,15 +35,15 @@
 <tbody>
 <tr>
 <td>P0</td>
-<td style="text-align: right;">22</td>
+<td style="text-align: right;">31</td>
 </tr>
 <tr>
 <td>P1</td>
-<td style="text-align: right;">132</td>
+<td style="text-align: right;">197</td>
 </tr>
 <tr>
 <td>P2</td>
-<td style="text-align: right;">35</td>
+<td style="text-align: right;">36</td>
 </tr>
 <tr>
 <td>P3</td>
@@ -70,9 +70,63 @@
 </tr>
 <tr>
 <td><code>closed_without_closure_review</code></td>
+<td><code>T0</code></td>
+<td>P0</td>
+<td>project is closed but its closure review is not published</td>
+</tr>
+<tr>
+<td><code>closed_without_closure_review</code></td>
+<td><code>T1</code></td>
+<td>P0</td>
+<td>project is closed but its closure review is not published</td>
+</tr>
+<tr>
+<td><code>closed_without_closure_review</code></td>
+<td><code>T10</code></td>
+<td>P0</td>
+<td>project is closed but its closure review is not published</td>
+</tr>
+<tr>
+<td><code>closed_without_closure_review</code></td>
+<td><code>T13</code></td>
+<td>P0</td>
+<td>project is closed but its closure review is not published</td>
+</tr>
+<tr>
+<td><code>closed_without_closure_review</code></td>
 <td><code>T14</code></td>
 <td>P0</td>
 <td>project is closed but its closure review is not published</td>
+</tr>
+<tr>
+<td><code>closed_without_closure_review</code></td>
+<td><code>T2</code></td>
+<td>P0</td>
+<td>project is closed but its closure review is not published</td>
+</tr>
+<tr>
+<td><code>closed_without_closure_review</code></td>
+<td><code>T3</code></td>
+<td>P0</td>
+<td>project is closed but its closure review is not published</td>
+</tr>
+<tr>
+<td><code>closed_without_closure_review</code></td>
+<td><code>T4</code></td>
+<td>P0</td>
+<td>project is closed but its closure review is not published</td>
+</tr>
+<tr>
+<td><code>closed_without_closure_review</code></td>
+<td><code>T9</code></td>
+<td>P0</td>
+<td>project is closed but its closure review is not published</td>
+</tr>
+<tr>
+<td><code>pi_plan_missing</code></td>
+<td><code>tranche 0 PI</code></td>
+<td>P0</td>
+<td>the PI carried by an authorised tranche has no published pi-plan output</td>
 </tr>
 <tr>
 <td><code>project_in_unauthorised_tranche</code></td>
@@ -247,6 +301,12 @@
 <td><code>programme</code></td>
 <td>P1</td>
 <td>the snapshot publishes no programme_cadence row (pi|demo|retro|refinement)</td>
+</tr>
+<tr>
+<td><code>closed_without_closure_review</code></td>
+<td><code>P0</code></td>
+<td>P1</td>
+<td>project is closed but its closure review is not published</td>
 </tr>
 <tr>
 <td><code>closed_without_closure_review</code></td>
@@ -783,6 +843,12 @@
 <td>missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards</td>
 </tr>
 <tr>
+<td><code>pi_objectives_missing</code></td>
+<td><code>tranche 0 PI</code></td>
+<td>P1</td>
+<td>the PI carried by an authorised tranche has no published pi-objectives output</td>
+</tr>
+<tr>
 <td><code>programme_baselines</code></td>
 <td><code>boundary</code></td>
 <td>P1</td>
@@ -799,6 +865,132 @@
 <td><code>management</code></td>
 <td>P1</td>
 <td>the programme has no management baseline</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:adm-profile</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:architecture-analysis</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:architecture-principles</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:artifact-standard</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:benefit-profile</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:benefits-map</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:benefits-strategy</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:blueprint</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:brief-template</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:business-case</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:governance</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:maturity-assessment</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:programme-plan</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:projects-dossier</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:realization-plan</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:reuse-map</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:skills-assessment</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:stakeholder-profiles</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:tranche-plan</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:tranche-review</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
+</tr>
+<tr>
+<td><code>programme_outputs</code></td>
+<td><code>P0:vision</code></td>
+<td>P1</td>
+<td>declared programme output is not published</td>
 </tr>
 <tr>
 <td><code>project_in_unauthorised_tranche</code></td>
@@ -960,31 +1152,283 @@
 <td><code>unpublished_declared_output</code></td>
 <td><code>DESIGN-PUBLISH</code></td>
 <td>P1</td>
-<td>declared outputs are not published: closure-review</td>
+<td>declared outputs are not published: closure-review, evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>P0</code></td>
+<td>P1</td>
+<td>declared outputs are not published: adm-profile, architecture-analysis, architecture-principles, artifact-standard, benefit-profile, benefits-map, benefits-strategy, blueprint, brief-template, business-case, governance, maturity-assessment, programme-plan, projects-dossier, realization-plan, reus…</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>PLATFORM</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S00</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S01</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S02</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S03</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S04</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S05</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S06</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S06b</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S06c</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S06d</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S07</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S08</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S09</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S10</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S11</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S12</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S13</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S14</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S15</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S16</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S17</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S18</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S19</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S20</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>S21</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>SPEC-V2</code></td>
+<td>P1</td>
+<td>declared outputs are not published: spec</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T0</code></td>
+<td>P1</td>
+<td>declared outputs are not published: closure-review, evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T1</code></td>
+<td>P1</td>
+<td>declared outputs are not published: closure-review, evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T10</code></td>
+<td>P1</td>
+<td>declared outputs are not published: closure-review, evidence, project-brief</td>
 </tr>
 <tr>
 <td><code>unpublished_declared_output</code></td>
 <td><code>T11</code></td>
 <td>P1</td>
-<td>declared outputs are not published: evidence</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T12</code></td>
+<td>P1</td>
+<td>declared outputs are not published: architecture-design, inception-analysis, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T13</code></td>
+<td>P1</td>
+<td>declared outputs are not published: closure-review, evidence, project-brief</td>
 </tr>
 <tr>
 <td><code>unpublished_declared_output</code></td>
 <td><code>T14</code></td>
 <td>P1</td>
-<td>declared outputs are not published: closure-review, evidence</td>
+<td>declared outputs are not published: closure-review, evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T15</code></td>
+<td>P1</td>
+<td>declared outputs are not published: architecture-design, inception-analysis, project-brief</td>
 </tr>
 <tr>
 <td><code>unpublished_declared_output</code></td>
 <td><code>T16</code></td>
 <td>P1</td>
-<td>declared outputs are not published: evidence</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T17</code></td>
+<td>P1</td>
+<td>declared outputs are not published: architecture-design, inception-analysis, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T2</code></td>
+<td>P1</td>
+<td>declared outputs are not published: closure-review, evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T3</code></td>
+<td>P1</td>
+<td>declared outputs are not published: closure-review, evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T4</code></td>
+<td>P1</td>
+<td>declared outputs are not published: closure-review, evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T5</code></td>
+<td>P1</td>
+<td>declared outputs are not published: architecture-design, inception-analysis, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T6</code></td>
+<td>P1</td>
+<td>declared outputs are not published: architecture-design, inception-analysis, project-brief</td>
 </tr>
 <tr>
 <td><code>unpublished_declared_output</code></td>
 <td><code>T7</code></td>
 <td>P1</td>
-<td>declared outputs are not published: evidence</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T8</code></td>
+<td>P1</td>
+<td>declared outputs are not published: evidence, project-brief</td>
+</tr>
+<tr>
+<td><code>unpublished_declared_output</code></td>
+<td><code>T9</code></td>
+<td>P1</td>
+<td>declared outputs are not published: adm-profile, architecture-artifact, architecture-design, architecture-principles, artifact-standard, closure-review, compliance-review, evidence, inception-analysis, maturity-assessment, project-brief, skills-assessment, statement-of-architecture-work, waiver</td>
 </tr>
 </tbody>
 </table>
@@ -1016,7 +1460,7 @@
 <td>closed</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: right;">24</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1025,7 +1469,7 @@
 <td>active</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1034,7 +1478,7 @@
 <td>closed</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1043,7 +1487,7 @@
 <td>closed</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1052,7 +1496,7 @@
 <td>active</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1061,7 +1505,7 @@
 <td>closed</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1070,7 +1514,7 @@
 <td>active</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1079,7 +1523,7 @@
 <td>closed</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1088,7 +1532,7 @@
 <td>active</td>
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1106,7 +1550,7 @@
 <td>closed</td>
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1115,7 +1559,7 @@
 <td>closed</td>
 <td style="text-align: right;">7</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1124,7 +1568,7 @@
 <td>closed</td>
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1133,7 +1577,7 @@
 <td>closed</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1142,7 +1586,7 @@
 <td>closed</td>
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1151,7 +1595,7 @@
 <td>closed</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1160,7 +1604,7 @@
 <td>closed</td>
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1169,7 +1613,7 @@
 <td>closed</td>
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1178,7 +1622,7 @@
 <td>active</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1187,7 +1631,7 @@
 <td>active</td>
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1196,7 +1640,7 @@
 <td>active</td>
 <td style="text-align: right;">11</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1205,7 +1649,7 @@
 <td>active</td>
 <td style="text-align: right;">7</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1214,7 +1658,7 @@
 <td>closed</td>
 <td style="text-align: right;">7</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1223,7 +1667,7 @@
 <td>active</td>
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1232,7 +1676,7 @@
 <td>active</td>
 <td style="text-align: right;">9</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1241,7 +1685,7 @@
 <td>active</td>
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1250,7 +1694,7 @@
 <td>active</td>
 <td style="text-align: right;">9</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1259,7 +1703,7 @@
 <td>active</td>
 <td style="text-align: right;">9</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1268,7 +1712,7 @@
 <td>closed</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1276,8 +1720,8 @@
 <td>T0</td>
 <td>closed</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
 <td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1285,8 +1729,8 @@
 <td>T1</td>
 <td>closed</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
 <td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1294,8 +1738,8 @@
 <td>T10</td>
 <td>closed</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">1</td>
 <td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1313,7 +1757,7 @@
 <td>active</td>
 <td style="text-align: right;">13</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1321,8 +1765,8 @@
 <td>T13</td>
 <td>closed</td>
 <td style="text-align: right;">3</td>
-<td style="text-align: right;">1</td>
 <td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1340,7 +1784,7 @@
 <td>active</td>
 <td style="text-align: right;">12</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1358,7 +1802,7 @@
 <td>active</td>
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1366,8 +1810,8 @@
 <td>T2</td>
 <td>closed</td>
 <td style="text-align: right;">2</td>
-<td style="text-align: right;">1</td>
 <td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1375,8 +1819,8 @@
 <td>T3</td>
 <td>closed</td>
 <td style="text-align: right;">3</td>
-<td style="text-align: right;">1</td>
 <td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1384,8 +1828,8 @@
 <td>T4</td>
 <td>closed</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">1</td>
 <td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1394,7 +1838,7 @@
 <td>active</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1403,7 +1847,7 @@
 <td>active</td>
 <td style="text-align: right;">11</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1421,7 +1865,7 @@
 <td>active</td>
 <td style="text-align: right;">11</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>
@@ -1429,8 +1873,8 @@
 <td>T9</td>
 <td>closed</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 </tr>

@@ -1,0 +1,112 @@
+[project]
+key = "P0"
+name = "Programme definition — vision, blueprint, plan and project briefs"
+gate = "The definition set is published; the charter and scope baseline are approved; the closure review and close gate are recorded."
+gate_checks = ["P0-project", "P0-baseline", "P0-charter", "P0-closure-outputs", "P0-contract", "P0-review", "P0-closure-gate", "P0-waivers", "P0-benefit-baseline", "P0-pi-cadence", "P0-wsjf", "P0-demo-credits", "P0-lessons", "P0-pi-plan", "P0-pi-objectives", "P0-product"]
+
+[[check]]
+id = "P0-project"
+check = "project"
+severity = "P0"
+description = "P0 is closed"
+
+[[check]]
+id = "P0-baseline"
+check = "project_baseline"
+require_approved = true
+severity = "P0"
+description = "the scope baseline is approved; the close gate reads the approved row"
+
+[[check]]
+id = "P0-charter"
+kind = "command"
+severity = "P0"
+description = "the charter asset exists and the charter gate is approved"
+command = '''python3 scripts/programme-record.py --check --action pm.get --input '{"project_id":"01a1dcb8-d24b-76de-b901-56fd56e001bc"}' | python3 -c '
+import json,sys
+s=sys.stdin.read()
+d=json.loads(s[s.find("{"):])
+o=d.get("output",d)
+assert o.get("charter_asset_id"), "no charter asset"
+gates={g.get("gate"):g.get("status") for g in o.get("gates",[])}
+assert gates.get("charter")=="approved", gates
+'
+'''
+
+[[check]]
+id = "P0-closure-outputs"
+check = "closure_outputs"
+severity = "P0"
+description = "the declared closure outputs are declared and published"
+
+[[check]]
+id = "P0-contract"
+check = "contract"
+severity = "P0"
+description = "a live board-approved delivery contract exists"
+
+[[check]]
+id = "P0-review"
+check = "review"
+severity = "P0"
+description = "the Phase-G review cites a published standing delegation"
+
+[[check]]
+id = "P0-closure-gate"
+check = "closure_gate"
+severity = "P0"
+description = "the closure gate was decided by an approver other than its requester"
+
+[[check]]
+id = "P0-waivers"
+check = "waivers"
+severity = "P0"
+description = "no active waiver is expired or owned by its reviewer"
+
+[[check]]
+id = "P0-benefit-baseline"
+check = "benefit_baseline"
+severity = "P1"
+description = "the programme's six benefit baselines are measured"
+
+[[check]]
+id = "P0-pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+description = "the project's PI has a cadence row and a backlog-refinement row"
+
+[[check]]
+id = "P0-wsjf"
+check = "wsjf"
+severity = "P0"
+description = "every WBS deliverable of the project carries the four typed WSJF inputs"
+
+[[check]]
+id = "P0-demo-credits"
+check = "demo_credits"
+severity = "P0"
+description = "every accepted deliverable has a demo credit carrying its evidence"
+
+[[check]]
+id = "P0-lessons"
+check = "lessons"
+severity = "P0"
+description = "the PI's retro produced its lessons"
+
+[[check]]
+id = "P0-pi-plan"
+check = "pi_plan"
+severity = "P0"
+description = "the PI plan is a published programme output"
+
+[[check]]
+id = "P0-pi-objectives"
+check = "pi_objectives"
+severity = "P0"
+description = "the PI objectives are a published programme output"
+
+[[check]]
+id = "P0-product"
+check = "product_findings"
+severity = "P0"
+description = "no open P0 product finding remains for the project"

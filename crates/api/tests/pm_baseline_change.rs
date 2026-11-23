@@ -264,7 +264,7 @@ async fn approved_change_request_advances_the_baseline() {
                 "project_id": project_id,
                 "baseline_id": baseline_id,
                 "title": "Add a hardening phase",
-                "impact": 5,
+                "impact": {"scope": "one hardening phase is added to the plan"},
             }),
             None,
             None,
@@ -294,7 +294,16 @@ async fn approved_change_request_advances_the_baseline() {
         baseline_id.to_string(),
         "{body}"
     );
-    assert_eq!(output(&body)["impact"], 5, "{body}");
+    // The §5.5 block lives in `meta`; the register's numeric `impact` column stays empty.
+    assert!(
+        output(&body)["impact"].is_null(),
+        "a change carries its impact as a block, not a number: {body}"
+    );
+    assert_eq!(
+        output(&body)["meta"]["impact"],
+        json!({"scope": "one hardening phase is added to the plan"}),
+        "the impact block did not round-trip through the register: {body}"
+    );
 
     // ── the second principal approves the change gate ───────────────────────────────────
     let (status, body) = decide(&running, change_gate, "approve").await;

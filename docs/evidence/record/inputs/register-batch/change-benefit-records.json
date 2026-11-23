@@ -1,0 +1,9 @@
+{
+ "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+ "baseline_id": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+ "title": "Complete the benefit records: B7 link, B7 conditions, and the baseline measurement fields",
+ "body": "The baseline dicts carry value/unit/definition but not measured_at/method; B7 has no benefits-map edge and no preconditions. This change authorises completing those records under the programme-level profiles.",
+ "impact": {
+  "scope": "benefit_profile B1..B7 baseline measurement records, B7 preconditions and the B7 benefits-map edge"
+ }
+}

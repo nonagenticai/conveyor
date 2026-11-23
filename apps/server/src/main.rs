@@ -85,12 +85,13 @@ enum Command {
     /// Deterministic JSON + `snapshot.js` under `--out`; no secret value, email or key id is
     /// ever selected. `--generated-at` pins the timestamp so a re-run is byte-identical.
     Snapshot {
-        /// The tenant slug to snapshot.
+        /// The tenant slug to snapshot. Required unless `--manifest-only` rehashes an
+        /// already-written pack.
+        #[arg(long, required_unless_present = "manifest_only")]
+        tenant: Option<String>,
+        /// The output directory. Defaults to `docs/design/data`; `--manifest-only` requires it.
         #[arg(long)]
-        tenant: String,
-        /// The output directory.
-        #[arg(long, default_value = "docs/design/data")]
-        out: PathBuf,
+        out: Option<PathBuf>,
         /// Also render every published platform output into this directory
         /// (`docs/design/docs`). Absent means the data snapshot only.
         #[arg(long)]
@@ -117,6 +118,10 @@ enum Command {
         /// working directory; a pod has no checkout, so a publish passes it explicitly.
         #[arg(long)]
         git_sha: Option<String>,
+        /// Rehash an already-written pack directory and rewrite its manifest; nothing else is
+        /// regenerated. Requires `--out`.
+        #[arg(long)]
+        manifest_only: bool,
     },
     /// Administrative operations (S14; S04 owns the action-registry commands).
     Admin {
@@ -547,10 +552,16 @@ async fn run(command: Command) -> Result<(), RunError> {
             feedback_url,
             database_url,
             git_sha,
+            manifest_only,
         } => {
+            if manifest_only && out.is_none() {
+                return Err(RunError::Refused(
+                    "--manifest-only requires --out".to_owned(),
+                ));
+            }
             let report = snapshot::run(snapshot::SnapshotArgs {
-                tenant,
-                out,
+                tenant: tenant.unwrap_or_default(),
+                out: out.unwrap_or_else(|| PathBuf::from("docs/design/data")),
                 outputs_dir,
                 generated_at,
                 issues,
@@ -558,6 +569,7 @@ async fn run(command: Command) -> Result<(), RunError> {
                 feedback_url,
                 database_url,
                 git_sha,
+                manifest_only,
             })
             .await?;
             tracing::info!(

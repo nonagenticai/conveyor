@@ -111,7 +111,7 @@ crates/actions/tests/copilot_coverage.rs</code></pre>
 </tr>
 <tr>
 <td><code>PROJECT_BINDING</code> / <code>SurfaceRefusal</code></td>
-<td>the projection <strong>omits</strong>; <code>/mcp</code> answers <code>action-not-found</code>, never <code>403</code> (S04-D6)</td>
+<td>the projection <strong>omits</strong> the action from both surfaces; calling a known-but-omitted name is <code>403 action-forbidden</code> (S04-D6 — the omission is the guarantee, not indistinguishability), and a name outside the registry is <code>-32602</code></td>
 </tr>
 <tr>
 <td><code>rbac.ts</code></td>
@@ -201,7 +201,7 @@ cargo clippy --workspace --all-targets -- -D warnings</code></pre>
 <tr>
 <td>e</td>
 <td>scope-absent tool</td>
-<td>low-scope principal's <code>/api/copilot/actions</code> <strong>and</strong> <code>/mcp</code> <code>tools/list</code> both omit it; calling it is <code>action-not-found</code>, not <code>403</code></td>
+<td>low-scope principal's <code>/api/copilot/actions</code> <strong>and</strong> <code>/mcp</code> <code>tools/list</code> both omit it; calling the omitted action is <code>403 action-forbidden</code> on the HTTP invocation route and an <code>isError</code> tool result with the same problem on <code>/mcp</code> (S04-D6); a name outside the registry is <code>-32602</code></td>
 </tr>
 <tr>
 <td>f</td>

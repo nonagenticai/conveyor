@@ -14,18 +14,26 @@ use crate::palette::Palette;
 use crate::screens::admin::AdminScreen;
 use crate::screens::approvals::Approvals;
 use crate::screens::architecture::ArchitectureScreen;
+use crate::screens::authoring::Authoring;
 use crate::screens::benchmarks::{BenchmarkRunDetail, Benchmarks};
 use crate::screens::boards::{BoardIndex, BoardScreen};
 use crate::screens::cockpit::Cockpit;
 use crate::screens::copilot::CopilotScreen;
 use crate::screens::evals::{EvalDetail, Evals};
+use crate::screens::improve::Improve;
 use crate::screens::improvement::Improvement;
 use crate::screens::inference::InferenceEndpoint;
 use crate::screens::members::Members;
 use crate::screens::models::{ModelDetail, ModelsScreen};
+use crate::screens::operations::Operations;
+use crate::screens::organisation::Organisation;
+use crate::screens::plan::Plan;
 use crate::screens::platform::Platform;
+use crate::screens::portfolio::Portfolio;
+use crate::screens::procedures::Procedures;
 use crate::screens::process_map::{ProcessMapDetail, ProcessMapList};
 use crate::screens::processes::{ProcessDetail, ProcessesScreen};
+use crate::screens::programme::Programme;
 use crate::screens::prompt_audit::PromptAuditScreen;
 use crate::screens::requirements::{RequirementDetail, RequirementsScreen};
 use crate::screens::roles::Roles;
@@ -166,6 +174,14 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/settings/inference") view=InferenceEndpoint/>
                             <Route path=path!("/settings/admin") view=AdminScreen/>
                             <Route path=path!("/copilot") view=CopilotScreen/>
+                            <Route path=path!("/portfolio") view=Portfolio/>
+                            <Route path=path!("/programme") view=Programme/>
+                            <Route path=path!("/organisation") view=Organisation/>
+                            <Route path=path!("/procedures") view=Procedures/>
+                            <Route path=path!("/authoring") view=Authoring/>
+                            <Route path=path!("/plan") view=Plan/>
+                            <Route path=path!("/improve") view=Improve/>
+                            <Route path=path!("/operations") view=Operations/>
                             <Route path=path!("/platform") view=Platform/>
                         </Routes>
                     </main>
@@ -269,6 +285,30 @@ fn Sidebar() -> impl IntoView {
                 <li><A href="/" exact=true><span class="nav-item">"Today"</span></A></li>
                 <li><A href="/boards"><span class="nav-item">"Board"</span></A></li>
                 <li><A href="/runs"><span class="nav-item">"Runs"</span></A></li>
+                {move || ctx.has_action("portfolio.in_flight").then(|| view! {
+                    <li><A href="/portfolio"><span class="nav-item">"Portfolio"</span></A></li>
+                })}
+                {move || ctx.has_action("programmes.list").then(|| view! {
+                    <li><A href="/programme"><span class="nav-item">"Programme"</span></A></li>
+                })}
+                {move || ctx.has_action("industries.list").then(|| view! {
+                    <li><A href="/organisation"><span class="nav-item">"Organisation"</span></A></li>
+                })}
+                {move || ctx.has_action("procedures.list").then(|| view! {
+                    <li><A href="/procedures"><span class="nav-item">"Procedures"</span></A></li>
+                })}
+                {move || ctx.has_action("authoring.assets").then(|| view! {
+                    <li><A href="/authoring"><span class="nav-item">"Authoring"</span></A></li>
+                })}
+                {move || ctx.has_action("projects.list").then(|| view! {
+                    <li><A href="/plan"><span class="nav-item">"Plan"</span></A></li>
+                })}
+                {move || ctx.has_action("metrics.flow").then(|| view! {
+                    <li><A href="/improve"><span class="nav-item">"Improve"</span></A></li>
+                })}
+                {move || ctx.has_action("workers.list").then(|| view! {
+                    <li><A href="/operations"><span class="nav-item">"Operations"</span></A></li>
+                })}
                 {move || ctx.has_action("approvals.list").then(|| view! {
                     <li><A href="/approvals"><span class="nav-item">"Approvals"</span></A></li>
                 })}

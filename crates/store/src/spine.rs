@@ -6,21 +6,22 @@
 //! action layer's vocabulary; a refusal the domain owns is raised as [`PlanStoreError::Illegal`]
 //! and mapped once, by the action.
 //!
-//! The one read model is [`in_flight_tx`]: it selects projects by the tenant's configured
-//! in-flight set (`tenant.settings -> 'portfolio' -> 'in_flight'`, default `active,paused`).
-//! There is no portfolio row (D-T1-7).
+//! The one read model is [`in_flight_tx`]: it selects projects **and** programmes by the
+//! tenant's configured in-flight set (`tenant.settings -> 'portfolio' -> 'in_flight'`, default
+//! `active,paused`). There is no portfolio row (D-T1-7).
 
-use chrono::{DateTime, Utc};
-use conveyor_domain::TenantId;
+use chrono::{DateTime, NaiveDate, Utc};
 use conveyor_domain::spine::{
-    BenefitMapFields, BenefitProfileFields, Measurement, PlanError, WsjfInputs,
-    benefit_map_missing, benefit_profile_missing, tranche_review_has_evidence,
-    transition_has_evidence, validate_change,
+    BenefitMapFields, BenefitProfileFields, PlanError, WsjfInputs, benefit_map_missing,
+    benefit_profile_missing, evidence_present, tranche_review_has_evidence,
+    validate_benefit_reading, validate_change,
 };
+use conveyor_domain::{Approval, TenantId};
 use serde_json::Value;
 use sqlx::{AssertSqlSafe, PgConnection};
 use uuid::Uuid;
 
+use crate::approval::{ApprovalStoreError, NewApproval, get_approval_tx, insert_approval_tx};
 use crate::parent::{Parent, ParentError, ensure_optional_parent_tx, ensure_parent_tx};
 
 /// The plan spine's failures.
@@ -60,6 +61,12 @@ pub enum PlanStoreError {
         /// Why the removal is refused.
         why: &'static str,
     },
+    /// A PI plan has no decision a person made, so nothing may materialise.
+    #[error("pi_plan_not_approved")]
+    PiPlanNotApproved,
+    /// The approval surface refused the plan's gate or its decision.
+    #[error(transparent)]
+    Approval(#[from] ApprovalStoreError),
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -434,7 +441,8 @@ pub async fn take_baseline_tx(
         .await
         .map_err(PlanStoreError::Parent)?;
     let wbs: Vec<WbsRecord> = list_wbs_tx(&mut *conn, tenant, project_id).await?;
-    let register: Vec<RegisterRecord> = list_register_tx(&mut *conn, tenant, project_id).await?;
+    let register: Vec<RegisterRecord> =
+        list_register_tx(&mut *conn, tenant, project_id, None).await?;
     let snapshot = serde_json::json!({
         "project_id": project_id,
         "wbs": wbs.iter().map(|node| serde_json::json!({
@@ -593,8 +601,10 @@ pub async fn list_baselines_tx(
 pub struct RegisterRecord {
     /// The row id.
     pub id: Uuid,
-    /// The owning project.
-    pub project_id: Uuid,
+    /// The owning project; null for a programme-level row.
+    pub project_id: Option<Uuid>,
+    /// The owning programme; null for a project-level row.
+    pub programme_id: Option<Uuid>,
     /// `risk | issue | assumption | dependency | benefit | change`.
     pub kind: String,
     /// The human code.
@@ -617,6 +627,10 @@ pub struct RegisterRecord {
     pub links: Value,
     /// The baseline a change changes.
     pub baseline_ref: Option<Uuid>,
+    /// When the row is next reviewed (a risk's review date).
+    pub review_at: Option<NaiveDate>,
+    /// The recorded response (a risk's mitigation).
+    pub response: Option<String>,
     /// Free-form metadata (a change's impact block lives here).
     pub meta: Value,
     /// The If-Match version.
@@ -627,15 +641,18 @@ pub struct RegisterRecord {
     pub updated_at: DateTime<Utc>,
 }
 
-const REGISTER_COLUMNS: &str = "id, project_id, kind, code, title, body, owner_job_id, status, \
-                                severity, probability, impact, links, baseline_ref, meta, version, \
-                                created_at, updated_at";
+const REGISTER_COLUMNS: &str = "id, project_id, programme_id, kind, code, title, body, \
+                                owner_job_id, status, severity, probability, impact, links, \
+                                baseline_ref, review_at, response, meta, version, created_at, \
+                                updated_at";
 
 /// A new register row.
 #[derive(Clone, Debug, Default)]
 pub struct NewRegisterItem {
-    /// The owning project.
-    pub project_id: Uuid,
+    /// The owning project; exactly one of this and `programme_id` is set.
+    pub project_id: Option<Uuid>,
+    /// The owning programme; exactly one of this and `project_id` is set.
+    pub programme_id: Option<Uuid>,
     /// The kind.
     pub kind: String,
     /// The human code.
@@ -658,6 +675,10 @@ pub struct NewRegisterItem {
     pub links: Value,
     /// The baseline a change changes.
     pub baseline_ref: Option<Uuid>,
+    /// When the row is next reviewed.
+    pub review_at: Option<NaiveDate>,
+    /// The recorded response.
+    pub response: Option<String>,
     /// Metadata; a change's impact block lives here.
     pub meta: Value,
 }
@@ -668,7 +689,14 @@ pub async fn insert_register_tx(
     tenant: TenantId,
     new: &NewRegisterItem,
 ) -> Result<RegisterRecord, PlanStoreError> {
-    require_project_tx(&mut *conn, tenant, new.project_id).await?;
+    if let Some(project) = new.project_id {
+        require_project_tx(&mut *conn, tenant, project).await?;
+    }
+    if let Some(programme) = new.programme_id {
+        ensure_parent_tx(&mut *conn, tenant, Parent::Programme, programme)
+            .await
+            .map_err(PlanStoreError::Parent)?;
+    }
     if let Some(owner) = new.owner_job_id {
         ensure_job_tx(&mut *conn, tenant, owner).await?;
     }
@@ -691,14 +719,15 @@ pub async fn insert_register_tx(
     }
     let sql = format!(
         "INSERT INTO project_register_item
-            (tenant_id, project_id, kind, code, title, body, owner_job_id, status, severity,
-             probability, impact, links, baseline_ref, meta)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            (tenant_id, project_id, programme_id, kind, code, title, body, owner_job_id, status,
+             severity, probability, impact, links, baseline_ref, review_at, response, meta)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
          RETURNING {REGISTER_COLUMNS}"
     );
     let row: RegisterRecord = sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(new.project_id)
+        .bind(new.programme_id)
         .bind(&new.kind)
         .bind(&new.code)
         .bind(&new.title)
@@ -710,6 +739,8 @@ pub async fn insert_register_tx(
         .bind(new.impact)
         .bind(&new.links)
         .bind(new.baseline_ref)
+        .bind(new.review_at)
+        .bind(&new.response)
         .bind(&new.meta)
         .fetch_one(&mut *conn)
         .await?;
@@ -732,20 +763,46 @@ pub async fn get_register_tx(
         .await?)
 }
 
-/// List a project's register rows.
+/// List a project's register rows. Programme-level rows have a null `project_id` and are
+/// deliberately not returned here: they belong to [`list_programme_register_tx`].
 pub async fn list_register_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     project_id: Uuid,
+    kind: Option<&str>,
 ) -> Result<Vec<RegisterRecord>, PlanStoreError> {
     let sql = format!(
         "SELECT {REGISTER_COLUMNS} FROM project_register_item
           WHERE tenant_id = $1 AND project_id = $2
+            AND ($3::text IS NULL OR kind = $3)
           ORDER BY created_at DESC, id DESC"
     );
     Ok(sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(project_id)
+        .bind(kind)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// List a programme's register rows. The null `project_id` is the scope, not a defect, so this
+/// read filters on `programme_id` and never on the project column.
+pub async fn list_programme_register_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+    kind: Option<&str>,
+) -> Result<Vec<RegisterRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {REGISTER_COLUMNS} FROM project_register_item
+          WHERE tenant_id = $1 AND programme_id = $2
+            AND ($3::text IS NULL OR kind = $3)
+          ORDER BY created_at DESC, id DESC"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .bind(kind)
         .fetch_all(&mut *conn)
         .await?)
 }
@@ -757,11 +814,17 @@ pub async fn update_register_tx(
     tenant: TenantId,
     id: Uuid,
     expected: i64,
+    programme_id: Option<Uuid>,
     status: Option<&str>,
     title: Option<&str>,
     body: Option<&str>,
     severity: Option<&str>,
+    probability: Option<&str>,
+    owner_job_id: Option<Uuid>,
     impact: Option<i32>,
+    links: Option<&Value>,
+    review_at: Option<NaiveDate>,
+    response: Option<&str>,
     meta: Option<&Value>,
 ) -> Result<RegisterRecord, PlanStoreError> {
     let current =
@@ -775,11 +838,30 @@ pub async fn update_register_tx(
             what: "register item",
         });
     }
+    if let Some(programme) = programme_id
+        && current.programme_id != Some(programme)
+    {
+        ensure_parent_tx(&mut *conn, tenant, Parent::Programme, programme)
+            .await
+            .map_err(PlanStoreError::Parent)?;
+    }
+    // The create rule is not a one-time admission: an update that replaces `meta` replaces the
+    // impact block too, so it is validated against the same §5.5 rule. The row's baseline is
+    // immutable here, so the stored `baseline_ref` is the one the new block belongs with.
+    if current.kind == "change"
+        && let Some(meta) = meta
+    {
+        validate_change(meta.get("impact"), current.baseline_ref)?;
+    }
     let sql = format!(
         "UPDATE project_register_item SET
-            status = coalesce($4, status), title = coalesce($5, title),
-            body = coalesce($6, body), severity = coalesce($7, severity),
-            impact = coalesce($8, impact), meta = coalesce($9, meta),
+            programme_id = coalesce($4, programme_id), status = coalesce($5, status),
+            title = coalesce($6, title), body = coalesce($7, body),
+            severity = coalesce($8, severity), probability = coalesce($9, probability),
+            owner_job_id = coalesce($10, owner_job_id), impact = coalesce($11, impact),
+            links = coalesce($12, links),
+            review_at = coalesce($13, review_at), response = coalesce($14, response),
+            meta = coalesce($15, meta),
             version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2 AND version = $3
           RETURNING {REGISTER_COLUMNS}"
@@ -788,11 +870,17 @@ pub async fn update_register_tx(
         .bind(tenant.as_uuid())
         .bind(id)
         .bind(expected)
+        .bind(programme_id)
         .bind(status)
         .bind(title)
         .bind(body)
         .bind(severity)
+        .bind(probability)
+        .bind(owner_job_id)
         .bind(impact)
+        .bind(links)
+        .bind(review_at)
+        .bind(response)
         .bind(meta)
         .fetch_optional(&mut *conn)
         .await?;
@@ -998,6 +1086,28 @@ pub struct InFlightRecord {
     pub version: i64,
 }
 
+/// One in-flight programme. A programme with no projects is still in flight.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct InFlightProgrammeRecord {
+    /// The programme id.
+    pub id: Uuid,
+    /// The name.
+    pub name: String,
+    /// The status.
+    pub status: String,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+/// The computed portfolio: every project and programme in the tenant's in-flight set.
+#[derive(Clone, Debug, Default)]
+pub struct InFlight {
+    /// The in-flight projects.
+    pub projects: Vec<InFlightRecord>,
+    /// The in-flight programmes.
+    pub programmes: Vec<InFlightProgrammeRecord>,
+}
+
 /// The tenant's in-flight set: `tenant.settings -> 'portfolio' -> 'in_flight'`, default
 /// `["active", "paused"]` (D-T1-7). A malformed or empty value falls back to the default.
 pub async fn in_flight_set_tx(
@@ -1023,20 +1133,34 @@ pub async fn in_flight_set_tx(
     Ok(set)
 }
 
-/// List the projects in the tenant's in-flight set.
+/// List the portfolio in flight: the projects and the programmes whose status is in the
+/// tenant's configured in-flight set. Membership is derived for both kinds (SPEC_V2 §5.1), so
+/// an in-flight programme appears on its own status even with zero projects. Read only.
 pub async fn in_flight_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
-) -> Result<Vec<InFlightRecord>, PlanStoreError> {
+) -> Result<InFlight, PlanStoreError> {
     let set = in_flight_set_tx(&mut *conn, tenant).await?;
-    let sql = "SELECT id, key, name, status, programme_id, version FROM project
+    let projects_sql = "SELECT id, key, name, status, programme_id, version FROM project
                 WHERE tenant_id = $1 AND status = ANY($2)
                 ORDER BY updated_at DESC, id DESC";
-    Ok(sqlx::query_as(AssertSqlSafe(sql))
+    let projects: Vec<InFlightRecord> = sqlx::query_as(AssertSqlSafe(projects_sql))
         .bind(tenant.as_uuid())
         .bind(&set)
         .fetch_all(&mut *conn)
-        .await?)
+        .await?;
+    let programmes_sql = "SELECT id, name, status, version FROM programme
+                WHERE tenant_id = $1 AND status = ANY($2)
+                ORDER BY updated_at DESC, id DESC";
+    let programmes: Vec<InFlightProgrammeRecord> = sqlx::query_as(AssertSqlSafe(programmes_sql))
+        .bind(tenant.as_uuid())
+        .bind(&set)
+        .fetch_all(&mut *conn)
+        .await?;
+    Ok(InFlight {
+        projects,
+        programmes,
+    })
 }
 
 // ── programme_tranche ───────────────────────────────────────────────────────────────────
@@ -1181,15 +1305,23 @@ pub async fn review_tranche_tx(
         .fetch_optional(&mut *conn)
         .await?
         .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
-    // A tranche close has one review. The check runs before the state guard so a second review
-    // of a row the first review closed reports "already reviewed", not "not reviewable".
+    // A tranche close has one review, with ONE exception (#526 v1-tr2-1): a tranche whose
+    // honest review PAUSED it and which was then resumed under its approved `tranche.resume`
+    // gate — back in `in_review` — records the second, dated review that can authorise its
+    // successor. The pause stays on record, so the dead end an unreviewable resume would leave
+    // (a programme that can never advance past a paused tranche) is closed without letting a
+    // second review of any other row through. The check runs before the state guard so a second
+    // review of a row the first review closed reports "already reviewed", not "not reviewable".
     let already: bool = sqlx::query_scalar(
         "SELECT EXISTS (
-            SELECT 1 FROM programme_tranche_review WHERE tenant_id = $1 AND tranche_id = $2
+            SELECT 1 FROM programme_tranche_review
+             WHERE tenant_id = $1 AND tranche_id = $2
+               AND NOT (decision = 'pause' AND $3 = 'in_review')
         )",
     )
     .bind(tenant.as_uuid())
     .bind(id)
+    .bind(&reviewed.state)
     .fetch_one(&mut *conn)
     .await?;
     if already {
@@ -1595,6 +1727,107 @@ pub async fn retire_tranche_tx(
     row.ok_or(PlanStoreError::Stale { what: "tranche" })
 }
 
+/// Resume a paused tranche under the cited `tranche.resume` gate (v1-tr2-1).
+///
+/// A `pause` review maps the tranche to `paused`, a tranche is reviewed only once, and the
+/// start/close gate accepts only `authorised | in_review | closed`: without this path a paused
+/// tranche froze every project in it and no action could move it back. The gate is the only
+/// authorisation — approved, opened for `tranche.resume`, naming this tranche in `meta.target`
+/// (the PI-plan gate's identity pattern), and carrying at least one human `approve` decision.
+/// A machine decision is not a resume authorisation.
+///
+/// `programme_tranche` has no `meta`/evidence column (0044, 0052, 0056), so the resume record is
+/// merged into the cited gate's own `meta` under `resume` — the row that authorises the move is
+/// the row that records it, and the action's outbox event names the tranche.
+pub async fn resume_tranche_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    tranche_id: Uuid,
+    approval_id: Uuid,
+    note: Option<&str>,
+) -> Result<TrancheRecord, PlanStoreError> {
+    let sql = format!(
+        "SELECT {TRANCHE_COLUMNS} FROM programme_tranche
+          WHERE tenant_id = $1 AND id = $2 FOR UPDATE"
+    );
+    let current: TrancheRecord = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(tranche_id)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
+    if current.state != "paused" {
+        return Err(PlanStoreError::Illegal(PlanError::TrancheNotPaused {
+            state: current.state,
+        }));
+    }
+    let authorised: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM approval a
+             WHERE a.tenant_id = $1 AND a.id = $2
+               AND a.status = 'approved' AND a.gate = 'tranche.resume'
+               AND a.meta->>'target' = $3
+               AND EXISTS (
+                   SELECT 1 FROM approval_decision d
+                    WHERE d.tenant_id = a.tenant_id AND d.approval_id = a.id
+                      AND d.decision = 'approve'
+                      AND (d.decided_by_kind = 'human'
+                           OR (d.decided_by_kind = 'rule'
+                               AND d.via->>'delegation_ref' IS NOT NULL
+                               AND EXISTS (
+                                   SELECT 1 FROM document doc
+                                    WHERE doc.tenant_id = a.tenant_id
+                                      AND doc.id::text = d.via->>'delegation_ref'
+                                      AND doc.status = 'active'
+                                      AND doc.published_at IS NOT NULL
+                                      AND doc.category = 'decision')))))",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .bind(tranche_id.to_string())
+    .fetch_one(&mut *conn)
+    .await?;
+    if !authorised {
+        return Err(PlanStoreError::Illegal(
+            PlanError::TrancheResumeApprovalMissing { approval_id },
+        ));
+    }
+    sqlx::query(
+        "UPDATE approval
+            SET meta = meta || jsonb_build_object(
+                    'resume', jsonb_build_object(
+                        'resumed_at', to_jsonb(now()),
+                        'resume_approval_id', $3::text,
+                        'tranche_id', $4::text,
+                        'note', $5::text)),
+                version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .bind(approval_id.to_string())
+    .bind(tranche_id.to_string())
+    .bind(note)
+    .execute(&mut *conn)
+    .await?;
+    let sql = format!(
+        "UPDATE programme_tranche
+            SET state = 'in_review', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND state = 'paused'
+          RETURNING {TRANCHE_COLUMNS}"
+    );
+    let row: Option<TrancheRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(tranche_id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    // The row was locked above, so this is unreachable while the lock is held; a changed row
+    // is still refused rather than reported as a successful resume.
+    row.ok_or(PlanStoreError::Illegal(PlanError::TrancheNotPaused {
+        state: "changed".to_owned(),
+    }))
+}
+
 // ── benefit_profile / benefit_link ─────────────────────────────────────────────────────
 
 /// A benefit profile.
@@ -1712,6 +1945,8 @@ impl NewBenefitProfile {
             target: self.target.clone(),
             measurement_method: self.measurement_method.clone(),
             benefit_owner_job_id: self.benefit_owner_job_id,
+            capabilities: self.capabilities.clone(),
+            operational_area: self.operational_area.clone(),
         }
     }
 }
@@ -1947,6 +2182,50 @@ pub async fn change_is_approved_tx(
     .await
 }
 
+/// True when `change_id` is the change request that authorises an edit under `baseline_id`.
+///
+/// A change names the baseline it changes in the register's own `baseline_ref` column (the FK
+/// `project_register_item_baseline_fk`; every `kind='change'` row carries one — `validate_change`
+/// refuses a change without it). The change must belong to the same project as the baseline, its
+/// `meta.impact` block must be present (the `validate_change` rule: a §5.5 object carrying at
+/// least one of scope/schedule/cost/risk with a NON-NULL value — the 0065 CHECK is the same
+/// rule), and its `change` gate must be approved — the row's own
+/// `status` is never an approval (`change_is_approved_tx`'s rule).
+///
+/// The reciprocal `meta.baseline_id` that `link_change_to_baseline_tx` writes names the baseline
+/// the change *produced*, so it is not the authorisation for edits under the new baseline; an
+/// edit after a re-baseline cites a change whose `baseline_ref` is that new baseline.
+pub async fn approved_change_for_baseline_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    change_id: Uuid,
+    baseline_id: Uuid,
+) -> Result<bool, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM project_register_item r
+              JOIN project_baseline b
+                ON b.tenant_id = r.tenant_id
+               AND b.id = r.baseline_ref
+               AND b.project_id = r.project_id
+              JOIN approval a
+                ON a.tenant_id = r.tenant_id
+               AND a.gate = 'change'
+               AND a.status = 'approved'
+               AND a.meta->>'change_id' = r.id::text
+             WHERE r.tenant_id = $1 AND r.id = $2 AND r.kind = 'change'
+               AND b.id = $3
+               AND r.meta->'impact' IS NOT NULL
+               AND r.meta->'impact' <> 'null'::jsonb
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(change_id)
+    .bind(baseline_id)
+    .fetch_one(&mut *conn)
+    .await
+}
+
 /// Append the profile to the change row's links, so the citation reads from both sides. The
 /// `NOT links @>` guard makes a repeated update idempotent; the row's version moves with it.
 async fn cite_benefit_on_change_tx(
@@ -1994,22 +2273,37 @@ pub async fn update_benefit_tx(
         return Err(PlanStoreError::Illegal(PlanError::BenefitRetired));
     }
     if patch.status.as_deref() == Some("realized") {
-        // §8.3: a realized claim is made of measurements, not timestamps. The transition must
-        // carry a typed baseline value, a typed post value and evidence; two timestamps alone
-        // never advance the status.
-        let measured = get_transition_tx(&mut *conn, tenant, id)
+        // §8.3: a benefit whose baseline was never measured cannot claim an improvement, and a
+        // realization is proved by readings, not timestamps. The claim must cite a measured
+        // baseline and a measured post reading taken after the transition was enacted, and each
+        // reading must carry the evidence behind it.
+        let baseline = latest_measurement_tx(&mut *conn, tenant, id, "baseline")
             .await?
-            .is_some_and(|t| {
-                t.baseline_value
-                    .as_ref()
-                    .and_then(Measurement::parse)
-                    .is_some()
-                    && t.post_value.as_ref().and_then(Measurement::parse).is_some()
-                    && transition_has_evidence(&t.evidence)
-            });
-        if !measured {
+            .ok_or(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing))?;
+        validate_benefit_reading(&baseline.kind, baseline.actual_value, &baseline.unit)
+            .map_err(PlanStoreError::Illegal)?;
+        if !evidence_present(&baseline.evidence) {
             return Err(PlanStoreError::Illegal(
-                PlanError::BenefitRealizationUnmeasured,
+                PlanError::BenefitMeasurementEvidenceMissing,
+            ));
+        }
+        let enacted_at = get_transition_tx(&mut *conn, tenant, id)
+            .await?
+            .and_then(|transition| transition.enacted_at);
+        let post = match enacted_at {
+            Some(enacted_at) => {
+                latest_post_measurement_after_tx(&mut *conn, tenant, id, enacted_at).await?
+            }
+            None => None,
+        }
+        .ok_or(PlanStoreError::Illegal(
+            PlanError::BenefitPostMeasurementMissing,
+        ))?;
+        validate_benefit_reading(&post.kind, post.actual_value, &post.unit)
+            .map_err(PlanStoreError::Illegal)?;
+        if !evidence_present(&post.evidence) {
+            return Err(PlanStoreError::Illegal(
+                PlanError::BenefitMeasurementEvidenceMissing,
             ));
         }
     }
@@ -2040,6 +2334,14 @@ pub async fn update_benefit_tx(
             .clone()
             .unwrap_or_else(|| current.measurement_method.clone()),
         benefit_owner_job_id: patch.benefit_owner_job_id.or(current.benefit_owner_job_id),
+        capabilities: patch
+            .capabilities
+            .clone()
+            .unwrap_or_else(|| current.capabilities.clone()),
+        operational_area: patch
+            .operational_area
+            .clone()
+            .unwrap_or_else(|| current.operational_area.clone()),
     };
     let missing = benefit_profile_missing(&fields);
     if !missing.is_empty() {
@@ -2282,6 +2584,37 @@ pub async fn insert_benefit_link_tx(
             what: "benefit profile",
         });
     }
+    // The output is a WBS node, not a label: `record_dependency_slip_tx` matches `output_ref`
+    // to `wbs_node.id`, so an edge naming anything else is a row that can never participate.
+    // The profile check above pins the profile's programme to `new.programme_id`, so resolving
+    // the node to this programme is resolving it to the profile's programme. The id is stored
+    // canonically (lowercase, hyphenated) so the slip's text join is exact.
+    let output_node = Uuid::parse_str(new.output_ref.trim()).map_err(|_| {
+        PlanStoreError::Illegal(PlanError::BenefitOutputUnresolved {
+            output_ref: new.output_ref.clone(),
+        })
+    })?;
+    let output_owned: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1
+              FROM wbs_node w
+              JOIN project p ON p.tenant_id = w.tenant_id AND p.id = w.project_id
+             WHERE w.tenant_id = $1 AND w.id = $2 AND p.programme_id = $3
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(output_node)
+    .bind(new.programme_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if !output_owned {
+        return Err(PlanStoreError::Illegal(
+            PlanError::BenefitOutputUnresolved {
+                output_ref: new.output_ref.clone(),
+            },
+        ));
+    }
+    let output_ref = output_node.to_string();
     let sql = "INSERT INTO benefit_link
                  (tenant_id, programme_id, output_ref, capability_ref, operational_outcome,
                   benefit_id, strategic_objective, kind)
@@ -2291,7 +2624,7 @@ pub async fn insert_benefit_link_tx(
     let row: BenefitLinkRecord = sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(new.programme_id)
-        .bind(&new.output_ref)
+        .bind(&output_ref)
         .bind(&new.capability_ref)
         .bind(&new.operational_outcome)
         .bind(new.benefit_id)
@@ -2391,16 +2724,12 @@ pub struct TransitionRecord {
     pub benefit_id: Uuid,
     /// When the baseline was measured.
     pub baseline_measured_at: Option<DateTime<Utc>>,
-    /// The measured baseline value: the typed pair `{ "value": <number>, "unit": <text> }`.
-    pub baseline_value: Option<Value>,
     /// The readiness assessment.
     pub readiness: Value,
     /// When the transition was enacted.
     pub enacted_at: Option<DateTime<Utc>>,
     /// When the post-transition measurement was taken.
     pub post_measured_at: Option<DateTime<Utc>>,
-    /// The measured post-transition value: the typed pair `{ "value": <number>, "unit": <text> }`.
-    pub post_value: Option<Value>,
     /// When the legacy practice was retired.
     pub retired_at: Option<DateTime<Utc>>,
     /// The evidence.
@@ -2409,24 +2738,20 @@ pub struct TransitionRecord {
     pub version: i64,
 }
 
-const TRANSITION_COLUMNS: &str = "id, benefit_id, baseline_measured_at, baseline_value, readiness, \
-    enacted_at, post_measured_at, post_value, retired_at, evidence, version";
+const TRANSITION_COLUMNS: &str = "id, benefit_id, baseline_measured_at, readiness, enacted_at, \
+    post_measured_at, retired_at, evidence, version";
 
 /// The editable fields of a realization record. `None` leaves the stored value in place.
 #[derive(Clone, Debug, Default)]
 pub struct TransitionPatch {
     /// When the baseline was measured.
     pub baseline_measured_at: Option<DateTime<Utc>>,
-    /// The typed baseline measurement; a placeholder is refused.
-    pub baseline_value: Option<Value>,
     /// The readiness assessment.
     pub readiness: Option<Value>,
     /// When the transition was enacted.
     pub enacted_at: Option<DateTime<Utc>>,
     /// When the post-transition measurement was taken.
     pub post_measured_at: Option<DateTime<Utc>>,
-    /// The typed post-transition measurement; needs a baseline value and is never a placeholder.
-    pub post_value: Option<Value>,
     /// When the legacy practice was retired.
     pub retired_at: Option<DateTime<Utc>>,
     /// The evidence.
@@ -2456,9 +2781,8 @@ pub async fn list_transitions_tx(
     tenant: TenantId,
     programme_id: Uuid,
 ) -> Result<Vec<TransitionRecord>, PlanStoreError> {
-    let sql = "SELECT t.id, t.benefit_id, t.baseline_measured_at, t.baseline_value, t.readiness,
-                      t.enacted_at, t.post_measured_at, t.post_value, t.retired_at, t.evidence,
-                      t.version
+    let sql = "SELECT t.id, t.benefit_id, t.baseline_measured_at, t.readiness, t.enacted_at,
+                      t.post_measured_at, t.retired_at, t.evidence, t.version
                  FROM benefit_transition t
                  JOIN benefit_profile b ON b.id = t.benefit_id AND b.tenant_id = t.tenant_id
                 WHERE t.tenant_id = $1 AND b.programme_id = $2
@@ -2499,59 +2823,55 @@ pub async fn upsert_transition_tx(
             what: "benefit transition",
         });
     }
-    for (field, value) in [
-        ("baseline_value", patch.baseline_value.as_ref()),
-        ("post_value", patch.post_value.as_ref()),
-    ] {
-        if value.is_some_and(|value| Measurement::parse(value).is_none()) {
-            return Err(PlanStoreError::Illegal(
-                PlanError::BenefitMeasurementInvalid { field },
-            ));
-        }
-    }
     let baseline = patch
         .baseline_measured_at
         .or(current.as_ref().and_then(|row| row.baseline_measured_at));
     let post = patch
         .post_measured_at
         .or(current.as_ref().and_then(|row| row.post_measured_at));
-    let baseline_value = patch
-        .baseline_value
-        .clone()
-        .or_else(|| current.as_ref().and_then(|row| row.baseline_value.clone()));
-    let post_value = patch
-        .post_value
-        .clone()
-        .or_else(|| current.as_ref().and_then(|row| row.post_value.clone()));
-    if (post.is_some() && baseline.is_none()) || (post_value.is_some() && baseline_value.is_none())
-    {
+    if post.is_some() && baseline.is_none() {
         return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
+    }
+    // A post-transition timestamp (or a legacy retirement) claims the post reading exists. The
+    // reading is the `benefit_measurement(kind='post')` row taken after the enactment; without
+    // it the transition would carry an assertion the evaluation cannot reproduce.
+    let enacted = patch
+        .enacted_at
+        .or(current.as_ref().and_then(|row| row.enacted_at));
+    if post.is_some() || patch.retired_at.is_some() {
+        let measured = match enacted {
+            Some(enacted_at) => {
+                post_measurement_after_tx(&mut *conn, tenant, benefit_id, enacted_at).await?
+            }
+            None => false,
+        };
+        if !measured {
+            return Err(PlanStoreError::Illegal(
+                PlanError::BenefitPostMeasurementMissing,
+            ));
+        }
     }
     match current {
         Some(current) => {
             let sql = format!(
                 "UPDATE benefit_transition SET
                     baseline_measured_at = coalesce($3, baseline_measured_at),
-                    baseline_value = coalesce($4, baseline_value),
-                    readiness = coalesce($5, readiness),
-                    enacted_at = coalesce($6, enacted_at),
-                    post_measured_at = coalesce($7, post_measured_at),
-                    post_value = coalesce($8, post_value),
-                    retired_at = coalesce($9, retired_at),
-                    evidence = coalesce($10, evidence),
+                    readiness = coalesce($4, readiness),
+                    enacted_at = coalesce($5, enacted_at),
+                    post_measured_at = coalesce($6, post_measured_at),
+                    retired_at = coalesce($7, retired_at),
+                    evidence = coalesce($8, evidence),
                     version = version + 1, updated_at = now()
-                  WHERE tenant_id = $1 AND id = $2 AND version = $11
+                  WHERE tenant_id = $1 AND id = $2 AND version = $9
                   RETURNING {TRANSITION_COLUMNS}"
             );
             let row: Option<TransitionRecord> = sqlx::query_as(AssertSqlSafe(sql))
                 .bind(tenant.as_uuid())
                 .bind(current.id)
                 .bind(patch.baseline_measured_at)
-                .bind(&patch.baseline_value)
                 .bind(&patch.readiness)
                 .bind(patch.enacted_at)
                 .bind(patch.post_measured_at)
-                .bind(&patch.post_value)
                 .bind(patch.retired_at)
                 .bind(&patch.evidence)
                 .bind(current.version)
@@ -2564,21 +2884,19 @@ pub async fn upsert_transition_tx(
         None => {
             let sql = format!(
                 "INSERT INTO benefit_transition
-                    (tenant_id, benefit_id, baseline_measured_at, baseline_value, readiness,
-                     enacted_at, post_measured_at, post_value, retired_at, evidence)
-                 VALUES ($1, $2, $3, $4, coalesce($5, '{{}}'::jsonb), $6, $7, $8, $9,
-                         coalesce($10, '[]'::jsonb))
+                    (tenant_id, benefit_id, baseline_measured_at, readiness, enacted_at,
+                     post_measured_at, retired_at, evidence)
+                 VALUES ($1, $2, $3, coalesce($4, '{{}}'::jsonb), $5, $6, $7,
+                         coalesce($8, '[]'::jsonb))
                  RETURNING {TRANSITION_COLUMNS}"
             );
             let row: TransitionRecord = sqlx::query_as(AssertSqlSafe(sql))
                 .bind(tenant.as_uuid())
                 .bind(benefit_id)
                 .bind(patch.baseline_measured_at)
-                .bind(&patch.baseline_value)
                 .bind(&patch.readiness)
                 .bind(patch.enacted_at)
                 .bind(patch.post_measured_at)
-                .bind(&patch.post_value)
                 .bind(patch.retired_at)
                 .bind(&patch.evidence)
                 .fetch_one(&mut *conn)
@@ -2586,6 +2904,213 @@ pub async fn upsert_transition_tx(
             Ok(row)
         }
     }
+}
+
+// ── benefit_measurement ────────────────────────────────────────────────────────────────
+// §8.3's readings: the baseline measured while the old practice is observable, the interim
+// monitoring readings, and the post-transition measurement the sponsor compares. A realization
+// claim cites these rows, never a timestamp alone.
+
+/// One measurement of a benefit.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct BenefitMeasurementRecord {
+    /// The row id.
+    pub id: Uuid,
+    /// The benefit measured.
+    pub benefit_id: Uuid,
+    /// The programme the benefit belongs to.
+    pub programme_id: Uuid,
+    /// The tranche the reading is attributed to, if any.
+    pub tranche_id: Option<Uuid>,
+    /// `baseline | interim | post`.
+    pub kind: String,
+    /// The target the reading is compared with.
+    pub target_value: Option<f64>,
+    /// The value actually observed.
+    pub actual_value: Option<f64>,
+    /// The unit of the values.
+    pub unit: String,
+    /// How the reading was taken.
+    pub method: String,
+    /// When the reading was taken.
+    pub measured_at: DateTime<Utc>,
+    /// The evidence behind the reading.
+    pub evidence: Value,
+}
+
+const BENEFIT_MEASUREMENT_COLUMNS: &str = "id, benefit_id, programme_id, tranche_id, kind, \
+    target_value::float8 AS target_value, actual_value::float8 AS actual_value, unit, method, \
+    measured_at, evidence";
+
+/// A new benefit measurement.
+#[derive(Clone, Debug)]
+pub struct NewBenefitMeasurement {
+    /// The benefit measured.
+    pub benefit_id: Uuid,
+    /// The tranche the reading is attributed to, if any.
+    pub tranche_id: Option<Uuid>,
+    /// `baseline | interim | post`.
+    pub kind: String,
+    /// The target the reading is compared with.
+    pub target_value: Option<f64>,
+    /// The value actually observed.
+    pub actual_value: Option<f64>,
+    /// The unit of the values.
+    pub unit: String,
+    /// How the reading was taken.
+    pub method: String,
+    /// When the reading was taken.
+    pub measured_at: DateTime<Utc>,
+    /// The evidence behind the reading.
+    pub evidence: Value,
+}
+
+/// Insert one measurement of a benefit. The programme is denormalised from the profile, so a
+/// reading cannot be filed under a programme the benefit does not belong to.
+pub async fn insert_benefit_measurement_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: &NewBenefitMeasurement,
+) -> Result<BenefitMeasurementRecord, PlanStoreError> {
+    // §8.3: a baseline or post reading is a number and a unit. Prose, a missing value, a blank
+    // unit and a placeholder unit are refused here; the `benefit_measurement` CHECK is the
+    // second lock.
+    validate_benefit_reading(&new.kind, new.actual_value, &new.unit)
+        .map_err(PlanStoreError::Illegal)?;
+    let programme_id: Option<Uuid> = sqlx::query_scalar(
+        "SELECT programme_id FROM benefit_profile WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(new.benefit_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let programme_id = programme_id.ok_or(PlanStoreError::NotFound {
+        what: "benefit profile",
+    })?;
+    let sql = format!(
+        "INSERT INTO benefit_measurement
+            (tenant_id, benefit_id, programme_id, tranche_id, kind, target_value, actual_value,
+             unit, method, measured_at, evidence)
+         VALUES ($1, $2, $3, $4, $5, $6::float8::numeric, $7::float8::numeric, $8, $9, $10,
+                 $11)
+         RETURNING {BENEFIT_MEASUREMENT_COLUMNS}"
+    );
+    let row: BenefitMeasurementRecord = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.benefit_id)
+        .bind(programme_id)
+        .bind(new.tranche_id)
+        .bind(&new.kind)
+        .bind(new.target_value)
+        .bind(new.actual_value)
+        .bind(&new.unit)
+        .bind(&new.method)
+        .bind(new.measured_at)
+        .bind(&new.evidence)
+        .fetch_one(&mut *conn)
+        .await?;
+    Ok(row)
+}
+
+/// List a benefit's measurements, newest reading first.
+pub async fn list_benefit_measurements_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+) -> Result<Vec<BenefitMeasurementRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {BENEFIT_MEASUREMENT_COLUMNS} FROM benefit_measurement
+          WHERE tenant_id = $1 AND benefit_id = $2
+          ORDER BY measured_at DESC, id DESC"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(benefit_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// List a programme's measurements, newest reading first; `benefit_id` narrows the page to one
+/// benefit when given.
+pub async fn list_programme_benefit_measurements_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+    benefit_id: Option<Uuid>,
+) -> Result<Vec<BenefitMeasurementRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {BENEFIT_MEASUREMENT_COLUMNS} FROM benefit_measurement
+          WHERE tenant_id = $1 AND programme_id = $2
+            AND ($3::uuid IS NULL OR benefit_id = $3)
+          ORDER BY measured_at DESC, id DESC"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .bind(benefit_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// True when the benefit has a `post` measurement taken strictly after `enacted_at`.
+pub async fn post_measurement_after_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+    enacted_at: DateTime<Utc>,
+) -> Result<bool, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM benefit_measurement
+             WHERE tenant_id = $1 AND benefit_id = $2 AND kind = 'post'
+               AND measured_at > $3
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(benefit_id)
+    .bind(enacted_at)
+    .fetch_one(&mut *conn)
+    .await
+}
+
+/// The benefit's latest reading of one kind, when one exists.
+pub async fn latest_measurement_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+    kind: &str,
+) -> Result<Option<BenefitMeasurementRecord>, sqlx::Error> {
+    let sql = format!(
+        "SELECT {BENEFIT_MEASUREMENT_COLUMNS} FROM benefit_measurement
+          WHERE tenant_id = $1 AND benefit_id = $2 AND kind = $3
+          ORDER BY measured_at DESC, id DESC LIMIT 1"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(benefit_id)
+        .bind(kind)
+        .fetch_optional(&mut *conn)
+        .await
+}
+
+/// The benefit's latest `post` reading taken strictly after `enacted_at`, when one exists.
+pub async fn latest_post_measurement_after_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+    enacted_at: DateTime<Utc>,
+) -> Result<Option<BenefitMeasurementRecord>, sqlx::Error> {
+    let sql = format!(
+        "SELECT {BENEFIT_MEASUREMENT_COLUMNS} FROM benefit_measurement
+          WHERE tenant_id = $1 AND benefit_id = $2 AND kind = 'post' AND measured_at > $3
+          ORDER BY measured_at DESC, id DESC LIMIT 1"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(benefit_id)
+        .bind(enacted_at)
+        .fetch_optional(&mut *conn)
+        .await
 }
 
 // ── programme_cadence ───────────────────────────────────────────────────────────────────
@@ -2611,6 +3136,48 @@ pub struct CadenceRecord {
 }
 
 const CADENCE_COLUMNS: &str = "id, programme_id, kind, period, state, meta, version";
+
+/// The closed set of `programme_cadence.state` values (0064's CHECK), in lifecycle order.
+///
+/// `active` is carried because the existing MSP editor test corrects a cadence to it through
+/// `cadences.update`; no worker, gate or materialiser writes it.
+pub const CADENCE_STATES: [&str; 6] = [
+    "planned",
+    "awaiting_approval",
+    "rejected",
+    "materialised",
+    "closed",
+    "active",
+];
+
+/// The writer a cadence state move belongs to.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum CadenceWriter {
+    /// The edit and approval-gate paths: `cadences.update` and the PI-plan gate.
+    Edit,
+    /// The materialiser, which sets the state in the transaction that drafts its cards.
+    Materialiser,
+}
+
+/// The one `programme_cadence.state` transition table: every legal `(from, to)` move and the
+/// writer allowed to make it. A same-state write is an idempotent metadata edit and needs no
+/// entry.
+///
+/// `materialised` is the materialiser's own outcome — a cadence becomes materialised only
+/// together with the cards it drafts — so an edit may never set it. `closed` is terminal.
+fn cadence_move(from: &str, to: &str) -> Option<CadenceWriter> {
+    match (from, to) {
+        ("planned", "awaiting_approval" | "rejected" | "closed" | "active") => {
+            Some(CadenceWriter::Edit)
+        }
+        ("planned", "materialised") => Some(CadenceWriter::Materialiser),
+        ("awaiting_approval", "rejected") => Some(CadenceWriter::Edit),
+        ("awaiting_approval", "materialised") => Some(CadenceWriter::Materialiser),
+        ("rejected", "awaiting_approval") => Some(CadenceWriter::Edit),
+        ("materialised", "closed") => Some(CadenceWriter::Edit),
+        _ => None,
+    }
+}
 
 /// Insert a cadence row.
 pub async fn insert_cadence_tx(
@@ -2701,6 +3268,19 @@ pub async fn update_cadence_tx(
             what: "cadence row",
         });
     }
+    // The state is a move in the one table, not a string the caller rewrites. `materialised` is
+    // the materialiser's outcome and is refused here even though the table has it.
+    if let Some(to) = &patch.state
+        && to != &current.state
+        && cadence_move(&current.state, to) != Some(CadenceWriter::Edit)
+    {
+        return Err(PlanStoreError::Illegal(
+            PlanError::CadenceIllegalTransition {
+                from: current.state.clone(),
+                to: to.clone(),
+            },
+        ));
+    }
     let sql = format!(
         "UPDATE programme_cadence SET
             period = coalesce($4, period),
@@ -2759,6 +3339,187 @@ pub async fn delete_cadence_tx(
     Ok(())
 }
 
+// ── PI plan approval ────────────────────────────────────────────────────────────────────
+
+/// The gate a PI plan's sign-off is recorded under.
+///
+/// A plan gate has no run, card or project to hang on, so `approval.run_id` is NULL and
+/// `uq_appr_pending` cannot see a second pending row. The gate's identity is
+/// `meta.target` — the cadence id — which is what every read below matches on.
+pub const PI_PLAN_APPROVAL_GATE: &str = "cadences.approve_plan";
+
+/// The `approval.kind` a PI plan's gate carries.
+pub const PI_PLAN_APPROVAL_KIND: &str = "plan";
+
+/// The cadence state while its plan waits for a person's decision.
+pub const CADENCE_AWAITING_APPROVAL: &str = "awaiting_approval";
+
+/// The cadence state after a person rejected its plan.
+pub const CADENCE_REJECTED: &str = "rejected";
+
+/// The pending PI-plan gate for `cadence_id`, if one is open.
+pub async fn pending_pi_plan_approval_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+) -> Result<Option<Uuid>, PlanStoreError> {
+    Ok(sqlx::query_scalar(
+        "SELECT id FROM approval
+          WHERE tenant_id = $1 AND gate = $2 AND status = 'pending'
+            AND meta->>'target' = $3
+          ORDER BY created_at DESC, id DESC
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(PI_PLAN_APPROVAL_GATE)
+    .bind(cadence_id.to_string())
+    .fetch_optional(&mut *conn)
+    .await?)
+}
+
+/// The approved PI-plan gate whose approving decision is a person's or a delegated rule's.
+///
+/// A `human` approve always qualifies; a `rule` approve qualifies only when
+/// `via.delegation_ref` names an active, published `category='decision'` document (the same
+/// shape `tranches.resume` accepts). A service or an undelegated agent can decide a gate
+/// through the generic approvals surface, and that decision must not turn an unapproved plan
+/// into cards. [`materialise_pi_tx`] refuses without this row.
+pub async fn pi_plan_human_approval_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+) -> Result<Option<Uuid>, PlanStoreError> {
+    Ok(sqlx::query_scalar(
+        "SELECT a.id
+           FROM approval a
+          WHERE a.tenant_id = $1 AND a.gate = $2 AND a.status = 'approved'
+            AND a.meta->>'target' = $3
+            AND EXISTS (
+                SELECT 1 FROM approval_decision d
+                 WHERE d.tenant_id = a.tenant_id AND d.approval_id = a.id
+                   AND d.decision = 'approve'
+                   AND (d.decided_by_kind = 'human'
+                        OR (d.decided_by_kind = 'rule'
+                            AND d.via->>'delegation_ref' IS NOT NULL
+                            AND EXISTS (
+                                SELECT 1 FROM document doc
+                                 WHERE doc.tenant_id = a.tenant_id
+                                   AND doc.id::text = d.via->>'delegation_ref'
+                                   AND doc.status = 'active'
+                                   AND doc.published_at IS NOT NULL
+                                   AND doc.category = 'decision'))))
+          ORDER BY a.created_at, a.id
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(PI_PLAN_APPROVAL_GATE)
+    .bind(cadence_id.to_string())
+    .fetch_optional(&mut *conn)
+    .await?)
+}
+
+/// Open — or return — the pending gate for a PI plan.
+///
+/// The cadence row is locked first, so two requesters serialise and the second sees the first's
+/// pending row. The insert names the cadence id in `meta.target`; that string, not a parent
+/// column, is the gate's identity. A cadence already materialised has nothing left to approve.
+pub async fn open_pi_plan_approval_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+    requested_by: Option<Uuid>,
+) -> Result<Approval, PlanStoreError> {
+    let row: Option<(String, String, String, Uuid)> = sqlx::query_as(
+        "SELECT kind, state, period, programme_id
+           FROM programme_cadence
+          WHERE tenant_id = $1 AND id = $2
+          FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (kind, state, period, programme_id) = row.ok_or(PlanStoreError::NotFound {
+        what: "cadence row",
+    })?;
+    if kind != "pi" {
+        return Err(PlanStoreError::Illegal(PlanError::CadenceWrongKind {
+            expected: "pi",
+            actual: kind,
+        }));
+    }
+    if state == "materialised" {
+        return Err(PlanStoreError::Conflict {
+            what: "cadence row",
+            why: "the plan is already materialised and cannot be approved again",
+        });
+    }
+    if let Some(existing) = pending_pi_plan_approval_tx(&mut *conn, tenant, cadence_id).await? {
+        return get_approval_tx(&mut *conn, tenant, existing)
+            .await?
+            .map(|record| record.approval)
+            .ok_or(PlanStoreError::NotFound { what: "approval" });
+    }
+    let mut input = NewApproval::new(PI_PLAN_APPROVAL_GATE, PI_PLAN_APPROVAL_KIND);
+    input.requested_by = requested_by;
+    input.meta = serde_json::json!({
+        "target": cadence_id.to_string(),
+        "cadence_id": cadence_id.to_string(),
+        "programme_id": programme_id.to_string(),
+        "period": period,
+        "description": "Approve this PI plan before its backlog becomes cards",
+    });
+    insert_approval_tx(conn, tenant, &input)
+        .await
+        .map_err(PlanStoreError::from)
+}
+
+/// Record the state a PI plan's approval leaves the cadence in.
+///
+/// `awaiting_approval` means "nothing may be drafted until a person approves"; `rejected` is
+/// the person's refusal. A materialised cadence is never moved — its cards are the record — and
+/// every other move is checked against [`cadence_move`], so a closed cadence cannot re-open.
+pub async fn set_pi_cadence_approval_state_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+    state: &str,
+) -> Result<(), PlanStoreError> {
+    let current: Option<String> = sqlx::query_scalar(
+        "SELECT state FROM programme_cadence
+          WHERE tenant_id = $1 AND id = $2 AND kind = 'pi' FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let Some(from) = current else {
+        return Ok(());
+    };
+    if from == "materialised" {
+        return Ok(());
+    }
+    if state != from && cadence_move(&from, state) != Some(CadenceWriter::Edit) {
+        return Err(PlanStoreError::Illegal(
+            PlanError::CadenceIllegalTransition {
+                from,
+                to: state.to_owned(),
+            },
+        ));
+    }
+    sqlx::query(
+        "UPDATE programme_cadence
+            SET state = $3, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND kind = 'pi' AND state <> 'materialised'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence_id)
+    .bind(state)
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
+}
+
 /// What a PI materialisation wrote.
 #[derive(Clone, Debug, Default)]
 pub struct PiMaterialisation {
@@ -2770,13 +3531,19 @@ pub struct PiMaterialisation {
 
 /// Materialise a `kind='pi'` cadence: draft the next cadence's cards from the standing backlog.
 ///
+/// **A plan is a person's decision.** Nothing is drafted until an `approval` for this cadence
+/// carries a human `approve` (`cadences.approve_plan` is the writer): an unapproved plan is
+/// [`PlanStoreError::PiPlanNotApproved`], never a silent draft, so the unattended worker tick
+/// cannot commit a plan nobody signed off. The tick reports the refusal and leaves the cadence
+/// `awaiting_approval`.
+///
 /// The backlog is a `wbs_node(kind='deliverable', status='open')` row with no card yet. The
 /// score is `(business_value + time_criticality + risk_reduction) / job_size`, computed in the
 /// ordering and never stored (D-T1-4). The drafts land in the board named by
 /// `meta.board_id`'s intake lane, bounded by the active lane's `wip_limit` minus the cards live
 /// there; the cadence then moves `planned → materialised` in the same transaction, so a second
 /// tick creates nothing. A tick with no free slot writes nothing and leaves the cadence
-/// `planned`, so a later tick still drafts.
+/// un-materialised, so a later tick still drafts.
 pub async fn materialise_pi_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -2793,8 +3560,25 @@ pub async fn materialise_pi_tx(
             actual: cadence.kind.clone(),
         }));
     }
-    if cadence.state != "planned" {
+    if cadence.state == "materialised" {
         return Ok(PiMaterialisation::default());
+    }
+    if pi_plan_human_approval_tx(&mut *conn, tenant, cadence_id)
+        .await?
+        .is_none()
+    {
+        return Err(PlanStoreError::PiPlanNotApproved);
+    }
+    // The materialising move is the table's own: a planned or awaiting-approval cadence becomes
+    // materialised with the cards drafted below. A rejected, active or closed cadence has no
+    // path to cards.
+    if cadence_move(&cadence.state, "materialised") != Some(CadenceWriter::Materialiser) {
+        return Err(PlanStoreError::Illegal(
+            PlanError::CadenceIllegalTransition {
+                from: cadence.state.clone(),
+                to: "materialised".to_owned(),
+            },
+        ));
     }
     let board_id: Uuid = cadence
         .meta
@@ -2944,6 +3728,133 @@ pub async fn materialise_pi_tx(
     })
 }
 
+/// What a backlog refinement revalidated and flagged.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct BacklogRefinement {
+    /// The open deliverables whose four WSJF inputs were revalidated.
+    pub revalidated: i64,
+    /// The rows that cannot score or have not moved inside the refinement window.
+    pub flagged: i64,
+}
+
+/// Refine the programme's standing backlog for a `kind='refinement'` cadence.
+///
+/// Every open `deliverable` of every project in the cadence's programme is revalidated against
+/// the four typed WSJF inputs. A row is flagged stale, with its reason on `meta.refinement`,
+/// when the inputs do not score (a negative value or a zero-size job), when every value input
+/// is zero (it has no WSJF inputs at all), or when it has not moved for `meta.stale_after_days`
+/// (default 30). A row that scores again loses a previous flag. The score itself is never
+/// stored (D-T1-4); only the flag is, so the board can say why an item needs attention.
+///
+/// The cadence move to `materialised` belongs to the caller (the worker tick), so a failed
+/// refinement never marks the period done.
+pub async fn refine_backlog_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+) -> Result<BacklogRefinement, PlanStoreError> {
+    let cadence = get_cadence_tx(&mut *conn, tenant, cadence_id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "cadence row",
+        })?;
+    if cadence.kind != "refinement" {
+        return Err(PlanStoreError::Illegal(PlanError::CadenceWrongKind {
+            expected: "refinement",
+            actual: cadence.kind.clone(),
+        }));
+    }
+    if cadence.state == "materialised" {
+        return Ok(BacklogRefinement::default());
+    }
+    if cadence_move(&cadence.state, "materialised") != Some(CadenceWriter::Materialiser) {
+        return Err(PlanStoreError::Illegal(
+            PlanError::CadenceIllegalTransition {
+                from: cadence.state.clone(),
+                to: "materialised".to_owned(),
+            },
+        ));
+    }
+    let stale_after_days = cadence
+        .meta
+        .get("stale_after_days")
+        .and_then(Value::as_i64)
+        .unwrap_or(30)
+        .clamp(1, 3650);
+    let rows: Vec<(Uuid, i32, i32, i32, i32, bool, Value)> = sqlx::query_as(
+        "SELECT w.id, w.business_value, w.time_criticality, w.risk_reduction, w.job_size,
+                (w.updated_at < now() - make_interval(days => $3::int)) AS stale_by_age,
+                w.meta
+           FROM wbs_node w
+           JOIN project p ON p.tenant_id = w.tenant_id AND p.id = w.project_id
+          WHERE w.tenant_id = $1 AND p.programme_id = $2
+            AND w.kind = 'deliverable' AND w.status = 'open'
+          ORDER BY w.id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence.programme_id)
+    .bind(i32::try_from(stale_after_days).unwrap_or(30))
+    .fetch_all(&mut *conn)
+    .await?;
+    let revalidated = i64::try_from(rows.len()).unwrap_or(i64::MAX);
+    let mut flagged = 0i64;
+    for (id, business_value, time_criticality, risk_reduction, job_size, stale_by_age, meta) in rows
+    {
+        let score = conveyor_domain::spine::wsjf(WsjfInputs {
+            business_value,
+            time_criticality,
+            risk_reduction,
+            job_size,
+        })
+        .ok();
+        let reason = match score {
+            None => Some("the four WSJF inputs do not score"),
+            Some(value) if value <= 0.0 => Some("every WSJF value input is zero"),
+            Some(_) if stale_by_age => Some("no change in the refinement window"),
+            Some(_) => None,
+        };
+        let mut next = if meta.is_object() {
+            meta.clone()
+        } else {
+            serde_json::json!({})
+        };
+        let object = next.as_object_mut().expect("just built an object");
+        match reason {
+            Some(reason) => {
+                object.insert(
+                    "refinement".to_owned(),
+                    serde_json::json!({
+                        "stale": true,
+                        "reason": reason,
+                        "cadence_id": cadence_id,
+                        "stale_after_days": stale_after_days,
+                    }),
+                );
+                flagged += 1;
+            }
+            None => {
+                if object.remove("refinement").is_none() {
+                    continue;
+                }
+            }
+        }
+        sqlx::query(
+            "UPDATE wbs_node
+                SET meta = $3, version = version + 1, updated_at = now()
+              WHERE tenant_id = $1 AND id = $2",
+        )
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(&next)
+        .execute(&mut *conn)
+        .await?;
+    }
+    Ok(BacklogRefinement {
+        revalidated,
+        flagged,
+    })
+}
+
 /// Record a demo credit for one completed deliverable, or return the existing one.
 ///
 /// A credit needs the deliverable accepted (`wbs_node.status = 'accepted'`) and exhibiting at
@@ -2985,6 +3896,9 @@ pub async fn credit_demo_tx(
     if evidence.as_array().is_none_or(|refs| refs.is_empty()) {
         return Err(PlanStoreError::Illegal(PlanError::DemoEvidenceMissing));
     }
+    if !typed_evidence(&evidence) {
+        return Err(PlanStoreError::Illegal(PlanError::DemoEvidenceUntyped));
+    }
     let inserted: Option<Uuid> = sqlx::query_scalar(
         "INSERT INTO programme_demo_credit (tenant_id, cadence_id, deliverable_id, evidence)
          VALUES ($1, $2, $3, $4)
@@ -3010,6 +3924,94 @@ pub async fn credit_demo_tx(
         .await
         .map_err(PlanStoreError::Database),
     }
+}
+
+/// Whether an evidence array carries typed refs: every item is a non-empty string or an object
+/// with at least one non-empty string value. The live rework refs are path strings; a blank
+/// string, null or an empty object is not something a demo can exhibit.
+fn typed_evidence(evidence: &Value) -> bool {
+    evidence.as_array().is_some_and(|refs| {
+        !refs.is_empty()
+            && refs.iter().all(|item| match item {
+                Value::String(text) => !text.trim().is_empty(),
+                Value::Object(fields) => fields
+                    .values()
+                    .any(|value| value.as_str().is_some_and(|text| !text.trim().is_empty())),
+                _ => false,
+            })
+    })
+}
+
+/// A demo credit row.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct DemoCreditRecord {
+    /// The row id.
+    pub id: Uuid,
+    /// The demo cadence the credit was recorded at.
+    pub cadence_id: Uuid,
+    /// The accepted deliverable the credit names.
+    pub deliverable_id: Uuid,
+    /// The deliverable's evidence, copied when the credit was recorded.
+    pub evidence: Value,
+    /// When the credit was recorded.
+    pub credited_at: DateTime<Utc>,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+const DEMO_CREDIT_COLUMNS: &str = "id, cadence_id, deliverable_id, evidence, credited_at, version";
+
+/// Read one demo credit.
+pub async fn get_demo_credit_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<DemoCreditRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {DEMO_CREDIT_COLUMNS} FROM programme_demo_credit
+          WHERE tenant_id = $1 AND id = $2"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// Read the credit for one (cadence, deliverable), if it was recorded.
+pub async fn find_demo_credit_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+    deliverable_id: Uuid,
+) -> Result<Option<DemoCreditRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {DEMO_CREDIT_COLUMNS} FROM programme_demo_credit
+          WHERE tenant_id = $1 AND cadence_id = $2 AND deliverable_id = $3"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(cadence_id)
+        .bind(deliverable_id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// List a demo cadence's credits.
+pub async fn list_demo_credits_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+) -> Result<Vec<DemoCreditRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {DEMO_CREDIT_COLUMNS} FROM programme_demo_credit
+          WHERE tenant_id = $1 AND cadence_id = $2 ORDER BY credited_at, id"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(cadence_id)
+        .fetch_all(&mut *conn)
+        .await?)
 }
 
 /// Propose a lesson for one retro finding; the table is the organisational-memory record.
@@ -3056,6 +4058,72 @@ pub async fn propose_lesson_tx(
     .fetch_one(&mut *conn)
     .await
     .map_err(PlanStoreError::Database)
+}
+
+/// A lesson row.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct LessonRecord {
+    /// The row id.
+    pub id: Uuid,
+    /// The programme whose memory holds the lesson.
+    pub programme_id: Uuid,
+    /// The retro cadence the finding came from, when known.
+    pub cadence_id: Option<Uuid>,
+    /// The finding's key within the retro.
+    pub finding_key: String,
+    /// The lesson itself.
+    pub statement: String,
+    /// The evidence refs behind the lesson.
+    pub evidence: Value,
+    /// How many of the refs are independent.
+    pub independent_count: i32,
+    /// `proposed | reviewed | promoted | rejected`.
+    pub state: String,
+    /// Where the lesson came from.
+    pub source: String,
+    /// Free-form metadata.
+    pub meta: Value,
+    /// The If-Match version.
+    pub version: i64,
+    /// Creation time.
+    pub created_at: DateTime<Utc>,
+    /// Last write.
+    pub updated_at: DateTime<Utc>,
+}
+
+const LESSON_COLUMNS: &str = "id, programme_id, cadence_id, finding_key, statement, evidence, \
+                              independent_count, state, source, meta, version, created_at, \
+                              updated_at";
+
+/// Read one lesson.
+pub async fn get_lesson_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<LessonRecord>, PlanStoreError> {
+    let sql = format!("SELECT {LESSON_COLUMNS} FROM lesson WHERE tenant_id = $1 AND id = $2");
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// List a programme's lessons.
+pub async fn list_lessons_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<Vec<LessonRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {LESSON_COLUMNS} FROM lesson
+          WHERE tenant_id = $1 AND programme_id = $2 ORDER BY created_at, id"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .fetch_all(&mut *conn)
+        .await?)
 }
 
 /// Open the retro cadence's one card (in the board named by `meta.board_id`), or return it.
@@ -3173,6 +4241,17 @@ pub async fn close_retro_tx(
     tenant: TenantId,
     cadence_id: Uuid,
 ) -> Result<(), PlanStoreError> {
+    let cadence = get_cadence_tx(&mut *conn, tenant, cadence_id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "cadence row",
+        })?;
+    if cadence.kind != "retro" {
+        return Err(PlanStoreError::Illegal(PlanError::CadenceWrongKind {
+            expected: "retro",
+            actual: cadence.kind.clone(),
+        }));
+    }
     let card: Option<(Uuid, Value)> = sqlx::query_as(
         "SELECT id, meta FROM card WHERE tenant_id = $1 AND meta->>'cadence_id' = $2 LIMIT 1",
     )
@@ -3203,11 +4282,90 @@ pub async fn close_retro_tx(
         .bind(&key)
         .fetch_one(&mut *conn)
         .await?;
-        if !present {
-            return Err(PlanStoreError::Illegal(
-                PlanError::RetroFindingWithoutLesson(key),
-            ));
+        if present {
+            continue;
         }
+        // A finding carries its lesson: the statement and the evidence refs. A close with no
+        // lesson content is refused, and the whole transaction writes nothing.
+        let statement = finding
+            .get("statement")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .trim()
+            .to_owned();
+        let evidence = finding.get("evidence").cloned().unwrap_or(Value::Null);
+        if statement.is_empty() || !evidence.as_array().is_some_and(|refs| !refs.is_empty()) {
+            return Err(PlanStoreError::Illegal(PlanError::RetroFindingIncomplete(
+                key,
+            )));
+        }
+        let systemic = finding
+            .get("systemic")
+            .and_then(Value::as_bool)
+            .unwrap_or(false)
+            || finding.get("kind").and_then(Value::as_str) == Some("systemic");
+        let lesson_meta = if systemic {
+            // A systemic finding names the improvement it believes is worth opening; the kata
+            // gate (`kata.open`) validates measurability and refuses an unmeasurable one. The
+            // close never opens a kata itself (T5's gate is the only opener).
+            let kata = finding.get("kata").cloned().unwrap_or(Value::Null);
+            let signature = kata
+                .get("signature")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .trim()
+                .to_owned();
+            let title = kata
+                .get("title")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .trim()
+                .to_owned();
+            let rationale = kata
+                .get("rationale")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned();
+            let target_ref = kata.get("target_ref").cloned().unwrap_or(Value::Null);
+            if signature.is_empty() || title.is_empty() || !target_ref.is_object() {
+                return Err(PlanStoreError::Illegal(PlanError::RetroFindingIncomplete(
+                    key,
+                )));
+            }
+            serde_json::json!({
+                "kata_candidate": {
+                    "signature": signature,
+                    "title": title,
+                    "rationale": rationale,
+                    "target_ref": target_ref,
+                    "prediction": Value::Null,
+                }
+            })
+        } else {
+            serde_json::json!({})
+        };
+        let independent_count = i32::try_from(
+            evidence
+                .as_array()
+                .map(|refs| refs.len())
+                .unwrap_or_default(),
+        )
+        .unwrap_or(i32::MAX);
+        sqlx::query(
+            "INSERT INTO lesson (tenant_id, programme_id, cadence_id, finding_key, statement,
+                                 evidence, independent_count, state, source, meta)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, 'proposed', 'retro', $8)",
+        )
+        .bind(tenant.as_uuid())
+        .bind(cadence.programme_id)
+        .bind(cadence_id)
+        .bind(&key)
+        .bind(&statement)
+        .bind(&evidence)
+        .bind(independent_count)
+        .bind(&lesson_meta)
+        .execute(&mut *conn)
+        .await?;
     }
     sqlx::query(
         "UPDATE card
@@ -3225,21 +4383,46 @@ pub async fn close_retro_tx(
 /// Refuse a project start when the programme's tranche has not been authorised.
 ///
 /// The rule is the domain's (`PlanError::TrancheNotAuthorised`); the action maps it to
-/// `409 tranche_not_authorised`. A project outside a programme, or in a programme with no
-/// tranche rows, is unchanged.
+/// `409 tranche_not_authorised`.
+///
+/// [`project_tranche_state_tx`] answers `None` for two different facts, and only one of them is
+/// allowed: a project outside a programme keeps its legacy allowance, while a project inside a
+/// programme that HAS a tranche plan but no row for the project's tranche is sitting in an
+/// undeclared tranche and is refused. A programme that has declared no tranche plan at all (the
+/// pre-tranche programmes) also keeps the legacy allowance — the rule binds the first tranche to
+/// a plan that exists, it does not invent one.
 pub async fn assert_project_tranche_authorised_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     project_id: Uuid,
 ) -> Result<(), PlanStoreError> {
     match project_tranche_state_tx(&mut *conn, tenant, project_id).await? {
-        None => Ok(()),
         Some((_number, state))
             if matches!(state.as_str(), "authorised" | "in_review" | "closed") =>
         {
             Ok(())
         }
         Some((_number, _state)) => Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised)),
+        None => {
+            let planned: bool = sqlx::query_scalar(
+                "SELECT EXISTS (
+                    SELECT 1 FROM project p
+                      JOIN programme_tranche t
+                        ON t.tenant_id = p.tenant_id AND t.programme_id = p.programme_id
+                     WHERE p.tenant_id = $1 AND p.id = $2
+                )",
+            )
+            .bind(tenant.as_uuid())
+            .bind(project_id)
+            .fetch_one(&mut *conn)
+            .await?;
+            if planned {
+                // The programme has a tranche plan; the project's tranche number is not in it.
+                Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised))
+            } else {
+                Ok(())
+            }
+        }
     }
 }
 
@@ -3271,6 +4454,36 @@ pub async fn record_dependency_slip_tx(
     let (_from, to_project) = row.ok_or(PlanStoreError::NotFound {
         what: "project dependency",
     })?;
+    // An edge that names no node cannot be attributed to a project, so it might have been this
+    // slip's output: report it rather than silently under-reporting the benefits at risk. The
+    // scope is the slipped project's programme, where the map lives.
+    let programme: Option<Uuid> =
+        sqlx::query_scalar("SELECT programme_id FROM project WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(to_project)
+            .fetch_one(&mut *conn)
+            .await?;
+    if let Some(programme) = programme {
+        let unresolved: Option<String> = sqlx::query_scalar(
+            "SELECT l.output_ref
+               FROM benefit_link l
+              WHERE l.tenant_id = $1 AND l.programme_id = $2
+                AND NOT EXISTS (
+                    SELECT 1 FROM wbs_node w
+                     WHERE w.tenant_id = l.tenant_id AND w.id::text = l.output_ref)
+              ORDER BY l.output_ref
+              LIMIT 1",
+        )
+        .bind(tenant.as_uuid())
+        .bind(programme)
+        .fetch_optional(&mut *conn)
+        .await?;
+        if let Some(output_ref) = unresolved {
+            return Err(PlanStoreError::Illegal(
+                PlanError::BenefitOutputUnresolved { output_ref },
+            ));
+        }
+    }
     let benefits: Vec<Uuid> = sqlx::query_scalar(
         "SELECT DISTINCT l.benefit_id
            FROM benefit_link l
@@ -3309,9 +4522,9 @@ pub struct BenefitRealization {
     pub post_measured_at: Option<DateTime<Utc>>,
     /// The operational area the improvement is attributed to.
     pub operational_area: String,
-    /// The baseline value the transition records, when it carries one.
+    /// The baseline value, when the profile records one.
     pub baseline_value: Option<f64>,
-    /// The post-transition value the transition records, when it carries one.
+    /// The post-transition value, when the transition's evidence records one.
     pub post_value: Option<f64>,
     /// `post - baseline`, when both values exist.
     pub delta: Option<f64>,
@@ -3324,14 +4537,15 @@ pub async fn benefit_realization_tx(
     tenant: TenantId,
     benefit_id: Uuid,
 ) -> Result<BenefitRealization, PlanStoreError> {
-    let operational_area: Option<String> = sqlx::query_scalar(
-        "SELECT operational_area FROM benefit_profile WHERE tenant_id = $1 AND id = $2",
+    let profile: Option<(Value, String)> = sqlx::query_as(
+        "SELECT coalesce(baseline, '{}'::jsonb), operational_area FROM benefit_profile
+          WHERE tenant_id = $1 AND id = $2",
     )
     .bind(tenant.as_uuid())
     .bind(benefit_id)
     .fetch_optional(&mut *conn)
     .await?;
-    let operational_area = operational_area.ok_or(PlanStoreError::NotFound {
+    let (baseline, operational_area) = profile.ok_or(PlanStoreError::NotFound {
         what: "benefit profile",
     })?;
     let transition = get_transition_tx(&mut *conn, tenant, benefit_id)
@@ -3340,16 +4554,19 @@ pub async fn benefit_realization_tx(
             what: "benefit realization",
             why: "the transition has not started",
         })?;
-    let baseline_value = transition
-        .baseline_value
-        .as_ref()
-        .and_then(Measurement::parse)
-        .map(|measurement| measurement.value);
+    if transition.post_measured_at.is_some() && transition.baseline_measured_at.is_none() {
+        return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
+    }
+    let baseline_value = baseline.get("value").and_then(Value::as_f64).or_else(|| {
+        transition
+            .evidence
+            .get("baseline_value")
+            .and_then(Value::as_f64)
+    });
     let post_value = transition
-        .post_value
-        .as_ref()
-        .and_then(Measurement::parse)
-        .map(|measurement| measurement.value);
+        .evidence
+        .get("post_value")
+        .and_then(Value::as_f64);
     let delta = match (baseline_value, post_value) {
         (Some(baseline), Some(post)) => Some(post - baseline),
         _ => None,

@@ -35,7 +35,7 @@ const SKILLS: [&str; 7] = [
 async fn the_profile_names_the_mandatory_set() {
     let f = arch::fixture().await;
     arch::tailor(
-        &f.running,
+        &f,
         json!({ "a": { "psa": ["stakeholder_map"] } }),
         json!({ "a": "statement_of_architecture_work" }),
     )

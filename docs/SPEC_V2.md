@@ -711,7 +711,7 @@ Forbidden generation: tool selection, routing, state transitions, gate decisions
 ### 7.5 Budgets and the ledger
 
 - Every run declares a token/cost budget; every job binding declares a default; exceeding it is a refusal
-  (`429 budget_exceeded`) before the next call, not a silent truncation.
+  (`429 tool_budget_exceeded`) before the next call, not a silent truncation.
 - `inference_call` keeps the prompt identity and usage, never the prompt/response bodies; the router keeps the text.
 - The cache classes are defined (V1 D23): `cache_read > 0` = hit, `cache_read = 0 ∧ cache_creation > 0` = write,
   neither = miss, no usage = unknown.

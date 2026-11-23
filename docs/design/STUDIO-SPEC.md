@@ -14,12 +14,32 @@ screen:
 - **V1 surfaces** — implemented in the Rust app (projects, cards, runs, approvals, procedures,
   capabilities, knowledge/memory, evals, benchmarks, hillclimb, prompt audit, the ledger, secrets,
   channels, licences and billing). These carry no V2 badge and link to their existing pages.
-- **V2 destinations** — proposed aggregates and actions from SPEC_V2. Every new destination carries
-  a `V2 · PROPOSED` ribbon naming the tables/actions it previews. There is no write path, no
-  backend call and no claim that the aggregate exists.
+- **V2 destinations** — aggregates and actions from SPEC_V2. A destination that has landed is
+  **live**: it has a route in `apps/web`, one screen module and the real action list in "Live V2
+  shell" below; the nav shows it only when the caller's manifest carries its first read. A
+  destination still in design carries the `V2 · PROPOSED` ribbon, names the tables/actions it
+  previews and makes no backend call.
 - **Legacy study surfaces** — the S12 surfaces V2 supersedes or reframes (the historical 92-entry
   job catalogue, the coding action catalogue, the TOC reasoning study). They remain reachable and
   are banner-labelled, never presented as the live model.
+
+### Live V2 shell
+
+The design site (`v2.js`) is the mock of each destination; this table is the product's contract
+with it. One route, one screen module, and the destination's whole server contract — a control
+whose action is absent from the caller's manifest is not rendered. A destination is added here
+only when its screen reads real rows; until then the mock's `V2 · PROPOSED` badge stands.
+
+| Destination | Route | Screen | Actions |
+|---|---|---|---|
+| Organisation | `/organisation` | `apps/web/src/screens/organisation.rs` | `industries.list`, `departments.list`, `job_catalogue.list`, `job_bindings.list` |
+| Procedures | `/procedures` | `apps/web/src/screens/procedures.rs` | `procedures.list` |
+| Authoring | `/authoring` | `apps/web/src/screens/authoring.rs` | `authoring.assets` (writes are the governed `authoring.intake\|draft\|review\|publish`) |
+| Portfolio | `/portfolio` | `apps/web/src/screens/portfolio.rs` | `portfolio.in_flight` |
+| Programme | `/programme` | `apps/web/src/screens/programme.rs` | `programmes.list`, `tranches.list`, `cadences.list`, `benefits.list`, `lessons.list` |
+| Plan | `/plan` | `apps/web/src/screens/plan.rs` | `projects.list`, `wbs.list`, `baselines.list`, `registers.list`, `project_dependencies.list` |
+| Improve | `/improve` | `apps/web/src/screens/improve.rs` | `metrics.flow`, `kata.list` |
+| Operations | `/operations` | `apps/web/src/screens/operations.rs` | `workers.list`, `providers.list`, `ops.pods`, `ops.deployments` |
 
 ## Review paths
 

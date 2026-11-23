@@ -2,6 +2,12 @@
   "feedback_url": "https://github.com/nonagenticai/conveyor/discussions",
   "files": [
     {
+      "bytes": 13497,
+      "path": "actions.json",
+      "records": 0,
+      "sha256": "b4e4d10bb18106bf5c900644e37db0287292f5063ac62c43d2f86b5641e1fcc2"
+    },
+    {
       "bytes": 108957,
       "path": "architecture.json",
       "records": 78,
@@ -20,6 +26,18 @@
       "sha256": "a8fd56b89802f3d35199cac1b3b75a10e6d1562781fbf15020192791fd7c588c"
     },
     {
+      "bytes": 26657,
+      "path": "coverage.js",
+      "records": 0,
+      "sha256": "e6e00cfcda1d848b5f398985144c20ff9c9a0477c2a130f2a0c35d86f0cb40ad"
+    },
+    {
+      "bytes": 48926,
+      "path": "coverage.json",
+      "records": 0,
+      "sha256": "b9fa76af0d5392b0ac3a4f61a6e55e7539d8a7b20dc17f0ae3b4460b33abb08c"
+    },
+    {
       "bytes": 109,
       "path": "evidence.json",
       "records": 0,
@@ -30,6 +48,12 @@
       "path": "feedback.json",
       "records": 0,
       "sha256": "c0dd0d7c535bbdc7ceb958fffa8f3eb7b28893c3a07f64b6524d3bbbf0d89736"
+    },
+    {
+      "bytes": 125170,
+      "path": "issues.json",
+      "records": 0,
+      "sha256": "6deda6065b328df8c8d2759e6faea53cc95316c4a1c0f482a9419509e8904611"
     },
     {
       "bytes": 1349,
@@ -50,10 +74,22 @@
       "sha256": "3807b68e9cb77bd166fbe6f6d4b0e269c8bc0923a8d156f45dba8342786bd2ee"
     },
     {
+      "bytes": 131593,
+      "path": "output-standard.js",
+      "records": 0,
+      "sha256": "aed452234aaf2fd23c366678c6d6363bcf98a5108605209445a7a06d134a7a27"
+    },
+    {
       "bytes": 180846,
       "path": "programme.json",
       "records": 49,
       "sha256": "e868cfc4d87105681c7ec5c022093b37f59223b288ce686d7ec2ce20d4fa58d3"
+    },
+    {
+      "bytes": 2069893,
+      "path": "rework.js",
+      "records": 505,
+      "sha256": "b50fb53c6ffc0327443a39b6d6a274610037da50d11d8687c61de1cd4f9781e6"
     },
     {
       "bytes": 225,
@@ -66,6 +102,18 @@
       "path": "snapshot.js",
       "records": 0,
       "sha256": "f14da210b7930ea189d21257895fd4df743dc0a4acdb855abcbec3cf816c7afe"
+    },
+    {
+      "bytes": 1871827,
+      "path": "standards.js",
+      "records": 505,
+      "sha256": "43143469879ffa2a27bb0f627b33c6ae1937439ff837ffd51871a19a859510e5"
+    },
+    {
+      "bytes": 1871798,
+      "path": "standards.json",
+      "records": 505,
+      "sha256": "846e131c2b533ba646981b759287eb4cdf96bec3cb092b430ec8d7175e2c24a2"
     },
     {
       "bytes": 1091172,

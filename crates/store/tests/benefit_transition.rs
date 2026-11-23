@@ -10,11 +10,11 @@
 #[path = "support/mod.rs"]
 mod support;
 
-use chrono::Utc;
+use chrono::{Duration, Utc};
 use conveyor_domain::TenantId;
 use conveyor_domain::spine::PlanError;
 use conveyor_store::begin_scoped;
-use conveyor_store::spine::{self, PlanStoreError, TransitionPatch};
+use conveyor_store::spine::{self, NewBenefitMeasurement, PlanStoreError, TransitionPatch};
 use serde_json::json;
 use uuid::Uuid;
 
@@ -157,12 +157,14 @@ async fn a_dependency_slip_names_the_benefits_at_risk() {
     assert_eq!(status, "slipped");
 }
 
+/// A post-transition timestamp is an assertion, not a reading: the transition refuses it until
+/// a `post` measurement after the enactment exists, and writes nothing.
 #[tokio::test]
-async fn a_measured_baseline_enables_realization() {
+async fn a_post_timestamp_without_a_reading_is_refused() {
     let db = support::TestDb::fresh().await;
     let f = fixture(&db).await;
     let now = Utc::now();
-    patch(
+    let refused = patch(
         &db,
         &f,
         TransitionPatch {
@@ -171,6 +173,65 @@ async fn a_measured_baseline_enables_realization() {
             enacted_at: Some(now),
             post_measured_at: Some(now),
             retired_at: Some(now),
+            evidence: Some(json!({ "baseline_value": 10.0, "post_value": 14.0 })),
+        },
+    )
+    .await;
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(
+                PlanError::BenefitPostMeasurementMissing
+            ))
+        ),
+        "a post timestamp no reading backs is refused: {refused:?}"
+    );
+    let rows: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM benefit_transition WHERE tenant_id = $1")
+            .bind(f.tenant.as_uuid())
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("count transitions");
+    assert_eq!(rows, 0, "no realization row is written");
+}
+
+/// A measured baseline enables realization once the post reading exists: the transition
+/// records the readings, and the realization carries the delta and the retirement.
+#[tokio::test]
+async fn a_measured_baseline_enables_realization() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    let enacted_at = Utc::now();
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    spine::insert_benefit_measurement_tx(
+        &mut tx,
+        f.tenant,
+        &NewBenefitMeasurement {
+            benefit_id: f.benefit,
+            tranche_id: None,
+            kind: "post".to_owned(),
+            target_value: Some(8.0),
+            actual_value: Some(14.0),
+            unit: "hours".to_owned(),
+            method: "the weekly run timestamps".to_owned(),
+            measured_at: enacted_at + Duration::seconds(1),
+            evidence: json!({ "ref": "post-reading" }),
+        },
+    )
+    .await
+    .expect("the post reading");
+    tx.commit().await.expect("commit");
+
+    let now = enacted_at;
+    patch(
+        &db,
+        &f,
+        TransitionPatch {
+            baseline_measured_at: Some(now),
+            readiness: Some(json!({ "ready": true })),
+            enacted_at: Some(now),
+            post_measured_at: Some(now + Duration::seconds(1)),
+            retired_at: Some(now + Duration::seconds(2)),
             evidence: Some(json!({ "baseline_value": 10.0, "post_value": 14.0 })),
         },
     )

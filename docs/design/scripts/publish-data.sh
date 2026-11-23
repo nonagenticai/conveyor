@@ -82,11 +82,17 @@ test -f "$tmp/conformance/standards-findings.json" || {
 python3 "$root/scripts/audit-programme-conformance.py" "${audit_args[@]}" \
   --findings "$root/docs/evidence/v1-conformance-findings.json" \
   --findings "$tmp/conformance/standards-findings.json" \
+  --deep-review "$root/docs/evidence/record-w3/deep-review-findings.json" \
   --report --rework-out "$tmp/conformance/rework.json"
 test -f "$tmp/conformance/rework.json" || {
   echo "publish-data: the audit produced no rework register" >&2
   exit 1
 }
+
+# The live register is public: evidence quotes code and plans, and must never carry a private
+# address. Redact before it is embedded in the snapshot, so the pack and the committed register
+# are the same document. publish-standards.sh does the same for the committed-pack half.
+python3 "$root/scripts/redact-public-register.py" "$tmp/conformance/rework.json"
 
 # 3b. The FINAL snapshot carries that register (`rework.json` and `snapshot.js.rework`), and the
 #     strict gate below audits THESE bytes — not the draft's.
@@ -130,10 +136,18 @@ test -f "$tmp/docs/standards/index.html" || {
 #     the gate: a failed publish leaves both the data and the documents untouched.
 python3 "$pack/scripts/build-docs.py"
 
+# 3f. The snapshot wrote its manifest before every generator above, so their files (the
+#     conformance register, the standards record, the documents) are not hashed in it. Finalise
+#     the finished pack: rehash the directory as it now stands and rewrite manifest.json.
+#     Nothing is regenerated, and no database is read.
+"$conveyor" snapshot --manifest-only --out "$tmp/data"
+
 # 4. Only now does the fresh pack replace the published one. The standards directory is replaced
 #    wholesale: a page for an artefact that no longer exists must not survive the publish.
 rsync -a --delete "$tmp/docs/standards/" "$pack/docs/standards/"
-rsync -a "$tmp/data/" "$data/"
+# The data directory is replaced wholesale too: a file a later generator stopped writing must
+# not survive as an unlisted (therefore unhashed) file beside the manifest.
+rsync -a --delete "$tmp/data/" "$data/"
 rsync -a "$tmp/docs/" "$pack/docs/"
 # The canonical register is an evidence ledger as well as a published row: the committed-pack
 # publish (`publish-standards.sh`) compares its build against this copy.

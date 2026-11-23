@@ -1,0 +1,21 @@
+{
+  "actual_value": 0.0,
+  "benefit_id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+  "evidence": {
+    "detail": {
+      "outside_authors": 0,
+      "repo": "nonagenticai/conveyor"
+    },
+    "instrument": "merged PR authors outside the org",
+    "reference": "B4",
+    "value": 0.0
+  },
+  "id": "01a204d3-8874-715e-802a-b2bb2d56ad25",
+  "kind": "baseline",
+  "measured_at": "2026-11-22T20:00:00Z",
+  "method": "merged PR authors outside the org",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "target_value": null,
+  "tranche_id": null,
+  "unit": "outside contributions"
+}

@@ -11,9 +11,12 @@
 //! `Uuid`, so a malformed id is a schema error at the edge rather than a string the store has
 //! to parse.
 //!
-//! **`kind` is never an input.** `requirements.*`, `principles.*` and `decisions.*` share
-//! these documents and are bound to their `AssetKind` at declaration (S07 §5.2), so there is
-//! no field here that could point a requirement action at a principle.
+//! **`kind` is never an input** of a family declaration. `requirements.*`, `principles.*` and
+//! `decisions.*` share these documents and are bound to their `AssetKind` at declaration
+//! (S07 §5.2), so there is no field here that could point a requirement action at a principle.
+//! The one exception is [`AssetComposeIn`]: the generic `governed_assets.*` family serves the
+//! MSP kinds no fixed family owns (SPEC_V2 §8.3), and it parses its `kind` against the same
+//! closed vocabulary before the store ever sees it.
 
 use chrono::{DateTime, Utc};
 use schemars::JsonSchema;
@@ -58,6 +61,52 @@ pub struct AssetCreateIn {
     /// Kind-specific fields.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<Value>,
+}
+
+/// `governed_assets.compose` — the generic create for the kinds no fixed family owns
+/// (SPEC_V2 §8.3's MSP programme artefacts).
+///
+/// `kind` is an INPUT here and nowhere else: it is parsed against the domain's closed
+/// vocabulary and an unknown value is a `422 unknown_kind`. The family declarations
+/// (`requirements.*`, `principles.*`, `decisions.*`) still bind their kind at the call site, so
+/// this document cannot point one of them at another kind.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct AssetComposeIn {
+    /// The governed-asset kind (`mandate`, `programme_brief`, `blueprint`, `business_case`,
+    /// `refined_vision`, `benefits_strategy`, `benefits_realization_plan`, `projects_dossier`, …).
+    pub kind: String,
+    /// The owning project (the programme-definition project for an MSP artefact).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_id: Option<Uuid>,
+    /// The title (required); the key is derived from it.
+    pub title: String,
+    /// The body.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub body: Option<String>,
+    /// Kind-specific fields.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub meta: Option<Value>,
+}
+
+/// `governed_assets.list` — the family list's filters plus an optional kind.
+///
+/// The family lists (`requirements.list`, …) cannot carry a kind filter: their kind is the
+/// declaration's. This one can, and an unknown kind is the same `422 unknown_kind` compose
+/// gives.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct GovernedAssetListIn {
+    /// Only assets of this kind; every kind when absent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
+    /// Only assets in this status.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
+    /// Only assets of this project.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_id: Option<Uuid>,
+    /// The shared pagination envelope (cursor + limit).
+    #[serde(flatten)]
+    pub page: PageIn,
 }
 
 /// `.update` — the editable fields. `If-Match` is the precondition; it is never a body field.

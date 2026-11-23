@@ -104,6 +104,7 @@ pub async fn wip_pull(
     };
     for (card_id, version) in selected {
         let request = InvokeRequest {
+            credential_alias: None,
             action: "cards.move".to_owned(),
             input: json!({
                 "id": card_id,
@@ -148,11 +149,6 @@ pub async fn wip_pull(
 /// the index is root-only and a coach for a dead run has no live parent to hang from.
 pub const COACH_ERROR_PROCESS: &str = "cap.kanban_coach.handle_error.v2";
 
-/// The most coach root runs one card may accumulate before `err.card` stops starting them
-/// (SPEC_V2 §1.4 · §12 T4's depth cap). Three failures are enough to show the coach is not
-/// converging; a fourth would only repeat the first three.
-pub const COACH_CHAIN_MAX: i64 = 3;
-
 /// The failure comment's marker: the old flow's `BLOCKED/flow_error` line, kept verbatim so a
 /// person (and the parity ledger) can still recognise it.
 pub const ERR_CARD_COMMENT_MARKER: &str = "BLOCKED/flow_error";
@@ -188,7 +184,7 @@ pub struct ErrCardOutcome {
 /// writing a second comment or starting a second coach. The move also skips when the card is
 /// already in waiting, and the coach skips when the card already holds a live root run — the
 /// two effects a replay would otherwise duplicate — or when the recursion guard refuses
-/// ([`COACH_CHAIN_MAX`], a coach-about-a-coach, a closed project).
+/// (a coach-about-a-coach, a closed project).
 ///
 /// A matrix refusal of the move is a real answer (not every card type may enter waiting); it is
 /// logged and the comment/coach still run. A transport failure is returned so the job retries.
@@ -277,13 +273,13 @@ pub async fn err_card(
             }
         })?;
 
-    // The recursion guard (SPEC_V2 §1.4 · §12 T4). `live` catches only a LIVE coach; a serial
-    // chain of terminal coach runs is invisible to it, and on 2026-11-15 that chain reached 278
-    // attempts in one night. Three independent refusals, all read inside this transaction so a
-    // redelivery reaches the same answer:
+    // The recursion guard (SPEC_V2 §1.4 · §12 T4). Two independent refusals, both read inside
+    // this transaction so a redelivery reaches the same answer:
     //   * no coach about a coach — the failed run IS the coach process;
-    //   * a closed or archived project produces no work to protect;
-    //   * the per-card depth cap.
+    //   * a closed or archived project produces no work to protect.
+    // There is deliberately no per-card breadth cap and no live-run skip: §6.2 makes every
+    // interruption exactly one coach card, and `coach.interrupt` — not this producer — decides
+    // by the (card_id, signature) window whether a repeat escalates (v1-p6-4).
     //
     // Identity is the process KEY family, never a process-row id: a v2 draft forked from a
     // published coach is a new row, so an id comparison would stop recognising the v1 coach and
@@ -308,15 +304,6 @@ pub async fn err_card(
         .await
         .map_err(|error| store_error(error, action))?
         .map(|project| project.status);
-    // T4: the cap counts INTERRUPTIONS, not coach runs. Since T4 the coach runs on its own
-    // card, so a per-card run count would read zero forever and never cap anything.
-    let prior_interruptions =
-        store::coach::count_interruptions_for_card_tx(&mut tx, tenant, card_id)
-            .await
-            .map_err(|error| {
-                tracing::error!(error = %error, "err.card: count the card's interruptions");
-                ActionError::internal()
-            })?;
     // T4 P3: a coach card is terminal for the interruption path. The failed run's process key
     // still carries the same answer for a coach run started before T4 (the #188 guard); the
     // card type covers the coach card itself.
@@ -338,8 +325,6 @@ pub async fn err_card(
         .is_some_and(|status| matches!(status, "closed" | "archived"))
     {
         Some("the card's project is closed")
-    } else if prior_interruptions >= COACH_CHAIN_MAX {
-        Some("the coach chain reached its cap")
     } else {
         None
     };
@@ -355,7 +340,7 @@ pub async fn err_card(
     let mut outcome = ErrCardOutcome {
         card_id: Some(card_id),
         coach_run_id: live.as_ref().map(|run| run.id),
-        coach_skipped: live.is_some() || coach_refusal.is_some(),
+        coach_skipped: coach_refusal.is_some(),
         ..ErrCardOutcome::default()
     };
 
@@ -371,6 +356,9 @@ pub async fn err_card(
                     "id": card_id,
                     "list_id": waiting.list.id,
                     "_version": version,
+                    // The failure is already being coached; blocking the card must not open a
+                    // second interruption as a "board event" (v1-p6-5).
+                    "internal_coach": true,
                 }),
                 format!("err.card:move:{run_id}"),
             );
@@ -477,13 +465,14 @@ async fn lane_and_version(
 }
 
 /// The executor's invocation for one computed step (the same principal a process step uses).
-fn service_request(
+pub(crate) fn service_request(
     app_key: &str,
     action: &str,
     input: Value,
     idempotency_key: String,
 ) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,

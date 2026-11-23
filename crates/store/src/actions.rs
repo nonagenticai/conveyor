@@ -274,6 +274,46 @@ pub async fn find_invocation_by_key(
     .await
 }
 
+/// One successful invocation, as a provenance check reads it.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct SuccessfulInvocation {
+    /// The invocation's id (the row a decision cites).
+    pub id: Uuid,
+    /// The canonical hash of the body the engine hashed.
+    pub input_hash: String,
+    /// What the call produced.
+    pub outcome: String,
+    /// The measured latency the engine recorded.
+    pub duration_ms: i32,
+}
+
+/// The most recent `ok` invocation one `Idempotency-Key` produced for `action`.
+///
+/// A failed attempt with the same key releases its claim and is retried, so the key can name
+/// several rows; only a successful one is evidence of an answer. The caller compares the
+/// returned `input_hash` with the request it rebuilt, so a key reused for a different body can
+/// never be cited as this decision's call.
+pub async fn successful_invocation_by_key(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    action: &str,
+    idempotency_key: &str,
+) -> Result<Option<SuccessfulInvocation>, sqlx::Error> {
+    sqlx::query_as(
+        "SELECT id, input_hash, outcome, duration_ms
+           FROM action_invocation
+          WHERE tenant_id = $1 AND action = $2 AND idempotency_key = $3
+            AND outcome = 'ok'
+          ORDER BY created_at DESC
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(action)
+    .bind(idempotency_key)
+    .fetch_optional(conn)
+    .await
+}
+
 /// Release an in-flight idempotency claim after a failed invocation.
 ///
 /// Only a row that is still IN FLIGHT is deleted (`status_code IS NULL`): a completed

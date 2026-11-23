@@ -8,9 +8,9 @@
 //!
 //! * **WSJF is computed on read** from four typed, non-negative integers and `job_size > 0`.
 //!   There is no score column; a stored score would become a stale opinion (D-T1-4).
-//! * **A benefit profile without its baseline, target, measurement method and owner is a
-//!   wish.** [`benefit_profile_missing`] returns the exact fields that are absent, so the
-//!   refusal can name them (D-T1-9).
+//! * **A benefit profile without a measured baseline and target, a measurement method, an owner,
+//!   its capabilities and its operational area is a wish.** [`benefit_profile_missing`] returns
+//!   the exact fields that are absent, so the refusal can name them (D-T1-9).
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -90,7 +90,7 @@ pub enum PlanError {
         /// The offending field.
         field: &'static str,
     },
-    /// A change request is missing its impact block or its baseline reference.
+    /// A change request is missing its impact analysis or its baseline reference.
     #[error("a change request needs an impact block and the baseline it changes")]
     ChangeImpactMissing,
     /// A benefit profile is missing one of its mandatory measurement fields.
@@ -104,6 +104,15 @@ pub enum PlanError {
     BenefitMapIncomplete {
         /// The absent level names.
         missing: Vec<&'static str>,
+    },
+    /// A benefits-map edge's `output_ref` names no WBS node of the edge's programme.
+    ///
+    /// The dependency-slip read matches `benefit_link.output_ref` to `wbs_node.id`; an edge
+    /// whose output is a label can never participate, so it is refused at write time.
+    #[error("output_ref {output_ref:?} names no wbs_node of this programme")]
+    BenefitOutputUnresolved {
+        /// The caller's unchecked string.
+        output_ref: String,
     },
     /// A tranche review with no baselines, benefit status or risk evidence is refused.
     #[error("a tranche review needs baselines, benefit status and the risk register as evidence")]
@@ -143,15 +152,19 @@ pub enum PlanError {
     /// A benefit has no measured baseline, so it cannot claim a realized improvement.
     #[error("benefit_baseline_missing")]
     BenefitBaselineMissing,
-    /// A realization record's measurement is not the typed `{value, unit}` pair.
+    /// A realization record's measurement is not a number with a usable unit.
     #[error("benefit_measurement_invalid")]
     BenefitMeasurementInvalid {
         /// The offending field.
         field: &'static str,
     },
-    /// A realized claim needs measured values and evidence, not two timestamps.
-    #[error("benefit_realization_unmeasured")]
-    BenefitRealizationUnmeasured,
+    /// A cited reading carries no evidence behind it.
+    #[error("benefit_measurement_evidence_missing")]
+    BenefitMeasurementEvidenceMissing,
+    /// A benefit has no `post` measurement after the transition was enacted, so a realization
+    /// claim or a post-transition timestamp is an assertion without a reading.
+    #[error("benefit_post_measurement_missing")]
+    BenefitPostMeasurementMissing,
     /// An approved benefit profile's measurement fields change only through an approved change.
     #[error("benefit_change_required")]
     BenefitChangeRequired,
@@ -170,6 +183,18 @@ pub enum PlanError {
     /// The tranche is already retired.
     #[error("tranche_retired")]
     TrancheRetired,
+    /// Only a paused tranche can be resumed.
+    #[error("the tranche is {state}; only a paused tranche can be resumed")]
+    TrancheNotPaused {
+        /// The state the row carries.
+        state: String,
+    },
+    /// The cited gate does not authorise resuming this tranche.
+    #[error("approval {approval_id} is not an approved tranche.resume gate naming this tranche")]
+    TrancheResumeApprovalMissing {
+        /// The approval the caller cited.
+        approval_id: Uuid,
+    },
     /// The cadence's kind does not match the operation that reads it.
     #[error("the cadence is {actual:?}; this operation needs {expected:?}")]
     CadenceWrongKind {
@@ -177,6 +202,14 @@ pub enum PlanError {
         expected: &'static str,
         /// The kind the row carries.
         actual: String,
+    },
+    /// A cadence state move the state machine does not allow.
+    #[error("the cadence is {from}; it cannot move to {to}")]
+    CadenceIllegalTransition {
+        /// The state the row carries.
+        from: String,
+        /// The state the caller asked for.
+        to: String,
     },
     /// A cadence names no target board in its metadata.
     #[error("the cadence names no target board in meta.board_id")]
@@ -190,6 +223,13 @@ pub enum PlanError {
     /// A demo credit names a deliverable with no evidence ref — no demo, no credit.
     #[error("gate_evidence_missing")]
     DemoEvidenceMissing,
+    /// A demo credit names evidence that is not a typed reference (a blank string, null or an
+    /// empty object is not evidence a demo can exhibit).
+    #[error("demo_evidence_untyped")]
+    DemoEvidenceUntyped,
+    /// A retro closes while one of its findings has no lesson content.
+    #[error("the retro finding {0:?} has no lesson content")]
+    RetroFindingIncomplete(String),
     /// A retro closes while one of its findings has no lesson.
     #[error("the retro finding {0:?} has no lesson")]
     RetroFindingWithoutLesson(String),
@@ -236,25 +276,53 @@ pub fn wsjf(inputs: WsjfInputs) -> Result<f64, PlanError> {
     Ok(sum as f64 / f64::from(inputs.job_size))
 }
 
-/// Refuse a change request that has no impact block or no baseline.
+/// The top-level keys a change's §5.5 impact block may carry.
+const CHANGE_IMPACT_KEYS: [&str; 4] = ["scope", "schedule", "cost", "risk"];
+
+/// Refuse a change request that has no impact analysis or no baseline.
+///
+/// SPEC_V2 §5.5's impact block is a real scope/schedule/cost/risk analysis, not a placeholder:
+/// a JSON object carrying at least one of those top-level keys with a non-null value. `{}`, a
+/// bare number, a string, an array and `null` are all "no analysis" — an approver reading them
+/// sees no delta to weigh.
 pub fn validate_change(
     impact: Option<&Value>,
     baseline_ref: Option<Uuid>,
 ) -> Result<(), PlanError> {
-    let has_impact = impact.is_some_and(|value| !value.is_null());
-    if !has_impact || baseline_ref.is_none() {
+    let has_analysis = impact.is_some_and(|value| {
+        value.as_object().is_some_and(|block| {
+            CHANGE_IMPACT_KEYS
+                .iter()
+                .any(|key| block.get(*key).is_some_and(|delta| !delta.is_null()))
+        })
+    });
+    if !has_analysis || baseline_ref.is_none() {
         return Err(PlanError::ChangeImpactMissing);
     }
     Ok(())
 }
 
+/// A measurement is a real reading, not a placeholder: a number or a non-empty structured
+/// document, never null/blank/an empty container and never the literal "not measured".
+fn is_measurement(value: &Value) -> bool {
+    match value {
+        Value::Null => false,
+        Value::String(text) => {
+            !text.trim().is_empty() && !text.eq_ignore_ascii_case("not measured")
+        }
+        Value::Array(items) => !items.is_empty(),
+        Value::Object(map) => !map.is_empty(),
+        _ => true,
+    }
+}
+
 /// The mandatory fields a benefit profile must carry, in the §8.3 order.
 pub fn benefit_profile_missing(profile: &BenefitProfileFields) -> Vec<&'static str> {
     let mut missing = Vec::new();
-    if profile.baseline.is_none() {
+    if !profile.baseline.as_ref().is_some_and(is_measurement) {
         missing.push("baseline");
     }
-    if profile.target.is_none() {
+    if !profile.target.as_ref().is_some_and(is_measurement) {
         missing.push("target");
     }
     if profile.measurement_method.trim().is_empty() {
@@ -262,6 +330,16 @@ pub fn benefit_profile_missing(profile: &BenefitProfileFields) -> Vec<&'static s
     }
     if profile.benefit_owner_job_id.is_none() {
         missing.push("benefit_owner");
+    }
+    if !profile
+        .capabilities
+        .as_array()
+        .is_some_and(|items| !items.is_empty())
+    {
+        missing.push("capabilities");
+    }
+    if profile.operational_area.trim().is_empty() {
+        missing.push("operational_area");
     }
     missing
 }
@@ -281,54 +359,41 @@ const PLACEHOLDER_UNITS: [&str; 11] = [
     "-",
 ];
 
-/// One benefit measurement: the numeric reading and the unit it is expressed in (§8.3).
+/// A baseline or post reading is a number and a unit; an interim reading may be qualitative.
 ///
-/// The stored and posted shape is `{ "value": <number>, "unit": <text> }`. Anything else —
-/// prose, `{}`, a numeric string, a blank unit or a placeholder unit — is not a measurement, so
-/// a realized claim built on it would be an opinion.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
-pub struct Measurement {
-    /// The numeric reading.
-    pub value: f64,
-    /// The unit the reading is expressed in; never blank or a placeholder.
-    pub unit: String,
-}
-
-impl Measurement {
-    /// Parse the typed pair; `None` means the value is not a measurement.
-    pub fn parse(measurement: &Value) -> Option<Self> {
-        let object = measurement.as_object()?;
-        let value = object.get("value")?.as_f64()?;
-        if !value.is_finite() {
-            return None;
-        }
-        let unit = object.get("unit")?.as_str()?.trim();
-        if unit.is_empty() {
-            return None;
-        }
-        let lowered = unit.to_ascii_lowercase();
-        if PLACEHOLDER_UNITS.contains(&lowered.as_str()) {
-            return None;
-        }
-        Some(Self {
-            value,
-            unit: unit.to_owned(),
-        })
+/// `kind` is the stored vocabulary (`baseline | interim | post`). A missing value, a blank unit
+/// or a placeholder unit is not a measurement, so a realized claim built on it would be an
+/// opinion. The `benefit_measurement` CHECK is the second lock.
+pub fn validate_benefit_reading(
+    kind: &str,
+    actual_value: Option<f64>,
+    unit: &str,
+) -> Result<(), PlanError> {
+    if !matches!(kind, "baseline" | "post") {
+        return Ok(());
     }
+    if actual_value.is_none_or(|value| !value.is_finite()) {
+        return Err(PlanError::BenefitMeasurementInvalid {
+            field: "actual_value",
+        });
+    }
+    let unit = unit.trim();
+    if unit.is_empty() || PLACEHOLDER_UNITS.contains(&unit.to_ascii_lowercase().as_str()) {
+        return Err(PlanError::BenefitMeasurementInvalid { field: "unit" });
+    }
+    Ok(())
 }
 
-/// A realization record's evidence: a non-empty list carrying at least one real entry. A blank
-/// string or a null is a slot, not evidence.
-pub fn transition_has_evidence(evidence: &Value) -> bool {
-    evidence.as_array().is_some_and(|items| {
-        items.iter().any(|item| match item {
-            Value::Null => false,
-            Value::String(text) => !text.trim().is_empty(),
-            Value::Object(map) => !map.is_empty(),
-            Value::Array(list) => !list.is_empty(),
-            _ => true,
-        })
-    })
+/// Evidence behind a reading or a realization: a non-empty object, list or text. A blank
+/// string, `{}` or an empty list is a slot, not evidence.
+pub fn evidence_present(evidence: &Value) -> bool {
+    match evidence {
+        Value::Null => false,
+        Value::String(text) => !text.trim().is_empty(),
+        Value::Array(items) => !items.is_empty(),
+        Value::Object(map) => !map.is_empty(),
+        _ => true,
+    }
 }
 
 /// The subset of a profile the completeness rule reads.
@@ -342,6 +407,10 @@ pub struct BenefitProfileFields {
     pub measurement_method: String,
     /// The BCM job that owns the benefit.
     pub benefit_owner_job_id: Option<Uuid>,
+    /// The capabilities the benefit depends on (§8.3); an empty array is a gap.
+    pub capabilities: Value,
+    /// The operational area that must change (§8.3); blank is a gap.
+    pub operational_area: String,
 }
 
 /// The five levels a benefits-map edge must name (§8.3).

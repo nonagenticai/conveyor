@@ -171,7 +171,12 @@ async fn start(running: &support::Running, card: &str) -> String {
         .invoke(
             "process_runs.start",
             TOKEN,
-            json!({"card_id": card, "process_key": "dev-agent-resolved", "inputs": {}}),
+            // The model-calling run must declare its spend ceiling (#526 / D45).
+            json!({
+                "card_id": card,
+                "process_key": "dev-agent-resolved",
+                "inputs": {"limits": {"cost_budget_usd": 5.0}}
+            }),
             None,
             None,
             None,

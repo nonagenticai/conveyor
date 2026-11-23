@@ -18,6 +18,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     "spec",
     "benefit-profile",
     "benefits-map",
+    "benefits-registry",
+    "benefit-evaluation",
     "projects-dossier",
     "tranche-plan",
     "tranche-review",
@@ -28,20 +30,24 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     "adm-profile",
     "artifact-standard",
     "architecture-artifact",
+    "architecture-artifact-instance",
     "statement-of-architecture-work",
     "compliance-review",
     "waiver",
     "maturity-assessment",
     "skills-assessment",
     "programme-brief",
+    "mandate",
     "refined-vision",
     "programme-baselines",
     "programme-strategies",
+    "programme-risk-register",
     "benefit-transition",
     "programme-report",
     "requirements-catalog",
     "architecture-capability",
     "architecture-governance-log",
+    "adr-register",
     "delivery-contract",
     "statement-of-intent",
     "request-for-architecture-work",
@@ -57,10 +63,18 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     "phase-b",
     "phase-c",
     "phase-d",
+    "candidate-solutions",
+    "project-context-diagram",
+    "benefits-diagram",
+    "gap-analysis",
     "phase-e",
     "phase-f",
     "phase-g",
-    "phase-h"
+    "phase-h",
+    "pi-plan",
+    "pi-objectives",
+    "system-demo",
+    "inspect-adapt"
   ],
   "aliases": {
     "brief": "project-brief",
@@ -232,7 +246,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": true,
       "spec": "§8.4",
-      "document_category": "project-brief"
+      "document_category": "project-brief",
+      "sources": {
+        "Outcome": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-brief",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
     },
     "inception-analysis": {
       "required": [
@@ -288,9 +315,22 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "standard": "SPEC",
       "level": "work_package",
       "subject_kind": "card",
-      "mandatory": false,
+      "mandatory": true,
       "spec": "§10.4",
-      "document_category": "decision"
+      "document_category": "decision",
+      "sources": {
+        "Context": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "decision",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
     },
     "evidence": {
       "required": [
@@ -307,7 +347,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "card",
       "mandatory": true,
       "spec": "§8.5",
-      "document_category": "evidence"
+      "document_category": "evidence",
+      "sources": {
+        "Claim": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "evidence",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
     },
     "closure-review": {
       "required": [
@@ -323,7 +376,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": true,
       "spec": "§8.4",
-      "document_category": "closure-review"
+      "document_category": "closure-review",
+      "sources": {
+        "Outcome vs acceptance": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "closure-review",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
     },
     "vision": {
       "required": [
@@ -342,45 +408,88 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "vision"
+      "document_category": "vision",
+      "sources": {
+        "Purpose": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "vision",
+              "scope": "programme"
+            }
+          }
+        ]
+      }
     },
     "blueprint": {
       "required": [
         "Aggregates and services",
         "Action registry and data model",
         "Deployment estate",
-        "The to-be the projects deliver"
+        "The to-be the projects deliver",
+        "Organisation and skills",
+        "Current, intermediate and target states"
       ],
       "optional": [
         "Decisions",
         "Links"
       ],
-      "skeleton": "# Blueprint\n\nThe target architecture and operating model the projects are held to.\n\n## Aggregates and services\n\nThe bounded contexts, their data ownership and the service boundaries.\n\n## Action registry and data model\n\nThe actions, tables, invariants and events that form the contract.\n\n## Deployment estate\n\nWhere each service runs and what it depends on.\n\n## The to-be the projects deliver\n\nEach project's contribution to this blueprint, and the gap it closes.\n\n## Decisions\n\nThe architecture decisions this blueprint rests on.\n\n## Links\n\nArtefacts, contracts, coverage.\n",
+      "skeleton": "# Blueprint\n\nThe target architecture and operating model the projects are held to.\n\n## Aggregates and services\n\nThe bounded contexts, their data ownership and the service boundaries.\n\n## Action registry and data model\n\nThe actions, tables, invariants and events that form the contract.\n\n## Deployment estate\n\nWhere each service runs and what it depends on.\n\n## The to-be the projects deliver\n\nEach project's contribution to this blueprint, and the gap it closes.\n\n## Organisation and skills\n\nThe organisation, roles and skills the target state requires.\n\n## Current, intermediate and target states\n\nThe current, intermediate and target states and what separates them.\n\n## Decisions\n\nThe architecture decisions this blueprint rests on.\n\n## Links\n\nArtefacts, contracts, coverage.\n",
       "standard": "MSP",
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "blueprint"
+      "document_category": "blueprint",
+      "sources": {
+        "Aggregates and services": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "blueprint",
+              "scope": "programme"
+            }
+          }
+        ]
+      }
     },
     "business-case": {
       "required": [
         "Why now",
         "Benefit map",
         "Cost and risk posture",
-        "Licensing frame"
+        "Licensing frame",
+        "Options, including doing nothing",
+        "Investment appraisal and cash flow",
+        "Capabilities the benefits depend on"
       ],
       "optional": [
-        "Options",
         "Decision"
       ],
-      "skeleton": "# Business case\n\nWhy now, what it buys, what it costs and the risk posture.\n\n## Why now\n\nThe problem, the cost of doing nothing, and the trigger for action.\n\n## Benefit map\n\nEach benefit, its mechanism and its measure; a benefit with no measure is a wish.\n\n## Cost and risk posture\n\nThe engineering cost, the recurring cost, and the exposure accepted.\n\n## Licensing frame\n\nThe public, opt-in and tenant boundary of the investment.\n\n## Options\n\nThe options considered including doing nothing.\n\n## Decision\n\nThe investment decision and its authority.\n",
+      "skeleton": "# Business case\n\nWhy now, what it buys, what it costs and the risk posture.\n\n## Why now\n\nThe problem, the cost of doing nothing, and the trigger for action.\n\n## Benefit map\n\nEach benefit, its mechanism and its measure; a benefit with no measure is a wish.\n\n## Cost and risk posture\n\nThe engineering cost, the recurring cost, and the exposure accepted.\n\n## Licensing frame\n\nThe public, opt-in and tenant boundary of the investment.\n\n## Options, including doing nothing\n\nThe options considered including doing nothing.\n\n## Investment appraisal and cash flow\n\nThe appraisal, the cash flow and the basis of both.\n\n## Capabilities the benefits depend on\n\nThe capabilities and business changes the benefits require, and who delivers them.\n\n## Decision\n\nThe investment decision and its authority.\n",
       "standard": "MSP",
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "business-case"
+      "document_category": "business-case",
+      "sources": {
+        "Why now": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "business-case",
+              "scope": "programme"
+            }
+          }
+        ]
+      }
     },
     "programme-plan": {
       "required": [
@@ -399,7 +508,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "programme-plan"
+      "document_category": "programme-plan",
+      "sources": {
+        "Tranches": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "programme-plan",
+              "scope": "programme"
+            }
+          }
+        ]
+      }
     },
     "governance": {
       "required": [
@@ -418,7 +540,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "governance"
+      "document_category": "governance",
+      "sources": {
+        "Roles": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "governance",
+              "scope": "programme"
+            }
+          }
+        ]
+      }
     },
     "reuse-map": {
       "required": [
@@ -503,6 +638,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "benefit",
       "mandatory": true,
       "spec": "§8.3",
+      "document_category": "benefit-profile",
       "sources": {
         "Identification and purpose": [
           {
@@ -579,6 +715,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
+      "document_category": "benefits-map",
       "sources": {
         "Benefit paths": [
           {
@@ -601,6 +738,104 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         ]
       }
     },
+    "benefits-registry": {
+      "required": [
+        "Benefit profiles",
+        "Map",
+        "Ownership"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Benefits Registry\n\nThe programme's benefits, indexed to their profiles and linked through the benefits map. A benefit with no profile is a wish, not a benefit.\n\n## Benefit profiles\n\nEvery benefit profile, with its reference, measurable improvement and owner.\n\n## Map\n\nThe output, capability, operational outcome and strategic objective each benefit links through.\n\n## Ownership\n\nThe benefit owner, the operational area the improvement is attributed to, and who realizes it.\n\n## Links\n\nThe projects and tranches the benefits depend on.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "benefits-registry",
+      "sources": {
+        "Benefit profiles": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles"
+          }
+        ],
+        "Map": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_links"
+          }
+        ],
+        "Ownership": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles"
+          }
+        ]
+      }
+    },
+    "benefit-evaluation": {
+      "required": [
+        "Baseline and target",
+        "Measurement method",
+        "Actuals and variance",
+        "Decision"
+      ],
+      "optional": [],
+      "skeleton": "# Benefit Evaluation\n\nOne benefit measured against its profile: the baseline and target, the method, the actual performance and the decision the comparison supports.\n\n## Baseline and target\n\nThe baseline measured before the transition and the target the profile names; a placeholder baseline cannot claim an improvement.\n\n## Measurement method\n\nThe instrument and cadence that produce the measurement.\n\n## Actuals and variance\n\nThe post-transition measurement, the delta against the baseline, and the variance against the target.\n\n## Decision\n\nContinue, correct or stop, with the evidence and the owner of the next measurement.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "benefit",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "benefit-evaluation",
+      "sources": {
+        "Baseline and target": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles",
+            "match": {
+              "reference": "$subject_key"
+            }
+          }
+        ],
+        "Measurement method": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles",
+            "match": {
+              "reference": "$subject_key"
+            }
+          }
+        ],
+        "Actuals and variance": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_id": "$subject_id"
+            }
+          }
+        ],
+        "Decision": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_transitions",
+            "match": {
+              "benefit_id": "$subject_id"
+            }
+          }
+        ]
+      }
+    },
     "projects-dossier": {
       "required": [
         "Projects",
@@ -615,6 +850,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
+      "document_category": "projects-dossier",
       "sources": {
         "Projects": [
           {
@@ -673,6 +909,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
+      "document_category": "tranche-plan",
       "sources": {
         "Tranches": [
           {
@@ -785,7 +1022,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "benefits-strategy"
+      "document_category": "benefits-strategy",
+      "sources": {
+        "Measurement methods": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "benefits-strategy",
+              "scope": "programme"
+            }
+          }
+        ]
+      }
     },
     "realization-plan": {
       "required": [
@@ -801,7 +1051,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "realization-plan"
+      "document_category": "realization-plan",
+      "sources": {
+        "Transition": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "realization-plan",
+              "scope": "programme"
+            }
+          }
+        ]
+      }
     },
     "stakeholder-profiles": {
       "required": [
@@ -818,6 +1081,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
+      "document_category": "stakeholder-profiles",
       "sources": {
         "Stakeholders": [
           {
@@ -893,6 +1157,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "capability",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "adm-profile",
       "sources": {
         "Phases": [
           {
@@ -936,6 +1201,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "capability",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "artifact-standard",
       "sources": {
         "Common metadata": [
           {
@@ -991,6 +1257,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "architecture-artifact",
       "sources": {
         "Metadata": [
           {
@@ -1014,9 +1281,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         ],
         "Links": [
           {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/links"
+            "kind": "computed",
+            "name": "project_artifact_links"
           }
         ],
         "Document": [
@@ -1028,6 +1294,48 @@ window.CONVEYOR_OUTPUT_STANDARD = {
               "category": "architecture-artifact",
               "scope": "subject"
             }
+          }
+        ]
+      }
+    },
+    "architecture-artifact-instance": {
+      "required": [
+        "Metadata",
+        "Entries",
+        "Links",
+        "Document"
+      ],
+      "optional": [],
+      "skeleton": "# Architecture artefact\n\nOne typed TOGAF artefact — a catalog, a matrix or a diagram — as its own record, with the metadata that identifies it, the entries that make it queryable, the links that place it in the repository, and the document or contract it sits under. The catalogue's `architecture-artifact` page is the project's index; this page is the artefact itself.\n\n## Metadata\n\nThe artefact's type, title, version, status, phase, plateau and related change initiative. A reviewer can tell what it is and whether it has been approved without opening the document.\n\n## Entries\n\nThe catalogue items (one axis) or matrix cells (two axes) the artefact carries. A catalog is queryable and a matrix is joinable because these are rows, not a picture.\n\n## Links\n\nWhat this artefact derives from, realizes, reuses or depends on. These edges are the architecture repository's trace; an artefact with no link is an orphan.\n\n## Document\n\nThe published document or contract the artefact sits under. A typed artefact without a document is metadata about something a reader cannot inspect.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "artifact",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "architecture-artifact-instance",
+      "sources": {
+        "Metadata": [
+          {
+            "kind": "computed",
+            "name": "artifact_metadata"
+          }
+        ],
+        "Entries": [
+          {
+            "kind": "computed",
+            "name": "artifact_entries"
+          }
+        ],
+        "Links": [
+          {
+            "kind": "computed",
+            "name": "artifact_links"
+          }
+        ],
+        "Document": [
+          {
+            "kind": "computed",
+            "name": "artifact_document"
           }
         ]
       }
@@ -1056,7 +1364,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/contracts",
             "match": {
               "kind": "statement_of_architecture_work",
-              "phase_code": "a"
+              "phase_code": "a",
+              "project_id": "$subject_id"
             }
           }
         ],
@@ -1067,7 +1376,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/contracts",
             "match": {
               "kind": "statement_of_architecture_work",
-              "phase_code": "a"
+              "phase_code": "a",
+              "project_id": "$subject_id"
             }
           }
         ],
@@ -1078,7 +1388,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/contracts",
             "match": {
               "kind": "statement_of_architecture_work",
-              "phase_code": "a"
+              "phase_code": "a",
+              "project_id": "$subject_id"
             }
           }
         ],
@@ -1089,7 +1400,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/contracts",
             "match": {
               "kind": "statement_of_architecture_work",
-              "phase_code": "a"
+              "phase_code": "a",
+              "project_id": "$subject_id"
             }
           }
         ],
@@ -1100,7 +1412,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/contracts",
             "match": {
               "kind": "statement_of_architecture_work",
-              "phase_code": "a"
+              "phase_code": "a",
+              "project_id": "$subject_id"
             }
           }
         ]
@@ -1127,6 +1440,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/compliance_reviews",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1137,6 +1451,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/compliance_reviews",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1147,6 +1462,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/waivers",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1157,6 +1473,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/compliance_reviews",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1184,6 +1501,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/waivers",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1194,6 +1512,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/waivers",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1204,6 +1523,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/waivers",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1214,6 +1534,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/waivers",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1235,6 +1556,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "capability",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "maturity-assessment",
       "sources": {
         "Dimensions": [
           {
@@ -1280,6 +1602,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "capability",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "skills-assessment",
       "sources": {
         "Categories": [
           {
@@ -1343,6 +1666,66 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         ]
       }
     },
+    "mandate": {
+      "required": [
+        "Strategic fit",
+        "Drivers",
+        "Deliverables and boundaries",
+        "Success and constraints"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Mandate\n\nThe programme's authority to proceed: strategic fit, drivers, deliverables and boundaries, and the success and constraints the sponsoring group authorised.\n\n## Strategic fit\n\nHow the programme serves the organisation's strategy and the current position it starts from.\n\n## Drivers\n\nThe internal and external drivers that make the programme necessary now.\n\n## Deliverables and boundaries\n\nWhat the programme delivers, what it explicitly excludes, and the delivery and assurance approach.\n\n## Success and constraints\n\nThe success criteria, the constraints the programme accepts, and the assumptions it depends on.\n\n## Links\n\nThe governing assets and decisions the mandate authorises.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "mandate",
+      "sources": {
+        "Strategic fit": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "mandate"
+            }
+          }
+        ],
+        "Drivers": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "mandate"
+            }
+          }
+        ],
+        "Deliverables and boundaries": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "mandate"
+            }
+          }
+        ],
+        "Success and constraints": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "mandate"
+            }
+          }
+        ]
+      }
+    },
     "refined-vision": {
       "required": [
         "Refined vision",
@@ -1357,7 +1740,20 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
-      "document_category": "refined-vision"
+      "document_category": "refined-vision",
+      "sources": {
+        "Refined vision": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "refined-vision",
+              "scope": "programme"
+            }
+          }
+        ]
+      }
     },
     "programme-baselines": {
       "required": [
@@ -1374,6 +1770,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
+      "document_category": "programme-baselines",
       "sources": {
         "Management baseline": [
           {
@@ -1426,7 +1823,18 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
+      "document_category": "programme-strategies",
       "sources": {
+        "Information strategy": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "information_strategy"
+            }
+          }
+        ],
         "Risk strategy": [
           {
             "kind": "rows",
@@ -1444,6 +1852,106 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/register_items",
             "match": {
               "kind": "issue"
+            }
+          }
+        ],
+        "Monitoring strategy": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "monitoring_strategy"
+            }
+          }
+        ],
+        "Communications strategy": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "communications_strategy"
+            }
+          }
+        ],
+        "Quality strategy": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "quality_strategy"
+            }
+          }
+        ],
+        "Resource strategy": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "resource_strategy"
+            }
+          }
+        ]
+      }
+    },
+    "programme-risk-register": {
+      "required": [
+        "Register",
+        "Categories",
+        "Owners and review dates",
+        "Escalations"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Programme Risk Register\n\nThe programme's risks, categorized and owned, with the dates they are reviewed and the escalations they forced.\n\n## Register\n\nEvery open and closed risk, with its impact, probability, status and mitigation.\n\n## Categories\n\nThe categories the risks are grouped by, and the category each risk belongs to.\n\n## Owners and review dates\n\nWho owns each risk and the date it is next reviewed; a risk with no owner or review date is refused.\n\n## Escalations\n\nThe risks escalated to the programme board, the sponsoring group or the SRO, with the decision each escalation seeks.\n\n## Links\n\nThe artefacts and issues the register informs.\n",
+      "standard": "MSP",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.3",
+      "document_category": "programme-risk-register",
+      "sources": {
+        "Register": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "risk"
+            }
+          }
+        ],
+        "Categories": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "risk"
+            }
+          }
+        ],
+        "Owners and review dates": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "risk"
+            }
+          }
+        ],
+        "Escalations": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "risk"
             }
           }
         ]
@@ -1466,6 +1974,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "benefit",
       "mandatory": true,
       "spec": "§8.3",
+      "document_category": "benefit-transition",
       "sources": {
         "Baseline measurement": [
           {
@@ -1579,6 +2088,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "requirements-catalog",
       "sources": {
         "Requirements": [
           {
@@ -1596,7 +2106,10 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           {
             "kind": "rows",
             "file": "architecture.json",
-            "pointer": "/links"
+            "pointer": "/links",
+            "match": {
+              "kind": "trace"
+            }
           }
         ]
       }
@@ -1613,47 +2126,48 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "optional": [
         "Links"
       ],
-      "skeleton": "# Architecture Capability\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Principles\n\nThe record the section derives from, or an explicit absence.\n\n## Tailored ADM\n\nThe record the section derives from, or an explicit absence.\n\n## Artefact standard\n\nThe record the section derives from, or an explicit absence.\n\n## Architecture Board\n\nThe record the section derives from, or an explicit absence.\n\n## Governance and contracts\n\nThe record the section derives from, or an explicit absence.\n\n## Maturity and skills\n\nThe record the section derives from, or an explicit absence.\n",
+      "skeleton": "# Architecture capability\n\nThe Preliminary phase is a capability before it is a project: the principles, the tailored ADM, the artefact standard, the Architecture Board, the governance and contracts, and the maturity and skills baseline. Each is a row, and each is approved by the body that owns it.\n\n## Principles\n\nThe architecture principles catalogue, each with its statement, rationale and implications. The Board approves the catalogue; a principle without a rationale or its implications is not a principle.\n\n## Tailored ADM\n\nThe adopted `adm_profile`: which phases this organisation runs, which artefacts are mandatory per phase and plateau, and which contract closes each phase. A profile that cannot be adopted is a draft, not the capability.\n\n## Artefact standard\n\nThe `artifact_type` catalogue the repository is seeded from: each type's phase, plateau and mandatory flag. The standard is adopted once and grows with the assessed maturity.\n\n## Architecture Board\n\nThe `governance_body` of kind architecture board: membership, charter, commissioning authority and decision limits. A draft board cannot govern.\n\n## Governance and contracts\n\nThe architecture contracts (Statement of Architecture Work, delivery contract, statement of intent, Request for Architecture Work) and the waivers that accept a deviation for a period. A waiver names its accepting owner and reassessment date.\n\n## Maturity and skills\n\nThe nine-dimension maturity assessment (0–5) and the seven-category skills assessment, each a dated row with evidence. The development plan is a set of milestones a tranche review can hold the capability to.\n",
       "standard": "TOGAF",
       "level": "programme",
       "subject_kind": "capability",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "architecture-capability",
       "sources": {
         "Principles": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "architecture_principles"
           }
         ],
         "Tailored ADM": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "architecture_profile"
           }
         ],
         "Artefact standard": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "artifact_standard"
           }
         ],
         "Architecture Board": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "architecture_board"
           }
         ],
         "Governance and contracts": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "architecture_governance"
           }
         ],
         "Maturity and skills": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "architecture_maturity_skills"
           }
         ]
       }
@@ -1671,8 +2185,9 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "standard": "TOGAF",
       "level": "programme",
       "subject_kind": "capability",
-      "mandatory": false,
+      "mandatory": true,
       "spec": "§8.1",
+      "document_category": "architecture-governance-log",
       "sources": {
         "Decisions": [
           {
@@ -1685,14 +2200,65 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           {
             "kind": "rows",
             "file": "architecture.json",
-            "pointer": "/compliance_reviews"
+            "pointer": "/compliance_reviews",
+            "optional": true
           }
         ],
         "Waivers": [
           {
             "kind": "rows",
             "file": "architecture.json",
-            "pointer": "/waivers"
+            "pointer": "/waivers",
+            "optional": true
+          }
+        ]
+      }
+    },
+    "adr-register": {
+      "required": [
+        "Register",
+        "Status and supersession",
+        "Decisions"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# ADR Register\n\nThe architecture decisions of record, their status, and the decision each supersedes or is superseded by. An ADR without a status is refused.\n\n## Register\n\nEvery architecture decision record, with its reference, title, date and governing project.\n\n## Status and supersession\n\nEach ADR's status and the ADR it supersedes or is superseded by; a superseded ADR names its replacement.\n\n## Decisions\n\nThe decision statement each ADR records, with its rationale and consequences.\n\n## Links\n\nThe artefacts, contracts and issues each decision governs.\n",
+      "standard": "TOGAF",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "adr-register",
+      "sources": {
+        "Register": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "adr"
+            }
+          }
+        ],
+        "Status and supersession": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "adr"
+            }
+          }
+        ],
+        "Decisions": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "adr"
+            }
           }
         ]
       }
@@ -1712,6 +2278,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "delivery-contract",
       "sources": {
         "Commitments": [
           {
@@ -1865,6 +2432,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.2",
+      "document_category": "safe-portfolio",
       "sources": {
         "Portfolio canvas": [
           {
@@ -1892,17 +2460,19 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "required": [
         "ART charter",
         "Solution intent",
-        "Backlog with WSJF"
+        "Backlog with WSJF",
+        "Shared configuration"
       ],
       "optional": [
         "Links"
       ],
-      "skeleton": "# Safe Art\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## ART charter\n\nThe record the section derives from, or an explicit absence.\n\n## Solution intent\n\nThe record the section derives from, or an explicit absence.\n\n## Backlog with WSJF\n\nThe record the section derives from, or an explicit absence.\n",
+      "skeleton": "# Safe Art\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## ART charter\n\nThe record the section derives from, or an explicit absence.\n\n## Solution intent\n\nThe record the section derives from, or an explicit absence.\n\n## Backlog with WSJF\n\nThe record the section derives from, or an explicit absence.\n\n## Shared configuration\n\nThe programme values every project inherits and the keys it locks against override.\n",
       "standard": "SAFe",
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.2",
+      "document_category": "safe-art",
       "sources": {
         "ART charter": [
           {
@@ -1919,9 +2489,19 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         ],
         "Backlog with WSJF": [
           {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/wbs_nodes"
+            "kind": "computed",
+            "name": "wsjf_order",
+            "severity": "P1",
+            "match": {
+              "status": "accepted"
+            }
+          }
+        ],
+        "Shared configuration": [
+          {
+            "kind": "computed",
+            "name": "shared_config",
+            "severity": "P1"
           }
         ]
       }
@@ -1942,6 +2522,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.2",
+      "document_category": "safe-cadence",
       "sources": {
         "PI plan": [
           {
@@ -1977,7 +2558,10 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           {
             "kind": "rows",
             "file": "work.json",
-            "pointer": "/approvals"
+            "pointer": "/approvals",
+            "match": {
+              "gate": "tranche_review"
+            }
           }
         ]
       }
@@ -1997,6 +2581,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": true,
       "spec": "§8.4",
+      "document_category": "project-wbs",
       "sources": {
         "Work packages": [
           {
@@ -2046,6 +2631,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": true,
       "spec": "§8.4",
+      "document_category": "project-baseline",
       "sources": {
         "Scope": [
           {
@@ -2107,6 +2693,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": true,
       "spec": "§8.4",
+      "document_category": "project-registers",
       "sources": {
         "Risks": [
           {
@@ -2191,6 +2778,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "project",
       "mandatory": true,
       "spec": "§8.4",
+      "document_category": "change-control",
       "sources": {
         "Change requests": [
           {
@@ -2236,17 +2824,19 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "optional": [
         "Findings"
       ],
-      "skeleton": "# Phase Preliminary\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
+      "skeleton": "# Phase Preliminary\n\nThe capability that makes architecture work possible: the principles, the tailored ADM, the artefact standard, the Board, governance and the maturity and skills baseline. Preliminary closes when the capability is adopted, not when a document is filed.\n\n## Mandatory artefacts\n\nThe preliminary artefact types the adopted profile requires, each evidenced by an artefact of that type in this phase. A required type with no artefact is missing; the package names it.\n\n## Contract and gate\n\nThe Board and the adopted profile are the gate objects: the Board's charter is approved and the profile is adopted. A draft board or an unadopted profile is not a gate.\n\n## Evidence\n\nThe preliminary artifacts and the adopted profile, with their status. This is what the Board approved.\n",
       "standard": "TOGAF",
       "level": "programme",
       "subject_kind": "capability",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "phase-preliminary",
       "sources": {
         "Mandatory artefacts": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "phase_artefacts",
+            "phase": "preliminary"
           }
         ],
         "Contract and gate": [
@@ -2288,6 +2878,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "phase",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "phase-a",
       "sources": {
         "Mandatory artefacts": [
           {
@@ -2342,6 +2933,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "phase",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "phase-b",
       "sources": {
         "Mandatory artefacts": [
           {
@@ -2396,6 +2988,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "phase",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "phase-c",
       "sources": {
         "Mandatory artefacts": [
           {
@@ -2450,6 +3043,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "phase",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "phase-d",
       "sources": {
         "Mandatory artefacts": [
           {
@@ -2489,21 +3083,225 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         ]
       }
     },
+    "candidate-solutions": {
+      "required": [
+        "Candidates",
+        "Criteria",
+        "Options rejected"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Candidate Solutions\n\nThe solution options the phase evaluated, the criteria they were judged on, and the options rejected.\n\n## Candidates\n\nEach candidate solution, with the capabilities it delivers and the work packages it implies.\n\n## Criteria\n\nThe criteria the candidates were judged on, with the score or verdict for each candidate.\n\n## Options rejected\n\nEach rejected option, with the reason it lost and the condition that would reopen it.\n\n## Links\n\nThe drivers, requirements and architecture artefacts the candidates answer.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "candidate-solutions",
+      "sources": {
+        "Candidates": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "candidate-solutions",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Criteria": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "candidate-solutions",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Options rejected": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "candidate-solutions",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
+    },
+    "project-context-diagram": {
+      "required": [
+        "Context",
+        "Affected organisation",
+        "Affected systems"
+      ],
+      "optional": [],
+      "skeleton": "# Project Context Diagram\n\nThe work package against the affected organisation, functions, services, applications, data and technology. A context diagram with no affected system is refused.\n\n## Context\n\nThe work package and the boundary of the solution the diagram describes.\n\n## Affected organisation\n\nThe actors, roles and organisational units the solution changes or serves.\n\n## Affected systems\n\nThe applications, data and technology the solution touches, with the interface or change at each.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "project-context-diagram",
+      "sources": {
+        "Context": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-context-diagram",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Affected organisation": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-context-diagram",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Affected systems": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-context-diagram",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
+    },
+    "benefits-diagram": {
+      "required": [
+        "Goals and outcomes",
+        "Measures",
+        "Benefits and sub-benefits"
+      ],
+      "optional": [],
+      "skeleton": "# Benefits Diagram\n\nThe goals and outcomes a solution serves, their measures, and the benefits and sub-benefits that follow.\n\n## Goals and outcomes\n\nThe goals and measurable outcomes the solution contributes to.\n\n## Measures\n\nThe measure and target for each outcome, with the instrument that reads it.\n\n## Benefits and sub-benefits\n\nThe benefits and sub-benefits the outcomes realise, and how each decomposes into the next.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "benefits-diagram",
+      "sources": {
+        "Goals and outcomes": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "benefits-diagram",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Measures": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "benefits-diagram",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Benefits and sub-benefits": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "benefits-diagram",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
+    },
+    "gap-analysis": {
+      "required": [
+        "Baseline",
+        "Target",
+        "Gaps and work packages"
+      ],
+      "optional": [],
+      "skeleton": "# Gap Analysis\n\nThe baseline and target states, the gaps between them, and the work packages that close each gap.\n\n## Baseline\n\nThe current state, with the evidence that establishes it.\n\n## Target\n\nThe target state the architecture specifies, with the plateau it belongs to.\n\n## Gaps and work packages\n\nEach gap between baseline and target, and the work package that closes it.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "project",
+      "mandatory": true,
+      "spec": "§8.1",
+      "document_category": "gap-analysis",
+      "sources": {
+        "Baseline": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "gap-analysis",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Target": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "gap-analysis",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Gaps and work packages": [
+          {
+            "kind": "computed",
+            "name": "gap-analysis",
+            "severity": "P1"
+          }
+        ]
+      }
+    },
     "phase-e": {
       "required": [
         "Mandatory artefacts",
         "Contract and gate",
-        "Evidence"
+        "Evidence",
+        "Gap analysis",
+        "Candidate solutions",
+        "Project context diagram",
+        "Benefits diagram",
+        "Work packages"
       ],
       "optional": [
         "Findings"
       ],
-      "skeleton": "# Phase E\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
+      "skeleton": "# Phase E\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n\n## Gap analysis\n\nThe baseline, the target and the gaps the work packages close.\n\n## Candidate solutions\n\nThe options evaluated, the criteria they were judged on and the options rejected.\n\n## Project context diagram\n\nThe work package against the affected organisation and systems.\n\n## Benefits diagram\n\nThe goals, outcomes, measures and benefits the solution serves.\n\n## Work packages\n\nThe work packages that close the gaps, with their WBS rows and owners.\n",
       "standard": "TOGAF",
       "level": "project",
       "subject_kind": "phase",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "phase-e",
       "sources": {
         "Mandatory artefacts": [
           {
@@ -2540,6 +3338,60 @@ window.CONVEYOR_OUTPUT_STANDARD = {
               "scope": "subject"
             }
           }
+        ],
+        "Gap analysis": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "gap-analysis",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Candidate solutions": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "candidate-solutions",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Project context diagram": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-context-diagram",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Benefits diagram": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "benefits-diagram",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Work packages": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/wbs_nodes",
+            "match": {
+              "project_id": "$project_id"
+            }
+          }
         ]
       }
     },
@@ -2558,6 +3410,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "phase",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "phase-f",
       "sources": {
         "Mandatory artefacts": [
           {
@@ -2612,6 +3465,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "phase",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "phase-g",
       "sources": {
         "Mandatory artefacts": [
           {
@@ -2666,6 +3520,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "phase",
       "mandatory": true,
       "spec": "§8.1",
+      "document_category": "phase-h",
       "sources": {
         "Mandatory artefacts": [
           {
@@ -2704,9 +3559,294 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       }
+    },
+    "pi-plan": {
+      "required": [
+        "Objectives",
+        "Plan",
+        "WSJF order",
+        "Capacity and WIP",
+        "Evidence",
+        "Dependencies",
+        "Backlog refinement"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# PI plan\n\nThe plan for one programme increment: the deliverables selected from the backlog, ordered by WSJF, within the WIP limit.\n\n## Objectives\n\nThe PI objectives this plan is judged against, with their planned business value.\n\n## Plan\n\nThe deliverables materialised for this increment, one per WBS node, with their project and acceptance.\n\n## WSJF order\n\nThe four typed inputs per candidate — business value, time criticality, risk reduction and job size — in the order the plan takes them. The score is computed, never stored.\n\n## Capacity and WIP\n\nThe capacity the plan is bounded by and the WIP limit it respects.\n\n## Evidence\n\nThe backlog rows, the cadence row and the approval that made this the plan.\n\n## Dependencies\n\nThe cross-project dependencies the order is constrained by.\n\n## Links\n\nThe cadence, the objectives and the tranche this plan belongs to.\n\n## Backlog refinement\n\nThe refinement cadence that re-scored the backlog before this plan was taken.\n",
+      "standard": "SAFe",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.2",
+      "document_category": "pi-plan",
+      "sources": {
+        "Objectives": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "pi-plan",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          }
+        ],
+        "Plan": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/wbs_nodes"
+          }
+        ],
+        "WSJF order": [
+          {
+            "kind": "computed",
+            "name": "wsjf_order",
+            "severity": "P1",
+            "match": {
+              "status": "accepted"
+            }
+          }
+        ],
+        "Capacity and WIP": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/cadences",
+            "match": {
+              "kind": "pi"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "pi-plan",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/cadences"
+          }
+        ],
+        "Dependencies": [
+          {
+            "kind": "computed",
+            "name": "dependency_graph",
+            "severity": "P1"
+          }
+        ],
+        "Backlog refinement": [
+          {
+            "kind": "computed",
+            "name": "refinement_cadence",
+            "severity": "P1"
+          }
+        ]
+      }
+    },
+    "pi-objectives": {
+      "required": [
+        "Objectives",
+        "Business value",
+        "Measurement",
+        "Evidence"
+      ],
+      "optional": [
+        "Risks",
+        "Links"
+      ],
+      "skeleton": "# PI objectives\n\nThe objectives for one programme increment, planned before delivery and assessed at its close.\n\n## Objectives\n\nEach objective, in outcome form: what is true after the increment that is not true now.\n\n## Business value\n\nThe planned business value per objective, typed as an integer; the actual value is recorded at the close.\n\n## Measurement\n\nHow each objective is judged: the acceptance manifest, the evidence and the check that decides it.\n\n## Evidence\n\nThe verification runs and the records that support the assessment.\n\n## Risks\n\nThe objectives at risk and what would move them.\n\n## Links\n\nThe PI plan, the tranche review and the project records.\n",
+      "standard": "SAFe",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.2",
+      "document_category": "pi-objectives",
+      "sources": {
+        "Objectives": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "pi-objectives",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          }
+        ],
+        "Business value": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/wbs_nodes"
+          }
+        ],
+        "Measurement": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/demo_credits",
+            "severity": "P1",
+            "projection": "live"
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "pi-objectives",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/demo_credits",
+            "severity": "P1",
+            "projection": "live"
+          }
+        ]
+      }
+    },
+    "system-demo": {
+      "required": [
+        "Demonstrated",
+        "Evidence",
+        "Credits",
+        "Findings"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# System demo\n\nThe demo record for one programme increment: every completed deliverable exhibits its evidence. No demo, no credit.\n\n## Demonstrated\n\nEach completed deliverable presented, with its project and the outcome it evidences.\n\n## Evidence\n\nThe evidence each deliverable exhibited: the acceptance manifest run, the published output and the record.\n\n## Credits\n\nThe demo credits recorded per accepted deliverable, copied from the deliverable's evidence.\n\n## Findings\n\nWhat the demo exposed: defects, gaps and follow-ups, with owners.\n\n## Links\n\nThe cadence row, the deliverables and the tranche review.\n",
+      "standard": "SAFe",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.2",
+      "document_category": "system-demo",
+      "sources": {
+        "Demonstrated": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/wbs_nodes",
+            "match": {
+              "status": "accepted"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/demo_credits",
+            "severity": "P1",
+            "projection": "live"
+          }
+        ],
+        "Credits": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/demo_credits",
+            "severity": "P1",
+            "projection": "live"
+          }
+        ],
+        "Findings": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "system-demo",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          }
+        ]
+      }
+    },
+    "inspect-adapt": {
+      "required": [
+        "What went well",
+        "What did not",
+        "Lessons",
+        "Actions",
+        "Kata candidates"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Inspect and adapt\n\nThe retro record for one programme increment: what the evidence showed, the lessons it produced and the actions it set.\n\n## What went well\n\nThe practices and decisions the evidence supports keeping.\n\n## What did not\n\nThe failures, delays and bypasses the evidence exposed, named plainly.\n\n## Lessons\n\nOne lesson per finding, as the organisational-memory record; a retro with no lessons is refused.\n\n## Actions\n\nThe actions, owners and dates that follow from the lessons.\n\n## Links\n\nThe retro cadence, the lessons and the tranche review.\n\n## Kata candidates\n\nThe systemic classes the retro raises as kata candidates, each with its evidence.\n",
+      "standard": "SAFe",
+      "level": "programme",
+      "subject_kind": "programme",
+      "mandatory": true,
+      "spec": "§8.2",
+      "document_category": "inspect-adapt",
+      "sources": {
+        "What went well": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "inspect-adapt",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          }
+        ],
+        "What did not": [
+          {
+            "kind": "documents",
+            "match": {
+              "category": "inspect-adapt",
+              "scope": "programme"
+            },
+            "file": "artefacts.json",
+            "pointer": "/documents"
+          }
+        ],
+        "Lessons": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/lessons",
+            "severity": "P1",
+            "projection": "live"
+          }
+        ],
+        "Actions": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/lessons",
+            "severity": "P1",
+            "projection": "live"
+          }
+        ],
+        "Kata candidates": [
+          {
+            "kind": "computed",
+            "name": "kata_candidates",
+            "severity": "P1"
+          }
+        ]
+      }
     }
   },
   "on_demand": [
+    "architecture-artifact-instance",
     "decision",
     "programme-brief",
     "refined-vision",
@@ -2735,6 +3875,19 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     "phase-e",
     "phase-f",
     "phase-g",
-    "phase-h"
+    "phase-h",
+    "pi-plan",
+    "pi-objectives",
+    "system-demo",
+    "inspect-adapt",
+    "programme-risk-register",
+    "adr-register",
+    "benefits-registry",
+    "benefit-evaluation",
+    "mandate",
+    "candidate-solutions",
+    "project-context-diagram",
+    "benefits-diagram",
+    "gap-analysis"
   ]
 };

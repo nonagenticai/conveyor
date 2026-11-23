@@ -1,0 +1,10 @@
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "cadence_id": "01a20281-09ba-709a-b61e-51a22f2ed172",
+ "finding_key": "k3",
+ "statement": "A delegation document's owner project is part of its contract: a PLATFORM-owned standing delegation was refused by a P0-only guard until the guard accepted both.",
+ "evidence": [
+  "crates/actions/src/programme.rs",
+  "crates/actions/tests/pi_plan_approval.rs"
+ ]
+}

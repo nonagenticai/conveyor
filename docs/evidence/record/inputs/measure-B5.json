@@ -1,0 +1,1 @@
+{"benefit_id": "01a1e9df-1e42-7199-87e1-23c577c62f8e", "kind": "baseline", "target_value": null, "actual_value": 1.0, "unit": "model stores", "method": "the ownership matrix's one home", "measured_at": "2026-11-22T20:00:00Z", "evidence": {"reference": "B5", "value": 1.0, "instrument": "the ownership matrix's one home", "detail": {"stores": 1, "gate": "T0 manifest"}}}

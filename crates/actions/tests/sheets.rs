@@ -18,6 +18,7 @@ const XLSX: &str = "application/vnd.openxmlformats-officedocument.spreadsheetml.
 
 fn request(action: &str, user_id: Uuid, input: Value) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,

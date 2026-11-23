@@ -1,0 +1,11 @@
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "cadence_id": "01a20281-09ba-709a-b61e-51a22f2ed172",
+ "finding_key": "k1",
+ "statement": "A clean build before a lock regeneration is the only trustworthy verdict: the shared target answered with another session's metadata and the first lock was hashed from a stale binary.",
+ "evidence": [
+  "f7409473 clean build",
+  "a7fcf0e7 lock correction",
+  "docs/evidence/record/journal.jsonl"
+ ]
+}

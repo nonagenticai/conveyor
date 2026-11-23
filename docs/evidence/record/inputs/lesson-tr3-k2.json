@@ -1,0 +1,10 @@
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "cadence_id": "01a20281-09ba-709a-b61e-51a22f2ed172",
+ "finding_key": "k2",
+ "statement": "The promotion journal must be validated after every append: trimming by line count silently dropped the publish row, and --check caught it.",
+ "evidence": [
+  "scripts/promote-record.py --check",
+  "docs/evidence/record/journal.jsonl"
+ ]
+}

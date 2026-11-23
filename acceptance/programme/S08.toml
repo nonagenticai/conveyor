@@ -1,0 +1,106 @@
+[project]
+key = "S08"
+name = "Governance, modelling, render and export"
+gate = "S08's gate is golden SVG/PNG/PDF/XMI fixtures, and Part A's round-trip is the governance floor."
+gate_checks = ["S08-project", "S08-baseline", "S08-charter", "S08-closure-outputs", "S08-contract", "S08-review", "S08-closure-gate", "S08-waivers", "S08-pi-cadence", "S08-pi-plan", "S08-pi-objectives", "S08-wsjf", "S08-demo-credits", "S08-lessons", "S08-product"]
+
+[[check]]
+id = "S08-project"
+check = "project"
+severity = "P0"
+description = "S08 is closed"
+
+[[check]]
+id = "S08-baseline"
+check = "project_baseline"
+require_approved = true
+severity = "P0"
+description = "the scope baseline is approved; the close gate reads the approved row"
+
+[[check]]
+id = "S08-charter"
+kind = "command"
+severity = "P0"
+description = "the charter asset exists and the charter gate is approved"
+command = '''python3 scripts/programme-record.py --check --action pm.get --input '{"project_id":"01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2"}' | python3 -c '
+import json,sys
+s=sys.stdin.read()
+d=json.loads(s[s.find("{"):])
+o=d.get("output",d)
+assert o.get("charter_asset_id"), "no charter asset"
+gates={g.get("gate"):g.get("status") for g in o.get("gates",[])}
+assert gates.get("charter")=="approved", gates
+'
+'''
+
+[[check]]
+id = "S08-closure-outputs"
+check = "closure_outputs"
+severity = "P0"
+description = "the declared closure outputs are declared and published"
+
+[[check]]
+id = "S08-contract"
+check = "contract"
+severity = "P0"
+description = "a live board-approved delivery contract exists"
+
+[[check]]
+id = "S08-review"
+check = "review"
+severity = "P0"
+description = "the Phase-G review cites a published standing delegation"
+
+[[check]]
+id = "S08-closure-gate"
+check = "closure_gate"
+severity = "P0"
+description = "the closure gate was decided by an approver other than its requester"
+
+[[check]]
+id = "S08-waivers"
+check = "waivers"
+severity = "P0"
+description = "no active waiver is expired or owned by its reviewer"
+
+[[check]]
+id = "S08-pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+description = "the project's PI has a cadence row and a backlog-refinement row"
+
+[[check]]
+id = "S08-pi-plan"
+check = "pi_plan"
+severity = "P0"
+description = "the project tranche's PI plan is published"
+
+[[check]]
+id = "S08-pi-objectives"
+check = "pi_objectives"
+severity = "P0"
+description = "the project tranche's PI objectives are published"
+
+[[check]]
+id = "S08-wsjf"
+check = "wsjf"
+severity = "P0"
+description = "every WBS deliverable of the project carries the four typed WSJF inputs"
+
+[[check]]
+id = "S08-demo-credits"
+check = "demo_credits"
+severity = "P0"
+description = "every accepted deliverable has a demo credit carrying its evidence"
+
+[[check]]
+id = "S08-lessons"
+check = "lessons"
+severity = "P1"
+description = "the tranche retro produced at least one lesson"
+
+[[check]]
+id = "S08-product"
+check = "product_findings"
+severity = "P0"
+description = "no open P0 product finding remains for the project"

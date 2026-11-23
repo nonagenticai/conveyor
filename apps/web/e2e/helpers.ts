@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 
-import type { APIRequestContext } from "@playwright/test";
+import { expect, type APIRequestContext, type Page } from "@playwright/test";
 
 const TOKEN_FILE = process.env.E2E_TOKEN_FILE ?? "test-results/oidc-token.txt";
 let oidc: string | undefined;
@@ -65,35 +65,35 @@ export async function invoke<T = unknown>(
   return document.output as T;
 }
 
+/** The reason a fixture records instead of typed evidence; it is not the gate's subject. */
+export const FIXTURE_EVIDENCE_WAIVER =
+  "e2e fixture: the gate's subject is the row the spec created";
+
 /**
- * This tenant lets a requester decide their own gate for `action` (#285's self-approval path).
+ * Record the tenant's decision for one action.
  *
- * The console disables a requester's own Approve unless the action's policy says `allowed`, so
- * a spec that needs that control enabled sets the policy instead of borrowing a second
- * principal. `approval: required` is kept: the gate still exists and is still decided — that
- * is the console's flow, not a bypass of it.
+ * §5.4 makes the requester's exclusion an invariant, so `self_approval` is sent as its only
+ * storable spelling, `forbidden` (ledger v1-w4b-4). A spec that needs a gate states `required`
+ * and decides it with [`decideAsReviewer`]; no spec may reintroduce the self-approval opt-out.
  */
-export async function allowSelfApproval(
+export async function setApprovalPolicy(
   request: APIRequestContext,
   action: string,
-  login = "alice",
+  approval: "required" | "waived",
 ): Promise<void> {
-  await invoke(
-    request,
-    "approval_policies.set",
-    { action, approval: "required", self_approval: "allowed" },
-    undefined,
-    login,
-  );
+  await invoke(request, "approval_policies.set", {
+    action,
+    approval,
+    self_approval: "forbidden",
+  });
 }
 
 /**
  * Decide one gate as `dev:reviewer`, the seed's second dev-a admin.
  *
- * The store refuses a requester deciding their own gate (409) unless the action's policy allows
- * it, and `approval_policies.set` only accepts registered destructive actions — so a card or
- * eval gate can only ever be decided by another person. Guard the caller with [`isDevAuth`]:
- * the deployed suite has one principal.
+ * The store refuses a requester deciding their own gate unconditionally (§5.4 / P4); no policy
+ * row can relax it, so the only way to resolve a gate is another person. Guard the caller with
+ * [`isDevAuth`]: the deployed suite has one principal and nobody else can decide.
  */
 export async function decideAsReviewer(
   request: APIRequestContext,
@@ -110,10 +110,14 @@ export async function decideAsReviewer(
 }
 
 /**
- * Request a gate for `action`, approve it as the same principal, and invoke with its id.
+ * Fixture path: request a gate for `action`, have a distinct approver decide it, then invoke
+ * with its id.
  *
  * The fixture path for a spec that needs a destructive call to have happened (a cleanup, a
- * seeded row) without driving the console. Pair it with [`allowSelfApproval`].
+ * seeded row) without driving the console. A destructive gate requires evidence, and a fixture
+ * is not the gate's subject, so the request records the same explicit `evidence_waiver_reason`
+ * an operator's prompt records — never a silent bypass. §5.4 forbids the requester deciding it,
+ * so the decision is [`decideAsReviewer`]'s. Guard the caller with [`isDevAuth`].
  */
 export async function approvedInvoke<T = unknown>(
   request: APIRequestContext,
@@ -121,6 +125,11 @@ export async function approvedInvoke<T = unknown>(
   input: unknown,
   login = "alice",
 ): Promise<T> {
+  if (!isDevAuth()) {
+    throw new Error(
+      `${name}: a fixture gate needs a distinct approver; the deployed suite has one principal`,
+    );
+  }
   const gate = await invoke<{ id: string }>(
     request,
     "approvals.request",
@@ -130,18 +139,96 @@ export async function approvedInvoke<T = unknown>(
       action: name,
       input,
       proposed_input: input,
+      evidence_waiver_reason: FIXTURE_EVIDENCE_WAIVER,
     },
     undefined,
     login,
   );
-  await invoke(
-    request,
-    "approvals.decide",
-    { approval_id: gate.id, decision: "approve" },
-    undefined,
-    login,
-  );
+  await decideAsReviewer(request, "approvals.decide", gate.id);
   return invoke<T>(request, name, input, undefined, login, gate.id);
+}
+
+export type PendingGate = {
+  id: string;
+  gate: string;
+  status: string;
+  target?: string;
+};
+
+/** The tenant's pending gates, newest first. */
+export async function pendingGates(request: APIRequestContext): Promise<PendingGate[]> {
+  const page = await invoke<{ items: PendingGate[] }>(request, "approvals.list", {
+    status: "pending",
+    limit: 50,
+  });
+  return page.items;
+}
+
+/** `cards.archive`'s target for one card — the string the invoke boundary compares. */
+export function archiveTarget(cardId: string): string {
+  return `card/${cardId}/archive`;
+}
+
+/** Poll until the pending gate for one target exists, and return it. */
+export async function pendingGateFor(
+  request: APIRequestContext,
+  target: string,
+): Promise<PendingGate> {
+  let found: PendingGate | undefined;
+  await expect
+    .poll(
+      async () => {
+        found = (await pendingGates(request)).find((row) => row.target === target);
+        return Boolean(found);
+      },
+      { timeout: 15_000 },
+    )
+    .toBe(true);
+  return found!;
+}
+
+/** The operator's answer to the console's §5.4 waiver prompt: a reason, or `null` to cancel. */
+export type WaiverAnswer = string | null;
+
+/**
+ * Answer the console's §5.4 evidence-waiver prompt as an operator would.
+ *
+ * The app asks `window.prompt` only after `approvals.request` refuses `422
+ * gate_evidence_missing`: Cancel (`null`) keeps the refusal and retries nothing, a non-empty
+ * reason retries the same request once with `evidence_waiver_reason`, and a blank answer is
+ * asked again. The last answer repeats if the app asks more times, so a bug cannot hang the
+ * spec; `dialogs` is the number of prompts the app actually showed.
+ */
+export function answerWaiverPrompt(
+  page: Page,
+  answers: WaiverAnswer[],
+): { dialogs: number } {
+  const seen = { dialogs: 0 };
+  let index = 0;
+  page.on("dialog", (dialog) => {
+    const answer = answers[Math.min(index, answers.length - 1)];
+    index += 1;
+    seen.dialogs += 1;
+    void (answer === null ? dialog.dismiss() : dialog.accept(answer));
+  });
+  return seen;
+}
+
+/** One `approvals.request` input the page sent, in order. */
+export type GateRequest = { input: Record<string, unknown> };
+
+/** Every `approvals.request` input the page sends, in order. */
+export function recordGateRequests(page: Page): GateRequest[] {
+  const bodies: GateRequest[] = [];
+  page.on("request", (request) => {
+    if (
+      request.method() === "POST" &&
+      new URL(request.url()).pathname === "/api/actions/approvals.request/invocations"
+    ) {
+      bodies.push(request.postDataJSON() as GateRequest);
+    }
+  });
+  return bodies;
 }
 
 export async function getJson<T = unknown>(
@@ -181,6 +268,8 @@ export async function createBoardCard(
     {
       title,
       project_type_code: "delivery",
+      // v1-e2e-1: a fixture is not programme work. The public pack excludes and lists it.
+      test_row: true,
     },
     undefined,
     login,

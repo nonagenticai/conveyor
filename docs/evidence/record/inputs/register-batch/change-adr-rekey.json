@@ -1,0 +1,9 @@
+{
+ "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+ "baseline_id": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+ "title": "Re-key the architecture decision register to its grammar",
+ "body": "The seed wrote file-backed ADRs under filename-stem keys; the register grammar is adr-NNNN. This change authorises archiving the stem-keyed rows and re-seeding adr-0001..adr-0012, with the no-deferrals row keeping its delegation evidence on adr-0012.",
+ "impact": {
+  "scope": "governed_asset(kind='adr') keys adr-0001..adr-0012 and the archived stem rows"
+ }
+}

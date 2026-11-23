@@ -112,9 +112,23 @@ use serde_json::{Value, json};
 /// **#511 (rework path) adds 2 internal**: `projects.charter` (charter an EXISTING project) and
 /// `projects.reopen` (the closed → active transition the retrospective's `rework` verdict
 /// authorises). 500 → **502**.
+/// **v1-w1c-3 adds 2**: `ladder.prepare` (internal read) and `laya.classify` (external) —
+/// the L1 path's own laya call, whose verified invocation a laya decision cites. 527 → **529**.
+/// **v1-w1c-4 adds 5 internal**: the authored option set family —
+/// `decision_options.create|update|publish|refine|get`. 529 → **534**.
 /// **#15 (S21 step 3) adds 5 internal**: the `prompt_recipes.create|get|list|activate|retire`
-/// catalogue surface. 503 → **508**.
-const EXPECTED: [&str; 513] = [
+/// catalogue surface. 534 → **539**.
+/// **#526 (tr2) adds 1 internal**: `benefits.measure` — the baseline/interim/post reading a
+/// realization cites. 539 → **540**.
+/// **#526 register gaps add 1 internal**: `benefits.measurement_list` — the read-back of the
+/// measurements a `benefits.measure` write records. 540 → **541**.
+/// **#560 (T14) adds 5 external**: `scientific_stats.meta_analysis|confidence_interval|trend`
+/// and `scientific_formal.translate|verify` — the estate toolkit's scientific reads (546).
+/// **#556/#590 add 8 internal**: `storage.get|put`, `tool_bindings.create|list|retire|update`
+/// and `tools.resume|retire`. 546 → **554**.
+/// **#526 (w3-gov-assets-1) adds 5 internal**: `governed_assets.compose|get|list|submit|approve` —
+/// the generic surface for the MSP programme-artefact kinds. 554 → **559**.
+const EXPECTED: [&str; 559] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -156,12 +170,18 @@ const EXPECTED: [&str; 513] = [
     "architecture.profile_get",
     "architecture.profile_tailor",
     "architecture.repository_search",
+    "architecture.reviews_get",
     "architecture.reviews_record",
     "architecture.reviews_waive",
     "architecture.skills_assess",
     "architecture.skills_list",
     "artifacts.list",
     "audit.list",
+    "authoring.assets",
+    "authoring.draft",
+    "authoring.intake",
+    "authoring.publish",
+    "authoring.review",
     "baselines.get",
     "baselines.list",
     "baselines.take",
@@ -180,6 +200,8 @@ const EXPECTED: [&str; 513] = [
     "benefits.link",
     "benefits.link_list",
     "benefits.list",
+    "benefits.measure",
+    "benefits.measurement_list",
     "benefits.retire",
     "benefits.transition_list",
     "benefits.transition_upsert",
@@ -188,7 +210,10 @@ const EXPECTED: [&str; 513] = [
     "billing.summary",
     "boards.get",
     "boards.set_member",
+    "cadences.approve_plan",
     "cadences.create",
+    "cadences.credit_demo",
+    "cadences.credit_list",
     "cadences.delete",
     "cadences.list",
     "cadences.update",
@@ -248,6 +273,11 @@ const EXPECTED: [&str; 513] = [
     "decisions.transition",
     "decisions.update",
     "decks.render",
+    "decision_options.create",
+    "decision_options.get",
+    "decision_options.publish",
+    "decision_options.refine",
+    "decision_options.update",
     "decision_policies.create",
     "decision_policies.list",
     "decision_policies.update",
@@ -316,6 +346,11 @@ const EXPECTED: [&str; 513] = [
     "fixtures.fail",
     "fixtures.slow",
     "fixtures.timeout",
+    "governed_assets.approve",
+    "governed_assets.compose",
+    "governed_assets.get",
+    "governed_assets.list",
+    "governed_assets.submit",
     "industries.create",
     "industries.get",
     "industries.list",
@@ -341,6 +376,16 @@ const EXPECTED: [&str; 513] = [
     "job_releases.retire",
     "jobs.list",
     "jobs.retry",
+    "kata.adopt",
+    "kata.analyse",
+    "kata.close",
+    "kata.get",
+    "kata.list",
+    "kata.measure",
+    "kata.observe",
+    "kata.open",
+    "kata.propagate",
+    "kata.propose",
     "knowledge.query",
     "labels.create",
     "labels.delete",
@@ -348,10 +393,14 @@ const EXPECTED: [&str; 513] = [
     "ladder.apply_draft",
     "ladder.evaluate",
     "ladder.list",
+    "ladder.prepare",
     "ladder.record",
+    "laya.classify",
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
+    "lessons.list",
+    "lessons.propose",
     "licences.get",
     "lists.create",
     "lists.move",
@@ -540,6 +589,8 @@ const EXPECTED: [&str; 513] = [
     "requirements.transition",
     "requirements.update",
     "retrieval.query",
+    "retros.close",
+    "retros.record_findings",
     "roles.policy_get",
     "roles.policy_reset",
     "roles.policy_set",
@@ -573,6 +624,8 @@ const EXPECTED: [&str; 513] = [
     "stakeholders.profile_list",
     "stakeholders.profile_update",
     "stakeholders.update",
+    "storage.get",
+    "storage.put",
     "task_lists.create",
     "task_lists.delete",
     "task_lists.update",
@@ -582,9 +635,15 @@ const EXPECTED: [&str; 513] = [
     "tasks.update",
     "tenants.get",
     "tenants.update_settings",
+    "tool_bindings.create",
+    "tool_bindings.list",
+    "tool_bindings.retire",
+    "tool_bindings.update",
     "toolkits.publish",
     "tools.call",
     "tools.probe",
+    "tools.resume",
+    "tools.retire",
     "tools.usage",
     "trace_links.create",
     "trace_links.delete",
@@ -593,6 +652,7 @@ const EXPECTED: [&str; 513] = [
     "tranches.create",
     "tranches.delete",
     "tranches.list",
+    "tranches.resume",
     "tranches.retire",
     "tranches.review",
     "tranches.review_list",
@@ -718,11 +778,16 @@ fn the_registry_is_exactly_the_declared_set() {
     // external stays 13.
     // #524 (U4) adds one internal action (`projects.close_request`, the programme's closure
     // request that opens the closure gate): 489 -> 490; external stays 13.
+    // v1-w1c-4 adds the five `decision_options.*` actions (create/update/publish/refine/get),
+    // all internal: 515 -> 520; external stays 14 — they author this tenant's own options.
     // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
-    // 490 -> 495; external stays 13.
+    // 520 -> 525; external stays 14.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
-    // `trend` and `scientific_formal.translate|verify`: internal stays 495, external 13 -> 18.
-    assert_eq!((internal, external), (495, 18));
+    // `trend` and `scientific_formal.translate|verify`. #556/#590 add eight internal actions
+    // (`storage.get|put`, `tool_bindings.create|list|retire|update`, `tools.resume|retire`).
+    // #526 (w3-gov-assets-1) adds five internal actions (`governed_assets.compose|get|list|submit|
+    // approve`). The merged registry is 559: 540 internal, 19 external.
+    assert_eq!((internal, external), (540, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

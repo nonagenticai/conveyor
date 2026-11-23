@@ -1,0 +1,10 @@
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "cadence_id": "01a20281-09ba-709a-b61e-51a22f2ed172",
+ "finding_key": "k4",
+ "statement": "A measurement change resets a benefit profile to draft; activation is a second recorded write with its own version.",
+ "evidence": [
+  "docs/evidence/record/journal.jsonl benefit:B2/fields",
+  "docs/evidence/record/journal.jsonl benefit:B2/status"
+ ]
+}

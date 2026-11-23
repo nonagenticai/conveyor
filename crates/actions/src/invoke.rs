@@ -14,6 +14,12 @@
 //! 5. a deadline is the caller's: `tokio::time::timeout` wraps the whole transaction, and
 //!    an expiry rolls it back and records `outcome='timeout'` in a separate short
 //!    transaction (a rolled-back transaction cannot record itself).
+//!
+//! A `captures_usage` action adds one gate before dispatch: the run it names must have a
+//! declared spend budget and must not have exhausted it (`429 tool_budget_exceeded`, #526). It
+//! runs before the input is validated and before any handler, so a refused model call is never
+//! charged. It is the run-level twin of the broker's spend gate (SPEC_V2 §7.5, §11.3 step 2),
+//! which only covers `tools.call`.
 
 use std::collections::HashMap;
 use std::collections::VecDeque;
@@ -175,6 +181,13 @@ pub struct InvokeRequest {
     /// Who made a model call and what it belongs to (S16). Captured only when the action
     /// declares `captures_usage`; every other action passes `None`.
     pub usage: Option<UsageContext>,
+    /// The binding's sealed credential alias, when a broker call supplied one (#526).
+    ///
+    /// The broker sets this from `tool_binding.credential_alias`; **no transport may** — an
+    /// HTTP or MCP caller cannot name a secret the tenant's grant did not bind. When present,
+    /// `invoke_external` opens THIS sealed tenant secret and sends it as the bearer instead
+    /// of the destination action's own compiled-in `auth` name.
+    pub credential_alias: Option<String>,
 }
 
 /// Who made a model call and what it belongs to (S16).
@@ -292,6 +305,8 @@ pub struct HandlerCtx {
     /// an approval target is refused by [`crate::invoke::invoke`] unless this names an approved
     /// approval for that exact target; every other action ignores it.
     pub approval_id: Option<Uuid>,
+    /// The request's model-call attribution, when the caller supplied one (§7.4).
+    pub usage: Option<UsageContext>,
 }
 
 impl HandlerCtx {
@@ -752,6 +767,126 @@ pub async fn invoke_bound(
     invoke(pool, registry, tenant, request).await
 }
 
+/// The SPEC's typed budget refusal: nothing was dispatched, so nothing is charged.
+fn budget_exceeded(detail: String) -> ActionError {
+    ActionError::new(429, "tool_budget_exceeded", detail)
+}
+
+/// The run-level inference pre-call gate (#526; SPEC_V2 §7.5, §11.3 step 2).
+///
+/// A `captures_usage` action dispatches a billable model call. The broker's spend gate covers a
+/// `spend`-class tool, but a run also reaches a capturing action directly — a workflow node, a
+/// process step, the capped agent loop — so the ceiling is enforced here too, before the handler
+/// runs and before any network call.
+///
+/// The budget is the same resolution the broker uses: [`store::inference::run_budget_tx`] reads
+/// the job release's `anatomy.limits.cost_budget_usd`, the binding's `meta.limits` override and a
+/// lower `run.inputs.limits`, and derives the recorded spend from the same ledgers (each call
+/// counted once). A run with no declared budget is refused, never treated as unlimited (D45: a
+/// spend call needs a budget).
+///
+/// A `run_id` that names no row in this tenant is **not** gated: `usage.run_id` is resolved by
+/// the engine (the broker checks the `tools.call` body's run id before copying it here),
+/// `inference_call`'s join keys are deliberately not FKs, and a dangling attribution has no run
+/// whose ceiling could be read. Refusing there would turn an accounting fixture into a false
+/// refusal without closing any caller-controlled path.
+async fn enforce_run_budget(
+    pool: &PgPool,
+    registry: &Registry,
+    tenant: TenantId,
+    run_id: Uuid,
+) -> Result<(), ActionError> {
+    let captured: Vec<String> = registry
+        .iter()
+        .filter(|spec| spec.captures_usage)
+        .map(|spec| spec.name.to_owned())
+        .collect();
+    let mut tx = store::begin_scoped_read_only(pool, tenant)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, run = %run_id, "scope the run's budget read");
+            ActionError::internal()
+        })?;
+    let budget = store::inference::run_budget_tx(&mut tx, tenant, run_id, &captured).await;
+    let _ = tx.rollback().await;
+    let budget = match budget {
+        Ok(budget) => budget,
+        Err(store::inference::InferenceStoreError::Database(sqlx::Error::RowNotFound)) => {
+            return Ok(());
+        }
+        Err(error) => {
+            tracing::error!(%error, run = %run_id, "read the run's spend budget");
+            return Err(ActionError::internal());
+        }
+    };
+    let Some(limit) = budget.limit_usd else {
+        return Err(budget_exceeded(format!(
+            "run {run_id} has no spend budget: declare `limits.cost_budget_usd` on the job \
+             release, the job binding's meta or the run's inputs before a model-calling action \
+             may run"
+        )));
+    };
+    if budget.spent_usd >= limit {
+        return Err(budget_exceeded(format!(
+            "run {run_id} has spent {} of its {limit} USD spend budget; the model call was \
+             refused before dispatch",
+            budget.spent_usd
+        )));
+    }
+    Ok(())
+}
+
+/// The ceiling a run declares for itself in `inputs.limits.cost_budget_usd`, if any.
+fn input_budget(inputs: &Value) -> Option<Decimal> {
+    let raw = inputs.get("limits")?.get("cost_budget_usd")?;
+    Decimal::try_from(raw.as_f64()?)
+        .ok()
+        .filter(|limit| *limit >= Decimal::ZERO)
+}
+
+/// Refuse to START a run on an `internal_agent` binding that declares no spend ceiling
+/// (#526; SPEC_V2 §4.4, §7.5, D45).
+///
+/// The call-time gate below stops the first model call, but a run that can never legally spend
+/// should not start at all: the refusal belongs at the start, naming the missing declaration and
+/// both places it may be made — the binding's `meta.limits` / its release's `anatomy.limits`, or
+/// this run's `inputs.limits`. A **procedure** binding is not gated: it may legitimately never
+/// call a model, and a declared `cost_budget_usd: 0` is the honest way to say "never spend".
+///
+/// A binding that does not exist in this tenant is left to the caller's own resolution, which
+/// produces the typed not-found before anything is written.
+pub(crate) async fn ensure_binding_budget(
+    conn: &mut sqlx::PgConnection,
+    tenant: TenantId,
+    binding_id: Uuid,
+    inputs: &Value,
+) -> Result<(), ActionError> {
+    let binding = store::inference::binding_budget_tx(conn, tenant, binding_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, binding = %binding_id, "read the binding's spend budget");
+            ActionError::internal()
+        })?;
+    let Some(binding) = binding else {
+        return Ok(());
+    };
+    if binding.executor_kind != "internal_agent"
+        || binding.limit_usd.is_some()
+        || input_budget(inputs).is_some()
+    {
+        return Ok(());
+    }
+    Err(ActionError::new(
+        422,
+        "budget_missing",
+        format!(
+            "the job binding {binding_id} declares no `limits.cost_budget_usd` and this run \
+             declares none; an internal-agent run must declare its spend ceiling before it may \
+             start"
+        ),
+    ))
+}
+
 /// Invoke one action.
 /// What [`precheck`] resolves: the spec, the input with `_version` folded out, and the
 /// precondition the call will use.
@@ -771,8 +906,10 @@ pub struct Prechecked<'a> {
 /// invalid input or a forbidden caller therefore fails the SUBMIT with the status the
 /// synchronous call would have returned — the work is never queued and the caller never has to
 /// poll to learn that its request was bad.
-pub fn precheck<'a>(
+pub async fn precheck<'a>(
+    pool: &PgPool,
     registry: &'a Registry,
+    tenant: TenantId,
     request: &InvokeRequest,
 ) -> Result<Prechecked<'a>, ActionError> {
     let Some(spec) = registry.get(&request.action) else {
@@ -798,6 +935,18 @@ pub fn precheck<'a>(
     }
     if spec.kind == ActionKind::Workflow {
         return Err(ActionError::workflow(spec.name));
+    }
+
+    // #526: the run-level inference pre-call gate. A capturing action buys a billable model call,
+    // so the run it belongs to must admit it before the handler or the destination is reached.
+    // It runs before the input is parsed (the broker's order: budget, then validate) and before
+    // the broker dispatch, so neither a refused call nor a tool that would reach one is charged.
+    // `precheck` owns it because both callers — the sync invoke and the async submit — must refuse
+    // a spend before any work starts.
+    if spec.captures_usage
+        && let Some(run_id) = request.usage.as_ref().and_then(|usage| usage.run_id)
+    {
+        enforce_run_budget(pool, registry, tenant, run_id).await?;
     }
 
     // The reserved `_version` member is stripped BEFORE validation (CONTRACT §6); the
@@ -829,6 +978,23 @@ pub fn precheck<'a>(
     if !field_errors.is_empty() {
         return Err(ActionError::invalid_input(field_errors));
     }
+
+    // v1-p6-5: `internal_coach` is the engine's own marker — "this move is made while an
+    // interruption that already exists is being handled" — and it suppresses the §6.2 flow
+    // observation. A caller may never name it: `Authority::Internal` is constructed only by
+    // engine code (`Authority::of` yields Role/Channel for every transport), and the coach's own
+    // move calls the handler directly. The member is absent from the served schema.
+    if spec.name == "cards.move"
+        && !matches!(request.authority, Authority::Internal)
+        && input.get("internal_coach").is_some()
+    {
+        return Err(ActionError::new(
+            422,
+            "engine_only_input",
+            "internal_coach is the engine's marker for a move made while handling an existing \
+             interruption; a caller cannot name it",
+        ));
+    }
     Ok(Prechecked {
         spec,
         input,
@@ -846,7 +1012,7 @@ pub async fn invoke(
         spec,
         input,
         precondition,
-    } = precheck(registry, &request)?;
+    } = precheck(pool, registry, tenant, &request).await?;
 
     let input_hash = idempotency::request_hash(&input);
     let (version, if_match) = match precondition {
@@ -870,6 +1036,7 @@ pub async fn invoke(
         action: spec.name,
         app_key: request.app_key.clone(),
         approval_id: request.approval_id,
+        usage: request.usage.clone(),
     };
 
     // T13 (SPEC_V2 §11.3): the tool broker is dispatched here, on the pool, because it must
@@ -1243,9 +1410,13 @@ async fn invoke_external(
     let url = format!("{}{}", base.trim_end_matches('/'), path);
 
     // A per-tenant credential is opened under the caller's tenant, never compiled in and never
-    // read from the environment. A missing secret is a typed 503 (the caller treats an
-    // unreachable/unconfigured judge as an outage, never as a decision).
-    let bearer: Option<String> = match auth {
+    // read from the environment. The broker's binding alias wins over the action's own
+    // configured name: the alias is the credential the grant resolved, so the destination sees
+    // the binding's credential, not the tool's tenant-wide default. Without an alias, the
+    // spec's `auth` name is read exactly as before. A missing secret is a typed 503 (the caller
+    // treats an unreachable/unconfigured judge as an outage, never as a decision).
+    let secret_name = request.credential_alias.as_deref().or(auth);
+    let bearer: Option<String> = match secret_name {
         None => None,
         Some(name) => {
             let mut tx = store::begin_scoped(pool, ctx.tenant)
@@ -1257,7 +1428,12 @@ async fn invoke_external(
                 Ok(bytes) => bearer_from_secret(bytes),
                 Err(store::secret::SecretError::NotFound) => None,
                 Err(error) => {
-                    tracing::warn!(%error, action = spec.name, "open the action's secret");
+                    tracing::warn!(
+                        %error,
+                        action = spec.name,
+                        secret = name,
+                        "open the action's credential"
+                    );
                     None
                 }
             };

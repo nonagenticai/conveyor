@@ -1,0 +1,222 @@
+{
+ "schema": "conveyor-batch-findings/v1",
+ "batch": "tranche-2",
+ "tranche": 2,
+ "tranche_id": "01a1e9e0-e2ac-786b-ac48-3b8bcdf12188",
+ "audited_sha": "7fa223b627583f1a9fd5f540c0aa1d7c2d14fed6",
+ "generated_at": "2026-11-21T22:49:58+00:00",
+ "method": "Two fresh auditors read each project's plan against the tree at HEAD; every evidence quote is the raw line at the cited path and was re-verified byte-for-byte by the parent before this file was written.",
+ "admitted": [
+  {
+   "id": "v1-t2-1",
+   "area": "\u00a77.1/\u00a77.4",
+   "standard": "SPEC",
+   "spec": "\u00a77.1/\u00a77.4",
+   "severity": "P0",
+   "title": "A generated draft is attached to a card by documents.compose without any gate",
+   "problem": "\u00a77.4 says a generation result is an inference_call bound to a draft artefact that becomes applicable only through an action with a gate, and \u00a712 T2's gate says a generated draft cannot transition a card. documents.update refuses to attach a document whose caller-supplied meta.generated is true, but documents.compose accepts card_id and writes it to the document at creation without consulting meta.generated. Any principal with documents:write can compose a model's output directly onto the card in one call; ladder.apply_draft never runs. The generated marker is free-form caller metadata and no document field binds an inference_call, prompt_ref, prompt_sha256, model_ref, usage or cost (\u00a77.4's artefact contract), so nothing can identify a generated draft once the caller omits the flag.",
+   "evidence": [
+    {
+     "path": "crates/actions/src/documents/actions.rs",
+     "line": 516,
+     "quote": "    pub card_id: Option<Uuid>,"
+    },
+    {
+     "path": "crates/actions/src/documents/actions.rs",
+     "line": 631,
+     "quote": "            card_id: input.card_id,"
+    },
+    {
+     "path": "crates/actions/src/documents/actions.rs",
+     "line": 967,
+     "quote": "        && current.meta.get(\"generated\").and_then(Value::as_bool) == Some(true)"
+    }
+   ],
+   "failure_scenario": "An agent with documents:write composes the model's patch as a document with card_id set (with meta.generated=true, or with no flag at all). The draft is attached to the card immediately and no draft.apply decision or approval is consulted. The documents.update guard is never reached, so a_generated_draft_cannot_transition_a_card only proves a path the production caller need not use.",
+   "acceptance": "documents.compose refuses a card_id on a generated draft and the generated class is derived from a bound inference_call, not caller meta; ladder.apply_draft remains the only attach path; tests prove compose with card_id cannot attach a generated draft and that a model draft without the meta flag is still recognised.",
+   "owner_project": "T2"
+  },
+  {
+   "id": "v1-t2-3",
+   "area": "\u00a77.2",
+   "standard": "SPEC",
+   "spec": "\u00a77.2",
+   "severity": "P1",
+   "title": "Publishing a refinement is not a gated policy change",
+   "problem": "\u00a77.2: \"Refinements are versioned; changing one is a gated policy change.\" refinements.publish is declared kind=internal with only the governance:write scope, confirm=none and no approval: a tenant principal publishes a threshold override directly (the acceptance test does exactly that and gets 200). A refinement can move a 0.8 threshold to 0.0 and thereby flip every later decision, with no person's approval recorded.",
+   "evidence": [
+    {
+     "path": "crates/actions/src/ladder/mod.rs",
+     "line": 437,
+     "quote": "    kind = \"internal\","
+    },
+    {
+     "path": "crates/actions/src/ladder/mod.rs",
+     "line": 438,
+     "quote": "    scopes = [\"governance:write\"],"
+    },
+    {
+     "path": "crates/actions/src/ladder/mod.rs",
+     "line": 442,
+     "quote": "    confirm = \"none\","
+    }
+   ],
+   "failure_scenario": "A service principal holding governance:write calls refinements.publish with threshold_override=0.0. The next ladder.evaluate on a 0.01-confidence answer is accepted, and no approval row or human decision exists to explain the threshold change; the decision rows pin refinement_version=2 as if the change had been governed.",
+   "acceptance": "refinements.publish routes through the tenant's approval policy (a human gate) before the new version is visible to evaluation; a test proves publishing without the configured approval is refused and no evaluation uses the unapproved refinement.",
+   "owner_project": "T2"
+  },
+  {
+   "id": "v1-t2-5",
+   "area": "\u00a77.5",
+   "standard": "SPEC",
+   "spec": "\u00a77.5",
+   "severity": "P2",
+   "title": "The budget refusal code is tool_budget_exceeded, not the spec's budget_exceeded",
+   "problem": "\u00a77.5 names the refusal `429 budget_exceeded`; every budget refusal in the tree is `429 tool_budget_exceeded` (the run-level inference pre-call gate in enforce_run_budget and the broker). The mechanism exists \u2014 a missing or exhausted cost_budget_usd is refused before dispatch \u2014 but a client or test matching the spec's code will not see it.",
+   "evidence": [
+    {
+     "path": "crates/actions/src/invoke.rs",
+     "line": 761,
+     "quote": "    ActionError::new(429, \"tool_budget_exceeded\", detail)"
+    },
+    {
+     "path": "docs/SPEC_V2.md",
+     "line": 714,
+     "quote": "  (`429 budget_exceeded`) before the next call, not a silent truncation."
+    }
+   ],
+   "failure_scenario": "A caller implements the \u00a77.5 contract and handles 429 budget_exceeded; every real budget refusal arrives as tool_budget_exceeded, so the client either treats it as an unknown tool error or retries a call that will never be dispatched.",
+   "acceptance": "The budget refusal carries the spec's `budget_exceeded` code (or \u00a77.5 is amended to the shipped spelling) and a test asserts the exact code.",
+   "owner_project": "T2"
+  },
+  {
+   "id": "v1-t2-6",
+   "area": "\u00a77.1/\u00a75.4",
+   "standard": "SPEC",
+   "spec": "\u00a77.1/\u00a75.4",
+   "severity": "P1",
+   "title": "A human L3 decision cites any approved approval, not the gate that posed its question",
+   "problem": "The v1-w1c-2 fix is real for draft application: a human decision must be recorded by actor_kind=user against an approved approval with a human approve decision, and ladder.apply_draft additionally requires kind=draft.apply and the approval's gate to be draft.apply on the same card. Outside that path the human rung is bound to a card only: ladder_record passes gate=None and human_approved_gate_tx checks the card only when card_id is Some. A person can record a human decision of kind X citing an approved approval for gate Y on the same card, or any approved approval in the tenant when the decision names no card. v1-w1c-2's acceptance required the approval to be bound to this decision.",
+   "evidence": [
+    {
+     "path": "crates/actions/src/ladder/mod.rs",
+     "line": 999,
+     "quote": "            human_approved_gate_tx(&mut *tx, ctx.tenant, approval_id, None, input.card_id).await?;"
+    },
+    {
+     "path": "crates/actions/src/ladder/mod.rs",
+     "line": 936,
+     "quote": "    if card_id.is_some() && approval.card_id != card_id {"
+    }
+   ],
+   "failure_scenario": "A card carries an approved publish gate. A person records a human decision kind=gate.precheck outcome=accepted citing that publish approval. The row is a valid L3 decision for a gate nobody approved; any later consumer that trusts an accepted human decision of that kind proceeds. With no card_id on the record, the same person can cite any approved approval in the tenant.",
+   "acceptance": "ladder.record requires the cited approval's gate to match the decision's gate/kind (and a project when no card is named) and refuses otherwise; a test proves an approval for another gate cannot back a human decision.",
+   "owner_project": "T2"
+  },
+  {
+   "id": "v1-s03-1",
+   "area": "S03 domain and schema",
+   "standard": "SPEC",
+   "spec": "\u00a76",
+   "severity": "P1",
+   "title": "Property (b) states claim exclusivity, but the code permits repeat claims and the race test never exercises the lease arm",
+   "problem": "The gate says a claim never succeeds twice without release or expiry, while its own proof column expects sequential claims to succeed. `claim_card_tx` deliberately lets the current assignee re-claim an unexpired lease (`OR assignee_id = $3`), and the four sequential renewals in `claim_race` prove that path. All 32 concurrent racers use the same `seed.user` and the same `Version::INITIAL`, so the one-winner assertion is decided by the version predicate; the test would still pass if the lease-exclusivity arm were deleted. No test shows a live lease blocking a different claimant.",
+   "evidence": [
+    {
+     "path": "docs/plans/slices/S03-domain-schema.md",
+     "line": 151,
+     "quote": "| b | a claim never succeeds twice without release or expiry | 32 concurrent tasks on one card: exactly one `Some`; sequential claims strictly increase `claim_fence`; a stale-fence completion writes nothing |"
+    },
+    {
+     "path": "crates/store/src/card.rs",
+     "line": 255,
+     "quote": "            AND (lease_expires_at IS NULL OR lease_expires_at < now() OR assignee_id = $3)"
+    },
+    {
+     "path": "crates/store/tests/claim_race.rs",
+     "line": 28,
+     "quote": "        let who = seed.user;"
+    }
+   ],
+   "failure_scenario": "The lease-exclusivity arm can be removed from `claim_card_tx` and every S03 gate test still passes; property (b) is recorded as proven while only the stale-version guard is exercised.",
+   "acceptance": "Add a race of 32 distinct app_users against one live lease and assert exactly one grant, or remove the same-assignee arm from `claim_card_tx`; restate property (b) to match the implemented renewal semantics.",
+   "owner_project": "S03"
+  },
+  {
+   "id": "v1-s03-2",
+   "area": "S03 domain and schema",
+   "standard": "SPEC",
+   "spec": "\u00a76",
+   "severity": "P2",
+   "title": "The archive-exclusion claim says every hot index filters archived cards; two card indexes do not",
+   "problem": "The plan and `crates/domain/src/board.rs`'s module doc state that `archived_at` excludes a card from every hot index. In `0002_domain.sql` the two board-scan indexes do carry `WHERE archived_at IS NULL`, but `card_assignee_lease_idx` indexes rows by `assignee_id` and `card_tsv_idx` is a plain `gin(tsv)`; both include stamped cards. Later migrations add `card_name_trgm_idx` and `card_wbs_node_idx` without the predicate. The board-scan half is true; the absolute claim and the 'reachable only from the restore screen' inference are not proven by the schema.",
+   "evidence": [
+    {
+     "path": "docs/plans/slices/S03-domain-schema.md",
+     "line": 105,
+     "quote": "`archived_at` and `list.kind='archive'` are two depths. The **kind** is a place: a positionable lane the card can be dragged out of \u2014 the UI's archive drop target writes `list_id`, a `may_move` transition. The **stamp** is exclusion: every hot index is `WHERE archived_at IS NULL`, so a stamped card leaves the board scan and is reachable only from the restore screen. Invariant, proptested: `archived_at IS NOT NULL \u21d2 list.kind='archive'`. The UI archives by list kind; only the sweep stamps."
+    },
+    {
+     "path": "migrations/0002_domain.sql",
+     "line": 160,
+     "quote": "    ON card (tenant_id, assignee_id, lease_expires_at) WHERE assignee_id IS NOT NULL;"
+    },
+    {
+     "path": "migrations/0002_domain.sql",
+     "line": 161,
+     "quote": "CREATE INDEX card_tsv_idx ON card USING gin (tsv);"
+    }
+   ],
+   "failure_scenario": "A later slice trusts 'every hot index' and assumes archived cards cannot be reached through lease or search scans; the schema never enforced that, and no test asserts it.",
+   "acceptance": "Restate the claim to name the two board-scan indexes that filter archived rows and list which other indexes include them deliberately (lease sweep, search); add `archived_at IS NULL` only where exclusion is actually intended.",
+   "owner_project": "S03"
+  },
+  {
+   "id": "v1-tr2-1",
+   "area": "\u00a78.3 MSP / T1 plan spine",
+   "standard": "SPEC",
+   "spec": "\u00a78.3",
+   "severity": "P1",
+   "title": "A paused tranche is a one-way door that freezes every project in it",
+   "problem": "`tranches.review` maps `pause` to state `paused` and a tranche can be reviewed only once. `projects.close` requires the project's tranche to be `authorised`, `in_review` or `closed`, so a paused tranche's projects can never close; the only remaining tranche actions are `tranches.update` (plan fields only), `tranches.retire` and `tranches.delete`, none of which resumes it. This was found by using the product: tranche 2 was paused on evidence with two projects open, and the close of S03 \u2014 whose Phase-G review is compliant and whose record is complete \u2014 was then refused `409 tranche_not_authorised`.",
+   "evidence": [
+    {
+     "path": "crates/store/src/spine.rs",
+     "line": 1204,
+     "quote": "        \"pause\" => \"paused\","
+    },
+    {
+     "path": "crates/store/src/spine.rs",
+     "line": 3718,
+     "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
+    },
+    {
+     "path": "crates/actions/src/programme.rs",
+     "line": 291,
+     "quote": "    conveyor_store::spine::assert_project_tranche_authorised_tx(&mut *tx, tenant, project_id)"
+    }
+   ],
+   "failure_scenario": "A tranche review that honestly records `pause` \u2014 the MSP answer when the exit criteria are not met \u2014 permanently prevents the very projects that could still meet them from closing. The programme has no way to resume short of deleting or retiring the tranche, so an honest pause converts a recoverable slip into a dead end.",
+   "acceptance": "Add a resume path (`tranches.resume` with an approving decision, or allow `tranches.review` to record a second dated review) and let a project close while its tranche is paused, with the closure recorded as in-flight work; a test proves a paused tranche can be resumed and that a compliant project can close in it.",
+   "owner_project": "T1",
+   "found_by": "use, during the tranche-2 rework (2026-11-21)"
+  }
+ ],
+ "dropped_duplicates": [
+  {
+   "id": "v1-t2-2",
+   "of": "duplicate of v1-w1c-3 (L1 never calls laya); its gate_unavailable half is v1-w1c-5"
+  },
+  {
+   "id": "v1-t2-4",
+   "of": "duplicate of v1-w1c-4 (options inline, answer unchecked)"
+  }
+ ],
+ "discovery": [
+  {
+   "id": "v1-tr2-1",
+   "how": "found by running the tranche-2 lifecycle, not by reading the code",
+   "at": "2026-11-21T23:32:31+00:00"
+  }
+ ]
+}

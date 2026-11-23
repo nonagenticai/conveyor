@@ -30,6 +30,9 @@ build() {
     --findings docs/evidence/v1-conformance-findings.json \
     --findings "$run/standards-pass1.json" \
     --rework-out "$run/rework.json" >/dev/null
+  # The public register must not carry a private address; redact at the one point every consumer
+  # reads, exactly as publish-standards.sh does.
+  python3 scripts/redact-public-register.py "$run/rework.json"
   python3 scripts/generate-standards.py \
     --snapshot docs/design/data --outputs-dir docs/design/docs \
     --gaps "$run/audit/conformance-gap-register.json" \

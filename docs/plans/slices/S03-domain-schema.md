@@ -148,7 +148,7 @@ test "$(grep -c 'FORCE ROW LEVEL SECURITY' migrations/0002_domain.sql)" = 14   #
 | # | property | proof |
 |---|---|---|
 | a | no transition leaves `list.kind` and `archived_at` contradictory | proptest over random card/list/kind sequences: `archived_at.is_some() ⇒ from_kind == Archive`; `restore` off a non-archive list is `Err` |
-| b | a claim never succeeds twice without release or expiry | 32 concurrent tasks on one card: exactly one `Some`; sequential claims strictly increase `claim_fence`; a stale-fence completion writes nothing |
+| b | one live claim per card; a distinct user cannot claim a leased card; the holder renews with the fence | 32 distinct users race one card: exactly one `Some`, 31 `None`; the holder's same-assignee re-claim and fence renew succeed while a stranger at the current version is refused; sequential renewals strictly increase `claim_fence`; a stale-fence completion writes nothing |
 | c | one pending approval per (run, gate) | 16 concurrent inserts: one `Ok`, fifteen `ApprovalConflict`, pending count 1 |
 | d | truncate/archive invariants | a terminal `run` rejects every transition; `revision` seq dense from 1; `is_prunable("model")` true past 50, false for `"requirement"` at any depth |
 

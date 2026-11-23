@@ -64,6 +64,34 @@ async fn approvals_decide(
     input: ApprovalDecideIn,
 ) -> Result<ApprovalOut, ActionError> {
     let kind = parse_decision(&input.decision)?;
+    // A delegation names a PUBLISHED decision document in this tenant. It is validated here, so
+    // a decision can never cite a delegation that does not exist, is unpublished, or is not a
+    // decision. The caller does not thereby become a human: the decision is recorded as a rule
+    // acting under that document, and a gate that requires a person accepts it only by name.
+    let delegation = match input.delegation_ref {
+        Some(reference) => {
+            let found: Option<i32> = sqlx::query_scalar(
+                "SELECT 1 FROM document
+                  WHERE tenant_id = $1 AND id = $2
+                    AND status = 'active' AND published_at IS NOT NULL
+                    AND category = 'decision'",
+            )
+            .bind(ctx.tenant.as_uuid())
+            .bind(reference)
+            .fetch_optional(&mut *tx)
+            .await
+            .map_err(|_| ActionError::internal())?;
+            if found.is_none() {
+                return Err(invalid(
+                    "delegation_ref",
+                    "invalid_value",
+                    "the delegation must name a published decision document in this tenant",
+                ));
+            }
+            Some(reference)
+        }
+        None => None,
+    };
     // The transport is DERIVED from the authenticated authority, never from the input
     // (S06 decision 8, extended by S06d). `ctx.channel` is `Some` only for a machine connector;
     // a human session records `web`, and the engine records `internal`. The sender reference is
@@ -80,11 +108,21 @@ async fn approvals_decide(
             "channel": if ctx.actor_kind == "user" { "web" } else { "internal" }
         }),
     };
+    let mut via = via;
+    if let Some(reference) = delegation {
+        via["delegation_ref"] = serde_json::Value::String(reference.to_string());
+    }
+    let decided_by_kind = if delegation.is_some() {
+        // Delegated, not human: the audit says a rule acted under a named owner decision.
+        DeciderKind::Rule
+    } else {
+        decider_kind(&ctx.actor_kind)
+    };
     let decision = Decision {
         approver_id: ctx.actor_id,
         kind,
         note: input.note.unwrap_or_default(),
-        decided_by_kind: decider_kind(&ctx.actor_kind),
+        decided_by_kind,
         via: Some(via),
         item_decisions: input.item_decisions,
     };
@@ -224,7 +262,10 @@ async fn approvals_decide(
                             card_id: approval.card_id,
                             question: "Apply the generated draft?".to_owned(),
                             answer: "approved".to_owned(),
+                            option_set_id: None,
                             option_set_version: None,
+                            option_set_hash: None,
+                            option_refinement_hashes: Vec::new(),
                             probabilities: serde_json::json!({}),
                             confidence: None,
                             input_hash: None,
@@ -234,6 +275,9 @@ async fn approvals_decide(
                             refinement_version: None,
                             laya_config_id: None,
                             laya_config_version: None,
+                            laya_invocation_id: None,
+                            laya_request_hash: None,
+                            laya_response_hash: None,
                             actor_kind: ctx.actor_kind.clone(),
                             actor_id: Some(ctx.actor_id),
                             approval_id: Some(approval.id),
@@ -479,20 +523,50 @@ async fn approvals_request(
     if let Some(allowed) = input.allowed_decisions {
         meta.insert("allowed_decisions".to_owned(), allowed);
     }
+    if input.requires_answer == Some(true) {
+        meta.insert("requires_answer".to_owned(), Value::Bool(true));
+    }
     if let Some(proposed) = input.proposed_input {
         meta.insert("proposed_input".to_owned(), proposed);
     }
     // T3: a gate resolves its typed evidence before it is opened, so an absent, draft,
     // superseded or non-typed reference never becomes a pending gate.
+    //
+    // §5.4: a gate for a destructive action always names evidence. The action spec is
+    // authoritative — `Effect::Destructive` makes evidence mandatory whether or not the tenant
+    // has stored a policy row for it — and `require_evidence` can add the requirement, never
+    // remove it.
+    let destructive = crate::registry::registry()
+        .get(gate)
+        .is_some_and(|spec| spec.effect == crate::spec::Effect::Destructive);
+    let require = input.require_evidence || destructive;
+    // The one override is an explicit reason, never a flag: a non-empty reason opens an
+    // evidence-less gate and is stored on the row (`meta.evidence_waiver`) where the governance
+    // audit reads it. An empty or whitespace-only reason is not a waiver. A reason supplied
+    // alongside real evidence is ignored — there is nothing to waive.
+    let waiver = input
+        .evidence_waiver_reason
+        .as_deref()
+        .map(str::trim)
+        .filter(|reason| !reason.is_empty());
     let evidence = crate::pm::resolve_evidence(
         &mut *tx,
         ctx.tenant,
         &input.evidence,
-        input.require_evidence,
+        require && !(input.evidence.is_empty() && waiver.is_some()),
     )
     .await?;
     if !evidence.is_empty() {
         meta.insert("evidence".to_owned(), Value::Array(evidence));
+    }
+    if require
+        && input.evidence.is_empty()
+        && let Some(reason) = waiver
+    {
+        meta.insert(
+            "evidence_waiver".to_owned(),
+            Value::String(reason.to_owned()),
+        );
     }
 
     let new = store::approval::NewApproval {
@@ -906,6 +980,13 @@ pub fn approval_out(record: &store::approval::ApprovalRecord) -> ApprovalOut {
             .get("proposed_answer")
             .and_then(Value::as_str)
             .map(str::to_owned),
+        // The store's writer reads `meta->>'requires_answer' = 'true'` (text), so the projection
+        // accepts the string form too: a screen and the writer must never disagree about whether
+        // the gate needs an answer, or the screen invites a decision the writer refuses.
+        requires_answer: record
+            .meta
+            .get("requires_answer")
+            .is_some_and(|value| value.as_bool() == Some(true) || value.as_str() == Some("true")),
         allowed_decisions: record.meta.get("allowed_decisions").cloned(),
         proposed_input: record.meta.get("proposed_input").cloned(),
         requested_by: record.requested_by.map(|id| id.to_string()),

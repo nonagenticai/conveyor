@@ -1,12 +1,14 @@
 #![forbid(unsafe_code)]
 //! T3 — the PM job (SPEC_V2 §6.1, §5.4, §8.4; issue #74).
 //!
-//! The PM is a job, not a code path: every action here names the caller's `job_binding_id` and
-//! refuses unless that binding resolves to an active `job_catalogue(job_key='pm')` job. The
-//! PM creates the project, writes its charter, plans the WBS, takes the baseline, routes the
-//! gates with typed evidence, requests a baseline change, and closes the project after the
-//! closure gate — never approving any of those gates itself (the store's single decision
-//! writer already refuses a requester's decision, T1/#72).
+//! The PM is a job, not a code path: the PM's own actions name the caller's `job_binding_id` and
+//! refuse unless that binding resolves to an active `job_catalogue(job_key='pm')` job. The one
+//! exception is `changes.request`: a tenant with no PM process satisfies the WBS change guard
+//! through the project's approved scope baseline instead (v1-change-1). The PM creates the
+//! project, writes its charter, plans the WBS, takes the baseline, routes the gates with typed
+//! evidence, requests a baseline change, and closes the project after the closure gate — never
+//! approving any of those gates itself (the store's single decision writer already refuses a
+//! requester's decision, T1/#72).
 //!
 //! Reused, not rebuilt: the approval primitive, the WBS/baseline/register rows (T1, 0044), the
 //! governed-asset lifecycle (S07), the project/board/start-card creation (S13), and the trace
@@ -26,7 +28,7 @@ use sqlx::PgConnection;
 use uuid::Uuid;
 
 use crate::board::projects::{insert_board_from_template, insert_start_card_and_run};
-use crate::control::store_error;
+use crate::control::{invalid, store_error};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
@@ -597,12 +599,18 @@ pub struct PmGateIn {
     /// How many distinct approvals resolve it; defaults to one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub required_decisions: Option<u16>,
-    /// The typed evidence the gate resolves against.
+    /// The typed evidence the gate resolves against. §5.4: a gate with no evidence is refused
+    /// (`422 gate_evidence_missing`); the only opt-out is [`Self::evidence_waiver`].
     #[serde(default)]
     pub evidence: Vec<EvidenceRef>,
-    /// Refuse an empty evidence list when true.
-    #[serde(default)]
-    pub require_evidence: bool,
+    /// Why this gate carries no evidence — the explicit §5.4 override.
+    ///
+    /// A gate is required to name the artefact or run it judges. There is no boolean that turns
+    /// that off: the one override is this non-empty reason, which is stored on the approval
+    /// (`meta.evidence_waiver`) so the override is a row the governance audit reads, not a
+    /// caller's unrecorded flag.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evidence_waiver: Option<String>,
     /// What is being asked.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -651,7 +659,7 @@ async fn pm_route_gate(
     // T9 (SPEC_V2 §8.1, D63): a delivery project cannot pass its design gate without the live
     // architecture contract that governs it. The refusal writes no approval row.
     if gate == "design" {
-        store::architecture::assert_design_contract_tx(&mut *tx, ctx.tenant, input.project_id)
+        store::architecture::assert_phase_g_tx(&mut *tx, ctx.tenant, input.project_id)
             .await
             .map_err(|error| match error {
                 store::architecture::ArchitectureStoreError::Database(error) => {
@@ -664,6 +672,22 @@ async fn pm_route_gate(
                     "architecture_contract_not_live",
                     format!("the delivery project's architecture contract is not live: {status}"),
                 ),
+                store::architecture::ArchitectureStoreError::Illegal(
+                    store::architecture::ArchitectureRule::ReviewMissing,
+                ) => ActionError::new(
+                    409,
+                    "architecture_review_missing",
+                    "the delivery project's live delivery contract has no Phase-G compliance review",
+                ),
+                store::architecture::ArchitectureStoreError::Illegal(
+                    store::architecture::ArchitectureRule::ReviewNonConformant(level),
+                ) => ActionError::new(
+                    409,
+                    "architecture_review_non_conformant",
+                    format!(
+                        "the Phase-G compliance review is {level}; an active waiver is required"
+                    ),
+                ),
                 _ => ActionError::new(
                     409,
                     "architecture_contract_missing",
@@ -671,13 +695,29 @@ async fn pm_route_gate(
                 ),
             })?;
     }
-    let evidence = resolve_evidence(
-        &mut *tx,
-        ctx.tenant,
-        &input.evidence,
-        input.require_evidence,
-    )
-    .await?;
+    // SPEC_V2 §5.4: a gate with no evidence is refused. The rule is not a caller's flag — the
+    // request carries evidence or a recorded waiver reason, and nothing else opens the gate.
+    let waiver = input
+        .evidence_waiver
+        .as_deref()
+        .map(str::trim)
+        .filter(|reason| !reason.is_empty());
+    if input.evidence.is_empty() && waiver.is_none() {
+        return Err(ActionError::new(
+            422,
+            "gate_evidence_missing",
+            "a gate needs at least one typed evidence reference; pass `evidence`, or record an \
+             explicit `evidence_waiver` reason (the waiver is stored on the approval)",
+        ));
+    }
+    let evidence = resolve_evidence(&mut *tx, ctx.tenant, &input.evidence, false).await?;
+    let mut meta = serde_json::Map::new();
+    meta.insert("description".to_owned(), json!(input.description));
+    meta.insert("evidence".to_owned(), Value::Array(evidence));
+    if let Some(reason) = waiver {
+        // The override is recorded where the governance audit reads it (§5.4).
+        meta.insert("evidence_waiver".to_owned(), json!(reason));
+    }
     let approval_id = open_gate(
         &mut *tx,
         &ctx,
@@ -685,10 +725,7 @@ async fn pm_route_gate(
         gate,
         kind,
         required,
-        json!({
-            "description": input.description,
-            "evidence": evidence,
-        }),
+        Value::Object(meta),
     )
     .await?;
     Ok(HandlerOutput::created(PmGateOut { approval_id }))
@@ -812,6 +849,23 @@ async fn pm_close(
             "only an open project can be closed",
         ));
     };
+    // The row is not the whole close: a consumer subscribed to the project aggregate must see
+    // it, so the event is appended in the same transaction as the status change (v1-project-1).
+    let event = store::NewEvent {
+        topic: format!("project:{}", project.id),
+        event_type: "project.updated".to_owned(),
+        aggregate_type: "project".to_owned(),
+        aggregate_id: project.id,
+        payload: json!({"id": project.id, "changed": ["status"]}),
+        correlation_id: None,
+        causation_id: None,
+    };
+    store::outbox::append(&mut *tx, ctx.tenant, &event)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "pm.close: append project event");
+            ActionError::internal()
+        })?;
     Ok(HandlerOutput::created(PmCloseOut {
         project_id: closed.id,
         status: closed.status,
@@ -934,19 +988,24 @@ async fn pm_get(
 /// `changes.request` — the only path that advances an approved baseline.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ChangeRequestIn {
-    /// The PM's active job binding.
-    pub job_binding_id: Uuid,
+    /// The PM's active job binding — the process route. Omit it to authorise the change by the
+    /// project's approved scope baseline in `baseline_id`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_binding_id: Option<Uuid>,
     /// The project.
     pub project_id: Uuid,
-    /// The approved baseline the change would replace.
-    pub baseline_id: Uuid,
+    /// The approved baseline the change would replace. Required on the direct route (no
+    /// `job_binding_id`), where it must be the project's current approved scope baseline.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub baseline_id: Option<Uuid>,
     /// The change's title.
     pub title: String,
     /// The change's body.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub body: Option<String>,
-    /// The impact block (required by the register's CHECK).
-    pub impact: i64,
+    /// The scope/schedule/cost/risk impact block (SPEC_V2 §5.5): an object carrying at least
+    /// one of `scope`, `schedule`, `cost` or `risk`. It is stored in the change's `meta`.
+    pub impact: Value,
 }
 
 /// `changes.request`'s result.
@@ -974,16 +1033,43 @@ async fn changes_request(
     ctx: HandlerCtx,
     input: ChangeRequestIn,
 ) -> Result<HandlerOutput<ChangeRequestOut>, ActionError> {
-    assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
-    let impact = i32::try_from(input.impact)
-        .map_err(|_| ActionError::new(422, "invalid_value", "impact must fit a 32-bit integer"))?;
+    // Two authorities: a PM process run's active binding, or — for a tenant that has no PM
+    // process — the project's current approved scope baseline itself (v1-change-1). The direct
+    // route validates exactly what the WBS change guard resolves, so the change it opens can
+    // authorise a post-baseline mutation.
+    let baseline_id = match (input.job_binding_id, input.baseline_id) {
+        (None, None) => {
+            return Err(invalid(
+                "job_binding_id",
+                "change_authority_missing",
+                "a change needs the PM job's active `job_binding_id` or the project's approved \
+                 scope baseline in `baseline_id`",
+            ));
+        }
+        (Some(binding_id), Some(baseline_id)) => {
+            assert_pm(&mut *tx, ctx.tenant, binding_id).await?;
+            baseline_id
+        }
+        (Some(binding_id), None) => {
+            assert_pm(&mut *tx, ctx.tenant, binding_id).await?;
+            return Err(invalid(
+                "baseline_id",
+                "baseline_required",
+                "the process route names the approved baseline the change would replace",
+            ));
+        }
+        (None, Some(baseline_id)) => {
+            assert_direct_change_baseline(&mut *tx, &ctx, input.project_id, baseline_id).await?;
+            baseline_id
+        }
+    };
     // The change gate resolves the approved baseline it would replace before it is opened.
     let evidence = resolve_evidence(
         &mut *tx,
         ctx.tenant,
         &[EvidenceRef {
             kind: "baseline".to_owned(),
-            id: input.baseline_id,
+            id: baseline_id,
         }],
         true,
     )
@@ -992,7 +1078,8 @@ async fn changes_request(
         &mut *tx,
         ctx.tenant,
         &NewRegisterItem {
-            project_id: input.project_id,
+            project_id: Some(input.project_id),
+            programme_id: None,
             kind: "change".to_owned(),
             code: String::new(),
             title: input.title,
@@ -1001,9 +1088,13 @@ async fn changes_request(
             status: "open".to_owned(),
             severity: None,
             probability: None,
-            impact: Some(impact),
+            impact: None,
             links: Value::Array(Vec::new()),
-            baseline_ref: Some(input.baseline_id),
+            baseline_ref: Some(baseline_id),
+            review_at: None,
+            response: None,
+            // The store validates the block (at least one of the four impact keys) in
+            // `insert_register_tx`; the numeric `impact` column stays empty for a change.
             meta: json!({ "impact": input.impact }),
         },
     )
@@ -1030,6 +1121,71 @@ async fn changes_request(
         change_id: change.id,
         approval_id,
     }))
+}
+
+/// The direct route's authority: `baseline_id` must be the project's current approved scope
+/// baseline. That is the baseline `wbs_change_guard` resolves, so a change opened against it is
+/// one the guard can accept; an older approved baseline, another project's row or an unapproved
+/// row would open a change that authorises nothing.
+async fn assert_direct_change_baseline(
+    conn: &mut PgConnection,
+    ctx: &HandlerCtx,
+    project_id: Uuid,
+    baseline_id: Uuid,
+) -> Result<(), ActionError> {
+    let baseline = store::spine::get_baseline_tx(&mut *conn, ctx.tenant, baseline_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "changes.request: read baseline");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            invalid(
+                "baseline_id",
+                "not_found",
+                format!("no baseline {baseline_id} in this tenant"),
+            )
+        })?;
+    if baseline.project_id != project_id {
+        return Err(invalid(
+            "baseline_id",
+            "baseline_project_mismatch",
+            format!("baseline {baseline_id} belongs to another project"),
+        ));
+    }
+    if baseline.kind != "scope" {
+        return Err(invalid(
+            "baseline_id",
+            "baseline_not_scope",
+            format!(
+                "baseline {baseline_id} is a {} baseline; the direct route needs the scope \
+                 baseline",
+                baseline.kind
+            ),
+        ));
+    }
+    if baseline.approved_by.is_none() {
+        return Err(invalid(
+            "baseline_id",
+            "baseline_not_approved",
+            format!("baseline {baseline_id} is not approved"),
+        ));
+    }
+    let current =
+        store::spine::latest_approved_baseline_tx(&mut *conn, ctx.tenant, project_id, "scope")
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "changes.request: read the current scope baseline");
+                ActionError::internal()
+            })?;
+    if current.as_ref().map(|row| row.id) != Some(baseline_id) {
+        return Err(invalid(
+            "baseline_id",
+            "baseline_not_current",
+            format!("baseline {baseline_id} is not the project's current approved scope baseline"),
+        ));
+    }
+    Ok(())
 }
 
 /// Move a governed asset to `approved` through its legal lifecycle.

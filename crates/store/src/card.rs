@@ -790,6 +790,36 @@ pub async fn bump_card_version_tx(
     }
 }
 
+/// The live rework cards that charge an open P0 package to `owner_project`.
+///
+/// `materialise-rework.py` writes one card per rework package with `meta.rework_key`,
+/// `meta.severity` and `meta.owner_project`; a package is closed when its card is archived or
+/// moved to a `done`/`archive` lane. This is the materialised-card half of the close gate's
+/// P0 rule (v1-close-1) — the committed findings ledger is the other half, and neither reads
+/// the generated rework register.
+pub async fn open_p0_rework_packages_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    owner_project: &str,
+) -> Result<Vec<String>, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT c.meta->>'rework_key'
+           FROM card c
+           JOIN list l ON l.tenant_id = c.tenant_id AND l.id = c.list_id
+          WHERE c.tenant_id = $1
+            AND c.archived_at IS NULL
+            AND l.kind NOT IN ('done', 'archive')
+            AND c.meta->>'rework_key' IS NOT NULL
+            AND c.meta->>'severity' = 'P0'
+            AND c.meta->>'owner_project' = $2
+          ORDER BY c.meta->>'rework_key'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(owner_project)
+    .fetch_all(&mut *conn)
+    .await
+}
+
 /// Write a lane transition the domain already approved.
 ///
 /// `card` is the POST-transition value from [`conveyor_domain::Card::archive`] or

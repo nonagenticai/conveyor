@@ -70,6 +70,23 @@ async fn approval_status(pg: &support::Pg, tenant: TenantId, id: &str) -> String
     .expect("the approval exists")
 }
 
+/// The one decision a gate carries: `(decision, note, decided_by_kind, via)`.
+async fn decision_row(
+    pg: &support::Pg,
+    tenant: TenantId,
+    approval: &str,
+) -> Option<(String, String, String, Value)> {
+    let mut tx = begin_scoped(&pg.owner, tenant).await.expect("scoped tx");
+    sqlx::query_as(
+        "SELECT decision, note, decided_by_kind, via
+           FROM approval_decision WHERE approval_id = $1::uuid",
+    )
+    .bind(approval)
+    .fetch_optional(&mut *tx)
+    .await
+    .expect("the decision row")
+}
+
 async fn request_approval(running: &support::Running, token: &str, project_id: &str) -> String {
     let (status, body) = running
         .invoke(
@@ -332,5 +349,215 @@ async fn mcp_tasks_lifecycle_is_the_run_lifecycle() {
         rpc_error(&mut plain, "tasks/get", json!({"taskId": task_id})).await,
         -32021,
         "a non-declaring client gets MISSING_REQUIRED_CLIENT_CAPABILITY"
+    );
+}
+
+/// WP17a — a free-text approval answered over MCP under a published delegation.
+///
+/// A `requires_answer` gate is an elicitation whose schema demands `answer`; accepting it
+/// with the answer IS the approval, and the answer becomes the decision's note. The agent
+/// platform's `_meta.delegation_ref` makes the engine record the answer as a `rule` decision
+/// under the published owner document. A malformed ref is ignored (the caller's own kind
+/// stands, never invented), and a repeated answer is the existing replay/409 sink, not a
+/// second decision.
+#[tokio::test]
+async fn mcp_tasks_answers_a_question_under_a_delegation() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    conveyor_store::seed::catalogue(&pg.owner)
+        .await
+        .expect("catalogue seed");
+    conveyor_actions::board::matrix::clear_cache();
+    let running = support::Running::start(&pg).await;
+
+    let (status, project) = running
+        .invoke(
+            "projects.create",
+            "dev:alice",
+            json!({"title": "WP17a answerable question", "project_type_code": "delivery"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{project}");
+    let project_id = project["output"]["id"]
+        .as_str()
+        .expect("a project id")
+        .to_owned();
+
+    let mut mcp =
+        support::Mcp::connect_with_capabilities(&running, "dev:alice", declaring_capabilities())
+            .await;
+    let task = mcp
+        .call("projects_execute", json!({"project_id": project_id}), None)
+        .await;
+    let task_id = task["taskId"].as_str().expect("a task id").to_owned();
+
+    // The owner's published decision the answer is delegated under.
+    let delegation = support::delegation_ref(&running, "dev:alice").await;
+
+    // A run-scoped free-text question, requested by the distinct reviewer.
+    let (status, gate) = running
+        .invoke(
+            "approvals.request",
+            support::REVIEWER,
+            json!({
+                "run_id": task_id,
+                "project_id": project_id,
+                "gate": "agent_question",
+                "kind": "question",
+                "description": "Which release channel should the agent use?",
+                "requires_answer": true,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{gate}");
+    let approval = gate["output"]["id"]
+        .as_str()
+        .expect("a question gate id")
+        .to_owned();
+
+    // ── a. a requires_answer gate is an elicitation that demands the answer ──────────────
+    let view = task_get(&mut mcp, &task_id).await;
+    assert_eq!(view["status"], "input_required", "{view}");
+    let request = view["inputRequests"]
+        .get(&approval)
+        .unwrap_or_else(|| panic!("the question must be an inputRequest: {view}"));
+    assert_eq!(
+        request["method"], "elicitation/create",
+        "a question is an elicitation: {request}"
+    );
+    let params = &request["params"];
+    let message = params["message"].as_str().expect("a message");
+    assert!(
+        message.contains("Which release channel"),
+        "the message carries the question: {message}"
+    );
+    assert!(
+        message.contains("an answer is required"),
+        "the message says an answer is required: {message}"
+    );
+    let conveyor = &params["_meta"]["ai.nonagentic/conveyor"];
+    assert_eq!(conveyor["requires_answer"], true, "{params}");
+    assert_eq!(
+        conveyor["description"], "Which release channel should the agent use?",
+        "{params}"
+    );
+    let schema = &params["requestedSchema"];
+    assert_eq!(
+        schema["properties"]["answer"]["type"], "string",
+        "the schema carries the answer field: {params}"
+    );
+    assert!(
+        schema["required"]
+            .as_array()
+            .is_some_and(|required| required.contains(&json!("answer"))),
+        "the answer is required: {params}"
+    );
+
+    // An empty answer is the writer's 422, surfaced with the reason; the gate stays open.
+    let refused = mcp
+        .raw(
+            "tasks/update",
+            json!({
+                "taskId": task_id,
+                "inputResponses": {
+                    approval.clone(): {"action": "accept", "content": {"answer": "   "}}
+                }
+            }),
+        )
+        .await;
+    let error = refused
+        .get("error")
+        .unwrap_or_else(|| panic!("an empty answer must be refused: {refused}"));
+    assert_eq!(error["code"], -32602, "{refused}");
+    assert!(
+        error["message"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("requires an answer"),
+        "the writer's refusal reaches the client: {refused}"
+    );
+    assert_eq!(
+        approval_status(&pg, seeded.tenant, &approval).await,
+        "pending",
+        "a refused answer leaves the gate open"
+    );
+
+    // ── b/c. the answer + _meta.delegation_ref is one rule decision; a repeat replays ────
+    let answer = json!({
+        "taskId": task_id,
+        "inputResponses": {
+            approval.clone(): {
+                "action": "accept",
+                "content": {"answer": "Use the canary channel"}
+            }
+        },
+        "_meta": {"delegation_ref": delegation.clone()},
+    });
+    let ack = mcp.raw("tasks/update", answer.clone()).await;
+    assert!(ack.get("result").is_some(), "{ack}");
+    assert_eq!(
+        approval_status(&pg, seeded.tenant, &approval).await,
+        "approved"
+    );
+    let (decision, note, kind, via) = decision_row(&pg, seeded.tenant, &approval)
+        .await
+        .expect("the delegated decision");
+    assert_eq!(decision, "approve", "an answer is the approval");
+    assert_eq!(note, "Use the canary channel", "the answer is the note");
+    assert_eq!(
+        kind, "rule",
+        "a delegated answer is a rule, never the caller"
+    );
+    assert_eq!(via["delegation_ref"], json!(delegation), "{via}");
+
+    let replay = mcp.raw("tasks/update", answer).await;
+    assert!(
+        replay.get("result").is_some(),
+        "a second update walks the existing 409/replay sink: {replay}"
+    );
+    let count = scoped_scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*)::text FROM approval_decision WHERE approval_id = $1::uuid",
+        &approval,
+    )
+    .await
+    .expect("a decision count");
+    assert_eq!(count, "1", "a repeated answer writes one decision");
+
+    // ── d. an answer-only update works on a gate that does not require one ───────────────
+    let plain = request_approval(&running, support::REVIEWER, &project_id).await;
+    let ack = mcp
+        .raw(
+            "tasks/update",
+            json!({
+                "taskId": task_id,
+                "inputResponses": {
+                    plain.clone(): {"action": "accept", "content": {"answer": "Ship it"}}
+                },
+                // A malformed ref is ignored: the caller's own kind stands, never invented.
+                "_meta": {"delegation_ref": "not-a-uuid"},
+            }),
+        )
+        .await;
+    assert!(ack.get("result").is_some(), "{ack}");
+    assert_eq!(
+        approval_status(&pg, seeded.tenant, &plain).await,
+        "approved"
+    );
+    let (decision, note, kind, _) = decision_row(&pg, seeded.tenant, &plain)
+        .await
+        .expect("the plain decision");
+    assert_eq!(decision, "approve");
+    assert_eq!(note, "Ship it", "answer-only is the note on a plain gate");
+    assert_eq!(
+        kind, "human",
+        "a malformed delegation is ignored, never invented"
     );
 }

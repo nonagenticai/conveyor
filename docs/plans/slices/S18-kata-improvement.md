@@ -85,8 +85,10 @@ product ships — which is exactly the failure this integration exists to preven
 - **Screen 14** declared for S12: version → rate, baseline line, control badges, regression flags, and the
   Start-candidate control (`improvement.spec.ts`).
 
-Tests: `apps/server/tests/benchmark_arm.rs`, `crates/api/tests/benchmark_trend.rs`,
-`apps/server/tests/benchmark_improvement.rs` — the gate's three named targets.
+Tests: `crates/api/tests/benchmark_arm.rs`, `crates/api/tests/benchmark_trend.rs` — the gate's
+shipped targets. **No `benchmark_improvement` target exists:** the job body
+(`apps/server/src/benchmark_improvement.rs`) ships with no test target and no `#[cfg(test)]`;
+`benchmark_arm` proves only that a baseline enqueues `benchmark.improvement.run`. Named gap (§7).
 
 ## 6. Build order
 
@@ -107,11 +109,12 @@ set -euo pipefail
 source ~/.cargo/env
 cd $HOME/Movies/conveyor
 
-# the arm refuses before S13/S15 data exists, and runs when it does
-cargo test -p conveyor-server --test benchmark_arm
+# the arm refuses before S13/S15 data exists, and runs when it does (the shipped package is conveyor-api)
+cargo test -p conveyor-api --test benchmark_arm
 # two versions of one subject compare with an exact McNemar delta
 cargo test -p conveyor-api --test benchmark_trend
-# the improvement job performs the same calls a person does
+# v1-s18-1 closed: the improvement body has its own target — the permanent refusal of an empty
+# payload, the no-op on an already judged candidate, and the scheduled next look for a live one.
 cargo test -p conveyor-server --test benchmark_improvement
 # the workspace is still green and the lock still matches
 cargo run -q -p conveyor-server -- --print-openapi --check-lock >/dev/null

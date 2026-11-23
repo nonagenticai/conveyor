@@ -62,6 +62,9 @@ pub mod architecture;
 // approval at all, and whether its requester may decide it. A missing row is the strict default.
 pub mod approval_policy;
 pub mod audit;
+// T17 (#526, SPEC_V2 §5.7, §10.4): tenant asset authoring — the intake brief, the asset
+// drafts it produces, the human review gate and the one-published-per-(kind, key) release.
+pub mod authoring;
 pub mod benchmark;
 pub mod board;
 // S13/CONTRACT §7: the bus cursor — the unpublished `event` rows and the mark that records a
@@ -88,6 +91,9 @@ pub mod interaction;
 pub mod inference;
 pub mod invite;
 pub mod jobs;
+// T5 (SPEC_V2 §6.3, §9.3–§9.4, §12 T5; issue #77): the kata loop — the pinned hypothesis,
+// the human adoption gate, the held-out measurement, propagation and the revert outcome.
+pub mod kata;
 pub mod label;
 // T2 (SPEC_V2 §7): the decision ladder's policies, refinements, laya configs and decisions.
 pub mod ladder;

@@ -35,7 +35,7 @@ A published procedure drives one card: ordered steps, each a registry action wit
 
 **OUT** — matrix legality (`S03`), approval transport (`S06`, `S06a`), sub-procedures/engine/editor (`S13`), screens (`S12`), PDL (never).
 
-**UI surface declared for S12** (declaration only): `procedures` — `procedures.*`, `procedure_runs.start/cancel`, read models `procedure` + `procedure_step` + `run_step`; SSE `run:{id}`.
+**UI surface declared for S12** (declaration only): `processes` — `processes.*`, `procedures.*` (the SOP), `process_runs.start/cancel`, read models `process` + `process_step` + `procedure` (SOP) + `run_step`; SSE `run:{id}`.
 
 ## 4. Source material
 
@@ -61,18 +61,19 @@ A published procedure drives one card: ordered steps, each a registry action wit
 
 | action | input → output |
 |---|---|
-| `procedures.create` | `{key,title,description?,card_type_code?,steps?}` → `ProcedureOut`; new key = v1, existing forks `max(version)+1`, second draft = 409 `procedure.draft_exists` |
-| `procedures.update` | `{procedure_id,title?,description?,steps?}` → `ProcedureOut`; draft only, `steps` replaces the list, `If-Match` |
-| `procedures.publish` | `{procedure_id}` → `{version,revision_id,content_hash}`; re-publish returns the same |
-| `procedures.retire` | `{procedure_id}` → `ProcedureOut`; live runs unaffected |
-| `procedures.get` / `.list` | `{procedure_id?/key?,version?}` / `{status?,card_type_code?,cursor?,limit?}` → `ProcedureOut` / page |
-| `procedure_runs.start` | `{card_id,procedure_id?/procedure_key?,inputs?}` → `RunOut`; `Idempotency-Key`, one live **root** run per card; a child may start under a live parent (`parent_run_id`/`step_id`, 2026-11-09) |
+| `processes.create` | `{key,title,description?,card_type_code?,steps?}` → `ProcessOut`; new key = v1, existing forks `max(version)+1`, second draft = 409 `process.draft_exists` |
+| `processes.update` | `{process_id,title?,description?,steps?}` → `ProcessOut`; draft only, `steps` replaces the list, `If-Match` |
+| `processes.publish` | `{process_id,acknowledge_findings?}` → `{version,revision_id,content_hash}`; re-publish returns the same |
+| `processes.retire` | `{process_id}` → `ProcessOut`; live runs unaffected |
+| `processes.get` / `.list` | `{process_id?/key?,version?}` / `{status?,card_type_code?,cursor?,limit?}` → `ProcessOut` / page |
+| `procedures.*` | the **SOP**, not the sequence: `{key,title,description?,definition_of_ready?,definition_of_done?,acceptance_criteria?,inspection?,outputs?}` and its `.update/.publish/.retire/.get/.list` siblings → `ProcedureOut`; a step names the published SOP it is judged against |
+| `process_runs.start` | `{card_id,process_id?/process_key?,inputs?}` → `RunOut`; `Idempotency-Key`, one live **root** run per card; a child may start under a live parent (`parent_run_id`/`step_id`, 2026-11-09) |
 
-`StepIn = {action, input_template, gate_kind?, on_error?, max_attempts?}`, `on_error ∈ fail|continue|retry` (default `fail`). `procedure_runs.start` composes S06's `runs.create` + `runs.start`; **cancel is S06's `runs.cancel`** (extended to skip the run's queued `run_step` rows and announce each) — no second run state machine and no second cancel surface. `procedure_runs.complete_step` is **dropped** (step 9, 2026-11-09): the executor is the only writer of a run step, and an external "mark this complete" would let a caller set a step result without executing it; no consumer existed. HTTP is the registry route; no screens (S12). Files: `crates/domain/src/{procedure,template}.rs`, `crates/store/src/{procedure,run_step}.rs`, `crates/actions/src/procedure/`, `crates/api/src/procedures.rs`, `crates/api/tests/procedure_*.rs`. **Events:** `procedure.published`/`procedure.retired` from publish/retire (`{id,key,version}`), `run_step.changed` on every `run_step` transition (`{run_id,position,attempt,status}`).
+`StepIn = {action, input_template, gate_kind?, on_result?, max_attempts?}`, `on_result ∈ fail|continue|retry` (default `fail`). ⚠️ The stored/API field is **`on_result`**; this plan's earlier drafts called it `on_error`, and the contract-change sections below keep that historical name. `process_runs.start` composes S06's `runs.create` + `runs.start`; **cancel is S06's `runs.cancel`** (extended to skip the run's queued `run_step` rows and announce each) — no second run state machine and no second cancel surface. `process_runs.complete_step` is **dropped** (step 9, 2026-11-09): the executor is the only writer of a run step, and an external "mark this complete" would let a caller set a step result without executing it; no consumer existed. HTTP is the registry route; no screens (S12). Files: `crates/domain/src/{procedure,template}.rs`, `crates/store/src/{procedure,run_step}.rs`, `crates/actions/src/procedure/`, `crates/api/src/procedures.rs`, `crates/api/tests/procedure_*.rs`. **Events:** `procedure.published`/`procedure.retired` from publish/retire (`{id,key,version}`), `run_step.changed` on every `run_step` transition (`{run_id,position,attempt,status}`).
 
 ### 5.3 Model and publish
 
-A procedure is a version family: rows share `(tenant_id, key)`, each with `version` and `status ∈ draft|published|retired`. Publish validates in one transaction: action in the live manifest; `gate_kind` in `catalogue_entry(kind='gate')`; template roots/paths legal and `steps.<n> < position`; `retry` only on idempotent actions; no `procedure_runs.*` step. It writes the frozen `revision` (`entity_type='procedure'`, `seq=version`, `content` = the steps, `content_hash=sha256(canonical JSON)`), flips the key's previous published row to `retired` and this one to `published`, emits `procedure.published`. `procedure_step` is immutable after publish; an edit copies it into v+1.
+A procedure is a version family: rows share `(tenant_id, key)`, each with `version` and `status ∈ draft|published|retired`. Publish validates in one transaction: action in the live manifest; `gate_kind` in `catalogue_entry(kind='gate')`; template roots/paths legal and `steps.<n> < position`; `retry` only on idempotent actions; no `process_runs.*` step. It writes the frozen `revision` (`entity_type='procedure'`, `seq=version`, `content` = the steps, `content_hash=sha256(canonical JSON)`), flips the key's previous published row to `retired` and this one to `published`, emits `procedure.published`. `procedure_step` is immutable after publish; an edit copies it into v+1.
 
 ### 5.4 Input template
 
@@ -116,10 +117,10 @@ A **process** (stored as `procedure` before migration `0033`, renamed to `proces
 3. `domain::template::resolve` + a case table (object, interpolation, escape, missing path, forward ref, unknown root); `cargo test -p conveyor-domain template`.
 4. `store::{procedure,run_step}`: create/fork, copy-forward, materialise, claim, record, append attempt; `cargo test -p conveyor-store procedure_crud run_step`.
 5. Six `procedures.*` actions + problem+json codes; `cargo test -p conveyor-actions procedures`.
-6. Publish: manifest lookup, gate lookup, revision freeze, old→retired in one tx; `cargo test -p conveyor-actions --test procedure publish`.
-7. Start: card/type checks, run insert, materialisation, job enqueue; `cargo test -p conveyor-actions --test procedure_start`.
-8. Step executor + `procedure.step` job: claim → resolve → invoke → record; `cargo test -p conveyor-actions --test procedure_step`.
-9. Gate, retry, continue, cancel (built 2026-11-09). **Gate representation:** the gated step stays `queued`; `gate_kind` opens an S06 `approval` (`kind='procedure'`, `gate=gate_kind`, `meta={position,attempt,procedure_step_id}`, quorum from `catalogue_entry(kind='gate').meta.dual_control`, `expires_at` from its `meta` when present) and the run parks `running → waiting_approval`. `approved` enqueues the same `(position,attempt)` as its own job (the `:gate` dedupe suffix keeps it from collapsing onto a still-running park job); `rejected|expired` applies `on_error` through the ordinary record-and-chain. **Cancel** is `runs.cancel` (voids the pending gate, skips the queued steps). Tests live in `crates/actions/tests/procedure_step.rs` (gate/retry/continue) and `procedure_cancel.rs`; a worker-level expiry path is in `apps/server/src/worker.rs::approval_expire`.
+6. Publish: manifest lookup, gate lookup, revision freeze, old→retired in one tx; `cargo test -p conveyor-actions --test procedures publish`.
+7. Start: card/type checks, run insert, materialisation, job enqueue; `cargo test -p conveyor-actions --test process_start`.
+8. Step executor + `procedure.step` job: claim → resolve → invoke → record; `cargo test -p conveyor-actions --test process_step`.
+9. Gate, retry, continue, cancel (built 2026-11-09). **Gate representation:** the gated step stays `queued`; `gate_kind` opens an S06 `approval` (`kind='procedure'`, `gate=gate_kind`, `meta={position,attempt,procedure_step_id}`, quorum from `catalogue_entry(kind='gate').meta.dual_control`, `expires_at` from its `meta` when present) and the run parks `running → waiting_approval`. `approved` enqueues the same `(position,attempt)` as its own job (the `:gate` dedupe suffix keeps it from collapsing onto a still-running park job); `rejected|expired` applies `on_error` through the ordinary record-and-chain. **Cancel** is `runs.cancel` (voids the pending gate, skips the queued steps). Tests live in `crates/actions/tests/process_step.rs` (gate/retry/continue) and `process_cancel.rs`; a worker-level expiry path is in `apps/server/src/worker.rs::approval_expire`.
 10. MCP projection + spec lock: `cargo run -p conveyor-server -- --print-openapi --check-lock`.
 11. Seed: `cargo run -p conveyor-server -- migrate --seed`; then, **tenant-scoped** (the table is RLS+FORCE, so an unscoped count is always 0): `psql "$DATABASE_URL" -qAtc "BEGIN; SET LOCAL app.current_tenant='<dev-a uuid>'; select count(*) from procedure where status='published'; COMMIT;"`. **The procedure seed itself is deferred (George 2026-11-09)**: the count is 0 by decision, and the derivation path is in §5.6.
 12. Gate rehearsal (§7); `cargo clippy --workspace --all-targets -- -D warnings && cargo fmt --check`.
@@ -134,28 +135,37 @@ CONVEYOR_DEV_AUTH=1 cargo run -p conveyor-server -- worker &
 CONVEYOR_DEV_AUTH=1 cargo run -p conveyor-server -- serve &
 trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
 API=localhost:8930/api/actions; P(){ curl -fsS -X POST "$API/$1/invocations" -H 'content-type: application/json' -H "authorization: Bearer dev:alice" -d "$2"; }
+PR(){ curl -fsS -X POST "$API/$1/invocations" -H 'content-type: application/json' -H "authorization: Bearer dev:reviewer" -d "$2"; }   # the second dev-a admin the requester exclusion needs
 TENANT=$(psql "$DATABASE_URL" -tAc "select id from tenant where slug='dev-a'")          # `tenant` is the one table with no RLS
 Q(){ psql "$DATABASE_URL" -qAtc "BEGIN; SET LOCAL app.current_tenant='$TENANT'; $1; COMMIT;"; }   # SET LOCAL inside one transaction, never a session-level SET
 PAIR=$(Q "select e.code || '|' || ct.code from catalogue_entry e join card_type ct on e.meta->'matrix' ? ct.code and e.meta->'matrix'->ct.code->'active' ? 'done' where e.kind='project_type' and e.is_active and ct.is_active order by e.code, ct.code limit 1")
 PT=${PAIR%%|*}; CT=${PAIR#*|}
 [ -n "$PT" ] && [ "$PT" != "$PAIR" ] || { echo "seed has no project_type whose matrix allows active→done (S07 §5.4)" >&2; exit 1; }
-ID=$(P procedures.create "{\"input\":{\"key\":\"dev-phase\",\"title\":\"Dev phase\",\"card_type_code\":\"$CT\",\"steps\":[
- {\"action\":\"cards.claim\",\"input_template\":{\"card_id\":\"{{card.id}}\",\"_version\":\"{{card.version}}\"}},
- {\"action\":\"cards.comment\",\"input_template\":{\"id\":\"{{card.id}}\",\"body\":\"run {{run.inputs.ticket}}\"},\"gate_kind\":\"human_approval\"},
- {\"action\":\"cards.move\",\"input_template\":{\"id\":\"{{card.id}}\",\"list_id\":\"{{run.inputs.done_list}}\",\"_version\":\"{{card.version}}\"}}]}}" | jq -r .id)
-PRJ=$(P projects.create "{\"input\":{\"title\":\"s11 gate\",\"project_type_code\":\"$PT\"}}" | jq -r .id)
+# v1-s11-1: the sequence is a PROCESS (`processes.*`); `procedures.*` is the SOP. The old
+# `procedure_runs.start` never existed at this head — the run entry point is `process_runs.start`.
+# Two current publish rules shape this block: every step names a PUBLISHED SOP, and `kind` is
+# explicit because a step carrying `gate_kind` infers `gate` when `kind` is absent (a gate step
+# may not name an action). The gated COMPUTED step parks for approval, then runs once.
+SOP=$(P procedures.create "{\"input\":{\"key\":\"dev-phase-sop\",\"title\":\"Dev phase SOP\",\"acceptance_criteria\":[\"the card reached done\"],\"inspection\":{\"kind\":\"checker\",\"rule\":\"always\"}}}" | jq -r .output.id)
+[ -n "$SOP" ] || { echo "procedures.create returned no id" >&2; exit 1; }
+P procedures.publish "{\"input\":{\"procedure_id\":\"$SOP\"}}"
+ID=$(P processes.create "{\"input\":{\"key\":\"dev-phase\",\"title\":\"Dev phase\",\"card_type_code\":\"$CT\",\"steps\":[
+ {\"kind\":\"computed\",\"procedure_id\":\"$SOP\",\"action\":\"cards.claim\",\"input_template\":{\"card_id\":\"{{card.id}}\",\"_version\":\"{{card.version}}\"}},
+ {\"kind\":\"computed\",\"procedure_id\":\"$SOP\",\"action\":\"cards.comment\",\"input_template\":{\"id\":\"{{card.id}}\",\"body\":\"run {{run.inputs.ticket}}\"},\"gate_kind\":\"human_approval\"},
+ {\"kind\":\"computed\",\"procedure_id\":\"$SOP\",\"action\":\"cards.move\",\"input_template\":{\"id\":\"{{card.id}}\",\"list_id\":\"{{run.inputs.done_list}}\",\"_version\":\"{{card.version}}\"}}]}}" | jq -r .output.id)
+PRJ=$(P projects.create "{\"input\":{\"title\":\"s11 gate\",\"project_type_code\":\"$PT\"}}" | jq -r .output.id)
 [ -n "$PRJ" ] || { echo "projects.create returned no id" >&2; exit 1; }
 BOARD=$(Q "select id from board where project_id='$PRJ' order by position, id limit 1")
 ACTIVE=$(Q "select id from list where board_id='$BOARD' and kind='active'")
 DONE=$(Q "select id from list where board_id='$BOARD' and kind='done'")
 [ -n "$BOARD" ] && [ -n "$ACTIVE" ] && [ -n "$DONE" ] || { echo "the project has no board or no active/done list" >&2; exit 1; }
-CARD=$(P cards.create "{\"input\":{\"board_id\":\"$BOARD\",\"list_id\":\"$ACTIVE\",\"name\":\"S11 gate card\",\"card_type_code\":\"$CT\"}}" | jq -r .id)
-P procedures.publish "{\"input\":{\"procedure_id\":\"$ID\"}}"
-RUN=$(P procedure_runs.start "{\"input\":{\"card_id\":\"$CARD\",\"procedure_key\":\"dev-phase\",\"inputs\":{\"ticket\":\"T-1\",\"done_list\":\"$DONE\"}}}" | jq -r .id)
+CARD=$(P cards.create "{\"input\":{\"board_id\":\"$BOARD\",\"list_id\":\"$ACTIVE\",\"name\":\"S11 gate card\",\"card_type_code\":\"$CT\"}}" | jq -r .output.id)
+P processes.publish "{\"input\":{\"process_id\":\"$ID\"}}"
+RUN=$(P process_runs.start "{\"input\":{\"card_id\":\"$CARD\",\"process_key\":\"dev-phase\",\"inputs\":{\"ticket\":\"T-1\",\"done_list\":\"$DONE\"}}}" | jq -r .output.id)
 for i in $(seq 1 30); do [ "$(Q "select status from run where id='$RUN'")" = waiting_approval ] && break; sleep 1; done   # the worker advances asynchronously
 test "$(Q "select status from run where id='$RUN'")" = waiting_approval          # waiting_approval
 APPROVAL=$(Q "select id from approval where run_id='$RUN' and status='pending'")
-P approvals.decide "{\"input\":{\"approval_id\":\"$APPROVAL\",\"decision\":\"approve\"}}"
+PR approvals.decide "{\"input\":{\"approval_id\":\"$APPROVAL\",\"decision\":\"approve\"}}"   # the requester (alice) may not decide her own gate
 for i in $(seq 1 30); do [ "$(Q "select count(*) from run_step where run_id='$RUN'")" = 3 ] && break; sleep 1; done
 test "$(Q "select count(*) from run_step where run_id='$RUN'")" = 3        # 3 rows
 for i in $(seq 1 30); do [ "$(Q "select status from run where id='$RUN'")" = succeeded ] && break; sleep 1; done   # the approved gate resumes the last step
@@ -173,13 +183,13 @@ Green when three `run_step` rows are `succeeded` with non-empty `input`/`output`
 
 - **PDL creeping back.** No condition/effect/assertion field. Input legality is the action's JSON Schema; state legality is the matrix; "what next" is step order.
 - **A template language with no escaping.** `\{{` is the only escape; unknown roots and bad indices refuse. No filters, `||` or truthiness.
-- **A step that invokes itself.** Publish refuses any step naming `procedure_runs.*` and any `steps.<n>` at or after its position. Sub-procedures (S13) need `run.parent_run_id` and a depth cap first.
+- **A step that invokes itself.** Publish refuses any step naming `process_runs.*` and any `steps.<n>` at or after its position. Sub-procedures (S13) need `run.parent_run_id` and a depth cap first.
 - **`run_step` outside the step's transaction.** Result, `action_invocation`, `audit_event` and event share one tx; the remote call cannot, so its `Idempotency-Key` derives from `(run_id, position, attempt)` and a crash retries into the same key. ⚠️ **As built (step 8), the internal composed call cannot share the record's tx**: `invoke` owns its own transaction (validation, idempotency claim, bookkeeping, handler, commit), so `action_invocation`/`audit_event` commit there and `run_step` + `run_step.changed` + the chain commit in a second transaction. The property is preserved by the replay rule instead: the resolved input is persisted at CLAIM, a crash re-invokes under the same Idempotency-Key, and the record is idempotent on `(run_id, position, attempt)`. Sharing one tx would require an `invoke_in_tx` engine entry point — deliberately not added here.
 - **Publishing without freezing.** Status flip, `revision` and retired-previous are one tx; `procedure_step` is immutable after publish. Never re-read the procedure at step time.
 - **A gate on a non-idempotent step.** A gate parks before execution so the step runs once per attempt, but `on_error='retry'` on a non-idempotent action is refused at publish — the retry has no second approval.
 - ⚠️ **Executor scoping (D22, CONTRACT §17) — S11 seams it, S15 fills it.** As built (2026-11-09): migration
   **`0021_s11_run_capability`** adds the two forward-reference `run` columns (`capability_id`,
-  `capability_agent_id`; no FK — S15's `0020` adds the targets and constraints), and `procedure_runs.start` calls one
+  `capability_agent_id`; no FK — S15's `0020` adds the targets and constraints), and `process_runs.start` calls one
   `resolve_start_context` + `ensure_start_ready` pair before anything is written. Today the resolver returns
   `StartContext::Unresolved` (no capability schema exists), so the readiness arm does not apply — it is not skipped;
   the enum makes that explicit. S15 fills the `Resolved` body (readiness, `409 capability_not_ready` with

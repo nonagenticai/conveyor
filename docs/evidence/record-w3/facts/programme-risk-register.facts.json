@@ -1,0 +1,1889 @@
+{
+  "category": "programme-risk-register",
+  "standard": "MSP",
+  "spec": "\u00a78.3",
+  "subject": {
+    "kind": "programme",
+    "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "title": "conveyor buildout",
+    "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "project_key": ""
+  },
+  "template_skeleton": "# Programme Risk Register\n\nThe programme's risks, categorized and owned, with the dates they are reviewed and the escalations they forced.\n\n## Register\n\nEvery open and closed risk, with its impact, probability, status and mitigation.\n\n## Categories\n\nThe categories the risks are grouped by, and the category each risk belongs to.\n\n## Owners and review dates\n\nWho owns each risk and the date it is next reviewed; a risk with no owner or review date is refused.\n\n## Escalations\n\nThe risks escalated to the programme board, the sponsoring group or the SRO, with the decision each escalation seeks.\n\n## Links\n\nThe artefacts and issues the register informs.\n",
+  "headings": [
+    {
+      "heading": "Register",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "msp.json",
+          "pointer": "/register_items",
+          "category": null,
+          "count": 17
+        }
+      ],
+      "items": [
+        {
+          "baseline_ref": null,
+          "body": "The one-organisation-loop proof (issue #88, T12) has no test and T5/T6 are proposed. The programme's viability verdict must not claim V2 acceptance; tranche 12 cannot record a continue on unbuilt work.",
+          "code": "",
+          "created_at": "2026-11-21T19:50:28.723073+00:00",
+          "id": "01a1ffa9-032a-7792-98c3-a85aa9bad193",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            "https://github.com/nonagenticai/conveyor/issues/88",
+            "docs/SPEC_V2.md#12"
+          ],
+          "meta": {},
+          "owner_job_id": null,
+          "probability": "high",
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "high",
+          "status": "open",
+          "title": "V2 acceptance (#88/T12) remains open",
+          "updated_at": "2026-11-21T19:50:28.723073+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "All six benefit profiles are draft with placeholder baselines and no measurement instrument. U6 owns the instruments and the before/after transition; no benefit may be claimed realized before that measurement.",
+          "code": "",
+          "created_at": "2026-11-21T19:50:34.899079+00:00",
+          "id": "01a1ffa9-1b48-7f8b-974a-c8d8e5366922",
+          "impact": 4,
+          "kind": "risk",
+          "links": [
+            "acceptance/programme/P0.toml",
+            "docs/evidence/conformance-gap-register.json"
+          ],
+          "meta": {},
+          "owner_job_id": null,
+          "probability": "high",
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "high",
+          "status": "open",
+          "title": "The six benefit baselines are placeholders",
+          "updated_at": "2026-11-21T19:50:34.899079+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "T5, T6, T12, T15 and T17 are proposed, not built. Their tranches must end in pause or stop rather than a fabricated continue, and no project is chartered or closed on unbuilt work.",
+          "code": "",
+          "created_at": "2026-11-21T19:50:42.505689+00:00",
+          "id": "01a1ffa9-3907-7c8d-a6c0-819281d6c050",
+          "impact": 4,
+          "kind": "risk",
+          "links": [
+            "https://github.com/nonagenticai/conveyor/issues/80",
+            "https://github.com/nonagenticai/conveyor/issues/86"
+          ],
+          "meta": {},
+          "owner_job_id": null,
+          "probability": "high",
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "medium",
+          "status": "open",
+          "title": "Tranches 5 and 10-13 cannot deliver on proposed projects",
+          "updated_at": "2026-11-21T19:50:42.505689+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R1",
+          "created_at": "2026-11-22T19:51:09.653118+00:00",
+          "id": "01a204cf-fe6e-783a-a837-ed168b16c967",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Scope vs capacity: 538 packages + 480 artefacts + 13 tranches",
+          "updated_at": "2026-11-22T19:51:09.653118+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R2",
+          "created_at": "2026-11-22T19:51:24.123997+00:00",
+          "id": "01a204d0-36df-7bd0-98c0-6c9a9e249c9b",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f13-7822-8c9a-09e67d5670e0",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Record theatre: sections resolve thinly, registers look operated but are not",
+          "updated_at": "2026-11-22T19:51:24.123997+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R3",
+          "created_at": "2026-11-22T19:51:24.222387+00:00",
+          "id": "01a204d0-3743-729c-bc24-8a95cc60df32",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f1b-7180-86f8-f991cb9b78d0",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Instrument self-deception: a check passes by construction",
+          "updated_at": "2026-11-22T19:51:24.222387+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R4",
+          "created_at": "2026-11-22T19:51:24.322822+00:00",
+          "id": "01a204d0-37a6-7d95-8690-bfd9e2cc8d4e",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-71cf-b84b-73a675ff91f2",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Live transport/pool: SSH forward, branch binary, one writer",
+          "updated_at": "2026-11-22T19:51:24.322822+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R5",
+          "created_at": "2026-11-22T19:51:24.422131+00:00",
+          "id": "01a204d0-3809-7c90-a88f-bdc6baf2ff7f",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f0f-7b77-ab6f-5b49038bef37",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Shared binary/target race",
+          "updated_at": "2026-11-22T19:51:24.422131+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R6",
+          "created_at": "2026-11-22T19:51:24.51888+00:00",
+          "id": "01a204d0-386a-7d1d-8d58-0125bebfd365",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Register staleness: allocation from an old snapshot",
+          "updated_at": "2026-11-22T19:51:24.51888+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R7",
+          "created_at": "2026-11-22T19:51:24.612784+00:00",
+          "id": "01a204d0-38c8-781e-8e39-0611db5b2a73",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Provenance residual: historical service decisions",
+          "updated_at": "2026-11-22T19:51:24.612784+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R8",
+          "created_at": "2026-11-22T19:51:24.71019+00:00",
+          "id": "01a204d0-392a-70b4-8728-a679b7681905",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4efe-73bf-9e8b-004de1b88c50",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Standard completeness: a tailored profile omits a clause",
+          "updated_at": "2026-11-22T19:51:24.71019+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R9",
+          "created_at": "2026-11-22T19:51:24.804523+00:00",
+          "id": "01a204d0-3988-77b5-a7a5-326cd00fc15f",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Peers/shared main: overlapping files and pending SPEC edits",
+          "updated_at": "2026-11-22T19:51:24.804523+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R10",
+          "created_at": "2026-11-22T19:51:24.898602+00:00",
+          "id": "01a204d0-39e6-7ce4-b6f1-02f14d8c6408",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f0c-7bd5-940f-3674a1ddf7fd",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "v1 quality unknown: the verdict may find real work",
+          "updated_at": "2026-11-22T19:51:24.898602+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R11",
+          "created_at": "2026-11-22T19:51:24.994802+00:00",
+          "id": "01a204d0-3a47-7118-97ee-73d1c1ba6a58",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4ef7-7e90-accc-c4d025595477",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Nullable project_id: a consumer returns zero rows silently",
+          "updated_at": "2026-11-22T19:51:24.994802+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R12",
+          "created_at": "2026-11-22T19:51:25.091531+00:00",
+          "id": "01a204d0-3aa7-74c6-bce6-562c5af6be60",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f0e-7ded-9a2c-42628510422a",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Seed quality: wrong statuses or duplicate ADR ids",
+          "updated_at": "2026-11-22T19:51:25.091531+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R13",
+          "created_at": "2026-11-22T19:51:25.186864+00:00",
+          "id": "01a204d0-3b06-7979-9973-06f5be8108f7",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Evidence theatre: the plan claims progress it cannot read back",
+          "updated_at": "2026-11-22T19:51:25.186864+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R14",
+          "created_at": "2026-11-22T19:51:25.282922+00:00",
+          "id": "01a204d0-3b66-7abc-ab67-0c9818b488aa",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f11-75a6-bec6-675c8fd11224",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "CI/agent budget: an agent burst or a probe run",
+          "updated_at": "2026-11-22T19:51:25.282922+00:00",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "heading": "Categories",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "msp.json",
+          "pointer": "/register_items",
+          "category": null,
+          "count": 17
+        }
+      ],
+      "items": [
+        {
+          "baseline_ref": null,
+          "body": "The one-organisation-loop proof (issue #88, T12) has no test and T5/T6 are proposed. The programme's viability verdict must not claim V2 acceptance; tranche 12 cannot record a continue on unbuilt work.",
+          "code": "",
+          "created_at": "2026-11-21T19:50:28.723073+00:00",
+          "id": "01a1ffa9-032a-7792-98c3-a85aa9bad193",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            "https://github.com/nonagenticai/conveyor/issues/88",
+            "docs/SPEC_V2.md#12"
+          ],
+          "meta": {},
+          "owner_job_id": null,
+          "probability": "high",
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "high",
+          "status": "open",
+          "title": "V2 acceptance (#88/T12) remains open",
+          "updated_at": "2026-11-21T19:50:28.723073+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "All six benefit profiles are draft with placeholder baselines and no measurement instrument. U6 owns the instruments and the before/after transition; no benefit may be claimed realized before that measurement.",
+          "code": "",
+          "created_at": "2026-11-21T19:50:34.899079+00:00",
+          "id": "01a1ffa9-1b48-7f8b-974a-c8d8e5366922",
+          "impact": 4,
+          "kind": "risk",
+          "links": [
+            "acceptance/programme/P0.toml",
+            "docs/evidence/conformance-gap-register.json"
+          ],
+          "meta": {},
+          "owner_job_id": null,
+          "probability": "high",
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "high",
+          "status": "open",
+          "title": "The six benefit baselines are placeholders",
+          "updated_at": "2026-11-21T19:50:34.899079+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "T5, T6, T12, T15 and T17 are proposed, not built. Their tranches must end in pause or stop rather than a fabricated continue, and no project is chartered or closed on unbuilt work.",
+          "code": "",
+          "created_at": "2026-11-21T19:50:42.505689+00:00",
+          "id": "01a1ffa9-3907-7c8d-a6c0-819281d6c050",
+          "impact": 4,
+          "kind": "risk",
+          "links": [
+            "https://github.com/nonagenticai/conveyor/issues/80",
+            "https://github.com/nonagenticai/conveyor/issues/86"
+          ],
+          "meta": {},
+          "owner_job_id": null,
+          "probability": "high",
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "medium",
+          "status": "open",
+          "title": "Tranches 5 and 10-13 cannot deliver on proposed projects",
+          "updated_at": "2026-11-21T19:50:42.505689+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R1",
+          "created_at": "2026-11-22T19:51:09.653118+00:00",
+          "id": "01a204cf-fe6e-783a-a837-ed168b16c967",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Scope vs capacity: 538 packages + 480 artefacts + 13 tranches",
+          "updated_at": "2026-11-22T19:51:09.653118+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R2",
+          "created_at": "2026-11-22T19:51:24.123997+00:00",
+          "id": "01a204d0-36df-7bd0-98c0-6c9a9e249c9b",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f13-7822-8c9a-09e67d5670e0",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Record theatre: sections resolve thinly, registers look operated but are not",
+          "updated_at": "2026-11-22T19:51:24.123997+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R3",
+          "created_at": "2026-11-22T19:51:24.222387+00:00",
+          "id": "01a204d0-3743-729c-bc24-8a95cc60df32",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f1b-7180-86f8-f991cb9b78d0",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Instrument self-deception: a check passes by construction",
+          "updated_at": "2026-11-22T19:51:24.222387+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R4",
+          "created_at": "2026-11-22T19:51:24.322822+00:00",
+          "id": "01a204d0-37a6-7d95-8690-bfd9e2cc8d4e",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-71cf-b84b-73a675ff91f2",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Live transport/pool: SSH forward, branch binary, one writer",
+          "updated_at": "2026-11-22T19:51:24.322822+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R5",
+          "created_at": "2026-11-22T19:51:24.422131+00:00",
+          "id": "01a204d0-3809-7c90-a88f-bdc6baf2ff7f",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f0f-7b77-ab6f-5b49038bef37",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Shared binary/target race",
+          "updated_at": "2026-11-22T19:51:24.422131+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R6",
+          "created_at": "2026-11-22T19:51:24.51888+00:00",
+          "id": "01a204d0-386a-7d1d-8d58-0125bebfd365",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Register staleness: allocation from an old snapshot",
+          "updated_at": "2026-11-22T19:51:24.51888+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R7",
+          "created_at": "2026-11-22T19:51:24.612784+00:00",
+          "id": "01a204d0-38c8-781e-8e39-0611db5b2a73",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Provenance residual: historical service decisions",
+          "updated_at": "2026-11-22T19:51:24.612784+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R8",
+          "created_at": "2026-11-22T19:51:24.71019+00:00",
+          "id": "01a204d0-392a-70b4-8728-a679b7681905",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4efe-73bf-9e8b-004de1b88c50",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Standard completeness: a tailored profile omits a clause",
+          "updated_at": "2026-11-22T19:51:24.71019+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R9",
+          "created_at": "2026-11-22T19:51:24.804523+00:00",
+          "id": "01a204d0-3988-77b5-a7a5-326cd00fc15f",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Peers/shared main: overlapping files and pending SPEC edits",
+          "updated_at": "2026-11-22T19:51:24.804523+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R10",
+          "created_at": "2026-11-22T19:51:24.898602+00:00",
+          "id": "01a204d0-39e6-7ce4-b6f1-02f14d8c6408",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f0c-7bd5-940f-3674a1ddf7fd",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "v1 quality unknown: the verdict may find real work",
+          "updated_at": "2026-11-22T19:51:24.898602+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R11",
+          "created_at": "2026-11-22T19:51:24.994802+00:00",
+          "id": "01a204d0-3a47-7118-97ee-73d1c1ba6a58",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4ef7-7e90-accc-c4d025595477",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Nullable project_id: a consumer returns zero rows silently",
+          "updated_at": "2026-11-22T19:51:24.994802+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R12",
+          "created_at": "2026-11-22T19:51:25.091531+00:00",
+          "id": "01a204d0-3aa7-74c6-bce6-562c5af6be60",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f0e-7ded-9a2c-42628510422a",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Seed quality: wrong statuses or duplicate ADR ids",
+          "updated_at": "2026-11-22T19:51:25.091531+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R13",
+          "created_at": "2026-11-22T19:51:25.186864+00:00",
+          "id": "01a204d0-3b06-7979-9973-06f5be8108f7",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Evidence theatre: the plan claims progress it cannot read back",
+          "updated_at": "2026-11-22T19:51:25.186864+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R14",
+          "created_at": "2026-11-22T19:51:25.282922+00:00",
+          "id": "01a204d0-3b66-7abc-ab67-0c9818b488aa",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f11-75a6-bec6-675c8fd11224",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "CI/agent budget: an agent burst or a probe run",
+          "updated_at": "2026-11-22T19:51:25.282922+00:00",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "heading": "Owners and review dates",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "msp.json",
+          "pointer": "/register_items",
+          "category": null,
+          "count": 17
+        }
+      ],
+      "items": [
+        {
+          "baseline_ref": null,
+          "body": "The one-organisation-loop proof (issue #88, T12) has no test and T5/T6 are proposed. The programme's viability verdict must not claim V2 acceptance; tranche 12 cannot record a continue on unbuilt work.",
+          "code": "",
+          "created_at": "2026-11-21T19:50:28.723073+00:00",
+          "id": "01a1ffa9-032a-7792-98c3-a85aa9bad193",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            "https://github.com/nonagenticai/conveyor/issues/88",
+            "docs/SPEC_V2.md#12"
+          ],
+          "meta": {},
+          "owner_job_id": null,
+          "probability": "high",
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "high",
+          "status": "open",
+          "title": "V2 acceptance (#88/T12) remains open",
+          "updated_at": "2026-11-21T19:50:28.723073+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "All six benefit profiles are draft with placeholder baselines and no measurement instrument. U6 owns the instruments and the before/after transition; no benefit may be claimed realized before that measurement.",
+          "code": "",
+          "created_at": "2026-11-21T19:50:34.899079+00:00",
+          "id": "01a1ffa9-1b48-7f8b-974a-c8d8e5366922",
+          "impact": 4,
+          "kind": "risk",
+          "links": [
+            "acceptance/programme/P0.toml",
+            "docs/evidence/conformance-gap-register.json"
+          ],
+          "meta": {},
+          "owner_job_id": null,
+          "probability": "high",
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "high",
+          "status": "open",
+          "title": "The six benefit baselines are placeholders",
+          "updated_at": "2026-11-21T19:50:34.899079+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "T5, T6, T12, T15 and T17 are proposed, not built. Their tranches must end in pause or stop rather than a fabricated continue, and no project is chartered or closed on unbuilt work.",
+          "code": "",
+          "created_at": "2026-11-21T19:50:42.505689+00:00",
+          "id": "01a1ffa9-3907-7c8d-a6c0-819281d6c050",
+          "impact": 4,
+          "kind": "risk",
+          "links": [
+            "https://github.com/nonagenticai/conveyor/issues/80",
+            "https://github.com/nonagenticai/conveyor/issues/86"
+          ],
+          "meta": {},
+          "owner_job_id": null,
+          "probability": "high",
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "medium",
+          "status": "open",
+          "title": "Tranches 5 and 10-13 cannot deliver on proposed projects",
+          "updated_at": "2026-11-21T19:50:42.505689+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R1",
+          "created_at": "2026-11-22T19:51:09.653118+00:00",
+          "id": "01a204cf-fe6e-783a-a837-ed168b16c967",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Scope vs capacity: 538 packages + 480 artefacts + 13 tranches",
+          "updated_at": "2026-11-22T19:51:09.653118+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R2",
+          "created_at": "2026-11-22T19:51:24.123997+00:00",
+          "id": "01a204d0-36df-7bd0-98c0-6c9a9e249c9b",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f13-7822-8c9a-09e67d5670e0",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Record theatre: sections resolve thinly, registers look operated but are not",
+          "updated_at": "2026-11-22T19:51:24.123997+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R3",
+          "created_at": "2026-11-22T19:51:24.222387+00:00",
+          "id": "01a204d0-3743-729c-bc24-8a95cc60df32",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f1b-7180-86f8-f991cb9b78d0",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Instrument self-deception: a check passes by construction",
+          "updated_at": "2026-11-22T19:51:24.222387+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R4",
+          "created_at": "2026-11-22T19:51:24.322822+00:00",
+          "id": "01a204d0-37a6-7d95-8690-bfd9e2cc8d4e",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-71cf-b84b-73a675ff91f2",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Live transport/pool: SSH forward, branch binary, one writer",
+          "updated_at": "2026-11-22T19:51:24.322822+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R5",
+          "created_at": "2026-11-22T19:51:24.422131+00:00",
+          "id": "01a204d0-3809-7c90-a88f-bdc6baf2ff7f",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f0f-7b77-ab6f-5b49038bef37",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Shared binary/target race",
+          "updated_at": "2026-11-22T19:51:24.422131+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R6",
+          "created_at": "2026-11-22T19:51:24.51888+00:00",
+          "id": "01a204d0-386a-7d1d-8d58-0125bebfd365",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Register staleness: allocation from an old snapshot",
+          "updated_at": "2026-11-22T19:51:24.51888+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R7",
+          "created_at": "2026-11-22T19:51:24.612784+00:00",
+          "id": "01a204d0-38c8-781e-8e39-0611db5b2a73",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Provenance residual: historical service decisions",
+          "updated_at": "2026-11-22T19:51:24.612784+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R8",
+          "created_at": "2026-11-22T19:51:24.71019+00:00",
+          "id": "01a204d0-392a-70b4-8728-a679b7681905",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4efe-73bf-9e8b-004de1b88c50",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Standard completeness: a tailored profile omits a clause",
+          "updated_at": "2026-11-22T19:51:24.71019+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R9",
+          "created_at": "2026-11-22T19:51:24.804523+00:00",
+          "id": "01a204d0-3988-77b5-a7a5-326cd00fc15f",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Peers/shared main: overlapping files and pending SPEC edits",
+          "updated_at": "2026-11-22T19:51:24.804523+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R10",
+          "created_at": "2026-11-22T19:51:24.898602+00:00",
+          "id": "01a204d0-39e6-7ce4-b6f1-02f14d8c6408",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f0c-7bd5-940f-3674a1ddf7fd",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "v1 quality unknown: the verdict may find real work",
+          "updated_at": "2026-11-22T19:51:24.898602+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R11",
+          "created_at": "2026-11-22T19:51:24.994802+00:00",
+          "id": "01a204d0-3a47-7118-97ee-73d1c1ba6a58",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4ef7-7e90-accc-c4d025595477",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Nullable project_id: a consumer returns zero rows silently",
+          "updated_at": "2026-11-22T19:51:24.994802+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R12",
+          "created_at": "2026-11-22T19:51:25.091531+00:00",
+          "id": "01a204d0-3aa7-74c6-bce6-562c5af6be60",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f0e-7ded-9a2c-42628510422a",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Seed quality: wrong statuses or duplicate ADR ids",
+          "updated_at": "2026-11-22T19:51:25.091531+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R13",
+          "created_at": "2026-11-22T19:51:25.186864+00:00",
+          "id": "01a204d0-3b06-7979-9973-06f5be8108f7",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Evidence theatre: the plan claims progress it cannot read back",
+          "updated_at": "2026-11-22T19:51:25.186864+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R14",
+          "created_at": "2026-11-22T19:51:25.282922+00:00",
+          "id": "01a204d0-3b66-7abc-ab67-0c9818b488aa",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f11-75a6-bec6-675c8fd11224",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "CI/agent budget: an agent burst or a probe run",
+          "updated_at": "2026-11-22T19:51:25.282922+00:00",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "heading": "Escalations",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "msp.json",
+          "pointer": "/register_items",
+          "category": null,
+          "count": 17
+        }
+      ],
+      "items": [
+        {
+          "baseline_ref": null,
+          "body": "The one-organisation-loop proof (issue #88, T12) has no test and T5/T6 are proposed. The programme's viability verdict must not claim V2 acceptance; tranche 12 cannot record a continue on unbuilt work.",
+          "code": "",
+          "created_at": "2026-11-21T19:50:28.723073+00:00",
+          "id": "01a1ffa9-032a-7792-98c3-a85aa9bad193",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            "https://github.com/nonagenticai/conveyor/issues/88",
+            "docs/SPEC_V2.md#12"
+          ],
+          "meta": {},
+          "owner_job_id": null,
+          "probability": "high",
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "high",
+          "status": "open",
+          "title": "V2 acceptance (#88/T12) remains open",
+          "updated_at": "2026-11-21T19:50:28.723073+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "All six benefit profiles are draft with placeholder baselines and no measurement instrument. U6 owns the instruments and the before/after transition; no benefit may be claimed realized before that measurement.",
+          "code": "",
+          "created_at": "2026-11-21T19:50:34.899079+00:00",
+          "id": "01a1ffa9-1b48-7f8b-974a-c8d8e5366922",
+          "impact": 4,
+          "kind": "risk",
+          "links": [
+            "acceptance/programme/P0.toml",
+            "docs/evidence/conformance-gap-register.json"
+          ],
+          "meta": {},
+          "owner_job_id": null,
+          "probability": "high",
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "high",
+          "status": "open",
+          "title": "The six benefit baselines are placeholders",
+          "updated_at": "2026-11-21T19:50:34.899079+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "T5, T6, T12, T15 and T17 are proposed, not built. Their tranches must end in pause or stop rather than a fabricated continue, and no project is chartered or closed on unbuilt work.",
+          "code": "",
+          "created_at": "2026-11-21T19:50:42.505689+00:00",
+          "id": "01a1ffa9-3907-7c8d-a6c0-819281d6c050",
+          "impact": 4,
+          "kind": "risk",
+          "links": [
+            "https://github.com/nonagenticai/conveyor/issues/80",
+            "https://github.com/nonagenticai/conveyor/issues/86"
+          ],
+          "meta": {},
+          "owner_job_id": null,
+          "probability": "high",
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "medium",
+          "status": "open",
+          "title": "Tranches 5 and 10-13 cannot deliver on proposed projects",
+          "updated_at": "2026-11-21T19:50:42.505689+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R1",
+          "created_at": "2026-11-22T19:51:09.653118+00:00",
+          "id": "01a204cf-fe6e-783a-a837-ed168b16c967",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Scope vs capacity: 538 packages + 480 artefacts + 13 tranches",
+          "updated_at": "2026-11-22T19:51:09.653118+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R2",
+          "created_at": "2026-11-22T19:51:24.123997+00:00",
+          "id": "01a204d0-36df-7bd0-98c0-6c9a9e249c9b",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f13-7822-8c9a-09e67d5670e0",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Record theatre: sections resolve thinly, registers look operated but are not",
+          "updated_at": "2026-11-22T19:51:24.123997+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R3",
+          "created_at": "2026-11-22T19:51:24.222387+00:00",
+          "id": "01a204d0-3743-729c-bc24-8a95cc60df32",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f1b-7180-86f8-f991cb9b78d0",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Instrument self-deception: a check passes by construction",
+          "updated_at": "2026-11-22T19:51:24.222387+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R4",
+          "created_at": "2026-11-22T19:51:24.322822+00:00",
+          "id": "01a204d0-37a6-7d95-8690-bfd9e2cc8d4e",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-71cf-b84b-73a675ff91f2",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Live transport/pool: SSH forward, branch binary, one writer",
+          "updated_at": "2026-11-22T19:51:24.322822+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R5",
+          "created_at": "2026-11-22T19:51:24.422131+00:00",
+          "id": "01a204d0-3809-7c90-a88f-bdc6baf2ff7f",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f0f-7b77-ab6f-5b49038bef37",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Shared binary/target race",
+          "updated_at": "2026-11-22T19:51:24.422131+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R6",
+          "created_at": "2026-11-22T19:51:24.51888+00:00",
+          "id": "01a204d0-386a-7d1d-8d58-0125bebfd365",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Register staleness: allocation from an old snapshot",
+          "updated_at": "2026-11-22T19:51:24.51888+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R7",
+          "created_at": "2026-11-22T19:51:24.612784+00:00",
+          "id": "01a204d0-38c8-781e-8e39-0611db5b2a73",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Provenance residual: historical service decisions",
+          "updated_at": "2026-11-22T19:51:24.612784+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R8",
+          "created_at": "2026-11-22T19:51:24.71019+00:00",
+          "id": "01a204d0-392a-70b4-8728-a679b7681905",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4efe-73bf-9e8b-004de1b88c50",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Standard completeness: a tailored profile omits a clause",
+          "updated_at": "2026-11-22T19:51:24.71019+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R9",
+          "created_at": "2026-11-22T19:51:24.804523+00:00",
+          "id": "01a204d0-3988-77b5-a7a5-326cd00fc15f",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Peers/shared main: overlapping files and pending SPEC edits",
+          "updated_at": "2026-11-22T19:51:24.804523+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R10",
+          "created_at": "2026-11-22T19:51:24.898602+00:00",
+          "id": "01a204d0-39e6-7ce4-b6f1-02f14d8c6408",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f0c-7bd5-940f-3674a1ddf7fd",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "v1 quality unknown: the verdict may find real work",
+          "updated_at": "2026-11-22T19:51:24.898602+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R11",
+          "created_at": "2026-11-22T19:51:24.994802+00:00",
+          "id": "01a204d0-3a47-7118-97ee-73d1c1ba6a58",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4ef7-7e90-accc-c4d025595477",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Nullable project_id: a consumer returns zero rows silently",
+          "updated_at": "2026-11-22T19:51:24.994802+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R12",
+          "created_at": "2026-11-22T19:51:25.091531+00:00",
+          "id": "01a204d0-3aa7-74c6-bce6-562c5af6be60",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B1"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f0e-7ded-9a2c-42628510422a",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "Seed quality: wrong statuses or duplicate ADR ids",
+          "updated_at": "2026-11-22T19:51:25.091531+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R13",
+          "created_at": "2026-11-22T19:51:25.186864+00:00",
+          "id": "01a204d0-3b06-7979-9973-06f5be8108f7",
+          "impact": 5,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B3"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "probability": "H",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "high",
+          "status": "open",
+          "title": "Evidence theatre: the plan claims progress it cannot read back",
+          "updated_at": "2026-11-22T19:51:25.186864+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": null,
+          "body": "",
+          "code": "R14",
+          "created_at": "2026-11-22T19:51:25.282922+00:00",
+          "id": "01a204d0-3b66-7abc-ab67-0c9818b488aa",
+          "impact": 3,
+          "kind": "risk",
+          "links": [
+            {
+              "kind": "relates_to",
+              "target": "benefit/B5"
+            }
+          ],
+          "meta": {},
+          "owner_job_id": "01a1db6b-4f11-75a6-bec6-675c8fd11224",
+          "probability": "M",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "response": null,
+          "review_at": "2026-11-29",
+          "severity": "medium",
+          "status": "open",
+          "title": "CI/agent budget: an agent burst or a probe run",
+          "updated_at": "2026-11-22T19:51:25.282922+00:00",
+          "version": 1
+        }
+      ]
+    }
+  ],
+  "definition_project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc"
+}

@@ -604,6 +604,7 @@ async fn call_model(
         registry(),
         caller.tenant,
         InvokeRequest {
+            credential_alias: None,
             action: "completions.create".to_owned(),
             input: serde_json::to_value(&input).map_err(ActionError::serialize)?,
             precondition: None,
@@ -690,6 +691,7 @@ async fn invoke_action(
         registry(),
         caller.tenant,
         InvokeRequest {
+            credential_alias: None,
             action: spec.name.to_owned(),
             input: input.clone(),
             precondition: None,

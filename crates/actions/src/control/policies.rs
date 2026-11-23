@@ -3,10 +3,13 @@
 //! gated (conveyor#282, SPEC_V2 §10.4).
 //!
 //! The mechanism lives in [`super::approvals::enforce_destructive_gate`]; this family is the only
-//! way a tenant changes what that gate does. Two settings per action, and nothing else:
-//! whether an approval is required at all, and whether the person who asked for a gate may decide
-//! it. Both defaults are the strict §11.4 / §5.4 rule, so a tenant that never calls `set` is
+//! way a tenant changes what that gate does. `approval` is the setting: whether an approval is
+//! required at all. Its default is the strict §11.4 rule, so a tenant that never calls `set` is
 //! already correct.
+//!
+//! ⛔ `self_approval` is **not** a setting: §5.4 / P4 make the requester's exclusion an invariant,
+//! so `set` refuses `allowed` (ledger v1-w4b-4) and `forbidden` is the only accepted spelling. A
+//! historical `allowed` row still reads, but authorises nothing.
 //!
 //! ⛔ A policy can only ever **lower** a requirement for one named action. It cannot grant a
 //! scope, widen an effect ceiling or authorise an action that the caller's role does not already
@@ -29,7 +32,10 @@ impl From<&ApprovalPolicy> for ApprovalPolicyOut {
         Self {
             action: policy.action.clone(),
             approval: policy.approval.as_str().to_owned(),
-            self_approval: policy.self_approval.as_str().to_owned(),
+            // A historical `allowed` row still parses — [`SelfApproval`] keeps the variant so old
+            // data never breaks a read — but the answer is §5.4's invariant, never the stored
+            // value: no read path may report a permission the engine refuses (ledger v1-w4b-4).
+            self_approval: SelfApproval::Forbidden.as_str().to_owned(),
         }
     }
 }
@@ -140,9 +146,20 @@ async fn approval_policies_set(
         invalid(
             "self_approval",
             "invalid_value",
-            "must be `forbidden` or `allowed`",
+            "must be `forbidden`: SPEC_V2 §5.4 makes self-approval an invariant, not a tenant \
+             permission",
         )
     })?;
+    // ⛔ §5.4 / P4 is an invariant, not a permission (ledger v1-w4b-4). The historical `allowed`
+    // spelling still parses so old rows read, but no caller may record it as a decision.
+    if self_approval == SelfApproval::Allowed {
+        return Err(invalid(
+            "self_approval",
+            "invalid_value",
+            "SPEC_V2 §5.4: the requester can never decide their own gate, so `allowed` cannot be \
+             stored; use `forbidden`",
+        ));
+    }
     let policy = ApprovalPolicy {
         action: spec.name.to_owned(),
         approval,
@@ -154,13 +171,21 @@ async fn approval_policies_set(
     Ok(ApprovalPolicyOut::from(&policy))
 }
 
-/// A policy store failure is never a client error except for the vocabulary the action already
-/// validated — so it is a scrubbed `500`, exactly like every other store failure here.
+/// A policy store failure is a scrubbed `500`, except the store's own refusal of `allowed`
+/// self-approval, which stays the client-correctable `422` the handler would have answered.
 fn policy_error(
     error: store::approval_policy::ApprovalPolicyStoreError,
     action: &str,
 ) -> ActionError {
     match error {
+        // Defense in depth: the handler refuses `allowed` before it reaches the store, but the
+        // store's own refusal is still a client-correctable value error, never a `500`.
+        store::approval_policy::ApprovalPolicyStoreError::SelfApprovalAllowed => invalid(
+            "self_approval",
+            "invalid_value",
+            "SPEC_V2 §5.4: the requester can never decide their own gate, so `allowed` cannot be \
+             stored; use `forbidden`",
+        ),
         store::approval_policy::ApprovalPolicyStoreError::Database(error) => {
             store_error(error, action)
         }
