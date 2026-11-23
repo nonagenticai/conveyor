@@ -1,0 +1,17 @@
+{
+  "schema": "w5-deep-review/v1",
+  "snapshot_manifest_sha256": null,
+  "method": "A code-path review of the action contract at lane head 3c13c4bd, after the red-first test was measured failing: the register input structs are compared with the schemars 1.2.3 derive's requiredness rule, and the refusal is reproduced by the test before the fix and required to pass after it.",
+  "findings": [
+    {
+      "key": "v1-registers-schema-1",
+      "kind": "code",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "registers.list refuses every bare filter, blocking the register read and the promotion replay",
+      "evidence": "At lane head 3c13c4bd, invoking registers.list with {} and with a valid programme_id both return 422 'the input does not match the action schema'. crates/actions/src/spine/mod.rs:699-708 declares RegisterListIn with three Option fields and no #[serde(default)]; the same omission is on RegisterCreateIn (:631-665) and RegisterUpdateIn (:668-696). schemars 1.2.3 derives requiredness from the field's default/option rule (schemars_derive schema_exprs.rs:728-739), so the generated input marks those fields required. The red-first test crates/actions/tests/registry.rs::registers_list_accepts_its_filters was committed at 5d51531a and fails at this head. The defect blocked scripts/promote-record.py --apply against the staging record and every checker that lists a register.",
+      "acceptance": "cargo-guard.py test -p conveyor-actions --test registry registers_list_accepts_its_filters exits 0; the generated schema carries no required entry for the register filter inputs; conveyor admin actions dump is regenerated and served-spec.lock.json --check-lock exits 0; a journal entry's input validates against its action schema.",
+      "artifact": "crates/actions/src/spine/mod.rs#registers-list"
+    }
+  ]
+}
