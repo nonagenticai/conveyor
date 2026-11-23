@@ -124,7 +124,7 @@
   ],
   "failures": [],
   "gate": "The A\u2013D set is approved; the project re-closes through the one gate.",
-  "generated_at": "2026-11-23T10:37:22.302315+00:00",
+  "generated_at": "2026-11-23T21:01:16.000784+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T0.toml",
   "name": "Model and contracts",
@@ -132,8 +132,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-23T10:28:30.225766+00:00",
-    "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
-    "path": "retained-snapshot/4304be961d76deea9b37b1c3dc5f6ba4abe5a642"
+    "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+    "path": "retained-snapshot/f3bfa7ab7abf9f520d880e1816b50e6db2b86031"
   },
   "verdict": "green",
   "warnings": []

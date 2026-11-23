@@ -1,0 +1,30 @@
+{
+  "checks": [
+    {
+      "check": null,
+      "description": "the snapshot carries the project",
+      "detail": "the snapshot has no project 'T18'",
+      "id": "T18-project",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    }
+  ],
+  "failures": [
+    "T18-project (P0): the snapshot has no project 'T18'"
+  ],
+  "gate": null,
+  "generated_at": "2026-11-23T21:01:17.166488+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/T18.toml",
+  "name": null,
+  "project": "T18",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-23T10:28:30.225766+00:00",
+    "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+    "path": "retained-snapshot/f3bfa7ab7abf9f520d880e1816b50e6db2b86031"
+  },
+  "verdict": "red",
+  "warnings": []
+}

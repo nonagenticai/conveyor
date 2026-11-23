@@ -4910,22 +4910,27 @@
       "evidence": [
         {
           "path": "crates/actions/src/workflow/runs.rs",
-          "line": 204,
-          "quote": "        capability_id: None,"
+          "line": 193,
+          "quote": "    let (capability_id, bound_agents) = match capability_agent_id {"
         },
         {
           "path": "crates/actions/src/process/runs.rs",
-          "line": 246,
-          "quote": "    let readiness = crate::capability::readiness::capability_readiness_tx("
+          "line": 248,
+          "quote": "    crate::capability::readiness::ensure_run_start_ready_tx("
         },
         {
           "path": "crates/store/src/prompt.rs",
-          "line": 185,
+          "line": 211,
           "quote": "    if let Some(capability_id) = capability_id {"
         }
       ],
       "failure_scenario": "A workflow whose node is an internal_agent with a required knowledge pack bound at an unpublished version starts through workflow_runs.start; no readiness check exists on that path, the run row is written, and the agent step later refuses or runs with no knowledge facts. The required pack is never enforced before the first step.",
       "acceptance": "Every run-start seam either resolves capability_id, including workflow and generic runs, or runs the same readiness check; a test starts a workflow run against a required unpublished pack and asserts the refusal with zero run rows and zero model calls.",
+      "resolved_by": {
+        "commit": "a8949f1f9b3d19b018eeeda550618a82805dd93d",
+        "test": "crates/actions/tests/run_capability.rs::a_generic_run_resolves_its_capability_or_refuses",
+        "evidence": "cargo-guard.py test -p conveyor-actions --test run_capability: 8 passed; --test workflow_runs: 8 passed"
+      },
       "owner_project": "PLATFORM"
     },
     {
@@ -5288,22 +5293,27 @@
       "evidence": [
         {
           "path": "crates/store/src/approval.rs",
-          "line": 878,
-          "quote": "    if eval_gate.is_some() {"
+          "line": 938,
+          "quote": "    if decision.decided_by_kind != DeciderKind::Human {"
         },
         {
           "path": "crates/store/src/approval.rs",
-          "line": 879,
-          "quote": "        if decision.decided_by_kind != DeciderKind::Human {"
+          "line": 939,
+          "quote": "        let allowed = match approval_policy::allows_approver_kind("
         },
         {
           "path": "crates/store/src/approval_policy.rs",
-          "line": 132,
-          "quote": "    pub self_approval: SelfApproval,"
+          "line": 138,
+          "quote": "    pub approver_kind: DeciderKind,"
         }
       ],
       "failure_scenario": "A service principal holding approvals:write answers a PM charter or baseline gate through an internal invoke. record_decision_tx writes a service decider and resolves the gate because it is not an eval gate; with two required decisions, two machine principals complete dual control and no human is involved, although the tenant never declared the gate non-governance.",
       "acceptance": "A non-human decision on any gate not declared non-governance in a tenant gate-policy row is refused 403 human_only_gate; the policy row carries the approver kind; tests cover the default refusal and the tenant-declared job or agent approval.",
+      "resolved_by": {
+        "commit": "900ec2b267defeaa33075864fee525c6a9c66d46",
+        "test": "crates/actions/tests/approval_policies.rs::a_job_decision_on_an_undeclared_gate_is_refused",
+        "evidence": "cargo-guard.py test -p conveyor-actions --test approval_policies: 12 passed; -p conveyor-store --test eval_signoff_gate: 2 passed"
+      },
       "owner_project": "T11"
     },
     {
