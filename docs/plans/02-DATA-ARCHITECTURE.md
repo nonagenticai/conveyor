@@ -1394,6 +1394,25 @@ The store's one apply helper (`apply_draft_tx`) is shared by `ladder.apply_draft
 `run.resume` worker, so the decision binding is checked once. The run's `waiting_approval` row is
 live work and holds `uq_run_live` until the decision, the rejection or `approval.expire`.
 
+### 2.26 The work package's run — S21 step 6 (0 new tables)
+
+The card's binding and the run's memory reuse existing columns and rows; no table and no migration.
+
+| Row | What the level writes |
+|---|---|
+| `card` | `job_binding_id` (the column from `0040_organisation`) is now written by `cards.create`/`cards.update` and read by every card view; the id must resolve in the tenant and be `active` |
+| `run` | a `runs.create` call with no binding inherits the card's binding before `insert_run_tx` resolves the pin; an explicit conflicting binding is refused before the INSERT; the run row is unchanged |
+| `work_package_memory` | one `kind='attempt'`, `source='system'` hot row per terminal root run of a card, inserted by the terminal transition in the same transaction (`run_id` set; `meta = {run_id, status, error_class}`), then the existing per-card `memory.consolidate` job is enqueued |
+| `job` | the existing `memory.consolidate` row is unchanged; it now has rows to consolidate |
+| `document` | unchanged — the draft's attach path is §2.25's |
+
+A child run (`parent_run_id IS NOT NULL`) and a card-less run write no memory row: a child shares
+its parent's card and is part of the parent's attempt, and a card-less run has no work package.
+The attempt row and the terminal status commit together or not at all. The prompt's memory selector
+reads the card's newest un-consolidated rows, so the next run reads the prior attempt until the
+digest stamps it. The **budget** is not this level's: `run_budget_tx` and the invoke precheck are the
+#526 lane's `v1-p75-1`/`v1-w4a-1`, and `ReleaseLimits.max_tokens` remains that gate's residual.
+
 ## 3. State machines and enforcement
 
 Every transition is a pure function in `crates/domain`; no DB trigger, no per-flow rule, no CHECK that
@@ -1422,12 +1441,16 @@ duplicates the function. The CHECK constraints below guard *vocabulary*, never *
 | Stored | `run.status`, `started_at`, `finished_at`, `attempt`, `error_class`, `error_message` |
 | Invariant | **a run is a tree (2026-11-09).** Partial unique `(tenant_id, card_id) WHERE parent_run_id IS NULL AND status IN ('queued','running','waiting_approval')` — **one live ROOT run per card**; the project form is `(tenant_id, project_id) WHERE parent_run_id IS NULL AND card_id IS NULL AND status IN (…)`; one live child per `(parent_run_id, step_id)` and one row per `(parent_run_id, step_id, attempt)`. `CHECK (parent_run_id IS NULL OR step_id IS NOT NULL)` and `CHECK (depth BETWEEN 0 AND 3)`. Cancel cascades from a parent to its children; a child's failure does not re-fire the parent's `err.card`. Enforced by the DB even if two API pods race |
 
-**A bound `internal_agent` run (S21 steps 4–5) uses the full path.** Its gate pre-check is recorded
+**A bound `internal_agent` run (S21 steps 4–6) uses the full path.** A run created for a card that
+names a binding inherits it (`card.job_binding_id → run.job_binding_id`; an explicit conflicting
+binding is refused `422 card_binding_mismatch` before the INSERT). Its gate pre-check is recorded
 on the step. On `accepted` it succeeds with the draft; on `handover` it parks in `waiting_approval`
 and opens a card-scoped `executor` approval whose `meta` names the draft (§2.25). A person's
 approval settles it `running` and the `run.resume` job applies the draft and finishes it
 `succeeded`. A rejection cancels it; `approval.expire` cancels a still-waiting run with
 `approval_expired`. The parked run is live work and holds `uq_run_live` until one of those outcomes.
+Every terminal root run of a card inserts one `attempt` memory row in the terminal transaction
+(§2.26).
 
 ### 3.3 Approval
 

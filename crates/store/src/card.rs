@@ -44,6 +44,9 @@ pub struct NewCard {
     pub assignee_id: Option<Uuid>,
     /// The creating user.
     pub created_by: Option<Uuid>,
+    /// The job binding the card is assigned to (SPEC_V2 §4.4; S21 step 6). The action layer
+    /// validates that the id is a live binding in this tenant before the write.
+    pub job_binding_id: Option<Uuid>,
     /// Kind-specific fields.
     pub meta: Value,
 }
@@ -66,6 +69,7 @@ impl NewCard {
             due_at: None,
             assignee_id: None,
             created_by: None,
+            job_binding_id: None,
             meta: Value::Object(serde_json::Map::new()),
         }
     }
@@ -185,8 +189,9 @@ pub async fn insert_card_tx(
     }
     let sql = format!(
         "INSERT INTO card (tenant_id, board_id, list_id, card_type_id, parent_card_id,
-                           name, description, position, due_at, assignee_id, created_by, meta)
-         SELECT $1, l.board_id, l.id, $3, $4, $5, $6, $7, $8, $9, $10, $11
+                           name, description, position, due_at, assignee_id, created_by,
+                           job_binding_id, meta)
+         SELECT $1, l.board_id, l.id, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
            FROM list l
           WHERE l.tenant_id = $1 AND l.id = $2
          RETURNING {COLUMNS}"
@@ -202,6 +207,7 @@ pub async fn insert_card_tx(
         .bind(input.due_at)
         .bind(input.assignee_id)
         .bind(input.created_by)
+        .bind(input.job_binding_id)
         .bind(&input.meta)
         .fetch_optional(&mut *conn)
         .await?;
@@ -447,6 +453,8 @@ pub struct CardRecord {
     pub stopwatch_seconds: i32,
     /// The creating user.
     pub created_by: Option<Uuid>,
+    /// The job binding the card is assigned to (S21 step 6), when one is named.
+    pub job_binding_id: Option<Uuid>,
     /// Kind-specific fields.
     pub meta: Value,
     /// The card type's stable code (`card_type.code`).
@@ -480,6 +488,7 @@ struct CardRecordRow {
     stopwatch_started_at: Option<chrono::DateTime<chrono::Utc>>,
     stopwatch_seconds: i32,
     created_by: Option<Uuid>,
+    job_binding_id: Option<Uuid>,
     meta: Value,
     card_type_code: String,
     created_at: chrono::DateTime<chrono::Utc>,
@@ -512,6 +521,7 @@ impl From<CardRecordRow> for CardRecord {
             stopwatch_started_at: row.stopwatch_started_at,
             stopwatch_seconds: row.stopwatch_seconds,
             created_by: row.created_by,
+            job_binding_id: row.job_binding_id,
             meta: row.meta,
             card_type_code: row.card_type_code,
             created_at: row.created_at,
@@ -524,7 +534,7 @@ const RECORD_COLUMNS: &str = "c.id, c.list_id, c.card_type_id, c.board_id, c.arc
      c.assignee_id, c.lease_expires_at, c.lease_token, c.claim_fence, c.prev_list_id, \
      c.list_changed_at, c.version, c.name, c.description, c.position, c.parent_card_id, \
      c.due_at, c.due_done_at, c.stopwatch_started_at, c.stopwatch_seconds, c.created_by, \
-     c.meta, c.created_at, c.updated_at, t.code AS card_type_code";
+     c.job_binding_id, c.meta, c.created_at, c.updated_at, t.code AS card_type_code";
 
 /// Read one card as a record inside the caller's scoped transaction.
 pub async fn get_card_record_tx(
@@ -686,6 +696,9 @@ pub struct CardUpdate {
     pub due_at: Option<chrono::DateTime<chrono::Utc>>,
     /// `Some(true)` stamps `due_done_at = now()`; `Some(false)` clears it.
     pub due_done: Option<bool>,
+    /// The job binding to assign the card to; absent leaves the assignment unchanged (S21
+    /// step 6). The action layer validates the id before the write.
+    pub job_binding_id: Option<Uuid>,
 }
 
 /// Update a card's content, guarded by its version. `None` means absent or stale.
@@ -707,9 +720,10 @@ pub async fn update_card_tx(
                     WHEN $6 THEN now()
                     ELSE NULL
                 END,
+                job_binding_id = coalesce($7::uuid, job_binding_id),
                 version = version + 1,
                 updated_at = now()
-          WHERE tenant_id = $1 AND id = $2 AND version = $7
+          WHERE tenant_id = $1 AND id = $2 AND version = $8
           RETURNING id",
     )
     .bind(tenant.as_uuid())
@@ -718,6 +732,7 @@ pub async fn update_card_tx(
     .bind(patch.description.as_deref())
     .bind(patch.due_at)
     .bind(patch.due_done)
+    .bind(patch.job_binding_id)
     .bind(expected)
     .fetch_optional(&mut *conn)
     .await?;

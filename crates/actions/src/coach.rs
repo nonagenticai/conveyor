@@ -904,6 +904,7 @@ async fn coach_interrupt(
             card_type_code: store::coach::COACH_CARD_TYPE.to_owned(),
             due_at: None,
             parent_card_id: None,
+            job_binding_id: None,
             meta: Some(json!({ "interrupted_card_id": interrupted_card_id })),
             // The one caller allowed to create a coach card (SPEC_V2 §6.2): the interruption
             // that references it is inserted in the same transaction (v1-p6-6).

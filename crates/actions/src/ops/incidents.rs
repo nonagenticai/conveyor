@@ -365,6 +365,7 @@ async fn ops_incident(
             internal_coach_card: false,
             due_at: None,
             parent_card_id: None,
+            job_binding_id: None,
             meta: Some(json!({
                 META_SERVICE: service,
                 META_SEVERITY: severity,

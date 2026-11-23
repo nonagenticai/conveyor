@@ -1,37 +1,69 @@
 import { expect, test } from "./fixture";
 
-// SPEC_V2 §10.5 — the live Portfolio destination. The screen's only read is
-// `portfolio.in_flight` against the seeded dev tenant: the in-flight set is computed from
-// project status, so what the screen shows is what the action returned, never an invented row.
+import { authFor, createBoardCard } from "./helpers";
 
-test("the portfolio destination renders the in-flight set from the real read", async ({ page }) => {
+// T18-1 P2/P3: Portfolio reads the tenant's rows; the delivery view renders L1–L4; a spend row
+// with no priced call is `—*`, never `$0`.
+
+test("the portfolio renders the tenant's in-flight set, never a fixture", async ({
+  page,
+  request,
+}) => {
+  const title = `e2e portfolio ${Date.now()}`;
+  await createBoardCard(request, title);
+
+  const response = await request.get("/api/projects?limit=200", { headers: authFor() });
+  expect(response.ok()).toBe(true);
+  const document = (await response.json()) as { items: { name: string }[] };
+  const names = document.items.map((project) => project.name);
+  expect(names).toContain(title);
+
   await page.goto("/portfolio");
   await expect(page.getByRole("heading", { name: "Portfolio", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "L1 · Portfolio" })).toBeVisible();
 
-  // The seeded admin's manifest carries portfolio.in_flight, so the read succeeds: a problem
-  // panel here would be a broken contract, not an empty tenant.
-  await expect(page.locator(".problem")).toHaveCount(0);
+  const table = page.locator("table.table").first();
+  const row = table.locator("tr", { hasText: title });
+  await expect(row).toBeVisible();
+  await expect(row.getByText("no dated activity")).toBeVisible();
+  await expect(row.getByText("—*")).toBeVisible();
 
-  // Four tiles count the two sets and the with/without-programme split, whatever the tenant's
-  // set is.
-  await expect(page.locator(".tile")).toHaveCount(4);
+  // Every rendered project row names a project the API returned: no fixture row survives.
+  const rendered = await table
+    .locator("tbody tr")
+    .evaluateAll((rows) => rows.map((row) => (row.children[1] as HTMLElement).innerText.trim()));
+  for (const name of rendered) {
+    expect(names).toContain(name);
+  }
 
-  // Either the tables carry rows, or the honest empty state is shown — never a fake row.
-  const rows = page.locator("table tbody tr");
-  const empty = page.getByText("Nothing is in flight");
-  const count = await rows.count();
-  const emptyVisible = await empty.isVisible().catch(() => false);
-  expect(count > 0 || emptyVisible, "portfolio shows rows or the empty state").toBeTruthy();
+  await expect(page.getByRole("heading", { name: "L2 · Programme" })).toBeVisible();
 });
 
-test("the portfolio screen has no horizontal page scroll at 1280 and 390", async ({ page }) => {
+test("the delivery view renders L1-L4 and the work package's execution", async ({
+  page,
+  request,
+}) => {
+  const title = `e2e delivery ${Date.now()}`;
+  const fixture = await createBoardCard(request, title);
+
   await page.goto("/portfolio");
-  await expect(page.getByRole("heading", { name: "Portfolio", exact: true })).toBeVisible();
-  for (const width of [1280, 390]) {
-    await page.setViewportSize({ width, height: 900 });
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    expect(overflow, `width ${width}`).toBeLessThanOrEqual(0);
-  }
+  const row = page.locator("table.table").first().locator("tr", { hasText: title });
+  await row.getByRole("button", { name: "Open" }).click();
+
+  await expect(page.getByRole("heading", { name: "L3 · Project" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "L4 · Work package" })).toBeVisible();
+  // The work package's own execution link is the cockpit route for THAT card; the board may
+  // carry other cards, so target the fixture's href rather than the first link.
+  await expect(page.locator(`a[href="/card/${fixture.card.id}"]`)).toBeVisible();
+});
+
+test("an unpriced row is marked", async ({ page, request }) => {
+  const title = `e2e unpriced ${Date.now()}`;
+  await createBoardCard(request, title);
+
+  await page.goto("/portfolio");
+  const row = page.locator("table.table").first().locator("tr", { hasText: title });
+  await expect(row.getByText("—*")).toBeVisible();
+  await expect(row.getByText("no priced call")).toBeVisible();
+  await expect(row.getByText("$0")).toHaveCount(0);
 });

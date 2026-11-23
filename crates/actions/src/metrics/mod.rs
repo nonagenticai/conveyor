@@ -1095,6 +1095,7 @@ async fn metrics_reconcile(
                 internal_coach_card: false,
                 due_at: None,
                 parent_card_id: None,
+                job_binding_id: None,
                 meta: Some(serde_json::json!({
                     "period_start": input.period_start.to_string(),
                     "period_end": input.period_end.to_string(),
