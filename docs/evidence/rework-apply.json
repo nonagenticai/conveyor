@@ -342,6 +342,12 @@
       "card_id": "01a207b9-1c96-7a25-a2b6-9a3c54e39927",
       "severity": "P1"
     },
+    "v1-shared-config-writer:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T09:28:02+00:00",
+      "card_id": "01a207bb-dd2f-7845-b1a2-8c8bbc366a88",
+      "severity": "P1"
+    },
     "v1-std-broken-source:PLATFORM": {
       "apply_to": "PLATFORM",
       "at": "2026-11-23T09:26:09+00:00",
@@ -513,5 +519,5 @@
   "failures": [],
   "schema": "conveyor-rework-apply/v1",
   "tenant": "nonagentic",
-  "updated_at": "2026-11-23T09:26:09+00:00"
+  "updated_at": "2026-11-23T09:28:02+00:00"
 }

@@ -15644,6 +15644,82 @@
       "title": "Rework rate is not computed anywhere"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-shared-config-writer:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "§8.2",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A served action family writes programme.shared_config scoped by tenant and programme, validating the object shape (values object, locked array) and taking an optimistic version; a read action returns it; a test writes then reads back and refuses a non-object; the safe-art body's Shared configuration section resolves from the row and the published document exists.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 8,
+              "path": "migrations/0070_programme_shared_config.sql",
+              "quote": "    ADD COLUMN shared_config jsonb NOT NULL DEFAULT '{}'::jsonb;",
+              "source": "code"
+            },
+            {
+              "line": 184,
+              "path": "crates/store/src/portfolio.rs",
+              "quote": "    pub shared_config: Value,",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-shared-config-writer",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-shared-config-writer:PLATFORM",
+      "kind": "CODE",
+      "owner_project": "PLATFORM",
+      "rule": "v1-shared-config-writer",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "Migration 0070 adds programme.shared_config with a shape constraint and the store reads it, but the served action registry has no action that writes or reads it (grep 'shared_config' in docs/design/data/actions.json is zero). The deep-review finding w3-shared-config-1 is recorded as RECORD, yet no record can be created through the product's actions; the safe-art artefact's Shared configuration and Published document sections therefore stay absent.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 8,
+                  "path": "migrations/0070_programme_shared_config.sql",
+                  "quote": "    ADD COLUMN shared_config jsonb NOT NULL DEFAULT '{}'::jsonb;",
+                  "source": "code"
+                },
+                {
+                  "line": 184,
+                  "path": "crates/store/src/portfolio.rs",
+                  "quote": "    pub shared_config: Value,",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-shared-config-writer",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "programme.shared_config has no writer action, so the mandatory safe-art artefact cannot resolve"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check seed_live_drift:programme",
       "apply_to": "PLATFORM",
       "artefact": "seed_reconciliation",
@@ -90499,12 +90575,12 @@
       "suppressed": 0
     },
     "SAFe": {
-      "findings": 3,
+      "findings": 4,
       "gaps": 18,
       "p0": 0,
       "p1": 18,
       "p2": 0,
-      "packages": 28,
+      "packages": 29,
       "rules": 8,
       "rules_clean": 6,
       "rules_with_gaps": 2,
@@ -90538,30 +90614,30 @@
   "snapshot": "/tmp/snap-526v7/data",
   "summary": {
     "by_kind": {
-      "CODE": 78,
+      "CODE": 79,
       "RECORD": 712,
       "STANDARD": 3
     },
     "by_severity": {
       "P0": 27,
-      "P1": 249,
+      "P1": 250,
       "P2": 517
     },
     "by_standard": {
       "MSP": 83,
       "PMP": 156,
-      "SAFe": 28,
+      "SAFe": 29,
       "SPEC": 70,
       "TOGAF": 456
     },
     "by_status": {
-      "open": 793
+      "open": 794
     },
     "duplicates": 0,
-    "open": 793,
-    "packages": 793,
+    "open": 794,
+    "packages": 794,
     "resolved": 114,
-    "subjects": 870,
+    "subjects": 871,
     "suppressed": 0
   }
 }

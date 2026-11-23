@@ -1,9 +1,9 @@
 {
   "schema": "v2-gap-ledger/v1",
-  "lane_pin": "74d17346",
+  "lane_pin": "6e36ab90",
   "generated_from": {
     "artefact_record": {
-      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526/scripts/generate-standards.py --snapshot /tmp/snap-526v7/data --outputs-dir /tmp/snap-526v7/docs --register docs/evidence/rework-register.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-ig7dgxza --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-ig7dgxza/findings.json",
+      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526/scripts/generate-standards.py --snapshot /tmp/snap-526v7/data --outputs-dir /tmp/snap-526v7/docs --register docs/evidence/rework-register.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-0gcmpn8t --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-0gcmpn8t/findings.json",
       "summary": {
         "absent": 411,
         "artefacts": 1049,
@@ -26,7 +26,7 @@
       },
       {
         "path": "docs/evidence/rework-register.json",
-        "sha256": "3fbc6d615a7eb8f7cac45d0019814bbb49c284edbe74db42c5f1f157e0665081",
+        "sha256": "129e0f18b3341bf15cc43b5e239421729ee9aaf4e9ea2d36e620c835694e4ef7",
         "role": "rework register; fix cards and owners"
       },
       {
@@ -41,7 +41,7 @@
       },
       {
         "path": "docs/evidence/v1-conformance-findings.json",
-        "sha256": "4d65b1e861d6c3fdf2636ceee251c66d152cbf7624687affc5cda43cbddd08f0",
+        "sha256": "9e4da30f9cc1bab9b15e34d5568828822915f10935c50714130d78888f20f874",
         "role": "v1 findings; open ledger"
       },
       {
@@ -83,14 +83,14 @@
     "deploy_bound": "the not-yet-deployed set is migrations 0062-0066 and the authoring.* family 0066 creates"
   },
   "counts": {
-    "rows": 446,
+    "rows": 447,
     "by_kind": {
       "artefact": 327,
       "baseline": 43,
-      "ledger": 76
+      "ledger": 77
     },
     "by_severity": {
-      "P1": 257,
+      "P1": 258,
       "P0": 34,
       "P2": 155
     },
@@ -105,23 +105,23 @@
         "P0": 12
       },
       "ledger": {
-        "P1": 49,
+        "P1": 50,
         "P2": 26,
         "P0": 1
       }
     },
     "by_deploy_bound": {
-      "false": 446
+      "false": 447
     },
     "by_status": {
       "absent": 327,
       "stale": 43,
-      "open": 76
+      "open": 77
     },
     "by_fix_card_resolution": {
       "published_package": 327,
       "baseline_key": 43,
-      "finding_id": 76
+      "finding_id": 77
     },
     "declared_package_keys_absent_from_register": [],
     "artefact_fix_card_resolution": {
@@ -7705,6 +7705,24 @@
       "standard_id": "v1-s17-1",
       "declared_package_key": "",
       "target_phase": "G",
+      "deploy_bound": false
+    },
+    {
+      "key": "ledger:v1-shared-config-writer",
+      "kind": "ledger",
+      "standard": "SAFe",
+      "spec": "§8.2",
+      "subject": "§8.2",
+      "project": "PLATFORM",
+      "title": "programme.shared_config has no writer action, so the mandatory safe-art artefact cannot resolve",
+      "status": "open",
+      "severity": "P1",
+      "owner": "PLATFORM",
+      "fix_card": "v1-shared-config-writer",
+      "fix_card_resolution": "finding_id",
+      "standard_id": "v1-shared-config-writer",
+      "declared_package_key": "",
+      "target_phase": "Preliminary",
       "deploy_bound": false
     },
     {
