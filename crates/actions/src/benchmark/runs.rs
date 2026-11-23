@@ -131,7 +131,7 @@ async fn benchmark_runs_start(
     }
     // S18 §3: the run pins the executor version it measured. Resolved here, once, at start — never
     // joined at read time, where an edit would silently relabel a past measurement.
-    let (subject_version, capability_agent_id, process_id) = match subject_kind {
+    let (subject_version, capability_agent_id, process_id, agent_snapshot) = match subject_kind {
         "suite" => {
             if input.arm == "conveyor" {
                 return Err(invalid(
@@ -147,7 +147,7 @@ async fn benchmark_runs_start(
                     "a suite subject carries no capability_agent_id or process_id",
                 ));
             }
-            (None, None, None)
+            (None, None, None, None)
         }
         "capability_agent" => {
             let id = input.capability_agent_id.ok_or_else(|| {
@@ -179,7 +179,18 @@ async fn benchmark_runs_start(
                     ),
                 ));
             }
-            (Some(agent.version), Some(id), None)
+            // S18 §3 / W11: the run measures a **frozen** configuration. The snapshot is taken
+            // once, here, and the producer executes it; editing the agent row mid-run cannot
+            // change what a started benchmark measures.
+            let snapshot = json!({
+                "model_ref": agent.model_ref,
+                "prompt_ref": agent.prompt_ref,
+                "allowed_actions": agent.allowed_actions,
+                "max_iterations": agent.max_iterations,
+                "timeout_secs": agent.timeout_secs,
+                "version": agent.version,
+            });
+            (Some(agent.version), Some(id), None, Some(snapshot))
         }
         "process" => {
             // S18 §5 allows a `swebench-fix` process as the producer. A process run is
@@ -247,11 +258,14 @@ async fn benchmark_runs_start(
         .iter()
         .map(|instance| instance.instance_id.clone())
         .collect();
-    let options = json!({
+    let mut options = json!({
         "concurrency": concurrency,
         "only": input.only,
         "with_failing_test": input.with_failing_test,
     });
+    if let Some(snapshot) = agent_snapshot {
+        options["agent_snapshot"] = snapshot;
+    }
 
     let run = store::benchmark::create_run_tx(
         &mut *tx,

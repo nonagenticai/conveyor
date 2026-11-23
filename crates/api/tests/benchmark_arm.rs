@@ -270,6 +270,16 @@ async fn an_active_executor_is_measurable_and_the_run_pins_its_version() {
         json!(1),
         "the version the run measured is recorded at start: {body}"
     );
+    assert_eq!(
+        run["options"]["agent_snapshot"]["model_ref"],
+        json!("claude-sonnet-5-5"),
+        "the run freezes the configuration it measures: {body}"
+    );
+    assert_eq!(
+        run["options"]["agent_snapshot"]["max_iterations"],
+        json!(8),
+        "the run freezes the loop caps: {body}"
+    );
 
     // ── 5b. a baseline from this suite enqueues the improvement job ─────────────────────
     let (status, body) = running

@@ -87,10 +87,18 @@ pub async fn produce(
             "a conveyor run must name the capability agent it measures",
         ));
     };
-    let agent = store::capability::get_agent_tx(&mut tx, tenant, agent_id)
-        .await
-        .map_err(|error| JobFailure::retryable(format!("database: {error}")))?
-        .ok_or_else(|| JobFailure::permanent("the capability agent is gone"))?;
+    // A run started after the snapshot existed executes the pinned configuration, never the
+    // live row. Only a run that predates the snapshot falls back to the agent it names.
+    let agent = if run.options.get("agent_snapshot").is_some() {
+        None
+    } else {
+        Some(
+            store::capability::get_agent_tx(&mut tx, tenant, agent_id)
+                .await
+                .map_err(|error| JobFailure::retryable(format!("database: {error}")))?
+                .ok_or_else(|| JobFailure::permanent("the capability agent is gone"))?,
+        )
+    };
     let Some(instance) = store::benchmark::producer_instances_tx(
         &mut tx,
         tenant,
@@ -133,22 +141,60 @@ pub async fn produce(
     // configuration the run pinned. `prompt_ref` is not sent: a benchmark run has no
     // run/procedure/capability facts, so the catalogue's `agent@1` cannot be rendered, and
     // the inference ledger must not claim a prompt the loop never applied.
-    let request = json!({
-        "model": agent.model_ref,
+    let (model, max_iterations, timeout_secs, bound) =
+        match (run.options.get("agent_snapshot"), agent) {
+            (Some(snapshot), _) => {
+                let model = snapshot
+                    .get("model_ref")
+                    .and_then(Value::as_str)
+                    .filter(|model| !model.trim().is_empty())
+                    .ok_or_else(|| {
+                        JobFailure::permanent("the pinned agent snapshot has no model_ref")
+                    })?;
+                let max_iterations = snapshot
+                    .get("max_iterations")
+                    .and_then(Value::as_i64)
+                    .ok_or_else(|| {
+                        JobFailure::permanent("the pinned agent snapshot has no max_iterations")
+                    })?;
+                let timeout_secs = snapshot
+                    .get("timeout_secs")
+                    .and_then(Value::as_i64)
+                    .ok_or_else(|| {
+                        JobFailure::permanent("the pinned agent snapshot has no timeout_secs")
+                    })?;
+                (model.to_owned(), max_iterations, timeout_secs, false)
+            }
+            (None, Some(agent)) => (
+                agent.model_ref,
+                i64::from(agent.max_iterations),
+                i64::from(agent.timeout_secs),
+                true,
+            ),
+            (None, None) => {
+                return Err(JobFailure::permanent(
+                    "the run has neither a pinned agent snapshot nor a live agent row",
+                ));
+            }
+        };
+    let mut request = json!({
+        "model": model,
         "messages": [
             { "role": "user", "content": format!("{}\n\n{}", INSTRUCTION, instance.problem_statement) }
         ],
         "tools": [],
-        "max_turns": agent.max_iterations,
-        "timeout_ms": i64::from(agent.timeout_secs) * 1000,
-        "capability_agent_id": agent_id,
+        "max_turns": max_iterations,
+        "timeout_ms": timeout_secs * 1000,
     });
+    if bound {
+        request["capability_agent_id"] = json!(agent_id);
+    }
     let outcome = run_step(
         pool,
         tenant,
         run_id,
         None,
-        Some(agent_id),
+        if bound { Some(agent_id) } else { None },
         app_key,
         Some(&format!("benchmark.produce:{case_id}")),
         1,

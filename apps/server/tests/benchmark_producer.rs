@@ -466,3 +466,75 @@ async fn a_redelivered_job_replays_and_buys_no_second_call() {
         "a re-delivered job does not spend a second attempt"
     );
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn an_edit_to_the_agent_row_cannot_change_a_started_run() {
+    let _serial = SERIAL.lock().await;
+    let stub = stub();
+    let db = common::TestDb::fresh().await;
+    let fixture = fixture(&db, "The pinned configuration must win.").await;
+
+    // The run carries the configuration it was started with; the live row is then edited to a
+    // different model, which must not reach the loop.
+    let snapshot = json!({
+        "model_ref": "test-model",
+        "prompt_ref": null,
+        "allowed_actions": [],
+        "max_iterations": 8,
+        "timeout_secs": 300,
+        "version": 1,
+    });
+    let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
+        .await
+        .expect("scoped");
+    sqlx::query(
+        "UPDATE benchmark_run
+            SET options = jsonb_set(options, '{agent_snapshot}', $3::jsonb)
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(fixture.run_id)
+    .bind(snapshot.to_string())
+    .execute(&mut *tx)
+    .await
+    .expect("pin the run");
+    sqlx::query(
+        "UPDATE capability_agent
+            SET model_ref = 'edited-model', max_iterations = 1
+          WHERE tenant_id = $1
+            AND id = (SELECT capability_agent_id FROM benchmark_run
+                       WHERE tenant_id = $1 AND id = $2)",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(fixture.run_id)
+    .execute(&mut *tx)
+    .await
+    .expect("edit the live agent");
+    tx.commit().await.expect("commit");
+    let stored: Value =
+        sqlx::query_scalar("SELECT options FROM benchmark_run WHERE tenant_id = $1 AND id = $2")
+            .bind(fixture.tenant.as_uuid())
+            .bind(fixture.run_id)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("read the stored options");
+    assert_eq!(
+        stored["agent_snapshot"]["model_ref"],
+        json!("test-model"),
+        "the fixture pinned the snapshot: {stored}"
+    );
+
+    let before = stub.calls.lock().expect("calls").len();
+    produce(&db.runtime, fixture.tenant, "conveyor", &payload(&fixture))
+        .await
+        .expect("produce");
+
+    let calls = stub.calls.lock().expect("calls").clone();
+    assert_eq!(calls.len(), before + 1, "one case is one model call");
+    assert_eq!(
+        calls[before]["model"],
+        json!("test-model"),
+        "the pinned model, never the edited live row: {}",
+        calls[before]
+    );
+}
