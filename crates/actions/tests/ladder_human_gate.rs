@@ -452,12 +452,11 @@ async fn a_pending_approval_cannot_gate_a_draft() {
         .expect_err("a pending approval must not become a human decision");
     assert_field_refusal(&refused, "approval_missing");
 
-    // A decision row that cites the pending gate (written before the check, or by a writer
-    // that skipped it) still does not apply the draft.
+    // The store writer refuses the same row: a decision cannot cite a pending approval at all.
     let mut tx = store::begin_scoped(&fx.pg.runtime, fx.seeded.tenant)
         .await
         .expect("scope the decision insert");
-    let decision = store::ladder::record_decision_tx(
+    let refused = store::ladder::record_decision_tx(
         &mut tx,
         fx.seeded.tenant,
         &store::ladder::NewDecision {
@@ -494,23 +493,14 @@ async fn a_pending_approval_cannot_gate_a_draft() {
         },
     )
     .await
-    .expect("insert the decision that cites the pending gate");
-    tx.commit().await.expect("commit the decision");
-
-    let refused = fx
-        .invoke(
-            "ladder.apply_draft",
-            json!({
-                "document_id": fx.document_id,
-                "card_id": fx.card_id,
-                "decision_id": decision.id
-            }),
-            "user",
-        )
-        .await
-        .expect_err("a pending approval must not gate a draft");
-    assert_eq!(refused.status, 422, "{refused:?}");
-    assert_eq!(refused.code, "draft_requires_gate");
+    .expect_err("a decision cannot cite a pending approval");
+    assert!(
+        matches!(
+            refused,
+            store::ladder::LadderStoreError::ApprovalNotAccepted
+        ),
+        "{refused:?}"
+    );
 }
 
 /// 4. A generated draft needs the dedicated `draft.apply` gate: an accepted laya decision, a
@@ -664,12 +654,11 @@ async fn a_human_draft_apply_decision_and_approval_applies_the_draft() {
     let fx = fixture().await;
     let approval = fx.gate(Some((fx.seeded.user_id, DeciderKind::Human))).await;
 
+    // The decision names the draft it applies: a decision that does not is refused.
+    let mut record = human_record(Some(fx.card_id), approval, DRAFT_APPLY_GATE);
+    record["meta"] = json!({ "draft_document_id": fx.document_id });
     let decision = fx
-        .invoke(
-            "ladder.record",
-            human_record(Some(fx.card_id), approval, DRAFT_APPLY_GATE),
-            "user",
-        )
+        .invoke("ladder.record", record, "user")
         .await
         .expect("record the human draft.apply decision");
     assert_eq!(decision.status, 201, "{}", decision.body);
