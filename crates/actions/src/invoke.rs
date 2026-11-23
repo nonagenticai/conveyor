@@ -978,6 +978,23 @@ pub async fn precheck<'a>(
     if !field_errors.is_empty() {
         return Err(ActionError::invalid_input(field_errors));
     }
+
+    // v1-p6-5: `internal_coach` is the engine's own marker — "this move is made while an
+    // interruption that already exists is being handled" — and it suppresses the §6.2 flow
+    // observation. A caller may never name it: `Authority::Internal` is constructed only by
+    // engine code (`Authority::of` yields Role/Channel for every transport), and the coach's own
+    // move calls the handler directly. The member is absent from the served schema.
+    if spec.name == "cards.move"
+        && !matches!(request.authority, Authority::Internal)
+        && input.get("internal_coach").is_some()
+    {
+        return Err(ActionError::new(
+            422,
+            "engine_only_input",
+            "internal_coach is the engine's marker for a move made while handling an existing \
+             interruption; a caller cannot name it",
+        ));
+    }
     Ok(Prechecked {
         spec,
         input,

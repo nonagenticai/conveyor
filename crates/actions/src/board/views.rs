@@ -488,8 +488,11 @@ pub struct CardsMoveIn {
     pub after_id: Option<Uuid>,
     /// Set by `err.card` and the coach's `move` remedy: the engine is moving the card while
     /// handling an interruption that already exists, so this move is not itself observed as a
-    /// §6.2 flow event. A person's move never sets it (v1-p6-5).
+    /// §6.2 flow event. A person's move never sets it (v1-p6-5); the invocation boundary refuses
+    /// any caller that names it, and `schemars(skip)` keeps it out of the public contract while
+    /// the two engine paths still deserialize it.
     #[serde(default)]
+    #[schemars(skip)]
     pub internal_coach: bool,
 }
 
