@@ -151,6 +151,10 @@ async fn approvals_decide(
             .map_err(|error| decide_error(error, "approvals.decide"))?
             .ok_or_else(ActionError::internal)?;
         crate::pm::apply_gate_effect_tx(&mut *tx, ctx.tenant, &record, ctx.actor_id).await?;
+        // v1-p44-2: an approved `job_binding` gate is the only thing that flips the binding it
+        // names to `active` (SPEC_V2 §4.4). The effect rides the decision's transaction, so a
+        // failed flip rolls the decision back.
+        crate::organisation::apply_binding_gate_effect_tx(&mut *tx, ctx.tenant, &record).await?;
     }
 
     // Only a gate that actually resolved announces it: a first approve under a two-person

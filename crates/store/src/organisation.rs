@@ -1178,6 +1178,35 @@ pub async fn job_binding_retire_tx(
         .ok_or(OrganisationStoreError::VersionMismatch("binding"))
 }
 
+/// Activate a binding an approved gate names (v1-p44-2, SPEC_V2 §4.4).
+///
+/// Only a `draft` row flips, and the version moves with it so an `If-Match` taken before the
+/// decision is stale rather than silently satisfied. An already-`active` binding is returned
+/// unchanged — a replayed decision is not a second activation — and a `retired` row is **never**
+/// resurrected: retirement is terminal, so a decision that lands late is a no-op instead of
+/// undoing it. A row that does not exist in the tenant is `NotFound`.
+pub async fn job_binding_activate_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<BindingRow, OrganisationStoreError> {
+    let sql = format!(
+        "UPDATE job_binding
+            SET status = 'active', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND status = 'draft'
+          RETURNING {BINDING_COLUMNS}"
+    );
+    let row: Option<BindingRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    match row {
+        Some(row) => Ok(row),
+        None => job_binding_get_tx(conn, tenant, id).await,
+    }
+}
+
 /// One binding.
 pub async fn job_binding_get_tx(
     conn: &mut PgConnection,
