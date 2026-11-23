@@ -274,10 +274,10 @@ async fn the_shipped_catalogue_runs_a_process_end_to_end() {
     let counts = conveyor_store::process_seed::apply_all(&pg.runtime, seeded.tenant)
         .await
         .expect("apply the shipped catalogue");
-    // 280 card-type processes (70 type files x four list stages) + the 54 named ones
-    // (52 `cap.*` — `cap.kanban_coach.handle_error.v2` is T4's — `ask_fr`, `kata.open`). The
-    // manifest's 280 is the type catalogue alone.
-    assert_eq!(counts.processes, 334, "{counts:?}");
+    // 280 card-type processes (70 type files x four list stages) + the 55 named ones
+    // (52 `cap.*` — `cap.kanban_coach.handle_error.v2` is T4's — `ask_fr`, `kata.open`,
+    // `swebench-fix`). The manifest's 280 is the type catalogue alone.
+    assert_eq!(counts.processes, 335, "{counts:?}");
     assert_eq!(counts.maps, 3, "{counts:?}");
 
     let inference = inference_stub().await;

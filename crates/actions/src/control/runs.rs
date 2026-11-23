@@ -13,6 +13,7 @@
 use conveyor_domain::RunStatus;
 use conveyor_store as store;
 use conveyor_store::run::{NewRun, RunRecord};
+use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -43,6 +44,60 @@ pub(crate) fn run_out(record: &RunRecord) -> RunOut {
         process_step_id: record.process_step_id.map(|id| id.to_string()),
         workflow_step_id: record.workflow_step_id.map(|id| id.to_string()),
         created_at: record.created_at,
+        // Only `runs.get` loads the trace, so only it can compose a declared output (S18 P3b).
+        output: Value::Null,
+    }
+}
+
+/// Compose a process run's declared outputs from its stored trace (S18 P3b).
+///
+/// `declared` is the process version's `outputs` ([`store::process::ProcessRecord::outputs`],
+/// seeded from `ProcessSpec.outputs`). A process declares its run output by **name**; the value
+/// comes from the **terminal step** of the trace — the highest `position`, at its latest attempt,
+/// which is the step whose answer the process returns. A name resolves, in order, as:
+///
+/// 1. a dot-path into the terminal step's stored output document (`steps.<n>.output`), so a
+///    computed step's named result resolves directly;
+/// 2. for an `agent.run` step, its answer: the step output's `output` member
+///    (`steps.<n>.output.output`, the `AgentRunOut.output`). That is the `swebench-fix` mapping
+///    `patch → steps.<n>.output.output` — the agent's reply IS the patch (or `NONE`).
+///
+/// A declared name that resolves to neither is `null`, never invented: the S18 driver's
+/// `no_attempt` path reads exactly that (P3d). A process that declares no outputs — every
+/// capability process — composes `null`, so "no declared output" is distinguishable from
+/// "declared but unresolved" (`{"patch": null}`) and from a resolved empty answer (which stays
+/// `""`; whether empty is usable is the driver's decision, not this read's).
+fn run_output(declared: &Value, steps: &[store::process::RunStepDetail]) -> Value {
+    let Some(names) = declared.as_array() else {
+        return Value::Null;
+    };
+    if names.is_empty() {
+        return Value::Null;
+    }
+    let mut output = serde_json::Map::new();
+    for name in names.iter().filter_map(Value::as_str) {
+        let value = steps
+            .last()
+            .and_then(|step| resolve_output(name, step))
+            .unwrap_or(Value::Null);
+        output.insert(name.to_owned(), value);
+    }
+    Value::Object(output)
+}
+
+/// One declared name against the terminal step — see [`run_output`] for the resolution order.
+fn resolve_output(name: &str, step: &store::process::RunStepDetail) -> Option<Value> {
+    if let Some(resolved) = name
+        .split('.')
+        .try_fold(&step.output, |current, segment| current.get(segment))
+    {
+        return Some(resolved.clone());
+    }
+    // `steps.<n>.output.output`: an agent step's answer is the `AgentRunOut.output` member.
+    if step.action == "agent.run" {
+        step.output.get("output").cloned()
+    } else {
+        None
     }
 }
 
@@ -642,23 +697,29 @@ async fn runs_get(
     .await
     .map_err(|error| crate::control::approval_error(error, ACTION))?;
 
-    let process = match detail.process_id {
+    let process_record = match detail.process_id {
         Some(id) => store::process::get_process_tx(&mut *tx, ctx.tenant, id)
             .await
-            .map_err(|error| crate::process::process_error(error, ACTION))?
-            .map(|record| RunProcessRef {
-                id: record.id.to_string(),
-                title: record.title,
-                version: record.version,
-            }),
+            .map_err(|error| crate::process::process_error(error, ACTION))?,
         None => None,
     };
+    let process = process_record.as_ref().map(|record| RunProcessRef {
+        id: record.id.to_string(),
+        title: record.title.clone(),
+        version: record.version,
+    });
+    // S18 P3b: the declared run output is composed here, against the trace this read loaded.
+    let output = process_record
+        .as_ref()
+        .map_or(Value::Null, |record| run_output(&record.outputs, &steps));
 
     let mut decisions =
         crate::control::approvals::decisions_by_approval(&mut *tx, ctx.tenant, &approvals).await?;
 
+    let mut run = run_out(&record);
+    run.output = output;
     Ok(HandlerOutput::ok(RunGetOut {
-        run: run_out(&record),
+        run,
         steps: steps
             .into_iter()
             .map(|step| RunStepOut {
@@ -702,4 +763,93 @@ async fn runs_get(
         },
         inputs: detail.inputs,
     }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn step(
+        position: i32,
+        attempt: i32,
+        action: &str,
+        output: Value,
+    ) -> store::process::RunStepDetail {
+        store::process::RunStepDetail {
+            id: Uuid::now_v7(),
+            process_step_id: None,
+            position,
+            attempt,
+            action: action.to_owned(),
+            status: "succeeded".to_owned(),
+            input: json!({}),
+            output,
+            error: None,
+            judge: None,
+            started_at: None,
+            finished_at: None,
+        }
+    }
+
+    #[test]
+    fn a_declared_output_resolves_to_the_terminal_agents_latest_answer() {
+        // The terminal step is the highest position, at its LATEST attempt; the earlier position
+        // and the earlier attempt are both superseded, exactly as the trace read orders them.
+        let steps = vec![
+            step(1, 1, "agent.run", json!({"output": "superseded"})),
+            step(
+                2,
+                1,
+                "agent.run",
+                json!({"output": "first terminal attempt"}),
+            ),
+            step(2, 2, "agent.run", json!({"output": "diff --git a/x b/x\n"})),
+        ];
+        assert_eq!(
+            run_output(&json!(["patch"]), &steps),
+            json!({"patch": "diff --git a/x b/x\n"})
+        );
+    }
+
+    #[test]
+    fn a_named_member_of_the_terminal_output_wins_over_the_agent_fallback() {
+        // A computed step's named result is `steps.<n>.output.<name>`; only an unresolved name on
+        // an agent step falls through to `steps.<n>.output.output`.
+        let computed = vec![step(
+            1,
+            1,
+            "documents.get",
+            json!({"title": "member", "output": "x"}),
+        )];
+        assert_eq!(
+            run_output(&json!(["title"]), &computed),
+            json!({"title": "member"})
+        );
+        let agent = vec![step(
+            1,
+            1,
+            "agent.run",
+            json!({"patch": "member", "output": "answer"}),
+        )];
+        assert_eq!(
+            run_output(&json!(["patch"]), &agent),
+            json!({"patch": "member"})
+        );
+    }
+
+    #[test]
+    fn an_unresolved_declaration_is_null_never_invented() {
+        // Declared but unresolved: the key exists with a null, which is the driver's `no_attempt`
+        // signal (S18 P3d) — never an invented patch and never a missing key.
+        let step_without_an_answer = vec![step(1, 1, "agent.run", json!({"turns": 3}))];
+        assert_eq!(
+            run_output(&json!(["patch"]), &step_without_an_answer),
+            json!({"patch": null})
+        );
+        // No trace at all is the same answer, not an error.
+        assert_eq!(run_output(&json!(["patch"]), &[]), json!({"patch": null}));
+        // No declarations: `null`, so "no declared output" never looks like `{}`.
+        assert_eq!(run_output(&json!([]), &step_without_an_answer), Value::Null);
+    }
 }

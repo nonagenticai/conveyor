@@ -157,6 +157,16 @@ pub struct RunOut {
     pub workflow_step_id: Option<String>,
     /// When the run row was created.
     pub created_at: DateTime<Utc>,
+    /// The run's declared outputs, keyed by the process's `outputs` names (S18 P3b).
+    ///
+    /// `runs.get` composes it from the terminal step's stored output: each declared name resolves
+    /// against `steps.<n>.output`, and an `agent.run` step's unresolved name is its answer
+    /// `steps.<n>.output.output` (the `AgentRunOut.output`) — the `swebench-fix` mapping
+    /// `patch → steps.<n>.output.output`. A declared name that resolves to nothing is `null`, never
+    /// invented; a run with no declared outputs (or no process) is `null`, not `{}`. Every other
+    /// run action returns `null`, because only the detail read loads the trace.
+    #[serde(default)]
+    pub output: Value,
 }
 
 /// `runs.get` — the run to read.
