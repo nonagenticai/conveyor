@@ -8,8 +8,9 @@
 //! **Two paths.** The `conveyor` and `baseline` model arms drive one `agent.run` inline. The
 //! `process` subject is card-scoped (P3c): the producer hosts the run's cards on its own
 //! project/board/list, creates the case's `benchmark` card, starts the published process the
-//! benchmark run pinned, and waits across ticks — reading the patch from the run's typed output
-//! is P3d's, not this module's, job.
+//! benchmark run pinned, and waits across ticks. When that run is terminal it collects the case's
+//! patch from the run's typed `RunOut.output` (P3d): a null, empty or `NONE` answer is
+//! `no_attempt`, never an invented patch, and the ordinary grading path then proceeds.
 //!
 //! **The producer is a consumer of the public surface** (S18 §3). It reads the instance through
 //! `producer_instances_tx`, which carries no `gold_patch`, no `test_patch`, no `fail_to_pass` — the
@@ -357,8 +358,10 @@ pub async fn produce(
 /// untouched. The attempt is spent exactly once, on the tick that finds no process yet and
 /// starts it — so a broken start is bounded, and a process that runs for minutes is not.
 ///
-/// **Collection is P3d's.** A terminal process writes nothing here; the collector reads the
-/// run's typed output and records the case.
+/// **Collection is the terminal tick** (P3d). A live process is a wait; a terminal one is read
+/// through `runs.get`'s typed `RunOut.output` and recorded. The attempt was spent by the tick that
+/// started the process, so neither waiting nor collecting spends another, and a terminal run can
+/// never start a second process.
 async fn produce_process(
     pool: &PgPool,
     tenant: TenantId,
@@ -379,11 +382,15 @@ async fn produce_process(
     let existing =
         card_for_case_tx(&mut tx, tenant, board_id, list_id, &instance.instance_id).await?;
     if let Some(card_id) = existing
-        && let Some(state) = root_run_status_tx(&mut tx, tenant, card_id).await?
+        && let Some((root_run_id, state)) = root_run_tx(&mut tx, tenant, card_id).await?
     {
-        // Live: wait for the next tick. Terminal: P3d collects; either way nothing is spent.
-        tracing::debug!(case = %case_id, %card_id, state, "benchmark process arm waits");
         tx.commit().await.map_err(db)?;
+        if matches!(state.as_str(), "succeeded" | "failed" | "cancelled") {
+            // Terminal: this tick collects the case's typed output (P3d).
+            return collect_process(pool, tenant, app_key, case_id, root_run_id, &state).await;
+        }
+        // Live: wait for the next tick. Nothing is spent and no second process is started.
+        tracing::debug!(case = %case_id, %card_id, state, "benchmark process arm waits");
         return Ok(());
     }
     // The case was produced between the caller's read and here: never start a second process.
@@ -472,7 +479,7 @@ async fn produce_process(
             // `uq_run_live` may have lost the card's slot to a concurrent start: wait, never
             // record a refusal for a process that did start.
             let mut tx = store::begin_scoped(pool, tenant).await.map_err(db)?;
-            let running = root_run_status_tx(&mut tx, tenant, card_id).await?;
+            let running = root_run_tx(&mut tx, tenant, card_id).await?;
             tx.commit().await.map_err(db)?;
             if running.is_some() {
                 return Ok(());
@@ -488,6 +495,106 @@ async fn produce_process(
             .await
         }
     }
+}
+
+/// Collect a terminal process run into its case (S18 P3d).
+///
+/// **The typed output is the only source of the patch.** `runs.get` composes `RunOut.output`
+/// from the process's declared `outputs` against its terminal step's stored output (P3b), so the
+/// resolution — not this module — decides what the run produced. A failed or cancelled run, a
+/// null/absent `patch`, an empty answer, the literal `NONE`, or a patch over the cap is
+/// `no_attempt`: a patch is never invented from anything else.
+///
+/// **Collecting spends nothing.** The attempt was spent by the tick that started the process, and
+/// `record_produced_tx` only writes a still-pending case, so a re-delivered collector cannot spend
+/// a second attempt, rewrite a produced case, or start a second process.
+async fn collect_process(
+    pool: &PgPool,
+    tenant: TenantId,
+    app_key: &str,
+    case_id: Uuid,
+    root_run_id: Uuid,
+    state: &str,
+) -> Result<(), JobFailure> {
+    if state != "succeeded" {
+        return record(
+            pool,
+            tenant,
+            case_id,
+            "no_attempt",
+            None,
+            &format!("the process run ended {state}"),
+        )
+        .await;
+    }
+    let run = match invoke_action(
+        pool,
+        tenant,
+        app_key,
+        "runs.get",
+        json!({ "id": root_run_id }),
+    )
+    .await
+    {
+        Ok(run) => run,
+        // A read that failed in transport may succeed on the retry: no case outcome was written.
+        Err(error) if error.status >= 500 => {
+            return Err(JobFailure::retryable(format!("runs.get: {error}")));
+        }
+        // A typed refusal means the typed output is unavailable: withheld, never invented.
+        Err(error) => {
+            return record(
+                pool,
+                tenant,
+                case_id,
+                "no_attempt",
+                None,
+                &format!("runs.get: {error}"),
+            )
+            .await;
+        }
+    };
+    let Some(patch) = run
+        .get("run")
+        .and_then(|run| run.get("output"))
+        .and_then(|output| output.get("patch"))
+        .and_then(Value::as_str)
+    else {
+        return record(
+            pool,
+            tenant,
+            case_id,
+            "no_attempt",
+            None,
+            "the process run declares no patch",
+        )
+        .await;
+    };
+    let text = patch.trim();
+    if text.is_empty() || text == "NONE" {
+        return record(
+            pool,
+            tenant,
+            case_id,
+            "no_attempt",
+            None,
+            "the process produced no patch",
+        )
+        .await;
+    }
+    if text.len() > MAX_PATCH_BYTES {
+        return record(
+            pool,
+            tenant,
+            case_id,
+            "no_attempt",
+            None,
+            &format!("the produced patch is {} bytes, over the cap", text.len()),
+        )
+        .await;
+    }
+    let hash = sha256_hex(text);
+    record(pool, tenant, case_id, "ok", Some((text, hash.as_str())), "").await
 }
 
 /// The host project/board/list one benchmark run's cards live on.
@@ -579,17 +686,17 @@ async fn card_for_case_tx(
     .map_err(db)
 }
 
-/// The card's latest ROOT run status, when it has one.
+/// The card's latest ROOT run — its id and status — when it has one.
 ///
 /// Root-only: a child run shares its parent's card, so it must never be mistaken for the
 /// process run the producer started.
-async fn root_run_status_tx(
+async fn root_run_tx(
     tx: &mut sqlx::PgConnection,
     tenant: TenantId,
     card_id: Uuid,
-) -> Result<Option<String>, JobFailure> {
-    sqlx::query_scalar(
-        "SELECT status FROM run
+) -> Result<Option<(Uuid, String)>, JobFailure> {
+    sqlx::query_as(
+        "SELECT id, status FROM run
           WHERE tenant_id = $1 AND card_id = $2 AND parent_run_id IS NULL
           ORDER BY created_at DESC, id DESC
           LIMIT 1",

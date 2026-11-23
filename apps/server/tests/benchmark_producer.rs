@@ -45,6 +45,16 @@ const DIFF: &str = "diff --git a/django/core.py b/django/core.py\n\
 -a\n\
 +b\n";
 
+fn sha256_hex(text: &str) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(text.as_bytes());
+    hasher
+        .finalize()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
+}
+
 /// Serialises the tests: the stub and its call log are process-global.
 static SERIAL: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 
@@ -615,11 +625,16 @@ async fn process_fixture(db: &common::TestDb, problem: &str, agent_status: &str)
     .await
     .expect("process agent");
     let process: Uuid = sqlx::query_scalar(
-        "INSERT INTO process (tenant_id, key, title, status, version, capability_id)
-         VALUES ($1, 'swebench-fix', 'SWE-bench fix', 'published', 1, $2) RETURNING id",
+        "INSERT INTO process
+             (tenant_id, key, title, status, version, capability_id, outputs)
+         VALUES ($1, 'swebench-fix', 'SWE-bench fix', 'published', 1, $2, $3::jsonb)
+         RETURNING id",
     )
     .bind(tenant_id)
     .bind(capability)
+    // P3a's seed: the process declares its answer as `patch`, which `runs.get` composes from
+    // the terminal agent step's `output.output`.
+    .bind(json!(["patch"]).to_string())
     .fetch_one(&mut *tx)
     .await
     .expect("the published swebench-fix process");
@@ -695,13 +710,16 @@ fn process_payload(fixture: &ProcessFixture) -> Value {
     })
 }
 
-/// `(produce_status, attempts)` of a process fixture's case.
-async fn process_case_row(db: &common::TestDb, fixture: &ProcessFixture) -> (String, i32) {
+/// `(produce_status, patch, patch_sha256, attempts)` of a process fixture's case.
+async fn process_case_row(
+    db: &common::TestDb,
+    fixture: &ProcessFixture,
+) -> (String, Option<String>, Option<String>, i32) {
     let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
         .await
         .expect("scoped");
     let row = sqlx::query_as(
-        "SELECT produce_status, attempts
+        "SELECT produce_status, patch, patch_sha256, attempts
            FROM benchmark_case WHERE tenant_id = $1 AND id = $2",
     )
     .bind(fixture.tenant.as_uuid())
@@ -711,6 +729,51 @@ async fn process_case_row(db: &common::TestDb, fixture: &ProcessFixture) -> (Str
     .expect("case row");
     tx.commit().await.expect("commit");
     row
+}
+
+/// Drive the started process run terminal, with one terminal agent answer.
+///
+/// The start tick materialised the process's one step; this is the executor's terminal write
+/// (`succeeded` + the action's output document), then the run's own terminal state.
+async fn finish_process(
+    db: &common::TestDb,
+    fixture: &ProcessFixture,
+    output: Value,
+    status: &str,
+) {
+    let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
+        .await
+        .expect("scoped");
+    let root_run_id: Uuid = sqlx::query_scalar(
+        "SELECT r.id FROM run r
+           JOIN card c ON c.tenant_id = r.tenant_id AND c.id = r.card_id
+          WHERE r.tenant_id = $1 AND c.meta->>'instance_id' = $2
+            AND r.parent_run_id IS NULL",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(fixture.instance_id.as_str())
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the started process run");
+    sqlx::query(
+        "UPDATE run_step
+            SET status = 'succeeded', output = $3::jsonb, finished_at = now()
+          WHERE tenant_id = $1 AND run_id = $2 AND position = 1 AND attempt = 1",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(root_run_id)
+    .bind(output.to_string())
+    .execute(&mut *tx)
+    .await
+    .expect("the terminal step");
+    sqlx::query("UPDATE run SET status = $3 WHERE tenant_id = $1 AND id = $2")
+        .bind(fixture.tenant.as_uuid())
+        .bind(root_run_id)
+        .bind(status)
+        .execute(&mut *tx)
+        .await
+        .expect("the terminal run");
+    tx.commit().await.expect("commit");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
@@ -792,10 +855,10 @@ async fn the_process_arm_starts_the_pinned_process_on_the_case_card_and_waits() 
     assert_eq!(status, "running");
     tx.commit().await.expect("commit");
 
-    let (produce_status, attempts) = process_case_row(&db, &fixture).await;
+    let (produce_status, _, _, attempts) = process_case_row(&db, &fixture).await;
     assert_eq!(
         produce_status, "pending",
-        "P3c collects nothing; P3d reads the run's typed output"
+        "a live process is not collected yet; P3d reads the run's typed output on its terminal tick"
     );
     assert_eq!(attempts, 1, "the start tick is the one attempt");
 
@@ -823,7 +886,7 @@ async fn the_process_arm_starts_the_pinned_process_on_the_case_card_and_waits() 
     tx.commit().await.expect("commit");
     assert_eq!(cards, 1, "one case is one card");
     assert_eq!(runs, 1, "one case is one process run");
-    let (_, attempts) = process_case_row(&db, &fixture).await;
+    let (_, _, _, attempts) = process_case_row(&db, &fixture).await;
     assert_eq!(attempts, 1, "waiting spends no producer attempt");
 }
 
@@ -842,7 +905,7 @@ async fn a_not_ready_process_is_no_attempt_not_a_retried_job() {
     .await
     .expect("a typed refusal finishes the job");
 
-    let (produce_status, attempts) = process_case_row(&db, &fixture).await;
+    let (produce_status, _, _, attempts) = process_case_row(&db, &fixture).await;
     assert_eq!(
         produce_status, "no_attempt",
         "an unready binding is withheld, never graded"
@@ -851,6 +914,81 @@ async fn a_not_ready_process_is_no_attempt_not_a_retried_job() {
         attempts, 1,
         "the start attempt was spent before the refusal"
     );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn the_process_arm_collects_the_typed_patch_once() {
+    let _serial = SERIAL.lock().await;
+    let db = common::TestDb::fresh().await;
+    let fixture =
+        process_fixture(&db, "The terminal process's answer is the case.", "active").await;
+    let input = process_payload(&fixture);
+
+    produce(&db.runtime, fixture.tenant, "conveyor", &input)
+        .await
+        .expect("the start tick");
+    // The process ran to a terminal success with one agent answer. P3b composes the declared
+    // `patch` from that step's `output.output`; P3d must read exactly that.
+    finish_process(&db, &fixture, json!({ "output": DIFF.trim() }), "succeeded").await;
+
+    produce(&db.runtime, fixture.tenant, "conveyor", &input)
+        .await
+        .expect("the collect tick");
+
+    let (status, patch, sha, attempts) = process_case_row(&db, &fixture).await;
+    assert_eq!(status, "ok", "the typed output becomes the case's patch");
+    assert_eq!(patch.as_deref(), Some(DIFF.trim()));
+    let expected = sha256_hex(DIFF.trim());
+    assert_eq!(sha.as_deref(), Some(expected.as_str()));
+    assert_eq!(attempts, 1, "collecting the typed output spends no attempt");
+
+    // A re-delivered collector writes nothing, spends nothing and starts no second process.
+    produce(&db.runtime, fixture.tenant, "conveyor", &input)
+        .await
+        .expect("the re-delivered collect tick");
+    let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
+        .await
+        .expect("scoped");
+    let runs: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM run r
+           JOIN card c ON c.tenant_id = r.tenant_id AND c.id = r.card_id
+          WHERE r.tenant_id = $1 AND c.meta->>'instance_id' = $2",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(fixture.instance_id.as_str())
+    .fetch_one(&mut *tx)
+    .await
+    .expect("runs");
+    tx.commit().await.expect("commit");
+    assert_eq!(runs, 1, "one case is one process run, never a second");
+    let (status, _, _, attempts) = process_case_row(&db, &fixture).await;
+    assert_eq!(status, "ok");
+    assert_eq!(attempts, 1);
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn a_terminal_process_without_a_patch_is_no_attempt_not_invented() {
+    let _serial = SERIAL.lock().await;
+    let db = common::TestDb::fresh().await;
+    let fixture = process_fixture(&db, "The terminal process stores no answer.", "active").await;
+    let input = process_payload(&fixture);
+
+    produce(&db.runtime, fixture.tenant, "conveyor", &input)
+        .await
+        .expect("the start tick");
+    // The process declares `patch`, but its terminal step stored no answer, so P3b composes
+    // `{"patch": null}` — the no_attempt signal. Nothing here may become an invented patch.
+    finish_process(&db, &fixture, json!({ "turns": 3 }), "succeeded").await;
+
+    produce(&db.runtime, fixture.tenant, "conveyor", &input)
+        .await
+        .expect("the collect tick");
+
+    let (status, patch, sha, attempts) = process_case_row(&db, &fixture).await;
+    assert_eq!(status, "no_attempt", "a withheld case is never graded");
+    assert!(patch.is_none(), "no patch is invented from a null output");
+    assert!(sha.is_none());
+    assert_eq!(attempts, 1, "the start tick is still the only attempt");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
