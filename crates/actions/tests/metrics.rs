@@ -745,6 +745,116 @@ async fn flow_recomputes_and_a_missing_ledger_is_unavailable() {
     );
 }
 
+/// One run row: `attempt` is the card's attempt sequence the store derives, never a stored flag.
+async fn run_row(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    project: Uuid,
+    attempt: i32,
+    status: &str,
+) -> Uuid {
+    sqlx::query_scalar(
+        "INSERT INTO run (tenant_id, project_id, attempt, status)
+         VALUES ($1, $2, $3, $4) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project)
+    .bind(attempt)
+    .bind(status)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("run")
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn rework_rate_is_a_read_time_ratio_over_runs_and_approvals() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = programme(&pg, &seeded).await;
+    let project = project(&pg, &seeded, programme, "REWORK").await;
+    // Five runs, two of them rework: a first attempt that failed and was never retried is a
+    // failure, not rework; a second attempt is; a rejected approval returns the card; an
+    // approval that passed does not.
+    run_row(&pg, &seeded, project, 1, "succeeded").await;
+    run_row(&pg, &seeded, project, 1, "failed").await;
+    run_row(&pg, &seeded, project, 2, "succeeded").await;
+    let returned = run_row(&pg, &seeded, project, 1, "failed").await;
+    let approved = run_row(&pg, &seeded, project, 1, "succeeded").await;
+    sqlx::query(
+        "INSERT INTO approval (tenant_id, run_id, gate, kind, status)
+         VALUES ($1, $2, 'quality_gate', 'gate', 'rejected'),
+                ($1, $3, 'quality_gate', 'gate', 'approved')",
+    )
+    .bind(seeded.tenant_id)
+    .bind(returned)
+    .bind(approved)
+    .execute(&pg.super_pool)
+    .await
+    .expect("approvals");
+
+    let (status, body) = running
+        .invoke(
+            "metrics.flow",
+            TOKEN,
+            json!({"project_id": project}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let flow = output(&body);
+    assert_eq!(flow["total_count"], 5, "{flow}");
+    assert_eq!(flow["rework_count"], 2, "{flow}");
+    let rate = flow["rework_rate"].as_f64().expect("the ratio");
+    assert!((rate - 0.4).abs() < 1e-12, "rate {rate}");
+
+    // A second read recomputes from the rows: the ratio is never a stored counter.
+    run_row(&pg, &seeded, project, 2, "succeeded").await;
+    let (status, body) = running
+        .invoke(
+            "metrics.flow",
+            TOKEN,
+            json!({"project_id": project}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let flow = output(&body);
+    assert_eq!(flow["total_count"], 6, "{flow}");
+    assert_eq!(flow["rework_count"], 3, "{flow}");
+    let rate = flow["rework_rate"].as_f64().expect("the ratio");
+    assert!((rate - 0.5).abs() < 1e-12, "rate {rate}");
+
+    // The tenant-wide read applies no project filter: the same rows, unscoped.
+    let (status, body) = running
+        .invoke("metrics.flow", TOKEN, json!({}), None, None, None)
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let flow = output(&body);
+    assert_eq!(flow["total_count"], 6, "{flow}");
+    assert_eq!(flow["rework_count"], 3, "{flow}");
+
+    // Zero denominator: a project with no runs reports null, never NaN or zero.
+    let empty = project(&pg, &seeded, programme, "EMPTY").await;
+    let (status, body) = running
+        .invoke(
+            "metrics.flow",
+            TOKEN,
+            json!({"project_id": empty}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let flow = output(&body);
+    assert_eq!(flow["total_count"], 0, "{flow}");
+    assert_eq!(flow["rework_count"], 0, "{flow}");
+    assert!(flow["rework_rate"].is_null(), "{flow}");
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn reconciliation_is_exact_or_opens_an_incident() {
     let (pg, running, seeded) = fixture().await;
