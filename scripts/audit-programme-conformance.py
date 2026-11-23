@@ -1877,6 +1877,14 @@ def _subject_record(
 # its key, maps its three kinds onto the register's package kinds, and takes the section from
 # the review. An unknown kind is refused rather than guessed.
 DEEP_REVIEW_KINDS = {"code": "CODE", "record+code": "CODE", "standard": "STANDARD"}
+# `record+code` names a finding whose code capability may already exist. At this head
+# `programmes.update` accepts `shared_config` and `lessons.propose`/`retros.*` exist, so the
+# blocker is the record write, not new code. The override is per finding and evidence-backed;
+# it never widens an unknown kind.
+DEEP_REVIEW_KIND_OVERRIDES = {
+    "w3-shared-config-1": "RECORD",
+    "w3-lessons-1": "RECORD",
+}
 DEEP_REVIEW_SPEC = {
     "w3-action-registry-projection-1": "§8.5",
     "w3-licensing-frame-1": "§8.5",
@@ -1915,6 +1923,7 @@ def deep_review_findings(path: Path, output_standard: dict[str, Any]) -> list[di
                 f"the deep-review finding {key!r} has unknown kind {raw_kind!r}; "
                 f"expected one of {', '.join(sorted(DEEP_REVIEW_KINDS))}"
             )
+        kind = DEEP_REVIEW_KIND_OVERRIDES.get(key, kind)
         _, _, template_key = str(finding.get("artifact") or "").partition("#")
         template = (output_standard.get("templates") or {}).get(template_key) or {}
         standard = str(template.get("standard") or "SPEC")
