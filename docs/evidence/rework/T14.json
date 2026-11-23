@@ -88,19 +88,19 @@
     {
       "check": "pi_plan",
       "description": "the project tranche's PI plan is published",
-      "detail": "no published pi-plan output for tranche-4",
+      "detail": "the tranche-4 PI plan is published",
       "id": "T14-pi-plan",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "pi_objectives",
       "description": "the project tranche's PI objectives are published",
-      "detail": "no published pi-objectives output for tranche-4",
+      "detail": "the tranche-4 PI objectives are published",
       "id": "T14-pi-objectives",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -124,10 +124,10 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "the tranche-4 retro produced no lesson",
+      "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro",
       "id": "T14-lessons",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T14-baseline' did not pass; the gate check 'T14-charter' did not pass; the gate check 'T14-closure-outputs' did not pass; the gate check 'T14-contract' did not pass; the gate check 'T14-review' did not pass; the gate check 'T14-closure-gate' did not pass; the gate check 'T14-pi-plan' did not pass; the gate check 'T14-pi-objectives' did not pass; the gate check 'T14-wsjf' did not pass; the gate check 'T14-demo-credits' did not pass; the gate check 'T14-lessons' did not pass; the gate check 'T14-product' did not pass",
+      "detail": "the gate check 'T14-baseline' did not pass; the gate check 'T14-charter' did not pass; the gate check 'T14-closure-outputs' did not pass; the gate check 'T14-contract' did not pass; the gate check 'T14-review' did not pass; the gate check 'T14-closure-gate' did not pass; the gate check 'T14-wsjf' did not pass; the gate check 'T14-demo-credits' did not pass; the gate check 'T14-product' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -165,26 +165,23 @@
     "T14-contract (P0): no live board-approved delivery contract",
     "T14-review (P0): no Phase-G compliance review for the project's live contract",
     "T14-closure-gate (P0): no approved closure gate for the project",
-    "T14-pi-plan (P0): no published pi-plan output for tranche-4",
-    "T14-pi-objectives (P0): no published pi-objectives output for tranche-4",
     "T14-wsjf (P0): no WBS deliverable carries the plan",
     "T14-demo-credits (P0): no accepted deliverable to demo",
-    "T14-lessons (P1): the tranche-4 retro produced no lesson",
     "T14-product (P0): 4 open P0 package(s): closed_without_closure_review:T14, std-pmp-change-control-t14:T14, std-pmp-project-baseline-t14:T14, std-togaf-compliance-review-t14:T14",
-    "gate (P0): the gate check 'T14-baseline' did not pass; the gate check 'T14-charter' did not pass; the gate check 'T14-closure-outputs' did not pass; the gate check 'T14-contract' did not pass; the gate check 'T14-review' did not pass; the gate check 'T14-closure-gate' did not pass; the gate check 'T14-pi-plan' did not pass; the gate check 'T14-pi-objectives' did not pass; the gate check 'T14-wsjf' did not pass; the gate check 'T14-demo-credits' did not pass; the gate check 'T14-lessons' did not pass; the gate check 'T14-product' did not pass",
+    "gate (P0): the gate check 'T14-baseline' did not pass; the gate check 'T14-charter' did not pass; the gate check 'T14-closure-outputs' did not pass; the gate check 'T14-contract' did not pass; the gate check 'T14-review' did not pass; the gate check 'T14-closure-gate' did not pass; the gate check 'T14-wsjf' did not pass; the gate check 'T14-demo-credits' did not pass; the gate check 'T14-product' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish",
-  "generated_at": "2026-11-23T08:00:24.028610+00:00",
+  "generated_at": "2026-11-23T08:10:27.689077+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T14.toml",
   "name": "Estate toolkits",
   "project": "T14",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T07:59:59.287216+00:00",
-    "git_sha": "8bb124abe9e709308af2aa42fc9f4403411762b7",
-    "path": "retained-snapshot/8bb124abe9e709308af2aa42fc9f4403411762b7"
+    "generated_at": "2026-11-23T08:09:50.563209+00:00",
+    "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
+    "path": "retained-snapshot/4727213b8c204ec69d825d24129f6b506ebb2a2e"
   },
   "verdict": "red",
   "warnings": []

@@ -126,7 +126,9 @@ use serde_json::{Value, json};
 /// and `scientific_formal.translate|verify` — the estate toolkit's scientific reads (546).
 /// **#556/#590 add 8 internal**: `storage.get|put`, `tool_bindings.create|list|retire|update`
 /// and `tools.resume|retire`. 546 → **554**.
-const EXPECTED: [&str; 554] = [
+/// **#526 (w3-gov-assets-1) adds 5 internal**: `governed_assets.compose|get|list|submit|approve` —
+/// the generic surface for the MSP programme-artefact kinds. 554 → **559**.
+const EXPECTED: [&str; 559] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -344,6 +346,11 @@ const EXPECTED: [&str; 554] = [
     "fixtures.fail",
     "fixtures.slow",
     "fixtures.timeout",
+    "governed_assets.approve",
+    "governed_assets.compose",
+    "governed_assets.get",
+    "governed_assets.list",
+    "governed_assets.submit",
     "industries.create",
     "industries.get",
     "industries.list",
@@ -778,8 +785,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
     // `trend` and `scientific_formal.translate|verify`. #556/#590 add eight internal actions
     // (`storage.get|put`, `tool_bindings.create|list|retire|update`, `tools.resume|retire`).
-    // The merged registry is 554: 535 internal, 19 external.
-    assert_eq!((internal, external), (535, 19));
+    // #526 (w3-gov-assets-1) adds five internal actions (`governed_assets.compose|get|list|submit|
+    // approve`). The merged registry is 559: 540 internal, 19 external.
+    assert_eq!((internal, external), (540, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
