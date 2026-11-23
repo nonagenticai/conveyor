@@ -165,16 +165,16 @@
     "gate (P0): the gate check 'T15-baseline' did not pass; the gate check 'T15-charter' did not pass; the gate check 'T15-closure-outputs' did not pass; the gate check 'T15-contract' did not pass; the gate check 'T15-review' did not pass; the gate check 'T15-closure-gate' did not pass; the gate check 'T15-pi-cadence' did not pass; the gate check 'T15-pi-plan' did not pass; the gate check 'T15-pi-objectives' did not pass; the gate check 'T15-wsjf' did not pass; the gate check 'T15-demo-credits' did not pass; the gate check 'T15-lessons' did not pass"
   ],
   "gate": "T15 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling' \u2014 is the condition on which it may be closed, not a claim that it is met.",
-  "generated_at": "2026-11-23T08:00:24.166284+00:00",
+  "generated_at": "2026-11-23T08:07:40.750727+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T15.toml",
   "name": "Tool authoring and BYO",
   "project": "T15",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T07:59:59.287216+00:00",
-    "git_sha": "8bb124abe9e709308af2aa42fc9f4403411762b7",
-    "path": "retained-snapshot/8bb124abe9e709308af2aa42fc9f4403411762b7"
+    "generated_at": "2026-11-23T08:04:57.407142+00:00",
+    "git_sha": "19c4126c3e8d859b369418191d00cf7aee2ba76b",
+    "path": "retained-snapshot/19c4126c3e8d859b369418191d00cf7aee2ba76b"
   },
   "verdict": "red",
   "warnings": []

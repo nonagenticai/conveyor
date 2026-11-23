@@ -1,9 +1,9 @@
 {
   "schema": "v2-gap-ledger/v1",
-  "lane_pin": "3dbf5777",
+  "lane_pin": "0c2c667b",
   "generated_from": {
     "artefact_record": {
-      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526/scripts/generate-standards.py --snapshot /tmp/snap-r1/data --outputs-dir /tmp/snap-r1/docs --register docs/evidence/rework-register.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-rd8rnxsi --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-rd8rnxsi/findings.json",
+      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526/scripts/generate-standards.py --snapshot /tmp/snap-r2/data --outputs-dir /tmp/snap-r2/docs --register docs/evidence/rework-register.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-0tc3zl3w --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-0tc3zl3w/findings.json",
       "summary": {
         "absent": 422,
         "artefacts": 1049,
@@ -15,23 +15,23 @@
     },
     "sources": [
       {
-        "path": "/tmp/snap-r1/data",
-        "sha256": "d4992d92a8947d66a64fb5c68573c4722969182999d8b50c0ae48210dc3bf567",
+        "path": "/tmp/snap-r2/data",
+        "sha256": "756d816118b0e3871f789aaa7f8d9359a1252c7b85c5fb331945a03c18ae319a",
         "role": "post-close snapshot; absent set"
       },
       {
-        "path": "/tmp/snap-r1/docs",
-        "sha256": "2a1821f54ecd2931a3947b238bd0e98344bb1f1c8d4fc84fdedec877edaa97f0",
+        "path": "/tmp/snap-r2/docs",
+        "sha256": "e244f9ae427dd05db3fe76eaa15eecce00557739c302037375dc0ecb231d23d8",
         "role": "published pages the record resolves document headings from"
       },
       {
         "path": "docs/evidence/rework-register.json",
-        "sha256": "beba1c4a70a24e71da618368e6380c9e9908aaf4a0a65622b3fed7b7ef821d7a",
+        "sha256": "2fcb63de0a4c28fbb44d72df1addcae18d4cb3565fc38390d053162a912e1e94",
         "role": "rework register; fix cards and owners"
       },
       {
         "path": "docs/evidence/conformance-gap-register.json",
-        "sha256": "51c4efee72a6e8e35299a0ee6f3356226825fd10654faf5cd55f873ebe3663fa",
+        "sha256": "592a9653e17a482bc20bf21653f6af32adcd28f5844e4eb20dd5859589bfd0e2",
         "role": "live gaps; baseline liveness"
       },
       {
@@ -41,7 +41,7 @@
       },
       {
         "path": "docs/evidence/standards-findings.json",
-        "sha256": "fc3e5336b1c1dc9534990dd1a7698c64d766f8216fcf66b70d5f0d2f5a0fbb74",
+        "sha256": "26808ed2410ce65a87ef8ac6079e657d0a93d928912631c554aa0151c0930652",
         "role": "v1 findings; open ledger"
       },
       {

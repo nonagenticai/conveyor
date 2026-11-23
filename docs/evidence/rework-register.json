@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-23T07:59:59.287216+00:00",
-  "git_sha": "8bb124abe9e709308af2aa42fc9f4403411762b7",
+  "generated_at": "2026-11-23T08:04:57.407142+00:00",
+  "git_sha": "19c4126c3e8d859b369418191d00cf7aee2ba76b",
   "packages": [
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check closed_without_closure_review:T14",
@@ -2139,66 +2139,6 @@
         }
       ],
       "title": "PMP artefact absent: project-baseline"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check pi_plan_missing:tranche-4",
-      "apply_to": "T4",
-      "artefact": "pi-plan",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every authorised tranche that carries projects has a published pi-plan output naming that tranche",
-          "met": false
-        },
-        {
-          "item": "No card is materialised from a PI plan a person has not approved",
-          "met": false
-        },
-        {
-          "item": "The audit reports zero pi_plan_missing gaps",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "pi_plan_missing",
-          "source": "snapshot",
-          "subjects": [
-            "tranche 4 PI"
-          ]
-        }
-      ],
-      "key": "pi_plan_missing:tranche-4",
-      "kind": "RECORD",
-      "owner_project": "T10",
-      "rule": "pi_plan_missing",
-      "scope": "tranche-4",
-      "severity": "P0",
-      "spec": "\u00a78.2",
-      "standard": "SAFe",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "the PI carried by an authorised tranche has no published pi-plan output",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "tranche 4 PI"
-        }
-      ],
-      "title": "Publish the tranche's PI plan before its cards materialise"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-s06-2:S06",
@@ -10222,66 +10162,6 @@
         }
       ],
       "title": "Give every carrying tranche a PI cadence"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check pi_objectives_missing:tranche-4",
-      "apply_to": "T4",
-      "artefact": "pi-objectives",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every authorised tranche has a published pi-objectives output naming that tranche",
-          "met": false
-        },
-        {
-          "item": "The objectives are published with the PI plan, not after delivery",
-          "met": false
-        },
-        {
-          "item": "The audit reports zero pi_objectives_missing gaps",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "pi_objectives_missing",
-          "source": "snapshot",
-          "subjects": [
-            "tranche 4 PI"
-          ]
-        }
-      ],
-      "key": "pi_objectives_missing:tranche-4",
-      "kind": "RECORD",
-      "owner_project": "T10",
-      "rule": "pi_objectives_missing",
-      "scope": "tranche-4",
-      "severity": "P1",
-      "spec": "\u00a78.2",
-      "standard": "SAFe",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "the PI carried by an authorised tranche has no published pi-objectives output",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "tranche 4 PI"
-        }
-      ],
-      "title": "Publish the PI objectives with the plan"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
@@ -81084,14 +80964,14 @@
     },
     "SAFe": {
       "findings": 3,
-      "gaps": 20,
-      "p0": 1,
-      "p1": 19,
+      "gaps": 18,
+      "p0": 0,
+      "p1": 18,
       "p2": 0,
-      "packages": 28,
+      "packages": 26,
       "rules": 8,
-      "rules_clean": 4,
-      "rules_with_gaps": 4,
+      "rules_clean": 6,
+      "rules_with_gaps": 2,
       "suppressed": 0
     },
     "SPEC": {
@@ -81119,33 +80999,33 @@
       "suppressed": 0
     }
   },
-  "snapshot": "/tmp/snap-r1/data",
+  "snapshot": "/tmp/snap-r2/data",
   "summary": {
     "by_kind": {
       "CODE": 82,
-      "RECORD": 659,
+      "RECORD": 657,
       "STANDARD": 1
     },
     "by_severity": {
-      "P0": 28,
-      "P1": 227,
+      "P0": 27,
+      "P1": 226,
       "P2": 487
     },
     "by_standard": {
       "MSP": 76,
       "PMP": 122,
-      "SAFe": 28,
+      "SAFe": 26,
       "SPEC": 73,
       "TOGAF": 443
     },
     "by_status": {
-      "open": 742
+      "open": 740
     },
     "duplicates": 0,
-    "open": 742,
-    "packages": 742,
+    "open": 740,
+    "packages": 740,
     "resolved": 110,
-    "subjects": 819,
+    "subjects": 817,
     "suppressed": 0
   }
 }

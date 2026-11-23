@@ -88,28 +88,28 @@
     {
       "check": "pi_plan",
       "description": "the project tranche's PI plan is published",
-      "detail": "no published pi-plan output for tranche-4",
+      "detail": "the tranche-4 PI plan is published",
       "id": "S09-pi-plan",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "pi_objectives",
       "description": "the project tranche's PI objectives are published",
-      "detail": "no published pi-objectives output for tranche-4",
+      "detail": "the tranche-4 PI objectives are published",
       "id": "S09-pi-objectives",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "the tranche-4 retro produced no lesson",
+      "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro",
       "id": "S09-lessons",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S09-baseline' did not pass; the gate check 'S09-charter' did not pass; the gate check 'S09-closure-outputs' did not pass; the gate check 'S09-contract' did not pass; the gate check 'S09-review' did not pass; the gate check 'S09-closure-gate' did not pass; the gate check 'S09-pi-plan' did not pass; the gate check 'S09-pi-objectives' did not pass; the gate check 'S09-lessons' did not pass; the gate check 'S09-wsjf' did not pass; the gate check 'S09-demo-credits' did not pass; the gate check 'S09-product' did not pass",
+      "detail": "the gate check 'S09-baseline' did not pass; the gate check 'S09-charter' did not pass; the gate check 'S09-closure-outputs' did not pass; the gate check 'S09-contract' did not pass; the gate check 'S09-review' did not pass; the gate check 'S09-closure-gate' did not pass; the gate check 'S09-wsjf' did not pass; the gate check 'S09-demo-credits' did not pass; the gate check 'S09-product' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -165,26 +165,23 @@
     "S09-contract (P0): no live board-approved delivery contract",
     "S09-review (P0): no Phase-G compliance review for the project's live contract",
     "S09-closure-gate (P0): no approved closure gate for the project",
-    "S09-pi-plan (P0): no published pi-plan output for tranche-4",
-    "S09-pi-objectives (P0): no published pi-objectives output for tranche-4",
-    "S09-lessons (P1): the tranche-4 retro produced no lesson",
     "S09-wsjf (P0): no WBS deliverable carries the plan",
     "S09-demo-credits (P0): no accepted deliverable to demo",
     "S09-product (P0): 3 open P0 package(s): std-pmp-change-control-s09:S09, std-pmp-project-baseline-s09:S09, std-togaf-compliance-review-s09:S09",
-    "gate (P0): the gate check 'S09-baseline' did not pass; the gate check 'S09-charter' did not pass; the gate check 'S09-closure-outputs' did not pass; the gate check 'S09-contract' did not pass; the gate check 'S09-review' did not pass; the gate check 'S09-closure-gate' did not pass; the gate check 'S09-pi-plan' did not pass; the gate check 'S09-pi-objectives' did not pass; the gate check 'S09-lessons' did not pass; the gate check 'S09-wsjf' did not pass; the gate check 'S09-demo-credits' did not pass; the gate check 'S09-product' did not pass",
+    "gate (P0): the gate check 'S09-baseline' did not pass; the gate check 'S09-charter' did not pass; the gate check 'S09-closure-outputs' did not pass; the gate check 'S09-contract' did not pass; the gate check 'S09-review' did not pass; the gate check 'S09-closure-gate' did not pass; the gate check 'S09-wsjf' did not pass; the gate check 'S09-demo-credits' did not pass; the gate check 'S09-product' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "the feature-list items are green \u2014 a 1 MiB round-trip whose sha256 equals `content_hash` with the object key gone after delete, a 10 MiB upload refused `413`, secrets never returning plaintext, the workers page rendering live rows, every report number equal to its SQL count, `timeout_ms` on every external, and billing with no write action and no metering event",
-  "generated_at": "2026-11-23T08:00:21.372177+00:00",
+  "generated_at": "2026-11-23T08:07:37.903685+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S09.toml",
   "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",
   "project": "S09",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T07:59:59.287216+00:00",
-    "git_sha": "8bb124abe9e709308af2aa42fc9f4403411762b7",
-    "path": "retained-snapshot/8bb124abe9e709308af2aa42fc9f4403411762b7"
+    "generated_at": "2026-11-23T08:04:57.407142+00:00",
+    "git_sha": "19c4126c3e8d859b369418191d00cf7aee2ba76b",
+    "path": "retained-snapshot/19c4126c3e8d859b369418191d00cf7aee2ba76b"
   },
   "verdict": "red",
   "warnings": []

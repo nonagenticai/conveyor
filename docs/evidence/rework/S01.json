@@ -137,16 +137,16 @@
   ],
   "failures": [],
   "gate": "The decision record states what is observable and marks the rest not recoverable; the project re-closes through the one gate.",
-  "generated_at": "2026-11-23T08:00:19.850748+00:00",
+  "generated_at": "2026-11-23T08:07:36.415466+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S01.toml",
   "name": "UI spike \u2014 Leptos CSR vs Leptos SSR",
   "project": "S01",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T07:59:59.287216+00:00",
-    "git_sha": "8bb124abe9e709308af2aa42fc9f4403411762b7",
-    "path": "retained-snapshot/8bb124abe9e709308af2aa42fc9f4403411762b7"
+    "generated_at": "2026-11-23T08:04:57.407142+00:00",
+    "git_sha": "19c4126c3e8d859b369418191d00cf7aee2ba76b",
+    "path": "retained-snapshot/19c4126c3e8d859b369418191d00cf7aee2ba76b"
   },
   "verdict": "green",
   "warnings": []
