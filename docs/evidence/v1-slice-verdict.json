@@ -1,9 +1,9 @@
 {
   "schema": "verify-slices/v1",
-  "audited_sha": "e09dd179fd7d6f1fe851855db145feccf4b14fc9",
+  "audited_sha": "a52466c1eb0cf44cb8f230265ab2a45e413a8c89",
   "snapshot": {
-    "path": "/tmp/u5a-v9/data",
-    "git_sha": "e09dd179fd7d6f1fe851855db145feccf4b14fc9",
+    "path": "/tmp/u5a-v10/data",
+    "git_sha": "a52466c1eb0cf44cb8f230265ab2a45e413a8c89",
     "generated_at": "2026-11-23T10:28:30.225766+00:00"
   },
   "slices": [
