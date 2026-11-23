@@ -64,6 +64,7 @@ python3 scripts/audit-programme-conformance.py \
   --snapshot "$snapshot" --out "$tmp/audit" \
   --findings docs/evidence/v1-conformance-findings.json \
   --findings "$tmp/standards-findings.json" \
+  --deep-review docs/evidence/record-w3/deep-review-findings.json \
   --rework-out "$tmp/rework.json" >/dev/null
 test -f "$tmp/rework.json" || {
   echo "publish-standards: the audit produced no rework register" >&2
