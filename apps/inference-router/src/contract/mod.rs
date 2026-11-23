@@ -126,7 +126,8 @@ mod tests {
                 .as_object()
                 .expect("schemas")
                 .len(),
-            35
+            // The original capture's 35 plus `AnyObject`, added for `chat_template_kwargs` (#626).
+            36
         );
         let operations = operations(&document);
         // 26 paths, 27 operations: one path carries GET and PUT.
