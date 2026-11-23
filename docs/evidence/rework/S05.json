@@ -88,28 +88,28 @@
     {
       "check": "pi_plan",
       "description": "the project tranche's PI plan is published",
-      "detail": "no published pi-plan output for tranche-4",
+      "detail": "the tranche-4 PI plan is published",
       "id": "S05-pi-plan",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "pi_objectives",
       "description": "the project tranche's PI objectives are published",
-      "detail": "no published pi-objectives output for tranche-4",
+      "detail": "the tranche-4 PI objectives are published",
       "id": "S05-pi-objectives",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "the tranche-4 retro produced no lesson",
+      "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro",
       "id": "S05-lessons",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S05-baseline' did not pass; the gate check 'S05-charter' did not pass; the gate check 'S05-closure-outputs' did not pass; the gate check 'S05-contract' did not pass; the gate check 'S05-review' did not pass; the gate check 'S05-closure-gate' did not pass; the gate check 'S05-pi-plan' did not pass; the gate check 'S05-pi-objectives' did not pass; the gate check 'S05-lessons' did not pass; the gate check 'S05-wsjf' did not pass; the gate check 'S05-demo-credits' did not pass; the gate check 'S05-product' did not pass",
+      "detail": "the gate check 'S05-baseline' did not pass; the gate check 'S05-charter' did not pass; the gate check 'S05-closure-outputs' did not pass; the gate check 'S05-contract' did not pass; the gate check 'S05-review' did not pass; the gate check 'S05-closure-gate' did not pass; the gate check 'S05-wsjf' did not pass; the gate check 'S05-demo-credits' did not pass; the gate check 'S05-product' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -165,26 +165,23 @@
     "S05-contract (P0): no live board-approved delivery contract",
     "S05-review (P0): no Phase-G compliance review for the project's live contract",
     "S05-closure-gate (P0): no approved closure gate for the project",
-    "S05-pi-plan (P0): no published pi-plan output for tranche-4",
-    "S05-pi-objectives (P0): no published pi-objectives output for tranche-4",
-    "S05-lessons (P1): the tranche-4 retro produced no lesson",
     "S05-wsjf (P0): no WBS deliverable carries the plan",
     "S05-demo-credits (P0): no accepted deliverable to demo",
     "S05-product (P0): 3 open P0 package(s): std-pmp-change-control-s05:S05, std-pmp-project-baseline-s05:S05, std-togaf-compliance-review-s05:S05",
-    "gate (P0): the gate check 'S05-baseline' did not pass; the gate check 'S05-charter' did not pass; the gate check 'S05-closure-outputs' did not pass; the gate check 'S05-contract' did not pass; the gate check 'S05-review' did not pass; the gate check 'S05-closure-gate' did not pass; the gate check 'S05-pi-plan' did not pass; the gate check 'S05-pi-objectives' did not pass; the gate check 'S05-lessons' did not pass; the gate check 'S05-wsjf' did not pass; the gate check 'S05-demo-credits' did not pass; the gate check 'S05-product' did not pass",
+    "gate (P0): the gate check 'S05-baseline' did not pass; the gate check 'S05-charter' did not pass; the gate check 'S05-closure-outputs' did not pass; the gate check 'S05-contract' did not pass; the gate check 'S05-review' did not pass; the gate check 'S05-closure-gate' did not pass; the gate check 'S05-wsjf' did not pass; the gate check 'S05-demo-credits' did not pass; the gate check 'S05-product' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "replay a board export, win a two-client race and survive the 1k-card load \u2014 zero deltas on 1,000 cards, one 200 and one 412 with the current representation, p95 \u2264 120 ms at 20 rps, the exact webhook shape, SSE within 200 ms, and no second store",
-  "generated_at": "2026-11-23T08:00:20.375664+00:00",
+  "generated_at": "2026-11-23T08:07:36.950221+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S05.toml",
   "name": "Board \u2014 projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
   "project": "S05",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T07:59:59.287216+00:00",
-    "git_sha": "8bb124abe9e709308af2aa42fc9f4403411762b7",
-    "path": "retained-snapshot/8bb124abe9e709308af2aa42fc9f4403411762b7"
+    "generated_at": "2026-11-23T08:04:57.407142+00:00",
+    "git_sha": "19c4126c3e8d859b369418191d00cf7aee2ba76b",
+    "path": "retained-snapshot/19c4126c3e8d859b369418191d00cf7aee2ba76b"
   },
   "verdict": "red",
   "warnings": []

@@ -165,16 +165,16 @@
     "gate (P0): the gate check 'S21-baseline' did not pass; the gate check 'S21-charter' did not pass; the gate check 'S21-closure-outputs' did not pass; the gate check 'S21-contract' did not pass; the gate check 'S21-review' did not pass; the gate check 'S21-closure-gate' did not pass; the gate check 'S21-pi-cadence' did not pass; the gate check 'S21-pi-plan' did not pass; the gate check 'S21-pi-objectives' did not pass; the gate check 'S21-lessons' did not pass; the gate check 'S21-wsjf' did not pass; the gate check 'S21-demo-credits' did not pass"
   ],
   "gate": "S21 is accepted when a step whose recipe requires `procedure` and whose run has none fails by name before a model call, the same recipe and the same facts compile byte-identically, changing the card changes the hash while changing an unrelated tenant's card does not, an over-budget section refuses with the measured size and never truncates, and the prompt audit can name the compiled text it audited by `(prompt_ref, prompt_sha256)`.",
-  "generated_at": "2026-11-23T08:00:23.007376+00:00",
+  "generated_at": "2026-11-23T08:07:39.607804+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S21.toml",
   "name": "Message construction",
   "project": "S21",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T07:59:59.287216+00:00",
-    "git_sha": "8bb124abe9e709308af2aa42fc9f4403411762b7",
-    "path": "retained-snapshot/8bb124abe9e709308af2aa42fc9f4403411762b7"
+    "generated_at": "2026-11-23T08:04:57.407142+00:00",
+    "git_sha": "19c4126c3e8d859b369418191d00cf7aee2ba76b",
+    "path": "retained-snapshot/19c4126c3e8d859b369418191d00cf7aee2ba76b"
   },
   "verdict": "red",
   "warnings": []

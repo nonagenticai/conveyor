@@ -166,16 +166,16 @@
     "gate (P0): the gate check 'S06-baseline' did not pass; the gate check 'S06-charter' did not pass; the gate check 'S06-closure-outputs' did not pass; the gate check 'S06-contract' did not pass; the gate check 'S06-review' did not pass; the gate check 'S06-closure-gate' did not pass; the gate check 'S06-pi-cadence' did not pass; the gate check 'S06-pi-plan' did not pass; the gate check 'S06-pi-objectives' did not pass; the gate check 'S06-wsjf' did not pass; the gate check 'S06-demo-credits' did not pass; the gate check 'S06-lessons' did not pass; the gate check 'S06-product' did not pass"
   ],
   "gate": "S06's gate is the golden card-type\u00d7list path, dual-control approval and retry.",
-  "generated_at": "2026-11-23T08:00:20.518599+00:00",
+  "generated_at": "2026-11-23T08:07:37.083473+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S06.toml",
   "name": "Control plane \u2014 claims, runs, approvals, andon, comms and notifications",
   "project": "S06",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T07:59:59.287216+00:00",
-    "git_sha": "8bb124abe9e709308af2aa42fc9f4403411762b7",
-    "path": "retained-snapshot/8bb124abe9e709308af2aa42fc9f4403411762b7"
+    "generated_at": "2026-11-23T08:04:57.407142+00:00",
+    "git_sha": "19c4126c3e8d859b369418191d00cf7aee2ba76b",
+    "path": "retained-snapshot/19c4126c3e8d859b369418191d00cf7aee2ba76b"
   },
   "verdict": "red",
   "warnings": []

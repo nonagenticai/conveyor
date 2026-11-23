@@ -88,19 +88,19 @@
     {
       "check": "pi_plan",
       "description": "the project tranche's PI plan is published",
-      "detail": "no published pi-plan output for tranche-4",
+      "detail": "the tranche-4 PI plan is published",
       "id": "T4-pi-plan",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "pi_objectives",
       "description": "the project tranche's PI objectives are published",
-      "detail": "no published pi-objectives output for tranche-4",
+      "detail": "the tranche-4 PI objectives are published",
       "id": "T4-pi-objectives",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -124,10 +124,10 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "the tranche-4 retro produced no lesson",
+      "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro",
       "id": "T4-lessons",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T4-review' did not pass; the gate check 'T4-closure-gate' did not pass; the gate check 'T4-pi-plan' did not pass; the gate check 'T4-pi-objectives' did not pass; the gate check 'T4-lessons' did not pass; the gate check 'T4-product' did not pass",
+      "detail": "the gate check 'T4-review' did not pass; the gate check 'T4-closure-gate' did not pass; the gate check 'T4-product' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -152,23 +152,20 @@
   "failures": [
     "T4-review (P0): the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver",
     "T4-closure-gate (P0): no approved closure gate for the project",
-    "T4-pi-plan (P0): no published pi-plan output for tranche-4",
-    "T4-pi-objectives (P0): no published pi-objectives output for tranche-4",
-    "T4-lessons (P1): the tranche-4 retro produced no lesson",
     "T4-product (P0): 1 open P0 package(s): std-pmp-change-control-t4:T4",
-    "gate (P0): the gate check 'T4-review' did not pass; the gate check 'T4-closure-gate' did not pass; the gate check 'T4-pi-plan' did not pass; the gate check 'T4-pi-objectives' did not pass; the gate check 'T4-lessons' did not pass; the gate check 'T4-product' did not pass"
+    "gate (P0): the gate check 'T4-review' did not pass; the gate check 'T4-closure-gate' did not pass; the gate check 'T4-product' did not pass"
   ],
   "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata",
-  "generated_at": "2026-11-23T08:00:24.824762+00:00",
+  "generated_at": "2026-11-23T08:07:41.395961+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T4.toml",
   "name": "Kanban coach",
   "project": "T4",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T07:59:59.287216+00:00",
-    "git_sha": "8bb124abe9e709308af2aa42fc9f4403411762b7",
-    "path": "retained-snapshot/8bb124abe9e709308af2aa42fc9f4403411762b7"
+    "generated_at": "2026-11-23T08:04:57.407142+00:00",
+    "git_sha": "19c4126c3e8d859b369418191d00cf7aee2ba76b",
+    "path": "retained-snapshot/19c4126c3e8d859b369418191d00cf7aee2ba76b"
   },
   "verdict": "red",
   "warnings": []

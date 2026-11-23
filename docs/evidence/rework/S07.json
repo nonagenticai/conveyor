@@ -88,28 +88,28 @@
     {
       "check": "pi_plan",
       "description": "the project tranche's PI plan is published",
-      "detail": "no published pi-plan output for tranche-4",
+      "detail": "the tranche-4 PI plan is published",
       "id": "S07-pi-plan",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "pi_objectives",
       "description": "the project tranche's PI objectives are published",
-      "detail": "no published pi-objectives output for tranche-4",
+      "detail": "the tranche-4 PI objectives are published",
       "id": "S07-pi-objectives",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "the tranche-4 retro produced no lesson",
+      "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro",
       "id": "S07-lessons",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S07-baseline' did not pass; the gate check 'S07-charter' did not pass; the gate check 'S07-closure-outputs' did not pass; the gate check 'S07-contract' did not pass; the gate check 'S07-review' did not pass; the gate check 'S07-closure-gate' did not pass; the gate check 'S07-pi-plan' did not pass; the gate check 'S07-pi-objectives' did not pass; the gate check 'S07-lessons' did not pass; the gate check 'S07-wsjf' did not pass; the gate check 'S07-demo-credits' did not pass; the gate check 'S07-product' did not pass",
+      "detail": "the gate check 'S07-baseline' did not pass; the gate check 'S07-charter' did not pass; the gate check 'S07-closure-outputs' did not pass; the gate check 'S07-contract' did not pass; the gate check 'S07-review' did not pass; the gate check 'S07-closure-gate' did not pass; the gate check 'S07-wsjf' did not pass; the gate check 'S07-demo-credits' did not pass; the gate check 'S07-product' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -165,26 +165,23 @@
     "S07-contract (P0): no live board-approved delivery contract",
     "S07-review (P0): no Phase-G compliance review for the project's live contract",
     "S07-closure-gate (P0): no approved closure gate for the project",
-    "S07-pi-plan (P0): no published pi-plan output for tranche-4",
-    "S07-pi-objectives (P0): no published pi-objectives output for tranche-4",
-    "S07-lessons (P1): the tranche-4 retro produced no lesson",
     "S07-wsjf (P0): no WBS deliverable carries the plan",
     "S07-demo-credits (P0): no accepted deliverable to demo",
     "S07-product (P0): 3 open P0 package(s): std-pmp-change-control-s07:S07, std-pmp-project-baseline-s07:S07, std-togaf-compliance-review-s07:S07",
-    "gate (P0): the gate check 'S07-baseline' did not pass; the gate check 'S07-charter' did not pass; the gate check 'S07-closure-outputs' did not pass; the gate check 'S07-contract' did not pass; the gate check 'S07-review' did not pass; the gate check 'S07-closure-gate' did not pass; the gate check 'S07-pi-plan' did not pass; the gate check 'S07-pi-objectives' did not pass; the gate check 'S07-lessons' did not pass; the gate check 'S07-wsjf' did not pass; the gate check 'S07-demo-credits' did not pass; the gate check 'S07-product' did not pass",
+    "gate (P0): the gate check 'S07-baseline' did not pass; the gate check 'S07-charter' did not pass; the gate check 'S07-closure-outputs' did not pass; the gate check 'S07-contract' did not pass; the gate check 'S07-review' did not pass; the gate check 'S07-closure-gate' did not pass; the gate check 'S07-wsjf' did not pass; the gate check 'S07-demo-credits' did not pass; the gate check 'S07-product' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "the relevance eval set beats the agreed baseline \u2014 3 revisions with a dense sequence, an idempotent seed, both GIN indexes used, relevance targets met, traceability in both directions with 0 cross-tenant rows, quality read-only, and no orphan",
-  "generated_at": "2026-11-23T08:00:21.097410+00:00",
+  "generated_at": "2026-11-23T08:07:37.629666+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S07.toml",
   "name": "Requirements, catalogues, revisions, quality scoring, search",
   "project": "S07",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T07:59:59.287216+00:00",
-    "git_sha": "8bb124abe9e709308af2aa42fc9f4403411762b7",
-    "path": "retained-snapshot/8bb124abe9e709308af2aa42fc9f4403411762b7"
+    "generated_at": "2026-11-23T08:04:57.407142+00:00",
+    "git_sha": "19c4126c3e8d859b369418191d00cf7aee2ba76b",
+    "path": "retained-snapshot/19c4126c3e8d859b369418191d00cf7aee2ba76b"
   },
   "verdict": "red",
   "warnings": []

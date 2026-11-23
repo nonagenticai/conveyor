@@ -1,11 +1,11 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `8bb124abe9e709308af2aa42fc9f4403411762b7` generated `2026-11-23T07:59:59.287216+00:00` from `snap-r1/data`.
+Snapshot: `19c4126c3e8d859b369418191d00cf7aee2ba76b` generated `2026-11-23T08:04:57.407142+00:00` from `snap-r2/data`.
 
 | Severity | Count |
 |---|---:|
-| P0 | 15 |
-| P1 | 141 |
+| P0 | 14 |
+| P1 | 140 |
 | P2 | 23 |
 | P3 | 0 |
 
@@ -17,7 +17,6 @@ Snapshot: `8bb124abe9e709308af2aa42fc9f4403411762b7` generated `2026-11-23T07:59
 | `closed_without_closure_review` | `T16` | P0 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `T3` | P0 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `T7` | P0 | project is closed but its closure review is not published |
-| `pi_plan_missing` | `tranche 4 PI` | P0 | the PI carried by an authorised tranche has no published pi-plan output |
 | `project_in_unauthorised_tranche` | `S06b` | P0 | project is closed in tranche 6 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S06c` | P0 | project is closed in tranche 7 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S06d` | P0 | project is closed in tranche 8 whose state is 'planned' |
@@ -125,7 +124,6 @@ Snapshot: `8bb124abe9e709308af2aa42fc9f4403411762b7` generated `2026-11-23T07:59
 | `pi_cadence_missing` | `tranche 7` | P1 | the tranche carries projects but has no PI cadence for its period |
 | `pi_cadence_missing` | `tranche 8` | P1 | the tranche carries projects but has no PI cadence for its period |
 | `pi_cadence_missing` | `tranche 9` | P1 | the tranche carries projects but has no PI cadence for its period |
-| `pi_objectives_missing` | `tranche 4 PI` | P1 | the PI carried by an authorised tranche has no published pi-objectives output |
 | `project_in_unauthorised_tranche` | `S06` | P1 | project is active in tranche 5 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S14` | P1 | project is active in tranche 11 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S15` | P1 | project is active in tranche 7 whose state is 'planned' |
