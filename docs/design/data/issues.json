@@ -1,4 +1,9 @@
 {
+  "schema": "issue-registry/v1",
+  "provenance": {
+    "tenant": "nonagentic",
+    "source": "github:nonagenticai/conveyor"
+  },
   "issues": [
     {
       "number": 612,
