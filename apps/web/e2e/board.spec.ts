@@ -182,8 +182,23 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
   await expect(page.getByText(cardName, { exact: true })).toHaveCount(0);
 
   await edited.getByRole("button", { name: "Archive" }).click();
-  await expect(page.locator(".card", { hasText: editedName })).toHaveCount(0);
-  await expect(page.locator(".archived")).toContainText(editedName);
+  // Prove the archive on the board's own read before the screen: the destructive path's
+  // refetch can be delayed past the default auto-wait under the full suite.
+  await expect
+    .poll(
+      async () => {
+        const view = await request
+          .get(`/api/boards/${boardId}/cards?limit=200`)
+          .then((r) => r.json());
+        return (view.items ?? []).map((row: { name: string }) => row.name);
+      },
+      { timeout: 30_000 },
+    )
+    .not.toContain(editedName);
+  await expect(page.locator(".card", { hasText: editedName })).toHaveCount(0, {
+    timeout: 30_000,
+  });
+  await expect(page.locator(".archived")).toContainText(editedName, { timeout: 30_000 });
 });
 
 test("a board beyond 200 cards pages instead of hiding the tail", async ({ page, request }) => {

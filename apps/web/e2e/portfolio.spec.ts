@@ -1,6 +1,6 @@
 import { expect, test } from "./fixture";
 
-import { authFor, createBoardCard } from "./helpers";
+import { authFor, createBoardCard, invoke } from "./helpers";
 
 // T18-1 P2/P3: Portfolio reads the tenant's rows; the delivery view renders L1–L4; a spend row
 // with no priced call is `—*`, never `$0`.
@@ -59,10 +59,33 @@ test("the delivery view renders L1-L4 and the work package's execution", async (
 
 test("an unpriced row is marked", async ({ page, request }) => {
   const title = `e2e unpriced ${Date.now()}`;
-  await createBoardCard(request, title);
+  const fixture = await createBoardCard(request, title);
+
+  // The page composes spend from its own report load; prove the project has no priced or
+  // unpriced call on the server first, so the assertion is not a race with that snapshot.
+  const until = new Date().toISOString();
+  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  await expect
+    .poll(
+      async () => {
+        const report = await invoke<{
+          rows: { bucket: string; priced_calls?: number; unpriced_calls?: number }[];
+        }>(request, "inference_usage.report", {
+          since,
+          until,
+          group_by: "project",
+        });
+        const entry = report.rows.find((row) => row.bucket === fixture.projectId);
+        return entry ? (entry.priced_calls ?? 0) + (entry.unpriced_calls ?? 0) : 0;
+      },
+      { timeout: 30_000 },
+    )
+    .toBe(0);
 
   await page.goto("/portfolio");
-  const row = page.locator("table.table").first().locator("tr", { hasText: title });
+  // The row carries its project id, so the assertion cannot drift to another project with a
+  // similar title.
+  const row = page.locator(`tr[data-project-id="${fixture.projectId}"]`);
   await expect(row.getByText("—*")).toBeVisible();
   await expect(row.getByText("no priced call")).toBeVisible();
   await expect(row.getByText("$0")).toHaveCount(0);
