@@ -41,6 +41,12 @@ const RAW: &[(&str, &str)] = &[
         "retrieval",
         include_str!("../../../../seed/toolkits/retrieval.json"),
     ),
+    // T14 (#560): the scientific processor's read surface, published as a draft until the
+    // service's deployment is scaled up and its probe is green.
+    (
+        "scientific",
+        include_str!("../../../../seed/toolkits/scientific.json"),
+    ),
     // The `artifacts`, `billing` and `worker_management` manifests were removed by #450: their
     // actions are internal now, and a toolkit binds External handlers only (SPEC_V2 §11.2,
     // §11.3, D57; #46).

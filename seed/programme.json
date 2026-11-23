@@ -367,7 +367,7 @@
       "key": "S09",
       "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",
       "description": "Plan: docs/plans/slices/S09-documents-integrations.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S09-documents-integrations.md",
@@ -774,14 +774,15 @@
       "key": "S21",
       "name": "Message construction (the compiled prompt)",
       "description": "Plan: docs/plans/slices/S21-message-construction.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S21-message-construction.md",
         "track": "v1",
         "issues": [
           15,
-          581
+          581,
+          590
         ],
         "depends_on": [
           "S09",
@@ -1440,6 +1441,48 @@
       }
     },
     {
+      "key": "T18",
+      "name": "The real V2 UI",
+      "description": "SPEC_V2 slice T18 (docs/SPEC_V2.md §12)",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [
+          559,
+          562,
+          563,
+          564,
+          565,
+          566
+        ],
+        "depends_on": [
+          "T0",
+          "T1",
+          "T2",
+          "T3",
+          "P0"
+        ],
+        "plan_status": "draft",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 4,
+        "expected_outputs": [
+          "project-brief",
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
+        ],
+        "adm_phase": "G",
+        "plateau": "capability",
+        "gate": "a signed-in tenant drives portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports `exists` only from a real route + spec; no production screen renders a fixture"
+      }
+    },
+    {
       "key": "DESIGN-PUBLISH",
       "name": "Publish the SPEC_V2 studio design pack, live",
       "description": "Programme-level unit (plan: docs/design/STUDIO-SPEC.md)",
@@ -1555,15 +1598,8 @@
           476,
           526,
           545,
-          559,
-          562,
-          563,
-          564,
-          565,
-          566,
           569,
-          572,
-          582
+          572
         ],
         "depends_on": [],
         "plan_status": "active",

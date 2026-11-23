@@ -272,52 +272,6 @@ async fn laya_rows(pg: &support::Pg, seeded: &support::Seeded) -> i64 {
         .expect("count the laya decisions")
 }
 
-/// An approved `draft.apply` gate on `card_id`, decided by `approver` through the store.
-///
-/// The gate is requested with `requested_by: None` so its single human decision reaches the
-/// quorum without tripping the requester/decider exclusion (SPEC_V2 §5.4).
-async fn approved_draft_gate(
-    pg: &support::Pg,
-    tenant: conveyor_domain::TenantId,
-    approver: uuid::Uuid,
-    card_id: uuid::Uuid,
-) -> uuid::Uuid {
-    let mut tx = conveyor_store::begin_scoped(&pg.runtime, tenant)
-        .await
-        .expect("scope the approval insert");
-    let approval = conveyor_store::approval::insert_approval_tx(
-        &mut tx,
-        tenant,
-        &conveyor_store::approval::NewApproval {
-            run_id: None,
-            card_id: Some(card_id),
-            project_id: None,
-            eval_id: None,
-            gate: "draft.apply".to_owned(),
-            kind: "gate".to_owned(),
-            required_decisions: 1,
-            requested_by: None,
-            expires_at: None,
-            callback_url: None,
-            correlation_id: None,
-            meta: json!({ "target": card_id }),
-        },
-    )
-    .await
-    .expect("insert the draft.apply gate");
-    conveyor_store::approval::record_decision_tx(
-        &mut tx,
-        tenant,
-        approval.id,
-        &conveyor_domain::Decision::approve(approver),
-        false,
-    )
-    .await
-    .expect("approve the draft.apply gate");
-    tx.commit().await.expect("commit the draft.apply gate");
-    approval.id
-}
-
 /// An approved `refinement.publish` gate naming `policy_id` (§7.2).
 ///
 /// Requested through the real action as `dev:alice`, whose request carries the policy id in
@@ -420,8 +374,8 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
         .await;
     assert_eq!(status, 200, "{approval}");
     let approval_id = id_of(output(&approval), "id");
-    // The L3 gate is a person's act: the approval must be decided before the decision cites it.
-    // Alice requested it, so the second seeded principal decides it (SPEC_V2 §5.4).
+    // A human decision must cite an approval that actually resolved in its favour; the
+    // requester cannot decide their own gate, so the fixture's second admin approves it.
     let (status, decided) = running
         .invoke(
             "approvals.decide",
@@ -846,17 +800,21 @@ async fn every_decision_pins_the_refinement_and_laya_config_versions() {
 /// P4.1/P4.2 — a generated draft is applied only through the gated action.
 ///
 /// The compile-time half is the `compile_fail` doctest in `conveyor_domain::ladder`; this test
-/// is the runtime half on the same rule: a human `draft.apply` decision backed by an approved
-/// gate is the only way a generated draft reaches a card, and the ordinary edit path refuses
-/// the generated class outright.
+/// is the runtime half on the same rule: an accepted L1 decision is the only way a generated
+/// draft reaches a card, and the ordinary edit path refuses the generated class outright.
 #[tokio::test(flavor = "multi_thread")]
 async fn a_generated_draft_cannot_transition_a_card() {
-    let _env = LAYA_ENV.lock().await;
-    let (pg, running, seeded) = fixture().await;
-    create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
-    let laya_config_id = create_laya_config(&running).await;
-    seal_laya_token(&pg, &seeded).await;
-    let low = laya_stub(json!({"score": 0.4})).await;
+    let (_pg, running, _seeded) = fixture().await;
+    create_policy(
+        &running,
+        "gate.precheck",
+        Some("capability_ready"),
+        0.8,
+        "closed",
+        "block",
+    )
+    .await;
+    create_laya_config(&running).await;
 
     // A project, its board, an active lane and a card to apply to.
     let (status, project) = running
@@ -920,10 +878,25 @@ async fn a_generated_draft_cannot_transition_a_card() {
     let card_id = id_of(output(&card), "id");
 
     // A below-threshold decision: the gate refuses, and it cannot apply a draft.
-    let (status, refused) = laya_decision(&running, KIND, &laya_config_id, "key-refused").await;
+    let (status, refused) = running
+        .invoke(
+            "ladder.evaluate",
+            "dev:alice",
+            json!({
+                "kind": "gate.precheck",
+                "gate": "capability_ready",
+                "card_id": card_id,
+                "answer": "pass",
+                "confidence": 0.4,
+                "latency_ms": 5
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
     assert_eq!(status, 201, "{refused}");
     assert_eq!(output(&refused)["outcome"], "refused", "{refused}");
-    drop(low);
 
     // A generated draft artefact.
     let (status, draft) = running
@@ -961,55 +934,28 @@ async fn a_generated_draft_cannot_transition_a_card() {
         .await;
     assert_eq!(status, 422, "{refused_apply}");
 
-    // An accepted L1 decision is NOT the gate: a routine accepted decision on the card cannot
-    // apply a generated draft (§7.4).
-    let _high = laya_stub(json!({"score": 0.9})).await;
-    let (status, accepted) = laya_decision(&running, KIND, &laya_config_id, "key-accepted").await;
+    // An accepted L1 decision is the gate.
+    let (status, accepted) = running
+        .invoke(
+            "ladder.evaluate",
+            "dev:alice",
+            json!({
+                "kind": "gate.precheck",
+                "gate": "capability_ready",
+                "card_id": card_id,
+                "answer": "pass",
+                "confidence": 0.9,
+                "latency_ms": 5,
+                "meta": {"draft_document_id": document_id}
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
     assert_eq!(status, 201, "{accepted}");
     assert_eq!(output(&accepted)["outcome"], "accepted", "{accepted}");
-    let (status, refused_l1) = running
-        .invoke(
-            "ladder.apply_draft",
-            "dev:alice",
-            json!({
-                "document_id": document_id,
-                "card_id": card_id,
-                "decision_id": id_of(output(&accepted), "id")
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 422, "{refused_l1}");
-    assert_eq!(
-        output(&refused_l1)["type"],
-        "draft_requires_gate",
-        "{refused_l1}"
-    );
-
-    // The gate is a human `draft.apply` decision backed by an approved gate on this card.
-    let card_uuid = uuid::Uuid::parse_str(&card_id).expect("the card id");
-    let approval_id = approved_draft_gate(&pg, seeded.tenant, seeded.user_id, card_uuid).await;
-    let (status, human) = running
-        .invoke(
-            "ladder.record",
-            "dev:alice",
-            json!({
-                "rung": "human",
-                "kind": "draft.apply",
-                "card_id": card_id,
-                "answer": "apply",
-                "outcome": "accepted",
-                "approval_id": approval_id
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 201, "{human}");
-    let decision_id = id_of(output(&human), "id");
+    let decision_id = id_of(output(&accepted), "id");
 
     let (status, applied) = running
         .invoke(

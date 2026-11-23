@@ -332,8 +332,8 @@ pub async fn run_case(
 ///
 /// The fields that differ between a measurement and a regrade are **provenance**, not behaviour:
 /// a regrade's [`output`](Self::output) is the one the source run captured, its
-/// [`usage`](Self::usage) is empty (the subject call was already billed on the source run, and
-/// spend is summed from these rows), and its [`action`](Self::action) names the job that wrote it.
+/// [`usage`](Self::usage) is empty (the subject call was billed on the source run and the ledger
+/// attributes it there), and its [`action`](Self::action) names the job that wrote it.
 struct GradeRequest<'a> {
     run_id: Uuid,
     case_id: Uuid,
@@ -415,6 +415,7 @@ async fn grade_and_record(
         action,
         &format!("eval.judge:{run_id}:{case_id}:{rep}"),
         &format!("eval:{run_id}"),
+        Some(run_id),
     )
     .await
     {
@@ -562,6 +563,10 @@ impl GradeFailure {
 ///
 /// The judge is invoked through the ordinary engine **outside** the caller's transaction — a
 /// model call inside it would hold row locks for the length of an inference.
+///
+/// `judge_eval_run_id` is the run the judge's spend belongs to; `None` for a one-shot
+/// `eval.grade` that has no run. Without it the judge call is billed but the run's report cannot
+/// see it.
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn grade_metrics(
     pool: &PgPool,
@@ -575,6 +580,7 @@ pub(crate) async fn grade_metrics(
     action: &str,
     judge_request_id: &str,
     judge_trace_id: &str,
+    judge_eval_run_id: Option<Uuid>,
 ) -> Result<MetricGrades, GradeFailure> {
     let mut grades = MetricGrades {
         grade: serde_json::Map::new(),
@@ -647,6 +653,7 @@ pub(crate) async fn grade_metrics(
                     request,
                     judge_request_id,
                     judge_trace_id,
+                    judge_eval_run_id,
                 )
                 .await
                 {
@@ -752,8 +759,9 @@ pub async fn regrade_case(
     };
 
     let deadline = CaseDeadline::starting(Utc::now(), EVAL_CASE_TIMEOUT);
-    // The subject's tokens were billed on the source run; `usage` stays empty so the climb's
-    // summed spend does not count them twice. `judge_usage` carries the regrade's own cost.
+    // The subject's tokens were billed on the source run, and the ledger attributes that call
+    // to the source run; `usage` stays empty so this run claims no second subject cost. The
+    // regrade's own cost is the judge's, recorded in `judge_usage` and the ledger.
     let usage = json!({});
     grade_and_record(
         pool,
@@ -911,6 +919,7 @@ async fn invoke_judge(
     request: Value,
     request_id: &str,
     trace_id: &str,
+    eval_run_id: Option<Uuid>,
 ) -> Result<Value, FailureClass> {
     let outcome = invoke(
         pool,
@@ -939,9 +948,10 @@ async fn invoke_judge(
                 run_id: None,
                 run_step_id: None,
                 conversation_turn_id: None,
-                // This seam grades one output and has no eval-run id in scope; the call is still
-                // attributed to `CallerKind::Eval` and its spend lands on the ledger.
-                eval_run_id: None,
+                // This seam grades one output. When it grades a run's slot it names that run, so
+                // the judge's spend lands on the same ledger key the report reads; the one-shot
+                // `eval.grade` seam has no run and leaves it empty.
+                eval_run_id,
                 prompt_ref: Some("eval_judge".to_owned()),
                 prompt_version: None,
                 prompt_sha256: None,

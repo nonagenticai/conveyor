@@ -114,6 +114,14 @@
       "benefit": "B6",
       "strategic_objective": "programme plan and coverage instrument",
       "kind": "benefit"
+    },
+    {
+      "output_ref": "T18 real V2 UI",
+      "capability_ref": "every programme record is readable and actionable in the app",
+      "operational_outcome": "O3 Every decision is auditable",
+      "benefit": "B1",
+      "strategic_objective": "decision ladder (rule -> laya -> generation -> human)",
+      "kind": "benefit"
     }
   ],
   "tranches": [
@@ -149,7 +157,7 @@
       "number": 4,
       "state": "planned",
       "entry": "the tranche 3 review decides continue; its exit criteria are met",
-      "exit": "every project in tranche 4 (S05, S07, S09, T10, T14, T16, T4, T9) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "exit": "every project in tranche 4 (S05, S07, S09, T10, T14, T16, T18, T4, T9) meets its acceptance with published evidence, and the review records continue, pause or stop",
       "review_at": null
     },
     {
@@ -408,6 +416,10 @@
     "SPEC-V2": {
       "adm_phase": "Preliminary",
       "plateau": "definition"
+    },
+    "T18": {
+      "adm_phase": "G",
+      "plateau": "capability"
     }
   }
 }

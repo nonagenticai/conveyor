@@ -333,8 +333,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 8,
-        "claimed": 4,
+        "blocked": 3,
+        "claimed": 2,
         "numbers": [
           17,
           22,
@@ -360,17 +360,10 @@
           476,
           526,
           545,
-          559,
-          562,
-          563,
-          564,
-          565,
-          566,
           569,
-          572,
-          582
+          572
         ],
-        "open": 23,
+        "open": 16,
         "ready": 5,
         "unknown": 0
       }
@@ -616,6 +609,7 @@
         "T10",
         "T14",
         "T16",
+        "T18",
         "T4",
         "T9"
       ],
@@ -868,6 +862,7 @@
         "T10",
         "T14",
         "T16",
+        "T18",
         "T4",
         "T9"
       ],
@@ -955,6 +950,7 @@
         "T10",
         "T14",
         "T16",
+        "T18",
         "T4",
         "T9"
       ],
@@ -964,7 +960,7 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 2,
+        "claimed": 0,
         "numbers": [
           156,
           168,
@@ -976,7 +972,7 @@
           577,
           579
         ],
-        "open": 2,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1500,12 +1496,13 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           15,
-          581
+          581,
+          590
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1672,6 +1669,7 @@
         "S09",
         "T14",
         "T16",
+        "T18",
         "T4",
         "T9"
       ],
@@ -1811,14 +1809,14 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           76,
           556,
           557
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1850,6 +1848,7 @@
         "S09",
         "T10",
         "T16",
+        "T18",
         "T4",
         "T9"
       ],
@@ -1859,14 +1858,14 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 2,
+        "claimed": 0,
         "numbers": [
           83,
           558,
           560,
           561
         ],
-        "open": 3,
+        "open": 1,
         "ready": 1,
         "unknown": 0
       }
@@ -1939,6 +1938,7 @@
         "S09",
         "T10",
         "T14",
+        "T18",
         "T4",
         "T9"
       ],
@@ -1992,11 +1992,65 @@
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           87
         ],
         "open": 1,
+        "ready": 1,
+        "unknown": 0
+      }
+    },
+    {
+      "blocked_by": [],
+      "evidence": [
+        "docs/plans/T18-real-v2-ui.md",
+        "docs/SPEC_V2.md",
+        "apps/web/src/app.rs"
+      ],
+      "gap": "no V2 route exists in apps/web; the destinations are mock pages only",
+      "key": "T18",
+      "measured": {
+        "actions": [
+          0,
+          0
+        ],
+        "modules": [
+          0,
+          0
+        ],
+        "tables": [
+          0,
+          0
+        ]
+      },
+      "name": "The real V2 UI",
+      "parallel_with": [
+        "S05",
+        "S07",
+        "S09",
+        "T10",
+        "T14",
+        "T16",
+        "T4",
+        "T9"
+      ],
+      "plan": "docs/SPEC_V2.md#12",
+      "status": "proposed",
+      "track": "v2",
+      "tranche": 4,
+      "units": {
+        "blocked": 5,
+        "claimed": 1,
+        "numbers": [
+          559,
+          562,
+          563,
+          564,
+          565,
+          566
+        ],
+        "open": 6,
         "ready": 0,
         "unknown": 0
       }
@@ -2113,6 +2167,7 @@
         "T10",
         "T14",
         "T16",
+        "T18",
         "T9"
       ],
       "plan": "docs/SPEC_V2.md#12",
@@ -2332,6 +2387,7 @@
         "T10",
         "T14",
         "T16",
+        "T18",
         "T4"
       ],
       "plan": "docs/SPEC_V2.md#12",
@@ -2595,13 +2651,13 @@
         "built": 40,
         "partial": 1,
         "planned": 0,
-        "proposed": 5,
+        "proposed": 6,
         "standing": 1
       },
-      "total": 48,
+      "total": 49,
       "uncovered": [],
-      "with_open_units": 20,
-      "without_open_units": 28
+      "with_open_units": 19,
+      "without_open_units": 30
     },
     "screens": {
       "actions_invoked": 39,

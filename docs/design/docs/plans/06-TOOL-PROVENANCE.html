@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>06 — Tool provenance and the retirement gate · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/06-TOOL-PROVENANCE.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="06--tool-provenance-and-the-retirement-gate">06 — Tool provenance and the retirement gate</h1>
+<p><strong>Status:</strong> the method and per-source summary behind <code>seed/tool_provenance.json</code> · 2026-11-22 · unit #558. <strong>Authority above this file:</strong> <code>docs/SPEC_V2.md</code> §11.2 and §11.9, <code>docs/decisions/0006-tool-absorption-grouping.md</code>, <code>docs/decisions/0007-tool-estate-conveyor-and-coding.md</code>, and the inventory in <code>docs/plans/04-TOOL-ESTATE-INVENTORY.md</code> and <code>docs/plans/05-W2V-ABSORPTION.md</code>.</p>
+<p>This file does not restate 04/05. It records <strong>how the capability diff was measured</strong>, where each source went, and what the repository now enforces. The machine-readable artifact is the seed; the gate is <code>crates/actions/tests/tool_provenance.rs</code>.</p>
+<h2 id="method">Method</h2>
+<ol type="1">
+<li><strong>Inventory the sources the repository records</strong>, not the repositories themselves. The evidence is <code>docs/plans/02-source-map/</code> (the retired work-management, board, gateway and flow surfaces), the analysis and evidence-review capture notes under <code>docs/evidence/</code>, and the in-repo OpenAPI locks for the four survivor services. No private repository, host, address or credential is named.</li>
+<li><strong>One row per recorded capability.</strong> Where a source map records an operation family (<code>/requirements*</code>, <code>/pm/projects</code>, the board application's board/card surface), the row is the family. Where the contract is an OpenAPI lock, the row is the operation. A row is reviewable; a transcription of 548 work-management paths or 367 flow-engine operations is not.</li>
+<li><strong>Disposition is one of three.</strong> <code>ALREADY-PRESENT</code> names the conveyor action or manifest tool that carries the capability. <code>PORT</code> names a live consumer and a usage sample, and either a manifest tool or the open unit that will provide it. <code>DROP</code> records the measurement date and the query or decision that justified dropping it.</li>
+<li><strong>A retired source is never a destination.</strong> Only a <code>live</code> source carries service aliases. Every manifest <code>service</code> must be owned by a live source, and a retired, archived or migration source carries none — so adding a manifest cannot turn one into a destination. No retired product name is used as a source label.</li>
+<li><strong>The gate runs with the suite.</strong> <code>cargo nextest run -p conveyor-actions --test tool_provenance</code> is part of <code>scripts/ci/gate.sh</code>; the seed is reviewed in the same PR as any manifest it targets.</li>
+</ol>
+<h2 id="per-source-summary">Per-source summary</h2>
+<table>
+<thead>
+<tr>
+<th>Source (public role)</th>
+<th>Status</th>
+<th>What it was</th>
+<th>Disposition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>coding fleet</td>
+<td>live</td>
+<td>repository provisioning, verified writes, tests, PRs</td>
+<td>two tools (<code>coding.jobs_create</code>, <code>coding.jobs_get</code>); the fleet stays external (D14/ADR 0007)</td>
+</tr>
+<tr>
+<td>model hosts</td>
+<td>live</td>
+<td>speech, transcription, image generation</td>
+<td>three tools; the hosts stay external HTTP</td>
+</tr>
+<tr>
+<td>strata retrieval</td>
+<td>live</td>
+<td>pinned-leaf retrieval</td>
+<td>one tool (<code>retrieval.query</code>)</td>
+</tr>
+<tr>
+<td>requirements / work management</td>
+<td>retired</td>
+<td>requirements, principles, decisions, projects, programmes, benefits, registers, architecture, modelling, UML, catalogue, search, approvals, cards, schedules, secrets, channels</td>
+<td><strong>carried as conveyor actions</strong>; the control-plane and product surfaces are dropped (§11.2)</td>
+</tr>
+<tr>
+<td>board application</td>
+<td>retired</td>
+<td>boards, lists, cards, comments, labels, custom fields, memberships, tasks, webhooks</td>
+<td><strong>carried as <code>boards.*</code>, <code>cards.*</code>, <code>tasks.*</code>, <code>webhooks.*</code></strong>; attachments and the admin-only surfaces are dropped</td>
+</tr>
+<tr>
+<td>flow engine</td>
+<td>retired</td>
+<td>348 workflows, agent steps, prompt recipes</td>
+<td><strong>flows become procedures</strong> (<code>procedures.*</code>); the runtime and its node packages are dropped</td>
+</tr>
+<tr>
+<td>legacy media fleet</td>
+<td>migration</td>
+<td>16 stage blueprints, orchestrator, analysis, deck, content, browser/ffmpeg producers, media measurement</td>
+<td><strong>rewritten as <code>media.*</code>, <code>analyse.*</code>, <code>decks.render</code>, <code>produce.script</code>, and the model-server tools</strong>; the orchestrator, SPA, app inspector, video-publish and video-generation fan-out are dropped</td>
+</tr>
+<tr>
+<td>archived graph platform</td>
+<td>archived</td>
+<td>graph service, hirag, karma, neo4j, orchestrator, clients, frontend</td>
+<td><strong>not a destination</strong> (R19); the graph service and the client surface are dropped, while K3–K5 (neo4j, hirag, karma) remain <strong>undecided</strong> and are deliberately not dispositioned in the seed</td>
+</tr>
+<tr>
+<td>research and Lean services</td>
+<td>live</td>
+<td>webscraper, media discovery, Lean prover, scientific processor</td>
+<td><strong>porting</strong>; the manifests land in #561 (webscraper, media discovery, Lean) and #560 (scientific)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-the-seed-proves-today">What the seed proves today</h2>
+<ul>
+<li>Every one of the six manifest tools has an <code>ALREADY-PRESENT</code> row.</li>
+<li>Every <code>ALREADY-PRESENT</code> target is a registered action or a published tool; the test resolves them against the live registry and manifests, not against a hand-maintained list.</li>
+<li>Every manifest <code>service</code> is owned by a <code>live</code> source; no non-live source carries a service alias, so no retired application can become a destination.</li>
+<li>Every <code>DROP</code> carries a date and a query or an owner decision.</li>
+<li>Every <code>PORT</code> carries a live consumer and a usage sample; the eleven survivor rows name the open unit (#561 or #560) until their manifest tools exist.</li>
+</ul>
+<h2 id="gaps-this-inventory-exposes-not-claimed-here">Gaps this inventory exposes (not claimed here)</h2>
+<ul>
+<li><strong><code>evidence_review</code></strong> was absorbed into <code>apps/scientific</code>; it has no manifest row yet. It needs a unit of its own once the scientific toolkit's read surface is settled.</li>
+<li><strong><code>strata_ingest</code></strong> is live and has no conveyor action or toolkit. It is a follow-on unit, not a row that can resolve today.</li>
+<li><strong><code>ops.*</code></strong> exists as an action family (18 actions, read verbs plus gated writes) but has no toolkit; host control is T7's mechanism decision, not a provenance row.</li>
+<li><strong>The four survivor services</strong> are pending rows, not omissions; #561 and #560 replace the <code>pending</code> with the published tool targets and keep this gate green.</li>
+</ul>
+<h2 id="corrections-measured-on-2026-11-22">Corrections measured on 2026-11-22</h2>
+<p><code>docs/plans/05-W2V-ABSORPTION.md</code> was measured on 2026-11-15. Three of its statements are now stale and are corrected here, in the same PR that measures them:</p>
+<ul>
+<li><code>produce.script</code> is registered; the production family is not "zero actions".</li>
+<li>The deck action is <code>decks.render</code> (<code>crates/deck</code>), not the planned <code>produce.deck</code>.</li>
+<li><code>analyse.site</code> and <code>analyse.video</code> are registered; the analysis library is on <code>main</code>, not "in flight".</li>
+</ul>
+<h2 id="re-measuring">Re-measuring</h2>
+<pre class="bash"><code>cargo nextest run -p conveyor-actions --test tool_provenance
+bash scripts/ci/no-private-refs.sh</code></pre>
+<p>The first fails naming the row, tool or source that broke a rule. The second fails if a private repository path, host or credential reached the seed.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/06-TOOL-PROVENANCE.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

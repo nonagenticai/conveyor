@@ -122,7 +122,9 @@ use serde_json::{Value, json};
 /// realization cites. 539 → **540**.
 /// **#526 register gaps add 1 internal**: `benefits.measurement_list` — the read-back of the
 /// measurements a `benefits.measure` write records. 540 → **541**.
-const EXPECTED: [&str; 541] = [
+/// **#560 (T14) adds 5 external**: `scientific_stats.meta_analysis|confidence_interval|trend`
+/// and `scientific_formal.translate|verify` — the estate toolkit's scientific reads. 541 → **546**.
+const EXPECTED: [&str; 546] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -591,6 +593,11 @@ const EXPECTED: [&str; 541] = [
     "runs.start",
     "schedules.list",
     "schedules.upsert",
+    "scientific_formal.translate",
+    "scientific_formal.verify",
+    "scientific_stats.confidence_interval",
+    "scientific_stats.meta_analysis",
+    "scientific_stats.trend",
     "search.query",
     "secrets.create",
     "secrets.delete",
@@ -758,7 +765,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // all internal: 515 -> 520; external stays 14 — they author this tenant's own options.
     // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
     // 520 -> 525; external stays 14.
-    assert_eq!((internal, external), (526, 14));
+    // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
+    // `trend` and `scientific_formal.translate|verify`: internal stays 526, external 14 -> 19.
+    assert_eq!((internal, external), (526, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
