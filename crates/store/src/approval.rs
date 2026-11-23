@@ -814,6 +814,29 @@ pub async fn approval_meta_tx(
     Ok(row.map(|(meta,)| meta))
 }
 
+/// The `meta` of the latest approved gate named `gate` on `card`, if one exists.
+///
+/// `cards.move` reads the Definition-of-Done gate through this. The gate is approved only by its
+/// decision, so this read is what lets the move refuse before the card row changes.
+pub async fn approved_card_gate_meta_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card_id: Uuid,
+    gate: &str,
+) -> Result<Option<Value>, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT meta FROM approval
+          WHERE tenant_id = $1 AND card_id = $2 AND gate = $3 AND status = 'approved'
+          ORDER BY created_at DESC, id DESC
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(card_id)
+    .bind(gate)
+    .fetch_optional(&mut *conn)
+    .await
+}
+
 /// Whether an approval resolved `approved` with at least one approving decision, and the card it
 /// gates. `None` when the row is absent in the tenant.
 ///

@@ -2225,7 +2225,10 @@ async fn ladder_apply_draft(
 /// The L1 case kind the runtime's pre-check records.
 pub(crate) const DRAFT_PRECHECK_GATE: &str = "gate.precheck";
 /// The L3 case kind an approved `executor` gate records.
-pub(crate) const DRAFT_APPLY_GATE: &str = "gate.draft_apply";
+///
+/// `pub`: the gate name is part of the action contract, and the integration tests that drive a
+/// human approval through the apply path import it rather than restating the literal.
+pub const DRAFT_APPLY_GATE: &str = "gate.draft_apply";
 
 fn draft_requires_gate(detail: &'static str) -> ActionError {
     ActionError::new(422, "draft_requires_gate", detail)
