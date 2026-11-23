@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | the real route and its Playwright spec exist | 48 |
-| `extend` | a V1 ancestor route exists, or the V2 route exists without its spec | 10 |
-| `new` | neither the route nor an ancestor exists | 11 |
+| `exists` | the real route and its Playwright spec exist | 50 |
+| `extend` | a V1 ancestor route exists, or the V2 route exists without its spec | 9 |
+| `new` | neither the route nor an ancestor exists | 10 |
 
 ## Rows
 
@@ -57,7 +57,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:architecture` | §10.4 | actions | architecture | `exists` | actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…) |
 | `actions:organisation` | §10.4 | actions | organisation | `exists` | actions: departments.* found (departments.create, departments.list)<br>actions: industries.* found (industries.create, industries.get, industries.list)<br>actions: job_bindings.* found (job_bindings.create, job_bindings.get, job_bindings.list…)<br>actions: job_releases.* found (job_releases.list, job_releases.publish, job_releases.retire)<br>actions: jobs.* found (jobs.list, jobs.retry) |
 | `actions:procedures` | §10.4 | actions | procedures | `exists` | actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)<br>actions: procedures.* found (procedures.create, procedures.get, procedures.ingest_process…) |
-| `actions:authoring` | §10.4 | actions | authoring | `new` | actions: authoring.* absent |
+| `actions:authoring` | §10.4 | actions | authoring | `exists` | actions: authoring.* found (authoring.assets, authoring.draft, authoring.intake…) |
 | `actions:approvals` | §10.4 | actions | approvals | `exists` | actions: approval_policies.* found (approval_policies.get, approval_policies.list, approval_policies.set)<br>actions: approvals.* found (approvals.decide, approvals.list, approvals.request) |
 | `actions:meetings` | §10.4 | actions | meetings | `extend` | actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…)<br>actions: meetings.* absent |
 | `actions:decision` | §10.4 | actions | decision | `new` | actions: approvals.* found (approvals.decide, approvals.list, approvals.request)<br>actions: decision_options.* absent<br>actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)<br>actions: laya_configs.* found (laya_configs.create, laya_configs.list)<br>actions: refinements.* found (refinements.list, refinements.publish)<br>*V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).* |
@@ -73,7 +73,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:metrics` | §10.4 | actions | metrics | `exists` | actions: metrics.* found (metrics.flow, metrics.job, metrics.maturity…) |
 | `destination:Organisation` | §10.5 | destination | Organisation | `exists` | apps/web/src/app.rs: route '/organisation' found<br>apps/web/e2e/organisation.spec.ts: present<br>docs/design/v2.js: page 'organisation' — design reference, not implementation<br>*The mock page is a design study; the app's /organisation route renders the T0/T2 organisation reads, and the write verbs remain T0/T2's.* |
 | `destination:Procedures` | §10.5 | destination | Procedures | `extend` | apps/web/src/app.rs: route '/procedures' found<br>apps/web/e2e/procedures.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/build/processes', '/build/process-map' found<br>docs/design/v2.js: page 'procedures' — design reference, not implementation<br>*V1 has the process list/detail and the process map at /build/processes and /build/process-map; V2 adds SOP/RDF/OWL/BPMN intake, PDDL/PKO and the publish gates (T16).* |
-| `destination:Authoring` | §10.5 | destination | Authoring | `extend` | apps/web/src/app.rs: route '/authoring' found<br>apps/web/e2e/authoring.spec.ts: absent<br>docs/design/v2.js: page 'authoring' — design reference, not implementation<br>*No route and no authoring actions; the destination is T17.* |
+| `destination:Authoring` | §10.5 | destination | Authoring | `exists` | apps/web/src/app.rs: route '/authoring' found<br>apps/web/e2e/authoring.spec.ts: present<br>docs/design/v2.js: page 'authoring' — design reference, not implementation<br>*The intake queue, the reviewed draft catalogue and the per-asset dependency status land with T17 (#87); `authoring.assets` is the read.* |
 | `destination:Portfolio` | §10.5 | destination | Portfolio | `exists` | apps/web/src/app.rs: route '/portfolio' found<br>apps/web/src/app.rs: route '/portfolio/:programme_id' found<br>apps/web/e2e/portfolio.spec.ts: present<br>docs/design/v2.js: page 'portfolio' — design reference, not implementation<br>*The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10.* |
 | `destination:Meetings` | §10.5 | destination | Meetings | `new` | apps/web/src/app.rs: route '/meetings' absent<br>apps/web/src/app.rs: route '/meetings/:id' absent<br>apps/web/e2e/meetings.spec.ts: absent |
 | `destination:Programme` | §10.5 | destination | Programme | `exists` | apps/web/src/app.rs: route '/programme' found<br>apps/web/e2e/programme.spec.ts: present<br>docs/design/v2.js: page 'programme' — design reference, not implementation<br>*No route; the MSP definition reads are T10.* |

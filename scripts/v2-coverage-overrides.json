@@ -21,7 +21,7 @@
       "note": "V1 has the process list/detail and the process map at /build/processes and /build/process-map; V2 adds SOP/RDF/OWL/BPMN intake, PDDL/PKO and the publish gates (T16)."
     },
     "destination:Authoring": {
-      "note": "No route and no authoring actions; the destination is T17."
+      "note": "The intake queue, the reviewed draft catalogue and the per-asset dependency status land with T17 (#87); `authoring.assets` is the read."
     },
     "destination:Portfolio": {
       "note": "The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10."

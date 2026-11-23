@@ -15,6 +15,7 @@ use crate::screens::admin::AdminScreen;
 use crate::screens::agents::AgentsScreen;
 use crate::screens::approvals::Approvals;
 use crate::screens::architecture::ArchitectureScreen;
+use crate::screens::authoring::Authoring;
 use crate::screens::benchmarks::{BenchmarkRunDetail, Benchmarks};
 use crate::screens::boards::{BoardIndex, BoardScreen};
 use crate::screens::cockpit::Cockpit;
@@ -42,8 +43,8 @@ use crate::screens::sign_in::SignIn;
 use crate::screens::today::Today;
 use crate::screens::usage::Usage;
 use crate::screens::v2::{
-    AdmGate, AuthoringGate, ImproveGate, KnowledgeGate, OperationsGate, PortfolioScreen,
-    ProceduresGate, ProgrammeScreen, ToolsGate,
+    AdmGate, ImproveGate, KnowledgeGate, OperationsGate, PortfolioScreen, ProceduresGate,
+    ProgrammeScreen, ToolsGate,
 };
 use crate::screens::validation::ValidationScreen;
 use crate::state::AppCtx;
@@ -187,7 +188,7 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/decisions") view=DecisionInboxScreen/>
                             <Route path=path!("/project-types") view=ProjectTypesScreen/>
                             <Route path=path!("/procedures") view=ProceduresGate/>
-                            <Route path=path!("/authoring") view=AuthoringGate/>
+                            <Route path=path!("/authoring") view=Authoring/>
                             <Route path=path!("/plan") view=PlanScreen/>
                             <Route path=path!("/validation") view=ValidationScreen/>
                             <Route path=path!("/improve") view=ImproveGate/>

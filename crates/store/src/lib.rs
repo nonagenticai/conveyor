@@ -62,6 +62,8 @@ pub mod architecture;
 // approval at all, and whether its requester may decide it. A missing row is the strict default.
 pub mod approval_policy;
 pub mod audit;
+// T17 (#87, SPEC_V2 §5.7): the authoring intake, draft, review and publish lifecycle.
+pub mod authoring;
 pub mod benchmark;
 pub mod board;
 // S13/CONTRACT §7: the bus cursor — the unpublished `event` rows and the mark that records a

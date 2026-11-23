@@ -114,7 +114,9 @@ use serde_json::{Value, json};
 /// authorises). 500 → **502**.
 /// **#15 (S21 step 3) adds 5 internal**: the `prompt_recipes.create|get|list|activate|retire`
 /// catalogue surface. 503 → **508**.
-const EXPECTED: [&str; 513] = [
+/// **T17 (#87) adds 5 internal**: `authoring.intake|draft|review|publish|assets` — the tenant
+/// asset authoring family. 513 → **518**.
+const EXPECTED: [&str; 518] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -162,6 +164,11 @@ const EXPECTED: [&str; 513] = [
     "architecture.skills_list",
     "artifacts.list",
     "audit.list",
+    "authoring.assets",
+    "authoring.draft",
+    "authoring.intake",
+    "authoring.publish",
+    "authoring.review",
     "baselines.get",
     "baselines.list",
     "baselines.take",
