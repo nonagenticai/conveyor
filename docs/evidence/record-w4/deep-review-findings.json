@@ -1,0 +1,117 @@
+{
+  "schema": "w3-deep-review/v1",
+  "snapshot_manifest_sha256": "ff855bbf28f126e2c674c41bd4650f31754d0857ba6c299e356a6e0db41a7dfe",
+  "method": "An adversarial reader opened every published programme-level document from the staging copy (document.body, published_at NOT NULL) and judged each required heading against its template: a heading is evidence only when it carries facts, a count must match its rows, and no test or placeholder row may be published as content.",
+  "findings": [
+    {
+      "key": "w4-prog-business-case-sources",
+      "kind": "standard",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "The business case's Why now, Benefit map, Cost and risk posture and Licensing frame headings publish empty pointers",
+      "evidence": "Each of the four required headings resolves to the business case document itself (01a1e006) and states that the facts carry no further fields, benefit rows or cost/risk rows. A published section that cites no source row is a heading without evidence, and the template's source mapping is what allowed it.",
+      "acceptance": "Each of the four headings maps to a named non-empty source (a benefit row, a cost/risk register item, the programme's licensing frame) and the published body carries its facts; the composer refuses the heading when the source resolves to zero rows.",
+      "artifact": "seed/output-standard.json#business-case"
+    },
+    {
+      "key": "w4-prog-business-case-options",
+      "kind": "standard",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "The business case's Options section renders change and approval rows, not options",
+      "evidence": "The Options, including doing nothing heading renders 17 change plus 94 approval rows and states no option set and no doing-nothing case. The source mapping selects operational rows the heading does not describe.",
+      "acceptance": "The Options heading maps to an option record (or an explicit absence naming the record that would satisfy it), never to change/approval counts presented as options.",
+      "artifact": "seed/output-standard.json#business-case"
+    },
+    {
+      "key": "w4-prog-blueprint-registry",
+      "kind": "standard",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "The blueprint's Action registry and data model section has no source",
+      "evidence": "The section says the record carries no items and cites no source; actions, tables, invariants and events are absent from a mandatory TOGAF artefact. The served action registry is not projected into the snapshot the template reads.",
+      "acceptance": "The action registry and data model section resolves from a projected registry (the served actions, tables, invariants and events) or the standard names the record that would satisfy it; the published blueprint carries counts and names, not a bare statement of absence.",
+      "artifact": "seed/output-standard.json#blueprint"
+    },
+    {
+      "key": "w4-prog-blueprint-states",
+      "kind": "standard",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "The blueprint's Current, intermediate and target states section renders baseline metadata only",
+      "evidence": "The heading renders 21 baseline-metadata rows and describes no current, intermediate or target state. A metadata list is not a state description, and the mapping selects the wrong source.",
+      "acceptance": "The states heading resolves from a state description or an explicit absence naming the record; baseline metadata is never presented as the states.",
+      "artifact": "seed/output-standard.json#blueprint"
+    },
+    {
+      "key": "w4-prog-mandate-probe-row",
+      "kind": "record",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "A published driver is the test row 'schema probe — delete me'",
+      "evidence": "The mandate's Drivers section publishes the row 'schema probe — delete me' as an accepted driver with no severity, owner or detail, and the same row recurs in programme-strategies / Issue strategy. Test data has reached a published governance artefact.",
+      "acceptance": "The probe row is retired or replaced by a real driver with severity, owner and detail in the live record; the mandate and programme-strategies bodies no longer carry it; a query over accepted drivers refuses an empty detail/owner at read time.",
+      "artifact": "seed/output-standard.json#mandate"
+    },
+    {
+      "key": "w4-prog-brief-cost",
+      "kind": "standard",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "The programme brief's Cost, timescale and effort section renders card counts, not cost, effort or timescale",
+      "evidence": "The heading renders per-project card counts plus one P0 token-ledger row; no programme cost, effort estimate or timescale is stated. The mapping selects operational counts.",
+      "acceptance": "The heading resolves from a cost/effort/timescale record (or an explicit absence naming it); card counts are not presented as a cost or timescale.",
+      "artifact": "seed/output-standard.json#programme-brief"
+    },
+    {
+      "key": "w4-prog-risk-owners",
+      "kind": "record",
+      "severity": "P1",
+      "owner_project": "PLATFORM",
+      "title": "Three uncoded risks have neither an owner nor a review date",
+      "evidence": "The programme risk register states that an uncoded risk is refused, yet three risk rows carry no owner and no review date. The register's own rule is not enforced on its rows.",
+      "acceptance": "Every risk row carries an owner and a next-review date, or the row is refused at creation; the published register's Owners and review dates section resolves from those fields with no empty row.",
+      "artifact": "seed/output-standard.json#programme-risk-register"
+    },
+    {
+      "key": "w4-prog-safe-portfolio-count",
+      "kind": "record",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "The portfolio canvas states 48 projects while its own status counts sum to 47",
+      "evidence": "The canvas names 48 projects but 26 closed plus 21 active equals 47; the archived project is omitted from the status breakdown and the canvas states it names no source for any count.",
+      "acceptance": "Every count on the canvas is derived from the same rows and sums exactly (archived included in the total and in its own status bucket), and the section names its source; a unit test asserts the sum equals the total for a fixture with an archived project.",
+      "artifact": "seed/output-standard.json#safe-portfolio"
+    },
+    {
+      "key": "w4-prog-refined-vision-count",
+      "kind": "record",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "The refined vision claims fifteen distinct baseline references from fourteen distinct ids",
+      "evidence": "The Changes from the mandate section claims 'fifteen distinct baseline references' while the 17 rows hold 14 distinct ids (01a20279, 01a1fdd8 and 01a1fbb1 each repeat). The distinct-count arithmetic counts rows, not distinct references.",
+      "acceptance": "The section's distinct-reference count is computed over distinct ids and equals the distinct set it lists; a unit test asserts the count for a fixture with repeated ids.",
+      "artifact": "seed/output-standard.json#refined-vision"
+    },
+    {
+      "key": "w4-prog-safe-cadence-pi",
+      "kind": "record",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "The safe cadence's PI plan covers five tranches of fourteen",
+      "evidence": "The PI plan states 'one per tranche' yet five cadence intervals cover only tranches 0-4 of the programme's 14 tranches (4 closed, 1 authorised, 9 planned). The record holds five cadence rows, not the fourteen the statement claims.",
+      "acceptance": "The cadence record carries one PI interval per authorised/planned tranche, or the section states the intervals it actually has and why the rest are absent; the body's count equals its rows.",
+      "artifact": "seed/output-standard.json#safe-cadence"
+    },
+    {
+      "key": "w4-prog-safe-art-intent",
+      "kind": "standard",
+      "severity": "P2",
+      "owner_project": "PLATFORM",
+      "title": "The safe-art ART charter and Solution intent sections publish the skeleton sentence and a programme summary",
+      "evidence": "Both headings carry the literal skeleton sentence plus raw JSON; the solution intent is a programme summary whose 28 closed plus 19 active equals 47 of 48 projects, and the charter's owner is null. A skeleton sentence beside a JSON block is not evidence of an ART charter or a solution intent.",
+      "acceptance": "The ART charter resolves from a charter record with an owner, and the solution intent resolves from a solution-intent record (or an explicit absence naming it); neither heading publishes the skeleton sentence as its content.",
+      "artifact": "seed/output-standard.json#safe-art"
+    }
+  ]
+}
