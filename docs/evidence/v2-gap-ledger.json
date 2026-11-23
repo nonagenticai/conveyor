@@ -1,9 +1,9 @@
 {
   "schema": "v2-gap-ledger/v1",
-  "lane_pin": "3e899707",
+  "lane_pin": "fc020437",
   "generated_from": {
     "artefact_record": {
-      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-board/scripts/generate-standards.py --snapshot /tmp/snap-526-0738/data --outputs-dir /tmp/snap-526-0738/docs --register /tmp/conf-0738/rework.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-vubygb9l --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-vubygb9l/findings.json",
+      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-board/scripts/generate-standards.py --snapshot /tmp/snap-526-0738/data --outputs-dir /tmp/snap-526-0738/docs --register /tmp/conf-0738/rework.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-zdncl__7 --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-zdncl__7/findings.json",
       "summary": {
         "absent": 428,
         "artefacts": 888,
@@ -41,7 +41,7 @@
       },
       {
         "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-board/docs/evidence/v1-conformance-findings.json",
-        "sha256": "3df881516016ca9630adef866f340cdb8e922f4be673cb774e8d9a32c675bd29",
+        "sha256": "4b74a4c8225cf7ed04fff133d1d129e7cfb57cafd94d479043589398c55c4537",
         "role": "v1 findings; open ledger"
       },
       {
@@ -83,14 +83,14 @@
     "deploy_bound": "the not-yet-deployed set is migrations 0062-0066 and the authoring.* family 0066 creates"
   },
   "counts": {
-    "rows": 458,
+    "rows": 457,
     "by_kind": {
       "artefact": 363,
       "baseline": 16,
-      "ledger": 79
+      "ledger": 78
     },
     "by_severity": {
-      "P1": 234,
+      "P1": 233,
       "P0": 20,
       "P2": 204
     },
@@ -105,22 +105,22 @@
         "P0": 4
       },
       "ledger": {
-        "P1": 52,
+        "P1": 51,
         "P2": 26,
         "P0": 1
       }
     },
     "by_deploy_bound": {
-      "false": 458
+      "false": 457
     },
     "by_status": {
       "absent": 363,
       "stale": 16,
-      "open": 79
+      "open": 78
     },
     "by_fix_card_resolution": {
       "published_package": 303,
-      "finding_id": 139,
+      "finding_id": 138,
       "baseline_key": 16
     },
     "declared_package_keys_absent_from_register": [
@@ -7387,24 +7387,6 @@
       "fix_card": "v1-p6-3",
       "fix_card_resolution": "finding_id",
       "standard_id": "v1-p6-3",
-      "declared_package_key": "",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "ledger:v1-p6-5",
-      "kind": "ledger",
-      "standard": "SAFe",
-      "spec": "§6.2",
-      "subject": "§6.2",
-      "project": "T4",
-      "title": "Coach is wired only to failed runs",
-      "status": "open",
-      "severity": "P1",
-      "owner": "T4",
-      "fix_card": "v1-p6-5",
-      "fix_card_resolution": "finding_id",
-      "standard_id": "v1-p6-5",
       "declared_package_key": "",
       "target_phase": "G",
       "deploy_bound": false
