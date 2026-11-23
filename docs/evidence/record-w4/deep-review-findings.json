@@ -11,7 +11,12 @@
       "title": "The business case's Why now, Benefit map, Cost and risk posture and Licensing frame headings publish empty pointers",
       "evidence": "Each of the four required headings resolves to the business case document itself (01a1e006) and states that the facts carry no further fields, benefit rows or cost/risk rows. A published section that cites no source row is a heading without evidence, and the template's source mapping is what allowed it.",
       "acceptance": "Each of the four headings maps to a named non-empty source (a benefit row, a cost/risk register item, the programme's licensing frame) and the published body carries its facts; the composer refuses the heading when the source resolves to zero rows.",
-      "artifact": "seed/output-standard.json#business-case"
+      "artifact": "seed/output-standard.json#business-case",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/compose-artefact-bodies.py --self-test",
+        "evidence": "seed/output-standard.json#business-case maps Why now to the issue rows and the programme row, Benefit map to benefit_links and benefit_profiles, Cost and risk posture to the risk register, and Licensing frame to governed_assets kind licensing_frame with a fallback absence naming the record. The composer refuses a heading whose only source is its own document; the business-case body composed at this commit carries facts or the explicit absence, never the document itself."
+      }
     },
     {
       "key": "w4-prog-business-case-options",
@@ -21,7 +26,12 @@
       "title": "The business case's Options section renders change and approval rows, not options",
       "evidence": "The Options, including doing nothing heading renders 17 change plus 94 approval rows and states no option set and no doing-nothing case. The source mapping selects operational rows the heading does not describe.",
       "acceptance": "The Options heading maps to an option record (or an explicit absence naming the record that would satisfy it), never to change/approval counts presented as options.",
-      "artifact": "seed/output-standard.json#business-case"
+      "artifact": "seed/output-standard.json#business-case",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/compose-artefact-bodies.py --self-test",
+        "evidence": "The Options, including doing nothing heading maps to an explicit absence naming the options appraisal decision; it no longer selects change or approval rows, and the composed body states the absence."
+      }
     },
     {
       "key": "w4-prog-blueprint-registry",
@@ -31,7 +41,12 @@
       "title": "The blueprint's Action registry and data model section has no source",
       "evidence": "The section says the record carries no items and cites no source; actions, tables, invariants and events are absent from a mandatory TOGAF artefact. The served action registry is not projected into the snapshot the template reads.",
       "acceptance": "The action registry and data model section resolves from a projected registry (the served actions, tables, invariants and events) or the standard names the record that would satisfy it; the published blueprint carries counts and names, not a bare statement of absence.",
-      "artifact": "seed/output-standard.json#blueprint"
+      "artifact": "seed/output-standard.json#blueprint",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/generate-standards.py --self-test",
+        "evidence": "computed action_registry wraps the served action names (actions.json carries strings, which rows_for discarded) and the snapshot's tables/invariants/events when projected; the fixture case asserts the rows and the blueprint body carries the registry names and count."
+      }
     },
     {
       "key": "w4-prog-blueprint-states",
@@ -41,7 +56,12 @@
       "title": "The blueprint's Current, intermediate and target states section renders baseline metadata only",
       "evidence": "The heading renders 21 baseline-metadata rows and describes no current, intermediate or target state. A metadata list is not a state description, and the mapping selects the wrong source.",
       "acceptance": "The states heading resolves from a state description or an explicit absence naming the record; baseline metadata is never presented as the states.",
-      "artifact": "seed/output-standard.json#blueprint"
+      "artifact": "seed/output-standard.json#blueprint",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/compose-artefact-bodies.py --self-test",
+        "evidence": "The Current, intermediate and target states heading maps to governed_assets kind blueprint-states with a fallback absence naming the record; baseline metadata is no longer presented as the states."
+      }
     },
     {
       "key": "w4-prog-mandate-probe-row",
@@ -61,7 +81,12 @@
       "title": "The programme brief's Cost, timescale and effort section renders card counts, not cost, effort or timescale",
       "evidence": "The heading renders per-project card counts plus one P0 token-ledger row; no programme cost, effort estimate or timescale is stated. The mapping selects operational counts.",
       "acceptance": "The heading resolves from a cost/effort/timescale record (or an explicit absence naming it); card counts are not presented as a cost or timescale.",
-      "artifact": "seed/output-standard.json#programme-brief"
+      "artifact": "seed/output-standard.json#programme-brief",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/compose-artefact-bodies.py --self-test",
+        "evidence": "Cost, timescale and effort maps to an explicit absence naming the programme cost, effort and timescale model; card counts are no longer presented as cost or timescale."
+      }
     },
     {
       "key": "w4-prog-risk-owners",
@@ -111,7 +136,12 @@
       "title": "The safe-art ART charter and Solution intent sections publish the skeleton sentence and a programme summary",
       "evidence": "Both headings carry the literal skeleton sentence plus raw JSON; the solution intent is a programme summary whose 28 closed plus 19 active equals 47 of 48 projects, and the charter's owner is null. A skeleton sentence beside a JSON block is not evidence of an ART charter or a solution intent.",
       "acceptance": "The ART charter resolves from a charter record with an owner, and the solution intent resolves from a solution-intent record (or an explicit absence naming it); neither heading publishes the skeleton sentence as its content.",
-      "artifact": "seed/output-standard.json#safe-art"
+      "artifact": "seed/output-standard.json#safe-art",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/generate-standards.py --self-test",
+        "evidence": "ART charter maps to computed programme_charter (the P0 charter governed asset with its owner; the fixture case asserts it), and Solution intent maps to an explicit absence naming the record; neither heading publishes the skeleton sentence as its content."
+      }
     },
     {
       "key": "w4-proj-probe-row",
@@ -131,7 +161,12 @@
       "title": "Schedule, Cost and Approval baseline headings all publish the same two kind=scope rows",
       "evidence": "T13's baseline artefact publishes the same two kind=scope baseline rows under Schedule, Cost and Approval; no schedule, cost or approval baseline is present. The template's per-heading source does not filter by baseline kind.",
       "acceptance": "Each baseline heading maps to rows of its own kind (schedule/cost/approval) or an explicit absence naming the record; a fixture with one row per kind asserts each heading receives only its kind.",
-      "artifact": "seed/output-standard.json#project-baseline"
+      "artifact": "seed/output-standard.json#project-baseline",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/compose-artefact-bodies.py --self-test",
+        "evidence": "Scope, Schedule and Cost filter project_baselines by kind and Approval reads the project's baseline approval; the S00 body composed at this commit shows Scope and Approval facts and explicit schedule and cost absences rather than the same two scope rows under every heading."
+      }
     },
     {
       "key": "w4-proj-compliance-waivers",
@@ -171,7 +206,12 @@
       "title": "Change-control Impact publishes impact null although meta.impact carries the text",
       "evidence": "Four of five change rows publish impact:null while meta.impact holds the text; the same block repeats under Change requests and Decisions. The source projection reads the column, not the meta field the record actually uses.",
       "acceptance": "The change-control heading maps to the field that carries the impact (meta.impact) or the row carries a typed impact column; a fixture with meta.impact set asserts the body shows it.",
-      "artifact": "seed/output-standard.json#change-control"
+      "artifact": "seed/output-standard.json#change-control",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/generate-standards.py --self-test",
+        "evidence": "Impact maps to computed change_impact, which publishes meta.impact when the typed column is null (fixture case asserts it); the change-control body carries the recorded impact text."
+      }
     },
     {
       "key": "w4-proj-change-control-placeholder",
@@ -191,7 +231,12 @@
       "title": "All three delivery-contract commitment headings publish the identical contract record",
       "evidence": "T13's delivery contract publishes one contract record under all three required headings; its body has no commitments field or commitment text, so the headings duplicate the row.",
       "acceptance": "Each commitment heading maps to its own field (commitments, conditions, acceptance criteria) or an explicit absence; the published contract names its commitments, not a repeated contract row.",
-      "artifact": "seed/output-standard.json#delivery-contract"
+      "artifact": "seed/output-standard.json#delivery-contract",
+      "resolved_by": {
+        "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
+        "test": "scripts/compose-artefact-bodies.py --self-test",
+        "evidence": "Commitments and Compliance method map to contract_field with fallback absences naming the fields, and Approval maps to contract_approval by the contract's own approval_id; the T13 body no longer repeats one contract row under all three headings."
+      }
     }
   ]
 }
