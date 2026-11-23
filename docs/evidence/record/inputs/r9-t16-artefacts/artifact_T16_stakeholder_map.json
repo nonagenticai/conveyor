@@ -1,0 +1,75 @@
+{
+ "artifact_kind": "matrix",
+ "artifact_type_id": "01a1f2c1-13ea-7764-afc8-4f6322e0ad3e",
+ "contract_id": "01a20a8b-b32c-7185-808f-8ea0b4c5ec46",
+ "entries": [
+  {
+   "axis_a": "Programme owner",
+   "axis_b": "Outcome: governed procedure knowledge",
+   "value": {
+    "engagement": "decide",
+    "influence": "high",
+    "interest": "high"
+   }
+  },
+  {
+   "axis_a": "Operations / procedure owners",
+   "axis_b": "Their SOPs become runnable procedures",
+   "value": {
+    "engagement": "consult",
+    "influence": "high",
+    "interest": "high"
+   }
+  },
+  {
+   "axis_a": "Architecture Board",
+   "axis_b": "Contract and Phase-G conformance",
+   "value": {
+    "engagement": "approve",
+    "influence": "high",
+    "interest": "high"
+   }
+  },
+  {
+   "axis_a": "Procedure publishers",
+   "axis_b": "They decide what is published",
+   "value": {
+    "engagement": "decide",
+    "influence": "medium",
+    "interest": "high"
+   }
+  },
+  {
+   "axis_a": "Delivery teams",
+   "axis_b": "A stable ingestion and PDDL surface",
+   "value": {
+    "engagement": "consult",
+    "influence": "medium",
+    "interest": "high"
+   }
+  },
+  {
+   "axis_a": "Tenants",
+   "axis_b": "Their own rows and sources",
+   "value": {
+    "engagement": "inform",
+    "influence": "low",
+    "interest": "high"
+   }
+  }
+ ],
+ "meta": {
+  "author": "conveyor-e2e",
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "recorded_on": "2026-11-23",
+  "retrospective": true,
+  "reviewer": "conveyor-approver",
+  "unit": "526"
+ },
+ "phase_code": "a",
+ "plateau": "psa",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "purpose": "Who the procedure-ingestion capability serves and who can change its outcome.",
+ "scope": "T16",
+ "title": "Stakeholder map \u2014 T16 procedure ingestion (retrospective, 2026-11-23)"
+}

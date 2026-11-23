@@ -1,0 +1,8 @@
+{
+ "body": "# T16 \u2014 Project context (retrospective, 2026-11-23)\n\n## Context\n\n```\noperators \u2500\u2500SOP\u2500\u2500\u2510\nanalysts \u2500\u2500RDF/OWL\u2500\u2500\u253c\u2500\u2500> procedures.ingest_* \u2500\u2500> drafts (one store)\nmodellers \u2500\u2500BPMN/Visio/draw.io\u2500\u2500\u2518                        \u2502\n                                                          v\n                              human publication gate \u2500\u2500> published procedure\n                                                          \u2502\n                                    process engine <\u2500\u2500 bound job runs PDDL steps\n```\n\n## Affected organisation\n\n- Operations and procedure owners supply and review the sources.\n- Procedure publishers decide publication; the drafting job cannot.\n- The Architecture Board approves the contract and the Phase-G review.\n- Programme governance authorises tranche 4 and reads the closure.\n\n## Affected systems\n\n- The conveyor action registry (`procedures.*`) and its HTTP/MCP projections.\n- PostgreSQL \u2014 procedure, draft and knowledge-pack rows, tenant-scoped.\n- Object storage for source bytes; the knowledge pack remains referenced, not copied.\n- The process engine that executes a reviewed, bound procedure's PDDL steps.\n- The documents surface that publishes the closure evidence.\n",
+ "category": "project-context-diagram",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "publishable": true,
+ "title": "T16 \u2014 Project context (retrospective, 2026-11-23)",
+ "unit": "T16"
+}

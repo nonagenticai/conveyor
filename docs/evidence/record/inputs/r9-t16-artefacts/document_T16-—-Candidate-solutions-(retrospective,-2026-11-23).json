@@ -1,0 +1,8 @@
+{
+ "body": "# T16 \u2014 Candidate solutions (retrospective, 2026-11-23)\n\n## Candidates\n\n- **C1 \u2014 Extend the one procedures capability.** `procedures.ingest_sop`, `ingest_rdf` and\n  `ingest_process` write typed drafts into the one store; a human gate publishes; bound jobs run\n  the PDDL steps. **Chosen.**\n- **C2 \u2014 A separate ingestion service with its own store.** Rejected.\n- **C3 \u2014 Vendor SOP tooling with no record rows.** Rejected.\n- **C4 \u2014 Ungated knowledge upload.** Rejected.\n\n## Criteria\n\nOne model and one store; a human publication gate; versioned re-ingest; multi-format intake\n(SOP, RDF/OWL, BPMN/Visio/draw.io); bound PDDL execution; audit rows for every write.\n\n## Options rejected\n\n- **C2** forks truth into a second store and puts the programme's blast radius across two systems;\n  it also has no single audit trail.\n- **C3** creates bespoke tooling with no action registry row, so no gate and no evidence.\n- **C4** lets an unreviewed source bind a job \u2014 exactly what SPEC_V2 \u00a712 T16 forbids. The delivered\n  gate refuses it in `an_unreviewed_source_cannot_bind`.\n",
+ "category": "candidate-solutions",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "publishable": true,
+ "title": "T16 \u2014 Candidate solutions (retrospective, 2026-11-23)",
+ "unit": "T16"
+}

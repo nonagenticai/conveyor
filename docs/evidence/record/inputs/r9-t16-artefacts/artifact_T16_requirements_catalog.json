@@ -1,0 +1,69 @@
+{
+ "artifact_kind": "catalog",
+ "artifact_type_id": "01a1f2c1-1421-7aa2-9f15-39948d9a84ab",
+ "contract_id": "01a20a8b-b32c-7185-808f-8ea0b4c5ec46",
+ "entries": [
+  {
+   "axis_a": "R1",
+   "axis_b": "SOP intake",
+   "value": {
+    "acceptance": "A PDF SOP becomes a PDDL procedure draft with capability and job drafts.",
+    "priority": "must"
+   }
+  },
+  {
+   "axis_a": "R2",
+   "axis_b": "RDF/OWL intake",
+   "value": {
+    "acceptance": "An OWL/Turtle file becomes a knowledge pack bound by knowledge_pack_ref.",
+    "priority": "must"
+   }
+  },
+  {
+   "axis_a": "R3",
+   "axis_b": "Process-document intake",
+   "value": {
+    "acceptance": "BPMN, Visio and draw.io become PDDL procedure drafts.",
+    "priority": "must"
+   }
+  },
+  {
+   "axis_a": "R4",
+   "axis_b": "Publication gate",
+   "value": {
+    "acceptance": "Publication needs a human approval; the drafting job cannot publish.",
+    "priority": "must"
+   }
+  },
+  {
+   "axis_a": "R5",
+   "axis_b": "Versioning",
+   "value": {
+    "acceptance": "A re-ingest creates a new draft version; the published row keeps its source and pack.",
+    "priority": "must"
+   }
+  },
+  {
+   "axis_a": "R6",
+   "axis_b": "Bound execution",
+   "value": {
+    "acceptance": "A bound job runs the PDDL steps; an unreviewed source cannot bind.",
+    "priority": "must"
+   }
+  }
+ ],
+ "meta": {
+  "author": "conveyor-e2e",
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "recorded_on": "2026-11-23",
+  "retrospective": true,
+  "reviewer": "conveyor-approver",
+  "unit": "526"
+ },
+ "phase_code": "a",
+ "plateau": "psa",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "purpose": "The requirements the delivered capability meets.",
+ "scope": "T16",
+ "title": "Requirements catalogue \u2014 T16 procedure ingestion (retrospective, 2026-11-23)"
+}

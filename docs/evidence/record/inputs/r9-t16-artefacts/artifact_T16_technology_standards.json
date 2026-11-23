@@ -1,0 +1,56 @@
+{
+ "artifact_kind": "catalog",
+ "artifact_type_id": "01a1f2c1-148a-7b2a-8f3e-77e7d910fcc2",
+ "contract_id": "01a20a8b-b32c-7185-808f-8ea0b4c5ec46",
+ "entries": [
+  {
+   "axis_a": "PostgreSQL",
+   "axis_b": "18",
+   "value": {
+    "usage": "the one store; tenant-scoped rows; psycopg 3.3 clients"
+   }
+  },
+  {
+   "axis_a": "Rust",
+   "axis_b": "stable workspace",
+   "value": {
+    "usage": "the action registry and the procedures capability"
+   }
+  },
+  {
+   "axis_a": "HTTP",
+   "axis_b": "unversioned /api routes",
+   "value": {
+    "usage": "/api/actions/procedures.*; no version segment"
+   }
+  },
+  {
+   "axis_a": "MCP",
+   "axis_b": "the action projections",
+   "value": {
+    "usage": "the same registry through a second transport"
+   }
+  },
+  {
+   "axis_a": "PDDL",
+   "axis_b": "planner input",
+   "value": {
+    "usage": "procedure drafts compile to PDDL; bound jobs execute the steps"
+   }
+  }
+ ],
+ "meta": {
+  "author": "conveyor-e2e",
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "recorded_on": "2026-11-23",
+  "retrospective": true,
+  "reviewer": "conveyor-approver",
+  "unit": "526"
+ },
+ "phase_code": "d",
+ "plateau": "hld",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "purpose": "The standards the delivered capability actually follows.",
+ "scope": "T16",
+ "title": "Technology standards \u2014 T16 procedure ingestion (retrospective, 2026-11-23)"
+}
