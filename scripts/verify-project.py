@@ -743,6 +743,10 @@ def rework_register(snapshot: Snapshot) -> tuple[dict[str, Any] | None, str | No
             str(ROOT / "docs" / "evidence" / "v1-conformance-findings.json"),
             "--findings",
             str(standards),
+            "--deep-review",
+            str(ROOT / "docs" / "evidence" / "record-w3" / "deep-review-findings.json"),
+            "--deep-review",
+            str(ROOT / "docs" / "evidence" / "record-w4" / "deep-review-findings.json"),
         ]
         completed = subprocess.run(command, capture_output=True, text=True)
         if completed.returncode != 0:
@@ -1079,6 +1083,60 @@ def gate_problem(
     if problems:
         return True, "; ".join(problems)
     return True, None
+
+
+def missing_project_evidence(
+    key: str,
+    snapshot: "Snapshot",
+    snapshot_dir: Path,
+    manifest_path: Path,
+    evidence_dir: Path,
+    kind_filter: str,
+) -> dict[str, Any]:
+    """A declared project with no snapshot row is a red project, not a stopped board.
+
+    `--all` must reach every manifest: one absent project row (a project created on main but
+    not yet in the restored copy) previously raised out of `Snapshot.project` and ended the
+    whole run, silently dropping every manifest after it. The board records the miss as a red
+    evidence row and continues, so the count of reds is the truth and no project disappears.
+    """
+    detail = f"the snapshot has no project {key!r}"
+    checks = [
+        {
+            "id": f"{key}-project",
+            "check": None,
+            "kind": "snapshot",
+            "severity": "P0",
+            "description": "the snapshot carries the project",
+            "result": "fail",
+            "detail": detail,
+        }
+    ]
+    evidence: dict[str, Any] = {
+        "schema": "project-acceptance/v1",
+        "project": key,
+        "name": None,
+        "gate": None,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "snapshot": {
+            "path": snapshot_label(snapshot_dir, snapshot.manifest),
+            "git_sha": snapshot.manifest.get("git_sha"),
+            "generated_at": snapshot.manifest.get("generated_at"),
+        },
+        "manifest": str(manifest_path.relative_to(ROOT))
+        if manifest_path.is_relative_to(ROOT)
+        else str(manifest_path),
+        "kind": kind_filter,
+        "checks": checks,
+        "failures": [f"{key}-project (P0): {detail}"],
+        "warnings": [],
+        "verdict": "red",
+    }
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+    (evidence_dir / f"{key}.json").write_text(
+        json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return evidence
 
 
 def run_project(
@@ -2059,6 +2117,21 @@ severity = "P0"
     if ok:
         failures.append("an indexed output whose file is gone did not red the published-proof check")
 
+    missing = extra_snapshot("missing-project")
+    missing_evidence = missing_project_evidence(
+        "NOT-A-PROJECT",
+        missing,
+        missing.path,
+        MANIFEST_DIR / "T18.toml",
+        workdir / "missing-evidence",
+        "all",
+    )
+    if (
+        missing_evidence["verdict"] != "red"
+        or "no project" not in missing_evidence["failures"][0]
+    ):
+        failures.append("a manifest whose project is absent did not produce a red evidence row")
+
     _REWORK_CACHE, _REWORK_ERROR = saved_cache, saved_error
 
     if failures:
@@ -2094,10 +2167,19 @@ def main(argv: list[str] | None = None) -> int:
             path.stem for path in MANIFEST_DIR.glob("*.toml") if path.stem != "README"
         )
     )
+    board = Snapshot(args.snapshot) if args.all else None
     red = 0
     for key in keys:
         manifest = args.manifest or (MANIFEST_DIR / f"{key}.toml")
         print(f"== {key} ==")
+        if board is not None and key not in board.projects:
+            evidence = missing_project_evidence(
+                key, board, args.snapshot, manifest, args.evidence_dir, args.kind
+            )
+            print(f"FAIL  {key}-project  {evidence['failures'][0]}")
+            print(f"{key}: red — 1 checks, 1 failures, 0 warnings")
+            red += 1
+            continue
         excluded = {item.strip() for item in args.exclude.split(",") if item.strip()}
         evidence = run_project(
             key, args.snapshot, manifest, args.evidence_dir, kind_filter=args.kind, exclude=excluded
