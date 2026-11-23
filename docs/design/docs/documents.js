@@ -573,8 +573,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "9a55a4da06617c6744ca0893d372a0ecabc3d7818f10bfec0f78e97cbffc4377",
-      "bytes": 12908,
+      "sha256": "5afe4d53eba20ee3c412170245724a50746a89c8bf83a34885deedfd2f808d04",
+      "bytes": 12948,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
