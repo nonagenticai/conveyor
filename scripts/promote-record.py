@@ -130,6 +130,10 @@ WRITE_ACTIONS = {
     # The architecture compliance review: one row per contract, and the table is unique per
     # (project, contract), so the replay reads the row it already wrote before recording one.
     "architecture.reviews_record",
+    # The TOGAF artefact rows the close gate requires. The create is idempotent per
+    # (project, type); the approve names the create's staging id, which the replay maps.
+    "architecture.artifacts_create",
+    "architecture.artifacts_approve",
     # The governed-asset family (SPEC_V2 §8.3, §10.4): the MSP programme artefacts no fixed
     # family owns are composed on the programme-definition project and stepped through
     # draft → in_review → approved. Without these three the MSP rows cannot replay at all.
@@ -168,6 +172,8 @@ READ_ACTIONS = {
     "cards.list",
     "wbs.list",
     "baselines.list",
+    "architecture.artifacts_list",
+    "architecture.artifacts_get",
 }
 
 # The release this script ships with has no action that lists measurements.  If one is
@@ -197,6 +203,8 @@ REVIEW_KEY_RE = re.compile(r"^review:([0-9a-f-]{36})$")
 PROJECT_CLOSE_KEY_RE = re.compile(r"^project:close:([0-9a-f-]{36})$")
 CARD_COMMENT_KEY_RE = re.compile(r"^card-comment:([0-9a-f-]{36}):([0-9a-f]{8,64})$")
 CARD_MOVE_KEY_RE = re.compile(r"^card-move:([0-9a-f-]{36}):(intake|active|waiting|done|archive)$")
+ARTIFACT_KEY_RE = re.compile(r"^architecture-artifact:([0-9a-f-]{36}):([0-9a-f-]{36})$")
+ARTIFACT_APPROVE_KEY_RE = re.compile(r"^architecture-artifact-approve:([0-9a-f-]{36})$")
 BENEFIT_LINK_KEY_RE = re.compile(rf"^benefit-link:({TOKEN}):(.+)$")
 DECISION_KEY_RE = re.compile(rf"^decision:({TOKEN})(?:/(draft|in_review|approved|superseded|archived))?$")
 # The governed-asset family (SPEC_V2 §8.3).  Compose keys by its content — kind, owning
@@ -276,6 +284,10 @@ class NaturalKey:
             return f"card-comment:{self.first}:{self.second}"
         if self.kind == "card_move":
             return f"card-move:{self.first}:{self.second}"
+        if self.kind == "architecture_artifact":
+            return f"architecture-artifact:{self.first}:{self.second}"
+        if self.kind == "architecture_artifact_approve":
+            return f"architecture-artifact-approve:{self.first}"
         if self.kind == "benefit_link":
             return f"benefit-link:{self.first}:{self.second}"
         if self.kind == "decision":
@@ -417,6 +429,12 @@ def parse_natural_key(value: str) -> NaturalKey:
     match = CARD_MOVE_KEY_RE.match(value)
     if match:
         return NaturalKey("card_move", match.group(1), match.group(2))
+    match = ARTIFACT_APPROVE_KEY_RE.match(value)
+    if match:
+        return NaturalKey("architecture_artifact_approve", match.group(1))
+    match = ARTIFACT_KEY_RE.match(value)
+    if match:
+        return NaturalKey("architecture_artifact", match.group(1), match.group(2))
     raise PromoteError(f"malformed natural key: {value!r}")
 
 
@@ -842,6 +860,35 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                 errors.append(f"line {entry.lineno}: a review needs a level")
             if not entry.payload.get("project_id"):
                 errors.append(f"line {entry.lineno}: a review needs a project_id")
+        elif entry.action == "architecture.artifacts_create":
+            if key.kind != "architecture_artifact":
+                errors.append(
+                    f"line {entry.lineno}: architecture.artifacts_create key must be "
+                    "architecture-artifact:<project id>:<artifact type id>"
+                )
+                continue
+            if str(entry.payload.get("project_id")) != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input project_id {entry.payload.get('project_id')!r}"
+                )
+            if str(entry.payload.get("artifact_type_id")) != key.second:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.second!r} does not match "
+                    f"input artifact_type_id {entry.payload.get('artifact_type_id')!r}"
+                )
+        elif entry.action == "architecture.artifacts_approve":
+            if key.kind != "architecture_artifact_approve":
+                errors.append(
+                    f"line {entry.lineno}: architecture.artifacts_approve key must be "
+                    "architecture-artifact-approve:<staging artifact id>"
+                )
+                continue
+            if str(entry.payload.get("id")) != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input id {entry.payload.get('id')!r}"
+                )
         elif entry.action == "wbs.update":
             if key.kind != "wbs_accept":
                 errors.append(
@@ -2587,6 +2634,22 @@ def remap_payload(
                 "entry must create or find it first"
             )
         payload["id"] = production
+    elif entry.action == "architecture.artifacts_create":
+        # The artefact's contract is an architecture-domain row the journal does not yet
+        # replay (v1-promotion-contract-actions-1). A mapped contract is carried; an
+        # unmapped staging reference is dropped rather than written as a dangling FK.
+        contract = payload.get("contract_id")
+        if contract:
+            payload["contract_id"] = id_map.get(str(contract))
+    elif entry.action == "architecture.artifacts_approve":
+        staging = payload.get("id")
+        production = id_map.get(str(staging)) if staging else None
+        if not production:
+            raise PromoteError(
+                f"architecture.artifacts_approve: artifact {staging!r} has no production "
+                "id; the create entry must create or find it first"
+            )
+        payload["id"] = production
     elif entry.action == "documents.publish":
         staging = payload.get("id")
         production = id_map.get(staging) if staging else None
@@ -2973,6 +3036,22 @@ def readback_entry(
                 )
             return row
         raise ReadbackError("architecture.reviews_list: the review is not readable")
+    if entry.action == "architecture.artifacts_create":
+        row = read_row(client, "architecture.artifacts_get", production_id)
+        if str(row.get("artifact_type_id")) != key.second:
+            raise ReadbackError(
+                f"architecture.artifacts_get: type is {row.get('artifact_type_id')!r}, "
+                f"not {key.second!r}"
+            )
+        return row
+    if entry.action == "architecture.artifacts_approve":
+        row = read_row(client, "architecture.artifacts_get", production_id)
+        if row.get("status") != "approved":
+            raise ReadbackError(
+                f"architecture.artifacts_get: status is {row.get('status')!r}, "
+                "not 'approved'"
+            )
+        return row
     if entry.action == "wbs.update":
         nodes = rows(client, "wbs.list", {"project_id": key.first})
         for node in nodes:
@@ -3259,9 +3338,30 @@ def apply_entries(
         assert key is not None
         actor = str(entry.raw.get("actor") or "") or None
         try:
-            existing = existing_for(
-                entry, state, change_index, id_map, superseded.get(entry.lineno)
-            )
+            if entry.action == "architecture.artifacts_create":
+                found = rows(
+                    client, "architecture.artifacts_list", {"project_id": key.first}
+                )
+                existing = next(
+                    (
+                        row
+                        for row in found
+                        if str(row.get("artifact_type_id")) == key.second
+                    ),
+                    None,
+                )
+            elif entry.action == "architecture.artifacts_approve":
+                production = id_map.get(key.first)
+                row = (
+                    read_row(client, "architecture.artifacts_get", production)
+                    if production
+                    else None
+                )
+                existing = row if row and row.get("status") == "approved" else None
+            else:
+                existing = existing_for(
+                    entry, state, change_index, id_map, superseded.get(entry.lineno)
+                )
             if existing is not None:
                 production_id = str(existing["id"])
                 id_map[entry.output_id] = production_id
@@ -3323,6 +3423,17 @@ def apply_entries(
                 if not isinstance(version, int):
                     raise PromoteError(
                         f"wbs.get: {payload['id']} has no version for If-Match"
+                    )
+                output = client.invoke(entry.action, payload, if_match=version, actor=actor)
+            elif entry.action == "architecture.artifacts_approve":
+                current = read_row(
+                    client, "architecture.artifacts_get", str(payload["id"])
+                )
+                version = current.get("version")
+                if not isinstance(version, int):
+                    raise PromoteError(
+                        f"architecture.artifacts_get: {payload['id']} has no version "
+                        "for If-Match"
                     )
                 output = client.invoke(entry.action, payload, if_match=version, actor=actor)
             elif entry.action == "documents.publish":
@@ -4322,6 +4433,54 @@ def self_test() -> int:
             parse_natural_key("benefit:B1/baseline").second == "baseline",
             "benefit suffix parses",
         )
+
+        # 1b. the TOGAF artefact family: the create key is (project, type), the approve names
+        #     the create's staging id, and a non-uuid key is refused rather than guessed.
+        project = "01a1d039-0d38-76fb-9394-b75934d16fcd"
+        artifact_type = "01a1f2c1-13ea-7764-afc8-4f6322e0ad3e"
+        artifact_id = "01a20a9a-d84d-70c0-8a32-59ad4e87a2be"
+        create_key = f"architecture-artifact:{project}:{artifact_type}"
+        approve_key = f"architecture-artifact-approve:{artifact_id}"
+        parsed = parse_natural_key(create_key)
+        ok(parsed.kind == "architecture_artifact", "the artefact create key parses")
+        ok(parsed.canonical() == create_key, "the artefact create key round-trips")
+        parsed = parse_natural_key(approve_key)
+        ok(
+            parsed.kind == "architecture_artifact_approve"
+            and parsed.canonical() == approve_key,
+            "the artefact approve key round-trips",
+        )
+        ok(
+            refused(lambda: parse_natural_key("architecture-artifact:not-a-uuid:x")),
+            "a non-uuid artefact key is refused",
+        )
+        create_input = root / "artifact-create.json"
+        create_input.write_text(
+            json.dumps(
+                {
+                    "project_id": project,
+                    "artifact_type_id": artifact_type,
+                    "phase_code": "a",
+                    "plateau": "psa",
+                    "artifact_kind": "matrix",
+                    "title": "a self-test artefact",
+                }
+            ),
+            encoding="utf-8",
+        )
+        approve_input = root / "artifact-approve.json"
+        approve_input.write_text(json.dumps({"id": artifact_id}), encoding="utf-8")
+        family = [
+            (10, {"action": "architecture.artifacts_create",
+                  "input": str(create_input), "natural_key": create_key,
+                  "output_id": artifact_id}),
+            (11, {"action": "architecture.artifacts_approve",
+                  "input": str(approve_input), "natural_key": approve_key,
+                  "output_id": artifact_id}),
+        ]
+        entries, unreplayable, errors = build_entries(family)
+        ok(not errors and not unreplayable, f"the artefact family parses: {errors}")
+        ok(not validate_entries(entries), "the artefact family validates")
 
         # 2. duplicate refusal.
         duplicate = _fixture_entries(paths, ("risk", "risk"))
