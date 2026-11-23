@@ -66,6 +66,11 @@ async fn a_pilot_writes_one_row_per_case_with_a_transcript_and_a_grade_object() 
             row.model, "eval-model",
             "the model comes from the response, never from the config: {row:?}"
         );
+        assert_eq!(
+            row.stop_reason.as_deref(),
+            Some("stop"),
+            "the finish_reason is recorded, never dropped: {row:?}"
+        );
         assert!(row.latency_ms >= 0, "{row:?}");
     }
     assert_eq!(
