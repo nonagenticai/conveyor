@@ -10,15 +10,16 @@ carries).
 
 The file's `categories` object carries the same chain for every output-standard **category**, so
 the "all standards are covered" claim holds for the whole output standard and not only where a
-rule happens to name a category. A category's check names the committed record's own verifier,
-`generate-standards.py --check#<category>` — never an invented instrument.
+rule happens to name a category. Each template declares its own verifier,
+`generate-standards.py --check-category <category>`, and the checker executes it: exit 0, or an
+exit 2 that reports no instance row, is covered; any other verdict is a gap.
 
 The checker refuses exactly what the map exists to prevent:
 
   - an **orphan rule**: a rule in the matrix with no coverage entry, or an entry for no rule;
   - an **unmapped category**: an output-standard category with no `categories` entry, an entry
-    for no category, a standard/spec that differs from its template, or a check that is not
-    `generate-standards.py --check#<category>`;
+    for no category, a standard/spec that differs from its template, or a template verifier that
+    is not `generate-standards.py --check-category <category>` or does not verify cleanly;
   - an **unknown verifier**: a registry name in neither registry, or a clause no manifest carries;
   - a **source absent from the schema it claims**: a committed snapshot pointer that does not
     resolve, an action the registry dump does not serve, a live-only projection that is marked
@@ -38,10 +39,11 @@ import argparse
 import ast
 import copy
 import json
+import subprocess
 import sys
 import tomllib
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 ROOT = Path(__file__).resolve().parents[1]
 COVERAGE = ROOT / "governance" / "standards-coverage.json"
@@ -51,6 +53,7 @@ SNAPSHOT = ROOT / "docs" / "design" / "data"
 ACTIONS = ROOT / "docs" / "design" / "data" / "actions.json"
 MANIFESTS = ROOT / "acceptance" / "programme"
 VERIFY_PROJECT = ROOT / "scripts" / "verify-project.py"
+GENERATE_STANDARDS = ROOT / "scripts" / "generate-standards.py"
 
 
 def read_json(path: Path) -> Any:
@@ -121,6 +124,16 @@ def action_names(path: Path = ACTIONS) -> set[str]:
     return {str(row) for row in rows or []}
 
 
+def run_category(name: str) -> tuple[int, str]:
+    """Execute a category's declared verifier; return its exit code and combined output."""
+    completed = subprocess.run(
+        [sys.executable, str(GENERATE_STANDARDS), "--check-category", name],
+        capture_output=True,
+        text=True,
+    )
+    return completed.returncode, (completed.stdout or "") + (completed.stderr or "")
+
+
 def check(
     coverage: dict[str, Any],
     standard: dict[str, Any],
@@ -129,6 +142,7 @@ def check(
     actions: set[str] | None = None,
     registry: set[str] | None = None,
     clauses: set[str] | None = None,
+    runner: Callable[[str], tuple[int, str]] = run_category,
 ) -> list[str]:
     problems: list[str] = []
     rules = standard.get("rules") or {}
@@ -244,12 +258,22 @@ def check(
             problems.append(
                 f"category {name}: spec {entry.get('spec')!r} != template {template.get('spec')!r}"
             )
-        expected = f"generate-standards.py --check#{name}"
-        if entry.get("check") != expected:
+        declared = template.get("verifier")
+        expected = f"generate-standards.py --check-category {name}"
+        if declared != expected:
             problems.append(
-                f"category {name}: check {entry.get('check')!r} != {expected!r} "
+                f"category {name}: verifier {declared!r} != {expected!r} "
                 "(the existing verifier)"
             )
+            continue
+        code, output = runner(name)
+        detail = " ".join(output.split()) or "no output"
+        if code == 0 or (code == 2 and "no instance row or trigger exists" in output):
+            continue
+        if code == 1:
+            problems.append(f"category {name}: verifier reports problem(s): {detail}")
+        else:
+            problems.append(f"category {name}: verifier cannot check the category: {detail}")
     return problems
 
 
@@ -268,12 +292,21 @@ def self_test() -> int:
     registry = registry_names(standard)
     clauses = manifest_clauses()
 
+    def fake_runner(name: str) -> tuple[int, str]:
+        return 0, f"check-category {name}: ok (1 instance(s))"
+
     def mutate(change) -> list[str]:
         variant = copy.deepcopy(coverage)
         change(variant)
-        return check(variant, standard, output_standard, snapshot, actions, registry, clauses)
+        return check(
+            variant, standard, output_standard, snapshot, actions, registry, clauses,
+            runner=fake_runner,
+        )
 
-    baseline = check(coverage, standard, output_standard, snapshot, actions, registry, clauses)
+    baseline = check(
+        coverage, standard, output_standard, snapshot, actions, registry, clauses,
+        runner=fake_runner,
+    )
     assert not baseline, f"the committed coverage must pass: {baseline}"
 
     def drop(variant):
@@ -332,9 +365,6 @@ def self_test() -> int:
     def category_spec_mismatch(variant):
         variant["categories"]["mandate"]["spec"] = "§9.9"
 
-    def invented_category_check(variant):
-        variant["categories"]["mandate"]["check"] = "scripts/invented-linter.py --all"
-
     def absent_category_map(variant):
         variant.pop("categories")
 
@@ -353,7 +383,6 @@ def self_test() -> int:
         "a category entry for no template fails": (add_unknown_category, "for no output-standard"),
         "a category standard mismatch fails": (category_standard_mismatch, "!= template"),
         "a category spec mismatch fails": (category_spec_mismatch, "!= template"),
-        "an invented category verifier fails": (invented_category_check, "--check#mandate"),
         "a missing category map fails": (absent_category_map, "coverage.categories"),
     }
     for label, (change, needle) in cases.items():
@@ -363,6 +392,57 @@ def self_test() -> int:
             f"self-test: {label} produced {problems}, expected one naming {needle!r}"
         )
         print(f"standards-coverage: self-test case {label} OK")
+
+    def mutate_template(change) -> list[str]:
+        variant = copy.deepcopy(output_standard)
+        change(variant)
+        return check(
+            coverage, standard, variant, snapshot, actions, registry, clauses,
+            runner=fake_runner,
+        )
+
+    def invented_category_verifier(variant):
+        variant["templates"]["mandate"]["verifier"] = "scripts/invented-linter.py --all"
+
+    problems = mutate_template(invented_category_verifier)
+    assert problems, "self-test: an invented category verifier was accepted"
+    assert any("--check-category mandate" in problem for problem in problems), (
+        f"self-test: an invented category verifier produced {problems}"
+    )
+    print("standards-coverage: self-test case an invented category verifier fails OK")
+
+    def undeclared_category_verifier(variant):
+        variant["templates"]["mandate"].pop("verifier")
+
+    problems = mutate_template(undeclared_category_verifier)
+    assert problems, "self-test: an undeclared category verifier was accepted"
+    assert any("category mandate: verifier None" in problem for problem in problems), (
+        f"self-test: an undeclared category verifier produced {problems}"
+    )
+    print("standards-coverage: self-test case an undeclared category verifier fails OK")
+
+    def unknown_category_runner(name: str) -> tuple[int, str]:
+        return 2, f"check-category {name}: unknown category"
+
+    problems = check(
+        coverage, standard, output_standard, snapshot, actions, registry, clauses,
+        runner=unknown_category_runner,
+    )
+    assert problems, "self-test: an unknown-category verifier exit was accepted"
+    assert any("unknown category" in problem for problem in problems), (
+        f"self-test: an unknown-category verifier exit produced {problems}"
+    )
+    print("standards-coverage: self-test case an unknown-category verifier exit fails OK")
+
+    def no_instance_runner(name: str) -> tuple[int, str]:
+        return 2, f"check-category {name}: no instance row or trigger exists"
+
+    problems = check(
+        coverage, standard, output_standard, snapshot, actions, registry, clauses,
+        runner=no_instance_runner,
+    )
+    assert not problems, f"self-test: a no-instance verifier exit must be covered: {problems}"
+    print("standards-coverage: self-test case a no-instance verifier exit is covered OK")
 
     print(
         f"standards-coverage: self-test OK ({len(coverage['entries'])} rules, "
