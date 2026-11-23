@@ -220,6 +220,13 @@ pub async fn open_tx(
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
          RETURNING {KATA_COLUMNS}"
     );
+    // The unique index is P4.2's guarantee. A failed INSERT aborts the caller's transaction,
+    // so the owner lookup that names the existing kata has to run after a rollback to a
+    // savepoint — otherwise Postgres refuses every statement until the transaction ends and
+    // the refusal degrades to a 500.
+    sqlx::query("SAVEPOINT kata_open_insert")
+        .execute(&mut *conn)
+        .await?;
     let result = sqlx::query_as::<_, KataRow>(sqlx::AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(new.job_binding_id)
@@ -235,8 +242,16 @@ pub async fn open_tx(
         .fetch_one(&mut *conn)
         .await;
     match result {
-        Ok(row) => Ok(row),
+        Ok(row) => {
+            sqlx::query("RELEASE SAVEPOINT kata_open_insert")
+                .execute(&mut *conn)
+                .await?;
+            Ok(row)
+        }
         Err(error) if unique_violation(&error) => {
+            sqlx::query("ROLLBACK TO SAVEPOINT kata_open_insert")
+                .execute(&mut *conn)
+                .await?;
             let existing: Option<Uuid> = sqlx::query_scalar(sqlx::AssertSqlSafe(format!(
                 "SELECT id FROM kata WHERE tenant_id = $1 AND signature = $2 \
                  AND status IN ({LIVE_STATUSES})"
@@ -245,6 +260,9 @@ pub async fn open_tx(
             .bind(&new.signature)
             .fetch_optional(&mut *conn)
             .await?;
+            sqlx::query("RELEASE SAVEPOINT kata_open_insert")
+                .execute(&mut *conn)
+                .await?;
             match existing {
                 Some(id) => Err(KataStoreError::SignatureOpen(id)),
                 None => Err(KataStoreError::Database(error)),
