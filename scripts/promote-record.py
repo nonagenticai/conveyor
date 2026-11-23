@@ -954,7 +954,11 @@ class ActionClient:
         payload: dict,
         if_match: int | None = None,
         approval_id: str | None = None,
+        actor: str | None = None,
     ) -> Any:
+        # The HTTP principal is the bearer token's; the journal's actor cannot be assumed
+        # there. The local transport (--local-bin) is the record's own and passes it.
+        del actor
         endpoint = f"{self.base}/actions/{action}/invocations"
         request = urllib.request.Request(
             endpoint,
@@ -993,7 +997,9 @@ class LocalActionClient:
     the binary the record was written with, against ``DATABASE_MIGRATE_URL``, so no HTTP
     authentication stands between the replay and the actions.  stdin is the action's input —
     except for an action whose input itself carries an ``input`` key (``approvals.request``),
-    which the CLI would read as its envelope, so it is wrapped.
+    which the CLI would read as its envelope, so it is wrapped.  The entry's recorded ``actor``
+    is passed as ``--actor-id``: a gate's requester and its approver are different people, and
+    without the flag both would be the CLI's default service actor.
     """
 
     def __init__(
@@ -1013,6 +1019,7 @@ class LocalActionClient:
         action: str,
         approval_id: str | None = None,
         if_match: int | None = None,
+        actor: str | None = None,
     ) -> list[str]:
         args = [
             self.binary,
@@ -1030,6 +1037,10 @@ class LocalActionClient:
             args += ["--approval-id", str(approval_id)]
         if if_match is not None:
             args += ["--if-match", str(if_match)]
+        # The journal records who acted. Without it every entry runs as the CLI's default
+        # service actor, and a gate's distinct-approver rule refuses its own requester.
+        if actor:
+            args += ["--actor-id", str(actor)]
         return args
 
     def build_stdin(self, payload: dict) -> str:
@@ -1046,13 +1057,16 @@ class LocalActionClient:
         payload: dict,
         if_match: int | None = None,
         approval_id: str | None = None,
+        actor: str | None = None,
     ) -> Any:
         stdin = self.build_stdin(payload)
         environment = dict(os.environ)
         environment.setdefault("RUST_LOG", "error")
         try:
             completed = subprocess.run(
-                self.build(action, approval_id=approval_id, if_match=if_match),
+                self.build(
+                    action, approval_id=approval_id, if_match=if_match, actor=actor
+                ),
                 input=stdin,
                 capture_output=True,
                 text=True,
@@ -1910,10 +1924,14 @@ def build_change_index(
         if change is None:
             continue
         gate = gate_for_change(state, change)
-        index[entry.key.first] = {
+        record = {
             "change_id": change.get("id"),
             "approval_id": gate.get("id") if gate else None,
         }
+        index[entry.key.first] = record
+        if entry.output_id:
+            # A decide may name the change by the staging id the journal recorded.
+            index[str(entry.output_id)] = record
     return index
 
 
@@ -2432,13 +2450,12 @@ def readback_entry(
         if not project_id:
             raise ReadbackError("projects.close_request: the input names no project")
         project = read_project(client, str(project_id))
-        if gate_id:
-            readback_gate(client, str(project_id), gate_id)
-        if closure_gate(state, str(project_id)) is None:
-            state.approvals.append(
-                {"id": gate_id, "gate": "closure", "status": "approved",
-                 "project_id": str(project_id)}
-            )
+        # Record the gate as the server has it — pending until the closure decide runs.
+        # A fabricated "approved" row makes that decide skip and leaves the draft closure
+        # asset unapproved, which the destructive gate's evidence check then refuses.
+        gate = readback_gate(client, str(project_id), gate_id) if gate_id else None
+        if gate is not None and closure_gate(state, str(project_id)) is None:
+            state.approvals.append(gate)
         return project
     if entry.action == "approvals.request" and key.kind == "tranche_review_gate":
         for gate in list_all(client, "approvals.list", {}):
@@ -2650,6 +2667,7 @@ def apply_entries(
     for entry in entries:
         key = entry.key
         assert key is not None
+        actor = str(entry.raw.get("actor") or "") or None
         try:
             existing = existing_for(
                 entry, state, change_index, id_map, superseded.get(entry.lineno)
@@ -2663,6 +2681,8 @@ def apply_entries(
                         "change_id": production_id,
                         "approval_id": str(gate["id"]) if gate else None,
                     }
+                    if entry.output_id:
+                        change_index[str(entry.output_id)] = change_index[key.first]
                     if entry.raw.get("approval_id") and gate is not None:
                         id_map[entry.raw["approval_id"]] = str(gate["id"])
                 outcomes.append(
@@ -2706,7 +2726,7 @@ def apply_entries(
                     raise PromoteError(
                         f"cards.get: {payload['id']} has no version for If-Match"
                     )
-                output = client.invoke(entry.action, payload, if_match=version)
+                output = client.invoke(entry.action, payload, if_match=version, actor=actor)
             elif entry.action == "documents.publish":
                 current = read_row(client, "documents.get", str(payload["id"]))
                 version = current.get("version")
@@ -2714,7 +2734,7 @@ def apply_entries(
                     raise PromoteError(
                         f"documents.get: {payload['id']} has no version for If-Match"
                     )
-                output = client.invoke(entry.action, payload, if_match=version)
+                output = client.invoke(entry.action, payload, if_match=version, actor=actor)
             elif entry.action == "registers.update":
                 current = read_row(client, "registers.get", str(payload["id"]))
                 version = current.get("version")
@@ -2722,7 +2742,7 @@ def apply_entries(
                     raise PromoteError(
                         f"registers.get: {payload['id']} has no version for If-Match"
                     )
-                output = client.invoke(entry.action, payload, if_match=version)
+                output = client.invoke(entry.action, payload, if_match=version, actor=actor)
             elif entry.action == "benefits.update":
                 current = read_row(client, "benefits.get", payload["id"])
                 version = current.get("version")
@@ -2730,7 +2750,7 @@ def apply_entries(
                     raise PromoteError(
                         f"benefits.get: {payload['id']} has no version for If-Match"
                     )
-                output = client.invoke(entry.action, payload, if_match=version)
+                output = client.invoke(entry.action, payload, if_match=version, actor=actor)
             elif entry.action == "cadences.update":
                 row = cadence_row(state, key.first, key.second or "")
                 version = row.get("version") if row else None
@@ -2739,9 +2759,11 @@ def apply_entries(
                         f"cadences.update: {key.first}/{key.second} has no version "
                         "for If-Match"
                     )
-                output = client.invoke(entry.action, payload, if_match=version)
+                output = client.invoke(entry.action, payload, if_match=version, actor=actor)
             else:
-                output = client.invoke(entry.action, payload, approval_id=approval)
+                output = client.invoke(
+                    entry.action, payload, approval_id=approval, actor=actor
+                )
             production_id, gate_id = output_id_for(entry.action, output)
             if entry.action == "tranches.review":
                 # The action returns the tranche; the review it recorded is only readable
@@ -2779,6 +2801,8 @@ def apply_entries(
                     "change_id": production_id,
                     "approval_id": gate_id,
                 }
+                if entry.output_id:
+                    change_index[str(entry.output_id)] = change_index[key.first]
                 if entry.raw.get("approval_id") and gate_id:
                     id_map[entry.raw["approval_id"]] = gate_id
 
@@ -2918,6 +2942,7 @@ class FakeClient:
     def __init__(self, state: State, unreadable: set[str] | None = None) -> None:
         self.state = state
         self.calls: list[tuple[str, dict, int | None, str | None]] = []
+        self.actors: list[str | None] = []
         self.unreadable = unreadable or set()
         self.counter = 0
 
@@ -2945,10 +2970,12 @@ class FakeClient:
         payload: dict,
         if_match: int | None = None,
         approval_id: str | None = None,
+        actor: str | None = None,
     ) -> Any:
         self.calls.append(
             (action, copy.deepcopy(payload), if_match, approval_id)
         )
+        self.actors.append(actor)
         if action == "registers.list":
             return {"items": self._rows(self.state.registers, payload)}
         if action == "benefits.list":
@@ -3090,6 +3117,11 @@ class FakeClient:
         if action == "approvals.decide":
             for gate in self.state.approvals:
                 if gate.get("id") == payload.get("approval_id"):
+                    if gate.get("status") != "pending":
+                        raise PromoteError(
+                            "approvals.decide: approval is "
+                            f"{gate.get('status')}; only a pending gate can change"
+                        )
                     gate["status"] = expected_gate_status(payload)
                     gate["version"] += 1
                     return copy.deepcopy(gate)
@@ -3534,6 +3566,7 @@ def _fixture_entries(
                 "natural_key": "project:closure:01a1dcb8-d24b-76de-b901-56fd56e001bc",
                 "output_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
                 "closure_asset_id": "01a2051f-d60f-7f6c-bf3e-935e8fc43482",
+                "actor": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
             }
         elif name == "close_gate":
             raw = {
@@ -3548,6 +3581,7 @@ def _fixture_entries(
                 "natural_key": "approval:projects.close:"
                                 "01a1dcb8-d24b-76de-b901-56fd56e001bc",
                 "output_id": "01a20520-6853-73c3-8b04-4139d64d3ef8",
+                "actor": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
             }
         elif name == "close":
             raw = {
@@ -3706,6 +3740,26 @@ def self_test() -> int:
         )
         ok(second_map == id_map, "the map is stable across runs")
 
+        # 5b. A decide keyed by the staging change id must find the approved gate on a
+        # replay. Otherwise it re-invokes the decide, and the server refuses a decided gate
+        # (measured on the production rehearsal, 2026-11-23 — seven such entries).
+        replay_entries, _ = build_entries(
+            _fixture_entries(paths, ("change",)) + [(9, {
+                "action": "approvals.decide", "input": str(paths["decide"]),
+                "natural_key":
+                    "approval:change:01a204d4-7f2e-7a73-bf79-4b8767d52db8",
+                "output_id": "01a204d4-7f35-791c-8809-dc947d85a7b4",
+            })]
+        )
+        _, replay = apply_entries(
+            FakeClient(state), replay_entries, state, str(snapshot)
+        )
+        ok(
+            [outcome.verdict for outcome in replay] == ["skipped", "skipped"],
+            f"an id-keyed change decide skips its approved gate: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in replay]}",
+        )
+
         # 6. a created row that cannot be read back is a failure, never a pass.
         entries, _ = build_entries(_fixture_entries(paths, ("risk",)))
         state = State()
@@ -3783,12 +3837,81 @@ def self_test() -> int:
             == id_map["01a2051f-d60f-7f6c-bf3e-935e8fc43482"],
             "the destructive gate's evidence is the production closure asset",
         )
+        ok(
+            "01a1e607-17d9-77d3-98d3-a43a87c4633d" in client.actors
+            and "01a1e8a7-8b23-76a9-9114-aafb95f7a545" in client.actors,
+            f"the replay passes each entry's recorded actor: {client.actors}",
+        )
+        local_client = LocalActionClient("/bin/true")
+        local_args = local_client.build(
+            "approvals.decide", approval_id="gate", if_match=2, actor="member"
+        )
+        ok(
+            "--actor-id" in local_args
+            and local_args[local_args.index("--actor-id") + 1] == "member",
+            f"the local transport carries the actor: {local_args}",
+        )
         _, second = apply_entries(FakeClient(state), entries, state, str(snapshot))
         ok(
             [outcome.verdict for outcome in second]
             == ["skipped"] * len(closure_names),
             f"a replay skips the whole closure chain: "
             f"{[(o.entry.natural_key, o.verdict, o.detail) for o in second]}",
+        )
+
+        # 8b. A pending closure gate is not a decision. The close_request readback must
+        # record the gate's real state; a fabricated "approved" row makes the decide that
+        # follows skip, leaves the closure asset draft, and the destructive gate then
+        # refuses its evidence (replay finding, 2026-11-23).
+        closure_raw = _fixture_entries(paths, ("closure",))[0][1]
+        closure_raw["approval_id"] = "01a2051f-d614-7c07-a57e-ac31652e51d1"
+        closure_entry = build_entries([(2, closure_raw)])[0][0]
+        pending_gate = {
+            "id": "01a2072f-0000-4000-8000-000000000063",
+            "gate": "closure",
+            "status": "pending",
+            "project_id": project,
+            "target": None,
+            "version": 1,
+        }
+
+        class _CloseRequestServer:
+            def __init__(self) -> None:
+                self.calls: list[str] = []
+
+            def invoke(self, action: str, payload: dict, **_: object) -> dict:
+                self.calls.append(action)
+                if action == "projects.get":
+                    return {
+                        "project": {"id": project, "status": "active", "meta": {}},
+                        "boards": [],
+                    }
+                if action == "approvals.list":
+                    return {"items": [copy.deepcopy(pending_gate)]}
+                raise AssertionError(f"unexpected read {action}")
+
+        server = _CloseRequestServer()
+        closure_state = State()
+        row = readback_entry(
+            closure_entry, server, closure_state, project, pending_gate["id"], None, {}
+        )
+        ok(row.get("id") == project, "the close request reads its project back")
+        recorded = [
+            gate for gate in closure_state.approvals
+            if gate.get("gate") == "closure" and gate.get("project_id") == project
+        ]
+        ok(
+            len(recorded) == 1 and recorded[0].get("status") == "pending",
+            f"the readback records the gate as pending, not approved: {recorded}",
+        )
+        decide_entry = build_entries([(3, {
+            "action": "approvals.decide", "input": str(paths["decide"]),
+            "natural_key": f"approval:closure:{project}",
+            "output_id": "01a2051f-d614-7c07-a57e-ac31652e51d1",
+        })])[0][0]
+        ok(
+            existing_for(decide_entry, closure_state, {}, {}) is None,
+            "a pending closure gate is not an existing decision: the decide must run",
         )
 
         # 9. the tr3 record family: a risk edited in place and a benefits-map edge replay.
