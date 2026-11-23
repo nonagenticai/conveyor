@@ -1,0 +1,18 @@
+{
+ "_version": 1,
+ "change_id": "01a20a86-0892-7ddb-9033-881937f87ee1",
+ "evidence": [
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/procedure_versioning.rs",
+   "ref": "procedure_versioning::a_reingest_creates_a_new_draft_version"
+  },
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/procedure_versioning.rs",
+   "ref": "procedure_versioning::the_published_procedure_keeps_its_source_and_pack"
+  }
+ ],
+ "id": "01a20a84-b2fe-71f2-bb87-338bdefaa6ec",
+ "status": "accepted"
+}

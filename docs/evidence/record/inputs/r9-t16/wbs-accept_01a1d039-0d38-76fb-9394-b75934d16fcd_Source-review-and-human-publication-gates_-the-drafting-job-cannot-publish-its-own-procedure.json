@@ -1,0 +1,23 @@
+{
+ "_version": 1,
+ "change_id": "01a20a86-0892-7ddb-9033-881937f87ee1",
+ "evidence": [
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/sop_ingestion.rs",
+   "ref": "sop_ingestion::a_human_approval_publishes_the_procedure"
+  },
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/sop_ingestion.rs",
+   "ref": "sop_ingestion::the_drafting_job_cannot_publish_its_own_procedure"
+  },
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/procedures.rs",
+   "ref": "procedures::publish_refuses_a_draft_with_no_judge"
+  }
+ ],
+ "id": "01a20a84-b2fd-704d-8e85-b51ffc8d34d9",
+ "status": "accepted"
+}

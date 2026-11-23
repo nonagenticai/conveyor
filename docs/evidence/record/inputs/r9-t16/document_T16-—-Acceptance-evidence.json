@@ -1,0 +1,8 @@
+{
+ "body": "# Evidence\n\n## Claim\n\nT16's SPEC_V2 \u00a712 gate is met at lane head `46fc49e2`.\n\n## Evidence\n\n25 tests run, 25 passed, 0 skipped (`sop_ingestion`, `procedure_versioning`, `procedures`); the clause-to-test\nmap is `/tmp/u5a-v14/evidence/T16-acceptance.md`.\n\n## Verification\n\nRe-run: `cargo-guard.py nextest run --locked -p conveyor-actions --test sop_ingestion --test\nprocedure_versioning --test procedures`.\n\n## Links\n\nThe closure review, the Phase-G review on the live contract, and the manifest `acceptance/programme/T16.toml`.\n\n## Gap\n\nNo live cluster fault injection was executed; the ops path is T7's and its live proof is recorded separately.\n",
+ "category": "evidence",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "publishable": true,
+ "title": "T16 \u2014 Acceptance evidence",
+ "unit": "T16"
+}
