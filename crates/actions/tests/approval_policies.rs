@@ -124,6 +124,162 @@ async fn set_policy(
     .unwrap_or_else(|error| panic!("approval_policies.set refused: {}", error.detail));
 }
 
+/// Record the complete policy, including the approver kind the tenant declares non-governance.
+async fn set_policy_kind(
+    pg: &support::Pg,
+    tenant: TenantId,
+    actor: Uuid,
+    action: &str,
+    approval: &str,
+    self_approval: &str,
+    approver_kind: &str,
+) {
+    invoke(
+        &pg.runtime,
+        registry(),
+        tenant,
+        request_as(
+            actor,
+            "approval_policies.set",
+            json!({
+                "action": action,
+                "approval": approval,
+                "self_approval": self_approval,
+                "approver_kind": approver_kind,
+            }),
+            None,
+        ),
+    )
+    .await
+    .unwrap_or_else(|error| panic!("approval_policies.set refused: {}", error.detail));
+}
+
+/// A request from a principal of `actor_kind`: the decide path turns `agent`/`service` into a
+/// machine [`DeciderKind`](conveyor_domain::DeciderKind), never a caller's own claim.
+fn request_as_kind(actor: Uuid, actor_kind: &str, action: &str, input: Value) -> InvokeRequest {
+    InvokeRequest {
+        action: action.to_owned(),
+        input,
+        precondition: None,
+        idempotency_key: None,
+        approval_id: None,
+        actor_id: actor,
+        actor_kind: actor_kind.to_owned(),
+        role: Role::Admin,
+        policy: Default::default(),
+        authority: conveyor_actions::Authority::Role,
+        request_id: Some("rid-approval-policies".to_owned()),
+        trace_id: Some("trace-approval-policies".to_owned()),
+        depth: 0,
+        app_key: "conveyor-test".to_owned(),
+        usage: None::<conveyor_actions::UsageContext>,
+    }
+}
+
+/// SPEC_V2 §5.4 — a human approver is the DEFAULT. A machine decision on a gate the tenant has
+/// not declared non-governance is refused `403 human_only_gate`, and writes no decision row.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_job_decision_on_an_undeclared_gate_is_refused() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let reviewer = support::reviewer_id(&pg).await;
+    let approval_id = pending(&pg, seeded.tenant, "ops.scale", seeded.user_id).await;
+
+    let refused = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as_kind(
+            reviewer,
+            "agent",
+            "approvals.decide",
+            json!({"approval_id": approval_id, "decision": "approve"}),
+        ),
+    )
+    .await
+    .expect_err("an undeclared gate does not accept a machine decision");
+    assert_eq!(refused.status, 403, "{}", refused.detail);
+    assert_eq!(refused.code, "human_only_gate");
+    assert!(
+        refused.detail.contains("ops.scale"),
+        "the refusal names the gate: {}",
+        refused.detail
+    );
+
+    let mut tx = store::scope::begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scope the decision count");
+    let decisions: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM approval_decision WHERE tenant_id = $1 AND approval_id = $2",
+    )
+    .bind(seeded.tenant.as_uuid())
+    .bind(approval_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("count the decision rows");
+    assert_eq!(decisions, 0, "a refused decision writes no row");
+    tx.rollback().await.expect("roll back");
+}
+
+/// SPEC_V2 §5.4 — a tenant may authorise one non-human approver kind for a gate it explicitly
+/// declares non-governance; that row admits the job/agent decision.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_tenant_declared_non_governance_gate_accepts_a_job_decision() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let reviewer = support::reviewer_id(&pg).await;
+    let approval_id = pending(&pg, seeded.tenant, "ops.scale", seeded.user_id).await;
+    set_policy_kind(
+        &pg,
+        seeded.tenant,
+        seeded.user_id,
+        "ops.scale",
+        "required",
+        "forbidden",
+        "agent",
+    )
+    .await;
+
+    let decided = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as_kind(
+            reviewer,
+            "agent",
+            "approvals.decide",
+            json!({"approval_id": approval_id, "decision": "approve"}),
+        ),
+    )
+    .await
+    .expect("the tenant declared the agent approver for this gate");
+    assert_eq!(decided.body["output"]["status"], json!("approved"));
+}
+
+/// SPEC_V2 §5.4 — with no policy row at all, a human decision is accepted.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_human_decision_is_accepted_by_default() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let reviewer = support::reviewer_id(&pg).await;
+    let approval_id = pending(&pg, seeded.tenant, "ops.scale", seeded.user_id).await;
+
+    let decided = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            reviewer,
+            "approvals.decide",
+            json!({"approval_id": approval_id, "decision": "approve"}),
+            None,
+        ),
+    )
+    .await
+    .expect("a human approver is the default");
+    assert_eq!(decided.body["output"]["status"], json!("approved"));
+}
+
 /// P2.1 — with no policy rows, the default is `required`: an approved approval is honoured and
 /// its absence is refused.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
