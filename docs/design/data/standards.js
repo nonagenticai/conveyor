@@ -9104,7 +9104,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:PLATFORM",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-platform.html",
@@ -9294,7 +9294,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S00",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s00.html",
@@ -9471,7 +9471,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S01",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s01.html",
@@ -9661,7 +9661,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S02",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s02.html",
@@ -9851,7 +9851,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S03",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s03.html",
@@ -10028,7 +10028,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S04",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s04.html",
@@ -10205,7 +10205,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S05",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s05.html",
@@ -10382,7 +10382,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S06",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06.html",
@@ -10749,7 +10749,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S06b",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06b.html",
@@ -10939,7 +10939,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S06c",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06c.html",
@@ -11116,7 +11116,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S06d",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06d.html",
@@ -11267,7 +11267,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S07",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s07.html",
@@ -11444,7 +11444,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S08",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s08.html",
@@ -11621,7 +11621,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S09",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s09.html",
@@ -11798,7 +11798,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S10",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s10.html",
@@ -11988,7 +11988,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S11",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s11.html",
@@ -12165,7 +12165,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S12",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s12.html",
@@ -12342,7 +12342,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S13",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s13.html",
@@ -12519,7 +12519,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S14",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s14.html",
@@ -12696,7 +12696,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S15",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s15.html",
@@ -12873,7 +12873,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S16",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s16.html",
@@ -13050,7 +13050,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S17",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s17.html",
@@ -13227,7 +13227,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S18",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s18.html",
@@ -13404,7 +13404,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S19",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s19.html",
@@ -13594,7 +13594,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S20",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s20.html",
@@ -13784,7 +13784,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S21",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s21.html",
@@ -13974,7 +13974,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:SPEC-V2",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-spec-v2.html",
@@ -14164,7 +14164,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T0",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t0.html",
@@ -14354,7 +14354,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T1",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t1.html",
@@ -14544,7 +14544,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T10",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t10.html",
@@ -14924,7 +14924,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T12",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t12.html",
@@ -15114,7 +15114,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T13",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t13.html",
@@ -15494,7 +15494,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T15",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t15.html",
@@ -15874,7 +15874,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T17",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t17.html",
@@ -16064,7 +16064,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T2",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t2.html",
@@ -16254,7 +16254,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T3",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t3.html",
@@ -16444,7 +16444,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T4",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t4.html",
@@ -16634,7 +16634,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T5",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t5.html",
@@ -16824,7 +16824,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T6",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t6.html",
@@ -17204,7 +17204,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T8",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t8.html",
@@ -17394,7 +17394,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T9",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t9.html",
@@ -35596,7 +35596,7 @@ window.CONVEYOR_STANDARDS = {
   },
   "generated_at": "2026-11-20T11:50:50.848127361+00:00",
   "git_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
-  "payload_sha256": "a57d65907f182149c226be5f19c67fadae253b72e0b83e4a4aab33c95ab56057",
+  "payload_sha256": "27304a1f0fb1a89f30606c9b3269a2c1dd137c17616f759030b308a44c9d85fe",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 26,
