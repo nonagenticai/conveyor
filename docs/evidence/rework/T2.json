@@ -151,7 +151,7 @@
   ],
   "failures": [],
   "gate": "a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card",
-  "generated_at": "2026-11-23T08:10:28.330381+00:00",
+  "generated_at": "2026-11-23T09:20:25.228036+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T2.toml",
   "name": "Decision ladder",
@@ -159,8 +159,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-23T08:09:50.563209+00:00",
-    "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-    "path": "retained-snapshot/4727213b8c204ec69d825d24129f6b506ebb2a2e"
+    "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+    "path": "retained-snapshot/65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8"
   },
   "verdict": "green",
   "warnings": []
