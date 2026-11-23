@@ -22,9 +22,9 @@ Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-
 T17 turns a tenant's chat brief and documents into reviewed, published tenant assets. Downstream of
 T0, T2, T3, T13 and T16, it owns intake, drafts, the publication orchestrator, a template store and
 an inert tool request. It does
-not own published assets' tables (§10.1), SOP/RDF/BPMN conversion and PKO (T16, #85, OPEN
-`status:blocked`, absent), the tool model (T13, #76, OPEN `status:claimed`, absent), or policy
-evaluation (T2). Publication calls the owning aggregate's action in one transaction; a missing
+not own published assets' tables (§10.1), SOP/RDF/BPMN conversion and the procedure draft/PDDL
+surface (T16, #85, OPEN `status:blocked`, absent), the tool model (T13, #76, OPEN `status:claimed`,
+absent), or policy evaluation (T2). Publication calls the owning aggregate's action in one transaction; a missing
 action refuses, never degrades.
 
 ## Aggregates, tables and actions
@@ -39,16 +39,16 @@ action refuses, never degrades.
 | Tool request | `tool_request` (to create) | names tool/toolkit intent, requested effect class and justification; never a binding, credential, ceiling or `approval_policy` | published via `authoring.publish`; feeds T13's `tool_authoring.draft` (to create) |
 
 `intake` means `authoring.intake`. Every existing action name resolves in
-`docs/design/data/actions.json`. The T16 names `procedures.draft`, `pko.import_rdf`, `pko.edit`
-and `pko.publish`, and T13's `tool_authoring.draft`, are absent today and are marked `(to create)`.
+`docs/design/data/actions.json`. T16's `procedures.draft` (the re-scoped surface; D53 retired the
+PKO actions) and T13's `tool_authoring.draft` are absent today and are marked `(to create)`.
 
 | Asset kind | Owning table / action | Drafted by | Publish action | Approval |
 |---|---|---|---|---|
 | industry | `industry` / `industries.create` | intake | `industries.create` | human |
 | department | `department` / `departments.create` | intake | `departments.create` | human |
 | job | `job_catalogue` + `job_release` | intake | `job_catalogue.create` then `job_releases.publish` | human |
-| procedure | `procedure` / `procedures.publish` (existing; T16 adds PDDL text and the PKO pin) | `procedures.draft` (to create, T16) | `procedures.publish` | human |
-| PKO rows | `pko_release`/`pko_entity` (to create, T16) | `pko.import_rdf`/`pko.edit` (to create, T16) | `pko.publish` (to create, T16) | human |
+| procedure | `procedure` / `procedures.publish` (existing; T16 adds PDDL text and the `knowledge_pack_ref` pin) | `procedures.draft` (to create, T16) | `procedures.publish` | human |
+| Knowledge pack | `strata` pack import (`procedures.ingest_rdf`, existing); the procedure pins it by `knowledge_pack_ref` (0060:22,38) | `procedures.ingest_rdf` (existing) | none — the procedure's publish carries the pin | human |
 | policy | `approval_policy` / `approval_policies.set` | intake | `approval_policies.set` | human; self-approval forbidden |
 | template | `asset_template` (to create) | intake | `authoring.publish` | human |
 | tool request | `tool_request` (to create) | intake | `authoring.publish` | human |
