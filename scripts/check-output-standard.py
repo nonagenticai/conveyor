@@ -368,6 +368,25 @@ def validate(std: dict, seed: dict, console: dict) -> list[str]:
                         errors.append(
                             f"template {category!r} section {heading!r} absence fallback must be a boolean"
                         )
+            # A heading that cites only the artefact's own document is a heading without facts
+            # unless the template declares its body authored. The 23 authored templates declare
+            # it; a template that loses the declaration is refused.
+            active = [s for s in source_list if isinstance(s, dict) and not s.get("optional")]
+            if (
+                document_category
+                and active
+                and template.get("document_authored") is not True
+                and all(
+                    s.get("kind") == "documents"
+                    and str((s.get("match") or {}).get("category", "$category"))
+                    in {str(document_category), "$category"}
+                    for s in active
+                )
+            ):
+                errors.append(
+                    f"template {category!r} section {heading!r} cites only its own "
+                    f"document category {document_category!r}; declare document_authored"
+                )
         if template.get("mandatory") is True:
             # A mandatory artefact must be resolvable: at least one named source, and the
             # document category the generator falls back to when its rows are empty. Without
@@ -506,6 +525,10 @@ def self_test(std: dict, seed: dict, console: dict) -> int:
     first_heading = bad["templates"]["vision"]["required"][0]
     bad["templates"]["vision"]["sources"] = {first_heading: [{"kind": "absence"}]}
     cases.append(("an absence source without a record", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["vision"].pop("document_authored", None)
+    cases.append(("a self-document template without document_authored", bad, seed, console))
 
     bad = copy.deepcopy(std)
     bad["templates"]["benefit-profile"].pop("subject_kind", None)

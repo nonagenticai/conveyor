@@ -83,6 +83,7 @@ def register_acceptance(
     ]
     deep_review = deep_review or [
         "docs/evidence/record-w3/deep-review-findings.json",
+        "docs/evidence/record-w4/deep-review-findings.json",
     ]
     parts = ["python3 scripts/audit-programme-conformance.py", f"--snapshot {snapshot}"]
     parts.extend(f"--findings {path}" for path in findings)
@@ -3387,9 +3388,33 @@ def main() -> None:
         )
     if args.rework_check:
         open_keys = {str(package.get("key")) for package in register.get("packages") or []}
+        # A key that is not open must still be a key the inputs know: a finding's rule and its
+        # owner project, or a baseline entry. Before this set an unknown key printed "cleared"
+        # and exited 0, so a typo in an acceptance command proved nothing.
+        known_keys = set(open_keys)
+        for entry in baseline_doc.get("entries", []) if isinstance(baseline_doc, dict) else []:
+            if isinstance(entry, dict) and entry.get("rule") and entry.get("subject"):
+                known_keys.add(f"{entry['rule']}:{entry['subject']}")
+        for finding in merged_findings:
+            if not isinstance(finding, dict):
+                continue
+            rule = str(finding.get("id") or "")
+            subject = str(
+                finding.get("owner_project") or finding.get("project")
+                or finding.get("scope") or ""
+            )
+            if rule and subject:
+                known_keys.add(f"{rule}:{subject}")
         if args.rework_check in open_keys:
             print(
                 f"audit-programme-conformance: {args.rework_check} is still open",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        if args.rework_check not in known_keys:
+            print(
+                f"audit-programme-conformance: {args.rework_check} matches no open package and "
+                "no finding or baseline rule; an unknown key is not cleared",
                 file=sys.stderr,
             )
             sys.exit(1)

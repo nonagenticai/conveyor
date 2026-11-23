@@ -2714,6 +2714,21 @@ def self_test_section_cause(outputs: Path, fixture: dict[str, Any]) -> None:
         "Objectives", sourced, "vision", subject, fixture, outputs, {}
     )
     assert section["status"] != "evidenced" and section["cause"] == "record", section
+    # A declared source resolving zero must not fall back to the artefact's own document: the
+    # business case's four headings and every compliance review's Waivers heading were resolved
+    # by that fallback while carrying no facts.
+    own = {
+        "subject_kind": "project", "document_category": "vision", "required": ["Purpose"],
+        "sources": {"Purpose": [{"kind": "rows", "file": "msp.json",
+                                     "pointer": "/register_items"}]},
+    }
+    project = {"kind": "project", "id": "p1", "title": "P1", "project_key": "P1",
+               "status": "active", "meta": {}, "project_id": "p1"}
+    section = resolve_section(
+        "Purpose", own, "vision", project, fixture, outputs, {"pg1": {"p1"}}
+    )
+    assert all(source["kind"] != "documents" for source in section["sources"]), section
+    assert section["status"] != "evidenced", section
     print("generate-standards: self-test case section-cause-decides-kind OK")
 
 
