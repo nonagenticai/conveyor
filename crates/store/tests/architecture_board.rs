@@ -171,7 +171,7 @@ async fn a_board_convenes_only_with_its_commission() {
     )
     .await
     .expect("a commissioned board convenes itself");
-    let activated = get_body_tx(&mut *tx, tenant, full.id)
+    let activated = get_body_tx(&mut tx, tenant, full.id)
         .await
         .expect("read the board")
         .expect("the board");
@@ -255,7 +255,7 @@ async fn an_active_board_decides_a_contract_and_a_retired_one_cannot() {
         is_conflict(refused),
         "a decision by a retired body approves nothing"
     );
-    let unchanged = get_contract_tx(&mut *tx, tenant, contract.id)
+    let unchanged = get_contract_tx(&mut tx, tenant, contract.id)
         .await
         .expect("read the contract")
         .expect("the contract");
