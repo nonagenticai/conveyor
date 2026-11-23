@@ -32,7 +32,7 @@ use std::collections::{BTreeSet, HashMap, VecDeque};
 use std::sync::{Arc, Mutex};
 
 use conveyor_domain::eval::{CaseSplit, split_sha256};
-use conveyor_domain::{AssetKind, RunStatus, TenantId, Version};
+use conveyor_domain::{AssetKind, AssetStatus, RunStatus, TenantId, Version};
 use conveyor_store as store;
 use conveyor_store::begin_scoped;
 use serde_json::{Value, json};
@@ -2694,6 +2694,29 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let id = seed_asset(pg, ctx, AssetKind::Adr).await;
             ctx.push(sample.name, id);
         }
+        "governed_assets.get" | "governed_assets.submit" => {
+            // The generic family takes its kind as an input; the prepared row is one of the MSP
+            // artefacts no fixed S07 family owns.
+            let id = seed_asset(pg, ctx, AssetKind::Mandate).await;
+            ctx.push(sample.name, id);
+        }
+        "governed_assets.approve" => {
+            // Approval is guarded: the row must already be submitted (`in_review`) each round.
+            let id = seed_asset(pg, ctx, AssetKind::Mandate).await;
+            scoped(pg, ctx, async |conn| {
+                store::governance::transition_asset_tx(
+                    conn,
+                    ctx.tenant,
+                    id,
+                    AssetStatus::InReview,
+                    None,
+                )
+                .await
+                .expect("prepare a submitted governed asset");
+            })
+            .await;
+            ctx.push(sample.name, id);
+        }
         "trace_links.create" => {
             // The edge's source is a governed asset in this tenant; the anchor card is the
             // other end in every round.
@@ -3959,6 +3982,32 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample
         },
         plain("decisions.list", json!({"limit": 10}), None),
+        // ── the generic governed-asset family (SPEC_V2 §8.3/§10.4) ──────────────────────
+        {
+            // `kind` is this family's input; the title is minted per round because the derived
+            // key is unique per (tenant, kind).
+            let mut sample = plain("governed_assets.compose", json!({}), None);
+            sample.input = Box::new(|_: &Ctx| {
+                json!({
+                    "kind": "mandate",
+                    "title": format!("Parity mandate {}", Uuid::now_v7().simple()),
+                    "body": "the programme mandate parity wrote",
+                    "meta": {"drivers": ["parity"]},
+                })
+            });
+            expecting(sample, 201)
+        },
+        expecting(on_prepared("governed_assets.get", None), 200),
+        expecting(
+            plain(
+                "governed_assets.list",
+                json!({"kind": "mandate", "limit": 10}),
+                None,
+            ),
+            200,
+        ),
+        expecting(on_prepared("governed_assets.submit", None), 200),
+        expecting(on_prepared("governed_assets.approve", None), 200),
         // Deterministic: the tenant's seeded card-type catalogue, read whole.
         plain("card_types.list", json!({}), None),
         plain(
@@ -5960,6 +6009,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 | "approvals.list"
                 | "notifications.list"
                 | "requirements.list"
+                | "governed_assets.list"
                 | "principles.list"
                 | "principles.list_conflicts"
                 | "decisions.list"
