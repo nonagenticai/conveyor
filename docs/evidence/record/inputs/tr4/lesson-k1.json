@@ -1,0 +1,12 @@
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "cadence_id": "01a202a2-0e3f-75be-9f2b-c572ddcdfce9",
+ "finding_key": "k1",
+ "statement": "A shared target directory can serve a stale rlib from another worktree: a 0.4 s 'Finished' build after a merge reused main's conveyor-store and the compiler blamed missing modules. Touch the source trees or build from a clean target before trusting a compile verdict.",
+ "evidence": [
+  "46f79dc4 merge of main",
+  "8bb124ab merge of the lane",
+  "bf41733f board at the clean replay",
+  "docs/evidence/record/journal.jsonl"
+ ]
+}

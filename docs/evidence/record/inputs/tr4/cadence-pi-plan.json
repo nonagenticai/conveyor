@@ -1,0 +1,114 @@
+{
+ "id": "01a202a1-dbb9-7e49-b64a-cf97c3fab095",
+ "meta": {
+  "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+  "tranche_id": "01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce",
+  "tranche_number": 4,
+  "pi_plan": {
+   "period": "tranche-4",
+   "scope": [
+    "T9",
+    "T10",
+    "T4",
+    "T14",
+    "T16",
+    "S05",
+    "S07",
+    "S09"
+   ],
+   "objectives": [
+    {
+     "id": "O1",
+     "statement": "The tranche-4 record sets are evidenced and their manifests green: T9 and T10 first (PI plan, PI objectives, retro lesson), then T4, T14, T16, S05, S07 and S09.",
+     "business_value": 10,
+     "committed": true
+    },
+    {
+     "id": "O2",
+     "statement": "The seven deep-review findings are packages and their fixes land: the governed_assets family, the action-registry and licensing projections, the shared_config and retro-lesson record writes, the register-field standard and the T18 harness.",
+     "business_value": 9,
+     "committed": true
+    },
+    {
+     "id": "O3",
+     "statement": "The v1 verdict is re-executed at the head: every absent or partial slice is packaged, and the eight record-only receipts gain an executed SPEC proof.",
+     "business_value": 8,
+     "committed": true
+    },
+    {
+     "id": "O4",
+     "statement": "The CODE P0 and P1 bundles execute: every closed package names a commit and a test, and the register's open CODE count falls.",
+     "business_value": 7,
+     "committed": true
+    },
+    {
+     "id": "O5",
+     "statement": "The pack is republished from the live rows; all 74 output-standard categories are mapped and checked; viability is re-run.",
+     "business_value": 6,
+     "committed": false
+    },
+    {
+     "id": "O6",
+     "statement": "The next tranche is prepared only where the record supports it; no artefact is generated from rows that do not exist.",
+     "business_value": 5,
+     "committed": false
+    }
+   ],
+   "capacity": {
+    "projects": [
+     "T9",
+     "T10",
+     "T4",
+     "T14",
+     "T16",
+     "S05",
+     "S07",
+     "S09"
+    ],
+    "live_record_writer": 1,
+    "build_concurrency": 1,
+    "read_agents_max": 6
+   },
+   "wip_limit": {
+    "open_cards_per_writer": 1,
+    "open_batches": 2
+   },
+   "dependencies": [
+    {
+     "from": "T9",
+     "to": "pi-plan:tranche-4",
+     "note": "the plan and objectives are published before the manifest's evidence is read"
+    },
+    {
+     "from": "T10",
+     "to": "pi-plan:tranche-4",
+     "note": "the plan and objectives are published before the manifest's evidence is read"
+    },
+    {
+     "from": "T14",
+     "to": "w3-gov-assets-1",
+     "note": "the governed_assets family unblocks the programme artefact rows"
+    },
+    {
+     "from": "T3",
+     "to": "record-write:tranche-4",
+     "note": "the remaining record P0s are writes, not code"
+    },
+    {
+     "from": "S05",
+     "to": "verdict:tranche-4",
+     "note": "the verdict re-executes after the batch's rows exist"
+    }
+   ],
+   "evidence": [
+    "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce",
+    "docs/evidence/record/journal.jsonl",
+    "bf41733f board at the clean replay"
+   ],
+   "refinement": {
+    "cadence_id": "01a202a2-2705-7392-a2d1-03ca2b3a174e"
+   }
+  }
+ }
+}

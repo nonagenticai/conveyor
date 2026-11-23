@@ -1,0 +1,14 @@
+{
+ "title": "Architecture Decision Register \u2014 conveyor buildout (retrospective, 2026-11-22)",
+ "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+ "body": "# ADR Register \u2014 conveyor buildout\n\nThe architecture decisions of record for the conveyor buildout programme (TOGAF \u00a78.1). The live record holds one architecture decision record, rendered in full under each heading below.\n\n## Register\n\nThe register holds ADR-0010, \"No deferrals; every finding executes\", status approved, decided on 2026-11-22 and held at `docs/decisions/0010-no-deferrals.md`. The row is linked to issue #526, to the document 01a202a6-c20c-7079-9e0e-488009d21e86 and to the register item 01a2029f-5a5f-70aa-be13-029435893a40.\n\n| Reference | Asset id | Number | Title | Status | Decided | Path | Version |\n|---|---|---|---|---|---|---|---|\n| adr-0010 | 01a202a0-4781-78ca-ad82-525217c02ad0 | 0010 | No deferrals; every finding executes | approved | 2026-11-22 | docs/decisions/0010-no-deferrals.md | 5 |\n\n_Source: artefacts.json#/governed_assets_\n\n## Status and supersession\n\nADR-0010 is approved. The row's `meta.supersedes` field names 01a20208-5261-7085-a4a7-74f061e4842b as the record it supersedes; the typed `supersedes_id` and `superseded_by_id` fields are both empty, and the superseded record itself is not carried among this heading's items.\n\n| Reference | Asset id | Status | Supersedes | Superseded by | Decided | Version |\n|---|---|---|---|---|---|---|\n| adr-0010 | 01a202a0-4781-78ca-ad82-525217c02ad0 | approved | 01a20208-5261-7085-a4a7-74f061e4842b | \u2014 | 2026-11-22 | 5 |\n\n_Source: artefacts.json#/governed_assets_\n\n## Decisions\n\nThe decision of record for ADR-0010 is \"No deferrals; every finding executes\". It was decided on 2026-11-22 by rule (`decided_by_kind`: `rule`) by \"the assistant under the owner's delegation\" under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526. The row names three related documents: 01a202a6-c20c-7079-9e0e-488009d21e86, 01a202a3-76b1-72da-8a41-7a1662b91fc7 and 01a2029c-9254-7605-8a7c-3013b28ee794. The facts hold no separate rationale or consequences text beyond the title and the decision metadata tabled here.\n\n| Reference | Asset id | Decision | Decided | Authority | Deciders | Delegation | Record |\n|---|---|---|---|---|---|---|---|\n| adr-0010 | 01a202a0-4781-78ca-ad82-525217c02ad0 | No deferrals; every finding executes | 2026-11-22 | rule | the assistant under the owner's delegation | 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 | #526 |\n\n_Source: artefacts.json#/governed_assets_\n",
+ "category": "adr-register",
+ "publishable": true,
+ "meta": {
+  "sha256": "ad272dc1e622275264f3c1f269a9e8d0a409ae2d9e2a99b20255fb8bd8ef947c",
+  "category": "adr-register",
+  "size_bytes": 2375,
+  "content_type": "text/markdown",
+  "w3_natural_key": "programme-artefact:adr-register:ad272dc1e6222752"
+ }
+}

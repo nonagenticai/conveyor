@@ -166,16 +166,16 @@
     "gate (P0): the gate check 'T12-baseline' did not pass; the gate check 'T12-charter' did not pass; the gate check 'T12-closure-outputs' did not pass; the gate check 'T12-contract' did not pass; the gate check 'T12-review' did not pass; the gate check 'T12-closure-gate' did not pass; the gate check 'T12-pi-cadence' did not pass; the gate check 'T12-pi-plan' did not pass; the gate check 'T12-pi-objectives' did not pass; the gate check 'T12-wsjf' did not pass; the gate check 'T12-demo-credits' did not pass; the gate check 'T12-lessons' did not pass; the gate check 'T12-product' did not pass"
   ],
   "gate": "T12 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'one tenant runs request \u2192 PM \u2192 delivery jobs \u2192 coach interruption \u2192 kata \u2192 development project \u2192 deploy \u2192 operations incident \u2192 lesson, all audited, within budget; one benefit is baselined before its transition and measured after it, with the delta attributable to the operational area' \u2014 is the condition on which it may be closed, not a claim that it is met.",
-  "generated_at": "2026-11-23T08:00:23.770292+00:00",
+  "generated_at": "2026-11-23T08:10:27.414034+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T12.toml",
   "name": "One organisation loop",
   "project": "T12",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T07:59:59.287216+00:00",
-    "git_sha": "8bb124abe9e709308af2aa42fc9f4403411762b7",
-    "path": "retained-snapshot/8bb124abe9e709308af2aa42fc9f4403411762b7"
+    "generated_at": "2026-11-23T08:09:50.563209+00:00",
+    "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
+    "path": "retained-snapshot/4727213b8c204ec69d825d24129f6b506ebb2a2e"
   },
   "verdict": "red",
   "warnings": []

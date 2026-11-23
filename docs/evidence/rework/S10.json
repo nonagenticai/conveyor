@@ -175,16 +175,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "S10 is accepted when a scripted agent session passes \u2014 the tool list is the projection of the ActionSpecs the caller's scopes admit, a destructive tool call becomes an S06 approval, and the conversation is two tables plus an SSE stream, not a second action system.",
-  "generated_at": "2026-11-23T08:00:21.510534+00:00",
+  "generated_at": "2026-11-23T08:10:25.058518+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S10.toml",
   "name": "Copilot / AG-UI \u2014 one action surface, proposals, conversations",
   "project": "S10",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T07:59:59.287216+00:00",
-    "git_sha": "8bb124abe9e709308af2aa42fc9f4403411762b7",
-    "path": "retained-snapshot/8bb124abe9e709308af2aa42fc9f4403411762b7"
+    "generated_at": "2026-11-23T08:09:50.563209+00:00",
+    "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
+    "path": "retained-snapshot/4727213b8c204ec69d825d24129f6b506ebb2a2e"
   },
   "verdict": "red",
   "warnings": []
