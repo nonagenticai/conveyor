@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Programme Blueprint — conveyor buildout (retrospective, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Programme blueprint — conveyor buildout</h1>
+<h2>Aggregates and services</h2>
+<p>The configuration record holds 18 aggregates and services: 15 tenant capabilities and 3 system services. All 18 rows are recorded with status active.</p>
+<table><thead><tr><th>Code</th><th>Label</th><th>Kind</th><th>Status</th><th>Description</th><th>ID</th></tr></thead><tbody>
+<tr><td>analysis</td><td>Analysis</td><td>tenant</td><td>active</td><td>Card types for analysis.</td><td>01a1d039-0cfa-7ac7-bba6-2394150b788b</td></tr>
+<tr><td>architecture</td><td>Architecture</td><td>tenant</td><td>active</td><td>Card types for architecture.</td><td>01a1d039-0cfb-7325-8a65-4585704a3c82</td></tr>
+<tr><td>asset_library_statistics</td><td>Asset library statistics</td><td>tenant</td><td>active</td><td>Card types for principle, requirement and decision library statistics.</td><td>01a1d039-0cfb-7852-b6ca-9a25373b0714</td></tr>
+<tr><td>bdd_tdd</td><td>BDD / TDD</td><td>tenant</td><td>active</td><td>Card types for behaviour- and test-driven development.</td><td>01a1d039-0cfb-7d04-9cc0-3157c3c0f666</td></tr>
+<tr><td>change_management</td><td>Change management</td><td>tenant</td><td>active</td><td>Card types that deal with change management.</td><td>01a1d039-0cfc-7240-89e0-5f501719c920</td></tr>
+<tr><td>design</td><td>Design</td><td>tenant</td><td>active</td><td>Card types for design.</td><td>01a1d039-0cfc-76d1-8531-53e09084286d</td></tr>
+<tr><td>development</td><td>Development</td><td>tenant</td><td>active</td><td>Card types for development.</td><td>01a1d039-0cfc-7a7b-bc5c-b5fb2970977e</td></tr>
+<tr><td>kaizen</td><td>Kaizen</td><td>tenant</td><td>active</td><td>Card types for flow improvements.</td><td>01a1d039-0cfc-7e1b-b34b-32a3c79e7b94</td></tr>
+<tr><td>kanban_coach</td><td>Kanban coach</td><td>system</td><td>active</td><td>Protector of flow. Any card interruption invokes a card for the kanban coach. Owns all flow-related decisions and fr/human interaction during a phase: blocked cards, comments, human input and answers, in-flow approvals, and rework limit reached (R34).</td><td>01a1d039-0cfd-71e9-99ed-2c1e8707de00</td></tr>
+<tr><td>kata</td><td>Kata</td><td>system</td><td>active</td><td>The continuous-improvement loop: open a kata from a benchmark or eval finding, run the improvement iteration, and report the verdict (SPEC D20/D29, S18).</td><td>01a1d039-0cfd-74e2-bb29-3005a47f3db7</td></tr>
+<tr><td>meta_procedure</td><td>Procedure improvement</td><td>tenant</td><td>active</td><td>Card types for procedure improvements for agents.</td><td>01a1d039-0cfd-77d5-95c8-8c0abd282e64</td></tr>
+<tr><td>meta_prompt</td><td>Prompt improvement</td><td>tenant</td><td>active</td><td>Card types for prompt improvement in flows.</td><td>01a1d039-0cfd-7b5f-b09a-19939e065f76</td></tr>
+<tr><td>program_management</td><td>Program management</td><td>tenant</td><td>active</td><td>Card types that deal with program management.</td><td>01a1d039-0cfd-7e59-b07e-a8a5a0811cfd</td></tr>
+<tr><td>project_management</td><td>Project management</td><td>system</td><td>active</td><td>Card types that deal with project management.</td><td>01a1d039-0cfe-71a0-905c-cd4b4311f6ce</td></tr>
+<tr><td>refactoring</td><td>Refactoring</td><td>tenant</td><td>active</td><td>Card types for refactoring.</td><td>01a1d039-0cfe-7597-9194-0b4949c47f1d</td></tr>
+<tr><td>research</td><td>Research</td><td>tenant</td><td>active</td><td>Card types for research.</td><td>01a1d039-0cfe-7947-9696-3720318718c2</td></tr>
+<tr><td>testing</td><td>Testing</td><td>tenant</td><td>active</td><td>Card types for testing.</td><td>01a1d039-0cfe-7c4b-b583-eaaad074e6ad</td></tr>
+<tr><td>workflow_engineering</td><td>Workflow engineering</td><td>tenant</td><td>active</td><td>Card types for changing the workflow itself: observe, probe, root cause and andon scope.</td><td>01a1d039-0cfe-7f5e-b4f6-58bba833fa2d</td></tr>
+</tbody></table>
+<p><em>Source: config.json#/capabilities</em></p>
+<h2>Action registry and data model</h2>
+<p>The product snapshot does not project the action registry and data model; the action registry is published by the design pack's actions.json, and the record carries no items for this heading, so the gap is named here.</p>
+<p><em>Source: none recorded.</em></p>
+<h2>Deployment estate</h2>
+<p>The heading combines two registers: 48 projects from the programme record and 22 jobs from the organisation record, 70 rows in all. Of the projects, 26 are closed, 21 active and 1 archived; every project row is of type it. Of the jobs, 5 are active and 17 draft.</p>
+<p>The first table renders the 48 project rows.</p>
+<table><thead><tr><th>Key</th><th>Name</th><th>Type</th><th>Status</th><th>Boards</th><th>Cards</th><th>Repository</th><th>ID</th></tr></thead><tbody>
+<tr><td>DESIGN-PUBLISH</td><td>Publish the SPEC_V2 studio design pack, live</td><td>it</td><td>closed</td><td>1</td><td>4</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d39-7414-b43c-450de170ffe1</td></tr>
+<tr><td>P0</td><td>Programme definition — vision, blueprint, plan and project briefs</td><td>it</td><td>closed</td><td>1</td><td>2</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1dcb8-d24b-76de-b901-56fd56e001bc</td></tr>
+<tr><td>PLATFORM</td><td>CI, runners and platform</td><td>it</td><td>active</td><td>1</td><td>30</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d39-79ce-84b6-1173b94bc67f</td></tr>
+<tr><td>S00</td><td>Usage inventory → parity/parity.yaml</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d26-7573-9b0c-e0f60af92003</td></tr>
+<tr><td>S01</td><td>UI spike — Leptos CSR vs Leptos SSR</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d27-724c-9bae-af96b2d926b1</td></tr>
+<tr><td>S02</td><td>Skeleton — workspace, tenancy, auth, jobs, SSE</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d27-7b45-abb5-bf851a4c3d4a</td></tr>
+<tr><td>S03</td><td>Domain and schema — aggregates, state machines, baseline domain migration</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d28-743b-86c7-0d0698ed69c1</td></tr>
+<tr><td>S04</td><td>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest</td><td>it</td><td>active</td><td>1</td><td>2</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d28-7eb6-a62a-f420e742595c</td></tr>
+<tr><td>S05</td><td>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d29-796d-967b-1e819a4dd40a</td></tr>
+<tr><td>S06</td><td>Control plane — claims, runs, approvals, andon, comms and notifications</td><td>it</td><td>active</td><td>1</td><td>2</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2a-7007-bcd8-29bb24f36b54</td></tr>
+<tr><td>S06a</td><td>mcp_server signed channel — both directions</td><td>it</td><td>archived</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2a-779c-8d89-3bc79003b513</td></tr>
+<tr><td>S06b</td><td>Agent direct interface — the conveyor's own MCP surface</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2a-7ea9-b809-929452f221fd</td></tr>
+<tr><td>S06c</td><td>MCP tasks — a long-running project asks for input</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2b-7542-9574-e961ffd1b597</td></tr>
+<tr><td>S06d</td><td>Interaction connector standard — web, Telegram, MCP first</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2b-7b80-93fe-c1daf60c5c1f</td></tr>
+<tr><td>S07</td><td>Requirements, catalogues, revisions, quality scoring, search</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2c-7322-b2f9-4dd041153894</td></tr>
+<tr><td>S08</td><td>Governance, modelling, render and export</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2</td></tr>
+<tr><td>S09</td><td>Documents, repositories, secrets, workers UI, reports/metrics, billing display</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2d-71f1-a403-c9abe52c1888</td></tr>
+<tr><td>S10</td><td>Copilot / AG-UI — one action surface, proposals, conversations</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2d-787e-853e-fef542ec8815</td></tr>
+<tr><td>S11</td><td>Processes, steps and SOPs — executable documentation</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2d-7ec6-aef0-4096ea66e7a4</td></tr>
+<tr><td>S12</td><td>UI build-out</td><td>it</td><td>closed</td><td>1</td><td>4</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2e-7585-8cb4-ab197d2e6dab</td></tr>
+<tr><td>S13</td><td>Process engine, judge, map and care-bus — the process is the executor, the DAG retained as the tool-sequence engine, the 348 flows re-authored</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2e-7ed4-9cda-a7fce9fffa8e</td></tr>
+<tr><td>S14</td><td>Cutover — deploy, seed, rehearse, decommission fr / RM / Planka</td><td>it</td><td>active</td><td>1</td><td>2</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2f-75f2-a1fb-aa95893aa206</td></tr>
+<tr><td>S15</td><td>Capability, knowledge and memory</td><td>it</td><td>active</td><td>1</td><td>2</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d2f-7ca0-9d3d-534ca7d673fb</td></tr>
+<tr><td>S16</td><td>Inference ledger and prompt audit</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d30-72a1-9bba-29fadf6170cf</td></tr>
+<tr><td>S17</td><td>Native benchmark harness</td><td>it</td><td>active</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d30-794f-bd53-c72986b18e60</td></tr>
+<tr><td>S18</td><td>Kata continuous improvement</td><td>it</td><td>active</td><td>1</td><td>2</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d30-7f95-9d93-30eaabfec6da</td></tr>
+<tr><td>S19</td><td>Eval builder</td><td>it</td><td>active</td><td>1</td><td>3</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d31-77b6-80e2-1c7205d63f99</td></tr>
+<tr><td>S20</td><td>Eval hillclimb</td><td>it</td><td>active</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d31-7d0f-ab1f-16240952e223</td></tr>
+<tr><td>S21</td><td>S21</td><td>it</td><td>active</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d32-71f6-bad4-81493c102060</td></tr>
+<tr><td>SPEC-V2</td><td>SPEC V2 — the organisational operating model</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d39-7f3b-bd04-211f7dfe1e50</td></tr>
+<tr><td>T0</td><td>Model and contracts</td><td>it</td><td>active</td><td>1</td><td>3</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d32-7734-98da-fb7f1e2386c7</td></tr>
+<tr><td>T1</td><td>Plan spine</td><td>it</td><td>closed</td><td>1</td><td>2</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d32-7c81-8365-371217d16ef7</td></tr>
+<tr><td>T10</td><td>SAFe cadence and MSP tranches</td><td>it</td><td>active</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d36-70c1-a5e8-f50956c5e3f9</td></tr>
+<tr><td>T11</td><td>Metrics, metering and maturity</td><td>it</td><td>closed</td><td>1</td><td>2</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d36-782b-8b18-ff07a64dedbe</td></tr>
+<tr><td>T12</td><td>One organisation loop</td><td>it</td><td>active</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d36-7de8-891c-4d3dcf110cf5</td></tr>
+<tr><td>T13</td><td>Tool platform</td><td>it</td><td>active</td><td>1</td><td>2</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d37-730f-8f8a-2f50e5a0933d</td></tr>
+<tr><td>T14</td><td>Estate toolkits</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d37-7896-adfb-fa7bd2279dfd</td></tr>
+<tr><td>T15</td><td>Tool authoring and BYO</td><td>it</td><td>active</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d37-7f20-9959-979c31daeb5e</td></tr>
+<tr><td>T16</td><td>SOP, RDF/OWL and process-document ingestion</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d38-76fb-9394-b75934d16fcd</td></tr>
+<tr><td>T17</td><td>Tenant asset authoring</td><td>it</td><td>active</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d38-7db1-b685-d76bd4cebf47</td></tr>
+<tr><td>T2</td><td>Decision ladder</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d33-7282-b7b0-6dde32c38ab1</td></tr>
+<tr><td>T3</td><td>PM job</td><td>it</td><td>closed</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d33-7915-8833-75f4dc31cc07</td></tr>
+<tr><td>T4</td><td>Kanban coach</td><td>it</td><td>active</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d33-7e7e-890e-b437b0c78db9</td></tr>
+<tr><td>T5</td><td>Kata</td><td>it</td><td>active</td><td>1</td><td>2</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d34-73db-975e-5d178d729cef</td></tr>
+<tr><td>T6</td><td>Development project</td><td>it</td><td>active</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d34-7973-8989-0b83246fc888</td></tr>
+<tr><td>T7</td><td>Operations</td><td>it</td><td>closed</td><td>1</td><td>2</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d34-7f89-a0be-f3de3c9f540e</td></tr>
+<tr><td>T8</td><td>Organisational memory</td><td>it</td><td>active</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d35-76bb-a22e-be49e3e95d16</td></tr>
+<tr><td>T9</td><td>TOGAF ADM capability</td><td>it</td><td>active</td><td>1</td><td>1</td><td>https://github.com/nonagenticai/conveyor</td><td>01a1d039-0d35-7bd1-945d-cea12c5dfd6d</td></tr>
+</tbody></table>
+<p>The second table renders the 22 job rows.</p>
+<table><thead><tr><th>Key</th><th>Name</th><th>Family</th><th>Status</th><th>Executor</th><th>Model</th><th>Limits</th><th>Authority</th><th>ID</th></tr></thead><tbody>
+<tr><td>architect</td><td>Architect</td><td>architecture</td><td>active</td><td>internal_agent</td><td>router/high</td><td>16 turns · 60k tokens · $4.00</td><td>draft contracts and ADRs; no merge</td><td>01a1db6b-4efe-73bf-9e8b-004de1b88c50</td></tr>
+<tr><td>backend_engineer</td><td>Backend engineer</td><td>engineering</td><td>active</td><td>internal_agent</td><td>router/medium</td><td>12 turns · 40k tokens · $2.50</td><td>implement, test, propose PR</td><td>01a1db6b-4ef7-7e90-accc-c4d025595477</td></tr>
+<tr><td>data_engineer</td><td>Data engineer</td><td>engineering</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f0e-7ded-9a2c-42628510422a</td></tr>
+<tr><td>frontend_engineer</td><td>Frontend engineer</td><td>engineering</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f0d-7d9c-a925-a60e124a0657</td></tr>
+<tr><td>incident_commander</td><td>Incident commander</td><td>operations</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f16-7551-9c4b-0850b18d2647</td></tr>
+<tr><td>kanban_coach</td><td>Kanban coach</td><td>improvement</td><td>active</td><td>procedure</td><td>laya</td><td>closed sets · no LLM remedy</td><td>triage + remedy within the closed set</td><td>01a1db6b-4f04-7c14-9fb0-89c1b1f802a6</td></tr>
+<tr><td>kata_facilitator</td><td>Kata facilitator</td><td>improvement</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f1a-703c-a4c6-64260c850671</td></tr>
+<tr><td>measurement_engineer</td><td>Measurement engineer</td><td>improvement</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f1b-7180-86f8-f991cb9b78d0</td></tr>
+<tr><td>performance_engineer</td><td>Performance engineer</td><td>verification</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f15-77f1-97d2-74fa066e7869</td></tr>
+<tr><td>platform_engineer</td><td>Platform engineer</td><td>engineering</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f0f-7b77-ab6f-5b49038bef37</td></tr>
+<tr><td>platform_operator</td><td>Platform operator</td><td>operations</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f17-71cf-b84b-73a675ff91f2</td></tr>
+<tr><td>pm</td><td>PM</td><td>product</td><td>active</td><td>procedure</td><td>laya + router/small</td><td>8 turns · 20k tokens · $1.00</td><td>create/close project; never sole approver</td><td>01a1db6b-4f01-7876-8daa-e701c00b3ea8</td></tr>
+<tr><td>portfolio_analyst</td><td>Portfolio analyst</td><td>product</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f19-7072-af61-f501850b6cbf</td></tr>
+<tr><td>product_owner</td><td>Product owner</td><td>product</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f0b-7602-a195-6efa4f9cbce7</td></tr>
+<tr><td>programme_manager</td><td>Programme manager</td><td>product</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f17-7e76-838d-590d71578ad1</td></tr>
+<tr><td>qa_engineer</td><td>QA engineer</td><td>verification</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f13-7822-8c9a-09e67d5670e0</td></tr>
+<tr><td>release_manager</td><td>Release manager</td><td>release</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f11-75a6-bec6-675c8fd11224</td></tr>
+<tr><td>reviewer</td><td>Reviewer</td><td>verification</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f10-770d-be8c-c29b6de7587f</td></tr>
+<tr><td>security_reviewer</td><td>Security reviewer</td><td>verification</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f14-77ac-b57f-de88b8df0a04</td></tr>
+<tr><td>sre</td><td>SRE / on-call</td><td>operations</td><td>active</td><td>internal_agent</td><td>router/medium</td><td>10 turns · 30k tokens · $3.00</td><td>read-first; write behind a gate</td><td>01a1db6b-4f07-7bbb-bc27-823f9fc63ce7</td></tr>
+<tr><td>tech_lead</td><td>Tech lead</td><td>engineering</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f0c-7bd5-940f-3674a1ddf7fd</td></tr>
+<tr><td>technical_writer</td><td>Technical writer</td><td>knowledge</td><td>draft</td><td>not set</td><td>not set</td><td>not set</td><td>not set</td><td>01a1db6b-4f12-74a5-93cd-e4a7651a6b47</td></tr>
+</tbody></table>
+<p><em>Source: programme.json#/projects, organisation.json#/jobs</em></p>
+<h2>The to-be the projects deliver</h2>
+<p>The record holds 48 project rows, all of type it: 26 closed, 21 active and 1 archived. No row carries a phase code. The table renders every row with the description held in the record.</p>
+<table><thead><tr><th>Key</th><th>Name</th><th>Status</th><th>Boards</th><th>Cards</th><th>Description</th><th>ID</th></tr></thead><tbody>
+<tr><td>DESIGN-PUBLISH</td><td>Publish the SPEC_V2 studio design pack, live</td><td>closed</td><td>1</td><td>4</td><td>Programme-level unit (plan: docs/design/STUDIO-SPEC.md)</td><td>01a1d039-0d39-7414-b43c-450de170ffe1</td></tr>
+<tr><td>P0</td><td>Programme definition — vision, blueprint, plan and project briefs</td><td>closed</td><td>1</td><td>2</td><td>Programme-level unit (plan: docs/plans/P0-programme-definition.md)</td><td>01a1dcb8-d24b-76de-b901-56fd56e001bc</td></tr>
+<tr><td>PLATFORM</td><td>CI, runners and platform</td><td>active</td><td>1</td><td>30</td><td>Programme-level unit (plan: docs/plans/development-process-speed.md)</td><td>01a1d039-0d39-79ce-84b6-1173b94bc67f</td></tr>
+<tr><td>S00</td><td>Usage inventory → parity/parity.yaml</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S00-usage-inventory.md</td><td>01a1d039-0d26-7573-9b0c-e0f60af92003</td></tr>
+<tr><td>S01</td><td>UI spike — Leptos CSR vs Leptos SSR</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S01-ui-spike.md</td><td>01a1d039-0d27-724c-9bae-af96b2d926b1</td></tr>
+<tr><td>S02</td><td>Skeleton — workspace, tenancy, auth, jobs, SSE</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S02-skeleton.md</td><td>01a1d039-0d27-7b45-abb5-bf851a4c3d4a</td></tr>
+<tr><td>S03</td><td>Domain and schema — aggregates, state machines, baseline domain migration</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S03-domain-schema.md</td><td>01a1d039-0d28-743b-86c7-0d0698ed69c1</td></tr>
+<tr><td>S04</td><td>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest</td><td>active</td><td>1</td><td>2</td><td>Plan: docs/plans/slices/S04-action-registry.md</td><td>01a1d039-0d28-7eb6-a62a-f420e742595c</td></tr>
+<tr><td>S05</td><td>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S05-board.md</td><td>01a1d039-0d29-796d-967b-1e819a4dd40a</td></tr>
+<tr><td>S06</td><td>Control plane — claims, runs, approvals, andon, comms and notifications</td><td>active</td><td>1</td><td>2</td><td>Plan: docs/plans/slices/S06-control-plane.md</td><td>01a1d039-0d2a-7007-bcd8-29bb24f36b54</td></tr>
+<tr><td>S06a</td><td>mcp_server signed channel — both directions</td><td>archived</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S06a-mcp-server-channel.md</td><td>01a1d039-0d2a-779c-8d89-3bc79003b513</td></tr>
+<tr><td>S06b</td><td>Agent direct interface — the conveyor's own MCP surface</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S06b-agent-direct-interface.md</td><td>01a1d039-0d2a-7ea9-b809-929452f221fd</td></tr>
+<tr><td>S06c</td><td>MCP tasks — a long-running project asks for input</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S06c-mcp-tasks.md</td><td>01a1d039-0d2b-7542-9574-e961ffd1b597</td></tr>
+<tr><td>S06d</td><td>Interaction connector standard — web, Telegram, MCP first</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S06d-connector-standard.md</td><td>01a1d039-0d2b-7b80-93fe-c1daf60c5c1f</td></tr>
+<tr><td>S07</td><td>Requirements, catalogues, revisions, quality scoring, search</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S07-requirements-search.md</td><td>01a1d039-0d2c-7322-b2f9-4dd041153894</td></tr>
+<tr><td>S08</td><td>Governance, modelling, render and export</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S08-governance-modelling.md</td><td>01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2</td></tr>
+<tr><td>S09</td><td>Documents, repositories, secrets, workers UI, reports/metrics, billing display</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S09-documents-integrations.md</td><td>01a1d039-0d2d-71f1-a403-c9abe52c1888</td></tr>
+<tr><td>S10</td><td>Copilot / AG-UI — one action surface, proposals, conversations</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S10-copilot-ag-ui.md</td><td>01a1d039-0d2d-787e-853e-fef542ec8815</td></tr>
+<tr><td>S11</td><td>Processes, steps and SOPs — executable documentation</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S11-procedures.md</td><td>01a1d039-0d2d-7ec6-aef0-4096ea66e7a4</td></tr>
+<tr><td>S12</td><td>UI build-out</td><td>closed</td><td>1</td><td>4</td><td>Plan: docs/plans/slices/S12-ui-buildout.md</td><td>01a1d039-0d2e-7585-8cb4-ab197d2e6dab</td></tr>
+<tr><td>S13</td><td>Process engine, judge, map and care-bus — the process is the executor, the DAG retained as the tool-sequence engine, the 348 flows re-authored</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S13-n8n-engine.md</td><td>01a1d039-0d2e-7ed4-9cda-a7fce9fffa8e</td></tr>
+<tr><td>S14</td><td>Cutover — deploy, seed, rehearse, decommission fr / RM / Planka</td><td>active</td><td>1</td><td>2</td><td>Plan: docs/plans/slices/S14-cutover.md</td><td>01a1d039-0d2f-75f2-a1fb-aa95893aa206</td></tr>
+<tr><td>S15</td><td>Capability, knowledge and memory</td><td>active</td><td>1</td><td>2</td><td>Plan: docs/plans/slices/S15-capability-knowledge-memory.md</td><td>01a1d039-0d2f-7ca0-9d3d-534ca7d673fb</td></tr>
+<tr><td>S16</td><td>Inference ledger and prompt audit</td><td>closed</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S16-inference-audit.md</td><td>01a1d039-0d30-72a1-9bba-29fadf6170cf</td></tr>
+<tr><td>S17</td><td>Native benchmark harness</td><td>active</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S17-benchmark-harness.md</td><td>01a1d039-0d30-794f-bd53-c72986b18e60</td></tr>
+<tr><td>S18</td><td>Kata continuous improvement</td><td>active</td><td>1</td><td>2</td><td>Plan: docs/plans/slices/S18-kata-improvement.md</td><td>01a1d039-0d30-7f95-9d93-30eaabfec6da</td></tr>
+<tr><td>S19</td><td>Eval builder</td><td>active</td><td>1</td><td>3</td><td>Plan: docs/plans/slices/S19-eval-builder.md</td><td>01a1d039-0d31-77b6-80e2-1c7205d63f99</td></tr>
+<tr><td>S20</td><td>Eval hillclimb</td><td>active</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S20-eval-hillclimb.md</td><td>01a1d039-0d31-7d0f-ab1f-16240952e223</td></tr>
+<tr><td>S21</td><td>S21</td><td>active</td><td>1</td><td>1</td><td>Plan: docs/plans/slices/S21-message-construction.md</td><td>01a1d039-0d32-71f6-bad4-81493c102060</td></tr>
+<tr><td>SPEC-V2</td><td>SPEC V2 — the organisational operating model</td><td>closed</td><td>1</td><td>1</td><td>Programme-level unit (plan: docs/SPEC_V2.md)</td><td>01a1d039-0d39-7f3b-bd04-211f7dfe1e50</td></tr>
+<tr><td>T0</td><td>Model and contracts</td><td>active</td><td>1</td><td>3</td><td>SPEC_V2 slice T0 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d32-7734-98da-fb7f1e2386c7</td></tr>
+<tr><td>T1</td><td>Plan spine</td><td>closed</td><td>1</td><td>2</td><td>SPEC_V2 slice T1 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d32-7c81-8365-371217d16ef7</td></tr>
+<tr><td>T10</td><td>SAFe cadence and MSP tranches</td><td>active</td><td>1</td><td>1</td><td>SPEC_V2 slice T10 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d36-70c1-a5e8-f50956c5e3f9</td></tr>
+<tr><td>T11</td><td>Metrics, metering and maturity</td><td>closed</td><td>1</td><td>2</td><td>SPEC_V2 slice T11 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d36-782b-8b18-ff07a64dedbe</td></tr>
+<tr><td>T12</td><td>One organisation loop</td><td>active</td><td>1</td><td>1</td><td>SPEC_V2 slice T12 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d36-7de8-891c-4d3dcf110cf5</td></tr>
+<tr><td>T13</td><td>Tool platform</td><td>active</td><td>1</td><td>2</td><td>SPEC_V2 slice T13 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d37-730f-8f8a-2f50e5a0933d</td></tr>
+<tr><td>T14</td><td>Estate toolkits</td><td>closed</td><td>1</td><td>1</td><td>SPEC_V2 slice T14 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d37-7896-adfb-fa7bd2279dfd</td></tr>
+<tr><td>T15</td><td>Tool authoring and BYO</td><td>active</td><td>1</td><td>1</td><td>SPEC_V2 slice T15 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d37-7f20-9959-979c31daeb5e</td></tr>
+<tr><td>T16</td><td>SOP, RDF/OWL and process-document ingestion</td><td>closed</td><td>1</td><td>1</td><td>SPEC_V2 slice T16 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d38-76fb-9394-b75934d16fcd</td></tr>
+<tr><td>T17</td><td>Tenant asset authoring</td><td>active</td><td>1</td><td>1</td><td>SPEC_V2 slice T17 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d38-7db1-b685-d76bd4cebf47</td></tr>
+<tr><td>T2</td><td>Decision ladder</td><td>closed</td><td>1</td><td>1</td><td>SPEC_V2 slice T2 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d33-7282-b7b0-6dde32c38ab1</td></tr>
+<tr><td>T3</td><td>PM job</td><td>closed</td><td>1</td><td>1</td><td>SPEC_V2 slice T3 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d33-7915-8833-75f4dc31cc07</td></tr>
+<tr><td>T4</td><td>Kanban coach</td><td>active</td><td>1</td><td>1</td><td>SPEC_V2 slice T4 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d33-7e7e-890e-b437b0c78db9</td></tr>
+<tr><td>T5</td><td>Kata</td><td>active</td><td>1</td><td>2</td><td>SPEC_V2 slice T5 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d34-73db-975e-5d178d729cef</td></tr>
+<tr><td>T6</td><td>Development project</td><td>active</td><td>1</td><td>1</td><td>SPEC_V2 slice T6 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d34-7973-8989-0b83246fc888</td></tr>
+<tr><td>T7</td><td>Operations</td><td>closed</td><td>1</td><td>2</td><td>SPEC_V2 slice T7 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d34-7f89-a0be-f3de3c9f540e</td></tr>
+<tr><td>T8</td><td>Organisational memory</td><td>active</td><td>1</td><td>1</td><td>SPEC_V2 slice T8 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d35-76bb-a22e-be49e3e95d16</td></tr>
+<tr><td>T9</td><td>TOGAF ADM capability</td><td>active</td><td>1</td><td>1</td><td>SPEC_V2 slice T9 (docs/SPEC_V2.md §12)</td><td>01a1d039-0d35-7bd1-945d-cea12c5dfd6d</td></tr>
+</tbody></table>
+<p><em>Source: programme.json#/projects</em></p>
+<h2>Organisation and skills</h2>
+<p>The organisation record holds 27 rows: 22 jobs and 5 departments. Of the jobs, 5 are active and 17 draft; the families are architecture (1), engineering (5), improvement (3), knowledge (1), operations (3), product (4), release (1), verification (4). The first table renders all 22 job rows.</p>
+<table><thead><tr><th>Key</th><th>Name</th><th>Family</th><th>Executor</th><th>Status</th><th>Model</th><th>Limits</th><th>Departments</th><th>Authority</th><th>ID</th></tr></thead><tbody>
+<tr><td>architect</td><td>Architect</td><td>architecture</td><td>internal_agent</td><td>active</td><td>router/high</td><td>16 turns · 60k tokens · $4.00</td><td>delivery</td><td>draft contracts and ADRs; no merge</td><td>01a1db6b-4efe-73bf-9e8b-004de1b88c50</td></tr>
+<tr><td>backend_engineer</td><td>Backend engineer</td><td>engineering</td><td>internal_agent</td><td>active</td><td>router/medium</td><td>12 turns · 40k tokens · $2.50</td><td>delivery</td><td>implement, test, propose PR</td><td>01a1db6b-4ef7-7e90-accc-c4d025595477</td></tr>
+<tr><td>data_engineer</td><td>Data engineer</td><td>engineering</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>delivery</td><td>not set</td><td>01a1db6b-4f0e-7ded-9a2c-42628510422a</td></tr>
+<tr><td>frontend_engineer</td><td>Frontend engineer</td><td>engineering</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>delivery</td><td>not set</td><td>01a1db6b-4f0d-7d9c-a925-a60e124a0657</td></tr>
+<tr><td>incident_commander</td><td>Incident commander</td><td>operations</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>operations</td><td>not set</td><td>01a1db6b-4f16-7551-9c4b-0850b18d2647</td></tr>
+<tr><td>kanban_coach</td><td>Kanban coach</td><td>improvement</td><td>procedure</td><td>active</td><td>laya</td><td>closed sets · no LLM remedy</td><td>improvement</td><td>triage + remedy within the closed set</td><td>01a1db6b-4f04-7c14-9fb0-89c1b1f802a6</td></tr>
+<tr><td>kata_facilitator</td><td>Kata facilitator</td><td>improvement</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>improvement</td><td>not set</td><td>01a1db6b-4f1a-703c-a4c6-64260c850671</td></tr>
+<tr><td>measurement_engineer</td><td>Measurement engineer</td><td>improvement</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>improvement</td><td>not set</td><td>01a1db6b-4f1b-7180-86f8-f991cb9b78d0</td></tr>
+<tr><td>performance_engineer</td><td>Performance engineer</td><td>verification</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>verification</td><td>not set</td><td>01a1db6b-4f15-77f1-97d2-74fa066e7869</td></tr>
+<tr><td>platform_engineer</td><td>Platform engineer</td><td>engineering</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>delivery</td><td>not set</td><td>01a1db6b-4f0f-7b77-ab6f-5b49038bef37</td></tr>
+<tr><td>platform_operator</td><td>Platform operator</td><td>operations</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>operations</td><td>not set</td><td>01a1db6b-4f17-71cf-b84b-73a675ff91f2</td></tr>
+<tr><td>pm</td><td>PM</td><td>product</td><td>procedure</td><td>active</td><td>laya + router/small</td><td>8 turns · 20k tokens · $1.00</td><td>project office</td><td>create/close project; never sole approver</td><td>01a1db6b-4f01-7876-8daa-e701c00b3ea8</td></tr>
+<tr><td>portfolio_analyst</td><td>Portfolio analyst</td><td>product</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>project office</td><td>not set</td><td>01a1db6b-4f19-7072-af61-f501850b6cbf</td></tr>
+<tr><td>product_owner</td><td>Product owner</td><td>product</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>delivery</td><td>not set</td><td>01a1db6b-4f0b-7602-a195-6efa4f9cbce7</td></tr>
+<tr><td>programme_manager</td><td>Programme manager</td><td>product</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>project office</td><td>not set</td><td>01a1db6b-4f17-7e76-838d-590d71578ad1</td></tr>
+<tr><td>qa_engineer</td><td>QA engineer</td><td>verification</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>verification</td><td>not set</td><td>01a1db6b-4f13-7822-8c9a-09e67d5670e0</td></tr>
+<tr><td>release_manager</td><td>Release manager</td><td>release</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>delivery</td><td>not set</td><td>01a1db6b-4f11-75a6-bec6-675c8fd11224</td></tr>
+<tr><td>reviewer</td><td>Reviewer</td><td>verification</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>delivery</td><td>not set</td><td>01a1db6b-4f10-770d-be8c-c29b6de7587f</td></tr>
+<tr><td>security_reviewer</td><td>Security reviewer</td><td>verification</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>verification</td><td>not set</td><td>01a1db6b-4f14-77ac-b57f-de88b8df0a04</td></tr>
+<tr><td>sre</td><td>SRE / on-call</td><td>operations</td><td>internal_agent</td><td>active</td><td>router/medium</td><td>10 turns · 30k tokens · $3.00</td><td>operations</td><td>read-first; write behind a gate</td><td>01a1db6b-4f07-7bbb-bc27-823f9fc63ce7</td></tr>
+<tr><td>tech_lead</td><td>Tech lead</td><td>engineering</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>delivery</td><td>not set</td><td>01a1db6b-4f0c-7bd5-940f-3674a1ddf7fd</td></tr>
+<tr><td>technical_writer</td><td>Technical writer</td><td>knowledge</td><td>not set</td><td>draft</td><td>not set</td><td>not set</td><td>delivery</td><td>not set</td><td>01a1db6b-4f12-74a5-93cd-e4a7651a6b47</td></tr>
+</tbody></table>
+<p>The second table renders the 5 departments by ordinal; delivery is the only department marked primary.</p>
+<table><thead><tr><th>Ordinal</th><th>Name</th><th>Primary</th><th>ID</th></tr></thead><tbody>
+<tr><td>1</td><td>delivery</td><td>true</td><td>01a1db6b-4ef2-7d79-ad7f-135d66dfaa12</td></tr>
+<tr><td>2</td><td>verification</td><td>false</td><td>01a1db6b-4ef3-7da9-87a6-3e9599cfb591</td></tr>
+<tr><td>3</td><td>operations</td><td>false</td><td>01a1db6b-4ef4-7958-a473-1c4b76ecd553</td></tr>
+<tr><td>4</td><td>project office</td><td>false</td><td>01a1db6b-4ef5-75ab-9543-a576ee5dcc1e</td></tr>
+<tr><td>5</td><td>improvement</td><td>false</td><td>01a1db6b-4ef5-7f96-969a-4531d4bbab19</td></tr>
+</tbody></table>
+<p><em>Source: organisation.json#/jobs, organisation.json#/departments</em></p>
+<h2>Current, intermediate and target states</h2>
+<p>The baseline record holds 21 rows: 1 boundary, 1 governance, 1 management and 18 scope baselines. The three programme-level rows are version 2; the 18 project scope baselines are version 1. Every scope snapshot is recorded frozen (18 rows), and all rows name conveyor-e2e as the taker and conveyor-approver as the approver.</p>
+<table><thead><tr><th>Kind</th><th>Project</th><th>Frozen</th><th>WBS rows</th><th>Taken at</th><th>Version</th><th>ID</th></tr></thead><tbody>
+<tr><td>boundary</td><td>programme-level</td><td>not set</td><td>not set</td><td>2026-11-21T01:12:52.166054+00:00</td><td>2</td><td>01a1fba9-d095-757c-91ed-afd21ecfa960</td></tr>
+<tr><td>governance</td><td>programme-level</td><td>not set</td><td>not set</td><td>2026-11-21T01:12:38.435315+00:00</td><td>2</td><td>01a1fba9-9afd-72e3-b41b-dc4287153c35</td></tr>
+<tr><td>management</td><td>programme-level</td><td>not set</td><td>not set</td><td>2026-11-21T01:12:11.15688+00:00</td><td>2</td><td>01a1fba9-308c-7cde-9d00-edb7f483f3af</td></tr>
+<tr><td>scope</td><td>01a1d039-0d26-7573-9b0c-e0f60af92003</td><td>true</td><td>1</td><td>2026-11-21T17:48:43.761438+00:00</td><td>1</td><td>01a1ff39-8d6e-7270-b2ba-9d235eb28b83</td></tr>
+<tr><td>scope</td><td>01a1d039-0d27-724c-9bae-af96b2d926b1</td><td>true</td><td>1</td><td>2026-11-21T17:39:52.695711+00:00</td><td>1</td><td>01a1ff31-72ec-766e-8ad3-227d927f64ab</td></tr>
+<tr><td>scope</td><td>01a1d039-0d27-7b45-abb5-bf851a4c3d4a</td><td>true</td><td>1</td><td>2026-11-21T19:12:12.47338+00:00</td><td>1</td><td>01a1ff85-faae-7c2e-b897-fe957985ca78</td></tr>
+<tr><td>scope</td><td>01a1d039-0d28-743b-86c7-0d0698ed69c1</td><td>true</td><td>1</td><td>2026-11-21T23:14:08.772733+00:00</td><td>1</td><td>01a20063-7af8-727b-b092-24de3821d204</td></tr>
+<tr><td>scope</td><td>01a1d039-0d28-7eb6-a62a-f420e742595c</td><td>true</td><td>11</td><td>2026-11-22T08:18:56.640334+00:00</td><td>1</td><td>01a20256-44d0-731d-b345-fffc5f3ac9e8</td></tr>
+<tr><td>scope</td><td>01a1d039-0d32-7734-98da-fb7f1e2386c7</td><td>true</td><td>1</td><td>2026-11-21T18:03:45.609503+00:00</td><td>1</td><td>01a1ff47-5043-73f7-b18d-2fc03832c96a</td></tr>
+<tr><td>scope</td><td>01a1d039-0d32-7c81-8365-371217d16ef7</td><td>true</td><td>1</td><td>2026-11-21T19:17:22.31215+00:00</td><td>1</td><td>01a1ff8a-b4f0-7e6e-9cc7-4231076e1039</td></tr>
+<tr><td>scope</td><td>01a1d039-0d33-7282-b7b0-6dde32c38ab1</td><td>true</td><td>1</td><td>2026-11-21T23:06:21.585567+00:00</td><td>1</td><td>01a2005c-5a4f-7eb5-a004-ccb5545eb6fb</td></tr>
+<tr><td>scope</td><td>01a1d039-0d33-7e7e-890e-b437b0c78db9</td><td>true</td><td>1</td><td>2026-11-22T09:19:40.844998+00:00</td><td>1</td><td>01a2028d-e17b-793d-9ea2-fe4f7f8e2b72</td></tr>
+<tr><td>scope</td><td>01a1d039-0d35-7bd1-945d-cea12c5dfd6d</td><td>true</td><td>1</td><td>2026-11-22T09:05:00.383623+00:00</td><td>1</td><td>01a20280-71de-7b06-9086-ae0158bfd36f</td></tr>
+<tr><td>scope</td><td>01a1d039-0d36-70c1-a5e8-f50956c5e3f9</td><td>true</td><td>1</td><td>2026-11-22T09:14:52.60631+00:00</td><td>1</td><td>01a20289-7be3-7e47-afe0-f6b1f82f1892</td></tr>
+<tr><td>scope</td><td>01a1d039-0d36-782b-8b18-ff07a64dedbe</td><td>true</td><td>1</td><td>2026-11-21T19:22:22.038135+00:00</td><td>1</td><td>01a1ff8f-47cb-78cf-9db8-d98d863e7dd0</td></tr>
+<tr><td>scope</td><td>01a1d039-0d37-730f-8f8a-2f50e5a0933d</td><td>true</td><td>1</td><td>2026-11-22T08:55:18.027529+00:00</td><td>1</td><td>01a20277-9131-7ee2-acad-7e40ffa8f947</td></tr>
+<tr><td>scope</td><td>01a1d039-0d37-730f-8f8a-2f50e5a0933d</td><td>true</td><td>2</td><td>2026-11-22T08:57:26.477641+00:00</td><td>1</td><td>01a20279-854d-79f6-a751-a34d51be7589</td></tr>
+<tr><td>scope</td><td>01a1d039-0d39-7414-b43c-450de170ffe1</td><td>true</td><td>1</td><td>2026-11-21T17:53:56.128695+00:00</td><td>1</td><td>01a1ff3e-51c4-75b1-9db1-a2f729dd10b8</td></tr>
+<tr><td>scope</td><td>01a1d039-0d39-79ce-84b6-1173b94bc67f</td><td>true</td><td>4</td><td>2026-11-21T11:23:26.290608+00:00</td><td>1</td><td>01a1fdd8-cff3-7cd9-9535-26fed3d5836b</td></tr>
+<tr><td>scope</td><td>01a1d039-0d39-7f3b-bd04-211f7dfe1e50</td><td>true</td><td>1</td><td>2026-11-21T17:58:45.10455+00:00</td><td>1</td><td>01a1ff42-ba64-7670-b694-99bb4b1354e5</td></tr>
+<tr><td>scope</td><td>01a1dcb8-d24b-76de-b901-56fd56e001bc</td><td>true</td><td>1</td><td>2026-11-21T01:21:28.099656+00:00</td><td>1</td><td>01a1fbb1-b05c-76b6-a5ac-7186fb859dcc</td></tr>
+</tbody></table>
+<p><em>Source: msp.json#/programme_baselines, msp.json#/project_baselines</em></p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-23T09:26:49Z · georgiedekker</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

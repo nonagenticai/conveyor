@@ -37,17 +37,17 @@
 <tr>
 <td><code>exists</code></td>
 <td>the real route and its Playwright spec exist</td>
-<td>46</td>
+<td>54</td>
 </tr>
 <tr>
 <td><code>extend</code></td>
 <td>a V1 ancestor route exists, or the V2 route exists without its spec</td>
-<td>11</td>
+<td>5</td>
 </tr>
 <tr>
 <td><code>new</code></td>
 <td>neither the route nor an ancestor exists</td>
-<td>5</td>
+<td>3</td>
 </tr>
 </tbody>
 </table>
@@ -342,7 +342,7 @@
 <td>actions</td>
 <td>programme/plan</td>
 <td><code>extend</code></td>
-<td>actions: baselines.* found (baselines.get, baselines.list, baselines.take)<br>actions: cadences.* found (cadences.create, cadences.delete, cadences.list…)<br>actions: governed_assets.* absent<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.baseline, programmes.baseline_approve, programmes.baselines_list…)<br>actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)<br>actions: registers.* found (registers.create, registers.delete, registers.get…)<br>actions: tranches.* found (tranches.authorise, tranches.create, tranches.delete…)<br>actions: wbs.* found (wbs.create, wbs.delete, wbs.get…)</td>
+<td>actions: baselines.* found (baselines.get, baselines.list, baselines.take)<br>actions: cadences.* found (cadences.approve_plan, cadences.create, cadences.credit_demo…)<br>actions: governed_assets.* found (governed_assets.approve, governed_assets.compose, governed_assets.get…)<br>actions: programme_config.* absent<br>actions: programmes.* found (programmes.baseline, programmes.baseline_approve, programmes.baselines_list…)<br>actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)<br>actions: registers.* found (registers.create, registers.delete, registers.get…)<br>actions: tranches.* found (tranches.authorise, tranches.create, tranches.delete…)<br>actions: wbs.* found (wbs.create, wbs.delete, wbs.get…)</td>
 </tr>
 <tr>
 <td><code>actions:benefits</code></td>
@@ -381,8 +381,8 @@
 <td>§10.4</td>
 <td>actions</td>
 <td>authoring</td>
-<td><code>new</code></td>
-<td>actions: authoring.* absent</td>
+<td><code>exists</code></td>
+<td>actions: authoring.* found (authoring.assets, authoring.draft, authoring.intake…)</td>
 </tr>
 <tr>
 <td><code>actions:approvals</code></td>
@@ -398,7 +398,7 @@
 <td>actions</td>
 <td>decision</td>
 <td><code>new</code></td>
-<td>actions: approvals.* found (approvals.decide, approvals.list, approvals.request)<br>actions: decision_options.* absent<br>actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)<br>actions: laya_configs.* found (laya_configs.create, laya_configs.list)<br>actions: refinements.* found (refinements.list, refinements.publish)<br><em>V1's decisions.</em> actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).*</td>
+<td>actions: approvals.* found (approvals.decide, approvals.list, approvals.request)<br>actions: decision_options.* found (decision_options.create, decision_options.get, decision_options.publish…)<br>actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)<br>actions: laya_configs.* found (laya_configs.create, laya_configs.list)<br>actions: refinements.* found (refinements.list, refinements.publish)<br><em>V1's decisions.</em> actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).*</td>
 </tr>
 <tr>
 <td><code>actions:PM</code></td>
@@ -422,7 +422,7 @@
 <td>actions</td>
 <td>kata</td>
 <td><code>new</code></td>
-<td>actions: kata.* absent<br><em>V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.</em> action family; the V2 kata workflow is T5.*</td>
+<td>actions: kata.* found (kata.adopt, kata.analyse, kata.close…)<br><em>V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.</em> action family; the V2 kata workflow is T5.*</td>
 </tr>
 <tr>
 <td><code>actions:development</code></td>
@@ -462,15 +462,15 @@
 <td>actions</td>
 <td>tools</td>
 <td><code>extend</code></td>
-<td>actions: tool_authoring.* absent<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* found (toolkits.publish)<br>actions: tools.* found (tools.probe, tools.usage)</td>
+<td>actions: tool_authoring.* absent<br>actions: tool_bindings.* found (tool_bindings.create, tool_bindings.list, tool_bindings.retire…)<br>actions: tool_calls.* absent<br>actions: toolkits.* found (toolkits.publish)<br>actions: tools.* found (tools.probe, tools.retire, tools.usage)</td>
 </tr>
 <tr>
 <td><code>actions:memory</code></td>
 <td>§10.4</td>
 <td>actions</td>
 <td>memory</td>
-<td><code>new</code></td>
-<td>actions: lessons.* absent</td>
+<td><code>exists</code></td>
+<td>actions: lessons.* found (lessons.list, lessons.propose)</td>
 </tr>
 <tr>
 <td><code>actions:metrics</code></td>
@@ -485,24 +485,24 @@
 <td>§10.5</td>
 <td>destination</td>
 <td>Organisation</td>
-<td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/organisation' found<br>apps/web/e2e/organisation.spec.ts: absent<br>docs/design/v2.js: page 'organisation' — design reference, not implementation<br><em>The mock page is a design study; the app has no /organisation route, and the organisation read/write actions are T0/T2.</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/organisation' found<br>apps/web/e2e/organisation.spec.ts: present<br>docs/design/v2.js: page 'organisation' — design reference, not implementation<br><em>The mock page is a design study; the app has no /organisation route, and the organisation read/write actions are T0/T2.</em></td>
 </tr>
 <tr>
 <td><code>destination:Procedures</code></td>
 <td>§10.5</td>
 <td>destination</td>
 <td>Procedures</td>
-<td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/procedures' found<br>apps/web/e2e/procedures.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/build/processes', '/build/process-map' found<br>docs/design/v2.js: page 'procedures' — design reference, not implementation<br><em>V1 has the process list/detail and the process map at /build/processes and /build/process-map; V2 adds SOP/RDF/OWL/BPMN intake, PDDL/PKO and the publish gates (T16).</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/procedures' found<br>apps/web/e2e/procedures.spec.ts: present<br>apps/web/src/app.rs: V1 ancestor '/build/processes', '/build/process-map' found<br>docs/design/v2.js: page 'procedures' — design reference, not implementation<br><em>V1 has the process list/detail and the process map at /build/processes and /build/process-map; V2 adds SOP/RDF/OWL/BPMN intake, PDDL/PKO and the publish gates (T16).</em></td>
 </tr>
 <tr>
 <td><code>destination:Authoring</code></td>
 <td>§10.5</td>
 <td>destination</td>
 <td>Authoring</td>
-<td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/authoring' found<br>apps/web/e2e/authoring.spec.ts: absent<br>docs/design/v2.js: page 'authoring' — design reference, not implementation<br><em>No route and no authoring actions; the destination is T17.</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/authoring' found<br>apps/web/e2e/authoring.spec.ts: present<br>docs/design/v2.js: page 'authoring' — design reference, not implementation<br><em>No route and no authoring actions; the destination is T17.</em></td>
 </tr>
 <tr>
 <td><code>destination:Portfolio</code></td>
@@ -533,24 +533,24 @@
 <td>§10.5</td>
 <td>destination</td>
 <td>Plan</td>
-<td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/plan' found<br>apps/web/e2e/plan.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/boards' found<br>docs/design/v2.js: page 'plan' — design reference, not implementation<br><em>The live Boards tab joins real cards at /boards; WBS, baseline, registers and change control are T1.</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/plan' found<br>apps/web/e2e/plan.spec.ts: present<br>apps/web/src/app.rs: V1 ancestor '/boards' found<br>docs/design/v2.js: page 'plan' — design reference, not implementation<br><em>The live Boards tab joins real cards at /boards; WBS, baseline, registers and change control are T1.</em></td>
 </tr>
 <tr>
 <td><code>destination:Improve</code></td>
 <td>§10.5</td>
 <td>destination</td>
 <td>Improve</td>
-<td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/improve' found<br>apps/web/e2e/improve.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/evals/improvement' found<br>docs/design/v2.js: page 'improve' — design reference, not implementation<br><em>V1 /evals/improvement carries the improvement campaigns; the coach/kata/lessons path is T4/T5.</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/improve' found<br>apps/web/e2e/improve.spec.ts: present<br>apps/web/src/app.rs: V1 ancestor '/evals/improvement' found<br>docs/design/v2.js: page 'improve' — design reference, not implementation<br><em>V1 /evals/improvement carries the improvement campaigns; the coach/kata/lessons path is T4/T5.</em></td>
 </tr>
 <tr>
 <td><code>destination:Operations</code></td>
 <td>§10.5</td>
 <td>destination</td>
 <td>Operations</td>
-<td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/operations' found<br>apps/web/e2e/operations.spec.ts: absent<br>docs/design/v2.js: page 'operations' — design reference, not implementation<br><em>No route and no operations actions; the incident/runbook/postmortem path is T7.</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/operations' found<br>apps/web/e2e/operations.spec.ts: present<br>docs/design/v2.js: page 'operations' — design reference, not implementation<br><em>No route and no operations actions; the incident/runbook/postmortem path is T7.</em></td>
 </tr>
 <tr>
 <td><code>destination:Tools</code></td>

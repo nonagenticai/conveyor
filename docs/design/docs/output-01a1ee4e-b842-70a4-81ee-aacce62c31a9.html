@@ -26,7 +26,21 @@
     <main class="doc-body"><h1>T6 — Architecture design</h1>
 <p>Project: T6 — Development project · Track: v2 · Tranche: 11 · Plan: docs/SPEC_V2.md §12
 Unit: #80 (this document is dependency-shaping work; blocked-by T5, T13 and P0)
-Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T5", "T13", "P0"]</p>
+Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-18; citations re-verified at this baseline) · Project row: active, meta.depends_on = ["T5", "T13", "P0"]</p>
+<ul>
+<li><strong>Status:</strong> published</li>
+<li><strong>Version:</strong> 1.0</li>
+<li><strong>Author / date:</strong> conveyor programme session / 2026-11-21</li>
+<li><strong>Reviewer / review date:</strong> #347 independent review / 2026-11-18; owner publication / 2026-11-21</li>
+<li><strong>Related project:</strong> T6 — Development project · issue #80 · live document <code>01a1ee4e-b842-70a4-81ee-aacce62c31a9</code></li>
+<li><strong>Rationale:</strong> Define the to-be architecture for Development project: aggregates, tables and actions, decisions, acceptance and the artefact set.</li>
+<li><strong>Published document:</strong> <code>01a1ee4e-b842-70a4-81ee-aacce62c31a9</code> — published 2026-11-21</li>
+<li><strong>Contract:</strong> pending</li>
+<li><strong>ADM phase / plateau:</strong> A / PSA for the artefact (project row: G / capability)</li>
+<li><strong>Entries:</strong> context and boundary; aggregate/table/action rows; decisions; acceptance scenarios; PSA set; typed artefacts; rollout.</li>
+<li><strong>Derivation / realization / reuse / dependency:</strong> derived from SPEC_V2 §6.4, §9.1, §12 T6 and P0 §5; realized by #80; reuse sources cited below; project dependencies T5, T13, P0.</li>
+<li><strong>Links:</strong> issue #80; SPEC_V2 §12; the sibling inception document; <code>seed/programme.json</code>.</li>
+</ul>
 <h2>Context and boundary</h2>
 <p>T6 owns the development project type and the actions that land a change on conveyor and one dependency repo under the platform's gates (§9.1, §5.2). T5 supplies the trigger, T13 the coding tool; both absent. T6 owns <code>dev.*</code>, the gate-protection and release records, the <code>development</code> type and its seed — not the PM (T3), plan spine (T1), broker (T13), ops writes (T7), the CI workflow or the manifests (Flux, human-applied).</p>
 <h2>Aggregates, tables and actions</h2>
@@ -102,7 +116,7 @@ I9 a dev job performs no cluster write.</p>
 <tr><td><code>.github/workflows/**</code></td><td>the pipeline that judges the PR</td></tr>
 <tr><td><code>crates/actions/src/invoke.rs</code></td><td>the action boundary enforcing approvals</td></tr>
 <tr><td><code>crates/actions/src/pm/**</code></td><td>gate routing and typed evidence</td></tr>
-<tr><td><code>crates/actions/src/dev/**</code></td><td>the dev family itself</td></tr>
+<tr><td><code>crates/actions/src/dev/**</code></td><td>the dev family itself (to create at #80)</td></tr>
 <tr><td><code>migrations/0050_approval_policies.sql</code></td><td>the approval-policy store</td></tr>
 <tr><td><code>seed/benchmark/**</code>, <code>crates/actions/tests/*gate*.rs</code></td><td>the instrument (P5)</td></tr>
 <tr><td><code>docs/design/data/actions.json</code></td><td>the served-spec lock</td></tr>
@@ -120,7 +134,7 @@ I9 a dev job performs no cluster write.</p>
 </ul>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Development project · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Development project · conveyor output · published 2026-11-23T09:26:49Z · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

@@ -2,7 +2,7 @@
   "counts": {
     "P0": 14,
     "P1": 135,
-    "P2": 23,
+    "P2": 28,
     "P3": 0
   },
   "excluded_test_projects": [],
@@ -1248,6 +1248,46 @@
       "subject": "T14"
     },
     {
+      "detail": "coverage says 'proposed', the register says 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "status_source_drift",
+      "severity": "P2",
+      "subject": "T12"
+    },
+    {
+      "detail": "coverage says 'proposed', the register says 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "status_source_drift",
+      "severity": "P2",
+      "subject": "T15"
+    },
+    {
+      "detail": "coverage says 'proposed', the register says 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "status_source_drift",
+      "severity": "P2",
+      "subject": "T17"
+    },
+    {
+      "detail": "coverage says 'proposed', the register says 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "status_source_drift",
+      "severity": "P2",
+      "subject": "T5"
+    },
+    {
+      "detail": "coverage says 'proposed', the register says 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "status_source_drift",
+      "severity": "P2",
+      "subject": "T6"
+    },
+    {
       "detail": "closed without a review date",
       "disposition": "rework",
       "evidence": null,
@@ -1385,9 +1425,9 @@
     }
   ],
   "snapshot": {
-    "generated_at": "2026-11-23T09:21:23.338525+00:00",
-    "git_sha": "d7e2e4fb6faba5fcde78024d0b7f4990fa80f051",
-    "path": "data",
+    "generated_at": "2026-11-23T09:26:49Z",
+    "git_sha": "bfdd6d2c",
+    "path": "docs/design/data",
     "tenant": "nonagentic"
   },
   "version": 1

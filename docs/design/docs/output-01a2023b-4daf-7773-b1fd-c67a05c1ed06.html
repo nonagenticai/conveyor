@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Business Capability Map — S02 Skeleton (retrospective, 2026-11-21) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Business Capability Map — S02 Skeleton (retrospective, 2026-11-21)</li>
+<li>Phase: b</li>
+<li>Kind: diagram</li>
+<li>Purpose: Map the capabilities S02 delivered to the programme outcomes they enable, so later slices invest in a capability instead of rebuilding it.</li>
+<li>Scope: The delivered S02 surfaces and the OUT list that defers domain, UI and deployment capabilities to later slices (plan §3); recorded retrospectively on 2026-11-21.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Tenancy and identity / Every later aggregate is tenant-scoped at the store</strong> - {"consumer": "S03\u2013S21", "outcome": "S03 and later cannot add an unscoped read path without a compile error; the tenant comes from membership (CONTRACT \u00a79)"}</li>
+<li><strong>Durable work execution / The worker can be killed without losing or double-running a job</strong> - {"consumer": "S03\u2013S21", "outcome": "the fr setInterval inventory becomes job kinds with a fenced lease"}</li>
+<li><strong>Event streaming / A client reconnects from a seq cursor and catches up without duplicates</strong> - {"consumer": "S12 UI", "outcome": "/api/events replays 500 rows in tenant scope and signals resync instead of buffering without bound"}</li>
+<li><strong>Audit and idempotency / Every action has a record and a replay-safe key</strong> - {"consumer": "S04 action registry", "outcome": "audit_event is append-only by grant; idempotency_key stores the response per tenant/scope/key"}</li>
+<li><strong>Entitlement gate / App access fails closed without a synced app_licence row</strong> - {"consumer": "D12 licences service", "outcome": "no row, stale, expired, revoked or unknown all refuse; core requests never call the licences service"}</li>
+<li><strong>Workspace and toolchain / One binary and ten members that later slices extend</strong> - {"consumer": "S03\u2013S21", "outcome": "edition 2024, #![forbid(unsafe_code)], exact pins; no per-slice fork"}</li>
+<li><strong>Operability / An operator can probe the service without reading code</strong> - {"consumer": "S14 estate", "outcome": "/health/live has no DB; /health/ready runs SELECT 1 through the runtime pool; /metrics is exported"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-23T09:26:49Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

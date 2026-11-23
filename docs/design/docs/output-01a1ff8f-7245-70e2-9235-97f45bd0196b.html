@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T11 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Closure review — T11 Metrics, metering and maturity (retrospective, 2026-11-21)</h1>
+<h2>Outcome vs acceptance</h2>
+<p>The SPEC_V2 §12 gate has four clauses. Each is met on the committed evidence:</p>
+<ul>
+<li><strong>Every metric and every metering level recomputes from rows.</strong> <code>metrics.flow</code>, <code>metrics.job</code>, <code>metrics.usage</code>, <code>metrics.programme</code> and <code>metrics.maturity</code> are read-time aggregates; migration <code>0059_metrics.sql</code> adds only <code>metric_threshold</code> and <code>metric_reconciliation</code>, and <code>crates/actions/tests/metrics.rs::a_level_moves_only_when_the_evidence_crosses_the_recorded_threshold</code> shows that the reads write no metric row. <code>::every_metering_level_sums_to_its_children</code> proves tenant, department, programme, project, job, run, step and call all sum to the same 3 calls and 3,150 tokens, with an <code>unattributed</code> bucket for the <code>caller_kind='other'</code> call; <code>::the_run_drilldown_sums_to_the_call_rows</code> proves the steps and calls sum to the run.</li>
+<li><strong>The reconciliation with <code>billing_service</code> is exact or opens an incident.</strong> <code>crates/actions/tests/metrics.rs::reconciliation_is_exact_or_opens_an_incident</code> matches 0.002 exactly, returns <code>difference</code> with delta 0.001 on 0.003 and opens an <code>incident</code> card whose meta carries both figures, and records a 503 as <code>unavailable</code> with null figures and the upstream error. <code>crates/domain/src/metrics.rs::reconciliation_is_exact_to_six_decimals</code> fixes the precision.</li>
+<li><strong>A C0–C5 level changes only when the measured evidence crosses its recorded threshold.</strong> <code>::a_level_moves_only_when_the_evidence_crosses_the_recorded_threshold</code> shows C1 at version 1, a rejection that changes the evidence but keeps the level, a raised threshold version 2 that drops it to C0 with the evidence unchanged, and a lowered version 3 that returns it; a missing metric never lifts a level and <code>current_level</code> stops at the first gap.</li>
+<li><strong>A gate that never refused is flagged.</strong> <code>::a_gate_with_no_refusal_is_flagged_and_one_refusal_clears_it</code> puts <code>tranche_review</code> (3 approvals, 0 rejections) in <code>never_refused</code>, clears it on one rejection, and leaves <code>benefit_review</code> untouched.</li>
+</ul>
+<p>The accompanying delivery scope is present: the flow family (<code>::flow_recomputes_and_a_missing_ledger_is_unavailable</code>: throughput 1, with lead about 3,600 s, cycle 1,800 s, queue 1,800 s, block 540 s and efficiency 0.35, each within the test's tolerance) with missing knowledge ledgers reported as unavailable; the MSP benefit metrics (<code>::realised_versus_planned_recomputes_and_an_unmeasured_baseline_is_not_zero</code>, <code>::a_dependency_slip_names_the_benefits_it_puts_at_risk</code>); the eight actions at 8/8 coverage, 3/3 modules and 2/2 tables; and the console Metering screen from #458, which reads the snapshot's <code>measure.inference</code> (609 calls, 9,458,468 tokens on 2026-11-21T18:50:29Z) and shows no fixture number when the section is absent.</p>
+<p>The project closed with four conformance findings: P0 <code>closed_without_closure_review</code>, P1 <code>contract_missing</code>, P1 <code>mandatory_artefacts</code> (all seven A–D artefacts) and P1 <code>unpublished_declared_output</code> (closure-review, evidence, project-brief). This rework produces the seven artefacts, the Statement of Architecture Work, the delivery contract, the Phase-G review and all three declared outputs; the findings are closed by this record.</p>
+<h2>Evidence</h2>
+<ul>
+<li><strong>Manifest:</strong> <code>acceptance/programme/T11.toml</code>, run by <code>scripts/verify-project.py</code> against the published snapshot at the re-close; its checks cover the project, baseline, charter, closure outputs, delivery contract, Phase-G review, distinct closure approver, waivers, tranche-1 cadence, PI plan, PI objectives, WSJF inputs, demo credits and lessons.</li>
+<li><strong>Coverage:</strong> <code>docs/evidence/v2-coverage.json</code> — <code>actions:metrics</code> <code>exists</code>; T11 <code>built</code>, 8/8 actions, 3/3 modules, 2/2 tables, gap null.</li>
+<li><strong>Code and schema:</strong> <code>migrations/0059_metrics.sql</code> (two tables, FORCE RLS and the shape CHECK), <code>crates/domain/src/metrics.rs</code> (nine evidence names, C0–C5, six-decimal reconcile), <code>crates/store/src/metrics.rs</code> (the read models), <code>crates/actions/src/metrics/mod.rs</code> (the eight actions), <code>served-spec.lock.json</code> (the eight served contracts).</li>
+<li><strong>Tests:</strong> <code>crates/actions/tests/metrics.rs</code> (eight integration tests) and <code>crates/store/tests/rls_domain.rs::metric_thresholds_are_tenant_isolated</code>.</li>
+<li><strong>Console:</strong> <code>docs/design/v2.js</code> <code>meteringLive()</code>; <code>docs/design/scripts/check-v2.cjs</code> 9b–9d; the snapshot <code>measure.json</code> generated 2026-11-21T18:50:29Z.</li>
+<li><strong>Delivery record:</strong> issue #84 merged 2026-11-19 (commit <code>183f5111</code>, PR #404); coverage correction <code>f7062f35</code> (PR #429); issue #458 merged 2026-11-20 (commit <code>0a8a6e95</code>, PR #499).</li>
+<li><strong>Artefacts:</strong> the seven A–D artefacts produced in this rework, the Statement of Architecture Work, the delivery contract, the charter and this closure review.</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li><strong>Original governance record: not recoverable.</strong> No charter, Statement of Architecture Work, delivery contract, Phase-G review or closure review was authored before the project closed. This set is retrospective and does not claim contemporaneous intent.</li>
+<li><strong>Eval- and benchmark-backed quality metrics:</strong> first-pass yield, rework rate, defect escapes, eval score and benchmark delta remain with S17–S20, which own the <code>eval*</code> and <code>benchmark*</code> ledgers; T11 delivers the approval- and run-derived quality figures only.</li>
+<li><strong>Knowledge metrics:</strong> pack hit rate and lesson promotion rate are unavailable until T8's ledgers exist and are reported with that reason, never zero.</li>
+<li><strong>Threshold calibration:</strong> the versioned configuration and its closed evidence vocabulary are delivered and tested; this record does not assert a live tenant threshold row, because none is visible in the 2026-11-21 snapshot.</li>
+<li><strong>Per-tool health and retirement:</strong> the per-tool calls, success rate, p95 latency and zero-use retirement of SPEC_V2 §11.9 belong to the tool platform, not T11.</li>
+<li><strong>Measurement window:</strong> the snapshot's inference aggregates are all-time at 2026-11-21T18:50:29Z; a bounded period is an API parameter, not a stored roll-up.</li>
+</ul>
+<h2>Decision</h2>
+<p>Record the compliance level <strong>compliant</strong> on the delivered code and its committed tests. Close the P0 <code>closed_without_closure_review</code> and the P1 <code>contract_missing</code>, <code>mandatory_artefacts</code> and <code>unpublished_declared_output</code> findings: the seven A–D artefacts, the Statement of Architecture Work, the delivery contract, the Phase-G review, the project brief, the evidence page and this closure review are produced and published by the 2026-11-21 rework. Re-close T11 against the green manifest <code>acceptance/programme/T11.toml</code>, with closure output <code>closure-review</code> and a closure gate decided by an approver other than its requester. This is a retrospective record under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>; it states the evidence that exists and does not claim a contemporaneous review that was never written.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Metrics, metering and maturity · conveyor output · published 2026-11-23T09:26:49Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

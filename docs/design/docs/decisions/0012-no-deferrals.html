@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
     <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
-    <title>0010 — No deferrals; every finding executes · conveyor documents</title>
+    <title>0012 — No deferrals; every finding executes · conveyor documents</title>
     <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../../assets/plex-sans.css" />
     <link rel="stylesheet" href="../../assets/plex-mono.css" />
@@ -23,7 +23,7 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1 id="0010--no-deferrals-every-finding-executes">0010 — No deferrals; every finding executes</h1>
+    <main class="doc-body"><h1 id="0012--no-deferrals-every-finding-executes">0012 — No deferrals; every finding executes</h1>
 <p>Status: Accepted · Date: 2026-11-22 · Slice: #526 (programme)</p>
 <h2 id="context">Context</h2>
 <p>The programme was disposing of open work with dated instruments rather than executing it: <code>v1-s14-1</code> carried a waiver accepted 2026-11-22 and expiring 2027-02-18; the acceptance manifest <code>acceptance/programme/P0.toml</code> carried an <code>[[allow]]</code> for <code>benefit_baseline</code> expiring 2027-02-18; <code>verify-viability.py</code> refused the programme unless every open finding carried a valid deferral; and <code>verify-project.py</code> and <code>audit-programme-conformance.py</code> suppressed non-conformance through active waivers. The measured board at <code>58645942</code> shows what that bought: 12 green / 35 red manifests, 14 closed-on-red projects, 965 artefacts of which 418 are absent and 311 partial, 483 standards findings, 102 audit packages, 62 contract gaps, and 6 of 6 viability checks missing.</p>

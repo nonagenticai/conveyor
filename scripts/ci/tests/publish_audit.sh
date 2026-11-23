@@ -14,8 +14,8 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
 mkdir -p "$tmp/docs/design/scripts" "$tmp/docs/design/docs" "$tmp/docs/design/data" \
-  "$tmp/docs/evidence" "$tmp/scripts" "$tmp/governance" "$tmp/seed" "$tmp/homepage/design" \
-  "$tmp/fixture" "$tmp/fixture-docs" "$tmp/bin"
+  "$tmp/docs/evidence" "$tmp/docs/evidence/record-w3" "$tmp/scripts" "$tmp/governance" "$tmp/seed" \
+  "$tmp/homepage/design" "$tmp/fixture" "$tmp/fixture-docs" "$tmp/bin"
 
 cp "$repo/docs/design/scripts/publish-data.sh" "$tmp/docs/design/scripts/publish-data.sh"
 printf '# no-op: the publish test does not rebuild the pack\n' > "$tmp/docs/design/scripts/build-docs.py"
@@ -27,6 +27,8 @@ cp "$repo/governance/conformance.json" "$tmp/governance/conformance.json"
 cp "$repo/seed/programme.json" "$tmp/seed/programme.json"
 cp "$repo/seed/programme-definition.json" "$tmp/seed/programme-definition.json"
 cp "$repo/seed/output-standard.json" "$tmp/seed/output-standard.json"
+cp "$repo/docs/evidence/record-w3/deep-review-findings.json" \
+  "$tmp/docs/evidence/record-w3/deep-review-findings.json"
 chmod +x "$tmp/scripts/fetch-issues.sh" "$tmp/docs/design/scripts/build-docs.py"
 
 cat > "$tmp/fixture/programme.json" <<'JSON'

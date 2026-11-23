@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — T2 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project brief — T2 Decision ladder (retrospective, 2026-11-21)</h1>
+<h2>Outcome</h2>
+<p>The conveyor has one decision ladder. An L0 rule, an L1 laya choice and an L3 human decision are written through one <code>decision</code> row shape; each row pins the policy, refinement and laya-config versions it read; a tenant refinement changes a threshold without a build; and a generated draft is applied only through <code>ladder.apply_draft</code> with a human <code>draft.apply</code> decision backed by an approved gate. Six findings remain open, and v1-t2-1 — <code>documents.compose</code> can attach a generated draft with no gate — keeps the project active.</p>
+<h2>Boundary</h2>
+<p>T2 owns the ladder row, the policy, refinement and laya-config rows, the human gate and the draft-apply gate. It does not own the PM job (T3), the tool platform (T13), metrics and metering (T11), cadence materialisation or PI planning (T10), the S15 judge's own laya call in <code>crates/actions/src/process/judge.rs</code>, or the ADR board's <code>decisions.*</code> family, which keeps its name. The console does not gain a ladder panel in T2; <code>ladder.list</code> is the read.</p>
+<h2>Reuse sources</h2>
+<p><code>migrations/0040_organisation.sql:216–360</code> — the five decision tables shipped by T0 as schema and contracts only. <code>crates/actions/src/control/approvals.rs</code> — the approval row, <code>approval_decision</code> and the requester/executor exclusion from T1. <code>crates/actions/src/documents/actions.rs</code> — <code>documents.compose</code> and <code>documents.update</code>, the two paths the draft gate must cover. The S16 <code>inference_call</code> ledger for the L2 generation split. The action registry, the <code>#[action]</code> declaration and the real-Postgres test harness.</p>
+<h2>Inception units</h2>
+<p>No T2-specific inception analysis or architecture design is present in the snapshot; this rework authored none. The inception claim is the SPEC_V2 §7.1–§7.5 text, the T2 row of §12 and the issue #73 body. The implementation record is the delivery commit and the two acceptance suites.</p>
+<h2>Dependencies</h2>
+<ul>
+<li>blocked-by: T1 and P0 (<code>project.meta.depends_on = ["T1", "P0"]</code>); the ladder writes the pins T1's plan spine and T0's decision contracts define.</li>
+<li>blocks: T3 (PM gate routing), T5 (kata decisions), T7 (operations severity and gate pre-check), T13 (tool selection) and T16 (procedure publication), per the §12 dependency line.</li>
+<li>related: T4 (coach triage and remedy) and T11 (governance metrics read <code>decision</code>).</li>
+</ul>
+<h2>Acceptance</h2>
+<p>The SPEC_V2 §12 T2 gate: a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya-config versions; a generated draft cannot transition a card. The first three are green by <code>decision_ladder.rs</code>; the fourth is green on <code>ladder.apply_draft</code> and <code>documents.update</code> and red on <code>documents.compose</code> (v1-t2-1). The rework's acceptance instrument is <code>acceptance/programme/T2.toml</code>.</p>
+<h2>Capabilities</h2>
+<p>One decision audit shape across L0, L1 and L3; version-pinned and reproducible decisions; tenant refinement without a build; the laya config row; the person-only human rung; the gated draft application; the <code>decision.changed</code> event; tenant-scoped rows and indexes.</p>
+<h2>Plan</h2>
+<p>Held to <code>docs/SPEC_V2.md</code> §12 (T2) and §7.1–§7.5. The project row's plan pointer is <code>docs/SPEC_V2.md#12</code> with <code>plan_status: draft</code>; no separate plan document exists. Delivered 2026-11-17 by commit <code>39363ba8</code> (#73, #286); reworked retrospectively 2026-11-21 and left active.</p>
+<h2>Risks</h2>
+<ul>
+<li><code>documents.compose</code> attaches a generated draft with no gate (v1-t2-1, P0): the fourth clause is not true until the create path checks the draft class.</li>
+<li>L1 records a caller-supplied answer and never calls laya (v1-t2-2): the ladder's confidence is only as good as its caller.</li>
+<li><code>refinements.publish</code> and <code>decision_policies.update</code> are ungated (v1-t2-3): a tenant can weaken a safety gate without an approval.</li>
+<li>Options and questions are inline request data (v1-t2-4): the option set is not independently versioned and the policy has no <code>fire_when</code> or <code>min_confidence</code>.</li>
+<li>The §7.5 budget slug has no implementation (v1-t2-5).</li>
+<li>A human decision does not pin its approval to its gate (v1-t2-6).</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Issue: https://github.com/nonagenticai/conveyor/issues/73</li>
+<li>Commit: <code>39363ba8cfb532d415c9ad06b45e86421c5c86b6</code></li>
+<li>Specification: <code>docs/SPEC_V2.md</code> §7.1–§7.5 and §12 (T2)</li>
+<li>Schema: <code>migrations/0046_decision_ladder.sql</code></li>
+<li>Tests: <code>crates/actions/tests/decision_ladder.rs</code>, <code>crates/actions/tests/ladder_human_gate.rs</code></li>
+<li>Tranche 2: <code>01a1e9e0-e2ac-786b-ac48-3b8bcdf12188</code></li>
+<li>Standing delegation: <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code></li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision ladder · conveyor output · published 2026-11-23T09:26:49Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
