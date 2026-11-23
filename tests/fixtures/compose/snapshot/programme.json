@@ -1,0 +1,19 @@
+{
+  "programme": [
+    {
+      "id": "prog-1",
+      "key": "PROG",
+      "title": "Compose Fixture Programme"
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-1",
+      "key": "PX",
+      "title": "Compose Fixture Project",
+      "programme_id": "prog-1",
+      "status": "active",
+      "meta": {"expected_outputs": ["fixture-artefact"]}
+    }
+  ]
+}
