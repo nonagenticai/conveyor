@@ -35,6 +35,7 @@ fn meeting_error(error: store::meetings::MeetingStoreError, action: &str) -> Act
             ActionError::new(409, "meeting_not_permitted", format!("{what}: {why}"))
         }
         E::Unprocessable { code, detail } => ActionError::new(422, code, detail),
+        E::Stricter { detail } => ActionError::new(409, "meeting_approval_stricter", detail),
         E::Card(error) => card_error(error, action),
         E::Outbox(store::outbox::OutboxError::Database(error)) => store_error(error, action),
         E::Outbox(error) => {
@@ -688,6 +689,56 @@ async fn meetings_position(
     .await
     .map_err(|error| meeting_error(error, ctx.action))?;
     Ok(HandlerOutput::created(record.into()))
+}
+
+// ── D4: the outcome arithmetic ─────────────────────────────────────────────────────────
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CloseItemIn {
+    pub meeting_id: Uuid,
+    pub agenda_item_id: Uuid,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CloseItemOut {
+    pub item: AgendaItemOut,
+    pub approval_status: Option<String>,
+    pub decisions_written: usize,
+    pub counted_positions: usize,
+    pub quorum: usize,
+}
+
+#[crate::action(
+    name = "meetings.close_item",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn meetings_close_item(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CloseItemIn,
+) -> Result<HandlerOutput<CloseItemOut>, ActionError> {
+    let result = store::meetings::close_item_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.meeting_id,
+        input.agenda_item_id,
+    )
+    .await
+    .map_err(|error| meeting_error(error, ctx.action))?;
+    Ok(HandlerOutput::ok(CloseItemOut {
+        item: result.item.into(),
+        approval_status: result.approval_status,
+        decisions_written: result.decisions_written,
+        counted_positions: result.counted_positions,
+        quorum: result.quorum,
+    }))
 }
 
 // ── reads ──────────────────────────────────────────────────────────────────────────────

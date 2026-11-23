@@ -31,6 +31,10 @@ pub enum MeetingStoreError {
     Conflict { what: &'static str, why: String },
     #[error("the {what} is not permitted: {why}")]
     Illegal { what: &'static str, why: String },
+    /// The linked approval's policy is stricter than the meeting's rule (dual control, required
+    /// decisions, evidence, P4). No decision rows are written.
+    #[error("{detail}")]
+    Stricter { detail: String },
     #[error("{detail}")]
     Unprocessable { code: &'static str, detail: String },
     #[error(transparent)]
@@ -1352,4 +1356,600 @@ async fn ensure_participant_tx(
     found
         .map(|_| ())
         .ok_or(MeetingStoreError::NotFound("participant"))
+}
+
+// ── close_item — the outcome arithmetic ────────────────────────────────────────────────
+
+#[derive(Clone, Debug)]
+pub struct CloseItemResult {
+    pub item: AgendaItemRecord,
+    pub approval_status: Option<String>,
+    pub decisions_written: usize,
+    pub counted_positions: usize,
+    pub quorum: usize,
+}
+
+struct ApprovalGate {
+    id: Uuid,
+    status: String,
+    required_decisions: i32,
+    meta: Value,
+    requested_by: Option<Uuid>,
+    gate: String,
+    card_assignee: Option<Uuid>,
+    card_job: Option<Uuid>,
+    run_job: Option<Uuid>,
+}
+
+struct SeatDecision {
+    approver_id: Option<Uuid>,
+    job_binding_id: Option<Uuid>,
+    participant_kind: &'static str,
+    decision: &'static str,
+    note: String,
+    via: Value,
+    decided_by_kind: &'static str,
+}
+
+/// Close one agenda item: quorum first, then the meeting's rule, then the linked approval's
+/// stricter policy; the stricter result wins. A deciding close writes one `approval_decision`
+/// row per qualifying seat and sets the gate's status once. A refusal writes nothing.
+pub async fn close_item_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+    agenda_item_id: Uuid,
+) -> Result<CloseItemResult> {
+    let meeting: Option<(String, Uuid)> = sqlx::query_as(
+        "SELECT status, meeting_type_id FROM meeting
+          WHERE tenant_id = $1 AND id = $2 FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (meeting_status, meeting_type_id) =
+        meeting.ok_or(MeetingStoreError::NotFound("meeting"))?;
+    if meeting_status != "live" {
+        return Err(MeetingStoreError::Illegal {
+            what: "meeting",
+            why: format!("a {meeting_status} meeting cannot close an item"),
+        });
+    }
+    let ty = get_meeting_type_tx(&mut *conn, tenant, meeting_type_id)
+        .await?
+        .ok_or(MeetingStoreError::NotFound("meeting type"))?;
+
+    let item: Option<(Option<String>, String, Uuid, Value, Vec<Uuid>)> = sqlx::query_as(
+        "SELECT outcome, resolved_kind, resolved_id, evidence_refs, participating_departments
+           FROM meeting_agenda_item
+          WHERE tenant_id = $1 AND id = $2 AND meeting_id = $3 FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(agenda_item_id)
+    .bind(meeting_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (outcome, resolved_kind, resolved_id, item_evidence, item_departments) =
+        item.ok_or(MeetingStoreError::NotFound("agenda item"))?;
+    if outcome.is_some() {
+        return Err(MeetingStoreError::Illegal {
+            what: "agenda item",
+            why: "the item is already closed".into(),
+        });
+    }
+
+    let attendance = list_attendance_tx(&mut *conn, tenant, meeting_id).await?;
+    let accepted: Vec<&AttendanceRecord> = attendance
+        .iter()
+        .filter(|row| row.response_state == "accepted" && row.seat != "observer")
+        .collect();
+
+    // 1. Quorum and required participation.
+    let mut missing: Vec<String> = Vec::new();
+    if (accepted.len() as i32) < ty.quorum {
+        missing.push(format!(
+            "quorum {} attending, {} required",
+            accepted.len(),
+            ty.quorum
+        ));
+    }
+    for (department, minimum) in required_departments(&ty.required_participation, &item_departments)
+    {
+        let present = accepted
+            .iter()
+            .filter(|row| row.department_id == Some(department))
+            .count() as i64;
+        if present < minimum {
+            missing.push(format!(
+                "department {department} has {present}, {minimum} required"
+            ));
+        }
+    }
+    for (seat, minimum) in required_seats(&ty.required_participation) {
+        let present = accepted.iter().filter(|row| row.seat == seat).count() as i64;
+        if present < minimum {
+            missing.push(format!("seat {seat} has {present}, {minimum} required"));
+        }
+    }
+    if !missing.is_empty() {
+        return defer_item_tx(
+            conn,
+            tenant,
+            meeting_id,
+            agenda_item_id,
+            "inquorate",
+            accepted.len(),
+            None,
+        )
+        .await;
+    }
+
+    // 2. The cast positions, with observers and P4-excluded seats removed.
+    let positions = list_positions_tx(&mut *conn, tenant, meeting_id).await?;
+    let gate = if resolved_kind == "approval" {
+        Some(load_gate_tx(&mut *conn, tenant, resolved_id).await?)
+    } else {
+        None
+    };
+    let self_approval_allowed = match &gate {
+        Some(gate) => crate::approval_policy::allows_self_approval(&mut *conn, tenant, &gate.gate)
+            .await
+            .unwrap_or(false),
+        None => false,
+    };
+    let mut decisions: Vec<SeatDecision> = Vec::new();
+    let mut cast_approve = 0_i32;
+    let mut cast_reject = 0_i32;
+    let mut counted = 0_usize;
+    let mut cast_departments: Vec<Uuid> = Vec::new();
+    let mut chair_stance: Option<&str> = None;
+    for position in positions
+        .iter()
+        .filter(|position| position.agenda_item_id == agenda_item_id)
+    {
+        let Some(seat) = attendance.iter().find(|row| {
+            row.participant_kind == position.participant_kind
+                && row.participant_id == position.participant_id
+        }) else {
+            continue;
+        };
+        if seat.seat == "observer" {
+            continue;
+        }
+        let excluded = match &gate {
+            Some(gate) => participant_excluded(position, seat, gate, self_approval_allowed),
+            None => false,
+        };
+        if excluded {
+            continue;
+        }
+        if seat.seat == "chair" {
+            chair_stance = Some(&position.stance);
+        }
+        if let Some(department) = seat.department_id {
+            cast_departments.push(department);
+        }
+        match position.stance.as_str() {
+            "approve" | "approve_with_conditions" | "reject" => {
+                counted += 1;
+                match position.stance.as_str() {
+                    "reject" => cast_reject += 1,
+                    _ => cast_approve += 1,
+                }
+                let job = position.participant_kind == "job_binding";
+                let kind = if job { "job" } else { "human" };
+                decisions.push(SeatDecision {
+                    approver_id: if job {
+                        None
+                    } else {
+                        Some(position.participant_id)
+                    },
+                    job_binding_id: if job {
+                        Some(position.participant_id)
+                    } else {
+                        None
+                    },
+                    participant_kind: kind,
+                    decision: if position.stance == "reject" {
+                        "reject"
+                    } else {
+                        "approve"
+                    },
+                    note: position.rationale.clone(),
+                    via: json!({
+                        "surface": "meeting",
+                        "channel": position.surface,
+                        "meeting_id": meeting_id,
+                    }),
+                    decided_by_kind: if job { "agent" } else { "human" },
+                });
+            }
+            // Abstain and request_evidence count toward quorum only; they are never decision rows.
+            _ => {}
+        }
+    }
+    if decisions.is_empty() {
+        return defer_item_tx(
+            conn,
+            tenant,
+            meeting_id,
+            agenda_item_id,
+            "no_positions",
+            accepted.len(),
+            None,
+        )
+        .await;
+    }
+
+    // 3. The meeting's rule.
+    let approved = match ty.decision_rule.as_str() {
+        "majority" => {
+            if cast_approve == cast_reject {
+                return defer_item_tx(
+                    conn,
+                    tenant,
+                    meeting_id,
+                    agenda_item_id,
+                    "tie",
+                    accepted.len(),
+                    None,
+                )
+                .await;
+            }
+            cast_approve > cast_reject
+        }
+        "unanimous" => {
+            if cast_reject > 0 {
+                false
+            } else if cast_approve > 0 {
+                true
+            } else {
+                return defer_item_tx(
+                    conn,
+                    tenant,
+                    meeting_id,
+                    agenda_item_id,
+                    "no_positions",
+                    accepted.len(),
+                    None,
+                )
+                .await;
+            }
+        }
+        "chair" => {
+            // The chair carries once quorum exists and every required department has stated a
+            // position. A missing seat is a deferral, not an invented approval.
+            let every_department =
+                required_departments(&ty.required_participation, &item_departments)
+                    .into_iter()
+                    .all(|(department, _)| cast_departments.contains(&department));
+            if !every_department {
+                return defer_item_tx(
+                    conn,
+                    tenant,
+                    meeting_id,
+                    agenda_item_id,
+                    "inquorate",
+                    accepted.len(),
+                    None,
+                )
+                .await;
+            }
+            match chair_stance {
+                Some("approve") | Some("approve_with_conditions") => true,
+                Some("reject") => false,
+                _ => {
+                    return defer_item_tx(
+                        conn,
+                        tenant,
+                        meeting_id,
+                        agenda_item_id,
+                        "chair_position_missing",
+                        accepted.len(),
+                        None,
+                    )
+                    .await;
+                }
+            }
+        }
+        _ => {
+            return Err(MeetingStoreError::Illegal {
+                what: "meeting type",
+                why: format!("unknown decision rule {}", ty.decision_rule),
+            });
+        }
+    };
+
+    // 4. The linked approval's stricter policy: required decisions (dual control), evidence and
+    //    P4. A meeting never lowers any of them, and writes no rows when it would.
+    let approval_status = if let Some(gate) = &gate {
+        if gate.status != "pending" {
+            return Err(MeetingStoreError::Conflict {
+                what: "approval",
+                why: format!("the approval is {}; the first decision wins", gate.status),
+            });
+        }
+        if evidence_count(&gate.meta) < i64::from(ty.evidence_minimum)
+            || evidence_count(&item_evidence) < i64::from(ty.evidence_minimum)
+        {
+            return Err(MeetingStoreError::Stricter {
+                detail: format!(
+                    "the linked approval's evidence is below the meeting type's minimum of {}",
+                    ty.evidence_minimum
+                ),
+            });
+        }
+        if approved && cast_approve < gate.required_decisions {
+            return Err(MeetingStoreError::Stricter {
+                detail: format!(
+                    "the approval requires {} distinct approvals (dual control); the meeting has {}",
+                    gate.required_decisions, cast_approve
+                ),
+            });
+        }
+        let rows: Vec<crate::approval::MeetingDecisionRow<'_>> = decisions
+            .iter()
+            .map(|decision| crate::approval::MeetingDecisionRow {
+                approver_id: decision.approver_id,
+                job_binding_id: decision.job_binding_id,
+                participant_kind: decision.participant_kind,
+                decision: decision.decision,
+                note: &decision.note,
+                via: &decision.via,
+                decided_by_kind: decision.decided_by_kind,
+            })
+            .collect();
+        let approval = crate::approval::record_meeting_decisions_tx(
+            &mut *conn, tenant, gate.id, &rows, approved,
+        )
+        .await
+        .map_err(|error| MeetingStoreError::Conflict {
+            what: "approval",
+            why: error.to_string(),
+        })?;
+        Some(approval.status.to_string())
+    } else {
+        None
+    };
+
+    let item = close_item_row_tx(&mut *conn, tenant, agenda_item_id, "decision", None).await?;
+    outbox::append(
+        &mut *conn,
+        tenant,
+        &NewEvent {
+            topic: format!("meeting:{meeting_id}"),
+            event_type: "meeting_item.closed".into(),
+            aggregate_type: "meeting".into(),
+            aggregate_id: meeting_id,
+            payload: json!({
+                "meeting_id": meeting_id,
+                "agenda_item_id": agenda_item_id,
+                "outcome": "decision",
+                "approval_status": approval_status,
+                "positions": counted,
+            }),
+            correlation_id: None,
+            causation_id: None,
+        },
+    )
+    .await?;
+    Ok(CloseItemResult {
+        item,
+        approval_status,
+        decisions_written: decisions.len(),
+        counted_positions: counted,
+        quorum: accepted.len(),
+    })
+}
+
+async fn defer_item_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+    agenda_item_id: Uuid,
+    reason: &str,
+    quorum: usize,
+    approval_status: Option<String>,
+) -> Result<CloseItemResult> {
+    let item =
+        close_item_row_tx(&mut *conn, tenant, agenda_item_id, "deferred", Some(reason)).await?;
+    outbox::append(
+        &mut *conn,
+        tenant,
+        &NewEvent {
+            topic: format!("meeting:{meeting_id}"),
+            event_type: "meeting_item.closed".into(),
+            aggregate_type: "meeting".into(),
+            aggregate_id: meeting_id,
+            payload: json!({
+                "meeting_id": meeting_id,
+                "agenda_item_id": agenda_item_id,
+                "outcome": "deferred",
+                "defer_reason": reason,
+            }),
+            correlation_id: None,
+            causation_id: None,
+        },
+    )
+    .await?;
+    Ok(CloseItemResult {
+        item,
+        approval_status,
+        decisions_written: 0,
+        counted_positions: 0,
+        quorum,
+    })
+}
+
+async fn close_item_row_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    agenda_item_id: Uuid,
+    outcome: &str,
+    defer_reason: Option<&str>,
+) -> Result<AgendaItemRecord> {
+    let sql = format!(
+        "UPDATE meeting_agenda_item
+            SET outcome = $3, defer_reason = $4, closed_at = now(), updated_at = now(),
+                version = version + 1
+          WHERE tenant_id = $1 AND id = $2
+          RETURNING {AGENDA_COLUMNS}"
+    );
+    sqlx::query_as::<_, AgendaItemRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(agenda_item_id)
+        .bind(outcome)
+        .bind(defer_reason)
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(MeetingStoreError::from)
+}
+
+async fn load_gate_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    approval_id: Uuid,
+) -> Result<ApprovalGate> {
+    let row: Option<(
+        Uuid,
+        String,
+        i32,
+        Value,
+        Option<Uuid>,
+        String,
+        Option<Uuid>,
+        Option<Uuid>,
+        Option<Uuid>,
+    )> = sqlx::query_as(
+        "SELECT a.id, a.status, a.required_decisions, a.meta, a.requested_by, a.gate,
+                c.assignee_id AS card_assignee, c.job_binding_id AS card_job,
+                r.job_binding_id AS run_job
+           FROM approval a
+           LEFT JOIN card c ON c.id = a.card_id AND c.tenant_id = a.tenant_id
+           LEFT JOIN run r ON r.id = a.run_id AND r.tenant_id = a.tenant_id
+          WHERE a.tenant_id = $1 AND a.id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (
+        id,
+        status,
+        required_decisions,
+        meta,
+        requested_by,
+        gate,
+        card_assignee,
+        card_job,
+        run_job,
+    ) = row.ok_or(MeetingStoreError::NotFound("approval"))?;
+    Ok(ApprovalGate {
+        id,
+        status,
+        required_decisions,
+        meta,
+        requested_by,
+        gate,
+        card_assignee,
+        card_job,
+        run_job,
+    })
+}
+
+/// P4: the executor never approves its own work. A human seat is excluded when it is the card's
+/// assignee; a job seat when it is the card's or run's binding; and (unless the approval policy
+/// allows self-approval) a human who requested the gate is excluded.
+fn participant_excluded(
+    position: &PositionRecord,
+    _seat: &AttendanceRecord,
+    gate: &ApprovalGate,
+    self_approval_allowed: bool,
+) -> bool {
+    match position.participant_kind.as_str() {
+        "app_user" => {
+            gate.card_assignee == Some(position.participant_id)
+                || (!self_approval_allowed && gate.requested_by == Some(position.participant_id))
+        }
+        "job_binding" => {
+            gate.card_job == Some(position.participant_id)
+                || gate.run_job == Some(position.participant_id)
+        }
+        _ => false,
+    }
+}
+
+fn required_departments(value: &Value, item_departments: &[Uuid]) -> Vec<(Uuid, i64)> {
+    let mut out: Vec<(Uuid, i64)> = Vec::new();
+    let mut push = |entry: &Value| {
+        let (id, minimum) = match entry {
+            Value::String(raw) => (raw.parse::<Uuid>().ok(), 1),
+            Value::Object(map) => {
+                let raw = map
+                    .get("id")
+                    .or_else(|| map.get("department_id"))
+                    .or_else(|| map.get("department"))
+                    .and_then(Value::as_str);
+                let minimum = map.get("minimum").and_then(Value::as_i64).unwrap_or(1);
+                (raw.and_then(|raw| raw.parse::<Uuid>().ok()), minimum)
+            }
+            _ => (None, 0),
+        };
+        if let Some(id) = id {
+            match out.iter_mut().find(|(existing, _)| *existing == id) {
+                Some((_, current)) => *current = (*current).max(minimum),
+                None => out.push((id, minimum.max(1))),
+            }
+        }
+    };
+    match value {
+        Value::Array(items) => {
+            for entry in items {
+                push(entry);
+            }
+        }
+        Value::Object(map) => {
+            if let Some(Value::Array(items)) = map.get("departments") {
+                for entry in items {
+                    push(entry);
+                }
+            }
+            if let Some(Value::Array(items)) = map.get("department_ids") {
+                for entry in items {
+                    push(entry);
+                }
+            }
+        }
+        _ => {}
+    }
+    for department in item_departments {
+        match out.iter_mut().find(|(existing, _)| existing == department) {
+            Some((_, current)) => *current = (*current).max(1),
+            None => out.push((*department, 1)),
+        }
+    }
+    out
+}
+
+fn required_seats(value: &Value) -> Vec<(String, i64)> {
+    let Some(map) = value.as_object() else {
+        return Vec::new();
+    };
+    let Some(Value::Array(items)) = map.get("seats") else {
+        return Vec::new();
+    };
+    items
+        .iter()
+        .filter_map(|entry| match entry {
+            Value::String(seat) => Some((seat.clone(), 1)),
+            Value::Object(fields) => fields.get("seat").and_then(Value::as_str).map(|seat| {
+                (
+                    seat.to_owned(),
+                    fields.get("minimum").and_then(Value::as_i64).unwrap_or(1),
+                )
+            }),
+            _ => None,
+        })
+        .collect()
 }

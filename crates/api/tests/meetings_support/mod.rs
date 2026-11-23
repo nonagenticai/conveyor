@@ -271,7 +271,10 @@ pub async fn job_binding(pg: &support::Pg, tenant_id: Uuid, authority: Option<&s
          VALUES ($1, $2, $3, 'delivery', 'Reviewer', 'active', '{}'::jsonb) RETURNING id",
     )
     .bind(tenant_id)
-    .bind(format!("job-{}", Uuid::now_v7().simple()))
+    .bind(format!(
+        "job_{}",
+        &Uuid::now_v7().simple().to_string()[..8]
+    ))
     .bind(industry)
     .fetch_one(&pg.super_pool)
     .await
@@ -310,15 +313,102 @@ pub async fn job_binding(pg: &support::Pg, tenant_id: Uuid, authority: Option<&s
 
 /// A pending approval with an evidence array.
 pub async fn approval(pg: &support::Pg, tenant_id: Uuid, evidence: Value) -> Uuid {
+    approval_with(pg, tenant_id, evidence, 1, None, None).await
+}
+
+/// A pending approval with the policy fields the meeting arithmetic reads: the required
+/// decisions (dual control), the judged card (P4's executor) and the requester (self-approval).
+pub async fn approval_with(
+    pg: &support::Pg,
+    tenant_id: Uuid,
+    evidence: Value,
+    required_decisions: i32,
+    card_id: Option<Uuid>,
+    requested_by: Option<Uuid>,
+) -> Uuid {
     sqlx::query_scalar(
-        "INSERT INTO approval (tenant_id, gate, kind, status, required_decisions, meta)
-         VALUES ($1, 'meeting_test', 'meeting', 'pending', 1, $2) RETURNING id",
+        "INSERT INTO approval (tenant_id, gate, kind, status, required_decisions, meta,
+             card_id, requested_by)
+         VALUES ($1, 'meeting_test', 'meeting', 'pending', $2, $3, $4, $5) RETURNING id",
     )
     .bind(tenant_id)
+    .bind(required_decisions)
     .bind(json!({"evidence": evidence}))
+    .bind(card_id)
+    .bind(requested_by)
     .fetch_one(&pg.super_pool)
     .await
     .expect("insert approval")
+}
+
+pub async fn respond(
+    f: &Fixture,
+    meeting_id: &str,
+    participant_kind: &str,
+    participant_id: Uuid,
+    response: &str,
+) -> Value {
+    ok(
+        &f.running,
+        "meetings.respond",
+        json!({
+            "meeting_id": meeting_id,
+            "participant_kind": participant_kind,
+            "participant_id": participant_id,
+            "response": response,
+        }),
+        None,
+    )
+    .await
+}
+
+pub async fn agenda_add(
+    f: &Fixture,
+    meeting_id: &str,
+    resolved_kind: &str,
+    resolved_id: Uuid,
+    evidence: Value,
+) -> Value {
+    created(
+        &f.running,
+        "meetings.agenda_add",
+        json!({
+            "meeting_id": meeting_id,
+            "resolved_kind": resolved_kind,
+            "resolved_id": resolved_id,
+            "evidence_refs": evidence,
+        }),
+        None,
+    )
+    .await
+}
+
+/// A card on the fixture's board, with an assignee: the work a linked approval judges.
+pub async fn judged_card(
+    pg: &support::Pg,
+    tenant_id: Uuid,
+    project_id: &str,
+    list_id: Uuid,
+    assignee: Uuid,
+) -> Uuid {
+    sqlx::query_scalar(
+        "INSERT INTO card (tenant_id, board_id, list_id, card_type_id, name, position,
+             assignee_id)
+         SELECT $1, b.id, $2,
+                (SELECT id FROM card_type WHERE tenant_id = $1 AND code = 'architecture_task'),
+                'Judged work', 900, $3
+           FROM board b
+          WHERE b.tenant_id = $1 AND b.project_id = $4
+          LIMIT 1
+         RETURNING id",
+    )
+    .bind(tenant_id)
+    .bind(list_id)
+    .bind(assignee)
+    .bind(project_id.parse::<Uuid>().expect("project uuid"))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert judged card")
 }
 
 pub async fn register_item(

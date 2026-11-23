@@ -97,3 +97,70 @@ async fn a_meeting_pins_its_type_version() {
     assert_eq!(detail["meeting_type"]["key"], "board", "{detail}");
     assert_eq!(detail["meeting_type"]["version"], 1, "{detail}");
 }
+
+#[tokio::test(flavor = "multi_thread")]
+async fn a_job_seat_writes_a_participant_decision() {
+    let f = meetings::fixture().await;
+    let job = meetings::job_binding(&f.pg, f.seeded.tenant_id, Some("board")).await;
+    let meeting = meetings::schedule(&f, "board", Some(meetings::policy()), None).await;
+    let meeting_id = meetings::id_of(&meeting);
+    meetings::open(&f, &meeting_id).await;
+    let approval = meetings::approval(
+        &f.pg,
+        f.seeded.tenant_id,
+        json!([{"kind": "document", "ref": "readme.md"}]),
+    )
+    .await;
+    let item = meetings::agenda_add(
+        &f,
+        &meeting_id,
+        "approval",
+        approval,
+        json!([{"kind": "document", "ref": "readme.md"}]),
+    )
+    .await;
+    let item_id = meetings::id_of(&item);
+
+    meetings::invite(&f, &meeting_id, "job_binding", job, "member", None).await;
+    meetings::respond(&f, &meeting_id, "job_binding", job, "accepted").await;
+    meetings::position(
+        &f,
+        &meeting_id,
+        &item_id,
+        "job_binding",
+        job,
+        "approve",
+        "mcp",
+    )
+    .await;
+    meetings::ok(
+        &f.running,
+        "meetings.close_item",
+        json!({"meeting_id": meeting_id, "agenda_item_id": item_id}),
+        None,
+    )
+    .await;
+
+    let (approver, binding, kind, decider, surface): (
+        Option<Uuid>,
+        Option<Uuid>,
+        String,
+        String,
+        String,
+    ) = sqlx::query_as(
+        "SELECT approver_id, job_binding_id, participant_kind, decided_by_kind,
+                via->>'surface'
+           FROM approval_decision
+          WHERE tenant_id = $1 AND approval_id = $2",
+    )
+    .bind(f.seeded.tenant_id)
+    .bind(approval)
+    .fetch_one(&f.pg.super_pool)
+    .await
+    .expect("the job seat's decision row");
+    assert_eq!(approver, None, "a job seat is not an app_user");
+    assert_eq!(binding, Some(job), "the job binding is the participant");
+    assert_eq!(kind, "job", "participant_kind");
+    assert_eq!(decider, "agent", "a job seat's decision is agent-kind");
+    assert_eq!(surface, "meeting", "via records the meeting");
+}
