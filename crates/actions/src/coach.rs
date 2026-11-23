@@ -40,18 +40,20 @@
 //! `conveyor_defect` systemic.
 
 use chrono::{Duration, Utc};
-use conveyor_domain::{ListKind, RunStatus};
+use conveyor_domain::{ListKind, RunStatus, TenantId};
 use conveyor_store as store;
 use rust_decimal::Decimal;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use sqlx::PgConnection;
+use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
+use crate::board::pull::service_request;
 use crate::board::views::CardCreateIn;
-use crate::invoke::{ActionError, HandlerCtx};
+use crate::invoke::{ActionError, HandlerCtx, invoke};
 use crate::process::views::ProcessRunStartIn;
+use crate::registry::registry;
 use crate::spec::{HandlerOutput, HandlerRef};
 
 /// The decision-policy kind the coach reads its window, floor and systemic classes from.
@@ -407,7 +409,7 @@ async fn move_card_action_tx(
     handler(
         &mut *tx,
         move_ctx,
-        json!({ "id": card_id, "list_id": list_id }),
+        json!({ "id": card_id, "list_id": list_id, "internal_coach": true }),
     )
     .await
     .map(|_| ())
@@ -943,6 +945,153 @@ async fn coach_interrupt(
         escalated: false,
         approval_id: None,
     }))
+}
+
+// ── the flow producers (§6.2 inputs that are not a failed run) ─────────────────────────────
+
+/// Open an interruption from a §6.2 flow input, inside the caller's transaction.
+///
+/// The producer supplies its own repeat key; everything after it is the one admission path, so
+/// the `(card_id, signature)` window, the escalation and one-card-per-interruption apply to a
+/// flow exactly as they do to a failed run.
+pub(crate) async fn open_flow_interruption_tx(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    card_id: Uuid,
+    trigger_kind: &str,
+    signature: &str,
+) -> Result<HandlerOutput<CoachInterruptOut>, ActionError> {
+    coach_interrupt(
+        tx,
+        ctx,
+        CoachInterruptIn {
+            run_id: None,
+            card_id: Some(card_id),
+            trigger_kind: Some(trigger_kind.to_owned()),
+            signature: Some(signature.to_owned()),
+        },
+    )
+    .await
+}
+
+/// Open an interruption from a §6.2 flow input, owning its transaction — the sweepers' shape.
+///
+/// A deadline sweep does not hold a handler context, so it reaches the same admission path the
+/// way `err.card` does: through the registry, as a service actor. `signature` must already carry
+/// the producer's own repeat key.
+pub async fn open_flow_interruption(
+    pool: &PgPool,
+    app_key: &str,
+    tenant: TenantId,
+    card_id: Uuid,
+    trigger_kind: &str,
+    signature: &str,
+) -> Result<(), ActionError> {
+    let request = service_request(
+        app_key,
+        "coach.interrupt",
+        json!({
+            "card_id": card_id,
+            "trigger_kind": trigger_kind,
+            "signature": signature,
+        }),
+        format!("{trigger_kind}:{card_id}:{signature}"),
+    );
+    invoke(pool, registry(), tenant, request).await?;
+    Ok(())
+}
+
+/// Observe one flow input without endangering the mutation that produced it.
+///
+/// A move must never fail because the coach's substrate is unconfigured — a tenant that has not
+/// published the coach process has nothing to triage with. The savepoint is what makes that
+/// safe: a failed statement inside `coach.interrupt` would otherwise poison the caller's
+/// transaction, so the observation rolls back to its own mark and the move stands.
+async fn observe_flow(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    card_id: Uuid,
+    trigger_kind: &str,
+    signature: &str,
+) -> bool {
+    if let Err(error) = sqlx::query("SAVEPOINT coach_flow").execute(&mut *tx).await {
+        tracing::error!(%error, "coach: open the flow savepoint");
+        return false;
+    }
+    match open_flow_interruption_tx(tx, ctx.clone(), card_id, trigger_kind, signature).await {
+        Ok(_) => {
+            if let Err(error) = sqlx::query("RELEASE SAVEPOINT coach_flow")
+                .execute(&mut *tx)
+                .await
+            {
+                tracing::error!(%error, "coach: release the flow savepoint");
+            }
+            true
+        }
+        Err(error) => {
+            if let Err(rollback) = sqlx::query("ROLLBACK TO SAVEPOINT coach_flow")
+                .execute(&mut *tx)
+                .await
+            {
+                tracing::error!(%rollback, "coach: roll back the flow savepoint");
+            }
+            tracing::warn!(
+                %error,
+                trigger_kind,
+                %card_id,
+                "coach: the flow interruption was not opened"
+            );
+            false
+        }
+    }
+}
+
+/// The §6.2 flow inputs a card move can raise.
+///
+/// A move that takes its destination past `wip_limit` is a breach; a card landing in a blocked
+/// (`waiting`) lane is a board event. **One move yields at most one interruption** — a breach is
+/// the more specific signal, so it pre-empts the blocked-lane event. A move inside one lane is a
+/// reorder, not a flow event, and raises neither.
+pub(crate) async fn flow_inputs_after_move(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    card_id: Uuid,
+    from_kind: ListKind,
+    to_kind: ListKind,
+    wip_limit: Option<i32>,
+    list_id: Uuid,
+) {
+    if let Some(limit) = wip_limit {
+        let live =
+            match store::card::count_live_cards_in_list_tx(&mut *tx, ctx.tenant, list_id).await {
+                Ok(count) => count,
+                Err(error) => {
+                    tracing::error!(%error, %list_id, "coach: count the destination lane");
+                    return;
+                }
+            };
+        if live > i64::from(limit) {
+            observe_flow(
+                tx,
+                &ctx,
+                card_id,
+                "wip_breach",
+                &format!("wip_breach|list:{list_id}|limit:{limit}"),
+            )
+            .await;
+            return;
+        }
+    }
+    if to_kind == ListKind::Waiting && from_kind != ListKind::Waiting {
+        observe_flow(
+            tx,
+            &ctx,
+            card_id,
+            "board_event",
+            &format!("board_event|card.moved|to:{list_id}"),
+        )
+        .await;
+    }
 }
 
 // ── coach.triage ─────────────────────────────────────────────────────────────────────────
