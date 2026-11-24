@@ -151,16 +151,16 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): v1-p61-1:T3 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "T3-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T3-charter' did not pass; the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass; the gate check 'T3-artefact-standard' did not pass; the gate check 'T3-rework' did not pass",
+      "detail": "the gate check 'T3-charter' did not pass; the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass; the gate check 'T3-artefact-standard' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -172,11 +172,10 @@
     "T3-contract (P0): no live board-approved delivery contract",
     "T3-review (P0): no Phase-G compliance review for the project's live contract",
     "T3-artefact-standard (P1): 4 mandatory artefact package(s) open: std-pmp-project-baseline-t3:T3, std-pmp-project-registers-t3:T3, std-togaf-architecture-artifact-t3:T3, std-togaf-compliance-review-t3:T3",
-    "T3-rework (P0): 1 unresolved P0/P1 package(s): v1-p61-1:T3 (P1)",
-    "gate (P0): the gate check 'T3-charter' did not pass; the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass; the gate check 'T3-artefact-standard' did not pass; the gate check 'T3-rework' did not pass"
+    "gate (P0): the gate check 'T3-charter' did not pass; the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass; the gate check 'T3-artefact-standard' did not pass"
   ],
   "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request",
-  "generated_at": "2026-11-24T20:29:59.319544+00:00",
+  "generated_at": "2026-11-24T21:07:28.257357+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T3.toml",
   "name": "PM job",
@@ -184,8 +183,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-24T18:25:22.625551+00:00",
-    "git_sha": "ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47",
-    "path": "retained-snapshot/ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47"
+    "git_sha": "86f5da93480fa1b163dd4ee35085cd72882f9b01",
+    "path": "retained-snapshot/86f5da93480fa1b163dd4ee35085cd72882f9b01"
   },
   "verdict": "red",
   "warnings": []

@@ -115,7 +115,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "27 mandatory artefact package(s) open: std-togaf-benefits-diagram-t0:T0, std-togaf-candidate-solutions-t0:T0, std-togaf-project-context-diagram-t0:T0, std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-instance-01a1ff45-f703-7150-992d-f61c4ce23ca5:T0, std-togaf-architecture-artifact-instance-01a1ff46-1dc2-7a7d-8245-dccdf9a8b037:T0, std-togaf-architecture-artifact-instance-01a1ff46-45c3-74fe-9fd8-7f3077dd0512:T0, +19 more",
+      "detail": "21 mandatory artefact package(s) open: std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-instance-01a1ff45-f703-7150-992d-f61c4ce23ca5:T0, std-togaf-architecture-artifact-instance-01a1ff46-1dc2-7a7d-8245-dccdf9a8b037:T0, std-togaf-architecture-artifact-instance-01a1ff46-45c3-74fe-9fd8-7f3077dd0512:T0, std-togaf-architecture-artifact-instance-01a1ff46-6cc1-7119-b56f-1d58c6226ac0:T0, std-togaf-architecture-artifact-instance-01a1ff46-93a7-7bb4-8ab0-93f094edd051:T0, std-togaf-architecture-artifact-instance-01a1ff46-b96e-74d6-a337-ebb3195ba4ad:T0, +13 more",
       "id": "T0-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -124,16 +124,16 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "3 unresolved P0/P1 package(s): std-togaf-benefits-diagram-t0:T0 (P1), std-togaf-candidate-solutions-t0:T0 (P1), std-togaf-project-context-diagram-t0:T0 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "T0-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T0-charter' did not pass; the gate check 'T0-artefact-standard' did not pass; the gate check 'T0-rework' did not pass",
+      "detail": "the gate check 'T0-charter' did not pass; the gate check 'T0-artefact-standard' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -151,13 +151,12 @@
   ],
   "failures": [
     "T0-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-    "T0-artefact-standard (P1): 27 mandatory artefact package(s) open: std-togaf-benefits-diagram-t0:T0, std-togaf-candidate-solutions-t0:T0, std-togaf-project-context-diagram-t0:T0, std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-instance-01a1ff45-f703-7150-992d-f61c4ce23ca5:T0, std-togaf-architecture-artifact-instance-01a1ff46-1dc2-7a7d-8245-dccdf9a8b037:T0, std-togaf-architecture-artifact-instance-01a1ff46-45c3-74fe-9fd8-7f3077dd0512:T0, +19 more",
-    "T0-rework (P0): 3 unresolved P0/P1 package(s): std-togaf-benefits-diagram-t0:T0 (P1), std-togaf-candidate-solutions-t0:T0 (P1), std-togaf-project-context-diagram-t0:T0 (P1)",
-    "gate (P0): the gate check 'T0-charter' did not pass; the gate check 'T0-artefact-standard' did not pass; the gate check 'T0-rework' did not pass",
+    "T0-artefact-standard (P1): 21 mandatory artefact package(s) open: std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-instance-01a1ff45-f703-7150-992d-f61c4ce23ca5:T0, std-togaf-architecture-artifact-instance-01a1ff46-1dc2-7a7d-8245-dccdf9a8b037:T0, std-togaf-architecture-artifact-instance-01a1ff46-45c3-74fe-9fd8-7f3077dd0512:T0, std-togaf-architecture-artifact-instance-01a1ff46-6cc1-7119-b56f-1d58c6226ac0:T0, std-togaf-architecture-artifact-instance-01a1ff46-93a7-7bb4-8ab0-93f094edd051:T0, std-togaf-architecture-artifact-instance-01a1ff46-b96e-74d6-a337-ebb3195ba4ad:T0, +13 more",
+    "gate (P0): the gate check 'T0-charter' did not pass; the gate check 'T0-artefact-standard' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The A\u2013D set is approved; the project re-closes through the one gate.",
-  "generated_at": "2026-11-24T20:29:58.278132+00:00",
+  "generated_at": "2026-11-24T21:07:27.259863+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T0.toml",
   "name": "Model and contracts",
@@ -165,8 +164,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-24T18:25:22.625551+00:00",
-    "git_sha": "ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47",
-    "path": "retained-snapshot/ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47"
+    "git_sha": "86f5da93480fa1b163dd4ee35085cd72882f9b01",
+    "path": "retained-snapshot/86f5da93480fa1b163dd4ee35085cd72882f9b01"
   },
   "verdict": "red",
   "warnings": []
