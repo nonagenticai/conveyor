@@ -1,5 +1,127 @@
 {
+  "schema": "issue-registry/v1",
+  "provenance": {
+    "tenant": "nonagentic",
+    "source": "github:nonagenticai/conveyor"
+  },
   "issues": [
+    {
+      "number": 684,
+      "title": "proof: T19F \u2014 the live gate, the published programme record and the closure review",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/684",
+      "updatedAt": "2026-11-24T20:02:13Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        },
+        {
+          "name": "T19F",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 683,
+      "title": "add: T19F \u2014 forum-policy authoring, the board sitting and cadence materialisation",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/683",
+      "updatedAt": "2026-11-24T20:02:11Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        },
+        {
+          "name": "T19F",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 682,
+      "title": "plan: T19F \u2014 the meeting-policy authoring route and the T9/T10 binding (plan + MSP/TOGAF/SAFe artefacts)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/682",
+      "updatedAt": "2026-11-24T20:06:04Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        },
+        {
+          "name": "T19F",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 681,
+      "title": "fix: publish-data derives the docs index and the programme seed from the data it installs",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/681",
+      "updatedAt": "2026-11-24T19:20:34Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 680,
+      "title": "fix: the materialise transport parses the first JSON document, not the whole stdout",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/680",
+      "updatedAt": "2026-11-24T19:20:29Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
     {
       "number": 671,
       "title": "ci: the record half belongs to the live publish \u2014 stop the refresh and standards_pack deriving it",
@@ -26,7 +148,7 @@
       "title": "rollback across a migration boundary cannot serve the prior digest (sqlx VersionMissing 70; Flux restores the pinned image)",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/669",
-      "updatedAt": "2026-11-24T18:15:03Z",
+      "updatedAt": "2026-11-24T20:09:42Z",
       "labels": [
         {
           "name": "bug",
@@ -81,7 +203,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-24T19:20:13Z",
+      "updatedAt": "2026-11-24T20:27:12Z",
       "labels": [
         {
           "name": "programme",
@@ -94,7 +216,7 @@
       "title": "add: the L1 laya gate \u2014 the ladder builds the case, the engine makes the call, the decision cites it",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/656",
-      "updatedAt": "2026-11-24T18:57:19Z",
+      "updatedAt": "2026-11-24T20:02:39Z",
       "labels": [
         {
           "name": "unit",
@@ -115,15 +237,15 @@
       "title": "add: the authoring intake queue read (authoring.intakes)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/655",
-      "updatedAt": "2026-11-24T09:26:37Z",
+      "updatedAt": "2026-11-24T20:22:28Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T17",
@@ -769,7 +891,7 @@
       "title": "T18-4: Tools, Metering, Operations and Improve",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/565",
-      "updatedAt": "2026-11-24T19:02:21Z",
+      "updatedAt": "2026-11-24T20:03:02Z",
       "labels": [
         {
           "name": "unit",
@@ -957,7 +1079,7 @@
       "title": "add: binding and catalogue actions, and the full published tool contract",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/557",
-      "updatedAt": "2026-11-22T22:10:34Z",
+      "updatedAt": "2026-11-24T20:14:44Z",
       "labels": [
         {
           "name": "unit",
@@ -1024,7 +1146,7 @@
       "title": "ops: publish the standards record and materialise the register after the live tranche closes",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/545",
-      "updatedAt": "2026-11-24T19:19:39Z",
+      "updatedAt": "2026-11-24T20:08:53Z",
       "labels": [
         {
           "name": "unit",
@@ -1142,7 +1264,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-24T19:15:16Z",
+      "updatedAt": "2026-11-24T20:23:54Z",
       "labels": [
         {
           "name": "unit",
@@ -1901,9 +2023,9 @@
     {
       "number": 395,
       "title": "architecture: the board approves a contract for every delivery project",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/395",
-      "updatedAt": "2026-11-24T15:37:32Z",
+      "updatedAt": "2026-11-24T20:26:43Z",
       "labels": [
         {
           "name": "unit",
@@ -4543,9 +4665,9 @@
     {
       "number": 88,
       "title": "T12 \u2014 One organisation loop (the acceptance of V2)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/88",
-      "updatedAt": "2026-11-24T18:15:48Z",
+      "updatedAt": "2026-11-24T20:26:41Z",
       "labels": [
         {
           "name": "unit",
@@ -4713,7 +4835,7 @@
       "title": "T6 \u2014 Development project",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/80",
-      "updatedAt": "2026-11-24T15:32:10Z",
+      "updatedAt": "2026-11-24T20:09:44Z",
       "labels": [
         {
           "name": "unit",
@@ -5434,9 +5556,9 @@
     {
       "number": 22,
       "title": "CI cost: merge-run tree equality (deferred, measurement-gated)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/22",
-      "updatedAt": "2026-11-24T19:19:04Z",
+      "updatedAt": "2026-11-24T19:59:18Z",
       "labels": [
         {
           "name": "unit",

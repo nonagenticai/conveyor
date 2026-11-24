@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d30-794f-bd53-c72986b18e60\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
       "exit": 1,
       "id": "S17-charter",
       "kind": "command",
       "result": "fail",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -161,7 +161,7 @@
   "failures": [
     "S17-project (P0): status is 'closed', expected 'active'",
     "S17-baseline (P0): no project baseline",
-    "S17-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+    "S17-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "S17-contract (P0): no live board-approved delivery contract",
     "S17-review (P0): no Phase-G compliance review for the project's live contract",
     "S17-wsjf (P0): no WBS deliverable carries the plan",
@@ -172,16 +172,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "`conveyor-bench` is absorbed: the conveyor becomes the whole measurement loop \u2014 seed the SWE-bench subset, produce a patch per instance for an arm, run the graded test in a sandbox, parse the log with a ported swebench parser, resolve it, store the verdict, and compare runs.",
-  "generated_at": "2026-11-24T18:05:34.791323+00:00",
+  "generated_at": "2026-11-24T20:29:57.838839+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S17.toml",
   "name": "Native benchmark harness",
   "project": "S17",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T16:58:37.395498+00:00",
-    "git_sha": "d0fbc638d538ea66e4ab5abb74e2ddcc0ad2e8d9",
-    "path": "retained-snapshot/d0fbc638d538ea66e4ab5abb74e2ddcc0ad2e8d9"
+    "generated_at": "2026-11-24T18:25:22.625551+00:00",
+    "git_sha": "ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47",
+    "path": "retained-snapshot/ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47"
   },
   "verdict": "red",
   "warnings": []

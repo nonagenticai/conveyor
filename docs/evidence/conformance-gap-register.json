@@ -1,36 +1,12 @@
 {
   "counts": {
     "P0": 13,
-    "P1": 132,
-    "P2": 25,
+    "P1": 144,
+    "P2": 20,
     "P3": 0
   },
   "excluded_test_projects": [],
   "gaps": [
-    {
-      "detail": "project is closed but its closure review is not published",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "closed_without_closure_review",
-      "severity": "P0",
-      "subject": "T14"
-    },
-    {
-      "detail": "project is closed but its closure review is not published",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "closed_without_closure_review",
-      "severity": "P0",
-      "subject": "T16"
-    },
-    {
-      "detail": "project is closed but its closure review is not published",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "closed_without_closure_review",
-      "severity": "P0",
-      "subject": "T7"
-    },
     {
       "detail": "project is closed in tranche 6 whose state is 'planned'",
       "disposition": "rework",
@@ -109,7 +85,31 @@
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
-      "subject": "T7"
+      "subject": "S17"
+    },
+    {
+      "detail": "project is closed in tranche 9 whose state is 'planned'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "project_in_unauthorised_tranche",
+      "severity": "P0",
+      "subject": "S18"
+    },
+    {
+      "detail": "project is closed in tranche 9 whose state is 'planned'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "project_in_unauthorised_tranche",
+      "severity": "P0",
+      "subject": "S20"
+    },
+    {
+      "detail": "project is closed in tranche 9 whose state is 'planned'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "project_in_unauthorised_tranche",
+      "severity": "P0",
+      "subject": "S21"
     },
     {
       "detail": "the tranche has no refinement cadence for its period",
@@ -142,14 +142,6 @@
       "rule": "backlog_refinement_missing",
       "severity": "P1",
       "subject": "tranche 13"
-    },
-    {
-      "detail": "the tranche has no refinement cadence for its period",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "backlog_refinement_missing",
-      "severity": "P1",
-      "subject": "tranche 5"
     },
     {
       "detail": "the tranche has no refinement cadence for its period",
@@ -197,14 +189,6 @@
       "evidence": null,
       "rule": "closed_without_closure_review",
       "severity": "P1",
-      "subject": "S05"
-    },
-    {
-      "detail": "project is closed but its closure review is not published",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "closed_without_closure_review",
-      "severity": "P1",
       "subject": "S06b"
     },
     {
@@ -288,12 +272,68 @@
       "subject": "S16"
     },
     {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S17"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S18"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S20"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S21"
+    },
+    {
       "detail": "project is closed but declares no closure_outputs",
       "disposition": "rework",
       "evidence": null,
       "rule": "closure_outputs_undeclared",
       "severity": "P1",
-      "subject": "S05"
+      "subject": "P0"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S00"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S01"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S03"
     },
     {
       "detail": "project is closed but declares no closure_outputs",
@@ -382,6 +422,46 @@
       "rule": "closure_outputs_undeclared",
       "severity": "P1",
       "subject": "S16"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S17"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S18"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S20"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S21"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "SPEC-V2"
     },
     {
       "detail": "closed delivery project has no Phase-G compliance review",
@@ -438,6 +518,22 @@
       "rule": "contract_missing",
       "severity": "P1",
       "subject": "T17"
+    },
+    {
+      "detail": "delivery project has no live architecture contract",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "contract_missing",
+      "severity": "P1",
+      "subject": "T18"
+    },
+    {
+      "detail": "delivery project has no live architecture contract",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "contract_missing",
+      "severity": "P1",
+      "subject": "T3"
     },
     {
       "detail": "delivery project has no live architecture contract",
@@ -501,7 +597,7 @@
       "evidence": null,
       "rule": "mandatory_artefacts",
       "severity": "P1",
-      "subject": "S05"
+      "subject": "S04"
     },
     {
       "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
@@ -709,7 +805,7 @@
       "evidence": null,
       "rule": "mandatory_artefacts",
       "severity": "P1",
-      "subject": "T16"
+      "subject": "T17"
     },
     {
       "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
@@ -717,7 +813,7 @@
       "evidence": null,
       "rule": "mandatory_artefacts",
       "severity": "P1",
-      "subject": "T17"
+      "subject": "T18"
     },
     {
       "detail": "missing approved artefacts: solution_concept",
@@ -726,6 +822,14 @@
       "rule": "mandatory_artefacts",
       "severity": "P1",
       "subject": "T2"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T3"
     },
     {
       "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
@@ -797,14 +901,6 @@
       "evidence": null,
       "rule": "pi_cadence_missing",
       "severity": "P1",
-      "subject": "tranche 5"
-    },
-    {
-      "detail": "the tranche carries projects but has no PI cadence for its period",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "pi_cadence_missing",
-      "severity": "P1",
       "subject": "tranche 6"
     },
     {
@@ -856,44 +952,12 @@
       "subject": "S15"
     },
     {
-      "detail": "project is active in tranche 5 whose state is 'planned'",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "project_in_unauthorised_tranche",
-      "severity": "P1",
-      "subject": "S17"
-    },
-    {
-      "detail": "project is active in tranche 9 whose state is 'planned'",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "project_in_unauthorised_tranche",
-      "severity": "P1",
-      "subject": "S18"
-    },
-    {
       "detail": "project is active in tranche 8 whose state is 'planned'",
       "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
       "subject": "S19"
-    },
-    {
-      "detail": "project is active in tranche 9 whose state is 'planned'",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "project_in_unauthorised_tranche",
-      "severity": "P1",
-      "subject": "S20"
-    },
-    {
-      "detail": "project is active in tranche 9 whose state is 'planned'",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "project_in_unauthorised_tranche",
-      "severity": "P1",
-      "subject": "S21"
     },
     {
       "detail": "project is active in tranche 13 whose state is 'planned'",
@@ -936,6 +1000,14 @@
       "subject": "T6"
     },
     {
+      "detail": "project is active in tranche 5 whose state is 'planned'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "project_in_unauthorised_tranche",
+      "severity": "P1",
+      "subject": "T7"
+    },
+    {
       "detail": "project is active in tranche 11 whose state is 'planned'",
       "disposition": "rework",
       "evidence": null,
@@ -949,7 +1021,7 @@
       "evidence": null,
       "rule": "seed_live_drift",
       "severity": "P1",
-      "subject": "S17"
+      "subject": "S05"
     },
     {
       "detail": "seed status 'closed' != live status 'active'",
@@ -957,7 +1029,7 @@
       "evidence": null,
       "rule": "seed_live_drift",
       "severity": "P1",
-      "subject": "S20"
+      "subject": "T15"
     },
     {
       "detail": "seed status 'closed' != live status 'active'",
@@ -965,7 +1037,15 @@
       "evidence": null,
       "rule": "seed_live_drift",
       "severity": "P1",
-      "subject": "T0"
+      "subject": "T16"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T3"
     },
     {
       "detail": "seed status 'closed' != live status 'active'",
@@ -976,12 +1056,36 @@
       "subject": "T4"
     },
     {
-      "detail": "declared outputs are not published: project-brief",
+      "detail": "seed status 'closed' != live status 'active'",
       "disposition": "rework",
       "evidence": null,
-      "rule": "unpublished_declared_output",
+      "rule": "seed_live_drift",
       "severity": "P1",
-      "subject": "S05"
+      "subject": "T5"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T6"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T7"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T8"
     },
     {
       "detail": "declared outputs are not published: project-brief",
@@ -1136,7 +1240,7 @@
       "subject": "S21"
     },
     {
-      "detail": "declared outputs are not published: closure-review, evidence, project-brief",
+      "detail": "declared outputs are not published: evidence, project-brief",
       "disposition": "rework",
       "evidence": null,
       "rule": "unpublished_declared_output",
@@ -1144,20 +1248,12 @@
       "subject": "T14"
     },
     {
-      "detail": "declared outputs are not published: closure-review, evidence, project-brief",
+      "detail": "declared outputs are not published: architecture-design, inception-analysis, project-brief",
       "disposition": "rework",
       "evidence": null,
       "rule": "unpublished_declared_output",
       "severity": "P1",
-      "subject": "T16"
-    },
-    {
-      "detail": "declared outputs are not published: closure-review, evidence, project-brief",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "unpublished_declared_output",
-      "severity": "P1",
-      "subject": "T7"
+      "subject": "T18"
     },
     {
       "detail": "declared outputs are not published: project-brief",
@@ -1168,7 +1264,7 @@
       "subject": "T8"
     },
     {
-      "detail": "151 declared dependency edge(s) carry no blocks|needs|supersedes|informs kind",
+      "detail": "163 declared dependency edge(s) carry no blocks|needs|supersedes|informs kind",
       "disposition": "rework",
       "evidence": null,
       "rule": "dependency_untyped",
@@ -1197,23 +1293,7 @@
       "evidence": null,
       "rule": "seed_live_drift",
       "severity": "P2",
-      "subject": "S02"
-    },
-    {
-      "detail": "seed status 'active' != live status 'closed'",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "seed_live_drift",
-      "severity": "P2",
-      "subject": "S04"
-    },
-    {
-      "detail": "seed status 'active' != live status 'closed'",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "seed_live_drift",
-      "severity": "P2",
-      "subject": "S13"
+      "subject": "S21"
     },
     {
       "detail": "seed status 'active' != live status 'closed'",
@@ -1222,14 +1302,6 @@
       "rule": "seed_live_drift",
       "severity": "P2",
       "subject": "T13"
-    },
-    {
-      "detail": "seed status 'active' != live status 'closed'",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "seed_live_drift",
-      "severity": "P2",
-      "subject": "T14"
     },
     {
       "detail": "closed without a review date",
@@ -1285,22 +1357,6 @@
       "evidence": null,
       "rule": "wbs_absent",
       "severity": "P2",
-      "subject": "S17"
-    },
-    {
-      "detail": "no WBS node is published for the active project",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "wbs_absent",
-      "severity": "P2",
-      "subject": "S18"
-    },
-    {
-      "detail": "no WBS node is published for the active project",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "wbs_absent",
-      "severity": "P2",
       "subject": "S19"
     },
     {
@@ -1309,23 +1365,15 @@
       "evidence": null,
       "rule": "wbs_absent",
       "severity": "P2",
-      "subject": "S20"
-    },
-    {
-      "detail": "no WBS node is published for the active project",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "wbs_absent",
-      "severity": "P2",
-      "subject": "S21"
-    },
-    {
-      "detail": "no WBS node is published for the active project",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "wbs_absent",
-      "severity": "P2",
       "subject": "T12"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "T14"
     },
     {
       "detail": "no WBS node is published for the active project",
@@ -1342,6 +1390,14 @@
       "rule": "wbs_absent",
       "severity": "P2",
       "subject": "T17"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "T18"
     },
     {
       "detail": "no WBS node is published for the active project",
@@ -1369,8 +1425,8 @@
     }
   ],
   "snapshot": {
-    "generated_at": "2026-11-23T21:13:58.679444+00:00",
-    "git_sha": "75d0fcbb25c0e40444908d15e0c2bd24fb73d660",
+    "generated_at": "2026-11-24T18:25:22.625551+00:00",
+    "git_sha": "ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47",
     "path": "data",
     "tenant": "nonagentic"
   },
