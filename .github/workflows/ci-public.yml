@@ -24,8 +24,9 @@ on:
   # merge-group ref: the queue waits for the required checks to appear on THAT ref. Without this
   # trigger those checks never run, and every queued PR sits in AWAITING_CHECKS forever (measured
   # on this very PR before this line existed). classify treats any non-pull_request event as
-  # docs_only=false, and dco is pull_request-only and not a required context, so the queue runs
-  # the same gates the PR did.
+  # docs_only=false, so the queue runs the same gates the PR did. dco also runs on a push to
+  # main: the scheduled acceptance check reads the release sha's check-runs, and a PR-only dco
+  # job leaves the required `dco` context missing there (the four-day red fixed 2026-11-24).
   merge_group:
   push:
     branches: [main]
@@ -192,7 +193,7 @@ jobs:
   # Runs on the queue too: a required context that never reports on `merge_group` stalls every
   # entry until timeout, so `dco` could not become required until this job ran there.
   dco:
-    if: ${{ !github.event.repository.private && (github.event_name == 'pull_request' || github.event_name == 'merge_group') }}
+    if: ${{ !github.event.repository.private && (github.event_name == 'pull_request' || github.event_name == 'merge_group' || (github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -202,8 +203,8 @@ jobs:
           persist-credentials: false
       - name: every commit is signed off
         env:
-          BASE_SHA: ${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha }}
+          BASE_SHA: ${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
           missing=""
