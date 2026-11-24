@@ -334,7 +334,7 @@
       "tranche": 0,
       "units": {
         "blocked": 1,
-        "claimed": 2,
+        "claimed": 1,
         "numbers": [
           17,
           22,
@@ -353,7 +353,6 @@
           223,
           224,
           225,
-          395,
           410,
           426,
           435,
@@ -361,10 +360,12 @@
           526,
           569,
           572,
-          660
+          660,
+          680,
+          681
         ],
         "open": 15,
-        "ready": 5,
+        "ready": 7,
         "unknown": 0
       }
     },
@@ -697,7 +698,8 @@
       "parallel_with": [
         "S06b",
         "S10",
-        "S11"
+        "S11",
+        "T19F"
       ],
       "plan": "docs/plans/slices/S06a-mcp-server-channel.md",
       "status": "archived",
@@ -738,7 +740,8 @@
       "parallel_with": [
         "S06a",
         "S10",
-        "S11"
+        "S11",
+        "T19F"
       ],
       "plan": "docs/plans/slices/S06b-agent-direct-interface.md",
       "status": "built",
@@ -1007,7 +1010,8 @@
       "parallel_with": [
         "S06a",
         "S06b",
-        "S11"
+        "S11",
+        "T19F"
       ],
       "plan": "docs/plans/slices/S10-copilot-ag-ui.md",
       "status": "built",
@@ -1048,7 +1052,8 @@
       "parallel_with": [
         "S06a",
         "S06b",
-        "S10"
+        "S10",
+        "T19F"
       ],
       "plan": "docs/plans/slices/S11-procedures.md",
       "status": "built",
@@ -1779,11 +1784,11 @@
       "tranche": 13,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           88
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2006,14 +2011,14 @@
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           87,
           629,
           655
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2119,6 +2124,53 @@
           650
         ],
         "open": 0,
+        "ready": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "blocked_by": [
+        "T17"
+      ],
+      "evidence": [
+        "docs/SPEC_V2.md"
+      ],
+      "gap": "action meetings.type_list, action meetings.type_get, action architecture.board_sit_open, action architecture.board_sit_decide, action cadences.materialise",
+      "key": "T19F",
+      "measured": {
+        "actions": [
+          0,
+          5
+        ],
+        "modules": [
+          0,
+          0
+        ],
+        "tables": [
+          0,
+          0
+        ]
+      },
+      "name": "Decision-forum governance (follow-on)",
+      "parallel_with": [
+        "S06a",
+        "S06b",
+        "S10",
+        "S11"
+      ],
+      "plan": "docs/plans/T19F-meeting-bindings.md",
+      "status": "proposed",
+      "track": "v2",
+      "tranche": 6,
+      "units": {
+        "blocked": 2,
+        "claimed": 1,
+        "numbers": [
+          682,
+          683,
+          684
+        ],
+        "open": 3,
         "ready": 0,
         "unknown": 0
       }
@@ -2732,13 +2784,13 @@
         "built": 45,
         "partial": 1,
         "planned": 0,
-        "proposed": 2,
+        "proposed": 3,
         "standing": 1
       },
-      "total": 50,
+      "total": 51,
       "uncovered": [],
       "with_open_units": 13,
-      "without_open_units": 37
+      "without_open_units": 38
     },
     "screens": {
       "actions_invoked": 39,

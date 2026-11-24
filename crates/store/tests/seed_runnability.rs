@@ -102,9 +102,9 @@ async fn the_programme_seed_gives_every_active_project_a_board() {
     let first = seed_programme(&db.super_pool, Some("run-prog"))
         .await
         .expect("the programme seeds");
-    assert_eq!(first[0].1.created, 51, "the programme and its 50 projects");
+    assert_eq!(first[0].1.created, 52, "the programme and its 51 projects");
     assert_eq!(
-        first[0].1.boards_created, 49,
+        first[0].1.boards_created, 50,
         "every non-archived project gets a board; `S06a` is archived and stays board-less"
     );
 
@@ -113,7 +113,7 @@ async fn the_programme_seed_gives_every_active_project_a_board() {
         .fetch_one(&db.super_pool)
         .await
         .expect("count projects");
-    assert_eq!(projects, 50);
+    assert_eq!(projects, 51);
 
     let boardless: Vec<String> = sqlx::query_scalar(
         "SELECT p.key FROM project p
@@ -159,7 +159,7 @@ async fn the_programme_seed_gives_every_active_project_a_board() {
         .fetch_one(&db.super_pool)
         .await
         .expect("count boards");
-    assert_eq!(boards, 49);
+    assert_eq!(boards, 50);
 }
 
 /// A tenant with no board template gets its projects and a warning, never invented lanes.
@@ -171,7 +171,7 @@ async fn the_programme_seed_invents_no_lane_list_without_a_template() {
     let first = seed_programme(&db.super_pool, Some("run-none"))
         .await
         .expect("the programme seeds without a template");
-    assert_eq!(first[0].1.created, 51);
+    assert_eq!(first[0].1.created, 52);
     assert_eq!(first[0].1.boards_created, 0);
 
     let boards: i64 = sqlx::query_scalar("SELECT count(*) FROM board WHERE tenant_id = $1")
