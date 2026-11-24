@@ -140,9 +140,27 @@
       "severity": "P0"
     },
     {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "7 mandatory artefact package(s) open: closed_without_closure_review:S12, std-pmp-change-control-s12:S12, std-pmp-project-baseline-s12:S12, std-pmp-project-registers-s12:S12, std-pmp-project-wbs-s12:S12, std-togaf-compliance-review-s12:S12, std-togaf-delivery-contract-s12:S12",
+      "id": "S12-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "1 unresolved P0/P1 package(s): closed_without_closure_review:S12 (P1)",
+      "id": "S12-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S12-baseline' did not pass; the gate check 'S12-charter' did not pass; the gate check 'S12-closure-outputs' did not pass; the gate check 'S12-contract' did not pass; the gate check 'S12-review' did not pass; the gate check 'S12-closure-gate' did not pass; the gate check 'S12-pi-cadence' did not pass; the gate check 'S12-pi-plan' did not pass; the gate check 'S12-pi-objectives' did not pass; the gate check 'S12-lessons' did not pass; the gate check 'S12-wsjf' did not pass; the gate check 'S12-demo-credits' did not pass",
+      "detail": "the gate check 'S12-baseline' did not pass; the gate check 'S12-charter' did not pass; the gate check 'S12-closure-outputs' did not pass; the gate check 'S12-contract' did not pass; the gate check 'S12-review' did not pass; the gate check 'S12-closure-gate' did not pass; the gate check 'S12-pi-cadence' did not pass; the gate check 'S12-pi-plan' did not pass; the gate check 'S12-pi-objectives' did not pass; the gate check 'S12-lessons' did not pass; the gate check 'S12-wsjf' did not pass; the gate check 'S12-demo-credits' did not pass; the gate check 'S12-artefact-standard' did not pass; the gate check 'S12-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -171,20 +189,22 @@
     "S12-lessons (P1): no retro cadence row for tranche-10",
     "S12-wsjf (P0): no WBS deliverable carries the plan",
     "S12-demo-credits (P0): no accepted deliverable to demo",
-    "gate (P0): the gate check 'S12-baseline' did not pass; the gate check 'S12-charter' did not pass; the gate check 'S12-closure-outputs' did not pass; the gate check 'S12-contract' did not pass; the gate check 'S12-review' did not pass; the gate check 'S12-closure-gate' did not pass; the gate check 'S12-pi-cadence' did not pass; the gate check 'S12-pi-plan' did not pass; the gate check 'S12-pi-objectives' did not pass; the gate check 'S12-lessons' did not pass; the gate check 'S12-wsjf' did not pass; the gate check 'S12-demo-credits' did not pass",
+    "S12-artefact-standard (P1): 7 mandatory artefact package(s) open: closed_without_closure_review:S12, std-pmp-change-control-s12:S12, std-pmp-project-baseline-s12:S12, std-pmp-project-registers-s12:S12, std-pmp-project-wbs-s12:S12, std-togaf-compliance-review-s12:S12, std-togaf-delivery-contract-s12:S12",
+    "S12-rework (P0): 1 unresolved P0/P1 package(s): closed_without_closure_review:S12 (P1)",
+    "gate (P0): the gate check 'S12-baseline' did not pass; the gate check 'S12-charter' did not pass; the gate check 'S12-closure-outputs' did not pass; the gate check 'S12-contract' did not pass; the gate check 'S12-review' did not pass; the gate check 'S12-closure-gate' did not pass; the gate check 'S12-pi-cadence' did not pass; the gate check 'S12-pi-plan' did not pass; the gate check 'S12-pi-objectives' did not pass; the gate check 'S12-lessons' did not pass; the gate check 'S12-wsjf' did not pass; the gate check 'S12-demo-credits' did not pass; the gate check 'S12-artefact-standard' did not pass; the gate check 'S12-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "S12 is accepted when every spec asserts empty state, error state and happy path \u2014 a spec that only asserts the happy path fails review \u2014 and the coverage table has no orphan.",
-  "generated_at": "2026-11-24T17:10:33.027807+00:00",
+  "generated_at": "2026-11-24T18:03:25.713106+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S12.toml",
   "name": "UI build-out",
   "project": "S12",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T17:09:25Z",
-    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
-    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
+    "generated_at": "2026-11-24T16:58:37.395498+00:00",
+    "git_sha": "1bf2fb7c92d5db83836034da909495e1bd2361c1",
+    "path": "retained-snapshot/1bf2fb7c92d5db83836034da909495e1bd2361c1"
   },
   "verdict": "red",
   "warnings": []

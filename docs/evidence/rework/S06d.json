@@ -140,9 +140,27 @@
       "severity": "P0"
     },
     {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "7 mandatory artefact package(s) open: closed_without_closure_review:S06d, std-pmp-change-control-s06d:S06d, std-pmp-project-baseline-s06d:S06d, std-pmp-project-registers-s06d:S06d, std-pmp-project-wbs-s06d:S06d, std-togaf-compliance-review-s06d:S06d, std-togaf-delivery-contract-s06d:S06d",
+      "id": "S06d-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "1 unresolved P0/P1 package(s): closed_without_closure_review:S06d (P1)",
+      "id": "S06d-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S06d-baseline' did not pass; the gate check 'S06d-charter' did not pass; the gate check 'S06d-closure-outputs' did not pass; the gate check 'S06d-contract' did not pass; the gate check 'S06d-review' did not pass; the gate check 'S06d-closure-gate' did not pass; the gate check 'S06d-pi-cadence' did not pass; the gate check 'S06d-pi-plan' did not pass; the gate check 'S06d-pi-objectives' did not pass; the gate check 'S06d-lessons' did not pass; the gate check 'S06d-wsjf' did not pass; the gate check 'S06d-demo-credits' did not pass",
+      "detail": "the gate check 'S06d-baseline' did not pass; the gate check 'S06d-charter' did not pass; the gate check 'S06d-closure-outputs' did not pass; the gate check 'S06d-contract' did not pass; the gate check 'S06d-review' did not pass; the gate check 'S06d-closure-gate' did not pass; the gate check 'S06d-pi-cadence' did not pass; the gate check 'S06d-pi-plan' did not pass; the gate check 'S06d-pi-objectives' did not pass; the gate check 'S06d-lessons' did not pass; the gate check 'S06d-wsjf' did not pass; the gate check 'S06d-demo-credits' did not pass; the gate check 'S06d-artefact-standard' did not pass; the gate check 'S06d-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -171,20 +189,22 @@
     "S06d-lessons (P1): no retro cadence row for tranche-8",
     "S06d-wsjf (P0): no WBS deliverable carries the plan",
     "S06d-demo-credits (P0): no accepted deliverable to demo",
-    "gate (P0): the gate check 'S06d-baseline' did not pass; the gate check 'S06d-charter' did not pass; the gate check 'S06d-closure-outputs' did not pass; the gate check 'S06d-contract' did not pass; the gate check 'S06d-review' did not pass; the gate check 'S06d-closure-gate' did not pass; the gate check 'S06d-pi-cadence' did not pass; the gate check 'S06d-pi-plan' did not pass; the gate check 'S06d-pi-objectives' did not pass; the gate check 'S06d-lessons' did not pass; the gate check 'S06d-wsjf' did not pass; the gate check 'S06d-demo-credits' did not pass",
+    "S06d-artefact-standard (P1): 7 mandatory artefact package(s) open: closed_without_closure_review:S06d, std-pmp-change-control-s06d:S06d, std-pmp-project-baseline-s06d:S06d, std-pmp-project-registers-s06d:S06d, std-pmp-project-wbs-s06d:S06d, std-togaf-compliance-review-s06d:S06d, std-togaf-delivery-contract-s06d:S06d",
+    "S06d-rework (P0): 1 unresolved P0/P1 package(s): closed_without_closure_review:S06d (P1)",
+    "gate (P0): the gate check 'S06d-baseline' did not pass; the gate check 'S06d-charter' did not pass; the gate check 'S06d-closure-outputs' did not pass; the gate check 'S06d-contract' did not pass; the gate check 'S06d-review' did not pass; the gate check 'S06d-closure-gate' did not pass; the gate check 'S06d-pi-cadence' did not pass; the gate check 'S06d-pi-plan' did not pass; the gate check 'S06d-pi-objectives' did not pass; the gate check 'S06d-lessons' did not pass; the gate check 'S06d-wsjf' did not pass; the gate check 'S06d-demo-credits' did not pass; the gate check 'S06d-artefact-standard' did not pass; the gate check 'S06d-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The connector standard \u2014 one registry entry per kind, one inbound route, one command grammar, one multicast dispatcher and a tenant-admin grant matrix \u2014 is accepted on the \u00a75 Gate result at `99ed39f` plus the five-failure fix: clippy/fmt clean, lock OK, and every affected binary re-run green.",
-  "generated_at": "2026-11-24T17:10:32.229602+00:00",
+  "generated_at": "2026-11-24T18:03:24.850980+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S06d.toml",
   "name": "Interaction connector standard \u2014 web, Telegram, MCP first",
   "project": "S06d",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T17:09:25Z",
-    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
-    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
+    "generated_at": "2026-11-24T16:58:37.395498+00:00",
+    "git_sha": "1bf2fb7c92d5db83836034da909495e1bd2361c1",
+    "path": "retained-snapshot/1bf2fb7c92d5db83836034da909495e1bd2361c1"
   },
   "verdict": "red",
   "warnings": []

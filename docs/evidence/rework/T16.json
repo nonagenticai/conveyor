@@ -140,9 +140,27 @@
       "severity": "P0"
     },
     {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "12 mandatory artefact package(s) open: std-togaf-phase-g-t16-g:T16, std-pmp-project-baseline-t16:T16, std-pmp-project-registers-t16:T16, std-togaf-architecture-artifact-instance-01a20e7e-8d5e-74e7-b24d-c95826f683ff:T16, std-togaf-architecture-artifact-instance-01a20e7e-8ed2-758f-aba3-473310bcc527:T16, std-togaf-architecture-artifact-instance-01a20e7e-9045-71a3-83bd-9f1c82abd8c0:T16, std-togaf-architecture-artifact-instance-01a20e7e-91b5-7ba6-9ffc-922428588752:T16, std-togaf-architecture-artifact-instance-01a20e7e-9324-7125-a9af-b72b1a784769:T16, +4 more",
+      "id": "T16-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "1 unresolved P0/P1 package(s): std-togaf-phase-g-t16-g:T16 (P1)",
+      "id": "T16-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass",
+      "detail": "the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-artefact-standard' did not pass; the gate check 'T16-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -152,19 +170,21 @@
   "failures": [
     "T16-contract (P0): no live board-approved delivery contract",
     "T16-review (P0): no Phase-G compliance review for the project's live contract",
-    "gate (P0): the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass"
+    "T16-artefact-standard (P1): 12 mandatory artefact package(s) open: std-togaf-phase-g-t16-g:T16, std-pmp-project-baseline-t16:T16, std-pmp-project-registers-t16:T16, std-togaf-architecture-artifact-instance-01a20e7e-8d5e-74e7-b24d-c95826f683ff:T16, std-togaf-architecture-artifact-instance-01a20e7e-8ed2-758f-aba3-473310bcc527:T16, std-togaf-architecture-artifact-instance-01a20e7e-9045-71a3-83bd-9f1c82abd8c0:T16, std-togaf-architecture-artifact-instance-01a20e7e-91b5-7ba6-9ffc-922428588752:T16, std-togaf-architecture-artifact-instance-01a20e7e-9324-7125-a9af-b72b1a784769:T16, +4 more",
+    "T16-rework (P0): 1 unresolved P0/P1 package(s): std-togaf-phase-g-t16-g:T16 (P1)",
+    "gate (P0): the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-artefact-standard' did not pass; the gate check 'T16-rework' did not pass"
   ],
   "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds",
-  "generated_at": "2026-11-24T17:10:35.604507+00:00",
+  "generated_at": "2026-11-24T18:03:28.298130+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T16.toml",
   "name": "SOP, RDF/OWL and process-document ingestion",
   "project": "T16",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T17:09:25Z",
-    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
-    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
+    "generated_at": "2026-11-24T16:58:37.395498+00:00",
+    "git_sha": "1bf2fb7c92d5db83836034da909495e1bd2361c1",
+    "path": "retained-snapshot/1bf2fb7c92d5db83836034da909495e1bd2361c1"
   },
   "verdict": "red",
   "warnings": []
