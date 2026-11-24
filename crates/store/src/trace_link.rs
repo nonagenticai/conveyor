@@ -208,6 +208,44 @@ pub async fn insert_trace_link_tx(
     Ok(row)
 }
 
+/// Insert a trace edge inside the caller's scoped transaction, tolerating the same edge.
+///
+/// [`insert_trace_link_tx`] reports a duplicate as [`TraceLinkStoreError::Conflict`], but a
+/// unique violation has already aborted the caller's transaction by the time the error reaches
+/// it, so a caller that ignores the conflict cannot continue. This writer states the tolerance
+/// in the statement instead: `ON CONFLICT ON CONSTRAINT trace_link_tenant_edge_key DO NOTHING`
+/// leaves the transaction usable and returns `None` when the edge was already there.
+///
+/// Both ends are still resolved inside the caller's tenant first (CONTRACT §2), and every other
+/// database error is returned unchanged, so a genuine failure is never read as an existing edge.
+pub async fn insert_trace_link_if_absent_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    input: &NewTraceLink,
+) -> Result<Option<TraceLinkRecord>, TraceLinkStoreError> {
+    ensure_end_tx(conn, tenant, "from", &input.from_type, input.from_id).await?;
+    ensure_end_tx(conn, tenant, "to", &input.to_type, input.to_id).await?;
+    if !LINK_KINDS.contains(&input.kind.as_str()) {
+        return Err(TraceLinkStoreError::UnknownKind(input.kind.clone()));
+    }
+    let sql = format!(
+        "INSERT INTO trace_link (tenant_id, from_type, from_id, to_type, to_id, kind)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         ON CONFLICT ON CONSTRAINT trace_link_tenant_edge_key DO NOTHING
+         RETURNING {COLUMNS}"
+    );
+    let row: Option<TraceLinkRecord> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(&input.from_type)
+        .bind(input.from_id)
+        .bind(&input.to_type)
+        .bind(input.to_id)
+        .bind(&input.kind)
+        .fetch_optional(&mut *conn)
+        .await?;
+    Ok(row)
+}
+
 /// Delete one trace edge. `false` means it does not exist in this tenant.
 pub async fn delete_trace_link_tx(
     conn: &mut PgConnection,
