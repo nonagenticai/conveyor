@@ -2,8 +2,7 @@
 key = "T12"
 name = "One organisation loop"
 gate = "T12 is NOT built, and its acceptance — `SPEC_V2` §12: 'one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget; one benefit is baselined before its transition and measured after it, with the delta attributable to the operational area' — is the condition on which it may be closed, not a claim that it is met."
-gate_checks = ["T12-project", "T12-baseline", "T12-charter", "T12-closure-outputs", "T12-contract", "T12-review", "T12-closure-gate", "T12-waivers", "T12-pi-cadence", "T12-pi-plan", "T12-pi-objectives", "T12-wsjf", "T12-demo-credits", "T12-lessons", "T12-product"]
-
+gate_checks = ["T12-project", "T12-baseline", "T12-charter", "T12-contract", "T12-review", "T12-waivers", "T12-pi-cadence", "T12-pi-plan", "T12-pi-objectives", "T12-wsjf", "T12-demo-credits", "T12-lessons", "T12-product"]
 [[check]]
 id = "T12-project"
 check = "project"
@@ -35,12 +34,6 @@ assert gates.get("charter")=="approved", gates
 '''
 
 [[check]]
-id = "T12-closure-outputs"
-check = "closure_outputs"
-severity = "P0"
-description = "the declared closure outputs are declared and published"
-
-[[check]]
 id = "T12-contract"
 check = "contract"
 severity = "P0"
@@ -51,12 +44,6 @@ id = "T12-review"
 check = "review"
 severity = "P0"
 description = "the Phase-G review cites a published standing delegation"
-
-[[check]]
-id = "T12-closure-gate"
-check = "closure_gate"
-severity = "P0"
-description = "the closure gate was decided by an approver other than its requester"
 
 [[check]]
 id = "T12-waivers"

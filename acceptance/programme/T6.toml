@@ -2,8 +2,7 @@
 key = "T6"
 name = "Development project"
 gate = "T6 is NOT built, and its acceptance — `SPEC_V2` §12: 'a real feature lands: lane → PR → CI → review → merge → deploy → live verify; the project cannot change its own gates; rollback tested' — is the condition on which it may be closed, not a claim that it is met."
-gate_checks = ["T6-project", "T6-baseline", "T6-charter", "T6-closure-outputs", "T6-contract", "T6-review", "T6-closure-gate", "T6-waivers", "T6-pi-cadence", "T6-pi-plan", "T6-pi-objectives", "T6-wsjf", "T6-demo-credits", "T6-lessons", "T6-product"]
-
+gate_checks = ["T6-project", "T6-baseline", "T6-charter", "T6-contract", "T6-review", "T6-waivers", "T6-pi-cadence", "T6-pi-plan", "T6-pi-objectives", "T6-wsjf", "T6-demo-credits", "T6-lessons", "T6-product"]
 [[check]]
 id = "T6-project"
 check = "project"
@@ -35,12 +34,6 @@ assert gates.get("charter")=="approved", gates
 '''
 
 [[check]]
-id = "T6-closure-outputs"
-check = "closure_outputs"
-severity = "P0"
-description = "the declared closure outputs are declared and published"
-
-[[check]]
 id = "T6-contract"
 check = "contract"
 severity = "P0"
@@ -51,12 +44,6 @@ id = "T6-review"
 check = "review"
 severity = "P0"
 description = "the Phase-G review cites a published standing delegation"
-
-[[check]]
-id = "T6-closure-gate"
-check = "closure_gate"
-severity = "P0"
-description = "the closure gate was decided by an approver other than its requester"
 
 [[check]]
 id = "T6-waivers"

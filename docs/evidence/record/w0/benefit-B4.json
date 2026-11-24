@@ -1,0 +1,24 @@
+{
+ "benefit": "B4",
+ "profile_id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+ "baseline": {
+  "definition": "no outside author in the merged PRs at 2026-11-22",
+  "value": 0.0,
+  "unit": "outside contributions",
+  "measured_at": "2026-11-22",
+  "method": "merged PR authors from the GitHub issue registry; the publication trail on the programme issues",
+  "evidence": {
+   "measurement_id": "01a20e7e-105e-793c-9109-6579e00ef4ed",
+   "instrument": "merged PR authors outside the org",
+   "merged_authors": {
+    "app/nonagenticai-claude": 69,
+    "app/github-actions": 45,
+    "georgiedekker": 6
+   },
+   "outside_authors": 0,
+   "re_verified_at_snapshot": "fe36ca35c3b9d444ba7e15822a6d033524b5e75b"
+  }
+ },
+ "snapshot_sha": "fe36ca35c3b9d444ba7e15822a6d033524b5e75b",
+ "note": "baseline reading taken 2026-11-22; evidence re-verified at the W0 snapshot"
+}
