@@ -7,7 +7,9 @@
 //! - `departments.*` — extended in `handlers.rs` with the industry placement;
 //! - `job_catalogue.*` — the position, its draft anatomy and its ordered departments;
 //! - `job_releases.*` — publish compiles and hashes; a release is never edited;
-//! - `job_bindings.*` — pin one release to one executor; the registry refuses an unserved kind.
+//! - `job_bindings.*` — pin one release to one executor; the registry refuses an unserved kind;
+//! - `job_authorities.*` — the tenant's meta-role × action matrix (SPEC_V2 §6.7), read and
+//!   changed as tenant data rather than as a database edit.
 //!
 //! Writes are `organisation:write` (admin/kata_executor); reads are `organisation:read` (open).
 //! No action here writes a raw SQL update: the store functions own the invariants and the
@@ -1117,4 +1119,253 @@ async fn job_bindings_list(
         .await
         .map_err(|error| store_error(error, "job_bindings.list"))?;
     Ok(rows.iter().map(binding_view).collect())
+}
+
+// ── job authorities ──────────────────────────────────────────────────────────────────────
+
+/// The five §6.7 meta-role columns, in SPEC order.
+const META_ROLES: [&str; 5] = ["pm", "coach", "kata", "delivery", "ops"];
+
+/// `job_authorities.get`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct JobAuthoritiesGetIn {
+    /// The §6.7 meta-role whose stored overrides are returned.
+    pub meta_role: String,
+}
+
+/// `job_authorities.set`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct JobAuthoritySetIn {
+    /// The §6.7 meta-role column.
+    pub meta_role: String,
+    /// The action's registry name (`coach.remedy`).
+    pub action: String,
+    /// `true` grants the action; `false` revokes it.
+    pub allowed: bool,
+}
+
+/// One stored override.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct JobAuthorityOut {
+    /// The §6.7 meta-role.
+    pub meta_role: String,
+    /// The action's registry name.
+    pub action: String,
+    /// The tenant's decision.
+    pub allowed: bool,
+    /// The principal that wrote the decision, for audit.
+    pub updated_by: Option<String>,
+    /// When the decision was last written.
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+/// One effective cell of the matrix: what a screen renders as "granted / not granted, and why".
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct JobAuthorityCellOut {
+    /// The §6.7 meta-role.
+    pub meta_role: String,
+    /// The action's registry name.
+    pub action: String,
+    /// Whether the role may call the action.
+    pub allowed: bool,
+    /// `stored` when a tenant row decided the cell; else `compiled_default`.
+    pub source: String,
+}
+
+/// The matrix a screen renders.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct JobAuthoritiesOut {
+    /// The role whose overrides are listed.
+    pub meta_role: String,
+    /// Every override the tenant stored for `meta_role`.
+    pub overrides: Vec<JobAuthorityOut>,
+    /// The five roles' effective cells over the matrix's bounded action list.
+    pub effective: Vec<JobAuthorityCellOut>,
+}
+
+fn job_authority_view(row: &store::job_authority::JobAuthority) -> JobAuthorityOut {
+    JobAuthorityOut {
+        meta_role: row.meta_role.clone(),
+        action: row.action.clone(),
+        allowed: row.allowed,
+        updated_by: row.updated_by.clone(),
+        updated_at: row.updated_at,
+    }
+}
+
+/// Trim and validate a caller-named meta-role against the five §6.7 columns.
+fn known_meta_role(raw: &str) -> Result<&'static str, ActionError> {
+    let role = raw.trim();
+    META_ROLES
+        .iter()
+        .copied()
+        .find(|known| *known == role)
+        .ok_or_else(|| {
+            invalid(
+                "meta_role",
+                "unknown_meta_role",
+                format!("{role:?} is not one of: {}", META_ROLES.join(", ")),
+            )
+        })
+}
+
+/// Trim and validate a caller-named action against the compiled registry.
+fn known_action(raw: &str) -> Result<&'static str, ActionError> {
+    let action = raw.trim();
+    crate::registry()
+        .get(action)
+        .map(|spec| spec.name)
+        .ok_or_else(|| {
+            invalid(
+                "action",
+                "unknown_action",
+                format!("{action:?} is not a registered action"),
+            )
+        })
+}
+
+/// The bounded action list the matrix speaks about: the five families a meta-role owns, the
+/// four cross-family verbs §6.7 names, plus every action the tenant stored a decision for.
+///
+/// Derived from the registry, so it can never name an action this build does not serve; a
+/// stored decision for an action outside the families is still shown, because a matrix that
+/// hid a tenant's own grant would lie.
+fn matrix_actions(stored: &[store::job_authority::JobAuthority]) -> Vec<&'static str> {
+    let mut actions: Vec<&'static str> = crate::registry()
+        .names()
+        .into_iter()
+        .filter(|name| {
+            name.starts_with("pm.")
+                || name.starts_with("projects.")
+                || name.starts_with("kata.")
+                || name.starts_with("coach.")
+                || name.starts_with("ops.")
+                || matches!(
+                    *name,
+                    "cards.create" | "cards.move" | "job_bindings.create" | "job_bindings.retire"
+                )
+        })
+        .collect();
+    for row in stored {
+        if let Some(spec) = crate::registry().get(row.action.as_str())
+            && !actions.contains(&spec.name)
+        {
+            actions.push(spec.name);
+        }
+    }
+    actions.sort_unstable();
+    actions
+}
+
+/// A store refusal from the authority matrix is a database failure; the run-bound refusals
+/// (`Forbidden`, `RunNotFound`) belong to `enforce_run_tx` and cannot arise here.
+fn job_authority_error(
+    error: store::job_authority::JobAuthorityError,
+    action: &str,
+) -> ActionError {
+    match error {
+        store::job_authority::JobAuthorityError::Database(error) => store_error(error, action),
+        other => {
+            tracing::error!(%other, action, "job authority store refusal");
+            ActionError::internal()
+        }
+    }
+}
+
+/// Read the tenant's meta-role × action matrix.
+///
+/// The stored overrides are the queried role's rows; the effective matrix is the five §6.7
+/// roles over [`matrix_actions`], each cell attributed to its stored row or the compiled
+/// default. Read-only: `effect = "read"`, no audit event.
+#[crate::action(
+    name = "job_authorities.get",
+    version = 1,
+    kind = "internal",
+    scopes = ["organisation:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn job_authorities_get(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: JobAuthoritiesGetIn,
+) -> Result<JobAuthoritiesOut, ActionError> {
+    let meta_role = known_meta_role(&input.meta_role)?;
+    let rows = store::job_authority::list(&mut *tx, ctx.tenant)
+        .await
+        .map_err(|error| job_authority_error(error, "job_authorities.get"))?;
+    let actions = matrix_actions(&rows);
+    let stored: std::collections::HashMap<(String, String), bool> = rows
+        .iter()
+        .map(|row| ((row.meta_role.clone(), row.action.clone()), row.allowed))
+        .collect();
+    let overrides: Vec<JobAuthorityOut> = rows
+        .iter()
+        .filter(|row| row.meta_role == meta_role)
+        .map(job_authority_view)
+        .collect();
+    let mut effective = Vec::with_capacity(META_ROLES.len() * actions.len());
+    for role in META_ROLES {
+        for action in &actions {
+            let stored_allowed = stored
+                .get(&(role.to_owned(), (*action).to_owned()))
+                .copied();
+            effective.push(JobAuthorityCellOut {
+                meta_role: role.to_owned(),
+                action: (*action).to_owned(),
+                allowed: stored_allowed
+                    .unwrap_or_else(|| store::job_authority::compiled_default(role, *action)),
+                source: if stored_allowed.is_some() {
+                    "stored".to_owned()
+                } else {
+                    "compiled_default".to_owned()
+                },
+            });
+        }
+    }
+    Ok(JobAuthoritiesOut {
+        meta_role: meta_role.to_owned(),
+        overrides,
+        effective,
+    })
+}
+
+/// Change one cell of the tenant's meta-role × action matrix.
+///
+/// This is the only write that can widen [`store::job_authority::compiled_default`]; the
+/// module's governance-write convention applies (`effect = "write"`, no approval gate, the
+/// same as `job_bindings.*`). An unknown role or action is a `422`, never a stored typo.
+#[crate::action(
+    name = "job_authorities.set",
+    version = 1,
+    kind = "internal",
+    scopes = ["organisation:write"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn job_authorities_set(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: JobAuthoritySetIn,
+) -> Result<JobAuthorityOut, ActionError> {
+    let meta_role = known_meta_role(&input.meta_role)?;
+    let action = known_action(&input.action)?;
+    let updated_by = ctx.actor_id.to_string();
+    let row = store::job_authority::set(
+        &mut *tx,
+        ctx.tenant,
+        meta_role,
+        action,
+        input.allowed,
+        &updated_by,
+    )
+    .await
+    .map_err(|error| job_authority_error(error, "job_authorities.set"))?;
+    Ok(job_authority_view(&row))
 }
