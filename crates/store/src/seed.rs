@@ -1119,23 +1119,6 @@ async fn seed_eval(
     Ok(())
 }
 
-///
-/// `project_type` → card_type → from-kind → allowed to-kinds. An absent entry denies.
-pub const DELIVERY_MATRIX: &str = r#"{
-  "feature": {
-    "intake": ["active", "archive"],
-    "active": ["waiting", "done", "archive"],
-    "waiting": ["active", "archive"],
-    "done": ["archive"],
-    "archive": ["intake"]
-  },
-  "bug": {
-    "intake": ["active"],
-    "active": ["done", "archive"],
-    "done": ["archive"]
-  }
-}"#;
-
 /// The default board template: one lane per `list.kind`, in lifecycle order.
 pub const DEFAULT_BOARD_TEMPLATE: [&str; 5] = ["intake", "active", "waiting", "done", "archive"];
 
@@ -1146,14 +1129,19 @@ pub const DEFAULT_BOARD_TEMPLATE: [&str; 5] = ["intake", "active", "waiting", "d
 ///
 /// It seeds three things, not one, because the first is unusable without the others:
 ///
-/// 1. the worked `delivery` `project_type` row carrying `meta.matrix` (S03 §5);
-/// 2. the `feature` and `bug` `card_type` rows the matrix is keyed by — a matrix whose card
-///    types do not exist denies every move, and `cards.create` could not name a type;
+/// 1. the worked `delivery` `project_type` row — its label and `meta` are read from the
+///    embedded export, so the dev seed and `migrate --seed` cannot drift apart (S03 §5, S07);
+/// 2. the `feature` and `bug` `card_type` rows the delivery matrix is keyed by — a matrix whose
+///    card types do not exist denies every move, and `cards.create` could not name a type;
 /// 3. the `standard` `board_template` row whose `meta.lists` is the five lane kinds
 ///    (`projects.create` creates exactly these lanes).
 pub async fn catalogue(pool: &PgPool) -> Result<(), SeedError> {
-    let matrix: serde_json::Value = serde_json::from_str(DELIVERY_MATRIX)
-        .map_err(|error| SeedError::Catalogue(error.to_string()))?;
+    let export = catalogue_export()?;
+    let delivery = export
+        .entries
+        .iter()
+        .find(|entry| entry.kind == "project_type" && entry.code == "delivery")
+        .ok_or_else(|| SeedError::Missing("catalogue_entry", "project_type/delivery"))?;
     let template = serde_json::json!({ "lists": DEFAULT_BOARD_TEMPLATE });
     for (slug, _) in DEV_TENANTS {
         // A test fixture may seed only one of the two dev tenants; an absent one is skipped,
@@ -1171,11 +1159,14 @@ pub async fn catalogue(pool: &PgPool) -> Result<(), SeedError> {
 
         sqlx::query(
             "INSERT INTO catalogue_entry (tenant_id, kind, code, label, meta, sort)
-             VALUES ($1, 'project_type', 'delivery', 'Delivery', $2, 0)
+             VALUES ($1, 'project_type', $2, $3, $4, $5)
              ON CONFLICT (tenant_id, kind, code) DO NOTHING",
         )
         .bind(tenant_id)
-        .bind(serde_json::json!({ "matrix": matrix }))
+        .bind(&delivery.code)
+        .bind(&delivery.label)
+        .bind(&delivery.meta)
+        .bind(delivery.sort)
         .execute(&mut *tx)
         .await?;
 
