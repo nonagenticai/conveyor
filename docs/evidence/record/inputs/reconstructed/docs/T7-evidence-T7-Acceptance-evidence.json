@@ -1,0 +1,8 @@
+{
+ "title": "T7 \u2014 Acceptance evidence",
+ "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+ "category": "evidence",
+ "body": "# Evidence\n\n## Claim\n\nT7's SPEC_V2 \u00a712 gate is met by executed tests at lane head `a9ffecb8`.\n\n## Evidence\n\n31 tests run, 31 passed, 1 skipped (`ops`, `ops_write`, `ops_read`, `ops_host`); the clause-to-test\nmap and the full pass list are `/tmp/u5a-r9/evidence/T7-acceptance.md`.\n\n## Verification\n\nRe-run: `cargo-guard.py nextest run --locked -p conveyor-actions --test ops --test ops_write\n--test ops_read --test ops_host`.\n\n## Links\n\nThe manifest `acceptance/programme/T7.toml`, the delivery contract and its Phase-G review, and the\ntranscript `/tmp/u5a-r9/evidence/T7-acceptance.md`.\n\n## Gap\n\nThe cluster live proof (`scripts/ops-live-proof.sh`) is deploy-bound: its operator CLI is absent\non this box and the deployed digest is `sha256:60898434\u2026` (rollout 2026-11-21T04:38Z). It is not\nclaimed as executed.\n",
+ "publishable": true,
+ "unit": "T7"
+}

@@ -1,0 +1,8 @@
+{
+ "title": "T7 \u2014 Statement of Architecture Work",
+ "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+ "category": "statement-of-architecture-work",
+ "body": "# Statement of Architecture Work \u2014 T7 operations\n\n## Assignment\n\nThe T7 slice (SPEC_V2 \u00a712) under the programme's architecture governance: operate the estate\nthrough one governed action surface, with the tenant's own approvals on every destructive write.\n\n## Scope\n\nIncidents and triage, the four write verbs, the tenant approval policy and quorum, mitigation and\nresolution with a postmortem, host registration and the k8s reads, and the systemic-finding loop.\nNot in scope: the process engine (S13) and the procedure catalogue (T18).\n\n## Responsibilities\n\nThe operator job requests and acts; the approver job decides every gate and is never its\nrequester; the programme architect owns the contract and the Phase-G review; the operations owner\nowns the incident record.\n\n## Acceptance criteria\n\nSPEC_V2 \u00a712 T7: triage, an approved mitigation with a read-back, resolution with a linked\npostmortem, a destructive call without the tenant's approvals refused, and restart/scale/rollback/\nflag-flip callable. Proven by the executed suite (`/tmp/u5a-r9/evidence/T7-acceptance.md`).\n\n## Contract\n\nThe live delivery contract `01a20ae2-30eb-7f69-812e-e98009182041`, requested by the operator job and approved by the\nArchitecture Board under the standing delegation `01a1fb9f-ac2d-732d-b274-1079be3dd2b3`; its Phase-G review is compliant\nand cites that delegation.\n",
+ "publishable": true,
+ "unit": "T7"
+}

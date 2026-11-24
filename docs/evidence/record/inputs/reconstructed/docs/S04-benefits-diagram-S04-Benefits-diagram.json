@@ -1,0 +1,8 @@
+{
+ "title": "S04 \u2014 Benefits diagram",
+ "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+ "category": "benefits-diagram",
+ "body": "# S04 \u2014 Benefits diagram\n\n## Goals and outcomes\n\nOne declaration per action; no transport drift; every invocation audited.\n\n## Measures\n\nThe registry count (549), the served operations (580) and the lock check (green at a9a5f20a).\n\n## Benefits and sub-benefits\n\nServes B4 (outside contribution: one declaration is the contribution surface) and B6 (the\ncoverage the registry gives); the sub-benefits are the six gate clauses.\n",
+ "publishable": true,
+ "unit": "S04"
+}

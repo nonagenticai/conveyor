@@ -97,6 +97,9 @@ WRITE_ACTIONS = {
     "documents.publish",
     # The closure family: the retrospective rework's close chains (T13/T10/T9/T4 corpus).
     "projects.close_request",
+    # The one backward transition: a closed `rework` project reopens before its closure
+    # chain replays onto a destination that already carries the production close.
+    "projects.reopen",
     "approvals.request",
     "projects.close",
     "cards.comment",
@@ -191,6 +194,7 @@ APPROVAL_KEY_RE = re.compile(r"^approval:([^/:]+)[/:](.+)$")
 DOCUMENT_KEY_RE = re.compile(r"^document:(.+)$")
 DOCUMENT_PUBLISH_KEY_RE = re.compile(r"^document-publish:(.+)$")
 PROJECT_CLOSURE_KEY_RE = re.compile(r"^project:closure:([0-9a-f-]{36})$")
+PROJECT_REOPEN_KEY_RE = re.compile(r"^project:reopen:([0-9a-f-]{36})$")
 PROJECT_CHARTER_KEY_RE = re.compile(r"^project:charter:([0-9a-f-]{36})$")
 PROJECT_BASELINE_KEY_RE = re.compile(r"^project:baseline:([0-9a-f-]{36})$")
 # A title carries colons ("The PM request-to-plan path: pm.plan writes the WBS"), so the
@@ -268,6 +272,8 @@ class NaturalKey:
             return f"document-publish:{self.first}"
         if self.kind == "project_closure":
             return f"project:closure:{self.first}"
+        if self.kind == "project_reopen":
+            return f"project:reopen:{self.first}"
         if self.kind == "project_charter":
             return f"project:charter:{self.first}"
         if self.kind == "project_baseline":
@@ -402,6 +408,9 @@ def parse_natural_key(value: str) -> NaturalKey:
     match = PROJECT_CLOSURE_KEY_RE.match(value)
     if match:
         return NaturalKey("project_closure", match.group(1))
+    match = PROJECT_REOPEN_KEY_RE.match(value)
+    if match:
+        return NaturalKey("project_reopen", match.group(1))
     match = PROJECT_CHARTER_KEY_RE.match(value)
     if match:
         return NaturalKey("project_charter", match.group(1))
@@ -806,6 +815,23 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                     f"line {entry.lineno}: natural key {key.first!r} does not match "
                     f"input id {entry.payload.get('id')!r}"
                 )
+        elif entry.action == "projects.reopen":
+            if key.kind != "project_reopen":
+                errors.append(
+                    f"line {entry.lineno}: projects.reopen key must be "
+                    "project:reopen:<project id>"
+                )
+                continue
+            if entry.payload.get("id") != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input id {entry.payload.get('id')!r}"
+                )
+            for field in ("reason", "decision_ref"):
+                if not str(entry.payload.get(field) or "").strip():
+                    errors.append(
+                        f"line {entry.lineno}: projects.reopen needs a non-empty {field}"
+                    )
         elif entry.action in ("projects.charter", "projects.baseline"):
             wanted = "project_charter" if entry.action == "projects.charter" else "project_baseline"
             shape = (
@@ -1568,19 +1594,26 @@ def load_state(
                     {"project_id": project_id, "category": category},
                 )
             )
-    card_gate_cards = {
-        entry.key.second if entry.key.kind == "approval" else entry.key.first
+    card_done_requests = {
+        entry.output_id: entry.key.second
         for entry in entries
         if entry.key is not None
-        and (
-            (
-                entry.action == "approvals.request"
-                and entry.key.kind == "approval"
-                and entry.key.first == "card_done"
-            )
-            or (entry.action == "approvals.decide" and entry.key.kind == "card_done_decide")
-        )
+        and entry.action == "approvals.request"
+        and entry.key.kind == "approval"
+        and entry.key.first == "card_done"
     }
+    card_gate_cards = set(card_done_requests.values())
+    for entry in entries:
+        if (
+            entry.action == "approvals.decide"
+            and entry.key is not None
+            and entry.key.kind == "card_done_decide"
+        ):
+            # The decide's natural key names the gate, not the card; the request that opened
+            # the gate is what ties it to the card.
+            card_id = card_done_requests.get(entry.key.first)
+            if card_id:
+                card_gate_cards.add(card_id)
     review_contracts = {
         entry.key.first
         for entry in entries
@@ -1617,13 +1650,19 @@ def load_state(
             entry.key.first
             for entry in entries
             if entry.key is not None
-            and entry.key.kind in ("project_close", "project_closure")
+            and entry.key.kind in ("project_close", "project_closure", "project_reopen")
         }
         for project_id in sorted(project_ids | close_projects):
             output = client.invoke("projects.get", {"id": project_id})
             row = output.get("project") if isinstance(output, dict) else None
             if isinstance(row, dict):
                 state.projects[project_id] = row
+            if project_id in close_projects:
+                # A closure gate's typed evidence cites the project's scope baseline by an id
+                # the replay recomputes; the rows are needed to resolve it by kind.
+                state.baselines[project_id] = rows(
+                    client, "baselines.list", {"project_id": project_id}
+                )
         for entry in entries:
             if entry.action not in ("cards.comment", "cards.move"):
                 continue
@@ -2179,7 +2218,18 @@ def existing_for(
         entry.action == "approvals.decide"
         and key.kind == "card_done_decide"
     ):
-        return card_gate(state, key.first, expected_gate_status(entry.payload))
+        production = (id_map or {}).get(key.first, key.first)
+        expected = expected_gate_status(entry.payload)
+        for gates in state.card_gates.values():
+            for gate in gates:
+                if gate.get("id") == production and gate.get("status") == expected:
+                    return gate
+        # The decide's natural key is recorded as the gate id on some cards and as the card
+        # id on others; a card-keyed entry finds its gate on that card directly.
+        for gate in state.card_gates.get(key.first, []):
+            if gate.get("status") == expected:
+                return gate
+        return None
     if entry.action == "approvals.request" and key.kind == "tranche_review_gate":
         tranche = tranche_by_number(state, key.first)
         return tranche_review_gate(
@@ -2307,6 +2357,13 @@ def existing_for(
         return None
     if entry.action == "projects.close_request":
         return closure_gate(state, key.first)
+    if entry.action == "projects.reopen":
+        # The reopen exists so the close chain can run. Once the project's closure gate
+        # exists the chain has run, so a second replay skips it — the project may be closed
+        # again by design (T4/T7's staging state is active with an approved close gate).
+        if closure_gate(state, key.first) is not None:
+            return state.projects.get(key.first)
+        return None
     if entry.action == "projects.charter":
         # The act is done once the project's charter gate exists at all: a pending gate still
         # needs its decide, an approved one needs nothing, and a second charter is refused.
@@ -2574,6 +2631,10 @@ def remap_payload(
     key = entry.key
     assert key is not None
     payload = copy.deepcopy(entry.payload)
+    if entry.action == "documents.publish" and "_version" in payload:
+        # The row's current version is the precondition the invoke sends; the recorded
+        # `_version` belongs to the staging row and would contradict it.
+        payload.pop("_version", None)
     if entry.action == "changes.request" and not (
         isinstance(payload.get("body"), str) and payload["body"].strip()
     ):
@@ -2735,6 +2796,15 @@ def remap_payload(
                 staging = item.get("id") if isinstance(item, dict) else None
                 if staging and id_map.get(str(staging)):
                     item["id"] = id_map[str(staging)]
+                elif isinstance(item, dict) and item.get("kind") == "baseline":
+                    # A scope baseline is recomputed at replay time, so its row id is not
+                    # portable. The project's approved scope baseline is the same evidence;
+                    # resolve it by kind rather than refusing a gate the staging record opened.
+                    project_id = str(entry.payload.get("project_id") or "")
+                    for row in state.baselines.get(project_id, []):
+                        if row.get("kind") == "scope" and row.get("approved_by"):
+                            item["id"] = row["id"]
+                            break
                 remapped.append(item)
             payload["evidence"] = remapped
     elif entry.action == "approvals.decide" and key.kind != "tranche_review_decide":
@@ -2936,6 +3006,12 @@ def output_id_for(action: str, output: Any) -> tuple[str, str | None]:
         if not project_id:
             raise PromoteError("projects.close_request: output has no project_id")
         return str(project_id), None
+    if action == "projects.reopen":
+        project = output.get("project") if isinstance(output, dict) else None
+        project_id = project.get("id") if isinstance(project, dict) else None
+        if not project_id:
+            raise PromoteError("projects.reopen: output has no project id")
+        return str(project_id), None
     if action == "projects.close":
         project = output.get("project")
         project_id = project.get("id") if isinstance(project, dict) else None
@@ -2981,8 +3057,9 @@ def readback_entry(
             return gate
         raise ReadbackError("approvals.list: the card-done gate is not readable")
     if entry.action == "approvals.decide" and key.kind == "card_done_decide":
-        gates = list_all(client, "approvals.list", {"card_id": key.first})
-        state.card_gates[key.first] = gates
+        # The key names the gate, not the card; read the decided gate by id across the
+        # tenant rather than filtering by a card id the key never carried.
+        gates = list_all(client, "approvals.list", {})
         for gate in gates:
             if gate.get("id") != production_id:
                 continue
@@ -2991,6 +3068,11 @@ def readback_entry(
                     f"approvals.list: the card-done gate is {gate.get('status')!r}, not "
                     f"{expected_gate_status(entry.payload)!r}"
                 )
+            card_id = gate.get("card_id")
+            if card_id:
+                state.card_gates[str(card_id)] = [
+                    row for row in gates if str(row.get("card_id")) == str(card_id)
+                ]
             return gate
         raise ReadbackError("approvals.list: the decided card-done gate is not readable")
     if entry.action == "registers.create":
@@ -3125,6 +3207,19 @@ def readback_entry(
         if gate is not None and closure_gate(state, str(project_id)) is None:
             state.approvals.append(gate)
         return project
+    if entry.action == "projects.reopen":
+        project = read_project(client, production_id)
+        if project.get("status") != "active":
+            raise ReadbackError(
+                f"projects.get: status is {project.get('status')!r}, not 'active'"
+            )
+        meta = project.get("meta") or {}
+        if meta.get("reopen_reason") != entry.payload.get("reason"):
+            raise ReadbackError(
+                "projects.get: reopen_reason is not the requested reason"
+            )
+        state.projects[production_id] = project
+        return project
     if entry.action == "approvals.request" and key.kind == "tranche_review_gate":
         for gate in list_all(client, "approvals.list", {}):
             if gate.get("id") != production_id:
@@ -3176,6 +3271,11 @@ def readback_entry(
             raise ReadbackError(
                 f"cards.get: the card is in a {kind!r} lane, not {key.second!r}"
             )
+        for comment in card.get("comments") or []:
+            if isinstance(comment, dict) and isinstance(comment.get("body"), str):
+                comment["_sha"] = hashlib.sha256(
+                    comment["body"].encode("utf-8")
+                ).hexdigest()
         state.cards[key.first] = card
         return card
     if entry.action == "decisions.create":
@@ -3544,8 +3644,38 @@ def apply_entries(
                 if entry.raw.get("approval_id") and gate_id:
                     id_map[entry.raw["approval_id"]] = gate_id
 
-            row = readback_entry(
-                entry, client, state, production_id, gate_id, snapshot, id_map
+            verified_output = None
+            if entry.action == "cards.comment":
+                # `cards.get` no longer projects comment bodies, so the action's own output
+                # is the read-back: the invoke response is the product's response.
+                body = output.get("body") if isinstance(output, dict) else None
+                if (
+                    not isinstance(body, str)
+                    or body.strip() != str(payload.get("body") or "").strip()
+                ):
+                    raise ReadbackError(
+                        "cards.comment: the action output does not carry the comment body"
+                    )
+                verified_output = output
+                card = state.cards.setdefault(
+                    key.first, {"id": key.first, "comments": []}
+                )
+                comments = card.setdefault("comments", [])
+                if not any(
+                    isinstance(item, dict) and item.get("id") == production_id
+                    for item in comments
+                ):
+                    comments.append({
+                        "id": production_id,
+                        "body": body,
+                        "_sha": hashlib.sha256(body.encode("utf-8")).hexdigest(),
+                    })
+            row = (
+                verified_output
+                if verified_output is not None
+                else readback_entry(
+                    entry, client, state, production_id, gate_id, snapshot, id_map
+                )
             )
             if row is not None:
                 if entry.action == "registers.create":
@@ -3950,6 +4080,17 @@ class FakeClient:
             }
             self.state.approvals.append(gate)
             return {"id": gate["id"], "gate": gate["gate"], "status": gate["status"]}
+        if action == "projects.reopen":
+            project = self.state.projects.get(payload.get("id"))
+            if project is None:
+                raise PromoteError("projects.reopen: no project")
+            if project.get("status") != "closed":
+                raise PromoteError("projects.reopen: project is not closed")
+            project["status"] = "active"
+            meta = project.setdefault("meta", {})
+            meta["reopen_reason"] = payload.get("reason")
+            meta["reopen_decision_ref"] = payload.get("decision_ref")
+            return {"project": copy.deepcopy(project), "boards": []}
         if action == "projects.close":
             project = self.state.projects.get(payload.get("id"))
             if project is None:
@@ -5375,6 +5516,88 @@ def self_test() -> int:
         ok(not document["complete"], "an unreplayable row makes the promotion incomplete")
         ok(main(["--check", "--journal", str(bad_path)]) == 1,
            "a check run with an unreplayable row exits non-zero")
+
+    # 15. the reopen transition: a closed `rework` project reopens before its closure chain,
+    #     the close request's gate makes the reopen a skip on a second replay, and a reopen
+    #     without a reason or decision reference is refused.
+    with tempfile.TemporaryDirectory(prefix="promote-record-reopen-") as tmp:
+        reopen_dir = Path(tmp)
+        project = "01a1dcb8-d24b-76de-b901-56fd56e001bc"
+        reopen_path = reopen_dir / "reopen.json"
+        reopen_path.write_text(json.dumps({
+            "id": project,
+            "reason": "Closed without its record; reopen to complete it.",
+            "decision_ref": "document/01a1fb9f-f19e-749b-9218-a4428b2e3dac",
+        }), encoding="utf-8")
+        close_path = reopen_dir / "close.json"
+        close_path.write_text(json.dumps({
+            "id": project,
+            "closure": "# Closure review\n\nThe record is complete.",
+            "reason": "Close after the retrospective record.",
+        }), encoding="utf-8")
+        reopen_raw = [
+            {"action": "projects.reopen", "input": str(reopen_path),
+             "natural_key": f"project:reopen:{project}", "output_id": project},
+            {"action": "projects.close_request", "input": str(close_path),
+             "natural_key": f"project:closure:{project}", "output_id": project},
+        ]
+        reopen_entries, reopen_unreplayable, reopen_errors = build_entries(
+            [(2, raw) for raw in reopen_raw]
+        )
+        ok(
+            not reopen_errors and not reopen_unreplayable,
+            f"the reopen chain parses: {reopen_errors} "
+            f"{[entry.unreplayable for entry in reopen_unreplayable]}",
+        )
+        ok(not validate_entries(reopen_entries), "the reopen chain validates")
+        reopen_state = State()
+        reopen_state.projects[project] = {
+            "id": project, "key": "T99", "status": "closed",
+            "meta": {"viability": "rework"}, "version": 3,
+        }
+        reopen_client = FakeClient(reopen_state)
+        first_map, first_outcomes = apply_entries(
+            reopen_client, reopen_entries, reopen_state, None
+        )
+        ok(
+            [outcome.verdict for outcome in first_outcomes] == ["created", "created"],
+            f"the reopen chain applies: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in first_outcomes]}",
+        )
+        ok(
+            reopen_state.projects[project]["status"] == "active",
+            "the reopen moves the project back to active",
+        )
+        ok(
+            first_map.get(project) == project,
+            "the reopen maps the project id",
+        )
+        gate = closure_gate(reopen_state, project)
+        ok(
+            gate is not None and gate.get("status") == "pending",
+            "the close request after the reopen opens the closure gate",
+        )
+        _, second_outcomes = apply_entries(
+            FakeClient(reopen_state), reopen_entries, reopen_state, None
+        )
+        ok(
+            [outcome.verdict for outcome in second_outcomes] == ["skipped", "skipped"],
+            f"a replay skips the reopen and its closure chain: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in second_outcomes]}",
+        )
+        bad_reopen = reopen_dir / "bad-reopen.json"
+        bad_reopen.write_text(
+            json.dumps({"id": project, "reason": ""}), encoding="utf-8"
+        )
+        bad_entries, bad_unreplayable, bad_errors = build_entries(
+            [(2, {"action": "projects.reopen", "input": str(bad_reopen),
+                  "natural_key": f"project:reopen:{project}", "output_id": project})]
+        )
+        ok(
+            not bad_errors and not bad_unreplayable
+            and bool(validate_entries(bad_entries)),
+            "a reopen without a reason or decision reference is refused",
+        )
 
     print(f"self-test: {checks} checks passed (offline; no network, no database)")
     return 0

@@ -1,0 +1,8 @@
+{
+ "title": "S04 \u2014 Project context diagram",
+ "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+ "category": "project-context-diagram",
+ "body": "# S04 \u2014 Project context diagram\n\n## Context\n\nThe registry sits at the centre of the platform: every caller (console, agents, CLI) resolves\nactions from it.\n\n## Affected organisation\n\nThe delivery team, the programme manager and the consumers of the served spec.\n\n## Affected systems\n\nThe action registry, the HTTP API, the MCP endpoint, the admin CLI and the external ingest \u2014 one\ndeclaration, five surfaces.\n",
+ "publishable": true,
+ "unit": "S04"
+}

@@ -1,0 +1,8 @@
+{
+ "title": "S04 \u2014 Candidate solutions",
+ "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+ "category": "candidate-solutions",
+ "body": "# S04 \u2014 Candidate solutions\n\n## Candidates\n\n1. Hand-written per-transport routes.\n2. One ActionSpec registry with a derive macro (chosen).\n3. Code generation at build time from a separate DSL.\n\n## Criteria\n\nOne source of truth; no drift between transports; the lock pins the served spec; the invocation\npath audits.\n\n## Options rejected\n\nCandidate 1 drifts and forks the audit path. Candidate 3 adds a second language surface without\nremoving the registry. Candidate 2 is the shipped path.\n",
+ "publishable": true,
+ "unit": "S04"
+}

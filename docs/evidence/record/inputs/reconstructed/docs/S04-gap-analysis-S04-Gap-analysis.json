@@ -1,0 +1,8 @@
+{
+ "title": "S04 \u2014 Gap analysis",
+ "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+ "category": "gap-analysis",
+ "body": "# S04 \u2014 Gap analysis\n\n## Baseline\n\nThe v1 registry without the derive crate: declarations and routes could drift, and the served spec\nhad no lock.\n\n## Target\n\nThe S04 gate: derive, manifest, OpenAPI, MCP, invocation and ingest from one declaration, locked.\n\n## Gaps and work packages\n\nClosed by the two accepted deliverables (derive crate; registry and vocabularies) under change\n`01a2054b-3f86\u2026`; the remaining work packages are the deliverables' decomposition rows, recorded\nas such.\n",
+ "publishable": true,
+ "unit": "S04"
+}
