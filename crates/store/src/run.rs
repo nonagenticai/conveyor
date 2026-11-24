@@ -205,6 +205,10 @@ pub enum RunStoreError {
     /// (`422 binding_required`, SPEC_V2 §4.4). Refused before the INSERT.
     #[error("a job run must name its job binding and pinned release")]
     BindingRequired,
+    /// A job run did not name the card whose work package it executes (`422 card_required`,
+    /// SPEC_V2 §5.1, v1-p5-5). Refused before the INSERT.
+    #[error("a job run must name the card whose work package it executes")]
+    CardRequired,
     /// A stored `run.kind` the store does not know.
     #[error("the database holds run.kind = {0:?}, which the store does not know")]
     UnknownKind(String),
@@ -440,6 +444,8 @@ fn constraint_of(error: &sqlx::Error) -> Option<&str> {
 /// [`RunStoreError::JobBindingStale`] and nothing is written (SPEC_V2 §4.4, T0 P2.2). A
 /// [`RunKind::Job`] run with no binding is likewise refused
 /// [`RunStoreError::BindingRequired`] before any write; the database CHECK is the second door.
+/// A [`RunKind::Job`] run with no card is refused [`RunStoreError::CardRequired`] the same way:
+/// the card is the work package the run executes (SPEC_V2 §5.1, v1-p5-5).
 pub async fn insert_run_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -449,6 +455,11 @@ pub async fn insert_run_tx(
     // binding pins, and this refusal runs before the parent lookups and the INSERT.
     if input.kind == RunKind::Job && input.job_binding_id.is_none() {
         return Err(RunStoreError::BindingRequired);
+    }
+    // The same path owes its card: a job run executes a work package, so a cardless job run is
+    // no work at all. Refused before the parent lookups, the binding lookup and the INSERT.
+    if input.kind == RunKind::Job && input.card_id.is_none() {
+        return Err(RunStoreError::CardRequired);
     }
     ensure_parent_tx(conn, tenant, Parent::Project, input.project_id).await?;
     ensure_optional_parent_tx(conn, tenant, Parent::Card, input.card_id).await?;

@@ -152,6 +152,12 @@ pub fn run_error(error: store::RunStoreError, action: &str) -> ActionError {
             "binding_required",
             "a job run must name the job binding (and its pinned release) it executes under",
         ),
+        // v1-p5-5 (SPEC_V2 §5.1): the card is the work package a job run executes.
+        store::RunStoreError::CardRequired => invalid(
+            "card_id",
+            "card_required",
+            "a job run must name the card whose work package it executes",
+        ),
         store::RunStoreError::UnknownKind(raw) => {
             tracing::error!(kind = %raw, "a stored run.kind is outside the four the store knows");
             ActionError::internal()

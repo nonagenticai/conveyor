@@ -45,6 +45,11 @@ pub enum PlanStoreError {
     /// The domain refused the write.
     #[error(transparent)]
     Illegal(#[from] PlanError),
+    /// A work-package write named no card, so nothing executes it (SPEC_V2 §5.1, v1-p5-5).
+    /// Raised by the follow-up slice that turns the chain into a hard rule; the variant is the
+    /// action layer's `422 card_required`.
+    #[error("a work package must name the card that executes it")]
+    CardRequired,
     /// A stored vocabulary value no longer parses.
     #[error("the database holds {what} = {value:?}, which the domain does not know")]
     Vocabulary {
@@ -151,6 +156,10 @@ pub struct NewWbsNode {
     pub body: String,
     /// Acceptance criteria.
     pub acceptance: Value,
+    /// The card that executes this work package. `None` is an unlinked node; a `work_package`
+    /// node owes one (the follow-up slice turns that into the store's refusal). When named, the
+    /// card must belong to this project in this tenant.
+    pub card_id: Option<Uuid>,
     /// The four WSJF inputs.
     pub inputs: WsjfInputs,
     /// Free-form metadata.
@@ -217,6 +226,31 @@ pub async fn insert_wbs_tx(
     new: &NewWbsNode,
 ) -> Result<WbsRecord, PlanStoreError> {
     require_project_tx(&mut *conn, tenant, new.project_id).await?;
+    // The card is the work package's executor: when one is named it must be a card of THIS
+    // project in THIS tenant. `card` carries no project column, so the project is reached the
+    // only way it exists — card → board → project. The FK alone would accept another tenant's
+    // card because referential checks bypass RLS (CONTRACT §2).
+    if let Some(card) = new.card_id {
+        let owned: bool = sqlx::query_scalar(
+            "SELECT EXISTS (
+                 SELECT 1
+                   FROM card c
+                   JOIN board b ON b.id = c.board_id
+                  WHERE c.tenant_id = $1 AND c.id = $2 AND b.tenant_id = $1
+                    AND b.project_id = $3
+             )",
+        )
+        .bind(tenant.as_uuid())
+        .bind(card)
+        .bind(new.project_id)
+        .fetch_one(&mut *conn)
+        .await?;
+        if !owned {
+            return Err(PlanStoreError::Parent(ParentError::NotFound {
+                parent: Parent::Card,
+            }));
+        }
+    }
     if let Some(parent) = new.parent_id {
         let owned: bool = sqlx::query_scalar(
             "SELECT EXISTS (SELECT 1 FROM wbs_node WHERE tenant_id = $1 AND id = $2 AND project_id = $3)",
@@ -248,9 +282,9 @@ pub async fn insert_wbs_tx(
     };
     let sql = format!(
         "INSERT INTO wbs_node (tenant_id, project_id, parent_id, position, kind, title, body,
-                               acceptance, business_value, time_criticality, risk_reduction,
-                               job_size, meta)
-         VALUES ($1, $2, $3, $4::float8::numeric, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+                               acceptance, card_id, business_value, time_criticality,
+                               risk_reduction, job_size, meta)
+         VALUES ($1, $2, $3, $4::float8::numeric, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
          RETURNING {WBS_COLUMNS}"
     );
     let row: WbsRecord = sqlx::query_as(AssertSqlSafe(sql))
@@ -262,6 +296,7 @@ pub async fn insert_wbs_tx(
         .bind(&new.title)
         .bind(&new.body)
         .bind(&new.acceptance)
+        .bind(new.card_id)
         .bind(new.inputs.business_value)
         .bind(new.inputs.time_criticality)
         .bind(new.inputs.risk_reduction)

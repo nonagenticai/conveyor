@@ -158,6 +158,7 @@ fn PlanDetailBody(detail: PlanDetail, project_id: String, refresh: Callback<()>)
     let binding_id = RwSignal::new(String::new());
     let new_wbs_kind = RwSignal::new("deliverable".to_owned());
     let new_wbs_title = RwSignal::new(String::new());
+    let new_wbs_card = RwSignal::new(String::new());
     let new_register_kind = RwSignal::new("risk".to_owned());
     let new_register_title = RwSignal::new(String::new());
     let notice = RwSignal::new(Option::<String>::None);
@@ -209,14 +210,17 @@ fn PlanDetailBody(detail: PlanDetail, project_id: String, refresh: Callback<()>)
             let project_id = project_id.clone();
             let kind = new_wbs_kind.get();
             let title = new_wbs_title.get();
+            let card = new_wbs_card.get();
             let refresh = refresh;
             leptos::task::spawn_local(async move {
+                // v1-p5-5: a work package names the card that executes it; the other kinds have
+                // no executor, so the card field is not sent for them.
+                let mut input = json!({ "project_id": project_id, "kind": kind, "title": title });
+                if kind == "work_package" {
+                    input["card_id"] = json!(card.trim());
+                }
                 match ctx
-                    .invoke(
-                        "wbs.create",
-                        json!({ "project_id": project_id, "kind": kind, "title": title }),
-                        InvokeOptions::default(),
-                    )
+                    .invoke("wbs.create", input, InvokeOptions::default())
                     .await
                 {
                     Ok(_) => {
@@ -285,13 +289,14 @@ fn PlanDetailBody(detail: PlanDetail, project_id: String, refresh: Callback<()>)
         } else {
             view! {
                 <table class="table" data-testid="plan-wbs">
-                    <thead><tr><th>"Kind"</th><th>"Title"</th><th>"Parent"</th><th>"Status"</th></tr></thead>
+                    <thead><tr><th>"Kind"</th><th>"Title"</th><th>"Parent"</th><th>"Card"</th><th>"Status"</th></tr></thead>
                     <tbody>
                         {wbs.into_iter().map(|row| view! {
                             <tr>
                                 <td>{text(&row, "kind")}</td>
                                 <td>{text(&row, "title")}</td>
                                 <td class="mono">{text(&row, "parent_id")}</td>
+                                <td class="mono">{text(&row, "card_id")}</td>
                                 <td><StatusPill status=text(&row, "status")/></td>
                             </tr>
                         }).collect_view()}
@@ -314,7 +319,15 @@ fn PlanDetailBody(detail: PlanDetail, project_id: String, refresh: Callback<()>)
                 <span>"Title"</span>
                 <input class="input" placeholder="what the node delivers"
                     on:input=move |event| new_wbs_title.set(event_target_value(&event))/></label>
-            <button class="btn" disabled=move || new_wbs_title.get().trim().is_empty()
+            <label class="field">
+                <span>"Card"</span>
+                <input class="input mono" placeholder="the card a work package executes (its id)"
+                    on:input=move |event| new_wbs_card.set(event_target_value(&event))/></label>
+            <button class="btn" disabled=move || {
+                    new_wbs_title.get().trim().is_empty()
+                        || (new_wbs_kind.get() == "work_package"
+                            && new_wbs_card.get().trim().is_empty())
+                }
                 on:click=create_wbs>"Add WBS node"</button>
         </div>
 
