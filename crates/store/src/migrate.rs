@@ -265,7 +265,10 @@ mod tests {
                 // T5 P2–P4 (#77): the open-time measurability gate, the pinned pre-kata
                 // procedure version, and the append-only revert and adoption evidence
                 // (0067_kata_gate.sql).
-                (67, "kata gate".to_owned())
+                (67, "kata gate".to_owned()),
+                // T6: the development charter, its immutable step evidence, the closure record,
+                // the one-pending development gate index and the approval-policy auto-merge terms.
+                (68, "development project".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
