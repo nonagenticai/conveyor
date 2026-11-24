@@ -1732,8 +1732,8 @@
     },
     {
      "path": "crates/actions/src/control/approvals.rs",
-     "line": 356,
-     "quote": "    let required_decisions = input.required_decisions.unwrap_or(1);"
+     "line": 486,
+     "quote": "    let required_decisions = input.required_decisions.unwrap_or(floor).max(floor);"
     },
     {
      "path": "crates/actions/src/ops/writes.rs",
@@ -1772,7 +1772,12 @@
    ],
    "failure_scenario": "A tenant wants phase gates to need two humans and the coach to be unable to do anything but move cards. Neither is expressible: no authority row exists, and every `pm.route_gate` call supplies `required_decisions` (1 by default) and an arbitrary kind, so the PM's design and closure gates open as single-approval; any binding holding the static action scopes can call `coach.remedy` or `projects.baseline` regardless of its meta-role.",
    "acceptance": "Role authority resolves from tenant rows (meta-role x action, narrowed by the binding); a delivery binding calling `coach.remedy` or `projects.baseline` is refused unless the tenant granted it; `required_decisions` and approver kind come from a tenant gate-policy row and `pm.route_gate` cannot lower them; tests cover a tenant override and the unconfigured default.",
-   "owner_project": "PLATFORM"
+   "owner_project": "PLATFORM",
+   "resolved_by": {
+    "commit": "b9648dcc72006764aa5c0fadc25dbc1e9058d0ab",
+    "test": "crates/actions/tests/job_authority.rs::an_unconfigured_delivery_binding_cannot_call_coach_remedy; crates/actions/tests/gate_policy.rs::approvals_request_cannot_lower_the_change_gate_floor",
+    "evidence": "cargo test -p conveyor-actions --test job_authority: 4 passed; --test gate_policy: 3 passed; -p conveyor-store job_authority: 8 passed; registry 15; parity 7; tool_budget 14; --check-lock exit 0. The U5 audit found the floor only clamped in pm.route_gate; b9648dcc closes approvals.request too, with the audit's scenario as a regression test."
+   }
   },
   {
    "id": "v1-w1c-2",
@@ -5353,7 +5358,12 @@
    ],
    "failure_scenario": "An imported draft tool is recorded as a governed asset for tenant-admin approval; the insert violates the kind check, so the draft and the approval and contract-test anchor that \u00a711.5 requires cannot exist.",
    "acceptance": "A forward migration adds tool_draft to the kind check; a draft-create action writes one; a test creates the draft, attaches an approval decision and only then publishes the toolkit.",
-   "owner_project": "PLATFORM"
+   "owner_project": "PLATFORM",
+   "resolved_by": {
+    "commit": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+    "test": "crates/actions/tests/tool_authoring.rs::a_tool_generated_from_a_spec_is_published_and_called",
+    "evidence": "cargo test -p conveyor-actions --test tool_authoring a_tool_generated_from_a_spec_is_published_and_called: 1 passed at db0a819c; migration 0070 admits governed_asset kind tool_draft and the fixture imports the draft, attaches the approval decision, then publishes."
+   }
   },
   {
    "id": "v1-p118-2",
@@ -5953,7 +5963,12 @@
    ],
    "failure_scenario": "A reviewer sends findings as an array of {finding,status} objects (the documented shape). The engine refuses 422 before the handler runs; the only accepted shape is an object, which no doc names.",
    "acceptance": "findings and evidence accept any JSON value the struct declares (array or object), proven by a schema-validation test, and the OpenAPI schema matches.",
-   "owner_project": "PLATFORM"
+   "owner_project": "PLATFORM",
+   "resolved_by": {
+    "commit": "03c393a31c48649944b2a510a656ab49573a7fed",
+    "test": "crates/actions/src/spec.rs::a_value_typed_field_accepts_any_json",
+    "evidence": "cargo test -p conveyor-actions --lib a_value_typed_field_accepts_any_json: 1 passed at db0a819c; the served schema admits arrays, objects and scalars for architecture.reviews_record findings/evidence; --check-lock exit 0."
+   }
   },
   {
    "id": "v1-close-gate-duplicate-500-1",
@@ -5972,7 +5987,12 @@
    ],
    "failure_scenario": "An operator closes a project; a transient failure leaves a second pending projects.close gate. Every later decide on it returns 500 with an unrelated aborted-transaction message, and no action removes the gate.",
    "acceptance": "A decision on a duplicate/stale gate returns a typed refusal (or a clean no-op) and writes no abort; the masked board-event error cannot replace the real cause.",
-   "owner_project": "PLATFORM"
+   "owner_project": "PLATFORM",
+   "resolved_by": {
+    "commit": "675cf854bf9e22cf9665d9e800a6c3708092f7ef",
+    "test": "crates/actions/tests/close_gate_duplicate.rs::duplicate_pending_close_gate_decides_without_abort; crates/actions/tests/close_gate_duplicate.rs::aborted_transaction_never_masks_root_cause",
+    "evidence": "cargo test -p conveyor-actions --test close_gate_duplicate: 2 passed; the duplicate edge is ON CONFLICT DO NOTHING (transaction stays usable), a non-conflict failure returns the typed 409 instead of a masked 500, and no edge is written."
+   }
   },
   {
    "id": "v1-promotion-contract-actions-1",
@@ -5992,6 +6012,49 @@
    "failure_scenario": "A retrospective chain journals its contract request, Board decision and approval. promote-record.py --check refuses the journal ('unknown action architecture.board_decide'); dropping the rows leaves production without the live contract, so a replayed project fails its contract gate.",
    "acceptance": "The journal replays architecture.contracts_request/board_decide/contracts_approve idempotently with their natural keys, proven by the self-test and a dry-run over the T16 chain.",
    "owner_project": "PLATFORM"
+  },
+  {
+   "id": "v1-u5-merge-gate-quorum",
+   "area": "\u00a76.4 development gates",
+   "standard": "SPEC",
+   "spec": "\u00a76.4",
+   "severity": "P1",
+   "title": "The development merge gate opens at one decision regardless of the tenant policy",
+   "problem": "The merge gate's NewApproval hard-codes required_decisions: 1. approval_policies.set admits development_projects.merge_gate (development::is_governed_gate) and stores the tenant's quorum, but the gate writer never reads it, so a two-decision merge policy still resolves on one approval \u2014 the v1-w1b-5 class through a third door. Found by the U5 audit, 2026-11-24.",
+   "evidence": [
+    {
+     "path": "crates/actions/src/development.rs",
+     "line": 579,
+     "quote": "        required_decisions: 1,"
+    }
+   ],
+   "failure_scenario": "A tenant sets development_projects.merge_gate to 2/rule; the gate opens at 1 and one approval merges. The stored floor is unenforced.",
+   "acceptance": "The merge gate's required_decisions comes from its approval_policy row (absent = 1) and the opener cannot lower it; a test sets 2, opens the gate, asserts the row is 2, and one decision leaves it pending.",
+   "owner_project": "T6"
+  },
+  {
+   "id": "v1-u5-copilot-gate-quorum",
+   "area": "\u00a75.4 approvals",
+   "standard": "SPEC",
+   "spec": "\u00a75.4",
+   "severity": "P1",
+   "title": "A copilot proposal gate ignores the tenant's quorum and the destructive gate never checks it",
+   "problem": "copilot/proposal.rs create_tx builds NewApproval::new (required_decisions defaults to 1) without reading the action's approval_policy row, and enforce_destructive_gate checks the approval target and waiver but never compares the approval's required_decisions to the policy. A tenant's two-decision destructive policy can therefore be satisfied by a one-decision proposal. Found by the U5 audit, 2026-11-24.",
+   "evidence": [
+    {
+     "path": "crates/api/src/copilot/proposal.rs",
+     "line": 232,
+     "quote": "    let mut new = NewApproval::new(request.spec.name, KIND);"
+    },
+    {
+     "path": "crates/actions/src/control/approvals.rs",
+     "line": 794,
+     "quote": "    require_approval_tx(tx, ctx, spec.name, &target, ctx.approval_id)"
+    }
+   ],
+   "failure_scenario": "A tenant sets a destructive action's policy to 2 decisions; a copilot proposal opens at 1 and one approval authorises the execution.",
+   "acceptance": "A copilot proposal opens at the tenant policy's quorum and the destructive gate refuses an approval below it; a test sets 2 and proves one decision cannot authorise.",
+   "owner_project": "S10"
   }
  ]
 }
