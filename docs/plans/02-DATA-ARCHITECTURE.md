@@ -1486,7 +1486,7 @@ recorded laya exchange. Two tables and one column, all new; no existing row chan
 | `decision_option_set` + `_option` | **read**: the authored menu and its version — the question's labels and the answer's legal keys |
 | `idempotency_key` | **read**: the engine's record of the `ladder.precheck` call — `request_hash` must equal the case hash, `status_code` must be 2xx, `response` is the answer document |
 | `action_invocation` | **read**: the invocation named by the key, for its `outcome` and measured `duration_ms` |
-| `decision` | **write**: one row with `rung='laya'`, the response-derived answer/confidence/probabilities, the measured latency, the pins, and `meta.laya_call_key` / `meta.laya_invocation_id` / `meta.case_sha256` |
+| `decision` | **write**: one row with `rung='laya'`, the response-derived answer/confidence/probabilities, the measured latency, the pins, and `meta.laya_call_key` / `meta.laya_invocation_id` / `meta.case_hash` |
 | `decision_option` | **write**: the authored rows the decision chose between, with their set version |
 | `event` | **write**: `decision.evaluated` |
 

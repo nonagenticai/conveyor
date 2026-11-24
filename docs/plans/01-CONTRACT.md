@@ -1035,7 +1035,7 @@ is not live-run guarded (ADR 0017 decision 7).
 builds all three: `model` from the tenant's `laya_inference_config`, `state` from the caller's
 declared facts, and each `questions.<qid>` as `{type, instructions, criteria}` from the effective
 `decision_policy` and the authored option set. `ladder.case` returns the exact
-`{case, case_sha256, laya_call_key}` a caller must post; in-process callers use the same builder.
+`{case, case_hash, laya_call_key}` a caller must post; in-process callers use the same builder.
 A caller supplies facts, never a verdict: `ladder.evaluate` has no `answer`, `confidence`,
 `probabilities`, `latency_ms` or `options`, and a request carrying one is `422
 caller_supplied_verdict`.
@@ -1057,7 +1057,7 @@ records a decision only when the engine's record of the call proves all of:
 
 The answer, confidence and probabilities are parsed from the stored response; latency is the
 invocation's measured `duration_ms`. The decision records `meta.laya_call_key`,
-`meta.laya_invocation_id`, `meta.case_sha256` and the option-set version, so §7.2's "a decision is
+`meta.laya_invocation_id`, `meta.case_hash` and the option-set version, so §7.2's "a decision is
 reproducible from the row" holds. A missing, in-flight, expired or mismatched key is `422
 laya_call_unverified` and writes nothing.
 

@@ -1477,11 +1477,11 @@
         "migrations/0030_prompt_catalogue.sql",
         "migrations/0068_ladder_option_sets.sql"
       ],
-      "gap": "action ladder.case, action ladder.precheck, action decision_option_sets.set, action decision_option_sets.get",
+      "gap": "action decision_option_sets.set, action decision_option_sets.get",
       "key": "S21",
       "measured": {
         "actions": [
-          6,
+          8,
           10
         ],
         "modules": [

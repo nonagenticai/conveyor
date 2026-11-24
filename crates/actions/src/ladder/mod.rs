@@ -28,10 +28,16 @@ use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
+use crate::ActionRegistration;
 use crate::control::{etag_of, invalid, parent_error, require_precondition_with, store_error};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
+use crate::spec::{
+    ActionKind, ActionSpec, AgentHints, Confirm, Effect, HandlerRef, Schema, Scope, Tenancy,
+};
 use crate::views::Page;
+
+pub mod case;
 
 pub use store::ladder::{
     DecisionRecord, EffectivePolicy, LadderStoreError, LayaConfigRecord, NewDecision,
@@ -1296,3 +1302,152 @@ async fn ensure_approved_approval_tx(
     }
     Ok(())
 }
+
+// ── the L1 case and its call (S21 step 10, issue #656) ──────────────────────────────────────
+//
+// `ladder.case` hands a caller the exact body to post to `ladder.precheck`; the engine performs
+// that external call outside any transaction (a handler holds one, and no transaction spans an
+// HTTP request — `process/judge.rs`'s rule); `ladder.evaluate` records the decision only from the
+// engine's record of it. The case is built by `case::build`, which both actions call, so the body
+// a caller posts and the body the evaluator verifies cannot drift.
+
+/// `ladder.case` — the exact laya body a caller posts to `ladder.precheck`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CaseIn {
+    /// The case kind the effective policy is keyed by.
+    pub kind: String,
+    /// The gate, when the policy is gate-specific.
+    pub gate: Option<String>,
+    /// The text the answer is about — the draft, the request, the SOP output.
+    pub output: Value,
+    /// The acceptance criteria the question judges `output` against.
+    pub criteria: Value,
+    /// The card/project facts the answer may consume.
+    pub facts: Option<Value>,
+}
+
+/// The case, its canonical hash and the claim the call must carry.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CaseOut {
+    /// `{model, state, questions}` — post this to `ladder.precheck` unchanged.
+    pub case: Value,
+    /// The canonical request hash of `case`. The decision records it; the verification compares it.
+    pub case_hash: String,
+    /// The `Idempotency-Key` the `ladder.precheck` call must carry.
+    pub call_key: String,
+    /// The policy version the case was built under.
+    pub policy_version: i64,
+    /// The laya config version in force, when the tenant has one.
+    pub laya_config_version: Option<i64>,
+}
+
+/// Build the L1 case for one decision.
+#[crate::action(
+    name = "ladder.case",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:read"],
+    idempotent = true,
+    timeout_ms = 10000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn ladder_case(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CaseIn,
+) -> Result<HandlerOutput<CaseOut>, ActionError> {
+    let kind = input.kind.trim();
+    if kind.is_empty() {
+        return Err(invalid("kind", "missing", "a case kind is required"));
+    }
+    let gate = trimmed(input.gate);
+    let effective = store::ladder::effective_policy_tx(&mut *tx, ctx.tenant, kind, gate.as_deref())
+        .await
+        .map_err(|error| ladder_error(error, ctx.action))?
+        .ok_or_else(|| ladder_error(LadderError::PolicyMissing.into(), ctx.action))?;
+    let model = effective
+        .laya_config
+        .as_ref()
+        .map(|row| row.model_ref.as_str());
+    let built = case::build(
+        ctx.tenant,
+        kind,
+        gate.as_deref(),
+        model,
+        &input.output,
+        &input.criteria,
+        input.facts.as_ref(),
+    );
+    Ok(HandlerOutput::ok(CaseOut {
+        case: built.body,
+        case_hash: built.hash,
+        call_key: built.call_key,
+        policy_version: effective
+            .pins()
+            .policy_version
+            .unwrap_or(effective.policy.version),
+        laya_config_version: effective.pins().laya_config_version,
+    }))
+}
+
+/// The wire document `ladder.precheck` posts — `{model, state, questions}`, the bridge's shape.
+fn precheck_input() -> Schema {
+    schemars::json_schema!({
+        "type": "object",
+        "description": "The L1 laya request `ladder.case` built: {model, state, questions}.",
+        "required": ["model", "state", "questions"],
+        "properties": {
+            "model": {"type": "string"},
+            "state": {"type": "string"},
+            "questions": {"type": "object", "additionalProperties": true}
+        }
+    })
+}
+
+/// Laya's answer document, read by the evaluator.
+fn precheck_output() -> Schema {
+    schemars::json_schema!({
+        "type": "object",
+        "description": "Laya's answers document; the case's verdict lives under answers.accept.",
+        "additionalProperties": true
+    })
+}
+
+/// `ladder.precheck` — the L1 request the ladder owns (SPEC_V2 §7.2).
+///
+/// An **external action**: the engine owns the timeout, the idempotency claim and the audit row,
+/// and the per-tenant bearer comes from the sealed `laya.token` secret. It is deliberately not
+/// `laya.judge`: that action's scope is the process surface and its question is the SOP step's.
+fn ladder_precheck() -> ActionSpec {
+    ActionSpec {
+        name: "ladder.precheck",
+        version: 1,
+        kind: ActionKind::External,
+        input: precheck_input,
+        output: precheck_output,
+        scopes: &[Scope::GovernanceWrite],
+        idempotent: true,
+        // A decision is an inference call on a shared GPU host: the budget covers the queue too.
+        timeout_ms: 60_000,
+        effect: Effect::Read,
+        confirm: Confirm::None,
+        tenancy: Tenancy::Tenant,
+        agent: AgentHints::default(),
+        task_capable: false,
+        captures_usage: false,
+        artefact: None,
+        approval_target: None,
+        handler: HandlerRef::External {
+            service: crate::process::judge::LAYA_SERVICE,
+            method: "POST",
+            path: crate::process::judge::LAYA_PATH,
+            auth: Some(crate::process::judge::LAYA_TOKEN_SECRET),
+            auth_optional: false,
+            upload: None,
+        },
+    }
+}
+
+inventory::submit! { ActionRegistration::new(ladder_precheck) }

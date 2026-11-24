@@ -20,10 +20,10 @@ rework `v1-w1c-3:T2`, `v1-w1c-4:T2`, `v1-w1c-5:T2`
    (CONTRACT §21). Two decisions, two actions, one laya service.
 
 3. **A read action hands the caller the exact case.** `ladder.case` takes the same facts
-   `ladder.evaluate` takes and returns `{case, case_sha256, laya_call_key}`. It exists so a caller
+   `ladder.evaluate` takes and returns `{case, case_hash, laya_call_key}`. It exists so a caller
    outside the process can obtain the exact bytes it must post to `ladder.precheck`; in-process
    callers (the executor) use the same builder function directly. The builder is deterministic:
-   the same facts, policy and option-set version produce the same `case_sha256`.
+   the same facts, policy and option-set version produce the same `case_hash`.
 
 4. **Only a verified recorded exchange produces a decision.** `ladder.evaluate` takes
    `laya_call_key` and rebuilds the case itself. It then requires **all** of:
@@ -34,7 +34,7 @@ rework `v1-w1c-3:T2`, `v1-w1c-4:T2`, `v1-w1c-5:T2`
    probabilities are parsed from the stored response, never from the request. Anything else —
    `Miss`, `InFlight`, `ConflictHash`, a non-2xx status, an unreadable body — is `422
    laya_call_unverified` and writes no decision. The decision records
-   `meta.laya_call_key`, `meta.laya_invocation_id`, `meta.case_sha256`, the option-set version and
+   `meta.laya_call_key`, `meta.laya_invocation_id`, `meta.case_hash`, the option-set version and
    the measured latency, so §7.2's "a decision is reproducible from the row" holds.
 
 5. **Options are authored, versioned rows.** Migration `0068` adds `decision_option_set` and

@@ -2263,6 +2263,11 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             ctx.push("ladder.evaluate.policy", policy);
             seed_parity_laya(pg, ctx).await;
         }
+        "ladder.case" => {
+            let policy = seed_parity_policy(pg, ctx, "parity.case", "parity_gate").await;
+            ctx.push("ladder.case.policy", policy);
+            seed_parity_laya(pg, ctx).await;
+        }
         "ladder.record" => {
             let policy = seed_parity_policy(pg, ctx, "parity.record", "parity_gate").await;
             ctx.push("ladder.record.policy", policy);
@@ -5472,6 +5477,21 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("eval_grades.create", json!({}), None),
         plain("eval_grades.get", json!({}), None),
         plain("laya.judge", json!({}), None),
+        plain(
+            "ladder.precheck",
+            json!({
+                "model": "system-1",
+                "state": "parity",
+                "questions": {
+                    "accept": {
+                        "type": "score",
+                        "instructions": "parity",
+                        "criteria": ["rejected", "accepted"]
+                    }
+                }
+            }),
+            None,
+        ),
         // ── S15's capability/memory surface ────────────────────────────────────────────────
         {
             // The anchor capability binds no packs, so this is a deterministic empty-hit read
@@ -6758,6 +6778,20 @@ fn ladder_samples() -> Vec<Sample> {
                 })
             });
             expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("ladder.case", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                let policy = ctx.pop("ladder.case.policy");
+                json!({
+                    "kind": format!("parity.case.{}", policy.as_str().unwrap_or_default()),
+                    "gate": "parity_gate",
+                    "output": {"draft": "parity"},
+                    "criteria": [{"criterion": "names the change"}]
+                })
+            });
+            expecting(sample, 200)
         },
         {
             let mut sample = plain("ladder.record", json!({}), None);

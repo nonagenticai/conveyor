@@ -752,7 +752,7 @@ and hands the answer over), and even it records the verdict without the call tha
 Rework `v1-w1c-3`, `v1-w1c-4` and `v1-w1c-5` are these three defects.
 
 **P1 — the case is the ladder's, and the decision cites the call.** `ladder.case` (read) returns
-`{case, case_sha256, laya_call_key}` built from the effective policy and the tenant's
+`{case, case_hash, laya_call_key}` built from the effective policy and the tenant's
 `laya_inference_config`; `ladder.precheck` is the external action that performs SPEC_V2 §7.2's
 `POST /v1/systemone` (`governance:write`, bearer `laya.token`, outside any transaction);
 `ladder.evaluate` loses `answer`, `confidence`, `probabilities`, `latency_ms` and `options`, takes
@@ -760,7 +760,7 @@ Rework `v1-w1c-3`, `v1-w1c-4` and `v1-w1c-5` are these three defects.
 (`store::idempotency::lookup` with the case's request hash must return the stored 2xx response;
 `store::actions::find_invocation_by_key` must name an `ok` invocation). The answer, confidence,
 probabilities and latency come from that exchange; the decision records `meta.laya_call_key`,
-`meta.laya_invocation_id` and `meta.case_sha256`. A request carrying a verdict is `422
+`meta.laya_invocation_id` and `meta.case_hash`. A request carrying a verdict is `422
 caller_supplied_verdict`; an unverifiable key is `422 laya_call_unverified`.
 
 **P2 — options are authored, versioned rows.** Migration `0068` adds `decision_option_set` and

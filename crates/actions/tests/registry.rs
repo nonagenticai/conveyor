@@ -121,8 +121,9 @@ use serde_json::{Value, json};
 /// **S21 step 9 (#649) adds 1 internal**: `cards.assign`, the card handoff (binding + note +
 /// bound run start). 530 → **531**. **T5 (#77) adds 8 internal**: P1's
 /// `kata.open|get|observe|analyse|hypothesise|propose|measure` and P2–P4's `kata.adopt` —
-/// 531 → **539**.
-const EXPECTED: [&str; 539] = [
+/// 531 → **539**. **S21 step 10 (#656) adds 2**: `ladder.case` (internal) and
+/// `ladder.precheck` (external) — 539 → **541**, internal 521 → 522, external 18 → 19.
+const EXPECTED: [&str; 541] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -368,7 +369,9 @@ const EXPECTED: [&str; 539] = [
     "labels.delete",
     "labels.update",
     "ladder.apply_draft",
+    "ladder.case",
     "ladder.evaluate",
+    "ladder.precheck",
     "ladder.list",
     "ladder.record",
     "laya.judge",
@@ -761,8 +764,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // 500 -> 512; external stays 18.
     // T5 (#77) adds eight internal actions — P1's `kata.open|get|observe|analyse|hypothesise|`
     // `propose|measure` and P2–P4's `kata.adopt`: internal 512 -> 520. S21 step 9 (#649) adds
-    // one internal (`cards.assign`): 520 -> 521; external stays 18.
-    assert_eq!((internal, external), (521, 18));
+    // one internal (`cards.assign`): 520 -> 521. S21 step 10 (#656) adds one internal
+    // (`ladder.case`) and one external (`ladder.precheck`): 521 -> 522, 18 -> 19.
+    assert_eq!((internal, external), (522, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
