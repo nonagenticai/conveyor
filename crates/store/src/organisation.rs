@@ -87,6 +87,20 @@ pub enum OrganisationStoreError {
     /// A mutable row moved underneath the caller.
     #[error("the {0} moved; the caller's version is stale")]
     VersionMismatch(&'static str),
+    /// Publishing or binding named a job that is not `active` (SPEC_V2 §4.1:
+    /// `409 job_not_live`). Only a curated, live job compiles and pins.
+    #[error("job_not_live: the job is {status:?}, not active")]
+    JobNotLive {
+        /// The stored status the write found.
+        status: String,
+    },
+    /// Activation named a job that is not `draft` (SPEC_V2 §4.3: `409 job_not_draft`).
+    /// Activation is the only edge into `active`; retirement is terminal.
+    #[error("job_not_draft: the job is {status:?}, not draft")]
+    JobNotDraft {
+        /// The stored status the write found.
+        status: String,
+    },
     /// The binding's executor contract refused it.
     #[error(transparent)]
     Executor(#[from] BindingError),
@@ -473,6 +487,43 @@ pub async fn job_update_tx(
         .ok_or(OrganisationStoreError::VersionMismatch("job"))
 }
 
+/// Activate a job an approved gate names (v1-w1a-4, SPEC_V2 §4.1/§4.3).
+///
+/// Only a `draft` row flips, and the version moves with it so an `If-Match` taken before the
+/// decision is stale rather than silently satisfied. An already-`active` job is returned
+/// unchanged — a replayed decision is not a second activation. Any other status (a retired
+/// job) is refused [`OrganisationStoreError::JobNotDraft`]: activation never resurrects it.
+pub async fn job_activate_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<JobRow, OrganisationStoreError> {
+    let sql = format!(
+        "UPDATE job_catalogue
+            SET status = 'active', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND status = 'draft'
+          RETURNING {JOB_COLUMNS}"
+    );
+    let row: Option<JobRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    match row {
+        Some(row) => Ok(row),
+        None => {
+            let current = job_get_tx(conn, tenant, id).await?;
+            if current.status == "active" {
+                Ok(current)
+            } else {
+                Err(OrganisationStoreError::JobNotDraft {
+                    status: current.status,
+                })
+            }
+        }
+    }
+}
+
 /// Retire a job (it stays readable; new releases refuse it).
 pub async fn job_retire_tx(
     conn: &mut PgConnection,
@@ -510,16 +561,65 @@ pub async fn job_get_tx(
         .ok_or(OrganisationStoreError::NotFound("job"))
 }
 
-/// The tenant's jobs, by key.
+/// The filters and keyset one catalogue page names (v1-p46-1, SPEC_V2 §4.6).
+#[derive(Clone, Copy, Debug, Default)]
+pub struct JobListQuery<'a> {
+    /// Case-insensitive substring of the job key (the position's code).
+    pub code: Option<&'a str>,
+    /// Case-insensitive substring of a capability the job declares in its draft anatomy or has
+    /// bound to a release.
+    pub capability: Option<&'a str>,
+    /// Case-insensitive substring of the name of a department the job is placed in.
+    pub department: Option<&'a str>,
+    /// Keyset position: only rows strictly after this `(job_key, id)`.
+    pub after: Option<(&'a str, Uuid)>,
+    /// Maximum rows to return.
+    pub limit: i64,
+}
+
+/// One page of the tenant's jobs, filtered, by `(job_key, id)`.
 pub async fn jobs_list_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
+    query: &JobListQuery<'_>,
 ) -> Result<Vec<JobRow>, sqlx::Error> {
     let sql = format!(
-        "SELECT {JOB_COLUMNS} FROM job_catalogue WHERE tenant_id = $1 ORDER BY job_key, id"
+        "SELECT {JOB_COLUMNS}
+           FROM job_catalogue j
+          WHERE j.tenant_id = $1
+            AND ($2::text IS NULL OR j.job_key ILIKE '%' || $2 || '%')
+            AND ($3::text IS NULL
+                 OR EXISTS (
+                        SELECT 1
+                          FROM job_binding b
+                          JOIN capability c
+                            ON c.tenant_id = b.tenant_id AND c.id = b.capability_id
+                         WHERE b.tenant_id = j.tenant_id AND b.job_id = j.id
+                           AND (c.code ILIKE '%' || $3 || '%'
+                                OR c.label ILIKE '%' || $3 || '%')
+                    )
+                 OR (j.definition -> 'capabilities')::text ILIKE '%' || $3 || '%')
+            AND ($4::text IS NULL
+                 OR EXISTS (
+                        SELECT 1
+                          FROM job_department jd
+                          JOIN department d
+                            ON d.tenant_id = jd.tenant_id AND d.id = jd.department_id
+                         WHERE jd.tenant_id = j.tenant_id AND jd.job_id = j.id
+                           AND d.name ILIKE '%' || $4 || '%'
+                    ))
+            AND ($5::text IS NULL OR (j.job_key, j.id) > ($5::text, $6::uuid))
+          ORDER BY j.job_key, j.id
+          LIMIT $7"
     );
     sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
+        .bind(query.code)
+        .bind(query.capability)
+        .bind(query.department)
+        .bind(query.after.map(|(job_key, _)| job_key))
+        .bind(query.after.map(|(_, id)| id))
+        .bind(query.limit)
         .fetch_all(&mut *conn)
         .await
 }
@@ -983,8 +1083,10 @@ pub async fn job_release_publish_tx(
     job_id: Uuid,
 ) -> Result<ReleaseRow, OrganisationStoreError> {
     let job = job_get_tx(conn, tenant, job_id).await?;
-    if job.status == "retired" {
-        return Err(OrganisationStoreError::NotFound("live job"));
+    // SPEC_V2 §4.1: only a live, curated job compiles into an immutable release; a draft is
+    // still being curated and a retired job is gone (`409 job_not_live`).
+    if job.status != "active" {
+        return Err(OrganisationStoreError::JobNotLive { status: job.status });
     }
     let snapshot = compile_release_tx(conn, tenant, job_id).await?;
     // The execution anatomy is proved before the hash: a malformed grant or limit must never
@@ -1082,6 +1184,11 @@ pub async fn job_binding_create_tx(
     input: &NewBinding,
     registry: &Registry,
 ) -> Result<BindingRow, OrganisationStoreError> {
+    // SPEC_V2 §4.1: a binding may pin only a live job's release (`409 job_not_live`).
+    let job = job_get_tx(conn, tenant, input.job_id).await?;
+    if job.status != "active" {
+        return Err(OrganisationStoreError::JobNotLive { status: job.status });
+    }
     let release = job_release_get_tx(conn, tenant, input.release_id).await?;
     if release.job_id != input.job_id {
         return Err(OrganisationStoreError::ReleaseJobMismatch);
@@ -1302,7 +1409,15 @@ pub async fn organisation_json_tx(
     .bind(tenant.as_uuid())
     .fetch_all(&mut *conn)
     .await?;
-    let jobs: Vec<JobRow> = jobs_list_tx(&mut *conn, tenant).await?;
+    let jobs: Vec<JobRow> = jobs_list_tx(
+        &mut *conn,
+        tenant,
+        &JobListQuery {
+            limit: i64::MAX,
+            ..JobListQuery::default()
+        },
+    )
+    .await?;
     let releases: Vec<ReleaseRow> = {
         let sql = format!(
             "SELECT {RELEASE_COLUMNS} FROM job_release

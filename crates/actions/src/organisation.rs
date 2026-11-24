@@ -28,7 +28,7 @@ use uuid::Uuid;
 use crate::control::{invalid, store_error};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::FieldError;
-use crate::views::EmptyIn;
+use crate::views::{EmptyIn, Page, PageIn};
 
 // ── views ────────────────────────────────────────────────────────────────────────────────
 
@@ -169,6 +169,29 @@ pub struct JobUpdateIn {
     /// A replacement placement; omit to keep the current one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub departments: Option<Vec<JobDepartmentIn>>,
+    /// `active` requests activation: the job stays `draft` until a different principal approves
+    /// the `job_activation` gate this opens. `draft` and `retired` are refused — a job is
+    /// created as a draft, and retirement is `job_catalogue.retire`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
+}
+
+/// `job_catalogue.list` — the catalogue's search filters and page (SPEC_V2 §4.6).
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct JobListIn {
+    /// Case-insensitive substring of the job key (the position's code).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
+    /// Case-insensitive substring of a capability the job declares in its draft anatomy or has
+    /// bound to a release.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub capability: Option<String>,
+    /// Case-insensitive substring of the name of a department the job is placed in.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub department: Option<String>,
+    /// The shared pagination envelope.
+    #[serde(flatten)]
+    pub page: PageIn,
 }
 
 /// `job_catalogue.retire`.
@@ -435,6 +458,16 @@ fn organisation_error(error: OrganisationStoreError, action: &str) -> ActionErro
         OrganisationStoreError::VersionMismatch(what) => {
             ActionError::precondition(format!("the {what} moved; re-read it and retry"))
         }
+        OrganisationStoreError::JobNotLive { status } => ActionError::new(
+            409,
+            "job_not_live",
+            format!("the job is {status}; only an active job may publish a release or be bound"),
+        ),
+        OrganisationStoreError::JobNotDraft { status } => ActionError::new(
+            409,
+            "job_not_draft",
+            format!("the job is {status}; only a draft job can be activated"),
+        ),
         OrganisationStoreError::Executor(error) => executor_error(error),
         OrganisationStoreError::UnknownStatus(raw) => {
             tracing::error!(status = %raw, "a stored organisation status is outside the domain");
@@ -561,6 +594,43 @@ fn status_in(raw: Option<&str>) -> Result<BindingActivation, ActionError> {
             "status",
             "invalid_value",
             format!("{other:?} is not draft"),
+        )),
+    }
+}
+
+/// The approval gate kind that authorises a job going live (v1-w1a-4, SPEC_V2 §4.3).
+pub(crate) const JOB_ACTIVATION_GATE_KIND: &str = "job_activation";
+
+/// The job activation gate's name: the action whose effect it authorises, so the approvals
+/// screen renders it as that action. The requester exclusion is §5.4's and unconditional, so
+/// the person who requested activation can never approve it.
+pub(crate) const JOB_ACTIVATION_GATE: &str = "job_catalogue.update";
+
+/// Whether a `job_catalogue.update` request asks for activation (SPEC_V2 §4.3).
+///
+/// `status: "active"` is the one lifecycle request this action carries: the patch applies to
+/// the draft and a `job_activation` gate opens; only an approved decision flips the job. The
+/// other statuses are the birth state or have their own action, so they are refused `422
+/// invalid_value` rather than silently ignored.
+fn job_status_update(raw: Option<&str>) -> Result<bool, ActionError> {
+    match raw {
+        None => Ok(false),
+        Some("active") => Ok(true),
+        Some("draft") => Err(invalid(
+            "status",
+            "invalid_value",
+            "a job is created as a draft; `active` requests activation and `retired` is \
+             `job_catalogue.retire`",
+        )),
+        Some("retired") => Err(invalid(
+            "status",
+            "invalid_value",
+            "retirement is its own action (`job_catalogue.retire`)",
+        )),
+        other => Err(invalid(
+            "status",
+            "invalid_value",
+            format!("{other:?} is not a job status"),
         )),
     }
 }
@@ -722,6 +792,22 @@ async fn job_catalogue_update(
     ctx: HandlerCtx,
     input: JobUpdateIn,
 ) -> Result<JobOut, ActionError> {
+    let activation = job_status_update(input.status.as_deref())?;
+    if activation {
+        // Only a draft is curated into a live job; an active or retired one has no activation
+        // edge (SPEC_V2 §4.3: `409 job_not_draft`).
+        let current = store::organisation::job_get_tx(&mut *tx, ctx.tenant, input.id)
+            .await
+            .map_err(|error| organisation_error(error, "job_catalogue.update"))?;
+        if current.status != "draft" {
+            return Err(organisation_error(
+                OrganisationStoreError::JobNotDraft {
+                    status: current.status,
+                },
+                "job_catalogue.update",
+            ));
+        }
+    }
     let patch = store::organisation::JobPatch {
         title: input.title.map(|title| title.trim().to_owned()),
         family: input.family.map(|family| family.trim().to_owned()),
@@ -733,6 +819,10 @@ async fn job_catalogue_update(
         store::organisation::job_update_tx(&mut *tx, ctx.tenant, input.id, input.version, &patch)
             .await
             .map_err(|error| organisation_error(error, "job_catalogue.update"))?;
+    if activation {
+        // The job stays draft; the gate is the only path to `active` (v1-w1a-4).
+        open_job_activation_gate(&mut *tx, &ctx, &row).await?;
+    }
     job_view(&mut *tx, ctx.tenant, &row).await
 }
 
@@ -782,7 +872,8 @@ async fn job_catalogue_get(
     job_view(&mut *tx, ctx.tenant, &row).await
 }
 
-/// Every catalogue position of the tenant.
+/// One page of catalogue positions: searchable by code, capability and department, with a
+/// stable `(job_key, id)` keyset (SPEC_V2 §4.6).
 #[crate::action(
     name = "job_catalogue.list",
     version = 1,
@@ -797,16 +888,62 @@ async fn job_catalogue_get(
 async fn job_catalogue_list(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
-    _input: EmptyIn,
-) -> Result<Vec<JobOut>, ActionError> {
-    let rows = store::organisation::jobs_list_tx(&mut *tx, ctx.tenant)
-        .await
-        .map_err(|error| store_error(error, "job_catalogue.list"))?;
-    let mut out = Vec::with_capacity(rows.len());
+    input: JobListIn,
+) -> Result<Page<JobOut>, ActionError> {
+    let limit = store::actions::clamp_limit(input.page.limit);
+    let after = decode_job_cursor(input.page.cursor.as_deref())?;
+    // One extra row decides whether a next page exists; it is not returned.
+    let mut rows = store::organisation::jobs_list_tx(
+        &mut *tx,
+        ctx.tenant,
+        &store::organisation::JobListQuery {
+            code: search_term(input.code.as_deref()),
+            capability: search_term(input.capability.as_deref()),
+            department: search_term(input.department.as_deref()),
+            after: after.as_ref().map(|(job_key, id)| (job_key.as_str(), *id)),
+            limit: limit + 1,
+        },
+    )
+    .await
+    .map_err(|error| store_error(error, "job_catalogue.list"))?;
+    let next_cursor = if rows.len() as i64 > limit {
+        rows.pop();
+        rows.last()
+            .map(|row| encode_job_cursor(&row.job_key, row.id))
+    } else {
+        None
+    };
+    let mut items = Vec::with_capacity(rows.len());
     for row in &rows {
-        out.push(job_view(&mut *tx, ctx.tenant, row).await?);
+        items.push(job_view(&mut *tx, ctx.tenant, row).await?);
     }
-    Ok(out)
+    Ok(Page { items, next_cursor })
+}
+
+/// Encode the `(job_key, id)` keyset cursor.
+fn encode_job_cursor(job_key: &str, id: Uuid) -> String {
+    serde_json::to_string(&(job_key, id)).unwrap_or_else(|_| "[]".to_owned())
+}
+
+/// Decode a catalogue cursor; a malformed one is a 422 naming the field.
+fn decode_job_cursor(cursor: Option<&str>) -> Result<Option<(String, Uuid)>, ActionError> {
+    let Some(raw) = cursor else {
+        return Ok(None);
+    };
+    serde_json::from_str::<(String, Uuid)>(raw)
+        .map(Some)
+        .map_err(|_| {
+            invalid(
+                "cursor",
+                "invalid_cursor",
+                "a job cursor is the [job_key, id] pair the previous page returned",
+            )
+        })
+}
+
+/// A search term, trimmed; blank means no filter.
+fn search_term(raw: Option<&str>) -> Option<&str> {
+    raw.map(str::trim).filter(|term| !term.is_empty())
 }
 
 // ── releases ─────────────────────────────────────────────────────────────────────────────
@@ -1049,6 +1186,85 @@ pub(crate) async fn apply_binding_gate_effect_tx(
             );
             ActionError::internal()
         })
+}
+
+/// Open the gate that authorises `row` going live (v1-w1a-4, SPEC_V2 §4.3).
+///
+/// The job id travels in `meta.job_id` — the only reader is
+/// [`apply_job_activation_gate_effect_tx`], in the decision's transaction. `requested_by` is the
+/// authenticated person and never a machine identity: §5.4's requester exclusion is what stops
+/// the one `organisation:write` holder approving their own activation.
+async fn open_job_activation_gate(
+    conn: &mut PgConnection,
+    ctx: &HandlerCtx,
+    row: &store::organisation::JobRow,
+) -> Result<(), ActionError> {
+    let mut gate = store::approval::NewApproval::new(JOB_ACTIVATION_GATE, JOB_ACTIVATION_GATE_KIND);
+    gate.requested_by = (ctx.actor_kind == "user").then_some(ctx.actor_id);
+    gate.meta = serde_json::json!({
+        "job_id": row.id.to_string(),
+        "job_key": row.job_key.clone(),
+        "description": format!("Activate job {} — {}", row.job_key, row.title),
+    });
+    store::approval::insert_approval_tx(conn, ctx.tenant, &gate)
+        .await
+        .map(|_| ())
+        .map_err(|error| {
+            tracing::error!(%error, job = %row.id, "open the job activation gate");
+            ActionError::internal()
+        })
+}
+
+/// Apply an approved `job_activation` gate: the job it names flips `draft → active`.
+///
+/// Runs inside `approvals.decide`'s transaction, so a failed flip rolls the decision back. A
+/// rejection writes nothing here and the job stays draft, where publish and bind refuse it
+/// `409 job_not_live`. A decision that lands after the job left draft activates nothing;
+/// retirement is terminal, so the refusal is swallowed and the decision stands.
+pub(crate) async fn apply_job_activation_gate_effect_tx(
+    conn: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    record: &store::approval::ApprovalRecord,
+) -> Result<(), ActionError> {
+    if record.approval.kind != JOB_ACTIVATION_GATE_KIND {
+        return Ok(());
+    }
+    let Some(job_id) = record
+        .meta
+        .get("job_id")
+        .and_then(Value::as_str)
+        .and_then(|raw| Uuid::parse_str(raw).ok())
+    else {
+        tracing::error!(
+            approval = %record.approval.id,
+            "an approved job_activation gate names no job"
+        );
+        return Err(ActionError::new(
+            422,
+            "gate_incomplete",
+            "the job_activation gate names no job",
+        ));
+    };
+    match store::organisation::job_activate_tx(conn, tenant, job_id).await {
+        Ok(_) => Ok(()),
+        Err(OrganisationStoreError::JobNotDraft { status }) => {
+            tracing::info!(
+                job = %job_id,
+                %status,
+                "activation no longer applies; the job left draft"
+            );
+            Ok(())
+        }
+        Err(error) => {
+            tracing::error!(
+                %error,
+                approval = %record.approval.id,
+                job = %job_id,
+                "activate the job an approved gate names"
+            );
+            Err(ActionError::internal())
+        }
+    }
 }
 
 /// Retire a binding; new runs naming it are refused `409 job_binding_stale`.
