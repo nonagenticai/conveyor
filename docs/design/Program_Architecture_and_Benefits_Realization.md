@@ -137,10 +137,13 @@ programme at the stated date:
   unstaffed as a risk. That is the honest state, not a zero. The seed now carries **seven**
   profiles: B1–B6 and **B7 Deliberated cross-department decisions** (T19); the published snapshot
   still shows the six it was exported with, and B7 appears after the next export.
-- **T19 (decision forums) is proposed at tranche 4** — plan and programme artefacts at #605,
-  implementation at #606; the T18 UI lane (#562–#566) is in flight and independent. The programme
-  seed is 50 projects, and T19's coverage row is `proposed` with the five tables and twelve actions
-  measured absent.
+- **T19 (decision forums) is built at tranche 4** — the plan and programme artefacts landed at
+  #605 and the implementation at #606: the five tables, the twelve `meetings.*` actions, the
+  `approval_decision` participant extension, the `/meetings` destination and the participant-hours
+  roll-up are measured present, and the slice's evidence is `docs/plans/T19/evidence.md`. The
+  programme seed is 50 projects, and T19's coverage row is `built`. The deployment-gated live proof
+  (the owner deciding one item in the web room and one over MCP) waits on the lane release. The T18
+  UI lane (#562–#566) is in flight and independent.
 - **Architecture contracts are the largest open gap.** Only T9's project has a contract row, and it
   is not yet approved; the other delivery projects have none. The board's approval is the
   authority act, and it is tracked separately from this study.

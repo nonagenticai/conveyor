@@ -970,6 +970,94 @@ pub async fn record_decision_tx(
     row.into_approval(next.approvals)
 }
 
+/// One seat's row in a meeting resolution. The participant is exactly one of a human or a job
+/// binding, matching the `approval_decision` extension (0065_meetings.sql).
+pub struct MeetingDecisionRow<'a> {
+    /// `app_user.id` for a human seat; `None` for a job seat.
+    pub approver_id: Option<Uuid>,
+    /// `job_binding.id` for a job seat; `None` for a human seat.
+    pub job_binding_id: Option<Uuid>,
+    /// `human | job`, matching the row's CHECK.
+    pub participant_kind: &'a str,
+    /// `approve | reject`.
+    pub decision: &'a str,
+    pub note: &'a str,
+    /// `{"surface":"meeting","channel":"web|telegram|mcp","meeting_id":"…"}`.
+    pub via: &'a Value,
+    /// `human | agent` — a job seat's decision is agent-kind.
+    pub decided_by_kind: &'a str,
+}
+
+/// Record a meeting's whole seat set and set the gate's status once.
+///
+/// This is deliberately not a loop over [`record_decision_tx`]: that path applies the
+/// single-decider rule (a reject resolves immediately; a decision after resolution is refused),
+/// while a meeting's rule is the forum's — a majority may approve with a recorded dissent. The
+/// insert still honours `(approval_id, participant)` uniqueness, so a seat that already decided
+/// keeps its row (the first decision wins). The caller checks the gate's policy floors (required
+/// decisions, distinct approvers, evidence, P4) under this row lock before calling.
+pub async fn record_meeting_decisions_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    approval_id: Uuid,
+    rows: &[MeetingDecisionRow<'_>],
+    approved: bool,
+) -> Result<Approval, ApprovalStoreError> {
+    let sql = format!("SELECT {COLUMNS} FROM approval WHERE tenant_id = $1 AND id = $2 FOR UPDATE");
+    let row: Option<ApprovalRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(approval_id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    let row = row.ok_or(ApprovalStoreError::NotFound)?;
+    if row.status != "pending" {
+        return Err(ApprovalStoreError::AlreadyDecided);
+    }
+    for seat in rows {
+        sqlx::query(
+            "INSERT INTO approval_decision (tenant_id, approval_id, approver_id, job_binding_id,
+                                            participant_kind, decision, note, decided_by_kind, via)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+             ON CONFLICT DO NOTHING",
+        )
+        .bind(tenant.as_uuid())
+        .bind(approval_id)
+        .bind(seat.approver_id)
+        .bind(seat.job_binding_id)
+        .bind(seat.participant_kind)
+        .bind(seat.decision)
+        .bind(seat.note)
+        .bind(seat.decided_by_kind)
+        .bind(seat.via)
+        .execute(&mut *conn)
+        .await?;
+    }
+    let approvals: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM approval_decision
+          WHERE tenant_id = $1 AND approval_id = $2 AND decision = 'approve'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    let approvals = u16::try_from(approvals).unwrap_or(u16::MAX);
+    let status = if approved { "approved" } else { "rejected" };
+    let sql = format!(
+        "UPDATE approval
+            SET status = $3, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND status = 'pending'
+         RETURNING {COLUMNS}"
+    );
+    let row: Option<ApprovalRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(approval_id)
+        .bind(status)
+        .fetch_optional(&mut *conn)
+        .await?;
+    let row = row.ok_or(ApprovalStoreError::AlreadyDecided)?;
+    row.into_approval(approvals)
+}
+
 fn decider_kind(kind: DeciderKind) -> &'static str {
     kind.as_str()
 }

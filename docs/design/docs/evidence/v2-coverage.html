@@ -37,17 +37,17 @@
 <tr>
 <td><code>exists</code></td>
 <td>the real route and its Playwright spec exist</td>
-<td>51</td>
+<td>58</td>
 </tr>
 <tr>
 <td><code>extend</code></td>
 <td>a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner</td>
-<td>8</td>
+<td>7</td>
 </tr>
 <tr>
 <td><code>new</code></td>
 <td>neither the route nor an ancestor exists</td>
-<td>10</td>
+<td>4</td>
 </tr>
 </tbody>
 </table>
@@ -269,40 +269,40 @@
 <td>§10.3</td>
 <td>table</td>
 <td>meeting_type</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE meeting_type</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE meeting_type</td>
 </tr>
 <tr>
 <td><code>table:meeting</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>meeting</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE meeting</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE meeting</td>
 </tr>
 <tr>
 <td><code>table:meeting_agenda_item</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>meeting_agenda_item</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE meeting_agenda_item</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE meeting_agenda_item</td>
 </tr>
 <tr>
 <td><code>table:meeting_attendance</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>meeting_attendance</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE meeting_attendance</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE meeting_attendance</td>
 </tr>
 <tr>
 <td><code>table:meeting_position</code></td>
 <td>§10.3</td>
 <td>table</td>
 <td>meeting_position</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE meeting_position</td>
+<td><code>exists</code></td>
+<td>migrations: CREATE TABLE meeting_position</td>
 </tr>
 <tr>
 <td><code>table:architecture_maturity</code></td>
@@ -437,8 +437,8 @@
 <td>§10.4</td>
 <td>actions</td>
 <td>meetings</td>
-<td><code>extend</code></td>
-<td>actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…)<br>actions: meetings.* absent</td>
+<td><code>exists</code></td>
+<td>actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…)<br>actions: meetings.* found (meetings.agenda_add, meetings.close, meetings.close_item…)</td>
 </tr>
 <tr>
 <td><code>actions:decision</code></td>
@@ -565,8 +565,8 @@
 <td>§10.5</td>
 <td>destination</td>
 <td>Meetings</td>
-<td><code>new</code></td>
-<td>apps/web/src/app.rs: route '/meetings' absent<br>apps/web/src/app.rs: route '/meetings/:id' absent<br>apps/web/e2e/meetings.spec.ts: absent</td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/meetings' found<br>apps/web/src/app.rs: route '/meetings/:id' found<br>apps/web/e2e/meetings.spec.ts: present</td>
 </tr>
 <tr>
 <td><code>destination:Programme</code></td>

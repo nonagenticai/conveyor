@@ -5951,6 +5951,139 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             201,
         ),
+        // ── T19 (#606): the meetings family ────────────────────────────────────────────────
+        // An unknown id is the deterministic refusal on both transports; the meeting tests own
+        // the aggregate's lifecycle. `schedule` refuses before the list lookup because the type
+        // has no policy to create.
+        expecting(plain("meetings.list", json!({"limit": 5}), None), 200),
+        expecting(
+            plain(
+                "meetings.get",
+                json!({"meeting_id": uuid::Uuid::nil()}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.open",
+                json!({"meeting_id": uuid::Uuid::nil()}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.invite",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "participant_kind": "app_user",
+                    "participant_id": alice,
+                    "seat": "member"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.respond",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "participant_kind": "app_user",
+                    "participant_id": alice,
+                    "response": "accepted"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.agenda_add",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "resolved_kind": "approval",
+                    "resolved_id": uuid::Uuid::nil(),
+                    "evidence_refs": []
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.position",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "agenda_item_id": uuid::Uuid::nil(),
+                    "participant_kind": "app_user",
+                    "participant_id": alice,
+                    "stance": "approve",
+                    "surface": "web"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.defer",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "agenda_item_id": uuid::Uuid::nil(),
+                    "reason": "parity"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.close_item",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "agenda_item_id": uuid::Uuid::nil()
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.close",
+                json!({"meeting_id": uuid::Uuid::nil()}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.minutes_publish",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "approval_id": uuid::Uuid::nil(),
+                    "title": "Parity",
+                    "lines": []
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.schedule",
+                json!({
+                    "title": "Parity",
+                    "list_id": uuid::Uuid::nil(),
+                    "meeting_type_key": "parity_unknown",
+                    "convener_kind": "app_user",
+                    "convener_id": alice
+                }),
+                None,
+            ),
+            422,
+        ),
     ];
 
     out.extend(spine_samples());

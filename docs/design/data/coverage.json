@@ -2074,21 +2074,22 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/meetings.rs",
+        "migrations/0065_meetings.sql"
       ],
-      "gap": "table meeting_type, table meeting, table meeting_agenda_item, table meeting_attendance, table meeting_position, action meetings.schedule",
+      "gap": null,
       "key": "T19",
       "measured": {
         "actions": [
-          0,
+          12,
           12
         ],
         "modules": [
-          0,
+          1,
           1
         ],
         "tables": [
-          0,
+          5,
           5
         ]
       },
@@ -2105,7 +2106,7 @@
         "T9"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 4,
       "units": {
@@ -2597,6 +2598,15 @@
         "docs/design/v2.js"
       ],
       "gap": null,
+      "key": "meetings",
+      "status": "live",
+      "title": "Meetings"
+    },
+    {
+      "evidence": [
+        "docs/design/v2.js"
+      ],
+      "gap": null,
       "key": "metering",
       "status": "live",
       "title": "Metering"
@@ -2715,10 +2725,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 40,
+        "built": 41,
         "partial": 1,
         "planned": 0,
-        "proposed": 7,
+        "proposed": 6,
         "standing": 1
       },
       "total": 50,
@@ -2730,11 +2740,11 @@
       "actions_invoked": 39,
       "by_status": {
         "legacy": 7,
-        "live": 14,
+        "live": 15,
         "mixed": 0,
         "proposed": 5
       },
-      "total": 26
+      "total": 27
     }
   },
   "version": 1

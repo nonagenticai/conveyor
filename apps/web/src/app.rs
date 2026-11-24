@@ -26,6 +26,7 @@ use crate::screens::execution::ExecutionScreen;
 use crate::screens::improvement::Improvement;
 use crate::screens::inference::InferenceEndpoint;
 use crate::screens::jobs::JobsScreen;
+use crate::screens::meetings::{MeetingRoomScreen, MeetingsScreen};
 use crate::screens::members::Members;
 use crate::screens::models::{ModelDetail, ModelsScreen};
 use crate::screens::organisation::OrganisationScreen;
@@ -193,6 +194,8 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/execution") view=ExecutionScreen/>
                             <Route path=path!("/authoring") view=Authoring/>
                             <Route path=path!("/plan") view=PlanScreen/>
+                            <Route path=path!("/meetings") view=MeetingsScreen/>
+                            <Route path=path!("/meetings/:id") view=MeetingRoomScreen/>
                             <Route path=path!("/validation") view=ValidationScreen/>
                             <Route path=path!("/improve") view=ImproveGate/>
                             <Route path=path!("/operations") view=OperationsGate/>
@@ -314,6 +317,9 @@ fn Sidebar() -> impl IntoView {
                 })}
                 {move || ctx.has_action("wbs.list").then(|| view! {
                     <li><A href="/plan"><span class="nav-item">"Plan"</span></A></li>
+                })}
+                {move || ctx.has_action("meetings.list").then(|| view! {
+                    <li><A href="/meetings"><span class="nav-item">"Meetings"</span></A></li>
                 })}
             </ul>
             <div class="grp">"Organisation"</div>
