@@ -344,6 +344,25 @@ async fn seed_card(pg: &support::Pg, ctx: &Ctx, lane: &str) -> Uuid {
     .await
 }
 
+/// A fresh architecture artefact in the tenant: the input `cards.assign` hands over.
+async fn seed_architecture_artifact(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let title = format!("Parity artefact {}", Uuid::now_v7().simple());
+    scoped(pg, ctx, async |conn| {
+        sqlx::query_scalar(
+            "INSERT INTO architecture_artifact
+                 (tenant_id, phase_code, plateau, artifact_kind, title)
+             VALUES ($1, 'a', 'psa', 'catalog', $2)
+             RETURNING id",
+        )
+        .bind(ctx.tenant_id)
+        .bind(title)
+        .fetch_one(&mut *conn)
+        .await
+        .expect("prepared artefact")
+    })
+    .await
+}
+
 /// A fresh draft executor spec on the parity capability, at version 1 (the edit sample's
 /// `If-Match`). The key is unique per insert, so a round never collides with its predecessor.
 async fn seed_capability_agent(pg: &support::Pg, ctx: &Ctx) -> Uuid {
@@ -3326,10 +3345,16 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let id = seed_list(pg, ctx).await;
             ctx.push(sample.name, id);
         }
-        "cards.update" | "cards.move" | "cards.archive" | "cards.duplicate" | "cards.comment"
-        | "cards.assign" => {
+        "cards.update" | "cards.move" | "cards.archive" | "cards.duplicate" | "cards.comment" => {
             let id = seed_card(pg, ctx, "active").await;
             ctx.push(sample.name, id);
+        }
+        // #526 v1-p66-1: a handoff names the artefacts it hands over, so each round seeds one.
+        "cards.assign" => {
+            let id = seed_card(pg, ctx, "active").await;
+            let artifact = seed_architecture_artifact(pg, ctx).await;
+            ctx.push(sample.name, id);
+            ctx.push("cards.assign.artifact", artifact);
         }
         // #295: the ledger's write and read address one card; each round gets a fresh one.
         "cards.ledger_append" | "cards.ledger_list" => {
@@ -4845,6 +4870,8 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                     "card_id": ctx.pop("cards.assign"),
                     "job_binding_id": binding,
                     "note": "the parity handoff",
+                    "acceptance": ["the receiver can tell what done means"],
+                    "artifact_ids": [ctx.pop("cards.assign.artifact")],
                 })
             });
             expecting(sample, 201)

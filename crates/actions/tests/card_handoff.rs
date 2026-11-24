@@ -194,6 +194,24 @@ async fn seed_binding(
     (binding.id, binding.release_hash)
 }
 
+/// One architecture artefact in the tenant: an input a handoff can name.
+async fn seed_artifact(pg: &support::Pg, tenant: TenantId) -> Uuid {
+    let mut tx = begin_scoped(&pg.runtime, tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO architecture_artifact
+             (tenant_id, phase_code, plateau, artifact_kind, title)
+         VALUES ($1, 'a', 'psa', 'catalog', $2)
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(format!("Handoff artefact {}", Uuid::now_v7().simple()))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("artefact");
+    tx.commit().await.expect("commit");
+    id
+}
+
 async fn create_card(
     running: &support::Running,
     board: &str,
@@ -297,6 +315,7 @@ async fn a_handoff_binds_the_card_records_the_note_and_starts_the_run() {
     let (pg, seeded, running) = fixture().await;
     let (board, lane) = board_and_lane(&running).await;
     let (binding, _) = seed_binding(&pg, seeded.tenant, "handoff-ok", BindingStatus::Active).await;
+    let artifact = seed_artifact(&pg, seeded.tenant).await;
     let (status, card) = create_card(&running, &board, &lane, None).await;
     assert_eq!(status, 201, "{card}");
     let card_id = Uuid::parse_str(&text(output(&card), "id")).expect("card id");
@@ -307,7 +326,13 @@ async fn a_handoff_binds_the_card_records_the_note_and_starts_the_run() {
         .invoke(
             "cards.assign",
             TOKEN,
-            json!({"card_id": card_id, "job_binding_id": binding, "note": note}),
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": note,
+                "acceptance": ["the receiver can tell what done means"],
+                "artifact_ids": [artifact],
+            }),
             Some(&etag),
             None,
             None,
@@ -318,6 +343,16 @@ async fn a_handoff_binds_the_card_records_the_note_and_starts_the_run() {
         output(&body)["card"]["job_binding_id"],
         json!(binding.to_string()),
         "the card names the binding"
+    );
+    assert_eq!(
+        output(&body)["card"]["meta"]["handoff"]["acceptance"],
+        json!(["the receiver can tell what done means"]),
+        "the card names what done means"
+    );
+    assert_eq!(
+        output(&body)["card"]["meta"]["handoff"]["artifact_ids"],
+        json!([artifact.to_string()]),
+        "the card names the artefacts it was handed"
     );
     assert_eq!(output(&body)["memory"]["kind"], "fact");
     assert_eq!(output(&body)["memory"]["source"], "human");
@@ -363,6 +398,7 @@ async fn a_second_handoff_is_refused_and_writes_nothing() {
     let (board, lane) = board_and_lane(&running).await;
     let (binding, _) =
         seed_binding(&pg, seeded.tenant, "handoff-live", BindingStatus::Active).await;
+    let artifact = seed_artifact(&pg, seeded.tenant).await;
     let (status, card) = create_card(&running, &board, &lane, None).await;
     assert_eq!(status, 201, "{card}");
     let card_id = Uuid::parse_str(&text(output(&card), "id")).expect("card id");
@@ -372,7 +408,13 @@ async fn a_second_handoff_is_refused_and_writes_nothing() {
         .invoke(
             "cards.assign",
             TOKEN,
-            json!({"card_id": card_id, "job_binding_id": binding, "note": "first"}),
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": "first",
+                "acceptance": ["the first handoff is complete"],
+                "artifact_ids": [artifact],
+            }),
             Some(&etag),
             None,
             None,
@@ -386,7 +428,13 @@ async fn a_second_handoff_is_refused_and_writes_nothing() {
         .invoke(
             "cards.assign",
             TOKEN,
-            json!({"card_id": card_id, "job_binding_id": binding, "note": "second"}),
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": "second",
+                "acceptance": ["the second handoff is complete"],
+                "artifact_ids": [artifact],
+            }),
             Some(&etag),
             None,
             None,
@@ -408,6 +456,7 @@ async fn concurrent_handoffs_start_one_run() {
     let (board, lane) = board_and_lane(&running).await;
     let (binding, _) =
         seed_binding(&pg, seeded.tenant, "handoff-race", BindingStatus::Active).await;
+    let artifact = seed_artifact(&pg, seeded.tenant).await;
     let (status, card) = create_card(&running, &board, &lane, None).await;
     assert_eq!(status, 201, "{card}");
     let card_id = Uuid::parse_str(&text(output(&card), "id")).expect("card id");
@@ -416,7 +465,13 @@ async fn concurrent_handoffs_start_one_run() {
     let one = running.invoke(
         "cards.assign",
         TOKEN,
-        json!({"card_id": card_id, "job_binding_id": binding, "note": "one"}),
+        json!({
+            "card_id": card_id,
+            "job_binding_id": binding,
+            "note": "one",
+            "acceptance": ["the race handoff is complete"],
+            "artifact_ids": [artifact],
+        }),
         Some(&etag),
         None,
         None,
@@ -424,7 +479,13 @@ async fn concurrent_handoffs_start_one_run() {
     let two = running.invoke(
         "cards.assign",
         TOKEN,
-        json!({"card_id": card_id, "job_binding_id": binding, "note": "two"}),
+        json!({
+            "card_id": card_id,
+            "job_binding_id": binding,
+            "note": "two",
+            "acceptance": ["the race handoff is complete"],
+            "artifact_ids": [artifact],
+        }),
         Some(&etag),
         None,
         None,
@@ -527,6 +588,7 @@ async fn an_empty_note_is_refused() {
     let (board, lane) = board_and_lane(&running).await;
     let (binding, _) =
         seed_binding(&pg, seeded.tenant, "handoff-empty", BindingStatus::Active).await;
+    let artifact = seed_artifact(&pg, seeded.tenant).await;
     let (status, card) = create_card(&running, &board, &lane, None).await;
     assert_eq!(status, 201, "{card}");
     let card_id = Uuid::parse_str(&text(output(&card), "id")).expect("card id");
@@ -536,7 +598,13 @@ async fn an_empty_note_is_refused() {
         .invoke(
             "cards.assign",
             TOKEN,
-            json!({"card_id": card_id, "job_binding_id": binding, "note": "   "}),
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": "   ",
+                "acceptance": ["a complete package, an empty note"],
+                "artifact_ids": [artifact],
+            }),
             Some(&etag),
             None,
             None,
@@ -550,11 +618,132 @@ async fn an_empty_note_is_refused() {
 }
 
 #[tokio::test]
+async fn a_handoff_without_acceptance_is_refused() {
+    let (pg, seeded, running) = fixture().await;
+    let (board, lane) = board_and_lane(&running).await;
+    let (binding, _) = seed_binding(
+        &pg,
+        seeded.tenant,
+        "handoff-no-acceptance",
+        BindingStatus::Active,
+    )
+    .await;
+    let artifact = seed_artifact(&pg, seeded.tenant).await;
+    let (status, card) = create_card(&running, &board, &lane, None).await;
+    assert_eq!(status, 201, "{card}");
+    let card_id = Uuid::parse_str(&text(output(&card), "id")).expect("card id");
+    let etag = etag_of_card(&running, card_id).await;
+
+    let (status, body) = running
+        .invoke(
+            "cards.assign",
+            TOKEN,
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": "the package is incomplete",
+                "artifact_ids": [artifact],
+            }),
+            Some(&etag),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], "handoff_incomplete", "{body}");
+    assert!(
+        body["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("acceptance"),
+        "the refusal names the missing field: {body}"
+    );
+    let (stored_binding, runs, jobs, memories) = stored(&pg, seeded.tenant, card_id).await;
+    assert_eq!(stored_binding, None, "the card is not bound");
+    assert_eq!((runs, jobs, memories), (0, 0, 0), "nothing was written");
+}
+
+#[tokio::test]
+async fn a_handoff_without_artefacts_is_refused() {
+    let (pg, seeded, running) = fixture().await;
+    let (board, lane) = board_and_lane(&running).await;
+    let (binding, _) = seed_binding(
+        &pg,
+        seeded.tenant,
+        "handoff-no-artefacts",
+        BindingStatus::Active,
+    )
+    .await;
+    let (status, card) = create_card(&running, &board, &lane, None).await;
+    assert_eq!(status, 201, "{card}");
+    let card_id = Uuid::parse_str(&text(output(&card), "id")).expect("card id");
+    let etag = etag_of_card(&running, card_id).await;
+
+    let (status, body) = running
+        .invoke(
+            "cards.assign",
+            TOKEN,
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": "the package is incomplete",
+                "acceptance": ["what done means, with nothing to hand over"],
+                "artifact_ids": [],
+            }),
+            Some(&etag),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], "handoff_incomplete", "{body}");
+    assert!(
+        body["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("artifact_ids"),
+        "the refusal names the missing field: {body}"
+    );
+
+    // An id that names no artefact in this tenant is equally incomplete, and writes nothing.
+    let unknown = Uuid::now_v7();
+    let (status, body) = running
+        .invoke(
+            "cards.assign",
+            TOKEN,
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": "the package names a foreign artefact",
+                "acceptance": ["what done means, with an artefact that is not there"],
+                "artifact_ids": [unknown],
+            }),
+            Some(&etag),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], "handoff_incomplete", "{body}");
+    assert!(
+        body["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("artifact_ids"),
+        "the refusal names the missing field: {body}"
+    );
+    let (stored_binding, runs, jobs, memories) = stored(&pg, seeded.tenant, card_id).await;
+    assert_eq!(stored_binding, None, "the card is not bound");
+    assert_eq!((runs, jobs, memories), (0, 0, 0), "nothing was written");
+}
+
+#[tokio::test]
 async fn the_andon_refuses_a_handoff() {
     let (pg, seeded, running) = fixture().await;
     let (board, lane) = board_and_lane(&running).await;
     let (binding, _) =
         seed_binding(&pg, seeded.tenant, "handoff-andon", BindingStatus::Active).await;
+    let artifact = seed_artifact(&pg, seeded.tenant).await;
     let (status, card) = create_card(&running, &board, &lane, None).await;
     assert_eq!(status, 201, "{card}");
     let card_id = Uuid::parse_str(&text(output(&card), "id")).expect("card id");
@@ -576,7 +765,13 @@ async fn the_andon_refuses_a_handoff() {
         .invoke(
             "cards.assign",
             TOKEN,
-            json!({"card_id": card_id, "job_binding_id": binding, "note": "while the cord is on"}),
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": "while the cord is on",
+                "acceptance": ["a complete package, refused by the andon"],
+                "artifact_ids": [artifact],
+            }),
             Some(&etag),
             None,
             None,
@@ -625,6 +820,7 @@ async fn the_handoff_writes_one_memory_row() {
     let (pg, seeded, running) = fixture().await;
     let (board, lane) = board_and_lane(&running).await;
     let (binding, _) = seed_binding(&pg, seeded.tenant, "handoff-row", BindingStatus::Active).await;
+    let artifact = seed_artifact(&pg, seeded.tenant).await;
     let (status, card) = create_card(&running, &board, &lane, None).await;
     assert_eq!(status, 201, "{card}");
     let card_id = Uuid::parse_str(&text(output(&card), "id")).expect("card id");
@@ -634,7 +830,13 @@ async fn the_handoff_writes_one_memory_row() {
         .invoke(
             "cards.assign",
             TOKEN,
-            json!({"card_id": card_id, "job_binding_id": binding, "note": "what the receiver must know"}),
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": "what the receiver must know",
+                "acceptance": ["the memory row is the whole note"],
+                "artifact_ids": [artifact],
+            }),
             Some(&etag),
             None,
             None,
@@ -670,6 +872,7 @@ async fn the_note_reaches_the_next_compiled_prompt() {
     let (board, lane) = board_and_lane(&running).await;
     let (binding, _) =
         seed_binding(&pg, seeded.tenant, "handoff-prompt", BindingStatus::Active).await;
+    let artifact = seed_artifact(&pg, seeded.tenant).await;
     let (status, card) = create_card(&running, &board, &lane, None).await;
     assert_eq!(status, 201, "{card}");
     let card_id = Uuid::parse_str(&text(output(&card), "id")).expect("card id");
@@ -680,7 +883,13 @@ async fn the_note_reaches_the_next_compiled_prompt() {
         .invoke(
             "cards.assign",
             TOKEN,
-            json!({"card_id": card_id, "job_binding_id": binding, "note": note}),
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": note,
+                "acceptance": ["the note reaches the next prompt"],
+                "artifact_ids": [artifact],
+            }),
             Some(&etag),
             None,
             None,
