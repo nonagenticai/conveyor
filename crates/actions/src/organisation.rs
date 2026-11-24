@@ -1318,7 +1318,7 @@ async fn job_authorities_get(
             // this action; an ungoverned action is allowed and left to the RBAC scope check.
             let (allowed, source) = match stored_allowed {
                 Some(allowed) => (allowed, "stored"),
-                None => match store::job_authority::compiled_default(role, *action) {
+                None => match store::job_authority::compiled_default(role, action) {
                     Some(allowed) => (allowed, "compiled_default"),
                     None => (true, "ungoverned"),
                 },
