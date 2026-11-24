@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S21 step 10 — the L1 laya gate: receipt · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-LAYA.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s21-step-10--the-l1-laya-gate-receipt">S21 step 10 — the L1 laya gate: receipt</h1>
+<p>Issue #656 · branch <code>issue/656-s21-l1-laya</code> · ADR <code>0018-l1-laya-provenance</code> · CONTRACT §28 · S21 §22 · resolves rework <code>v1-w1c-3</code>, <code>v1-w1c-4</code>, <code>v1-w1c-5</code></p>
+<p><strong>State: built.</strong> Measured at <code>7d56abb2</code> on 2026-11-24, before the PR. The merge is the lane's last CI run; nothing in this receipt is claimed for <code>main</code> yet.</p>
+<h2 id="what-changes-at-this-level">What changes at this level</h2>
+<p>Before: <code>ladder.evaluate</code> took <code>answer</code>, <code>confidence</code>, <code>latency_ms</code> and <code>probabilities</code> from its request body and wrote <code>rung = 'laya'</code>, so any <code>governance:write</code> caller could record a calibrated-looking L1 decision it had invented; options were inline request text; an outage could not become <code>gate_unavailable</code>; and nothing could stop the case being asked.</p>
+<p>After: the ladder builds the case from the effective policy and an authored, versioned option set; the engine performs the request as the external action <code>ladder.precheck</code>; <code>ladder.evaluate</code> records a decision only from the engine's recorded exchange (the claim's request hash, a 2xx status, the invocation's measured duration); the answer must be an authored key; an unavailable answer follows the policy's fail action; and a policy whose <code>fire_when</code> does not hold is not asked at all.</p>
+<h2 id="measured-suites-exact-head-7d56abb2">Measured suites (exact head <code>7d56abb2</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Suite</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/actions/tests/ladder_laya.rs</code> (new)</td>
+<td><strong>15 passed</strong></td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/decision_ladder.rs</code> (rewritten to the verified path)</td>
+<td><strong>7 passed</strong></td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/draft_apply.rs</code> (rewritten)</td>
+<td><strong>7 passed</strong></td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/internal_agent_runtime.rs</code></td>
+<td><strong>18 passed, 2 ignored</strong></td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/executor_runtime.rs</code></td>
+<td><strong>8 passed</strong></td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/registry.rs</code></td>
+<td><strong>12 passed</strong> — 543 actions (524 internal, 19 external)</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/parity_http_mcp.rs</code></td>
+<td><strong>7 passed</strong> — both option-set actions and <code>ladder.evaluate</code>'s refusal sampled over HTTP and MCP</td>
+</tr>
+<tr>
+<td><code>crates/store/tests/prompt_catalogue.rs</code></td>
+<td><strong>7 passed</strong></td>
+</tr>
+<tr>
+<td><code>crates/actions</code> lib unit tests</td>
+<td><strong>175 passed</strong></td>
+</tr>
+<tr>
+<td><code>clippy -D warnings</code> (domain, store, actions, api, server; all targets)</td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td><code>cargo fmt --all -- --check</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td><code>served-spec.lock.json</code></td>
+<td><strong>574 operations</strong>, <code>--check-lock</code> exit 0</td>
+</tr>
+<tr>
+<td>design-pack gate (coverage ×2, seed, docs pack, data/standards/outputs/console/v2/studio/learning/workbench/architecture)</td>
+<td><strong>all pass</strong></td>
+</tr>
+<tr>
+<td>rework audit <code>--rework-check v1-w1c-3/-4/-5</code></td>
+<td><strong>each prints "is cleared"</strong></td>
+</tr>
+<tr>
+<td><code>board.py --dry-run</code></td>
+<td>clean (reported only, nothing changed)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scenarios">Scenarios</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Test</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1.1 the precheck records the case under its claim</td>
+<td><code>ladder_laya::the_precheck_call_records_the_case</code></td>
+<td>pass — one stub call, the policy's <code>model_ref</code> and a typed <code>score</code> question</td>
+</tr>
+<tr>
+<td>P1.2 the decision derives from the recording</td>
+<td><code>::evaluate_derives_the_verdict_from_the_recording</code></td>
+<td>pass — answer/confidence from the response, measured <code>latency_ms</code>, <code>meta.laya_call_key</code> / <code>laya_invocation_id</code> / <code>case_sha256</code></td>
+</tr>
+<tr>
+<td>P1.3 a caller-supplied verdict is refused</td>
+<td><code>::a_caller_supplied_confidence_is_refused</code></td>
+<td>pass — <code>422 caller_supplied_verdict</code>, zero decisions</td>
+</tr>
+<tr>
+<td>P1.4 another case's claim is refused</td>
+<td><code>::a_call_for_another_case_is_refused</code></td>
+<td>pass — <code>422 laya_call_unverified</code>, zero decisions</td>
+</tr>
+<tr>
+<td>P1.5 the gate makes one laya request</td>
+<td><code>internal_agent_runtime::the_gate_records_a_laya_decision</code></td>
+<td>pass — stub hit count 1, one decision</td>
+</tr>
+<tr>
+<td>P2.1 the question comes from the authored set</td>
+<td><code>ladder_laya::the_question_comes_from_the_authored_set</code></td>
+<td>pass — <code>choice</code>, criteria <code>[accept, refuse]</code>; inline <code>options</code> <code>422 invalid_input</code> (<code>inline_options</code>)</td>
+</tr>
+<tr>
+<td>P2.2 an out-of-set answer is refused</td>
+<td><code>::an_answer_outside_the_set_is_refused</code></td>
+<td>pass — <code>422 laya_answer_not_in_options</code>, zero decisions</td>
+</tr>
+<tr>
+<td>P2.3 a declared choice with no set is refused</td>
+<td><code>::a_case_without_an_authored_set_is_refused</code></td>
+<td>pass — <code>409 option_set_missing</code></td>
+</tr>
+<tr>
+<td>P2.4 authoring twice bumps the version</td>
+<td><code>::the_set_version_increments</code></td>
+<td>pass — versions 1 then 2, <code>.get</code> reads 2</td>
+</tr>
+<tr>
+<td>P2.5 the decision records the authored rows</td>
+<td><code>::a_choice_decision_records_the_authored_set</code></td>
+<td>pass — <code>option_set_version=1</code>, two <code>decision_option</code> rows with the authored labels</td>
+</tr>
+<tr>
+<td>P3.1 an outage follows the policy</td>
+<td><code>::an_outage_follows_the_fail_policy</code></td>
+<td>pass — closed → refused, open+handover → escalated, <code>meta.gate_unavailable</code>, one call per case</td>
+</tr>
+<tr>
+<td>P3.1b no recorded call writes no decision</td>
+<td><code>::an_unrecorded_outage_writes_no_decision</code></td>
+<td>pass — <code>422 laya_call_unverified</code>, zero decisions</td>
+</tr>
+<tr>
+<td>P3.2 a non-firing case is not asked</td>
+<td><code>::a_case_that_does_not_fire_is_not_asked</code></td>
+<td>pass — <code>fires:false</code>, <code>409 case_not_fired</code>, zero stub calls; clearing <code>fire_when</code> makes it fire again</td>
+</tr>
+<tr>
+<td>P4.2 the register clears the findings</td>
+<td>the rework audit above</td>
+<td>pass — all three cleared</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reversal-proofs-fired-red-reverted-green">Reversal proofs (fired, red, reverted, green)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Edit that reverses the property</th>
+<th>Test</th>
+<th>Observed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>accept a caller-supplied verdict (the refusal check removed)</td>
+<td><code>a_caller_supplied_confidence_is_refused</code></td>
+<td><strong>red</strong> — the contract's named refusal disappears; the request falls through to <code>laya_call_unverified</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>build a constant, schema-valid case body (the facts ignored)</td>
+<td><code>a_call_for_another_case_is_refused</code></td>
+<td><strong>red</strong> — <code>201</code>, another case's exchange accepted</td>
+</tr>
+<tr>
+<td>3</td>
+<td>accept an answer outside the authored set (<code>unwrap_or("accepted")</code>)</td>
+<td><code>an_answer_outside_the_set_is_refused</code></td>
+<td><strong>red</strong> — <code>201</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>ignore <code>fail_policy</code> on an unreadable answer (<code>Outcome::Accepted</code>)</td>
+<td><code>an_outage_follows_the_fail_policy</code></td>
+<td><strong>red</strong> — <code>accepted</code> instead of <code>refused</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>make the executor call <code>ladder.precheck</code> a second time</td>
+<td><code>internal_agent_runtime::the_gate_records_a_laya_decision</code></td>
+<td><strong>red</strong> — "one laya call": 2</td>
+</tr>
+</tbody>
+</table>
+<p>All five were reverted to the committed head before the next ran; the table's green state is the suite results above.</p>
+<h2 id="notes-and-fixture-amendments-recorded-not-hidden">Notes and fixture amendments (recorded, not hidden)</h2>
+<ul>
+<li><strong><code>decision.input_hash</code> and <code>meta.case_sha256</code> are the case's sha256.</strong> The engine's idempotency witness is a different hash (<code>idempotency::request_hash</code>, an FNV-1a claim hash); the P1b cut had used it as <code>input_hash</code>, which the column's sha256 check refuses. The case now carries both: <code>Case::hash</code> (the claim) and <code>Case::sha256</code> (the decision).</li>
+<li><strong>The executor now uses the shared builder.</strong> It previously constructed its own <code>judge::request</code> and derived the claim from that copy; <code>decide()</code> now calls <code>case::build</code>, so the authored menu and <code>fire_when</code> reach an in-process gate too.</li>
+<li><strong>The parity samples were rewritten, not relaxed.</strong> <code>ladder.evaluate</code>'s sample now presents a claim no engine call backs and both transports must refuse it (<code>422</code>); the verified happy path is <code>ladder_laya.rs</code>'s, since a parity sample cannot call a real laya. <code>decision_option_sets.set</code> is sampled live (the set it authors is read by <code>.get</code> in the same round).</li>
+<li><strong>Two ladder test helpers changed shape.</strong> <code>decision_ladder</code>'s <code>evaluate</code> now drives the verified path with a stub whose verdict it controls, and uses a distinct draft text per verdict: two evaluations of an identical case share the claim and the engine replays the first exchange — that is the verification working, not a fixture shortcut.</li>
+<li><strong>A deterministic parity sample cannot use <code>prepare</code></strong> (that branch of the harness runs none); the read is chained to the set the authoring sample just wrote.</li>
+</ul>
+<h2 id="residuals-kept-not-fixed-here">Residuals (kept, not fixed here)</h2>
+<ul>
+<li>Automatic apply of an L1-accepted draft (ADR 0011:77) — the decision now exists honestly; what happens to an accepted draft is its own unit.</li>
+<li>The live model/laya proof remains <strong>blocked</strong> on the estate's caller licence (S21-RUN.md); every proof here is stub-backed and the tests say so.</li>
+<li>The SOP judge (<code>laya.judge</code>, <code>process/step.rs</code>) keeps its own question and threshold.</li>
+<li>Mid-loop budget enforcement is the #526 lane's; release pinning (<code>v1-p42-1</code>), prompt-budget authoring (<code>v1-p77-2</code>) and the NULL-hash guard (<code>v1-p77-1</code>) are untouched.</li>
+<li>A tenant-authored <code>fire_when</code> / question-type UI; both are authored through the actions.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S21-LAYA.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -12,6 +12,7 @@
 //! transition (`GeneratedDraft`, §7.4).
 
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use thiserror::Error;
 
 /// The three rungs a decision row records (§7.1).
@@ -228,6 +229,18 @@ pub enum LadderError {
         /// The gate, when the policy is gate-specific.
         gate: Option<String>,
     },
+    /// An authored option set is unusable.
+    #[error("the option set is invalid: {detail}")]
+    OptionSetInvalid {
+        /// What is wrong with it.
+        detail: String,
+    },
+    /// A policy's `fire_when` cannot be parsed.
+    #[error("fire_when is invalid: {detail}")]
+    InvalidFireWhen {
+        /// What is wrong with it.
+        detail: String,
+    },
 }
 
 /// Validate a confidence or a threshold.
@@ -373,5 +386,150 @@ impl GeneratedDraft {
             inference_call_id: None,
             prompt_sha256: None,
         }
+    }
+}
+
+// ── fire_when ────────────────────────────────────────────────────────────────────────────
+
+/// A policy's `fire_when`: whether a resolved case is asked at all (SPEC_V2 §7.2).
+///
+/// The expression is structured, never code: `{"all_of": [...]}` or `{"any_of": [...]}`, whose
+/// entries are predicates over `{kind, gate, field}`. A predicate matches when every key it names
+/// matches: `kind` and `gate` equal the case's, and `field` names a non-null member of the case's
+/// fact document. `null` (or an absent column) fires always — a policy with no `fire_when` asks
+/// every case, which is the pre-existing behaviour.
+#[derive(Clone, Debug, PartialEq)]
+pub struct FireWhen {
+    any_of: bool,
+    predicates: Vec<FirePredicate>,
+}
+
+/// One predicate of a [`FireWhen`] expression.
+#[derive(Clone, Debug, PartialEq)]
+struct FirePredicate {
+    kind: Option<String>,
+    gate: Option<String>,
+    field: Option<String>,
+}
+
+impl FireWhen {
+    /// The most predicates one expression may carry. A menu of conditions is authored, not a
+    /// program; the cap keeps a policy row readable and its evaluation bounded.
+    pub const MAX_PREDICATES: usize = 16;
+
+    /// Parse a stored or posted expression. `Ok(None)` for `null`.
+    pub fn parse(value: &Value) -> Result<Option<Self>, LadderError> {
+        if value.is_null() {
+            return Ok(None);
+        }
+        let object = value
+            .as_object()
+            .ok_or_else(|| LadderError::InvalidFireWhen {
+                detail: "the expression must be an object".to_owned(),
+            })?;
+        if let Some(unknown) = object
+            .keys()
+            .find(|key| !matches!(key.as_str(), "all_of" | "any_of"))
+        {
+            return Err(LadderError::InvalidFireWhen {
+                detail: format!("{unknown:?} is not all_of or any_of"),
+            });
+        }
+        let (any_of, list) = match (object.get("all_of"), object.get("any_of")) {
+            (Some(list), None) => (false, list),
+            (None, Some(list)) => (true, list),
+            (Some(_), Some(_)) => {
+                return Err(LadderError::InvalidFireWhen {
+                    detail: "name all_of or any_of, not both".to_owned(),
+                });
+            }
+            (None, None) => {
+                return Err(LadderError::InvalidFireWhen {
+                    detail: "the expression must name all_of or any_of".to_owned(),
+                });
+            }
+        };
+        let list = list
+            .as_array()
+            .ok_or_else(|| LadderError::InvalidFireWhen {
+                detail: "the predicate list must be an array".to_owned(),
+            })?;
+        if list.is_empty() {
+            return Err(LadderError::InvalidFireWhen {
+                detail: "the predicate list is empty".to_owned(),
+            });
+        }
+        if list.len() > Self::MAX_PREDICATES {
+            return Err(LadderError::InvalidFireWhen {
+                detail: format!("at most {} predicates are allowed", Self::MAX_PREDICATES),
+            });
+        }
+        let predicates = list
+            .iter()
+            .map(FirePredicate::parse)
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(Some(Self { any_of, predicates }))
+    }
+
+    /// Whether the case fires. `facts` is the fact document the case was built from.
+    pub fn fires(&self, kind: &str, gate: Option<&str>, facts: &Value) -> bool {
+        if self.any_of {
+            self.predicates
+                .iter()
+                .any(|predicate| predicate.matches(kind, gate, facts))
+        } else {
+            self.predicates
+                .iter()
+                .all(|predicate| predicate.matches(kind, gate, facts))
+        }
+    }
+}
+
+impl FirePredicate {
+    fn parse(value: &Value) -> Result<Self, LadderError> {
+        let object = value
+            .as_object()
+            .ok_or_else(|| LadderError::InvalidFireWhen {
+                detail: "a predicate must be an object".to_owned(),
+            })?;
+        if let Some(unknown) = object
+            .keys()
+            .find(|key| !matches!(key.as_str(), "kind" | "gate" | "field"))
+        {
+            return Err(LadderError::InvalidFireWhen {
+                detail: format!("{unknown:?} is not kind, gate or field"),
+            });
+        }
+        let text = |name: &str| -> Result<Option<String>, LadderError> {
+            match object.get(name) {
+                None => Ok(None),
+                Some(Value::String(text)) if !text.trim().is_empty() => {
+                    Ok(Some(text.trim().to_owned()))
+                }
+                Some(_) => Err(LadderError::InvalidFireWhen {
+                    detail: format!("{name} must be a non-empty string"),
+                }),
+            }
+        };
+        let predicate = Self {
+            kind: text("kind")?,
+            gate: text("gate")?,
+            field: text("field")?,
+        };
+        if predicate.kind.is_none() && predicate.gate.is_none() && predicate.field.is_none() {
+            return Err(LadderError::InvalidFireWhen {
+                detail: "a predicate must name kind, gate or field".to_owned(),
+            });
+        }
+        Ok(predicate)
+    }
+
+    fn matches(&self, kind: &str, gate: Option<&str>, facts: &Value) -> bool {
+        self.kind.as_deref().is_none_or(|want| want == kind)
+            && self.gate.as_deref().is_none_or(|want| Some(want) == gate)
+            && self
+                .field
+                .as_deref()
+                .is_none_or(|field| facts.get(field).is_some_and(|value| !value.is_null()))
     }
 }

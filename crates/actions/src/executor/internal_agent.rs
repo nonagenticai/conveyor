@@ -612,6 +612,24 @@ async fn decide(
         store::ladder::effective_policy_tx(&mut tx, tenant, GATE_KIND, anatomy.gate.as_deref())
             .await
             .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
+    // A declared `choice` gate answers from the authored menu; read it in the same transaction as
+    // the policy so the case the executor posts and the one the evaluator rebuilds use one set.
+    let option_set = match &policy {
+        Some(policy) if crate::ladder::case::question_is_choice(&policy.policy.meta) => Some(
+            store::ladder::effective_option_set_tx(
+                &mut tx,
+                tenant,
+                GATE_KIND,
+                anatomy.gate.as_deref(),
+            )
+            .await
+            .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?
+            .ok_or_else(|| {
+                ExecutorFailure::permanent("a choice gate policy has no authored option set")
+            })?,
+        ),
+        _ => None,
+    };
     tx.commit()
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
@@ -661,22 +679,57 @@ async fn decide(
         "card_id": run.card_id,
         "release_hash": binding.release_hash,
     });
-    let request = judge::request(
+    let case_output = json!({ "output": out.output, "turns": out.turns });
+
+    // `fire_when` decides whether the gate is asked at all. Not fired: no call, no decision, and
+    // the step proceeds — the policy said this case is not its business.
+    let facts = crate::ladder::case_facts(&case_output, &criteria, Some(&case_input));
+    let fires = match &policy.policy.fire_when {
+        None => true,
+        Some(value) => conveyor_domain::ladder::FireWhen::parse(value)
+            .map_err(|error| {
+                ExecutorFailure::permanent(format!(
+                    "the gate policy's fire_when is invalid: {error}"
+                ))
+            })?
+            .is_none_or(|expression| expression.fires(GATE_KIND, anatomy.gate.as_deref(), &facts)),
+    };
+    if !fires {
+        return Ok(Gate {
+            judge: json!({
+                "decision": "not_required",
+                "kind": GATE_KIND,
+                "fire_when": "does not hold",
+            }),
+            refusal: None,
+            escalation: None,
+        });
+    }
+
+    // One builder (`crate::ladder::case::build`) makes the body the executor posts, its claim and
+    // the body `ladder.evaluate` re-derives — one authored menu, one case, one call.
+    let built = crate::ladder::case::build(
+        tenant,
+        GATE_KIND,
+        anatomy.gate.as_deref(),
         Some(&laya_config.model_ref),
-        &json!({ "output": out.output, "turns": out.turns }),
+        &case_output,
         &criteria,
         Some(&case_input),
+        option_set.as_ref().map(|set| set.options.as_slice()),
     );
+    let request = built.body;
+    let call_key = built.call_key;
     let started = std::time::Instant::now();
     let judged = invoke(
         pool,
         registry(),
         tenant,
         InvokeRequest {
-            action: "laya.judge".to_owned(),
+            action: "ladder.precheck".to_owned(),
             input: request,
             precondition: None,
-            idempotency_key: Some(format!("{prefix}:judge")),
+            idempotency_key: Some(call_key.clone()),
             approval_id: None,
             actor_id,
             actor_kind: "service".to_owned(),
@@ -741,8 +794,6 @@ async fn decide(
         });
     };
 
-    let answer = if verdict.accepted { "accept" } else { "refuse" };
-    let confidence = verdict.score.unwrap_or(0.0);
     let evaluated = invoke(
         pool,
         registry(),
@@ -755,13 +806,10 @@ async fn decide(
                 "project_id": run.project_id,
                 "card_id": run.card_id,
                 "question": judge::JUDGE_QUESTION,
-                "answer": answer,
-                "confidence": confidence,
-                "input": {
-                    "output": out.output,
-                    "release_hash": binding.release_hash,
-                },
-                "latency_ms": latency_ms,
+                "output": case_output,
+                "criteria": criteria,
+                "facts": case_input,
+                "call_key": call_key,
                 "meta": {
                     "run_id": run.id,
                     "job_binding_id": binding.id,
@@ -788,7 +836,7 @@ async fn decide(
         },
     )
     .await;
-    let (decision_id, outcome) = match evaluated {
+    let (decision_id, outcome, recorded_answer, recorded_confidence) = match evaluated {
         Ok(outcome) => {
             let output = outcome.body.get("output").cloned().unwrap_or(Value::Null);
             let decision_id = output.get("id").and_then(Value::as_str).map(str::to_owned);
@@ -796,7 +844,16 @@ async fn decide(
                 .get("outcome")
                 .and_then(Value::as_str)
                 .map(str::to_owned);
-            (decision_id, recorded)
+            let recorded_answer = output
+                .get("answer")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned();
+            let recorded_confidence = output
+                .get("confidence")
+                .and_then(Value::as_f64)
+                .unwrap_or(0.0);
+            (decision_id, recorded, recorded_answer, recorded_confidence)
         }
         Err(error) => {
             // The verdict was readable but the ladder refused to record it: an infrastructure
@@ -820,8 +877,8 @@ async fn decide(
     let judge_doc = json!({
         "decision": outcome_str(outcome),
         "decision_id": decision_id,
-        "answer": answer,
-        "confidence": confidence,
+        "answer": recorded_answer,
+        "confidence": recorded_confidence,
         "threshold": threshold,
         "reason": verdict.reason,
         "policy_id": policy.policy.id.to_string(),
@@ -833,7 +890,7 @@ async fn decide(
         Outcome::Refused => Some(Refusal {
             class: "laya_refused".to_owned(),
             detail: format!(
-                "the gate refused the draft (confidence {confidence:.3} < threshold {threshold:.3})"
+                "the gate refused the draft (confidence {recorded_confidence:.3} < threshold {threshold:.3})"
             ),
         }),
         Outcome::Escalated => None,

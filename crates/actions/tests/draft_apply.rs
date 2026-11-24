@@ -21,6 +21,20 @@ async fn fixture() -> (support::Pg, support::Running, support::Seeded) {
         .await
         .expect("the catalogue seed");
     let running = support::Running::start(&pg).await;
+    // `ladder.precheck` authenticates with the tenant's sealed `laya.token`.
+    let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scoped tx");
+    conveyor_store::secret::create_secret_tx(
+        &mut tx,
+        seeded.tenant,
+        "laya.token",
+        b"test-laya-token",
+        "tenant",
+    )
+    .await
+    .expect("seal the laya token");
+    tx.commit().await.expect("commit the laya token");
     (pg, running, seeded)
 }
 
@@ -153,7 +167,45 @@ async fn compose_draft(
 }
 
 /// An accepted L1 decision for the card, with whatever draft binding the caller supplies.
+///
+/// The decision comes from the verified path: the case is built, posted to the stub laya through
+/// the engine, and evaluated from that record. The caller holds [`support::LAYA_ENV`].
 async fn evaluate_accepted(running: &support::Running, card_id: &str, meta: Value) -> String {
+    let stub = support::LayaStub::start(json!({
+        "answers": {"accept": {"score": 0.9, "reason": "the stub's verdict"}}
+    }))
+    .await;
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &stub.base);
+    let case_output = json!({"draft": "the model's proposal"});
+    let criteria = json!([{"criterion": "names the change"}]);
+    let (status, body) = running
+        .invoke(
+            "ladder.case",
+            TOKEN,
+            json!({
+                "kind": "gate.precheck",
+                "gate": "capability_ready",
+                "output": case_output,
+                "criteria": criteria
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let case = output(&body).clone();
+    let (status, body) = running
+        .invoke(
+            "ladder.precheck",
+            TOKEN,
+            case["case"].clone(),
+            None,
+            case["call_key"].as_str(),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
     let (status, accepted) = running
         .invoke(
             "ladder.evaluate",
@@ -162,11 +214,9 @@ async fn evaluate_accepted(running: &support::Running, card_id: &str, meta: Valu
                 "kind": "gate.precheck",
                 "gate": "capability_ready",
                 "card_id": card_id,
-                "question": "Is the draft safe to apply?",
-                "answer": "pass",
-                "confidence": 0.9,
-                "latency_ms": 1,
-                "input": {"card": card_id},
+                "output": case_output,
+                "criteria": criteria,
+                "call_key": case["call_key"],
                 "meta": meta
             }),
             None,
@@ -214,6 +264,7 @@ async fn document_card(running: &support::Running, document: &str) -> Option<Str
 
 #[tokio::test(flavor = "multi_thread")]
 async fn an_unbound_decision_cannot_apply_a_draft() {
+    let _guard = support::LAYA_ENV.lock().await;
     let (_pg, running, _seeded) = fixture().await;
     create_policy(&running).await;
     create_laya_config(&running).await;
@@ -240,6 +291,7 @@ async fn an_unbound_decision_cannot_apply_a_draft() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn a_decision_bound_to_another_draft_is_refused() {
+    let _guard = support::LAYA_ENV.lock().await;
     let (_pg, running, _seeded) = fixture().await;
     create_policy(&running).await;
     create_laya_config(&running).await;

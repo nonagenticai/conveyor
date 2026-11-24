@@ -1339,6 +1339,78 @@ CREATE TABLE job_binding (
 </tbody>
 </table>
 <p>The handoff is the level's entry (SPEC_V2 §6.6.1–5): the card names the binding, the note is memory, the run starts. It is not a lane move — <code>cards.move</code> changes no run and writes no memory. It accepts no <code>release_hash</code> (the binding is the pin) and writes no <code>run_step</code>; the run's first step is the executor's own (S21 step 4).</p>
+<h3 id="230-the-l1-laya-evaluation--s21-step-10-migration-0071">2.30 The L1 laya evaluation — S21 step 10 (migration <code>0071</code>)</h3>
+<p>The ladder stops trusting its caller: the case is built by the ladder and the verdict comes from a recorded laya exchange. Two tables and one column, all new; no existing row changes shape.</p>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>decision_option_set</code></td>
+<td>one live authored set per <code>(tenant_id, kind, gate)</code>; <code>version</code> is monotonic, and an edit is a new version, never an in-place update</td>
+</tr>
+<tr>
+<td><code>decision_option_set_option</code></td>
+<td>the set's rows: <code>key</code>, <code>label</code>, <code>payload</code> (with `payload.outcome ∈ accepted</td>
+</tr>
+<tr>
+<td><code>decision_policy.fire_when</code></td>
+<td>nullable structured expression (<code>all_of</code> / <code>any_of</code> over <code>{kind, gate, field}</code> predicates); <code>NULL</code> fires always</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the L1 path reads or writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>decision_policy</code></td>
+<td><strong>read</strong>: threshold, <code>fail_policy</code>, <code>action</code>, <code>fire_when</code>; <strong>pinned</strong>: <code>policy_version</code></td>
+</tr>
+<tr>
+<td><code>decision_policy_refinement</code></td>
+<td><strong>read</strong>: the tenant's override; <strong>pinned</strong>: <code>refinement_version</code></td>
+</tr>
+<tr>
+<td><code>laya_inference_config</code></td>
+<td><strong>read</strong>: <code>model_ref</code>, <code>params</code>, <code>timeout_ms</code>; <strong>pinned</strong>: <code>laya_config_version</code></td>
+</tr>
+<tr>
+<td><code>decision_option_set</code> + <code>_option</code></td>
+<td><strong>read</strong>: the authored menu and its version — the question's labels and the answer's legal keys</td>
+</tr>
+<tr>
+<td><code>idempotency_key</code></td>
+<td><strong>read</strong>: the engine's record of the <code>ladder.precheck</code> call — <code>request_hash</code> must equal the case hash, <code>status_code</code> must be 2xx, <code>response</code> is the answer document</td>
+</tr>
+<tr>
+<td><code>action_invocation</code></td>
+<td><strong>read</strong>: the invocation named by the key, for its <code>outcome</code> and measured <code>duration_ms</code></td>
+</tr>
+<tr>
+<td><code>decision</code></td>
+<td><strong>write</strong>: one row with <code>rung='laya'</code>, the response-derived answer/confidence/probabilities, the measured latency, the pins, and <code>meta.laya_call_key</code> / <code>meta.laya_invocation_id</code> / <code>meta.case_sha256</code></td>
+</tr>
+<tr>
+<td><code>decision_option</code></td>
+<td><strong>write</strong>: the authored rows the decision chose between, with their set version</td>
+</tr>
+<tr>
+<td><code>event</code></td>
+<td><strong>write</strong>: <code>decision.evaluated</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Authoring a set is one row's version bump, never a second row.</strong> <code>decision_option_sets.set</code> updates the existing header (<code>version = version + 1</code>) and replaces its children inside the same transaction, so the partial unique indexes in <code>0071</code> are never asked to hold two live sets and a reader never sees a half-replaced menu. Old labels survive only in <code>decision_option</code> — the per-decision record of what that decision chose between; a decision is reproducible from its own row plus its set version.</p>
+<p><strong>The call itself writes no conveyor row of ours beyond the engine's own bookkeeping.</strong> The laya service is external: <code>ladder.precheck</code> is dispatched with the tenant's sealed <code>laya.token</code>, and the engine records the claim (<code>idempotency_key</code>), the invocation (<code>action_invocation</code>) and the response body that the <code>idempotency_key.response</code> column already holds. That record is the provenance: the decision cites it rather than restating it, so nothing in <code>decision</code> can be written from a request body.</p>
 <h2 id="3-state-machines-and-enforcement">3. State machines and enforcement</h2>
 <p>Every transition is a pure function in <code>crates/domain</code>; no DB trigger, no per-flow rule, no CHECK that duplicates the function. The CHECK constraints below guard <em>vocabulary</em>, never <em>legality</em>.</p>
 <h3 id="31-card-lifecycle">3.1 Card lifecycle</h3>

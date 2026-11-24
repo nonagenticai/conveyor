@@ -177,14 +177,28 @@ window.ArchitecturePack = (function () {
   note right of running: one live run per card (uq_run_live); a retry is an attempt`,
     "decision-ladder": `flowchart TD
   L0["L0 - Rule: deterministic Rust"]:::rule
+  P["decision_policy and the authored option set"]:::row
+  F{"fire_when holds?"}:::rule
+  S["not fired: no call, no decision, the step proceeds"]:::row
+  C["the case: model, state, typed questions"]
+  K["ladder.precheck - POST /v1/systemone, no transaction held"]:::laya
+  U["outage: no recorded call, the caller applies fail_policy"]:::rule
+  V[("the engine's record: request_hash, 2xx, response")]:::row
   L1["L1 - Laya: calibrated choice, score or noul"]:::laya
   L2["L2 - Generation: LLM text, code, plans"]:::gen
   L3["L3 - Human: approval, override, irreversible action"]:::human
   R0[("row and action_invocation")]:::row
-  R1[("decision row: answer and confidence")]:::row
+  R1[("decision row: answer, confidence, call id, case sha256")]:::row
   R2[("inference_call and draft artefact")]:::row
   R3[("approval and approval_decision")]:::row
   L0 --> R0
+  P --> F
+  F -->|no| S
+  F -->|yes| C
+  C --> K
+  K -.->|no completed call| U
+  K --> V
+  V --> L1
   L1 --> R1
   L2 --> R2
   L3 --> R3
