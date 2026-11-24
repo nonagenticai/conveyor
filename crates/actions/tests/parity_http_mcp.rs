@@ -6525,6 +6525,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         expecting(plain("tools.list", json!({}), None), 200),
         expecting(plain("toolkits.list", json!({}), None), 200),
         expecting(plain("tool_calls.list", json!({}), None), 200),
+        expecting(plain("tool_bindings.list", json!({}), None), 200),
         expecting(
             plain(
                 "tools.get",

@@ -581,8 +581,8 @@ async fn the_published_tool_carries_its_contract() {
         )
         .await;
     assert_eq!(status, 200, "tools.get: {body}");
-    assert_eq!(body["idempotency"], "required", "{body}");
-    assert_eq!(body["verification"], "jobs_get", "{body}");
-    assert!(body["output_schema"].is_object(), "{body}");
-    assert!(body["redact"].is_array(), "{body}");
+    assert_eq!(body["output"]["idempotency"], "required", "{body}");
+    assert_eq!(body["output"]["verification"], "jobs_get", "{body}");
+    assert!(body["output"]["output_schema"].is_object(), "{body}");
+    assert!(body["output"]["redact"].is_array(), "{body}");
 }

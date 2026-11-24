@@ -839,6 +839,38 @@ pub async fn binding_by_id(
     Ok(row)
 }
 
+/// Every grant in one tenant, newest first. The filters are exact ids; `enabled` narrows to live
+/// or disabled grants. The row carries the `meta` a probe writes, so a reader can tell a
+/// hand-retired grant from one a failed probe disabled.
+pub async fn bindings_list(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    job_binding_id: Option<Uuid>,
+    run_id: Option<Uuid>,
+    enabled: Option<bool>,
+    limit: i64,
+) -> Result<Vec<BindingRow>, ToolStoreError> {
+    let rows = sqlx::query_as(
+        "SELECT id, job_binding_id, run_id, toolkit_id, effect_ceiling, credential_alias,
+                rate_limit_per_min, enabled, meta, version
+           FROM tool_binding
+          WHERE tenant_id = $1
+            AND ($2::uuid IS NULL OR job_binding_id = $2)
+            AND ($3::uuid IS NULL OR run_id = $3)
+            AND ($4::bool IS NULL OR enabled = $4)
+          ORDER BY created_at DESC, id DESC
+          LIMIT $5",
+    )
+    .bind(tenant.as_uuid())
+    .bind(job_binding_id)
+    .bind(run_id)
+    .bind(enabled)
+    .bind(limit)
+    .fetch_all(conn)
+    .await?;
+    Ok(rows)
+}
+
 /// The full new state of a binding. The action computes it from the current row, so a nullable
 /// credential or rate can be cleared without a second patch shape.
 pub struct BindingUpdate<'a> {
@@ -1064,8 +1096,8 @@ pub async fn calls_page(
         None => (None, None),
     };
     let rows = sqlx::query_as(
-        "SELECT id, run_id, tool_id, tool_key, toolkit_key, toolkit_version, input_hash,
-                status, http_status, latency_ms, created_at
+        "SELECT id, run_id, tool_id, binding_id, tool_key, toolkit_key, toolkit_version,
+                input_hash, status, http_status, latency_ms, created_at
            FROM tool_call
           WHERE tenant_id = $1
             AND ($2::uuid IS NULL OR run_id = $2)

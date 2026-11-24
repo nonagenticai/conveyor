@@ -20,6 +20,7 @@ use uuid::Uuid;
 
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::{Effect, FieldError};
+use crate::views::{Page, PageIn};
 
 /// `tool_bindings.create`'s input.
 #[derive(Clone, Debug, Deserialize, schemars::JsonSchema)]
@@ -206,9 +207,12 @@ async fn tool_bindings_create(
         )
     })?;
     if ceiling.rank() > strongest {
-        return Err(invalid(
-            "effect_ceiling",
-            "narrow_only",
+        // #557 P2.1 names the widened-grant refusal with the effect code the T18 Tools contract
+        // and SPEC_V2 §11.4 use at the call: `403 tool_effect_forbidden`. The issue's first
+        // draft said 422; the correction is recorded on #557.
+        return Err(ActionError::new(
+            403,
+            "tool_effect_forbidden",
             format!(
                 "{ceiling_text:?} is above the toolkit's strongest effect; the binding narrows only"
             ),
@@ -270,10 +274,13 @@ async fn tool_bindings_update(
                 )
             })?;
             if parsed.rank() > current_ceiling.rank() {
-                return Err(invalid(
-                    "effect_ceiling",
-                    "narrow_only",
-                    "the ceiling may only narrow".to_owned(),
+                return Err(ActionError::new(
+                    403,
+                    "tool_effect_forbidden",
+                    format!(
+                        "{text:?} is above the current ceiling {:?}; the binding may only narrow",
+                        row.effect_ceiling
+                    ),
                 ));
             }
             parsed
@@ -370,4 +377,58 @@ async fn tool_bindings_retire(
             ))
         }
     }
+}
+
+/// `tool_bindings.list`'s input.
+#[derive(Clone, Debug, Deserialize, schemars::JsonSchema)]
+pub struct BindingListIn {
+    /// Only this durable job binding's grants.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_binding_id: Option<Uuid>,
+    /// Only this run's grants.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub run_id: Option<Uuid>,
+    /// Only live (`true`) or disabled (`false`) grants.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub enabled: Option<bool>,
+    /// The shared page envelope; the list is capped at 200 and is not cursor-paged.
+    #[serde(default)]
+    pub page: PageIn,
+}
+
+/// Every grant in the tenant, filtered by the target the caller names.
+#[crate::action(
+    name = "tool_bindings.list",
+    version = 1,
+    kind = "internal",
+    scopes = ["tools:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn tool_bindings_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BindingListIn,
+) -> Result<Page<BindingOut>, ActionError> {
+    let limit = i64::from(input.page.limit.unwrap_or(50).clamp(1, 200));
+    let rows = store::tool::bindings_list(
+        &mut *tx,
+        ctx.tenant,
+        input.job_binding_id,
+        input.run_id,
+        input.enabled,
+        limit,
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "tool_bindings.list: read the grants");
+        ActionError::internal()
+    })?;
+    Ok(Page {
+        items: rows.iter().map(out).collect(),
+        next_cursor: None,
+    })
 }
