@@ -661,22 +661,28 @@ async fn decide(
         "card_id": run.card_id,
         "release_hash": binding.release_hash,
     });
+    let case_output = json!({ "output": out.output, "turns": out.turns });
     let request = judge::request(
         Some(&laya_config.model_ref),
-        &json!({ "output": out.output, "turns": out.turns }),
+        &case_output,
         &criteria,
         Some(&case_input),
     );
+    // The case's claim, derived exactly as `ladder.evaluate` will re-derive it: the L1 call and
+    // the decision that cites it cannot disagree about which case was asked.
+    let case_hash = store::idempotency::request_hash(&request);
+    let call_key =
+        crate::ladder::case::call_key(tenant, GATE_KIND, anatomy.gate.as_deref(), &case_hash);
     let started = std::time::Instant::now();
     let judged = invoke(
         pool,
         registry(),
         tenant,
         InvokeRequest {
-            action: "laya.judge".to_owned(),
+            action: "ladder.precheck".to_owned(),
             input: request,
             precondition: None,
-            idempotency_key: Some(format!("{prefix}:judge")),
+            idempotency_key: Some(call_key.clone()),
             approval_id: None,
             actor_id,
             actor_kind: "service".to_owned(),
@@ -741,8 +747,6 @@ async fn decide(
         });
     };
 
-    let answer = if verdict.accepted { "accept" } else { "refuse" };
-    let confidence = verdict.score.unwrap_or(0.0);
     let evaluated = invoke(
         pool,
         registry(),
@@ -755,13 +759,10 @@ async fn decide(
                 "project_id": run.project_id,
                 "card_id": run.card_id,
                 "question": judge::JUDGE_QUESTION,
-                "answer": answer,
-                "confidence": confidence,
-                "input": {
-                    "output": out.output,
-                    "release_hash": binding.release_hash,
-                },
-                "latency_ms": latency_ms,
+                "output": case_output,
+                "criteria": criteria,
+                "facts": case_input,
+                "call_key": call_key,
                 "meta": {
                     "run_id": run.id,
                     "job_binding_id": binding.id,
@@ -788,6 +789,8 @@ async fn decide(
         },
     )
     .await;
+    let mut recorded_answer = String::new();
+    let mut recorded_confidence = 0.0_f64;
     let (decision_id, outcome) = match evaluated {
         Ok(outcome) => {
             let output = outcome.body.get("output").cloned().unwrap_or(Value::Null);
@@ -796,6 +799,15 @@ async fn decide(
                 .get("outcome")
                 .and_then(Value::as_str)
                 .map(str::to_owned);
+            recorded_answer = output
+                .get("answer")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned();
+            recorded_confidence = output
+                .get("confidence")
+                .and_then(Value::as_f64)
+                .unwrap_or(0.0);
             (decision_id, recorded)
         }
         Err(error) => {
@@ -820,8 +832,8 @@ async fn decide(
     let judge_doc = json!({
         "decision": outcome_str(outcome),
         "decision_id": decision_id,
-        "answer": answer,
-        "confidence": confidence,
+        "answer": recorded_answer,
+        "confidence": recorded_confidence,
         "threshold": threshold,
         "reason": verdict.reason,
         "policy_id": policy.policy.id.to_string(),
@@ -833,7 +845,7 @@ async fn decide(
         Outcome::Refused => Some(Refusal {
             class: "laya_refused".to_owned(),
             detail: format!(
-                "the gate refused the draft (confidence {confidence:.3} < threshold {threshold:.3})"
+                "the gate refused the draft (confidence {recorded_confidence:.3} < threshold {threshold:.3})"
             ),
         }),
         Outcome::Escalated => None,

@@ -20,7 +20,7 @@
 //! payload `{entity, id, op}` and the topic `<entity>:<id>`.
 
 use chrono::{DateTime, Utc};
-use conveyor_domain::ladder::{LadderError, Outcome, Rung, evaluate};
+use conveyor_domain::ladder::{FailPolicy, LadderError, Outcome, Rung, evaluate, unavailable};
 use conveyor_store as store;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -738,29 +738,31 @@ pub struct EvaluateIn {
     pub card_id: Option<Uuid>,
     /// The question, in the case's terms.
     pub question: Option<String>,
-    /// The answer the rung proposes.
-    pub answer: String,
-    /// The confidence in 0–1 (the L1 path supplies laya's; a test injects it).
-    pub confidence: Option<f64>,
-    /// The probabilities, where the question type provides them.
-    pub probabilities: Option<Value>,
-    /// The facts the answer consumed; hashed with the case into `input_hash`.
-    pub input: Option<Value>,
-    /// An explicit input hash; computed from the basis when absent.
-    pub input_hash: Option<String>,
-    /// The authored options this decision chose between.
-    pub options: Option<Vec<OptionIn>>,
-    /// The authored option set's version; defaults to 1 when options are recorded.
-    pub option_set_version: Option<i64>,
-    /// A laya config override; the effective policy's config is used otherwise.
-    pub laya_config_id: Option<Uuid>,
-    /// The evaluation latency.
-    pub latency_ms: Option<i32>,
+    /// The text the case's question is about — the facts the case was built from.
+    pub output: Value,
+    /// The acceptance criteria the case was built from.
+    pub criteria: Value,
+    /// Further facts the case was built from.
+    pub facts: Option<Value>,
+    /// The claim the caller's `ladder.precheck` call carried (`ladder.case` returned it).
+    pub call_key: String,
     /// Free-form metadata.
     pub meta: Option<Value>,
+    /// A verdict in the request. Present only so it can be refused: a verdict is evidence.
+    pub answer: Option<String>,
+    /// A caller-supplied confidence. Refused.
+    pub confidence: Option<f64>,
+    /// Caller-supplied probabilities. Refused.
+    pub probabilities: Option<Value>,
+    /// A caller-supplied latency. Refused.
+    pub latency_ms: Option<i32>,
 }
 
-/// Evaluate one answer against the effective policy and record the decision.
+/// Record one L1 decision from the call the engine made.
+///
+/// The caller supplies the facts the case was built from and the claim `ladder.case` derived; the
+/// answer comes from the engine's recorded exchange with laya, and the latency from that
+/// invocation's measured duration. A request that carries a verdict is refused.
 #[crate::action(
     name = "ladder.evaluate",
     version = 1,
@@ -777,6 +779,17 @@ async fn ladder_evaluate(
     ctx: HandlerCtx,
     input: EvaluateIn,
 ) -> Result<HandlerOutput<DecisionOut>, ActionError> {
+    if input.answer.is_some()
+        || input.confidence.is_some()
+        || input.probabilities.is_some()
+        || input.latency_ms.is_some()
+    {
+        return Err(ActionError::new(
+            422,
+            "caller_supplied_verdict",
+            "a laya decision is recorded from the call the engine made, never from a verdict in the request",
+        ));
+    }
     let kind = input.kind.trim();
     if kind.is_empty() {
         return Err(invalid("kind", "missing", "a case kind is required"));
@@ -793,53 +806,123 @@ async fn ladder_evaluate(
             "the decision policy has no threshold",
         )
     })?;
-    let confidence = input.confidence.ok_or_else(|| {
-        invalid(
-            "confidence",
-            "confidence_missing",
-            "an evaluated decision needs the confidence it evaluated",
-        )
-    })?;
     let action = effective
         .action()
         .map_err(|error| ladder_error(error, ctx.action))?;
-    let outcome = evaluate(confidence, threshold, action)
-        .map_err(|error| ladder_error(error.into(), ctx.action))?;
-    let question = input.question.clone().unwrap_or_else(|| kind.to_owned());
-    let hash = match input.input_hash.clone() {
-        Some(hash) => hash,
-        None => input_hash_of(
-            kind,
-            gate.as_deref(),
-            &question,
-            &input.answer,
-            Some(confidence),
-            input.input.as_ref(),
-        )?,
-    };
-    let pins = effective.pins();
-    let laya_config_id = input
-        .laya_config_id
-        .or(effective.laya_config.as_ref().map(|row| row.id));
-    let laya_config_version = match input.laya_config_id {
-        Some(id) => {
-            let config = store::ladder::get_laya_config_tx(&mut *tx, ctx.tenant, id)
-                .await
-                .map_err(|error| ladder_error(error, ctx.action))?
-                .ok_or_else(|| ActionError::resource_not_found("laya_inference_config"))?;
-            Some(config.version)
+    let fail_policy = FailPolicy::parse(&effective.policy.fail_policy).ok_or_else(|| {
+        ladder_error(
+            LadderError::UnknownFailPolicy {
+                value: effective.policy.fail_policy.clone(),
+            }
+            .into(),
+            ctx.action,
+        )
+    })?;
+
+    // The claim must be this case's, and it must name a call the engine actually completed for
+    // this body. `ladder.case` derived it; a caller cannot pick one that names another case.
+    let model = effective
+        .laya_config
+        .as_ref()
+        .map(|row| row.model_ref.as_str());
+    let built = case::build(
+        ctx.tenant,
+        kind,
+        gate.as_deref(),
+        model,
+        &input.output,
+        &input.criteria,
+        input.facts.as_ref(),
+    );
+    if input.call_key != built.call_key {
+        return Err(call_unverified("the claim does not name this case"));
+    }
+    let recorded = store::idempotency::lookup(
+        &mut *tx,
+        ctx.tenant,
+        "ladder.precheck",
+        &built.call_key,
+        &built.hash,
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "ladder.evaluate: read the call record");
+        ActionError::internal()
+    })?;
+    let response = match recorded {
+        store::idempotency::Lookup::Replay {
+            status_code,
+            response,
+        } if (200..300).contains(&status_code) => Some(response),
+        // A recorded call that did not answer is an outage, not a verdict: it follows the fail
+        // policy below. A claim with no call behind it is a caller error.
+        store::idempotency::Lookup::Replay { .. } => None,
+        store::idempotency::Lookup::ConflictHash => {
+            return Err(call_unverified("the claim names a different case"));
         }
-        None => pins.laya_config_version,
+        store::idempotency::Lookup::Miss | store::idempotency::Lookup::InFlight => {
+            return Err(call_unverified("no completed call carries this claim"));
+        }
     };
-    let options = options_of(input.options.clone());
-    let option_set_version = input
-        .option_set_version
-        .or_else(|| (!options.is_empty()).then_some(1));
+    let invocation = store::actions::find_invocation_facts_by_key(
+        &mut *tx,
+        ctx.tenant,
+        "ladder.precheck",
+        &built.call_key,
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "ladder.evaluate: read the invocation");
+        ActionError::internal()
+    })?;
+    let Some(invocation) = invocation.filter(|facts| facts.outcome == "ok") else {
+        return Err(call_unverified(
+            "the call did not settle as a completed exchange",
+        ));
+    };
+
+    let verdict = response
+        .as_ref()
+        .and_then(|body| crate::process::judge::parse_verdict(body, Some(threshold)).ok());
+    let outage = verdict.is_none();
+    let (answer, confidence, outcome) = match &verdict {
+        Some(verdict) => {
+            let answer = if verdict.accepted { "accept" } else { "refuse" };
+            let confidence = verdict.score.unwrap_or(0.0);
+            let outcome = evaluate(confidence, threshold, action)
+                .map_err(|error| ladder_error(error.into(), ctx.action))?;
+            (answer.to_owned(), confidence, outcome)
+        }
+        None => (
+            "unavailable".to_owned(),
+            0.0,
+            unavailable(fail_policy, action),
+        ),
+    };
+
+    let question = input.question.clone().unwrap_or_else(|| kind.to_owned());
+    let pins = effective.pins();
+    let laya_config_id = effective.laya_config.as_ref().map(|row| row.id);
     let decided_at = if matches!(outcome, Outcome::Escalated) {
         None
     } else {
         Some(Utc::now())
     };
+    let mut meta = input.meta.unwrap_or_else(|| serde_json::json!({}));
+    if let Value::Object(ref mut object) = meta {
+        object.insert(
+            "laya_call_key".to_owned(),
+            serde_json::json!(built.call_key),
+        );
+        object.insert(
+            "laya_invocation_id".to_owned(),
+            serde_json::json!(invocation.id.to_string()),
+        );
+        object.insert("case_hash".to_owned(), serde_json::json!(built.hash));
+        if outage {
+            object.insert("gate_unavailable".to_owned(), serde_json::json!(true));
+        }
+    }
     let record = store::ladder::record_decision_tx(
         &mut *tx,
         ctx.tenant,
@@ -849,31 +932,36 @@ async fn ladder_evaluate(
             project_id: input.project_id,
             card_id: input.card_id,
             question,
-            answer: input.answer.clone(),
-            option_set_version,
-            probabilities: input.probabilities.unwrap_or_else(|| serde_json::json!({})),
+            answer,
+            option_set_version: None,
+            probabilities: serde_json::json!({}),
             confidence: Some(confidence),
-            input_hash: Some(hash),
+            input_hash: Some(built.hash),
             policy_id: Some(effective.policy.id),
             policy_version: pins.policy_version,
             policy_refinement_id: effective.refinement.as_ref().map(|row| row.id),
             refinement_version: pins.refinement_version,
             laya_config_id,
-            laya_config_version,
+            laya_config_version: pins.laya_config_version,
             actor_kind: ctx.actor_kind.clone(),
             actor_id: Some(ctx.actor_id),
             approval_id: None,
-            latency_ms: input.latency_ms,
+            latency_ms: Some(invocation.duration_ms),
             outcome,
             decided_at,
-            meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
-            options,
+            meta,
+            options: Vec::new(),
         },
     )
     .await
     .map_err(|error| ladder_error(error, ctx.action))?;
     emit_decision_event(&mut *tx, &ctx, "decision", record.id, "evaluated").await?;
     Ok(HandlerOutput::created(decision_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// The typed refusal a claim that names no completed call gets.
+fn call_unverified(detail: &str) -> ActionError {
+    ActionError::new(422, "laya_call_unverified", detail)
 }
 
 /// `ladder.record`.
