@@ -69,37 +69,39 @@ pub struct JobAuthority {
 
 /// The §6.7 cell for `(meta_role, action)` when the tenant has stored no row.
 ///
-/// Fail-closed: a role or an action the matrix does not name answers `false`. This is a
-/// **default, never a grant** — [`set`] is the only way to widen it, and a tenant that has
-/// decided nothing behaves exactly as the SPEC's default column says.
+/// **`None` means the matrix does not govern this action for this role.** §6.7 is a table of
+/// governed rows, not a closed allowlist for every registered action: an action the matrix does
+/// not name stays governed by the RBAC scope check (`tenant_role_scope`) and the binding's own
+/// `meta.authority` allowlist. Only the rows the SPEC names answer `Some(true | false)`, so a
+/// delivery run may keep calling `documents.create`, `tool.*` and the rest of its work.
 ///
 /// The rules, each citing its §6.7 row:
 ///
 /// * **PM** — "Create/close project ✅", "Create/move card in project ✅", "Assign a job
 ///   binding ✅", "Open a kata ✅". The PM's own `pm.*` actions and the `projects.*` lifecycle it
-///   owns are allowed. `crates/actions/src/pm/mod.rs::require_pm_binding` separately proves the
-///   calling binding is a live `pm` job; this matrix does not branch on `job_key`.
+///   owns are allowed; `coach.remedy`, `kata.adopt` and the `ops.*` set are denied.
 /// * **Coach** — "Create/move card in project ✅ (remedy only)" and "Open a kata ✅". Its own
-///   triage/escalation/interruption actions and opening a kata are allowed. `coach.remedy` is
-///   deliberately NOT compiled: the finding's floor is that no non-granted meta-role — delivery
-///   included — may call it, and sharing the `coach.` prefix does not make a role the coach. A
-///   tenant that wants its coach to remedy stores the grant.
-/// * **Kata** — "Adopt a kata change: — (propose only)", and "Open a kata: —". The kata job's own
-///   loop (`kata.propose`, `kata.measure`, …) is allowed; `kata.open` and `kata.adopt` are not.
-/// * **Delivery** — "Create/move card in project — own card", and nothing else. The ownership
-///   check ("own card") is the action layer's, because card identity is not an argument here.
-/// * **Ops** — "Create/move card in project — own incident", "Open a kata ✅", and the
-///   destructive ops action it proposes with a dry-run (human dual control is `approval_policy`,
-///   not this matrix). Its own `ops.*` actions and opening a kata are allowed.
+///   triage/escalation/interruption/remedy actions and opening a kata are allowed; the
+///   `projects.*`/`pm.*` lifecycle, `kata.adopt`, general card create/move and the ops set are
+///   denied.
+/// * **Kata** — "Adopt a kata change: — (propose only)", "Open a kata: —". Its own loop
+///   (`kata.propose`, `kata.measure`, …) is allowed; `kata.open`/`kata.adopt` and the PM's
+///   lifecycle are denied.
+/// * **Delivery** — "Create/move card in project — own card". Card create/move is allowed (the
+///   ownership check is the action layer's); `coach.remedy`, the `projects.*`/`pm.*` lifecycle,
+///   the kata gates, binding assignment and the ops set are denied.
+/// * **Ops** — "Create/move card in project — own incident", "Open a kata ✅", and its own
+///   `ops.*` actions (the destructive subset's human dual control is `approval_policy`, not this
+///   matrix). The PM's lifecycle, `coach.remedy` and `kata.adopt` are denied.
 ///
-/// Nothing else is allowed: every unknown role, and `coach.remedy` / `projects.baseline` / any
-/// `pm.*` action for the four non-PM roles, answers `false`.
-pub fn compiled_default(meta_role: &str, action: &str) -> bool {
+/// An unknown role answers `None` for every action: the SPEC gives no matrix row for it, so this
+/// guard has nothing to refuse and the RBAC scope check remains the authority.
+pub fn compiled_default(meta_role: &str, action: &str) -> Option<bool> {
+    let lifecycle = action.starts_with("projects.") || action.starts_with("pm.");
+    let bindings = action.starts_with("job_bindings.");
     match meta_role {
-        // §6.7 PM column: the project lifecycle, its own gate routing, card create/move, the
-        // binding assignment, and opening a kata. It may not remedy (that is the Coach's row).
         "pm" => {
-            action.starts_with("pm.")
+            if action.starts_with("pm.")
                 || action.starts_with("projects.")
                 || matches!(
                     action,
@@ -109,25 +111,78 @@ pub fn compiled_default(meta_role: &str, action: &str) -> bool {
                         | "job_bindings.retire"
                         | "kata.open"
                 )
+            {
+                Some(true)
+            } else if matches!(action, "coach.remedy" | "kata.adopt") || action.starts_with("ops.")
+            {
+                Some(false)
+            } else {
+                None
+            }
         }
-        // §6.7 Coach column: "Create/move card in project — ✅ (remedy only)". The remedy IS the
-        // coach's card move; denying it would deny the coach its own row.
-        "coach" => matches!(
-            action,
-            "coach.triage" | "coach.escalate" | "coach.interrupt" | "coach.remedy" | "kata.open"
-        ),
-        "kata" => action.starts_with("kata.") && !matches!(action, "kata.open" | "kata.adopt"),
-        "delivery" => matches!(action, "cards.create" | "cards.move"),
-        "ops" => action.starts_with("ops.") || action == "kata.open",
-        _ => false,
+        "coach" => {
+            if matches!(
+                action,
+                "coach.triage"
+                    | "coach.escalate"
+                    | "coach.interrupt"
+                    | "coach.remedy"
+                    | "kata.open"
+            ) {
+                Some(true)
+            } else if lifecycle
+                || bindings
+                || matches!(action, "kata.adopt" | "cards.create" | "cards.move")
+                || action.starts_with("ops.")
+            {
+                Some(false)
+            } else {
+                None
+            }
+        }
+        "kata" => {
+            if action.starts_with("kata.") {
+                Some(!matches!(action, "kata.open" | "kata.adopt"))
+            } else if lifecycle || bindings || action == "coach.remedy" {
+                Some(false)
+            } else {
+                None
+            }
+        }
+        "delivery" => {
+            if matches!(action, "cards.create" | "cards.move") {
+                Some(true)
+            } else if lifecycle
+                || bindings
+                || matches!(action, "coach.remedy" | "kata.open" | "kata.adopt")
+                || action.starts_with("ops.")
+            {
+                Some(false)
+            } else {
+                None
+            }
+        }
+        "ops" => {
+            if action.starts_with("ops.")
+                || matches!(action, "kata.open" | "cards.create" | "cards.move")
+            {
+                Some(true)
+            } else if lifecycle || bindings || matches!(action, "coach.remedy" | "kata.adopt") {
+                Some(false)
+            } else {
+                None
+            }
+        }
+        _ => None,
     }
 }
 
-/// [`effective`]'s pure decision: a stored row wins; an absent row is the compiled default.
+/// [`effective`]'s pure decision: a stored row wins; an absent row is the compiled default for a
+/// governed row, and **allowed** for an action the §6.7 matrix does not name.
 fn resolve_row(stored: Option<&JobAuthority>, meta_role: &str, action: &str) -> bool {
     match stored {
         Some(row) => row.allowed,
-        None => compiled_default(meta_role, action),
+        None => compiled_default(meta_role, action).unwrap_or(true),
     }
 }
 
@@ -226,7 +281,9 @@ pub async fn effective(
 ///    named there (`"*"` is the existing wildcard spelling, as in `store::meetings`). A
 ///    disallowed or absent action is refused even when the tenant row allows it. A free-form
 ///    value of another JSON type does not narrow.
-/// 4. The tenant row, else [`compiled_default`], must allow the action.
+/// 4. The tenant row, else [`compiled_default`] for a governed row, must allow the action. A
+///    role the matrix does not know, or an action it does not name, is ungoverned: allowed here,
+///    with the RBAC scope check remaining its authority.
 ///
 /// The caller passes a `begin_scoped` connection (the `_tx` convention); both reads run under
 /// the tenant's RLS.
@@ -299,89 +356,113 @@ mod tests {
     #[test]
     fn the_floor_is_denied_outside_its_own_row() {
         for role in ["delivery", "kata", "ops", "pm"] {
-            assert!(!compiled_default(role, "coach.remedy"), "{role}");
+            assert_eq!(
+                compiled_default(role, "coach.remedy"),
+                Some(false),
+                "{role}"
+            );
         }
-        assert!(compiled_default("coach", "coach.remedy"));
+        assert_eq!(compiled_default("coach", "coach.remedy"), Some(true));
         for role in ["delivery", "coach", "kata", "ops"] {
-            assert!(!compiled_default(role, "projects.baseline"), "{role}");
-            assert!(!compiled_default(role, "pm.charter"), "{role}");
-            assert!(!compiled_default(role, "pm.route_gate"), "{role}");
+            assert_eq!(
+                compiled_default(role, "projects.baseline"),
+                Some(false),
+                "{role}"
+            );
+            assert_eq!(compiled_default(role, "pm.charter"), Some(false), "{role}");
+            assert_eq!(
+                compiled_default(role, "pm.route_gate"),
+                Some(false),
+                "{role}"
+            );
         }
-        assert!(compiled_default("pm", "projects.baseline"));
+        assert_eq!(compiled_default("pm", "projects.baseline"), Some(true));
     }
 
     /// §6.7's PM column: the project lifecycle, its own gate routing, card create/move, the
     /// binding assignment, and opening a kata.
     #[test]
     fn pm_owns_projects_and_its_own_actions() {
-        assert!(compiled_default("pm", "pm.charter"));
-        assert!(compiled_default("pm", "pm.route_gate"));
-        assert!(compiled_default("pm", "projects.baseline"));
-        assert!(compiled_default("pm", "projects.close_request"));
-        assert!(compiled_default("pm", "cards.create"));
-        assert!(compiled_default("pm", "cards.move"));
-        assert!(compiled_default("pm", "job_bindings.create"));
-        assert!(compiled_default("pm", "kata.open"));
-        assert!(!compiled_default("pm", "coach.remedy"));
-        assert!(!compiled_default("pm", "ops.restart"));
+        assert_eq!(compiled_default("pm", "pm.charter"), Some(true));
+        assert_eq!(compiled_default("pm", "pm.route_gate"), Some(true));
+        assert_eq!(compiled_default("pm", "projects.baseline"), Some(true));
+        assert_eq!(compiled_default("pm", "projects.close_request"), Some(true));
+        assert_eq!(compiled_default("pm", "cards.create"), Some(true));
+        assert_eq!(compiled_default("pm", "cards.move"), Some(true));
+        assert_eq!(compiled_default("pm", "job_bindings.create"), Some(true));
+        assert_eq!(compiled_default("pm", "kata.open"), Some(true));
+        assert_eq!(compiled_default("pm", "coach.remedy"), Some(false));
+        assert_eq!(compiled_default("pm", "ops.restart"), Some(false));
+        // The matrix does not name ordinary work; RBAC owns it.
+        assert_eq!(compiled_default("pm", "documents.create"), None);
     }
 
     /// §6.7's Coach column: "Create/move card in project — ✅ (remedy only)"; opening a kata is
     /// allowed and adopting one is not.
     #[test]
     fn the_coach_may_remedy_and_open_a_kata() {
-        assert!(compiled_default("coach", "coach.triage"));
-        assert!(compiled_default("coach", "coach.escalate"));
-        assert!(compiled_default("coach", "coach.interrupt"));
-        assert!(compiled_default("coach", "coach.remedy"));
-        assert!(compiled_default("coach", "kata.open"));
-        assert!(!compiled_default("coach", "kata.adopt"));
-        assert!(!compiled_default("coach", "cards.create"));
+        assert_eq!(compiled_default("coach", "coach.triage"), Some(true));
+        assert_eq!(compiled_default("coach", "coach.escalate"), Some(true));
+        assert_eq!(compiled_default("coach", "coach.interrupt"), Some(true));
+        assert_eq!(compiled_default("coach", "coach.remedy"), Some(true));
+        assert_eq!(compiled_default("coach", "kata.open"), Some(true));
+        assert_eq!(compiled_default("coach", "kata.adopt"), Some(false));
+        assert_eq!(compiled_default("coach", "cards.create"), Some(false));
+        assert_eq!(compiled_default("coach", "projects.baseline"), Some(false));
     }
 
     /// §6.7's Kata column: its own loop, propose only for adoption, never opening itself.
     #[test]
     fn the_kata_proposes_but_never_opens_or_adopts() {
-        assert!(compiled_default("kata", "kata.propose"));
-        assert!(compiled_default("kata", "kata.measure"));
-        assert!(!compiled_default("kata", "kata.open"));
-        assert!(!compiled_default("kata", "kata.adopt"));
+        assert_eq!(compiled_default("kata", "kata.propose"), Some(true));
+        assert_eq!(compiled_default("kata", "kata.measure"), Some(true));
+        assert_eq!(compiled_default("kata", "kata.open"), Some(false));
+        assert_eq!(compiled_default("kata", "kata.adopt"), Some(false));
+        assert_eq!(compiled_default("kata", "coach.remedy"), Some(false));
     }
 
-    /// §6.7's Delivery column: create/move its own card, and nothing across roles. This is the
-    /// finding's exact acceptance: the delivery binding is refused `coach.remedy` and
-    /// `projects.baseline` unless the tenant granted it.
+    /// §6.7's Delivery column: create/move its own card; the governed cross-role rows are denied.
+    /// This is the finding's exact acceptance: the delivery binding is refused `coach.remedy` and
+    /// `projects.baseline` unless the tenant granted it, while ungoverned work stays with RBAC.
     #[test]
-    fn delivery_moves_cards_only() {
-        assert!(compiled_default("delivery", "cards.create"));
-        assert!(compiled_default("delivery", "cards.move"));
-        assert!(!compiled_default("delivery", "cards.assign"));
-        assert!(!compiled_default("delivery", "coach.remedy"));
-        assert!(!compiled_default("delivery", "projects.baseline"));
-        assert!(!compiled_default("delivery", "pm.plan"));
-        assert!(!compiled_default("delivery", "ops.restart"));
-        assert!(!compiled_default("delivery", "kata.open"));
+    fn delivery_moves_cards_and_is_denied_the_governed_rows() {
+        assert_eq!(compiled_default("delivery", "cards.create"), Some(true));
+        assert_eq!(compiled_default("delivery", "cards.move"), Some(true));
+        assert_eq!(compiled_default("delivery", "coach.remedy"), Some(false));
+        assert_eq!(
+            compiled_default("delivery", "projects.baseline"),
+            Some(false)
+        );
+        assert_eq!(compiled_default("delivery", "pm.plan"), Some(false));
+        assert_eq!(compiled_default("delivery", "ops.restart"), Some(false));
+        assert_eq!(compiled_default("delivery", "kata.open"), Some(false));
+        // Ungoverned work is left to the RBAC scope check, not refused here.
+        assert_eq!(compiled_default("delivery", "documents.create"), None);
+        assert_eq!(compiled_default("delivery", "cards.get"), None);
     }
 
     /// §6.7's Ops column: its incident/ops actions and opening a kata.
     #[test]
     fn ops_owns_its_operations_actions() {
-        assert!(compiled_default("ops", "ops.incident"));
-        assert!(compiled_default("ops", "ops.restart"));
-        assert!(compiled_default("ops", "kata.open"));
-        assert!(!compiled_default("ops", "pm.plan"));
-        assert!(!compiled_default("ops", "coach.remedy"));
+        assert_eq!(compiled_default("ops", "ops.incident"), Some(true));
+        assert_eq!(compiled_default("ops", "ops.restart"), Some(true));
+        assert_eq!(compiled_default("ops", "kata.open"), Some(true));
+        assert_eq!(compiled_default("ops", "pm.plan"), Some(false));
+        assert_eq!(compiled_default("ops", "coach.remedy"), Some(false));
+        assert_eq!(compiled_default("ops", "kata.adopt"), Some(false));
     }
 
-    /// An unknown or missing role is refused: a job family such as `engineering` is not a
-    /// §6.7 meta-role, and silence is never consent.
+    /// An unknown or missing role has no §6.7 row: the matrix answers `None` (not governed), so
+    /// an ordinary job binding keeps working and the RBAC scope check remains its authority.
     #[test]
-    fn an_unknown_role_is_refused() {
-        assert!(!compiled_default("engineering", "cards.get"));
-        assert!(!compiled_default("", "pm.charter"));
+    fn an_unknown_role_is_ungoverned() {
+        assert_eq!(compiled_default("engineering", "cards.get"), None);
+        assert_eq!(compiled_default("engineering", "coach.remedy"), None);
+        assert_eq!(compiled_default("", "pm.charter"), None);
     }
 
-    /// `effective`'s pure branch: a stored row wins, and an absent row is the compiled default.
+    /// `effective`'s pure branch: a stored row wins (allow or deny); an absent row is the
+    /// compiled default for a governed action and allowed for an action the matrix does not name.
     #[test]
     fn a_stored_row_wins_and_an_absent_row_is_the_compiled_default() {
         let stored = JobAuthority {
@@ -394,5 +475,16 @@ mod tests {
         assert!(resolve_row(Some(&stored), "delivery", "coach.remedy"));
         assert!(!resolve_row(None, "delivery", "coach.remedy"));
         assert!(resolve_row(None, "pm", "pm.plan"));
+        // The matrix does not name ordinary work, so an absent row does not deny it.
+        assert!(resolve_row(None, "delivery", "documents.create"));
+        // A tenant's explicit deny still wins on an ungoverned action.
+        let denied = JobAuthority {
+            meta_role: "delivery".to_owned(),
+            action: "documents.create".to_owned(),
+            allowed: false,
+            updated_by: Some("dev:alice".to_owned()),
+            updated_at: Utc::now(),
+        };
+        assert!(!resolve_row(Some(&denied), "delivery", "documents.create"));
     }
 }
