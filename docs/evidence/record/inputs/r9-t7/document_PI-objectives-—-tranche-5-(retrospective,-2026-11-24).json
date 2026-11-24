@@ -1,0 +1,8 @@
+{
+ "body": "# PI objectives \u2014 tranche 5\n\n## Objectives\n\n- O1 \u2014 T7's record is complete and its manifest green, closed by a distinct approver.\n- O2 \u2014 The operations gate executes: triage with no write, approved mitigation read-back, resolve\n  with a postmortem, and a destructive call without approval refused.\n- O3 \u2014 restart, scale, rollback and flag-flip are callable and read back; an undeclared verb is\n  refused; a dry run makes no write.\n- O4 \u2014 The cluster live proof runs once the deployed operator CLI exists; deploy-bound.\n- O5 \u2014 Tranche 5's other projects are assessed against their manifests; the tranche review\n  decides on the evidence.\n\n## Business value\n\nO1 10, O2 9, O3 8, O4 7, O5 6 (committed: O1\u2013O3).\n\n## Measurement\n\nO1 by `acceptance/programme/T7.toml`; O2 and O3 by the executed suite (`/tmp/u5a-r9/evidence/T7-acceptance.md`); O4 by the live\nproof when its prerequisites exist; O5 by the tranche review.\n\n## Evidence\n\nThe PI plan's ids and paths (`01a1d039-0d34-7f89-a0be-f3de3c9f540e`, `01a1e9e0-fe45-77e0-993a-d571fecc5ec1`, the journal) and the acceptance transcript.\n",
+ "category": "pi-objectives",
+ "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+ "publishable": true,
+ "title": "PI objectives \u2014 tranche 5 (retrospective, 2026-11-24)",
+ "unit": "tranche-5"
+}

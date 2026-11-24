@@ -1,0 +1,18 @@
+{
+ "_version": 1,
+ "change_id": "01a20ae2-1d0a-7eb7-8302-e7a5850919e2",
+ "evidence": [
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/ops.rs",
+   "ref": "ops::an_incident_resolves_with_a_linked_postmortem"
+  },
+  {
+   "kind": "document",
+   "path": "/tmp/u5a-r9/evidence/T7-acceptance.md",
+   "ref": "T7 acceptance transcript"
+  }
+ ],
+ "id": "01a20ae2-1b56-7cf2-9488-e77b52352c80",
+ "status": "accepted"
+}

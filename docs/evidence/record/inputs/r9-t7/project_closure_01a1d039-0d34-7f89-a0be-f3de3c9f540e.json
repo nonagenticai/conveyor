@@ -1,0 +1,20 @@
+{
+ "closure": "# T7 \u2014 Closure review (record completed, 2026-11-24)\n\nProject: T7 \u2014 Operations \u00b7 Tranche 5 \u00b7 Plan: SPEC_V2 \u00a712 \u00b7 Issues #78, #8\n\n## Outcome vs acceptance\n\nSPEC_V2 \u00a712 T7's gate is met by executed tests at lane head `a9ffecb8`, not by prose: an incident\nis triaged with no write (`an_incident_is_triaged_with_no_write`); an approved mitigation sets\n`mitigated_at` with a read-back (`an_approved_mitigation_sets_mitigated_at_with_a_read_back`); an\nincident resolves with a linked postmortem (`an_incident_resolves_with_a_linked_postmortem`); a\ndestructive call without the tenant's approvals is refused (`a_destructive_call_without_approval_is_refused`),\nand an approval for another target is refused; restart, scale, rollback and flag-flip are callable\nand read back (`the_four_write_verbs_are_callable_and_read_back`). 31 tests, 31 passed, 1 skipped.\n\n## Evidence\n\nThe published acceptance evidence `01a20ae2-55d5-75f3-b7ed-49e043ac52b8` carries the command and the clause-to-test map\n(`/tmp/u5a-r9/evidence/T7-acceptance.md`); the delivery contract `01a20ae2-30eb-7f69-812e-e98009182041` is live with its Board decision; the Phase-G\nreview `01a20ae2-325e-7e6d-a8fb-e8664452bc5e` is compliant and cites the published standing delegation `01a1fb9f-ac2d-732d-b274-1079be3dd2b3`; the\nclosure asset is `01a20ae2-5976-74c1-9cb2-2e02d0ac5c03`. The manifest `acceptance/programme/T7.toml` is the gate.\n\n## Open items\n\nThe cluster live proof is deploy-bound: `scripts/ops-live-proof.sh` needs the operator CLI\n(`$HOME/.claude/skills/conveyor-api/scripts/conveyor-ctl`), which is absent on this box, and the\ndeployed conveyor is digest `sha256:60898434\u2026` (rollout 2026-11-21T04:38Z). `the_live_read_returns_the_pod_list`\nis skipped by its own harness env gate. Neither is claimed as executed.\n\n## Decision\n\nClose.\n",
+ "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+ "evidence": [
+  {
+   "kind": "document",
+   "ref": "01a20ae2-5976-74c1-9cb2-2e02d0ac5c03"
+  },
+  {
+   "kind": "document",
+   "ref": "01a20ae2-55d5-75f3-b7ed-49e043ac52b8"
+  },
+  {
+   "kind": "manifest",
+   "ref": "acceptance/programme/T7.toml"
+  }
+ ],
+ "id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+ "reason": "The record is complete against the manifest: charter, approved baseline, accepted deliverables with evidence, live delivery contract with a Board decision, compliant Phase-G review and a published closure review."
+}

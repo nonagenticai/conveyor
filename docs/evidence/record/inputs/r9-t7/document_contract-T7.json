@@ -1,0 +1,23 @@
+{
+ "body": {
+  "acceptance": "SPEC_V2 \u00a712 T7: an injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable",
+  "evidence": [
+   "crates/actions/tests/ops.rs",
+   "crates/actions/tests/ops_write.rs",
+   "crates/actions/tests/ops_read.rs",
+   "crates/actions/tests/ops_host.rs",
+   "/tmp/u5a-r9/evidence/T7-acceptance.md"
+  ],
+  "obligations": [
+   "a destructive verb runs only under an approved, target-checked gate",
+   "a dry run makes no write and a caller without the scope is refused",
+   "a host is registered before a read; an unregistered host refuses",
+   "the requester never approves its own gate"
+  ],
+  "scope": "incidents, triage, runbooks and postmortems, the four write verbs, the tenant approval policy and quorum, mitigation and resolution, host registration and the k8s reads"
+ },
+ "kind": "delivery_contract",
+ "phase_code": "g",
+ "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+ "title": "T7 \u2014 delivery contract: the governed operations surface"
+}

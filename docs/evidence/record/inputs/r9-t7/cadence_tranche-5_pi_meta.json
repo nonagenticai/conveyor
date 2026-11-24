@@ -1,0 +1,93 @@
+{
+ "_version": 1,
+ "id": "01a20ae1-dfdb-7cda-8fbd-15502c7f9b8a",
+ "meta": {
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "pi_plan": {
+   "capacity": {
+    "build_concurrency": 1,
+    "live_record_writer": 1,
+    "projects": [
+     "S08",
+     "T7",
+     "S06",
+     "S17",
+     "T17"
+    ],
+    "read_agents_max": 6
+   },
+   "dependencies": [
+    {
+     "from": "T7",
+     "note": "the manifest's PI checks read this plan and the objectives before the chain closes",
+     "to": "tranche-5 PI plan"
+    },
+    {
+     "from": "T7",
+     "note": "needs the deployed operator CLI",
+     "to": "live proof"
+    },
+    {
+     "from": "T7",
+     "note": "an unregistered host refuses; the live read is skipped in the suite",
+     "to": "ops.host registration"
+    }
+   ],
+   "evidence": [
+    "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+    "01a1e9e0-fe45-77e0-993a-d571fecc5ec1",
+    "docs/evidence/record/journal.jsonl",
+    "/tmp/u5a-r9/evidence/T7-acceptance.md"
+   ],
+   "objectives": [
+    {
+     "business_value": 10,
+     "committed": true,
+     "id": "O1",
+     "statement": "T7's record is complete and its manifest green: charter, WSJF baseline, live delivery contract, Phase-G review and a published closure review, closed by a distinct approver."
+    },
+    {
+     "business_value": 9,
+     "committed": true,
+     "id": "O2",
+     "statement": "The operations gate executes: an incident is triaged with no write, an approved mitigation reads back, the incident resolves with a linked postmortem, and a destructive call without the tenant's approvals is refused."
+    },
+    {
+     "business_value": 8,
+     "committed": true,
+     "id": "O3",
+     "statement": "The four write verbs are callable and read back; an undeclared verb is refused; a dry run makes no write."
+    },
+    {
+     "business_value": 7,
+     "committed": false,
+     "id": "O4",
+     "statement": "The cluster live proof runs against the deployed service once its operator CLI exists; it is deploy-bound and not claimed before then."
+    },
+    {
+     "business_value": 6,
+     "committed": false,
+     "id": "O5",
+     "statement": "Tranche 5's remaining projects (S08, S06, S17, T17) are assessed against their manifests; the tranche review decides continue or pause on the evidence."
+    }
+   ],
+   "period": "tranche-5",
+   "refinement": {
+    "cadence_id": "01a20ae1-e197-797f-ad84-3fceb90e2645"
+   },
+   "scope": [
+    "S08",
+    "T7",
+    "S06",
+    "S17",
+    "T17"
+   ],
+   "wip_limit": {
+    "open_batches": 2,
+    "open_cards_per_writer": 1
+   }
+  },
+  "tranche_id": "01a1e9e0-fe45-77e0-993a-d571fecc5ec1",
+  "tranche_number": 5
+ }
+}
