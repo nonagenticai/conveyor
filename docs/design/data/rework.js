@@ -20264,61 +20264,6 @@ window.CONVEYOR_REWORK = {
       "title": "Reconcile the project's status source"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T5",
-      "apply_to": "T5",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T5"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T5",
-      "owner_project": "T5",
-      "rule": "status_source_drift",
-      "scope": "T5",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T5"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p102-1:T2",
       "apply_to": "PLATFORM",
       "artefact": "§10.2",
@@ -29555,11 +29500,11 @@ window.CONVEYOR_REWORK = {
     },
     "SPEC": {
       "findings": 86,
-      "gaps": 43,
+      "gaps": 42,
       "p0": 0,
       "p1": 9,
-      "p2": 34,
-      "packages": 106,
+      "p2": 33,
+      "packages": 105,
       "rules": 8,
       "rules_clean": 2,
       "rules_with_gaps": 6,
@@ -29583,24 +29528,24 @@ window.CONVEYOR_REWORK = {
     "by_severity": {
       "P0": 26,
       "P1": 149,
-      "P2": 153
+      "P2": 152
     },
     "by_standard": {
       "MSP": 66,
       "PMP": 49,
       "SAFe": 16,
-      "SPEC": 106,
+      "SPEC": 105,
       "TOGAF": 91
     },
     "by_status": {
-      "open": 325,
+      "open": 324,
       "suppressed": 3
     },
     "duplicates": 0,
-    "open": 325,
-    "packages": 328,
+    "open": 324,
+    "packages": 327,
     "resolved": 14,
-    "subjects": 432,
+    "subjects": 431,
     "suppressed": 3
   }
 };

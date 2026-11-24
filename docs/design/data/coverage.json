@@ -1751,8 +1751,7 @@
     {
       "blocked_by": [
         "T15",
-        "T17",
-        "T5"
+        "T17"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -2257,22 +2256,24 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/kata.rs",
+        "migrations/0066_kata.sql",
+        "migrations/0067_kata_gate.sql"
       ],
-      "gap": "no kata.* action family and no measured procedure-change loop",
+      "gap": null,
       "key": "T5",
       "measured": {
         "actions": [
-          0,
-          0
+          8,
+          8
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
-          0,
-          0
+          5,
+          5
         ]
       },
       "name": "Kata",
@@ -2280,7 +2281,7 @@
         "S12"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 10,
       "units": {
@@ -2296,9 +2297,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T5"
-      ],
+      "blocked_by": [],
       "evidence": [
         "crates/actions/src/development.rs",
         "migrations/0068_development_project.sql"
@@ -2386,9 +2385,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T5"
-      ],
+      "blocked_by": [],
       "evidence": [
         "migrations/0056_cadence_tranche.sql"
       ],
@@ -2729,10 +2726,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 42,
+        "built": 43,
         "partial": 1,
         "planned": 0,
-        "proposed": 5,
+        "proposed": 4,
         "standing": 1
       },
       "total": 50,
