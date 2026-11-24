@@ -4337,6 +4337,366 @@
       "is_active": true
     },
     {
+      "kind": "project_type",
+      "code": "delivery",
+      "label": "Delivery",
+      "meta": {
+        "description": "Delivery project: charter -> plan -> build -> verify -> release -> close (the PMP template); gates are design (conditional), merge, deploy and close (SPEC 5.2).",
+        "phases": [
+          "charter",
+          "plan",
+          "build",
+          "verify",
+          "release",
+          "close"
+        ],
+        "gates": [
+          "design",
+          "merge",
+          "deploy",
+          "close"
+        ],
+        "card_types": [
+          {
+            "code": "bug",
+            "phase": "build",
+            "is_entry": false
+          },
+          {
+            "code": "feature",
+            "phase": "build",
+            "is_entry": false
+          },
+          {
+            "code": "project_start_request_analysis",
+            "phase": "charter",
+            "is_entry": true
+          }
+        ],
+        "matrix": {
+          "bug": {
+            "intake": [
+              "active"
+            ],
+            "active": [
+              "done",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ]
+          },
+          "feature": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          },
+          "project_start_request_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          }
+        }
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "project_type",
+      "code": "improvement",
+      "label": "Improvement",
+      "meta": {
+        "description": "Improvement (kata) project: the six Gets - Go to See, Grasp the Situation, Get to Solution, Get to Standardization, Get to Sustainability, Get to Stretch; hypothesis and adoption gates (SPEC 5.2, 6.3).",
+        "phases": [
+          "go_to_see",
+          "grasp_the_situation",
+          "get_to_solution",
+          "get_to_standardization",
+          "get_to_sustainability",
+          "get_to_stretch"
+        ],
+        "gates": [
+          "hypothesis",
+          "adoption"
+        ],
+        "card_types": [
+          {
+            "code": "project_start_request_analysis",
+            "phase": "go_to_see",
+            "is_entry": true
+          }
+        ],
+        "matrix": {
+          "project_start_request_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          }
+        }
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "project_type",
+      "code": "development",
+      "label": "Development",
+      "meta": {
+        "description": "Self-development project: design -> branch -> implement -> CI -> review -> merge -> deploy -> verify; design (structural), merge and deploy gates (SPEC 5.2, 9.1).",
+        "phases": [
+          "design",
+          "branch",
+          "implement",
+          "ci",
+          "review",
+          "merge",
+          "deploy",
+          "verify"
+        ],
+        "gates": [
+          "design",
+          "merge",
+          "deploy"
+        ],
+        "card_types": [
+          {
+            "code": "project_start_request_analysis",
+            "phase": "design",
+            "is_entry": true
+          }
+        ],
+        "matrix": {
+          "project_start_request_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          }
+        }
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "project_type",
+      "code": "operations",
+      "label": "Operations",
+      "meta": {
+        "description": "Operations project: detect -> triage -> mitigate -> resolve -> postmortem; only the destructive-action gate (SPEC 5.2, 9.2).",
+        "phases": [
+          "detect",
+          "triage",
+          "mitigate",
+          "resolve",
+          "postmortem"
+        ],
+        "gates": [
+          "destructive_action"
+        ],
+        "card_types": [
+          {
+            "code": "project_start_request_analysis",
+            "phase": "detect",
+            "is_entry": true
+          }
+        ],
+        "matrix": {
+          "project_start_request_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          }
+        }
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "project_type",
+      "code": "setup",
+      "label": "Setup",
+      "meta": {
+        "description": "Setup (authoring) project: intake -> asset design -> review -> publish -> validate; per-asset review and publish gates (SPEC 5.2, 5.7).",
+        "phases": [
+          "intake",
+          "asset_design",
+          "review",
+          "publish",
+          "validate"
+        ],
+        "gates": [
+          "asset_review",
+          "publish"
+        ],
+        "card_types": [
+          {
+            "code": "project_start_request_analysis",
+            "phase": "intake",
+            "is_entry": true
+          }
+        ],
+        "matrix": {
+          "project_start_request_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          }
+        }
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
+      "kind": "project_type",
+      "code": "media",
+      "label": "Media",
+      "meta": {
+        "description": "Media production project: brief -> script -> asset -> render -> QC -> publish -> close; script, asset, QC and publish gates (SPEC 5.2.1).",
+        "phases": [
+          "brief",
+          "script",
+          "asset",
+          "render",
+          "qc",
+          "publish",
+          "close"
+        ],
+        "gates": [
+          "script",
+          "asset",
+          "qc",
+          "publish"
+        ],
+        "card_types": [
+          {
+            "code": "project_start_request_analysis",
+            "phase": "brief",
+            "is_entry": true
+          }
+        ],
+        "matrix": {
+          "project_start_request_analysis": {
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
+          }
+        }
+      },
+      "sort": 0,
+      "is_active": true
+    },
+    {
       "kind": "phase",
       "code": "analysis",
       "label": "Analysis",
