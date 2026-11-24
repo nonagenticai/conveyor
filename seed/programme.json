@@ -123,7 +123,7 @@
           "S02",
           "S03"
         ],
-        "plan_status": "planned",
+        "plan_status": "built 2026-11-22",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 3,
@@ -804,13 +804,15 @@
         ],
         "plan_status": "built",
         "status_source": "github issue state > measured coverage > plan frontmatter",
-        "measured_status": "built",
+        "measured_status": "partial",
         "tranche": 9,
         "expected_outputs": [
           "project-brief",
           "evidence"
         ],
-        "closure_outputs": [],
+        "closure_outputs": [
+          "closure-review"
+        ],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -1227,7 +1229,7 @@
       "key": "T12",
       "name": "One organisation loop",
       "description": "SPEC_V2 slice T12 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1632,7 +1634,6 @@
           223,
           224,
           225,
-          395,
           410,
           426,
           435,
@@ -1640,7 +1641,12 @@
           526,
           569,
           572,
-          660
+          660,
+          680,
+          681,
+          682,
+          683,
+          684
         ],
         "depends_on": [],
         "plan_status": "active",

@@ -13,7 +13,7 @@ mod support;
 
 use conveyor_domain::TenantId;
 use conveyor_store::architecture::{
-    ArchitectureStoreError, BoardSubject, NewBody, NewContract, approve_contract_tx,
+    ArchitectureStoreError, BoardDecider, BoardSubject, NewBody, NewContract, approve_contract_tx,
     create_body_tx, decide_board_tx, get_body_tx, get_contract_tx, request_contract_tx,
 };
 use conveyor_store::begin_scoped;
@@ -34,6 +34,14 @@ fn body(key: &str, charter: &str, authority: &str, members: Value) -> NewBody {
 
 fn commissioned() -> Value {
     json!([{ "role": "chief architect" }])
+}
+
+fn decider(user: Uuid) -> BoardDecider<'static> {
+    BoardDecider {
+        decided_by: user,
+        decided_by_kind: "human",
+        delegation_ref: None,
+    }
 }
 
 async fn project(pool: &sqlx::PgPool, tenant: Uuid) -> Uuid {
@@ -95,11 +103,11 @@ async fn a_draft_board_cannot_decide_a_contract() {
         board.id,
         "approved",
         json!({ "delegation_ref": "gate" }),
-        seeded.user,
         BoardSubject {
             kind: Some("contract"),
             id: Some(contract.id),
         },
+        decider(seeded.user),
     )
     .await;
     assert!(
@@ -133,11 +141,11 @@ async fn a_board_convenes_only_with_its_commission() {
         empty.id,
         "approved",
         json!({ "charter": "convene" }),
-        seeded.user,
         BoardSubject {
             kind: Some("board"),
             id: None,
         },
+        decider(seeded.user),
     )
     .await;
     assert!(
@@ -163,11 +171,11 @@ async fn a_board_convenes_only_with_its_commission() {
         full.id,
         "approved",
         json!({ "charter": "convene" }),
-        seeded.user,
         BoardSubject {
             kind: Some("board"),
             id: None,
         },
+        decider(seeded.user),
     )
     .await
     .expect("a commissioned board convenes itself");
@@ -205,11 +213,11 @@ async fn an_active_board_decides_a_contract_and_a_retired_one_cannot() {
         board.id,
         "approved",
         json!({ "charter": "convene" }),
-        seeded.user,
         BoardSubject {
             kind: Some("board"),
             id: None,
         },
+        decider(seeded.user),
     )
     .await
     .expect("convene the board");
@@ -222,11 +230,11 @@ async fn an_active_board_decides_a_contract_and_a_retired_one_cannot() {
         board.id,
         "approved",
         json!({ "delegation_ref": "gate" }),
-        seeded.user,
         BoardSubject {
             kind: Some("contract"),
             id: Some(contract.id),
         },
+        decider(seeded.user),
     )
     .await
     .expect("an active board decides the contract");

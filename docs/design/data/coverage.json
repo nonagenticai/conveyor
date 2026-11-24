@@ -334,7 +334,7 @@
       "tranche": 0,
       "units": {
         "blocked": 1,
-        "claimed": 2,
+        "claimed": 1,
         "numbers": [
           17,
           22,
@@ -363,7 +363,7 @@
           572,
           660
         ],
-        "open": 15,
+        "open": 13,
         "ready": 5,
         "unknown": 0
       }
@@ -1477,11 +1477,11 @@
         "migrations/0030_prompt_catalogue.sql",
         "migrations/0071_ladder_option_sets.sql"
       ],
-      "gap": null,
+      "gap": "action ladder.case, action ladder.precheck, action decision_option_sets.set, action decision_option_sets.get",
       "key": "S21",
       "measured": {
         "actions": [
-          10,
+          6,
           10
         ],
         "modules": [
@@ -1499,7 +1499,7 @@
         "S20"
       ],
       "plan": "docs/plans/slices/S21-message-construction.md",
-      "status": "built",
+      "status": "partial",
       "track": "v1",
       "tranche": 9,
       "units": {
@@ -1779,11 +1779,11 @@
       "tranche": 13,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           88
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2006,14 +2006,14 @@
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           87,
           629,
           655
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2729,16 +2729,16 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 45,
-        "partial": 1,
+        "built": 44,
+        "partial": 2,
         "planned": 0,
         "proposed": 2,
         "standing": 1
       },
       "total": 50,
       "uncovered": [],
-      "with_open_units": 13,
-      "without_open_units": 37
+      "with_open_units": 12,
+      "without_open_units": 38
     },
     "screens": {
       "actions_invoked": 39,
