@@ -1,4 +1,4 @@
--- 0061_kata.sql — T5: the kata on the V2 spine (SPEC_V2 §6.3, §9.3–§9.4, §12 T5; issue #77).
+-- 0066_kata.sql — T5: the kata on the V2 spine (SPEC_V2 §6.3, §9.3–§9.4, §12 T5; issue #77).
 --
 -- Forward only: never edited after this slice closes (CONTRACT §2).
 --

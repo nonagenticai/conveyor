@@ -252,10 +252,20 @@ mod tests {
                 // can submit and poll instead of holding one response open
                 // (0063_async_invocation.sql).
                 (63, "async invocation".to_owned()),
-                // T5 (#77): the kata itself, and the gate a second kata for an open signature
-                // passes through (0064_kata.sql, 0065_kata_gate.sql).
-                (64, "kata".to_owned()),
-                (65, "kata gate".to_owned())
+                // T17 (#87): the tenant asset authoring intake, drafts, review gate and the
+                // one-published-row-per-(kind, key) catalogue (0064_authoring.sql, SPEC_V2 §5.7).
+                (64, "authoring".to_owned()),
+                // T19 (#606): the decision forum — meeting types, meetings, agenda items,
+                // attendance, positions and the participant extension (0065_meetings.sql,
+                // SPEC_V2 §6.8, D66).
+                (65, "meetings".to_owned()),
+                // T5 (#77): the kata's record, its six Gets and its held-out measurement
+                // (0066_kata.sql, SPEC_V2 §6.3, §9.3–§9.4).
+                (66, "kata".to_owned()),
+                // T5 P2–P4 (#77): the open-time measurability gate, the pinned pre-kata
+                // procedure version, and the append-only revert and adoption evidence
+                // (0067_kata_gate.sql).
+                (67, "kata gate".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

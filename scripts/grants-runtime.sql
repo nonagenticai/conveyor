@@ -72,11 +72,11 @@ REVOKE UPDATE, DELETE ON tool_call FROM conveyor_runtime;
 -- from the runtime role, so an application bug cannot rewrite what the coach decided.
 REVOKE UPDATE, DELETE ON coach_remedy FROM conveyor_runtime;
 
--- T5 (0064): the six Gets and the held-out measurement are the kata's evidence. A Get is written
+-- T5 (0066): the six Gets and the held-out measurement are the kata's evidence. A Get is written
 -- once and the measurement is the number a person adopts against; UPDATE and DELETE are withheld
 -- so an application bug cannot rewrite either (the `kata` row carries the mutable stage).
 REVOKE UPDATE, DELETE ON kata_get, kata_measurement FROM conveyor_runtime;
 
--- T5 P2/P3 (0065): the revert and the adoption are append-only evidence — a regression's reason
+-- T5 P2/P3 (0067): the revert and the adoption are append-only evidence — a regression's reason
 -- and a person's decision are never edited or erased.
 REVOKE UPDATE, DELETE ON kata_revert, kata_adoption FROM conveyor_runtime;

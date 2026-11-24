@@ -114,7 +114,11 @@ use serde_json::{Value, json};
 /// authorises). 500 → **502**.
 /// **#15 (S21 step 3) adds 5 internal**: the `prompt_recipes.create|get|list|activate|retire`
 /// catalogue surface. 503 → **508**.
-const EXPECTED: [&str; 521] = [
+/// **T17 (#87) adds 5 internal**: `authoring.intake|draft|review|publish|assets` — the tenant
+/// asset authoring family. 513 → 518. **T19 (#606) adds 12 internal**: the meetings family
+/// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
+/// `minutes_publish|list|get`) — 518 → **530**.
+const EXPECTED: [&str; 538] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -162,6 +166,11 @@ const EXPECTED: [&str; 521] = [
     "architecture.skills_list",
     "artifacts.list",
     "audit.list",
+    "authoring.assets",
+    "authoring.draft",
+    "authoring.intake",
+    "authoring.publish",
+    "authoring.review",
     "baselines.get",
     "baselines.list",
     "baselines.take",
@@ -382,6 +391,18 @@ const EXPECTED: [&str; 521] = [
     "members.list",
     "members.remove",
     "members.set_role",
+    "meetings.agenda_add",
+    "meetings.close",
+    "meetings.close_item",
+    "meetings.defer",
+    "meetings.get",
+    "meetings.invite",
+    "meetings.list",
+    "meetings.minutes_publish",
+    "meetings.open",
+    "meetings.position",
+    "meetings.respond",
+    "meetings.schedule",
     "memory.recall",
     "memory.remember",
     "metrics.flow",
@@ -730,9 +751,12 @@ fn the_registry_is_exactly_the_declared_set() {
     // 490 -> 495; external stays 13.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
     // `trend` and `scientific_formal.translate|verify`: internal stays 495, external 13 -> 18.
+    // T17 (#87) adds five internal actions (`authoring.intake|draft|review|publish|assets`):
+    // 495 -> 500; external stays 18. T19 (#606) adds twelve internal meetings actions:
+    // 500 -> 512; external stays 18.
     // T5 (#77) adds eight internal actions — P1's `kata.open|get|observe|analyse|hypothesise|`
-    // `propose|measure` (495 -> 502) and P2–P4's `kata.adopt` (502 -> 503); external stays 18.
-    assert_eq!((internal, external), (503, 18));
+    // `propose|measure` and P2–P4's `kata.adopt`: internal 512 -> 520; external stays 18.
+    assert_eq!((internal, external), (520, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
@@ -1145,9 +1169,8 @@ fn no_eval_signoff_or_answer_key_action_is_machine_reachable() {
 
     assert_eq!(
         conveyor_actions::channel::MCP_DEFAULT_ACTIONS.len(),
-        43,
-        "34 before S15, plus knowledge.query and memory.recall, plus S15 step 5's four capability \
-         reads, plus S19 Part C's report, audits.get and findings.list"
+        48,
+        "43 before T19, plus the five meeting reads/writes the agent front end needs"
     );
 }
 

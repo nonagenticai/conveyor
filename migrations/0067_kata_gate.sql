@@ -1,4 +1,4 @@
--- 0065_kata_gate.sql — T5 P2–P4: the gate, the revert and the person (SPEC_V2 §6.3, §9.3–§9.4;
+-- 0067_kata_gate.sql — T5 P2–P4: the gate, the revert and the person (SPEC_V2 §6.3, §9.3–§9.4;
 -- issue #77).
 --
 -- Forward only: never edited after this slice closes (CONTRACT §2).

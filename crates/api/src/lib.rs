@@ -22,6 +22,7 @@ pub mod error;
 pub mod extract;
 pub mod invocations;
 pub mod job_routes;
+pub mod meetings;
 pub mod metrics;
 pub mod models;
 pub mod request_id;
@@ -152,7 +153,9 @@ pub fn app(state: AppState) -> Router {
         )
         // The poll half of the async invocation surface (#579). `spec_exempt`: it is a REST
         // endpoint over an engine record, not an action, and it is not in the registry.
-        .route("/api/invocations/{id}", get(invocations::get));
+        .route("/api/invocations/{id}", get(invocations::get))
+        // T19 (#606): the calendar read of attendance; derived, read-only, not an action.
+        .route("/api/meetings/{id}/ics", get(meetings::ics));
 
     // One literal route per registered action. Static segments win over `{name}`, so the
     // fallback only ever sees a name that is not in the registry.
@@ -411,9 +414,12 @@ mod tests {
     fn every_action_has_a_documented_operation() {
         let spec = openapi();
         let registry = conveyor_actions::registry();
+        // T17 (#87) adds the five `authoring.*` actions: 513 -> 518.
+        // T19 (#606) adds the twelve `meetings.*` actions: 518 -> 530.
+        // T5 (#77) adds eight internal kata actions: 530 -> 538; external stays 18.
         assert_eq!(
             registry.len(),
-            521,
+            538,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -444,9 +450,7 @@ mod tests {
              (projects.close_request) (503) + #15's five prompt_recipes actions
              (create, get, list, activate, retire) (508) + #560's five scientific read actions \
              (scientific_stats.meta_analysis|confidence_interval|trend, \
-             scientific_formal.translate|verify) (513) + T5's seven kata actions \
-             (kata.open|get|observe|analyse|hypothesise|propose|measure) (520) + T5 P2–P4's \
-             human adoption gate (kata.adopt) (521). \
+             scientific_formal.translate|verify) (513). \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
         );

@@ -3,9 +3,9 @@
     {
       "number": 637,
       "title": "bug: the schedule seed test asserts against a later clock and straddles the seeded minute boundary",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/637",
-      "updatedAt": "2026-11-23T20:59:20Z",
+      "updatedAt": "2026-11-23T23:51:08Z",
       "labels": [
         {
           "name": "bug",
@@ -24,9 +24,9 @@
     {
       "number": 635,
       "title": "fix(server): grade the baseline arm's produced patch",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/635",
-      "updatedAt": "2026-11-23T21:00:03Z",
+      "updatedAt": "2026-11-23T22:47:56Z",
       "labels": [
         {
           "name": "bug",
@@ -107,9 +107,9 @@
     {
       "number": 626,
       "title": "fix: the router refuses unknown models, forwards the OpenAI knobs it documents, and every conveyor client honours Retry-After",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/626",
-      "updatedAt": "2026-11-23T20:44:59Z",
+      "updatedAt": "2026-11-24T00:05:13Z",
       "labels": [
         {
           "name": "unit",
@@ -128,9 +128,9 @@
     {
       "number": 624,
       "title": "add: the Request source \u2014 the declared step in the compiled prompt and the laya judge",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/624",
-      "updatedAt": "2026-11-23T20:30:36Z",
+      "updatedAt": "2026-11-24T00:05:13Z",
       "labels": [
         {
           "name": "unit",
@@ -233,9 +233,9 @@
     {
       "number": 606,
       "title": "T19: decision forums \u2014 meetings as the decision forum",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/606",
-      "updatedAt": "2026-11-23T21:00:15Z",
+      "updatedAt": "2026-11-24T02:29:08Z",
       "labels": [
         {
           "name": "unit",
@@ -529,7 +529,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/569",
-      "updatedAt": "2026-11-23T20:12:26Z",
+      "updatedAt": "2026-11-24T04:12:17Z",
       "labels": [
         {
           "name": "programme",
@@ -567,15 +567,15 @@
       "title": "T18-4: Tools, Metering, Operations and Improve",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/565",
-      "updatedAt": "2026-11-22T07:12:06Z",
+      "updatedAt": "2026-11-24T00:08:55Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "programme",
@@ -590,9 +590,9 @@
     {
       "number": 564,
       "title": "T18-3: Procedures, Capabilities, Authoring, Execution and Run history",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/564",
-      "updatedAt": "2026-11-23T20:59:41Z",
+      "updatedAt": "2026-11-24T00:05:13Z",
       "labels": [
         {
           "name": "unit",
@@ -940,7 +940,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-23T21:29:30Z",
+      "updatedAt": "2026-11-24T00:13:01Z",
       "labels": [
         {
           "name": "unit",
@@ -4362,9 +4362,9 @@
     {
       "number": 87,
       "title": "T17 \u2014 Tenant asset authoring",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/87",
-      "updatedAt": "2026-11-23T21:14:25Z",
+      "updatedAt": "2026-11-24T01:21:23Z",
       "labels": [
         {
           "name": "unit",

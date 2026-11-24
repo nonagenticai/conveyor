@@ -518,7 +518,7 @@
       "key": "S13",
       "name": "Process engine, judge, map and care-bus — the process is the executor, the DAG retained as the tool-sequence engine, the 348 flows re-authored",
       "description": "Plan: docs/plans/slices/S13-n8n-engine.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S13-n8n-engine.md",
@@ -651,7 +651,7 @@
       "key": "S17",
       "name": "Native benchmark harness",
       "description": "Plan: docs/plans/slices/S17-benchmark-harness.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S17-benchmark-harness.md",
@@ -778,7 +778,7 @@
       "key": "S21",
       "name": "Message construction (the compiled prompt)",
       "description": "Plan: docs/plans/slices/S21-message-construction.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S21-message-construction.md",
@@ -1495,7 +1495,7 @@
       "key": "T19",
       "name": "Decision forums (meetings)",
       "description": "SPEC_V2 slice T19 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1512,15 +1512,13 @@
         ],
         "plan_status": "draft",
         "status_source": "github issue state > measured coverage > plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
           "project-brief",
-          "inception-analysis",
-          "architecture-design"
+          "evidence"
         ],
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "adm_phase": "G",
@@ -1645,8 +1643,7 @@
           526,
           545,
           569,
-          572,
-          637
+          572
         ],
         "depends_on": [],
         "plan_status": "active",

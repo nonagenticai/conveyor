@@ -492,6 +492,7 @@ window.ArchitecturePack = (function () {
     ["Plan & WBS", "plan", "wbs_node · project_baseline · register · change control", "§5.3–§5.5", "P"],
     ["Validation", "validation", "Measured coverage · tranche · units · gap list · the gate", "§12, coverage.json", "R"],
     ["Execution room", "execution", "Run · prompt compiler · tool panel · explain context", "§7.7, §10.5", "R + P"],
+    ["Meetings", "meetings", "meeting_type · meeting · agenda item · attendance · position · approval_decision (participant) · minutes", "§6.8, D66, T19", "P"],
     ["Decision inbox", "decisions", "Approval · gate · dual control · decided_by_kind", "§5.4", "R"],
     ["Run history", "runs", "Run · step · attempt · two executor kinds", "§4.5, §5.1", "R"],
     ["Organisation", "organisation", "Authority matrix · approval policies · decision ladder · laya config", "§6, §7, D50", "P"],

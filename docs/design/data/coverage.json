@@ -334,7 +334,7 @@
       "tranche": 0,
       "units": {
         "blocked": 3,
-        "claimed": 3,
+        "claimed": 2,
         "numbers": [
           17,
           22,
@@ -361,10 +361,9 @@
           526,
           545,
           569,
-          572,
-          637
+          572
         ],
-        "open": 17,
+        "open": 16,
         "ready": 5,
         "unknown": 0
       }
@@ -1153,7 +1152,7 @@
       "tranche": 8,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           7,
           136,
@@ -1162,7 +1161,7 @@
           620,
           626
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1332,12 +1331,12 @@
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           11,
           635
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1504,7 +1503,7 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           15,
           581,
@@ -1513,7 +1512,7 @@
           612,
           624
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2007,12 +2006,12 @@
       "tranche": 5,
       "units": {
         "blocked": 1,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           87,
           629
         ],
-        "open": 2,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2057,8 +2056,8 @@
       "track": "v2",
       "tranche": 4,
       "units": {
-        "blocked": 2,
-        "claimed": 1,
+        "blocked": 1,
+        "claimed": 0,
         "numbers": [
           559,
           562,
@@ -2067,29 +2066,30 @@
           565,
           566
         ],
-        "open": 3,
-        "ready": 0,
+        "open": 2,
+        "ready": 1,
         "unknown": 0
       }
     },
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/meetings.rs",
+        "migrations/0065_meetings.sql"
       ],
-      "gap": "table meeting_type, table meeting, table meeting_agenda_item, table meeting_attendance, table meeting_position, action meetings.schedule",
+      "gap": null,
       "key": "T19",
       "measured": {
         "actions": [
-          0,
+          12,
           12
         ],
         "modules": [
-          0,
+          1,
           1
         ],
         "tables": [
-          0,
+          5,
           5
         ]
       },
@@ -2106,17 +2106,17 @@
         "T9"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           605,
           606
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2598,6 +2598,15 @@
         "docs/design/v2.js"
       ],
       "gap": null,
+      "key": "meetings",
+      "status": "live",
+      "title": "Meetings"
+    },
+    {
+      "evidence": [
+        "docs/design/v2.js"
+      ],
+      "gap": null,
       "key": "metering",
       "status": "live",
       "title": "Metering"
@@ -2716,26 +2725,26 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 40,
+        "built": 41,
         "partial": 1,
         "planned": 0,
-        "proposed": 7,
+        "proposed": 6,
         "standing": 1
       },
       "total": 50,
       "uncovered": [],
-      "with_open_units": 20,
-      "without_open_units": 30
+      "with_open_units": 16,
+      "without_open_units": 34
     },
     "screens": {
       "actions_invoked": 39,
       "by_status": {
         "legacy": 7,
-        "live": 14,
+        "live": 15,
         "mixed": 0,
         "proposed": 5
       },
-      "total": 26
+      "total": 27
     }
   },
   "version": 1

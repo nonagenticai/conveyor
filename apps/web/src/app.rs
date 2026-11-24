@@ -15,6 +15,7 @@ use crate::screens::admin::AdminScreen;
 use crate::screens::agents::AgentsScreen;
 use crate::screens::approvals::Approvals;
 use crate::screens::architecture::ArchitectureScreen;
+use crate::screens::authoring::Authoring;
 use crate::screens::benchmarks::{BenchmarkRunDetail, Benchmarks};
 use crate::screens::boards::{BoardIndex, BoardScreen};
 use crate::screens::cockpit::Cockpit;
@@ -25,6 +26,7 @@ use crate::screens::execution::ExecutionScreen;
 use crate::screens::improvement::Improvement;
 use crate::screens::inference::InferenceEndpoint;
 use crate::screens::jobs::JobsScreen;
+use crate::screens::meetings::{MeetingRoomScreen, MeetingsScreen};
 use crate::screens::members::Members;
 use crate::screens::models::{ModelDetail, ModelsScreen};
 use crate::screens::organisation::OrganisationScreen;
@@ -44,8 +46,8 @@ use crate::screens::sign_in::SignIn;
 use crate::screens::today::Today;
 use crate::screens::usage::Usage;
 use crate::screens::v2::{
-    AdmGate, AuthoringGate, ImproveGate, KnowledgeGate, OperationsGate, PortfolioScreen,
-    ProgrammeScreen, ToolsGate,
+    AdmGate, ImproveGate, KnowledgeGate, OperationsGate, PortfolioScreen, ProgrammeScreen,
+    ToolsGate,
 };
 use crate::screens::validation::ValidationScreen;
 use crate::state::AppCtx;
@@ -190,8 +192,10 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/project-types") view=ProjectTypesScreen/>
                             <Route path=path!("/procedures") view=ProceduresScreen/>
                             <Route path=path!("/execution") view=ExecutionScreen/>
-                            <Route path=path!("/authoring") view=AuthoringGate/>
+                            <Route path=path!("/authoring") view=Authoring/>
                             <Route path=path!("/plan") view=PlanScreen/>
+                            <Route path=path!("/meetings") view=MeetingsScreen/>
+                            <Route path=path!("/meetings/:id") view=MeetingRoomScreen/>
                             <Route path=path!("/validation") view=ValidationScreen/>
                             <Route path=path!("/improve") view=ImproveGate/>
                             <Route path=path!("/operations") view=OperationsGate/>
@@ -313,6 +317,9 @@ fn Sidebar() -> impl IntoView {
                 })}
                 {move || ctx.has_action("wbs.list").then(|| view! {
                     <li><A href="/plan"><span class="nav-item">"Plan"</span></A></li>
+                })}
+                {move || ctx.has_action("meetings.list").then(|| view! {
+                    <li><A href="/meetings"><span class="nav-item">"Meetings"</span></A></li>
                 })}
             </ul>
             <div class="grp">"Organisation"</div>

@@ -113,6 +113,52 @@ pub fn parse(text: &str) -> Parsed {
                 input,
             }
         }
+        // T19 (#606): a meeting seat answers in the chat. The caller's own seat is the
+        // default participant; a job/organisation seat is named explicitly elsewhere.
+        "position" => {
+            let Some((meeting_id, rest)) = split_id(rest) else {
+                return Parsed::NoOp;
+            };
+            let Some((agenda_item_id, tail)) = split_id(rest) else {
+                return Parsed::NoOp;
+            };
+            let (stance, note) = match tail.split_once(char::is_whitespace) {
+                Some((stance, note)) => (stance, note.trim()),
+                None => (tail, ""),
+            };
+            if !matches!(
+                stance,
+                "approve" | "approve_with_conditions" | "reject" | "abstain" | "request_evidence"
+            ) {
+                return Parsed::NoOp;
+            }
+            let mut input = json!({
+                "meeting_id": meeting_id,
+                "agenda_item_id": agenda_item_id,
+                "stance": stance,
+                "surface": "telegram",
+            });
+            if !note.is_empty() {
+                input["rationale"] = Value::String(note.to_owned());
+            }
+            Parsed::Command {
+                action: "meetings.position".to_owned(),
+                input,
+            }
+        }
+        "respond" => {
+            let Some((meeting_id, tail)) = split_id(rest) else {
+                return Parsed::NoOp;
+            };
+            let response = tail.trim();
+            if !matches!(response, "accepted" | "declined" | "tentative") {
+                return Parsed::NoOp;
+            }
+            Parsed::Command {
+                action: "meetings.respond".to_owned(),
+                input: json!({ "meeting_id": meeting_id, "response": response }),
+            }
+        }
         "cancel" => {
             let Some((run_id, reason)) = split_id(rest) else {
                 return Parsed::NoOp;
@@ -180,8 +226,16 @@ fn split_id(rest: &str) -> Option<(Uuid, &str)> {
 /// `help` must not advertise an action the tenant revoked, so every line is filtered through
 /// the same authority the invocation would use.
 pub fn help_text(authority: &ChannelAuthority) -> String {
-    const COMMANDS: [(&str, &str); 11] = [
+    const COMMANDS: [(&str, &str); 13] = [
         ("approve <id> [note]", "approvals.decide"),
+        (
+            "position <meeting> <item> <stance> [note]",
+            "meetings.position",
+        ),
+        (
+            "respond <meeting> accepted|declined|tentative",
+            "meetings.respond",
+        ),
         ("reject <id> [reason]", "approvals.decide"),
         ("answer <id> [text]", "approvals.decide"),
         ("run <card_id>", "runs.create"),
