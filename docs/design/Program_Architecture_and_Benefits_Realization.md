@@ -121,7 +121,7 @@ certification or full conformance; what is claimed is testable: the artefacts an
 organisation uses are rows, the process runs, and a deviation is a decision record rather than a
 silent fork.
 
-## 5. The buildout under its own capability — measured 2026-11-23
+## 5. The buildout under its own capability — measured 2026-11-24
 
 The programme does not only describe MSP and TOGAF; it runs under them. Measured on the live
 programme at the stated date:
@@ -134,19 +134,38 @@ programme at the stated date:
   refuses a build run until a project's analysis and architecture are published.
 - **The benefit profiles are `draft`, with their baselines `not measured`** and a measurement
   method recorded; the tranche-0 review evidence lists them unmeasured and records that the BCM is
-  unstaffed as a risk. That is the honest state, not a zero. The seed now carries **seven**
-  profiles: B1–B6 and **B7 Deliberated cross-department decisions** (T19); the published snapshot
-  still shows the six it was exported with, and B7 appears after the next export.
-- **T19 (decision forums) is built at tranche 4** — the plan and programme artefacts landed at
-  #605 and the implementation at #606: the five tables, the twelve `meetings.*` actions, the
-  `approval_decision` participant extension, the `/meetings` destination and the participant-hours
-  roll-up are measured present, and the slice's evidence is `docs/plans/T19/evidence.md`. The
-  programme seed is 50 projects, and T19's coverage row is `built`. The deployment-gated live proof
-  (the owner deciding one item in the web room and one over MCP) waits on the lane release. The T18
-  UI lane (#562–#566) is in flight and independent.
-- **Architecture contracts are the largest open gap.** Only T9's project has a contract row, and it
-  is not yet approved; the other delivery projects have none. The board's approval is the
-  authority act, and it is tracked separately from this study.
+  unstaffed as a risk. That is the honest state, not a zero. The exception is **B7 Deliberated
+  cross-department decisions** (T19), whose baseline is now a measurement record — zero deliberated
+  decision rows before T19 — with the programme-manager job as its benefit owner. The seed carries
+  **seven** profiles: B1–B6 and B7; the snapshot regenerated with this study exports all seven.
+- **T19 (decision forums) is built and closed at tranche 4** — the plan and programme artefacts
+  landed at #605, the implementation at #606, and the close-out at #650: the five tables, the
+  twelve `meetings.*` actions, the `approval_decision` participant extension, the `/meetings`
+  destination and the participant-hours roll-up are measured present, and the slice's evidence is
+  `docs/plans/T19/evidence.md`. The live gate ran on the deployed revision on 2026-11-24: the
+  human seat decided one agenda item in the web room and one over MCP, both `via='meeting'`, and
+  the meeting closed on its published minutes; the same 15-check gate passes again on the current
+  deployment `7e617673`. The gate exposed and closed two deployment defects in the MCP surface
+  (the public host allowlist and per-session pod affinity), both in `gitops-production`. The
+  published snapshot now carries T19, its board and B7.
+  T19's own TOGAF chain is live and approved: seven typed artefacts
+  (`requirements_catalog`, `stakeholder_map`, `driver_goal_objective`, `solution_concept`,
+  `business_capability_map`, `data_entity_catalog`, `technology_standards`), their links, a live
+  Statement of Architecture Work (`01a20ce0-5183-776c-84bd-327f2301b19b`, board decision
+  `01a20ce0-644d-7340-a696-1af10fa8c61e`), a live phase-F delivery contract
+  (`01a20cea-91bb-77f4-a880-044c90bb5f0e`), a Phase-G compliance review on each contract (level
+  `conformant`), and a published `architecture-artifact` output
+  (`01a20ce4-73e4-7009-9ec7-eb2265e9e84e`); `scripts/t19-governance-chain.py --check` reads all 16
+  assertions back. The approvals were performed by the tenant's `conveyor-approver` seat under the
+  standing delegation, not by the owner personally. `docs/plans/T19/closure-review.md` records the
+  decision; the one remaining T19-labelled audit finding is the programme's tranche-4
+  authorisation (P0), which belongs to the #526 retrospective chain; the `meeting_type` authoring
+  route and the T9/T10 binding remain follow-ups. The T18 UI lane (#562–#566) is in flight and
+  independent.
+- **Architecture contracts remain a large open gap, one project smaller.** Twelve delivery
+  projects (T3, T5–T8, T12, T14–T19) had no live contract at the last audit; T19 now carries one,
+  live and board-approved, so the count is eleven. The board's approval is the authority act, and
+  the remaining contract requests are tracked by the #526 programme-rework lane.
 
 The units that close the gaps are themselves rows in the programme: T11's metrics (merged
 2026-11-19, #404) measure realization; the seed of the buildout's own definition — its benefits,

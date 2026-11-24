@@ -24,7 +24,7 @@
       >
     </header>
     <main class="doc-body"><h1 id="t19--decision-forums-meetings">T19 — Decision forums (meetings)</h1>
-<p>Programme project: T19 · issue #606</p>
+<p>Programme project: T19 · issue #606 · close-out #650</p>
 <p><strong>Gate (SPEC_V2 §12 T19):</strong> a three-department board meeting decides its agenda items by recorded majority with a recorded dissent; an item missing a required department is deferred <code>inquorate</code> and cannot be decided; a meeting cannot lower a linked approval's dual control or waive its evidence; the owner decides one item in the web meeting room and another asynchronously from the agent front end over MCP, both recorded <code>via='meeting'</code>; minutes publish behind the chair's gate and every action becomes a card; a forum with no decision over a cycle is flagged.</p>
 <h2 id="1-objective">1. Objective</h2>
 <p>The conveyor records the decision <em>and</em> the deliberation. High-level work — programme management, architecture, analysis, project management — happens in meetings between positions from different departments; today only the resulting <code>approval</code> row survives. T19 makes the meeting a first-class <strong>card</strong> whose agenda items resolve existing approvals, whose participants are job bindings or humans holding typed positions, and whose outcomes are derived by arithmetic over those positions and the linked approval's stricter policy. The record is rows, not a transcript: the meeting adds the cross-department positions, conditions, commitments and dissent, and never creates a second decision store.</p>

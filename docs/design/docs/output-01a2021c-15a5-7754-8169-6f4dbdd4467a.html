@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Solution Concept Diagram — T1 Plan spine (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Solution Concept Diagram — T1 Plan spine (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: diagram</li>
+<li>Purpose: The rows, actions and edges that carry the plan spine, and the one gate primitive it changes.</li>
+<li>Scope: migrations/0044_plan_spine.sql, the spine action families and approvals.decide.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>wbs_node / the project's phase/deliverable/work-package/milestone tree</strong> - {"kind": "component", "note": "stores the four WSJF inputs as non-negative integers; status open|accepted|cancelled; acceptance and evidence jsonb"}</li>
+<li><strong>project_baseline / the frozen promise</strong> - {"kind": "component", "note": "kind scope|schedule|cost; immutable snapshot jsonb; taken_by and approved_by; append-only"}</li>
+<li><strong>project_register_item / the one six-kind register</strong> - {"kind": "component", "note": "risk|issue|assumption|dependency|benefit|change; a change carries baseline_ref and meta.impact"}</li>
+<li><strong>project_dependency / directed programme edges</strong> - {"kind": "component", "note": "blocks|needs|supersedes|informs; unique edge; self-edge and cycle refused in the creating transaction"}</li>
+<li><strong>programme_cadence / the SAFe rhythm row</strong> - {"kind": "component", "note": "pi|sprint|demo|retro|refinement; T1 stores the row, T10 materialises its cards"}</li>
+<li><strong>programme_tranche / the unit the programme reviews together</strong> - {"kind": "component", "note": "number unique per programme; state planned|authorised|in_review|closed|paused|stopped; entry/exit criteria"}</li>
+<li><strong>benefit_profile / the measurement record</strong> - {"kind": "component", "note": "baseline, target, measurement_method and benefit owner are mandatory; six field groups"}</li>
+<li><strong>benefit_link / the benefits-map edge</strong> - {"kind": "component", "note": "output -&gt; capability -&gt; operational outcome -&gt; benefit -&gt; strategic objective; all five levels non-blank"}</li>
+<li><strong>benefit_transition / the realization record per benefit</strong> - {"kind": "component", "note": "baseline_measured_at, readiness, enacted_at, post_measured_at, retired_at, evidence"}</li>
+<li><strong>stakeholder_profile / the MSP stakeholder profile</strong> - {"kind": "component", "note": "concerns, influence, interest, support level and trend, engagement target; distinct from V1's project_stakeholder"}</li>
+<li><strong>programme_baseline / the management/governance/boundary trio</strong> - {"kind": "component", "note": "snapshot jsonb, taken_by, approved_by; the next tranche is managed against it"}</li>
+<li><strong>governed_asset (widened kinds) / the MSP narrative artefacts</strong> - {"kind": "component", "note": "mandate, programme_brief, blueprint, business_case, refined_vision, benefits_strategy, benefits_realization_plan, projects_dossier use the existing lifecycle"}</li>
+<li><strong>approvals.decide / the one gate primitive, now requester-aware</strong> - {"kind": "component", "note": "refuses the requester or executor as the decider for every gate; the (approval_id, approver_id) index remains the second half of dual control"}</li>
+<li><strong>portfolio.in_flight / the computed portfolio read</strong> - {"kind": "component", "note": "a read model, no row; the in-flight set comes from tenant.settings.portfolio.in_flight, default active,paused"}</li>
+<li><strong>project_baseline / wbs_node / project_register_item</strong> - {"kind": "edge", "note": "the take freezes the rows as they were; later edits cannot move it"}</li>
+<li><strong>project_register_item(change) / project_baseline</strong> - {"kind": "edge", "note": "a change points at the baseline it changes and carries the impact block"}</li>
+<li><strong>project_dependency / the programme gate</strong> - {"kind": "edge", "note": "the edge table is the dependency source; meta.depends_on is a bounded fallback for unmigrated seed rows"}</li>
+<li><strong>wbs_node / portfolio.in_flight and the backlog</strong> - {"kind": "edge", "note": "the four stored inputs feed the WSJF score on read; the score is never persisted"}</li>
+<li><strong>benefit_link / benefit_profile</strong> - {"kind": "edge", "note": "the five-level edge names exactly one benefit or disbenefit profile"}</li>
+<li><strong>tranches.review / programme_baseline / benefit status / risk register</strong> - {"kind": "edge", "note": "the review gate refuses without the three evidence sets; a continue authorises the next tranche"}</li>
+<li><strong>approvals.decide / every gate</strong> - {"kind": "edge", "note": "the requester/executor exclusion applies to every action approval, not only T1's"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Plan spine · conveyor output · published 2026-11-24T10:10:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

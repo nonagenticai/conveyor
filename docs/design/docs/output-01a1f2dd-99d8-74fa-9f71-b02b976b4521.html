@@ -23,112 +23,18 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Architecture skills assessment</h1>
-<p><strong>Programme:</strong> conveyor buildout · <strong>Baseline date:</strong> 2026-11-19 · <strong>Supersedes:</strong> SA-1 (2026-11-17) · <strong>Ratified by:</strong> Architecture Board decision <code>01a1f2c8-e26f-79ce-a082-5526648a47c5</code> · <strong>Stored as:</strong> assessment group <code>9ce8e8d6-d665-47b6-bde7-4dcf33411686</code> · <strong>Code baseline:</strong> <code>main@f14b7d36</code>; capability merged at <code>c8204432</code> (PR #350).</p>
+    <main class="doc-body"><h1>Architecture skills assessment — T9 TOGAF ADM capability (retrospective, 2026-11-22)</h1>
 <h2>Categories</h2>
-<p>The seven Architecture Skills Framework categories:</p>
-<ol>
-<li><strong>General</strong> — communication, leadership, teamwork, decision-making.</li>
-<li><strong>Business skills and methods</strong> — strategy, benefits, operating models, process.</li>
-<li><strong>Architecture skills</strong> — the ADM, modelling, artefact production, architecture governance.</li>
-<li><strong>Programme and project management</strong> — planning, tranches, risk, quality, delivery control.</li>
-<li><strong>General IT knowledge</strong> — systems, data, networking, operations, security fundamentals.</li>
-<li><strong>Technical IT skills</strong> — software engineering, languages, databases, platforms, testing.</li>
-<li><strong>Legal environment</strong> — licensing, contracts, data protection, procurement.</li>
-</ol>
-<p>Proficiency is scored 0–5: 0 none, 1 aware, 2 developing practitioner, 3 practitioner, 4 advanced practitioner, 5 expert. A rating names its evidence; an unstaffed role is none (0) and is recorded as a gap, not a zero score to be argued away.</p>
+<p>The assessment covers the seven categories of the Architecture Skills Framework in SPEC_V2 §8.1: general; business skills and methods; architecture skills; programme and project management; general IT knowledge; technical IT skills; and legal environment. Each is assessed at a proficiency level per role, against the role's job key, with a date and evidence; <code>crates/api/tests/architecture_capability.rs::a_skills_assessment_names_its_role</code> proves that the seven categories and the job key are required.</p>
 <h2>Proficiency by role</h2>
-<p>Six positions are assessed; the two unstaffed positions are recorded as none.</p>
-<h3>Sponsor / owner (<code>sponsor</code>)</h3>
-<table><thead><tr><th>Category</th><th>Score</th></tr></thead><tbody>
-<tr><td>General</td><td>5</td></tr>
-<tr><td>Business skills and methods</td><td>5</td></tr>
-<tr><td>Architecture skills</td><td>3</td></tr>
-<tr><td>Programme and project management</td><td>3</td></tr>
-<tr><td>General IT knowledge</td><td>3</td></tr>
-<tr><td>Technical IT skills</td><td>1</td></tr>
-<tr><td>Legal environment</td><td>1</td></tr>
-</tbody></table>
-<p><strong>Evidence:</strong> the ADRs, the owner rulings and the public programme record; the business case and licensing frame; legal awareness with advice, not authority.</p>
-<h3>Programme architect — maintainer sessions under the owner's authority (<code>programme-architect</code>)</h3>
-<table><thead><tr><th>Category</th><th>Score</th></tr></thead><tbody>
-<tr><td>General</td><td>3</td></tr>
-<tr><td>Business skills and methods</td><td>2</td></tr>
-<tr><td>Architecture skills</td><td>5</td></tr>
-<tr><td>Programme and project management</td><td>2</td></tr>
-<tr><td>General IT knowledge</td><td>4</td></tr>
-<tr><td>Technical IT skills</td><td>5</td></tr>
-<tr><td>Legal environment</td><td>1</td></tr>
-</tbody></table>
-<p><strong>Evidence:</strong> the registry, migrations, document aggregate, published output set, design-pack gates and CI; the sessions do not approve their own work.</p>
-<h3>Maintainer sessions (AI) (<code>maintainer-session</code>)</h3>
-<table><thead><tr><th>Category</th><th>Score</th></tr></thead><tbody>
-<tr><td>General</td><td>3</td></tr>
-<tr><td>Business skills and methods</td><td>1</td></tr>
-<tr><td>Architecture skills</td><td>3</td></tr>
-<tr><td>Programme and project management</td><td>1</td></tr>
-<tr><td>General IT knowledge</td><td>5</td></tr>
-<tr><td>Technical IT skills</td><td>5</td></tr>
-<tr><td>Legal environment</td><td>0</td></tr>
-</tbody></table>
-<p><strong>Evidence:</strong> the merged code and its tests, the evidence documents and the design pack; no legal authority.</p>
-<h3>Outside contributor (<code>outside-contributor</code>)</h3>
-<table><thead><tr><th>Category</th><th>Score</th></tr></thead><tbody>
-<tr><td>General</td><td>1</td></tr>
-<tr><td>Business skills and methods</td><td>1</td></tr>
-<tr><td>Architecture skills</td><td>1</td></tr>
-<tr><td>Programme and project management</td><td>0</td></tr>
-<tr><td>General IT knowledge</td><td>3</td></tr>
-<tr><td>Technical IT skills</td><td>3</td></tr>
-<tr><td>Legal environment</td><td>1</td></tr>
-</tbody></table>
-<p><strong>Evidence:</strong> the contribution protocol and the public design pack; the contributor's own PR is the evidence of technical skill.</p>
-<h3>Programme manager — position, unstaffed (<code>programme-manager</code>)</h3>
-<table><thead><tr><th>Category</th><th>Score</th></tr></thead><tbody>
-<tr><td>General</td><td>0</td></tr>
-<tr><td>Business skills and methods</td><td>0</td></tr>
-<tr><td>Architecture skills</td><td>0</td></tr>
-<tr><td>Programme and project management</td><td>0</td></tr>
-<tr><td>General IT knowledge</td><td>0</td></tr>
-<tr><td>Technical IT skills</td><td>0</td></tr>
-<tr><td>Legal environment</td><td>0</td></tr>
-</tbody></table>
-<p><strong>Evidence:</strong> the catalogue position exists and no holder is bound; recorded as none, which is a gap.</p>
-<h3>Business change manager — position, unstaffed (<code>business-change-manager</code>)</h3>
-<table><thead><tr><th>Category</th><th>Score</th></tr></thead><tbody>
-<tr><td>General</td><td>0</td></tr>
-<tr><td>Business skills and methods</td><td>0</td></tr>
-<tr><td>Architecture skills</td><td>0</td></tr>
-<tr><td>Programme and project management</td><td>0</td></tr>
-<tr><td>General IT knowledge</td><td>0</td></tr>
-<tr><td>Technical IT skills</td><td>0</td></tr>
-<tr><td>Legal environment</td><td>0</td></tr>
-</tbody></table>
-<p><strong>Evidence:</strong> unstaffed; the benefit profiles name the BCM as their owner while the position is unstaffed, recorded here as a governance gap.</p>
-<p><strong>Reading.</strong> The capability has a strong architecture and technical core: the programme architect and the maintainer sessions both score 5 in architecture skills and technical IT skills, and the owner scores 5 in general and business skills. The thin layer is programme governance: both programme-management positions are unstaffed and scored none across all seven categories, and the maintainer sessions score 1 in business skills and 0 in the legal environment — they build and evidence, and hold no authority. The outside contributor is assessed from the contribution protocol and the design pack; one PR is not programme-level proficiency.</p>
+<p>No proficiency is asserted by this rework. P0's <code>skills-assessment</code> document (SA-1), delivered by #122's A7, is the proposed baseline and states proposed for P0 acceptance (plan §2); it is not a measured <code>architecture_skill_assessment</code> row, and this pass did not run <code>architecture.skills_assess</code>. Naming a proficiency for the programme architect, the Board or any delivery role without a dated assessment would invent a receipt. The instrument is live; the measurement is the capability owner's dated activity.</p>
 <h2>Baseline</h2>
-<ul>
-<li><strong>Dated:</strong> 2026-11-19, at the same code baseline as the maturity baseline: capability merged at <code>c8204432</code> (PR #350), <code>main@f14b7d36</code>. It supersedes SA-1 (2026-11-17), which used labels rather than scores and listed a PM position (T3, unbuilt) and the then-unconvened Board; this re-score records six positions and rates them 0–5.</li>
-<li><strong>Scope:</strong> the roles the programme actually uses; a role with no holder is listed and rated none. The Board is now a governance body with a recorded decision and is not a proficiency holder; the PM job remains T3's and is outside this assessment.</li>
-<li><strong>Method:</strong> a review judgement against evidence a reviewer can open — ADRs, code, tests, the published record and the contribution protocol. Not an external assessment and not a certification.</li>
-<li><strong>Ratification:</strong> the programme owner approved this baseline on 2026-11-19 in the same bundle as the maturity baseline: decision <code>01a1f2c8-e26f-79ce-a082-5526648a47c5</code>, recorded through the operator path. The session did not judge its own work.</li>
-<li><strong>Stored record:</strong> the six role assessments are in group <code>9ce8e8d6-d665-47b6-bde7-4dcf33411686</code>. Unlike the maturity baseline, this assessment has no duplicate group: it appears once, and no read-back copy exists.</li>
-<li><strong>What is not claimed:</strong> not a TOGAF certification and not an external audit; the ratings are not computed by an instrument: <code>architecture.skills_assess</code> records dated rows over the seven categories per role, but the ratings are a reviewer's judgement. Computing them from released job requirements and their bindings remains a kata candidate; until it exists, this baseline is a dated review with named evidence.</li>
-</ul>
+<p>With no measured row, the baseline is P0's proposed SA-1 content. The plan's starting-state table records that no skills row existed at the build; the first adopted assessment becomes the baseline the next review compares against. The retrospective record keeps that distinction explicit rather than treating a proposal as evidence.</p>
 <h2>Development milestones</h2>
-<p>P0's plan for closing the skills gaps, with the actual state:</p>
-<table><thead><tr><th>Milestone</th><th>State</th><th>Evidence</th></tr></thead><tbody>
-<tr><td>S1 — staff the BCM</td><td>not yet</td><td>The BCM position is unstaffed and the benefit profiles name it as owner with no holder bound. Closing evidence: a BCM position bound to the programme, and the benefit profiles re-attributed from the interim owner.</td></tr>
-<tr><td>S2 — staff the PMO lead and quality manager</td><td>not yet</td><td>Neither position is bound. Closing evidence: both positions bound, and a quality review with a recorded finding.</td></tr>
-<tr><td>S3 — the PM job</td><td>not yet</td><td>T3 is not delivered; no <code>pm</code> job is released and bound. Closing evidence: the <code>pm</code> job released and bound, and a project delivered through it.</td></tr>
-<tr><td>S4 — the Board</td><td>achieved</td><td>The Conveyor Architecture Board is a governance-body row with its charter, commissioning authority and decision limits, and decision <code>01a1f2c8-…</code> records the adoption bundle. The board row is at status draft and has no standing cadence, which is why the maturity baseline scores senior management at 3.</td></tr>
-<tr><td>S5 — skills are measured, not asserted</td><td>not yet</td><td>Closing evidence: the assessment reads released job requirements and their bindings instead of a review judgement, and each rating cites a row.</td></tr>
-<tr><td>S6 — the sessions' evidence is auditable</td><td>not yet</td><td>Continuous. The current posture is that the sessions do not approve their own work. Closing evidence: every maintainer contribution in a full cycle carries a run/test record and an owner's approval — a complete cycle, not one run.</td></tr>
-</tbody></table>
-<p>The gap recorded as a kata at SA-1 still stands: no instrument computes the ratings, and the role catalogue is not yet in a release naming required proficiency.</p>
+<p>The development plan is the set of milestones a tranche review can hold the capability to, one per category and role where a gap is measured. No milestone row is claimed here because no assessment was adopted. When the Board records the assessment, the milestones become dated targets; until then the <code>architecture.skills_assess</code> action and its test are the proof that the shape is enforced, not that a result exists.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-24T10:10:00Z · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

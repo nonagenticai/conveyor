@@ -195,8 +195,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
       "section": "Design",
-      "sha256": "03296e4716d4562df9467a801c36025e0cc5c1aa851abcf9dfa85aaebb9ed474",
-      "bytes": 16426,
+      "sha256": "b534cd0891d6cdf0923586016878c357274a5a80e4c5f0708e2bc3f66b5f1b91",
+      "bytes": 18121,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md"
     },
     {
@@ -216,6 +216,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "bceb5d63a826ae0e2401707e4175cada58740f922fec7c073ff29caf7524b992",
       "bytes": 80862,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
+    },
+    {
+      "title": "MSP/TOGAF conformance gap register",
+      "path": "docs/design/data/conformance.html",
+      "source": "docs/design/data/conformance.md",
+      "section": "Design",
+      "sha256": "6679e33aa06451668e2c1882e14af92e616d674c190aa9e1ac096c7e7d0fccfb",
+      "bytes": 24244,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
     {
       "title": "Remaining development work — corrected assessment, 2026-11-10",
@@ -555,8 +564,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "4cfd81a55cf9466384497cf43c8caf00e354a15a70fa0f28a1797c47a5a21870",
-      "bytes": 23313,
+      "sha256": "24795b1d914e7ca8799f70049b2949fd2de92e5cabbc3db00a1517911d33f34f",
+      "bytes": 24042,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
     {
@@ -641,6 +650,267 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/produce-capture-2026-11-16.md"
     },
     {
+      "title": "T19 — Business capability map — approval",
+      "path": "docs/evidence/t19/gov/approve-business_capability_map.html",
+      "source": "docs/evidence/t19/gov/approve-business_capability_map.md",
+      "section": "Evidence",
+      "sha256": "7fd4c2de463fde87e329b973e5f2fe82643b269a6da2c68903d6aa85d0ec44c6",
+      "bytes": 2030,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-business_capability_map.md"
+    },
+    {
+      "title": "T19 — Data entity catalog — approval",
+      "path": "docs/evidence/t19/gov/approve-data_entity_catalog.html",
+      "source": "docs/evidence/t19/gov/approve-data_entity_catalog.md",
+      "section": "Evidence",
+      "sha256": "88005bbb23aecebff413297fe780a6ea04bc52bd796363e48f8d9d95a5437f90",
+      "bytes": 2062,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-data_entity_catalog.md"
+    },
+    {
+      "title": "T19 — Drivers, goals and objectives — approval",
+      "path": "docs/evidence/t19/gov/approve-driver_goal_objective.html",
+      "source": "docs/evidence/t19/gov/approve-driver_goal_objective.md",
+      "section": "Evidence",
+      "sha256": "93baae4f132c8d6cb4d39c697e758b117056b69ecf961d19bc825852da48148d",
+      "bytes": 2016,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-driver_goal_objective.md"
+    },
+    {
+      "title": "T19 — Requirements catalog — approval",
+      "path": "docs/evidence/t19/gov/approve-requirements_catalog.html",
+      "source": "docs/evidence/t19/gov/approve-requirements_catalog.md",
+      "section": "Evidence",
+      "sha256": "a8aacbfe8fdff979f1ce714483853900e4a204dce0500327479e929be298c1f8",
+      "bytes": 2083,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-requirements_catalog.md"
+    },
+    {
+      "title": "T19 — Solution concept — approval",
+      "path": "docs/evidence/t19/gov/approve-solution_concept.html",
+      "source": "docs/evidence/t19/gov/approve-solution_concept.md",
+      "section": "Evidence",
+      "sha256": "16c8a62e9f5171e7c9e4fd24ad0bcc7b5c6272deceba3fba09f979ac6dddd96d",
+      "bytes": 1989,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-solution_concept.md"
+    },
+    {
+      "title": "T19 — Stakeholder map — approval",
+      "path": "docs/evidence/t19/gov/approve-stakeholder_map.html",
+      "source": "docs/evidence/t19/gov/approve-stakeholder_map.md",
+      "section": "Evidence",
+      "sha256": "a8d5285a5545c3b8e1a491a9cfc06ff523e7aa775ddcffbdc6a12dc886e56def",
+      "bytes": 2066,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-stakeholder_map.md"
+    },
+    {
+      "title": "T19 — Technology standards — approval",
+      "path": "docs/evidence/t19/gov/approve-technology_standards.html",
+      "source": "docs/evidence/t19/gov/approve-technology_standards.md",
+      "section": "Evidence",
+      "sha256": "c3982a09c3ce22886af7fb006f5f18f859859bded32a7199abaab0149d826951",
+      "bytes": 2003,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-technology_standards.md"
+    },
+    {
+      "title": "T19 — Business capability map",
+      "path": "docs/evidence/t19/gov/artifact-business_capability_map.html",
+      "source": "docs/evidence/t19/gov/artifact-business_capability_map.md",
+      "section": "Evidence",
+      "sha256": "527f326d18fd4154f02c4b12692ccf8c25d46935df36b966d44c5f974c3e7cc6",
+      "bytes": 1913,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-business_capability_map.md"
+    },
+    {
+      "title": "T19 — Data entity catalog",
+      "path": "docs/evidence/t19/gov/artifact-data_entity_catalog.html",
+      "source": "docs/evidence/t19/gov/artifact-data_entity_catalog.md",
+      "section": "Evidence",
+      "sha256": "5a3fbf01c6bba568513d3679ff90551a6eefa985a1dc4c67015743ceef85690a",
+      "bytes": 1941,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-data_entity_catalog.md"
+    },
+    {
+      "title": "T19 — Architecture artifact (the typed TOGAF set)",
+      "path": "docs/evidence/t19/gov/artifact-document-compose.html",
+      "source": "docs/evidence/t19/gov/artifact-document-compose.md",
+      "section": "Evidence",
+      "sha256": "6f2f04321ff2e1ac84bfe3ce7d97eeffdeeb13f2a4646d28ecbbe2444e9e462a",
+      "bytes": 8889,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-document-compose.md"
+    },
+    {
+      "title": "T19 — Architecture artifact (the typed TOGAF set) — publication",
+      "path": "docs/evidence/t19/gov/artifact-document-publish.html",
+      "source": "docs/evidence/t19/gov/artifact-document-publish.md",
+      "section": "Evidence",
+      "sha256": "543005b025ce8caf75341cc381a94a97de7744e1c2948c36330547b6b23d4e67",
+      "bytes": 9022,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-document-publish.md"
+    },
+    {
+      "title": "T19 architecture artifact — the Document section",
+      "path": "docs/evidence/t19/gov/artifact-document-update.html",
+      "source": "docs/evidence/t19/gov/artifact-document-update.md",
+      "section": "Evidence",
+      "sha256": "d164208672b99dae79b15cda592f267f3f2427cddbd15e5e64ac1549b71c8df1",
+      "bytes": 8966,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-document-update.md"
+    },
+    {
+      "title": "T19 — Drivers, goals and objectives",
+      "path": "docs/evidence/t19/gov/artifact-driver_goal_objective.html",
+      "source": "docs/evidence/t19/gov/artifact-driver_goal_objective.md",
+      "section": "Evidence",
+      "sha256": "e9c8fb004eda844b0e6faf3e653cdaf0eaf2f9033da3439935d22e8e819bc5f0",
+      "bytes": 1897,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-driver_goal_objective.md"
+    },
+    {
+      "title": "T19 artefact link — drivergoalobjective derivation requirementscatalog",
+      "path": "docs/evidence/t19/gov/artifact-links.html",
+      "source": "docs/evidence/t19/gov/artifact-links.md",
+      "section": "Evidence",
+      "sha256": "697222d4d84cad812dedb2541adb094ca01fc67982b6bf5d61e5eaaf467ed605",
+      "bytes": 5965,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-links.md"
+    },
+    {
+      "title": "T19 — Requirements catalog",
+      "path": "docs/evidence/t19/gov/artifact-requirements_catalog.html",
+      "source": "docs/evidence/t19/gov/artifact-requirements_catalog.md",
+      "section": "Evidence",
+      "sha256": "0f09d05d2d74e3a9b734008d189ed0824902610f01f31e5c3f79e3145c7f2bfc",
+      "bytes": 1963,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-requirements_catalog.md"
+    },
+    {
+      "title": "T19 — Solution concept",
+      "path": "docs/evidence/t19/gov/artifact-solution_concept.html",
+      "source": "docs/evidence/t19/gov/artifact-solution_concept.md",
+      "section": "Evidence",
+      "sha256": "ff30fa53c52b33dc7286194c3b493406fee8f81b0389d20f7c69698739f27a5d",
+      "bytes": 1865,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-solution_concept.md"
+    },
+    {
+      "title": "T19 — Stakeholder map",
+      "path": "docs/evidence/t19/gov/artifact-stakeholder_map.html",
+      "source": "docs/evidence/t19/gov/artifact-stakeholder_map.md",
+      "section": "Evidence",
+      "sha256": "7708bcc10eb26ecec9e5a7963bcb3d635c2d53363b57aa8394f888775f637e24",
+      "bytes": 1940,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-stakeholder_map.md"
+    },
+    {
+      "title": "T19 — Technology standards",
+      "path": "docs/evidence/t19/gov/artifact-technology_standards.html",
+      "source": "docs/evidence/t19/gov/artifact-technology_standards.md",
+      "section": "Evidence",
+      "sha256": "572d19c7eddaf01227125dfe305198b20469bf7b2a8b56b7d744b36af672687c",
+      "bytes": 1883,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-technology_standards.md"
+    },
+    {
+      "title": "B7 — the measured baseline",
+      "path": "docs/evidence/t19/gov/benefit-b7-baseline.html",
+      "source": "docs/evidence/t19/gov/benefit-b7-baseline.md",
+      "section": "Evidence",
+      "sha256": "8ee36b8bd3312e7b5b94f5152e0c351a4f092476db4dd1eeb4286c4d7f6f838d",
+      "bytes": 3174,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/benefit-b7-baseline.md"
+    },
+    {
+      "title": "T19 Phase-G compliance review — deliverycontract",
+      "path": "docs/evidence/t19/gov/compliance-review-delivery.html",
+      "source": "docs/evidence/t19/gov/compliance-review-delivery.md",
+      "section": "Evidence",
+      "sha256": "cb339730018c2a706dfaf9dd6093139dc6016ea9680f05b995c946b69f49398d",
+      "bytes": 3198,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/compliance-review-delivery.md"
+    },
+    {
+      "title": "T19 Phase-G compliance review — statementofarchitecturework",
+      "path": "docs/evidence/t19/gov/compliance-review-soaw.html",
+      "source": "docs/evidence/t19/gov/compliance-review-soaw.md",
+      "section": "Evidence",
+      "sha256": "e6f066eee9929ccd767fbdf9fb39426a5a549ade6241e8d6b9d085d7f1a087ea",
+      "bytes": 3197,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/compliance-review-soaw.md"
+    },
+    {
+      "title": "T19 architecture contract — approval",
+      "path": "docs/evidence/t19/gov/contract-approve.html",
+      "source": "docs/evidence/t19/gov/contract-approve.md",
+      "section": "Evidence",
+      "sha256": "369a9cd13f9bbc086624102fc4ffa6ddfc367c18ba84e255f57927d8e3364144",
+      "bytes": 3451,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/contract-approve.md"
+    },
+    {
+      "title": "T19 architecture contract — the Board's decision",
+      "path": "docs/evidence/t19/gov/contract-board-decision.html",
+      "source": "docs/evidence/t19/gov/contract-board-decision.md",
+      "section": "Evidence",
+      "sha256": "d8514ebdf40156d5f87c78cec84e6f0b933f8a8536e2d9ab42e9fcf53ad6b253",
+      "bytes": 1759,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/contract-board-decision.md"
+    },
+    {
+      "title": "Statement of Architecture Work — T19 decision forums (2026-11-24)",
+      "path": "docs/evidence/t19/gov/contract-request.html",
+      "source": "docs/evidence/t19/gov/contract-request.md",
+      "section": "Evidence",
+      "sha256": "a5dc3f5faa5c18ed30ca3bd212da7d3d827b6d62df3500f71a1a43ba1c85a9ce",
+      "bytes": 3213,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/contract-request.md"
+    },
+    {
+      "title": "T19 delivery contract — approval",
+      "path": "docs/evidence/t19/gov/delivery-contract-approve.html",
+      "source": "docs/evidence/t19/gov/delivery-contract-approve.md",
+      "section": "Evidence",
+      "sha256": "10e41d0df321c6792b76ad2a4ddc88a6b40491cad5602bd287a4599912441706",
+      "bytes": 3501,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/delivery-contract-approve.md"
+    },
+    {
+      "title": "T19 delivery contract — the Board's decision",
+      "path": "docs/evidence/t19/gov/delivery-contract-board-decision.html",
+      "source": "docs/evidence/t19/gov/delivery-contract-board-decision.md",
+      "section": "Evidence",
+      "sha256": "9acdf5bda93125e39b37a437c3057254392ae9e861216fc102f5febf17171a5e",
+      "bytes": 1676,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/delivery-contract-board-decision.md"
+    },
+    {
+      "title": "Delivery contract — T19 decision forums (2026-11-24)",
+      "path": "docs/evidence/t19/gov/delivery-contract-request.html",
+      "source": "docs/evidence/t19/gov/delivery-contract-request.md",
+      "section": "Evidence",
+      "sha256": "935a5f9bda3536b30d38d99d8569aead712868287252699fc6e25a096ee63d68",
+      "bytes": 3268,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/delivery-contract-request.md"
+    },
+    {
+      "title": "T19 close-out — live write evidence",
+      "path": "docs/evidence/t19/live-write-evidence.html",
+      "source": "docs/evidence/t19/live-write-evidence.md",
+      "section": "Evidence",
+      "sha256": "b3b6ff1653e1ba823045a13b384f4a642dc41512d212d839ff0c4d4942f7efb2",
+      "bytes": 931,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/live-write-evidence.md"
+    },
+    {
+      "title": "T19 close-out — programmes.refresh evidence",
+      "path": "docs/evidence/t19/refresh-evidence.html",
+      "source": "docs/evidence/t19/refresh-evidence.md",
+      "section": "Evidence",
+      "sha256": "ddac071a949b01161f9bb16d0a38c5749705b774a6b2935b6ef7caf52ad3cc2d",
+      "bytes": 486,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/refresh-evidence.md"
+    },
+    {
       "title": "V1 → SPECV2 coverage",
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
@@ -654,8 +924,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "f89a480234b60572776c884a7501c25031599629089095fd338a84dd6bff3c91",
-      "bytes": 257563,
+      "sha256": "9a4e6f8a35a1b40feb9ddc59fe3a892576fd5ceae64439c4cf95b92cfa1c9261",
+      "bytes": 258086,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -807,8 +1077,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19-decision-forums.html",
       "source": "docs/plans/T19-decision-forums.md",
       "section": "Plans",
-      "sha256": "8f8c85d67e6cc6928bf174ccf600ed55d1f46ab72764da88a25ed7f79c4cebd4",
-      "bytes": 25846,
+      "sha256": "316edd9323a47737bda6eb12239bd5f1bcefe40431f99e0a2069e8b09d4a4bf2",
+      "bytes": 25864,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19-decision-forums.md"
     },
     {
@@ -816,8 +1086,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19/architecture-design.html",
       "source": "docs/plans/T19/architecture-design.md",
       "section": "Plans",
-      "sha256": "53c9df699470184dad570edcd6f82e3c09ef3c0fa61a76092ae1b96382240ef0",
-      "bytes": 14788,
+      "sha256": "730266ca5fa0006d7f9059267ba4c6e1bc8e381ffb018e511d888c5f0ebd0371",
+      "bytes": 16429,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/architecture-design.md"
     },
     {
@@ -825,17 +1095,26 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19/artifact-register.html",
       "source": "docs/plans/T19/artifact-register.md",
       "section": "Plans",
-      "sha256": "d6bac4601bfb5ad7b91263ecfb7d18876d016886e16be46913e6533b6a2cc40b",
-      "bytes": 3686,
+      "sha256": "44a1f02c2fc887a787a2b50033e7775ae2aec73b28878b1da4452d04208bfd02",
+      "bytes": 5995,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/artifact-register.md"
+    },
+    {
+      "title": "T19 — Decision forums: closure review",
+      "path": "docs/plans/T19/closure-review.html",
+      "source": "docs/plans/T19/closure-review.md",
+      "section": "Plans",
+      "sha256": "d7fe5b981be971797a2768ed5ba67c390ae52edc4afc293d4429ee741abede8d",
+      "bytes": 6122,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/closure-review.md"
     },
     {
       "title": "T19 — Decision forums: evidence",
       "path": "docs/plans/T19/evidence.html",
       "source": "docs/plans/T19/evidence.md",
       "section": "Plans",
-      "sha256": "92dfa8f9a8bfe3f52ec25c32e17a9263e551b77898c39ab02a6516897457ccf1",
-      "bytes": 6828,
+      "sha256": "aeb7d5ed9e5b54fcf67288a57e0d8b4aa66c0f343351bdb97b90e99c142ce6a6",
+      "bytes": 12563,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/evidence.md"
     },
     {
@@ -843,8 +1122,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19/inception-analysis.html",
       "source": "docs/plans/T19/inception-analysis.md",
       "section": "Plans",
-      "sha256": "69b54af6f41e775bb59149461d8fb3e642786af83981935f8657f20ad9b95820",
-      "bytes": 6382,
+      "sha256": "77aa784a87f54ce444e5991f2b883e01ae0404aec2efdc443b25675754e7c12a",
+      "bytes": 6378,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/inception-analysis.md"
     },
     {

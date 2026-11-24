@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Driver/Goal/Objective Catalog — S03 Domain and schema (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Driver/Goal/Objective Catalog — S03 Domain and schema (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: The drivers behind the baseline domain, the goal each serves and the objective the migration and the machines install.</li>
+<li>Scope: one migration, list-as-state, claim and lease, approval uniqueness, FORCE RLS, the anti-accretion rule and the archive invariant.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>D1 Fourteen aggregates with no single owning schema / G1 One baseline migration owns the tables</strong> - {"objective": "migrations/0002_domain.sql creates exactly 14 tables (programme, project, board, list, card_type, card, run, approval, approval_decision, governed_asset, trace_link, catalogue_entry, revision, andon_state); <code>grep -c 'CREATE TABLE'</code> returns 14; later slices add tables but never re-invent one (S3 mandate; plan \u00a71)."}</li>
+<li><strong>D2 A card carries its own status column, which drifts from its list / G2 list.kind is the only state</strong> - {"objective": "<code>card</code> has no state or status column; <code>information_schema.columns</code> for card and (state,status) returns zero rows; <code>may_move</code> reads project_type.meta.matrix and an absent entry, card type or row denies (S3-D1, S3-D3; plan trap 1)."}</li>
+<li><strong>D3 Two claims can grant the same card / G3 A conditional claim UPDATE with a fence</strong> - {"objective": "claim_card_tx is one <code>UPDATE \u2026 WHERE tenant_id = $1 AND id = $2 AND version = $5 AND (lease_expires_at IS NULL OR lease_expires_at &lt; now() OR assignee_id = $3) RETURNING claim_fence, version</code>; claim_fence rises on every grant and release is fenced. The lease arm also lets the current assignee renew, so the exclusive reading is the P1 package v1-s03-1."}</li>
+<li><strong>D4 Two pending approvals per (run, gate) / G4 A partial unique index is the guarantee</strong> - {"objective": "uq_appr_pending (tenant_id, run_id, gate) WHERE status='pending'; a duplicate is 23505 and maps to ApprovalConflict; sixteen concurrent inserts yield one pending row. A NULL run_id escapes the index; the card-level path is S06's (plan trap 5)."}</li>
+<li><strong>D5 ENABLE RLS still lets the table owner read everything / G5 FORCE RLS on all fourteen tables</strong> - {"objective": "every table carries tenant_id, ENABLE and FORCE ROW LEVEL SECURITY and the tenant_isolation policy; as conveyor_runtime scoped to A, B's rows are absent and a forged tenant_id=B insert fails WITH CHECK; the owner sees 0 and a superuser both (plan trap 7)."}</li>
+<li><strong>D6 Porting fr's 224-migration accretion is the largest failure mode / G6 The baseline is SPEC §6, not fr's history</strong> - {"objective": "R10: a column enters only because \u00a72.3/\u00a72.4 names it; a deviation is a contract change; the schema-review step checks every table line by line and records a reviewed list rather than a silent drift (plan trap 10)."}</li>
+<li><strong>D7 Archive has two notions — a lane and a stamp — that can disagree / G7 One proptestable archive invariant</strong> - {"objective": "archived_at IS NOT NULL implies list.kind='archive', proved by board.rs::archived_implies_the_card_sits_in_an_archive_list; restore off a non-archive list is an error. The stronger claim that every hot index filters archived cards is true only of the two board-scan indexes \u2014 the P2 package v1-s03-2."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Domain and schema — aggregates, state machines, baseline domain migration · conveyor output · published 2026-11-24T10:10:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

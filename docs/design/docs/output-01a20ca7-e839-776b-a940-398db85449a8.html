@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T19 — Inception analysis · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T19 — Inception analysis</h1>
+<h2>Current state</h2>
+<p>Measured at <code>main@b9a6e293</code> on 2026-11-23.</p>
+<table><thead><tr><th>Area</th><th>State</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>Meeting aggregate</td><td>ABSENT</td><td><code>git grep -n 'meeting_type|meeting_position|meetings\.' -- migrations crates apps</code> → 0</td></tr>
+<tr><td><code>approval_decision</code> participants</td><td>HUMAN-ONLY</td><td><code>migrations/0002_domain.sql:231-248</code>: <code>approver_id uuid NOT NULL REFERENCES app_user(id)</code>; <code>via jsonb</code></td></tr>
+<tr><td>Decision values</td><td><code>approve | reject</code></td><td><code>migrations/0002_domain.sql:236</code>; conditions must live in the position/approval meta</td></tr>
+<tr><td><code>minutes</code> as a governed asset</td><td>ABSENT</td><td><code>migrations/0044_plan_spine.sql:411-419</code> kind CHECK</td></tr>
+<tr><td><code>meeting</code> card type</td><td>ABSENT</td><td><code>seed/catalogue.json</code> has no <code>meeting</code></td></tr>
+<tr><td>Meetings console route</td><td>ABSENT</td><td><code>apps/web/src/app.rs</code> has no <code>/meetings</code>; <code>docs/design/v2.js</code> has no Meetings screen</td></tr>
+<tr><td>Approvals, cards, runs</td><td>DONE</td><td><code>migrations/0002_domain.sql</code>; <code>crates/actions/src/control/approvals.rs</code></td></tr>
+<tr><td><code>app_user</code> humans</td><td>DONE</td><td><code>migrations/0002_domain.sql</code>; referenced by <code>approval_decision</code></td></tr>
+<tr><td><code>project_dependency</code></td><td>DONE (T1)</td><td><code>migrations/0044_plan_spine.sql</code></td></tr>
+<tr><td><code>governance_body</code></td><td>DONE (T9, #81 closed)</td><td><code>migrations/0054_architecture.sql</code></td></tr>
+<tr><td><code>programme_cadence</code></td><td>DONE (T10, #82 closed)</td><td><code>migrations/0056_cadence_tranche.sql</code></td></tr>
+<tr><td>T18 UI lane</td><td>IN FLIGHT</td><td>#562–#566; PR #603; separate files</td></tr>
+<tr><td>T19 programme entries</td><td>ABSENT</td><td><code>seed/programme.json</code> has no T19; <code>scripts/v2-slice-artefacts.json</code> has T0–T18</td></tr>
+</tbody></table>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>Source</th><th>Path:symbol</th><th>Reuse decision</th></tr></thead><tbody>
+<tr><td>Approval and decision</td><td><code>migrations/0002_domain.sql:188</code> <code>approval</code>, <code>:231</code> <code>approval_decision</code></td><td>Reuse lifecycle and uniqueness; <strong>extend</strong> the participant columns</td></tr>
+<tr><td>Decision attribution</td><td><code>crates/actions/src/control/approvals.rs:87</code> <code>decided_by_kind</code></td><td>Reuse; job seats use <code>agent</code>, humans <code>human</code></td></tr>
+<tr><td>Decision read model</td><td><code>crates/actions/src/control/approvals.rs:930</code> <code>decisions_for</code>; <code>crates/actions/src/control/views.rs:447</code> <code>ApprovalDecisionOut</code></td><td>Reuse; add participant kind to the view</td></tr>
+<tr><td>Store record</td><td><code>crates/store/src/approval.rs:210</code> <code>ApprovalDecisionRecord</code></td><td>Reuse; add <code>job_binding_id</code>/<code>participant_kind</code></td></tr>
+<tr><td>Surface record</td><td><code>migrations/0002_domain.sql:241</code> <code>via jsonb</code>; <code>crates/api/tests/approval_dual.rs:147</code></td><td>Reuse; <code>via-&gt;&gt;'surface'='meeting'</code></td></tr>
+<tr><td>Human seat</td><td><code>app_user</code> (<code>migrations/0002_domain.sql</code>)</td><td>Reuse</td></tr>
+<tr><td>Card and DoD</td><td><code>card</code>, <code>card_type</code>, <code>seed/catalogue.json</code></td><td>Reuse; add the <code>meeting</code> type</td></tr>
+<tr><td>Minutes</td><td><code>governed_asset</code> (<code>migrations/0002_domain.sql:287</code>; <code>0044_plan_spine.sql:411</code>)</td><td>Reuse; widen the kind CHECK with <code>minutes</code></td></tr>
+<tr><td>Commitments</td><td><code>project_dependency</code> (<code>0044_plan_spine.sql</code>)</td><td>Reuse</td></tr>
+<tr><td>Board convener</td><td><code>governance_body</code> (<code>0054_architecture.sql</code>)</td><td>Reuse; T19 consumes, T9's macros follow</td></tr>
+<tr><td>Cadence slot</td><td><code>programme_cadence</code> (<code>0056_cadence_tranche.sql</code>)</td><td>Reuse; T19 consumes, T10's binding follows</td></tr>
+<tr><td>Action declaration</td><td><code>crates/actions/src/control/approvals.rs</code>; <code>crates/actions/tests/</code></td><td>Reuse the <code>ActionSpec</code> pattern for <code>meetings.*</code></td></tr>
+<tr><td>Console contract</td><td><code>apps/web/src/app.rs</code>; <code>docs/design/v2.js</code> §10.5</td><td>Extend the T18 route registry with <code>/meetings</code> and its spec</td></tr>
+</tbody></table>
+<h2>Build vs reuse</h2>
+<p><strong>Build:</strong> the five meeting tables; the twelve actions; the console screen; the participant
+extension; the <code>minutes</code> kind; the card type and seed; the instruments and flag.</p>
+<p><strong>Reuse, never rebuild:</strong> the approval lifecycle, the card/run path, the governed-asset lifecycle,
+the dependency edge, the board and cadence rows. The meeting is a composition over these
+primitives; a second decision table, a separate meeting-decision table, or a chat store is
+rejected by §6.8's first principle.</p>
+<p><strong>The one core-table decision:</strong> a job-binding seat must write an <code>approval_decision</code> row. The
+existing <code>approver_id</code> FK is human-only, so T19 adds nullable <code>approver_id</code>, <code>job_binding_id</code>,
+<code>participant_kind</code>, an exactly-one CHECK, and a partial unique index. The alternative — writing
+L1 <code>decision</code> rows for job seats — would split the decision record and is rejected.</p>
+<h2>Constraints and licences</h2>
+<p>All work is in this repository; the tables, actions, console and tests use the existing Rust
+workspace and Leptos app. No third-party licence is introduced. No calendar or AV service is
+integrated; an ICS feed is a read of attendance. The MCP surface is the existing stateless
+infrastructure contract; no new port or external runtime is used.</p>
+<h2>Risks</h2>
+<table><thead><tr><th>Risk</th><th>Evidence it is real</th><th>Mitigation in this slice</th></tr></thead><tbody>
+<tr><td>Meeting theatre (R20)</td><td>approvals today have no deliberation record</td><td>typed items, evidence minimum, closed outcomes, owner+date commitments, minutes matching rows, metering</td></tr>
+<tr><td>Lowering dual control</td><td>the linked approval's policy can be stricter</td><td>evaluate the approval after the meeting rule; stricter wins; a test with dual control</td></tr>
+<tr><td>Job-seat misattribution</td><td><code>approver_id → app_user</code> cannot express a job</td><td>explicit participant extension, CHECK and test</td></tr>
+<tr><td>Silent LLM selection</td><td>an agenda could be generated</td><td>L0 query + <code>agenda_add</code>; the LLM has no action to select or position</td></tr>
+<tr><td>Calendar dependency</td><td>an ICS feed can imply a calendar system</td><td>attendance is the record; the feed is a read</td></tr>
+<tr><td>T18 lane collision</td><td><code>/meetings</code> is a new route in a lane that is in flight</td><td>T19 owns the route/screen; T18's shell lists it without building it</td></tr>
+</tbody></table>
+<h2>Open questions</h2>
+<table><thead><tr><th>#</th><th>Question</th><th>Default</th></tr></thead><tbody>
+<tr><td>1</td><td>Should a <code>meeting_type</code> allow a job to convene without a human chair?</td><td>yes; the type's authority row decides, and the chair seat remains optional where the type allows</td></tr>
+<tr><td>2</td><td>Does an <code>approve_with_conditions</code> decision row store <code>approve</code> and leave conditions in the position?</td><td>yes; <code>approval_decision</code> admits only approve/reject and the derived outcome is computed from positions</td></tr>
+<tr><td>3</td><td>Is a minute line that cites a row enough, or must it embed the row id?</td><td>embed the row id; a line without a matching row is a defect</td></tr>
+</tbody></table>
+<h2>Links</h2>
+<ul>
+<li>Brief: <code>docs/plans/T19/project-brief.md</code></li>
+<li>Architecture: <code>docs/plans/T19/architecture-design.md</code></li>
+<li>Plan: <code>docs/plans/T19-decision-forums.md</code></li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §6.8, §10.3–§10.4, §12 T19, D66</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision forums (meetings) · conveyor output · published 2026-11-24T10:10:00Z · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

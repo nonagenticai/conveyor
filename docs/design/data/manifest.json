@@ -2,83 +2,95 @@
   "feedback_url": "https://github.com/nonagenticai/conveyor/discussions",
   "files": [
     {
-      "bytes": 108957,
+      "bytes": 1784978,
       "path": "architecture.json",
-      "records": 78,
-      "sha256": "60a4663b81a1f2016a258617b51d45f7a60532a3ecfcf29a7613d071f07727dc"
+      "records": 520,
+      "sha256": "f83e212711661cc82852702a667d65d54e77f5474471fbec7680ae855e9e7b47"
     },
     {
-      "bytes": 73583,
+      "bytes": 134357,
       "path": "artefacts.json",
-      "records": 168,
-      "sha256": "206f4c0fa748cf56fe79b9421ea70ea4565b055b355eabf05c69f49f7312fd38"
+      "records": 283,
+      "sha256": "19758d31d44de8dc3fd504c6f36024648558fa3a31933aac73364cd2478e7d95"
     },
     {
-      "bytes": 1832926,
+      "bytes": 1832901,
       "path": "config.json",
       "records": 2256,
-      "sha256": "a8fd56b89802f3d35199cac1b3b75a10e6d1562781fbf15020192791fd7c588c"
+      "sha256": "0cc88b3deffe48cbe35b26a1af435f219cddb1985b40127e6fe2117a1ab5ebdc"
     },
     {
-      "bytes": 109,
+      "bytes": 30152,
       "path": "evidence.json",
-      "records": 0,
-      "sha256": "77372f89ec390511d7ff4c6bdb31bc4ecfc7428def50d493bf26b18427354ddb"
+      "records": 172,
+      "sha256": "a79b99a6fdd44603d0b29ae1f6706d4e8678aebb7527f486cedcebb09a2fb8dd"
     },
     {
-      "bytes": 110,
+      "bytes": 95,
       "path": "feedback.json",
       "records": 0,
-      "sha256": "c0dd0d7c535bbdc7ceb958fffa8f3eb7b28893c3a07f64b6524d3bbbf0d89736"
+      "sha256": "3e12c5771490df899fbc1aa15bbbfe0bd225784f704dfca38bff5d555ba13e54"
     },
     {
-      "bytes": 1349,
+      "bytes": 4193,
       "path": "measure.json",
       "records": 0,
-      "sha256": "41fb58d82d6c01e0b617e3f459fff4ce229bca6fbcd9544227b4de150301c233"
+      "sha256": "5dd0db7ced75dc1628c225bdbef4188f1bdf0efb22a82ded0914072314bd1721"
     },
     {
-      "bytes": 27605,
+      "bytes": 454065,
       "path": "msp.json",
-      "records": 33,
-      "sha256": "46a90c23341283a453fd8c6da86ea77c8b99271f1b6ffa3d94d2ad406f4a0d12"
+      "records": 173,
+      "sha256": "28ab0e7cfe875b39e4836448e35915c3041d95548d346d49a159131d715ad998"
     },
     {
-      "bytes": 16712,
+      "bytes": 1016,
+      "path": "ops.json",
+      "records": 1,
+      "sha256": "b05a3968261a643ec1706bf97c477c1e42e11613bd20d7e4d2d8b9c539e74b10"
+    },
+    {
+      "bytes": 16697,
       "path": "organisation.json",
       "records": 34,
-      "sha256": "3807b68e9cb77bd166fbe6f6d4b0e269c8bc0923a8d156f45dba8342786bd2ee"
+      "sha256": "33ba9653f68e8758d42878a33e04acd53e3a5d6818e09eb078cebd6ec996e6aa"
     },
     {
-      "bytes": 180846,
+      "bytes": 235405,
       "path": "programme.json",
-      "records": 49,
-      "sha256": "e868cfc4d87105681c7ec5c022093b37f59223b288ce686d7ec2ce20d4fa58d3"
+      "records": 53,
+      "sha256": "546048d09e2d94b3d3cd3c7fae64dfd25ab915cd370dfd78b431f1514286325e"
     },
     {
-      "bytes": 225,
+      "bytes": 1403147,
+      "path": "rework.json",
+      "records": 433,
+      "sha256": "5c2393e6076731f11c3e6c32d6e5e80f3d107c0e87a85e5f2a302bdc46246e00"
+    },
+    {
+      "bytes": 211,
       "path": "secrets.json",
       "records": 0,
-      "sha256": "fa7a6bcd04624416cc6f6d444015ea54ac25ec6f0e3157c549396d80c8ec0f5e"
+      "sha256": "06d500cfd94e192de4e4d3117d156f3a993c04630eb5ddca5c0b7ddc43fff2b4"
     },
     {
-      "bytes": 2524495,
+      "bytes": 5098162,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "f14da210b7930ea189d21257895fd4df743dc0a4acdb855abcbec3cf816c7afe"
+      "sha256": "81c080e1237501a844e042315d09af742eafd33d92dc452c9d41261e4dc6fc39"
     },
     {
-      "bytes": 1091172,
+      "bytes": 1215090,
       "path": "work.json",
-      "records": 1912,
-      "sha256": "3b3d22c86e306b2d0e7d78a0520cf6149c7543c63bac571ec9449100905bb615"
+      "records": 2180,
+      "sha256": "49b58e87797379efe4dc80415ac15711245cb0e373cd5515bce8a51160f5b96f"
     }
   ],
-  "generated_at": "2026-11-20T11:50:50.848127361+00:00",
-  "git_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+  "generated_at": "2026-11-24T10:10:00Z",
+  "git_sha": "7edea5b80ede2a245d297ef7931bd60090d3482b",
   "migration": {
-    "description": "procedure ingestion",
-    "version": 60
+    "description": "tool authoring",
+    "version": 70
   },
   "redaction": "no secret values, no encryption key ids, no emails, no OIDC subjects, no session or licence tokens",
   "schema": "design-snapshot/v1",

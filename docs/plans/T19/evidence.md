@@ -1,12 +1,12 @@
 ---
 document: T19/evidence
-version: 1
+version: 3
 status: published
 project: T19
 category: evidence
 owner: programme-manager
 reviewer: Architecture Board
-review_date: 2026-11-23
+review_date: 2026-11-24
 artifact_kind: evidence
 phase: G
 plateau: capability
@@ -16,10 +16,11 @@ plateau: capability
 
 ## Claim
 
-Issue #606's D1–D8 are implemented on `issue/606-t19-meetings`: the meeting is a typed card whose
-agenda resolves existing approvals, whose seats record positions, and whose outcome is derived by
-arithmetic over those positions and the linked approval's stricter policy — with the human seat
-available in the web room, over Telegram and over MCP, and the minutes a chaired governed asset.
+Issue #606's D1–D8 are implemented on `issue/606-t19-meetings` and exercised on the deployed
+engine (`a8f67c3e`): the meeting is a typed card whose agenda resolves existing approvals, whose
+seats record positions, and whose outcome is derived by arithmetic over those positions and the
+linked approval's stricter policy — with the human seat available in the web room, over Telegram
+and over MCP, and the minutes a chaired governed asset. The live gate is recorded below.
 
 ## Evidence
 
@@ -59,12 +60,71 @@ Supporting gates at the same head:
 
 | Gate | Evidence | Result |
 |---|---|---|
-| the registry and the committed action dump agree (525 actions, 507 internal) | `cargo test -p conveyor-actions --test registry` | pass |
-| HTTP and MCP return the same body for all 525 actions | `cargo test -p conveyor-actions --test parity_http_mcp` | pass |
-| the migration ledger has `(64, "meetings")` | `cargo test -p conveyor-store migrate` | pass |
+| the registry and the committed action dump agree (530 actions, 512 internal) | `cargo test -p conveyor-actions --test registry` | pass |
+| HTTP and MCP return the same body for all 530 actions | `cargo test -p conveyor-actions --test parity_http_mcp` | pass |
+| the migration ledger has `(65, "meetings")` | `cargo test -p conveyor-store migrate` | pass |
 | the OpenAPI lock matches the 12 new operations | `conveyor --print-openapi --write-lock` ran; `served-spec.lock.json` updated | pass |
 | the mock UI registers and renders the Meetings destination | `node docs/design/scripts/check-v2.cjs`, `check-console.cjs` | pass |
 | the real app's Meetings destination has a Playwright spec | `apps/web/e2e/meetings.spec.ts` (empty, happy, refusal and phone/tablet layout) | runs in `web.yml` on the PR |
+
+### The live gate — deployed `a8f67c3e`, tenant `nonagentic`, 2026-11-24
+
+The human seat was exercised by the tenant's admin identity `FR Test` (app_user
+`01a1cf1e-09dd-7580-99cc-de395f3e86cc`), supplied by the owner for this proof; the evidence names
+the identity exactly and does not claim the owner's personal account. The meeting
+`01a20c8a-33ac-7f2a-b02f-0d2165ef05d5` was scheduled on the T19 board, opened, the chair invited
+and accepted, and two deciding items added (approvals `…5d47…` and `…bc7e…`). The seat approved
+item 1 in the web room and item 2 through the public `/mcp` transport; each item was closed from
+its own surface. The chair's minutes approval (`…a182`) was decided, the minutes governed asset
+`01a20ca3-7d7a-72f0-b63d-96a09064c6df` published, and the meeting closed at
+`2026-11-24T08:19:39Z`.
+
+`python3 scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed` reads the
+rows back through the deployed read actions — never SQL, never a captured fixture:
+
+| Check | Result |
+|---|---|
+| the live project is T19 and its board is a row | pass |
+| one active `meeting` card type; benefit B7 is a row | pass |
+| the meeting is `closed`; two agenda items closed as `decision` | pass |
+| web: one meeting decision row, approval `approved`, `via.channel='web'` | pass |
+| mcp: one meeting decision row, approval `approved`, `via.channel='mcp'` | pass |
+| both rows name one approver, and it is the seated principal | pass |
+| the minutes approval is `approved` (and `meetings.close` refuses without the published asset) | pass |
+
+The gate found and closed two deployment defects, both in `gitops-production`:
+`CONVEYOR_MCP_ALLOWED_HOSTS` was unset, so rmcp's localhost-only allowlist answered every public
+handshake `403 Host header is not allowed` (#5429); and the MCP session lives in one pod's memory
+while the two-replica Service round-robins, so 6 of 8 post-initialize calls 404'd until a
+DestinationRule pinned the session on `mcp-session-id` (#5432). After the rollout, the same probe
+served 8 of 8.
+
+**Re-run on the current deployment.** The check was run again on `7e617673` (the T5 release, which
+carries T19 unchanged): all 15 assertions passed, with the same approver
+`01a1cf1e-09dd-7580-99cc-de395f3e86cc` on both decision rows. The gate is therefore evidenced on
+the deployment that is running now, not only on the one it was first taken on.
+
+### The T19 conformance chain — deployed `7e617673`, tenant `nonagentic`, 2026-11-24
+
+The conformance audit named four T19-owned gaps. Three are closed here through the engine's own
+action surface, under the published standing delegation
+`01a1fb9f-ac2d-732d-b274-1079be3dd2b3`; the fourth is the programme's tranche chain (see Gap).
+
+| Gap | Act | Read-back |
+|---|---|---|
+| seven mandatory TOGAF artefacts | `architecture.artifacts_create` + `artifacts_approve` on each of `requirements_catalog`, `stakeholder_map`, `driver_goal_objective`, `solution_concept`, `business_capability_map`, `data_entity_catalog`, `technology_standards` | seven `approved` rows for T19, entries from `docs/plans/T19/architecture-design.md` |
+| artefact links | `architecture.artifacts_link` × 7 (derivation / realization / dependency, §5 of the design) | seven edges among the T19 artefacts |
+| the live architecture contract | `architecture.contracts_request` → `architecture.board_decide` (Architecture Board, citing the delegation) → `architecture.contracts_approve` (approver distinct from requester) | `statement_of_architecture_work` `01a20ce0-5183-776c-84bd-327f2301b19b` is `live`, `approved_at` set, board decision `01a20ce0-644d-7340-a696-1af10fa8c61e` |
+| the phase-F delivery contract | the same request → board decision → approval flow, `kind=delivery_contract`, phase `f` | `01a20cea-91bb-77f4-a880-044c90bb5f0e` is `live`, board decision `01a20cea-a68f-7e08-8d0c-399759ef16e0` |
+| the Phase-G compliance reviews | `architecture.reviews_record` × 2 (one per live contract), level `conformant`, recorded by `conveyor-approver` under the delegation | both reviews carry the delegation ref and the named follow-ups; the audit's `compliance_review_missing` clears |
+| B7's baseline and owner | `benefits.update` | baseline `{value: 0, unit, measured_at, method}` (zero deliberated decision rows before T19) and the programme-manager benefit owner |
+| the `architecture-artifact` standard | `documents.compose` + `documents.publish` | output `01a20ce4-73e4-7009-9ec7-eb2265e9e84e` is published; its page carries Metadata / Entries / Links / Document |
+
+`python3 scripts/t19-governance-chain.py --check` reads every row back through the deployed read
+actions and passes all 16 assertions. The approvals were performed by the tenant's
+`conveyor-approver` seat under the standing delegation, not by the owner personally; the contract's
+requester is the operator's default actor, so the requester is never its approver. Each act's
+write and read-back is under `docs/evidence/t19/gov/`.
 
 ## Verification
 
@@ -81,6 +141,8 @@ cargo test -p conveyor-actions --test registry
 cargo test -p conveyor-actions --test parity_http_mcp
 cargo test -p conveyor-store migrate
 npx playwright test apps/web/e2e/meetings.spec.ts
+python3 scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed
+python3 scripts/t19-governance-chain.py --check
 ```
 
 The Rust suites were run through `~/.claude/scripts/cargo-guard.py` on m4 (the estate's sanctioned
@@ -91,16 +153,21 @@ run of the real app (no `cargo-leptos` is installed on m4, and installing it wou
 ## Links
 
 - Plan: `docs/plans/T19-decision-forums.md`
-- Issue: #606 (`Closes #606` in the PR)
+- Issue: #606 (`Closes #606` in the PR); close-out: #650
 - Specification: `docs/SPEC_V2.md` §6.8, §8.1–§8.3, §10.3–§10.5, §12 T19, D66
 - Programme: `docs/design/Program_Architecture_and_Benefits_Realization.md`; B7 in `seed/programme-definition.json`
 - Architecture: `docs/plans/T19/architecture-design.md`; MSP: `docs/plans/T19/msp-profile.md`; SAFe: `docs/plans/T19/safe-epic.md`
 - Console: `apps/web/src/screens/meetings.rs`; design reference: `docs/design/v2.js` `meetings`
+- Live gate state and read-backs: `docs/evidence/t19/`; checker: `scripts/t19-live-gate-check.py`
+- Conformance chain: `scripts/t19-governance-chain.py`; per-act read-backs: `docs/evidence/t19/gov/`
+- Delegation: `docs/evidence/t19/gov/` names the standing delegation `01a1fb9f-ac2d-732d-b274-1079be3dd2b3`
+- Deployment fixes the gate required: gitops-production #5429 (MCP allowed hosts) and #5432 (MCP session affinity)
 
 ## Gap
 
-The deployment-gated live proof — the owner deciding one item in the web room and one over MCP at
-the deployed revision, both `via='meeting'` — is acceptance-blocked by the lane release, not waived:
-the unit tests prove the two surfaces and the first-decision rule, and the Playwright spec proves
-the room. No other gap is claimed; the type-authoring route (a policy change is a new
-`meeting_type` version through the governance route) is a planned follow-up, not part of D1–D8.
+None against T19's acceptance. The audit's one remaining T19-labelled finding is the **P0
+`project_in_unauthorised_tranche`**: T19 is closed while tranche 4 is `planned`, and tranche 4's
+entry needs the tranche 3 review — the programme's retrospective tranche chain, owned by #526. This
+unit does not backfill those reviews; the strict-gate disclosure in the PR and the closure review
+state it. Two declared follow-ups (the `meeting_type` authoring route and the T9 board / T10 cadence
+binding) stay open items with owners in `docs/plans/T19/closure-review.md`.

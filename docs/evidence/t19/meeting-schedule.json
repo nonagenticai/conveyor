@@ -1,0 +1,42 @@
+== write: meetings.schedule ==
+{
+  "cadence_slot": null,
+  "card_id": "01a20c8a-3370-7a8f-b903-faf5f7cff917",
+  "card_name": "T19 live gate \u2014 decision forum",
+  "closed_at": null,
+  "convener_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+  "convener_kind": "app_user",
+  "decision_rule": "majority",
+  "decision_window_end": null,
+  "id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+  "meeting_type": "t19-live-gate",
+  "meeting_type_name": "T19 live gate",
+  "meeting_type_version": 1,
+  "opens_at": null,
+  "retirement_candidate": false,
+  "status": "scheduled",
+  "version": 1
+}
+== read-back: meetings.list ==
+{
+  "items": [
+    {
+      "cadence_slot": null,
+      "card_id": "01a20c8a-3370-7a8f-b903-faf5f7cff917",
+      "card_name": "T19 live gate \u2014 decision forum",
+      "closed_at": null,
+      "convener_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "convener_kind": "app_user",
+      "decision_rule": "majority",
+      "decision_window_end": null,
+      "id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+      "meeting_type": "t19-live-gate",
+      "meeting_type_name": "T19 live gate",
+      "meeting_type_version": 1,
+      "opens_at": null,
+      "retirement_candidate": false,
+      "status": "scheduled",
+      "version": 1
+    }
+  ]
+}

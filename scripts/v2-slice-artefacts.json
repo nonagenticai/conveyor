@@ -390,6 +390,8 @@
       ],
       "evidence": [
         "docs/plans/T19-decision-forums.md",
+        "docs/plans/T19/evidence.md",
+        "docs/plans/T19/closure-review.md",
         "docs/SPEC_V2.md"
       ],
       "gap": null

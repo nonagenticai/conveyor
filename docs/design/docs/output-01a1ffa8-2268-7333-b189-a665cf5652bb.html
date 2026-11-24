@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Conformance baseline v5 — acceptance (2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Conformance baseline v5 — acceptance (2026-11-21)</h1>
+<h2>Context</h2>
+<p>The U5b batch reworked tranche 1 — S02, T1 and T11 — through the reconstituted lifecycle and
+re-derived the ledger from a fresh snapshot of the live record: <code>git_sha</code>
+<code>d367a4a992ca5338c82466e9d6ef308e62b01ba6</code>, generated <code>2026-11-21T19:48:06.428670+00:00</code>, 128
+published outputs. The committed v4 baseline was derived before the batch; the fresh audit
+reports <strong>182 P0/P1 entries — 27 P0 / 155 P1</strong> and 3 P2.</p>
+<p>The batch closed <strong>14 entries</strong> and deleted them, not re-dated: 3 P0
+(<code>closed_without_closure_review</code> T1 and T11; <code>pi_plan_missing</code> tranche 1 PI) and 11 P1
+(<code>contract_missing</code> T1 and T11; <code>mandatory_artefacts</code> S02, T1 and T11;
+<code>unpublished_declared_output</code> S02, T1 and T11; <code>pi_cadence_missing</code>, <code>backlog_refinement_missing</code>
+and <code>pi_objectives_missing</code> for tranche 1). One new <strong>P2</strong> records that the definition seed still
+says S02 is active while the live record closes it: the seed is the programme definition image,
+and this batch does not rewrite the definition to match the record.</p>
+<p>S02's acceptance gained the proof issue #2 named: <code>apps/server/tests/jobs_lease_two_workers.rs</code>
+(P2.1–P2.3), local PASS (11.878 s), preflight run 44938697512 (success). T1 and T11 close with
+their retrospective records and the honest gaps the review names: T1 had no contemporaneous
+governance record, and T11 has no calibrated C0–C5 threshold row.</p>
+<h2>Decision</h2>
+<p><code>conveyor-approver</code> accepts baseline v5 under the U5 delegation
+<code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>, with <code>conveyor-e2e</code> as executor. Every entry carries a
+disposition (<code>rework</code>, except S06a's one <code>fold</code>), the programme owner and an expiry of
+2027-02-18; the batch that fixes an entry deletes it.</p>
+<h2>Consequences</h2>
+<p>The strict audit is green against v5: no new P0/P1 and no entry without a live gap. The
+tranche-1 review can proceed on a ledger that matches the live record. The next batch
+(tranche 2: S03, T2) starts from these 182 entries plus the three P2 observations.</p>
+<h2>Evidence</h2>
+<ul>
+<li>Snapshot <code>d367a4a992ca5338c82466e9d6ef308e62b01ba6</code>, generated
+<code>2026-11-21T19:48:06.428670+00:00</code>, manifest sha256
+<code>f135ff3789cfb930fef38bbdf7ac2a466705c8f5e3ffe34a940716898cef4334</code>, 128 published outputs.</li>
+<li><code>docs/evidence/conformance-baseline.json</code> (version 5).</li>
+<li><code>acceptance/programme/{S02,T1,T11}.toml</code> green at the same snapshot; evidence in
+<code>docs/evidence/rework/{S02,T1,T11}.json</code>.</li>
+<li>Lessons from the tranche-1 retro: <code>01a1ff82-cc70-7b18-bb12-6501ac4239e4</code>,
+<code>01a1ff82-e836-7867-981f-4bdfcfa860f0</code>, <code>01a1ff83-06d1-7ff1-84c4-1f0d7957efc7</code>,
+<code>01a1ff83-23de-713d-8099-d3e9ec8d74ea</code>, <code>01a1ff83-3f5c-7734-830a-c8bb6c45024f</code>.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-24T10:10:00Z · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

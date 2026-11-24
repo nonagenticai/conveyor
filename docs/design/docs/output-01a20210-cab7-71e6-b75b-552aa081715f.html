@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Requirements Catalog — S03 Domain and schema (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Requirements Catalog — S03 Domain and schema (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: The requirements the S03 gate and its contracts must satisfy, each with an executable acceptance.</li>
+<li>Scope: the four gate properties, tenant isolation, migration idempotence, the card-state proof, the catalogue vocabulary and the schema review.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>R1 Property (a) / No transition leaves list.kind and archived_at contradictory</strong> - {"acceptance": "proptest \u2265256 cases: archived_at.is_some() implies from_kind == Archive; restore off a non-archive list is Err. crates/domain/src/board.rs::archived_implies_the_card_sits_in_an_archive_list and ::restore_off_a_non_archive_list_is_an_error.", "priority": "must"}</li>
+<li><strong>R2 Property (b) / A claim never succeeds twice without release or expiry</strong> - {"acceptance": "crates/store/tests/claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic \u2014 exactly one Some, fence 1 then monotonic renewals, stale-fence completion writes nothing. Admitted limit (v1-s03-1): all 32 racers share seed.user and Version::INITIAL, so the version predicate decides the winner and the test would pass with the lease arm deleted.", "priority": "must"}</li>
+<li><strong>R3 Property (c) / One pending approval per (run, gate)</strong> - {"acceptance": "approval_race.rs::sixteen_racers_create_exactly_one_pending_approval \u2014 one Ok, fifteen ApprovalConflict, pending count 1; uq_appr_pending is the guarantee.", "priority": "must"}</li>
+<li><strong>R4 Property (d) / Terminal-run and revision invariants</strong> - {"acceptance": "transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense \u2014 a terminal run rejects every transition; revision seq is dense from 1; is_prunable('model') is true past 50 and false for 'requirement' at any depth.", "priority": "must"}</li>
+<li><strong>R5 Tenant isolation / All fourteen tables isolate runtime, owner and superuser</strong> - {"acceptance": "rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser \u2014 runtime scoped to A sees none of B's rows; a forged tenant_id=B insert fails WITH CHECK; owner 0; superuser both.", "priority": "must"}</li>
+<li><strong>R6 Migration idempotence / Two migrations, one embedded set, no IF NOT EXISTS</strong> - {"acceptance": "fresh database applies 2; the second <code>cargo run -p conveyor-server -- migrate</code> exits 0 with _sqlx_migrations unchanged; store/src/migrate.rs asserts [(1,"platform"),(2,"domain")]; no <code>IF NOT EXISTS</code> in the file.", "priority": "must"}</li>
+<li><strong>R7 Card-state proof / A card has no state or status column</strong> - {"acceptance": "information_schema.columns for card and column_name in ('state','status') returns zero rows; an insta snapshot pins Card's field set; the plan's word-boundary grep returns 0.", "priority": "must"}</li>
+<li><strong>R8 FORCE RLS count / Fourteen FORCE policies, no exception</strong> - {"acceptance": "<code>grep -c 'FORCE ROW LEVEL SECURITY' migrations/0002_domain.sql</code> returns 14; every policy is FOR ALL USING (tenant_id = app_current_tenant()) WITH CHECK (the same).", "priority": "must"}</li>
+<li><strong>R9 Catalogue vocabulary / Eleven kinds and one delivery matrix row</strong> - {"acceptance": "catalogue_entry.kind has no CHECK by design; S03 fixes the eleven labels (project_type, phase, recipe, wip_limit, gate, capability, deliverable_kind, milestone_kind, priority_level, board_template, architecture_standard); the delivery matrix is one project_type row with code='delivery' and meta.matrix (S3-D1).", "priority": "must"}</li>
+<li><strong>R10 Schema review / A second reader checks 14 tables against §2.3/§2.4</strong> - {"acceptance": "a line-by-line review yielding 14 tables with zero deviations or a reviewed list. No contemporaneous review record exists; this retrospective review re-performs the check and admits v1-s03-2 (the archive-exclusion claim covers only the two board-scan indexes).", "priority": "must"}</li>
+<li><strong>R11 Move invariant / A move keeps the boards in agreement and refuses a stale version</strong> - {"acceptance": "transitions.rs::a_move_keeps_the_boards_in_agreement_and_refuses_a_stale_version \u2014 card.board_id equals list.board_id in the same statement; a move from a stale version is refused (plan trap 8).", "priority": "must"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Domain and schema — aggregates, state machines, baseline domain migration · conveyor output · published 2026-11-24T10:10:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

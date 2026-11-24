@@ -13,7 +13,7 @@ plateau: PSA + HLD
 
 # T19 — Architecture design (PSA and HLD)
 
-## 1. Context and boundary
+## Context and boundary
 
 T19 adds a decision forum over the existing four units. It does not add a fifth unit, a chat
 system, a second decision store or a calendar dependency. The architecture covers the meeting
@@ -27,7 +27,7 @@ standard's common metadata: title, status, version, owner, reviewer, review date
 stakeholders, scope, related project and its published document; links use
 `derivation | realization | reuse | dependency`.
 
-## 2. Artefact catalogue (common metadata)
+## Architecture artefacts
 
 | ID | Artefact | Type | Phase / plateau | Version | Owner | Reviewer | Review date | Status |
 |---|---|---|---|---|---|---|---|---|
@@ -48,7 +48,9 @@ stakeholders, scope, related project and its published document; links use
 The published document is this file for every row; the future typed repository rows derive from it.
 No row is approved yet; the review date is the Architecture Board's sitting in tranche 4.
 
-## 3. Project Start Architecture (Phase A)
+## Aggregates, tables and actions
+
+### Project Start Architecture (Phase A)
 
 ### A1 — Principles applied (catalog)
 
@@ -123,7 +125,7 @@ architect owns the set; the Architecture Board reviews; the SRO accepts the bene
 evidence. Acceptance: the six gate clauses plus D1–D8. The contract is a document now; T9's
 `architecture.contracts_approve` makes it live when the repository is used.
 
-## 4. High-Level Design (Phases B–D)
+### High-Level Design (Phases B–D)
 
 ### B1 — Business interaction matrix
 
@@ -215,13 +217,29 @@ tranche review reads the D7 instruments.
 | T9 `governance_body` | reuse | A3/B1 | the Board is a convener, not a new body |
 | T10 `programme_cadence` | reuse | B1 | the cadence supplies the slot, the meeting the record |
 
-## 6. Compliance and contract
+## Decisions
+
+| ID | Decision | Rationale | Where it shows |
+|---|---|---|---|
+| AD1 | A meeting is a card over the four existing units; no fifth unit and no second decision store | the record stays one approval row per decision | `meeting` is a card; decisions are `approval_decision` rows |
+| AD2 | The participant extension is additive on `approval_decision` (nullable `approver_id`, `job_binding_id`, `participant_kind`) | required decisions and distinct approvers count on the decision rows themselves | migration 0065 |
+| AD3 | Positions are deliberation, never decisions; `close_item` derives one decision row per qualifying seat | a second store would make the record ambiguous | `meeting_position` + `close_item` |
+| AD4 | The stricter policy wins: the meeting rule first, then the linked approval's dual control, evidence and P4 exclusions; a refusal is not a close | a meeting must never weaken a gate | `close_item` arithmetic |
+| AD5 | The agenda is an L0 query over `agenda_sources[]`; the LLM never selects an item | selection must be reproducible | `agenda_add` + the materialised query |
+| AD6 | Minutes are a governed asset behind the chair's approval; the rows remain the record | the DoD needs a published artefact without a second record | `minutes_publish` |
+| AD7 | Participant-hours derive from attendance × duration at read time; no stored metric row | metering follows D37/D52's read-time rule | the instruments |
+
+## Acceptance
 
 The delivery design gate: T19 is an ordinary delivery project under the P0 brief and the T9
 capability. The set above is the PSA/HLD evidence; a deviation (a second decision table, a chat
 transcript as a decision, a calendar dependency) is a change request, never a silent fork. The
 compliance review records one level against the statement of architecture work when the project
 closes. The full TOGAF repository rows are T9's; this set is publishable now and importable later.
+
+The acceptance itself is the D1–D8 scenarios in `docs/plans/T19-decision-forums.md` §5, the live
+gate recorded in `docs/plans/T19/evidence.md`, and the decision in
+`docs/plans/T19/closure-review.md`.
 
 ## 7. Review and links
 

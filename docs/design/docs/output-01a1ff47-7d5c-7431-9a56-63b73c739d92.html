@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T0 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Closure review — T0 Model and contracts (retrospective, 2026-11-21)</h1>
+<h2>Outcome vs acceptance</h2>
+<p>The SPEC_V2 §12 T0 gate has six clauses. Each is met:</p>
+<ul>
+<li><strong>A job is created in the conveyor.</strong> <code>job_catalogue</code> is the position; the organisation action family serves <code>job_catalogue.create|update|retire|get|list</code> over HTTP and MCP from one <code>ActionSpec</code>.</li>
+<li><strong>A release is published, and a binding pins its hash.</strong> <code>job_releases.publish</code> writes an append-only <code>job_release</code> whose <code>release_hash</code> is SHA-256 over the canonical snapshot; <code>job_bindings.create</code> stores the hash and the frozen snapshot. <code>crates/store/tests/organisation.rs::release_hash_is_deterministic_and_publish_is_idempotent</code> proves the same job and pins hash identically and that unchanged content is one release.</li>
+<li><strong>A run on a retired binding refuses <code>409 job_binding_stale</code>.</strong> The binding is resolved before the run INSERT and the refusal names both hashes: <code>crates/store/tests/organisation.rs::a_run_pins_its_binding_and_a_retired_or_mismatched_pin_is_refused</code>; the action surface is exercised in <code>crates/actions/tests/sop_ingestion.rs::a_bound_job_runs_the_pddl_steps</code>.</li>
+<li><strong>No concept has two stores.</strong> SPEC_V2 §10.1 assigns each fact one system of record; <code>job_catalogue</code> is the position and V1's <code>job</code> remains the durable work queue, two concepts, neither renamed into the other; no manifest is imported.</li>
+<li><strong>A test-only third executor kind registers without editing the run path.</strong> <code>executor_kind</code> is an open slug; <code>crates/domain/src/executor.rs::a_third_kind_registers_without_touching_the_builtins</code> and <code>crates/store/tests/organisation.rs::third_executor_kind_registers_without_editing_the_run_path</code> prove it.</li>
+<li><strong>The decision-ladder types exist.</strong> <code>decision</code>, <code>decision_option</code>, <code>decision_policy</code>, <code>decision_policy_refinement</code> and <code>laya_inference_config</code> are created with FORCE RLS; T2 owns evaluation, so no evaluation path is claimed here.</li>
+</ul>
+<p>The close carried one P1 <code>mandatory_artefacts</code> finding. This rework produces the seven mandatory Phase A–D artefacts — stakeholder_map, driver_goal_objective, requirements_catalog, solution_concept, business_capability_map, data_entity_catalog, technology_standards — and the Phase-G record. The finding is closed.</p>
+<h2>Evidence</h2>
+<ul>
+<li><strong>Manifest:</strong> <code>acceptance/programme/T0.toml</code>, run by <code>scripts/verify-project.py</code> against the published snapshot at main@d7293f96 (2026-11-21); the close records <code>result: green</code> — project closed, baseline approved, charter approved, closure outputs <code>closure-review</code> and <code>evidence</code> published, delivery contract live and board-approved, Phase-G review citing the published standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>, closure gate decided by a distinct approver, no active waiver, PI and refinement cadence rows, WSJF inputs on the WBS deliverable, and a demo credit on every accepted deliverable.</li>
+<li><strong>Published project evidence:</strong> document <code>01a1e688-678d-76fd-8ae7-6ca2712b64c2</code> (main@cc88052, 2026-11-16): coverage 15/15 actions, 3/3 modules and 9/9 tables, with every cited path checked for presence.</li>
+<li><strong>Code and schema:</strong> <code>crates/domain/src/executor.rs</code>, <code>crates/domain/src/organisation.rs</code>, <code>crates/store/src/organisation.rs</code>, <code>migrations/0040_organisation.sql</code> (ten tables), <code>crates/actions/src/organisation.rs</code>, <code>served-spec.lock.json</code>.</li>
+<li><strong>Tests:</strong> <code>crates/store/tests/organisation.rs</code> (FORCE RLS, ordered placement, deterministic release hash, the pin and stale refusal, the third kind, the seed and the AHTAPol isolation) and <code>crates/actions/tests/sop_ingestion.rs</code> (the action-surface refusal).</li>
+<li><strong>Artefacts:</strong> the seven A–D artefacts published in this rework, plus this review, the statement of architecture work, the delivery contract, the charter and the closure.</li>
+<li><strong>Archive:</strong> <code>docs/evidence/rework/T0.json</code> (the manifest run) and <code>docs/evidence/rework/tranche-0/acts.md</code> (the retrospective tranche-0 cadence record).</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li><strong>Original governance record: not recoverable.</strong> No charter, statement of architecture work, delivery contract, Phase-G review or closure review was authored before the 2026-11-14 close. The contemporaneous record is the published evidence document and the git history; the records in this set are retrospective.</li>
+<li><strong><code>project-brief</code> output:</strong> the expected output has no published document at this snapshot; the published evidence page links <code>output-01a1e008-0d4f-7170-8a5e-0e89861340fe</code>, which is absent from the published index. It remains an open item, not a T0 gate clause.</li>
+<li><strong>Execution behaviour:</strong> the <code>Executor</code> trait deliberately has no step-execution method in T0; T2 adds it so no second dispatch path can grow in the meantime. The decision-ladder tables likewise have no evaluation path until T2.</li>
+<li><strong>Two <code>job</code> concepts:</strong> V1's <code>job</code> work queue and <code>job_catalogue</code> the position are distinct by design. The next slice that touches either must not merge them.</li>
+</ul>
+<h2>Decision</h2>
+<p>Record the compliance level <strong>compliant</strong>. Close the P1 <code>mandatory_artefacts</code> finding: the A–D set is published and approved. Re-close T0 against the green manifest <code>acceptance/programme/T0.toml</code>, with closure outputs <code>closure-review</code> and <code>evidence</code>, and a closure gate decided by an approver other than its requester. This is a retrospective record under the standing delegation and states the evidence that exists; it does not claim a contemporaneous review that was never written.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Model and contracts · conveyor output · published 2026-11-24T10:10:00Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>System Demo — tranche 1 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>System demo — tranche 1 (retrospective, 2026-11-21)</h1>
+<p>Every completed deliverable exhibits its evidence; no demo, no credit.</p>
+<h2>Demonstrated</h2>
+<ul>
+<li><strong>S02 — the skeleton.</strong> The two-worker long-handler proof issue #2 named is landed:
+<code>apps/server/tests/jobs_lease_two_workers.rs</code> (P2.1–P2.3) runs two real workers with
+<code>JOB_LEASE_SECS=2</code> against a handler held for four leases. Manifest 13/13 green.</li>
+<li><strong>T1 — the plan spine.</strong> The ten gate scenarios are proved by named tests in
+<code>crates/actions/tests/plan_spine.rs</code>, <code>crates/api/tests/approval_dual.rs</code> and
+<code>crates/actions/tests/programme_baseline.rs</code>. Manifest 14/14 green.</li>
+<li><strong>T11 — metrics and metering.</strong> The eight actions and eight integration tests recompute every
+metric from rows. Manifest 14/14 green; no calibrated C0–C5 threshold row is claimed.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li><code>acceptance/programme/S02.toml</code> 13/13, <code>T1.toml</code> 14/14, <code>T11.toml</code> 14/14 at snapshot
+<code>d367a4a992ca5338c82466e9d6ef308e62b01ba6</code>, generated <code>2026-11-21T19:48:06Z</code>.</li>
+<li><code>apps/server/tests/jobs_lease_two_workers.rs</code>: local PASS (11.878 s); preflight run 44938697512
+(success) at the same SHA.</li>
+<li><code>docs/evidence/rework/S02.json</code>, <code>T1.json</code>, <code>T11.json</code>; the transcripts in
+<code>docs/evidence/rework/&lt;KEY&gt;/transcript.jsonl</code>.</li>
+</ul>
+<h2>Credits</h2>
+<ul>
+<li>S02: <code>01a1ff87-9e5c-7454-8f79-8b33ada96519</code></li>
+<li>T1: <code>01a1ff8c-29be-7604-a144-0bcc7a1ea107</code></li>
+<li>T11: <code>01a1ff90-cd9e-7afc-afc7-ce5bac11a07f</code></li>
+</ul>
+<h2>Findings</h2>
+<ul>
+<li>S02's acceptance instrument named a test that did not exist; it is landed in this batch.</li>
+<li>T1 had no contemporaneous charter, SoAW, contract or review; the closure is a retrospective
+reconstruction and does not attest contemporaneous intent.</li>
+<li>T11 has no live C0–C5 threshold row calibrated from real data; only the mechanism and its tests
+are claimed.</li>
+<li>The rework runner left stale published claims and created artefacts without a type binding;
+both are fixed and re-tested in this batch.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Tranche-1 record: <code>docs/evidence/rework/tranche-1/acts.md</code>.</li>
+<li>PI plan <code>01a1ff76-1ac5-7318-9d4f-2e4b5af310f1</code>; PI objectives
+<code>01a1ff76-5199-7175-b850-c234588ff48f</code>.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-24T10:10:00Z · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

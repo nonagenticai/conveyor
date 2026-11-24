@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Requirements Catalog — S02 Skeleton (retrospective, 2026-11-21) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Requirements Catalog — S02 Skeleton (retrospective, 2026-11-21)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: State each S02 requirement testably, so the S2 gate and the later slices can check the skeleton instead of re-deriving it.</li>
+<li>Scope: The IN list and deliverable rules in docs/plans/slices/S02-skeleton.md §3 and §5; recorded retrospectively on 2026-11-21.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>REQ-S02-01 — platform tables / Exactly eleven tables</strong> - {"statement": "tenant, app_user, department, membership, event, job, schedule, audit_event, action_invocation, idempotency_key and app_licence; no others", "verify": "migrations/0001_platform.sql"}</li>
+<li><strong>REQ-S02-02 — tenant scope / Transaction-local GUC only</strong> - {"statement": "every store function takes TenantId as its first argument after the connection; begin_scoped sets app.current_tenant with set_config($1, $2, true); no session-level SET appears", "verify": "crates/store/src/scope.rs; plan \u00a75 Tenancy"}</li>
+<li><strong>REQ-S02-03 — forced RLS / The owner is included</strong> - {"statement": "the nine tenant-owned tables are ENABLE + FORCE ROW LEVEL SECURITY, each with one FOR ALL tenant_isolation policy carrying USING and WITH CHECK; membership adds one SELECT-only membership_self_read policy TO conveyor_runtime", "verify": "migrations/0001_platform.sql; cargo test -p conveyor-server --test rls"}</li>
+<li><strong>REQ-S02-04 — roles / Least privilege</strong> - {"statement": "conveyor_migrate is the owner; conveyor_runtime is LOGIN NOSUPERUSER NOBYPASSRLS; migrate asserts rolsuper = false and rolbypassrls = false and aborts otherwise; REVOKE ALL ON _sqlx_migrations FROM conveyor_runtime", "verify": "scripts/db-roles.sql; crates/store/src/migrate.rs"}</li>
+<li><strong>REQ-S02-05 — OIDC / An unlisted issuer is never fetched</strong> - {"statement": "one realm conveyor; an unlisted iss is rejected before any JWKS fetch; per-issuer cache TTL 600 s with a 30 s negative floor; aud and azp are both required", "verify": "crates/auth/src/jwks.rs"}</li>
+<li><strong>REQ-S02-06 — dev principal / Membership resolves the tenant</strong> - {"statement": "CONVEYOR_DEV_AUTH=1 accepts Bearer dev:&lt;login&gt; or the conveyor_dev=&lt;login&gt; cookie; membership must resolve exactly one (app_user, tenant) or the request is a 401; migrate --dev-seed creates dev-a/alice and dev-b/bob; startup exits non-zero if set with APP_ENV=production", "verify": "crates/auth/src/dev.rs; plan \u00a75 Auth"}</li>
+<li><strong>REQ-S02-07 — licence gate / Fail closed</strong> - {"statement": "RequireLicence reads app_licence only; absent, stale beyond 3600 s, expired, revoked or unknown refuses; a JWT-shaped token that fails verification is a hard 401, never retried as a licence token; licence.sync refreshes the row", "verify": "crates/auth/src/licence.rs"}</li>
+<li><strong>REQ-S02-08 — fenced jobs / A stale token writes nothing</strong> - {"statement": "claim is FOR UPDATE SKIP LOCKED with lease_token and lease_until; an expired lease is reclaimed and attempts increments; finish/retry are guarded by status = 'running' AND lease_token = $token; schedules materialise under pg_advisory_xact_lock(hashtext('conveyor:schedule'))", "verify": "crates/store/src/jobs.rs; crates/store/src/schedule.rs"}</li>
+<li><strong>REQ-S02-09 — audit / Append-only</strong> - {"statement": "audit_event grants SELECT and INSERT only; UPDATE and DELETE are revoked after the schema-wide GRANT; action matches ^[a-z0-9_]+\.[a-z0-9_]+$; details are capped at 8192 bytes", "verify": "migrations/0001_platform.sql; plan \u00a75"}</li>
+<li><strong>REQ-S02-10 — SSE / Bounded replay</strong> - {"statement": "Last-Event-ID is event.seq; replay is seq &gt; $last AND topic = ANY($topics) ORDER BY seq LIMIT 500 in the subscriber's tenant scope; 15 s keepalive; a 64-slot channel closes a slow client with resync; the LISTEN connection is direct because PgBouncer is transaction-pooled", "verify": "crates/api/src/routes/events.rs; cargo test -p conveyor-server --test events"}</li>
+<li><strong>REQ-S02-11 — API surface / Unversioned /api</strong> - {"statement": "GET /health, /health/live, /health/ready, /metrics, /api/me and /api/events; /api is one OpenApiRouter built with .routes(); --print-openapi emits the document and exits before config/DB", "verify": "plan \u00a75 Endpoints; apps/server"}</li>
+<li><strong>REQ-S02-12 — ports and compose / Same inside and outside; never 8000</strong> - {"statement": "db on 5439 (postgres -p 5439), pgbouncer on 6439, app on 8930; integration tests start their own ephemeral container on a random host port; a container that cannot start fails, never skips", "verify": "compose.yaml; plan \u00a75/\u00a78 trap 6"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-24T10:10:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

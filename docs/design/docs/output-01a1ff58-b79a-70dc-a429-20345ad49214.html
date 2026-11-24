@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Correction — conformance baseline v4&#39;s snapshot hash (2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Correction — conformance baseline v4's snapshot hash (2026-11-21)</h1>
+<h2>Context</h2>
+<p>The v4 acceptance document <code>01a1ff54-eb5c-7581-91c6-4e1ea2cde8c7</code> cited the snapshot's manifest hash
+as <code>None</code>: the snapshot's <code>manifest.json</code> carries per-file hashes, not a single <code>manifest_sha256</code>,
+and the acceptance template read the wrong field.</p>
+<h2>Decision</h2>
+<p>The snapshot that baseline v4 was derived from hashes to <code>ba8129181a213aa76e642f9a83673c26ed82dabec3f8eeaa364fe825e18968c4</code> — the sha256 of its
+<code>manifest.json</code>, at <code>git_sha</code> <code>d7293f96082dbf2f99f53bb8fd765834dddf6858</code>, generated
+<code>2026-11-21T18:17:55.718331+00:00</code>, 116 outputs. The ledger's <code>snapshot.manifest_sha256</code> carries it.
+This is a correction to the evidence line, not a re-acceptance: the acceptance and its decision
+stand unchanged.</p>
+<h2>Consequences</h2>
+<p>The v4 baseline is traceable to the exact snapshot bytes. No entry changes, no disposition changes.</p>
+<h2>Evidence</h2>
+<ul>
+<li>the snapshot's <code>manifest.json</code>, sha256 <code>ba8129181a213aa76e642f9a83673c26ed82dabec3f8eeaa364fe825e18968c4</code></li>
+<li>acceptance document <code>01a1ff54-eb5c-7581-91c6-4e1ea2cde8c7</code></li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-24T10:10:00Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
