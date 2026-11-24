@@ -181,7 +181,9 @@ async fn seed_binding(
             process_id: None,
             capability_agent_id: Some(agent),
             capability_id: Some(capability),
-            meta: json!({}),
+            // An internal-agent run requires a declared spend ceiling (§7.5, D45); the handoff
+            // starts one, so the fixture's binding declares it.
+            meta: json!({"limits": {"cost_budget_usd": 1.0}}),
             status,
         },
         &Registry::builtin(),
