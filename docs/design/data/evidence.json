@@ -11,9 +11,9 @@
       "sha256": "af821f73b2a20f8edb2d3fc98949348eaac2a59ab472767b9756c916b0401c6a"
     },
     {
-      "bytes": 196052,
+      "bytes": 196503,
       "path": "docs/SPEC_V2.md",
-      "sha256": "571e2a241be13dcc686a4e2863b66282d0c6cd67bd4519a08f5262470b21993e"
+      "sha256": "2c944b95a7cd14b570996d8a6997766ddf3d1dfef0ad44eac867a258a557581e"
     },
     {
       "bytes": 11057,
@@ -91,6 +91,11 @@
       "sha256": "0f0238e5905c39957db243d6750fff728ff64207d1fda8c05ceaf21c75d6b154"
     },
     {
+      "bytes": 6053,
+      "path": "docs/decisions/0017-card-handoff.md",
+      "sha256": "c4bd4334f99b72a699394cba7b9e80a693e5ef1af3000d2bd2ded36943c469ad"
+    },
+    {
       "bytes": 18121,
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.md",
       "sha256": "b534cd0891d6cdf0923586016878c357274a5a80e4c5f0708e2bc3f66b5f1b91"
@@ -106,9 +111,9 @@
       "sha256": "bceb5d63a826ae0e2401707e4175cada58740f922fec7c073ff29caf7524b992"
     },
     {
-      "bytes": 24082,
+      "bytes": 24244,
       "path": "docs/design/data/conformance.md",
-      "sha256": "85f5a39704586f486ecd1d4d7b4a48b11abd33c714077496d2c1372a481db9ed"
+      "sha256": "6679e33aa06451668e2c1882e14af92e616d674c190aa9e1ac096c7e7d0fccfb"
     },
     {
       "bytes": 10909,
@@ -259,6 +264,11 @@
       "bytes": 5241,
       "path": "docs/evidence/S21-EXECUTOR.md",
       "sha256": "5b86488e0e1a049d3b2afd58f4d7918d2b03e7d2e3f81caa4343a86b091dda2c"
+    },
+    {
+      "bytes": 6021,
+      "path": "docs/evidence/S21-HANDOFF.md",
+      "sha256": "452b7a1da7ba507706a804c221cdb73fb73a045ee1944e943e8f2a950c7b9af2"
     },
     {
       "bytes": 3602,
@@ -491,24 +501,24 @@
       "sha256": "ddac071a949b01161f9bb16d0a38c5749705b774a6b2935b6ef7caf52ad3cc2d"
     },
     {
-      "bytes": 14781,
+      "bytes": 15002,
       "path": "docs/evidence/v2-coverage.md",
-      "sha256": "322feda4904b2d2ec1a45ad7414ef95b19496907c69989b86a928c9eb35e5b81"
+      "sha256": "b8b4c5f7ac25f2e5bfd29ef905063c495d47b2f99e8be33bca28295d5b273bba"
     },
     {
-      "bytes": 257438,
+      "bytes": 258086,
       "path": "docs/plans/00-INDEX.md",
-      "sha256": "535be65f06ed234430fe6182c82f41a1b2fb5e798f3eea177616018c4528aa92"
+      "sha256": "9a4e6f8a35a1b40feb9ddc59fe3a892576fd5ceae64439c4cf95b92cfa1c9261"
     },
     {
-      "bytes": 81989,
+      "bytes": 85381,
       "path": "docs/plans/01-CONTRACT.md",
-      "sha256": "caa747a2eef3c21295c9ce32e883fbe2b6f0adcd6f6fef08b6e41cfdb0479f6b"
+      "sha256": "0b38c7c6257b40030579b9a276794968ce448e6d1ccd56a3f362dd5e4770699b"
     },
     {
-      "bytes": 150776,
+      "bytes": 152574,
       "path": "docs/plans/02-DATA-ARCHITECTURE.md",
-      "sha256": "c122850c3507a8d1f37ba122caf037ba442a49815b030e3f42d51304c421d116"
+      "sha256": "77e80ec2e18a0bac679ee84ded7452fb19ccca8c228664b85e8cd51cec0b39ea"
     },
     {
       "bytes": 17526,
@@ -576,9 +586,9 @@
       "sha256": "a532c8aab5ef93d8bd5b13d390544ed18050c2fe205ee026fd51e6f0f53b0cc4"
     },
     {
-      "bytes": 17090,
+      "bytes": 17688,
       "path": "docs/plans/T18-real-v2-ui.md",
-      "sha256": "856f35830ac643e60d42be2a90794287823f15e82a535bbe19f88cfbc63dfa1f"
+      "sha256": "d8fd549f7f47dc9fdd510575d957bedf84b942d8bcafeb0b61ee93441e3d1b23"
     },
     {
       "bytes": 16429,
@@ -846,11 +856,11 @@
       "sha256": "b3fa237121c8a38186c333f826f94e8ee9d21b7ac8774a7c5f933b1bb397e038"
     },
     {
-      "bytes": 49489,
+      "bytes": 53018,
       "path": "docs/plans/slices/S21-message-construction.md",
-      "sha256": "1974a35c3c44801056a6fe2adb35991cf861d5b97ef37f449010901fcc7e79f5"
+      "sha256": "4c90dacf0b3752e0f30a6349b8424ca032fb6866c33040233b850531f86fd40d"
     }
   ],
-  "generated_at": "2026-11-24T10:00:00Z",
+  "generated_at": "2026-11-24T10:10:00Z",
   "schema": "design-snapshot/v1"
 }

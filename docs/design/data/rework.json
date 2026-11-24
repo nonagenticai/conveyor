@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-24T10:00:00Z",
-  "git_sha": "97f5256d0de769bb8bdc8ffbb0413e770541cc0d",
+  "generated_at": "2026-11-24T10:10:00Z",
+  "git_sha": "7edea5b80ede2a245d297ef7931bd60090d3482b",
   "packages": [
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T16",
@@ -8545,6 +8545,107 @@
         }
       ],
       "title": "Demo and retro cadence rows enforce nothing: no evidence, no credit, no lessons"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check seed_live_drift:programme",
+      "apply_to": "PLATFORM",
+      "artefact": "seed_reconciliation",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 5,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The seeded project facts equal the live rows, or the drift is recorded and approved",
+          "met": false
+        },
+        {
+          "item": "The audit reports no seed_live_drift gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "seed_live_drift",
+          "source": "snapshot",
+          "subjects": [
+            "T5",
+            "T6",
+            "T8",
+            "S21",
+            "T19"
+          ]
+        }
+      ],
+      "key": "seed_live_drift:programme",
+      "owner_project": "PLATFORM",
+      "rule": "seed_live_drift",
+      "scope": "programme",
+      "severity": "P1",
+      "spec": "§5.3",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 5,
+      "subjects": [
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T5"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T6"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T8"
+        },
+        {
+          "detail": "seed status 'active' != live status 'closed'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P2",
+          "subject": "S21"
+        },
+        {
+          "detail": "seed status 'active' != live status 'closed'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        }
+      ],
+      "title": "Reconcile the seed with the live rows"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p101-1:T2",
@@ -26000,61 +26101,6 @@
       "title": "Reconcile the project's status source"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T6",
-      "apply_to": "T6",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T6"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T6",
-      "owner_project": "T6",
-      "rule": "status_source_drift",
-      "scope": "T6",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T6"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p102-1:T2",
       "apply_to": "PLATFORM",
       "artefact": "§10.2",
@@ -41487,14 +41533,14 @@
     },
     "SPEC": {
       "findings": 86,
-      "gaps": 21,
+      "gaps": 25,
       "p0": 0,
-      "p1": 0,
-      "p2": 21,
+      "p1": 3,
+      "p2": 22,
       "packages": 102,
       "rules": 8,
-      "rules_clean": 4,
-      "rules_with_gaps": 4,
+      "rules_clean": 3,
+      "rules_with_gaps": 5,
       "suppressed": 0
     },
     "TOGAF": {
@@ -41514,8 +41560,8 @@
   "summary": {
     "by_severity": {
       "P0": 26,
-      "P1": 188,
-      "P2": 219
+      "P1": 189,
+      "P2": 218
     },
     "by_standard": {
       "MSP": 74,
@@ -41532,7 +41578,7 @@
     "open": 431,
     "packages": 433,
     "resolved": 14,
-    "subjects": 544,
+    "subjects": 548,
     "suppressed": 2
   }
 }

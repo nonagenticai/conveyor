@@ -1,12 +1,12 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `97f5256d0de769bb8bdc8ffbb0413e770541cc0d` generated `2026-11-24T10:00:00Z` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.wg0JmVinai/data`.
+Snapshot: `7edea5b80ede2a245d297ef7931bd60090d3482b` generated `2026-11-24T10:10:00Z` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.lnPHX9egWj/data`.
 
 | Severity | Count |
 |---|---:|
 | P0 | 26 |
-| P1 | 139 |
-| P2 | 37 |
+| P1 | 141 |
+| P2 | 39 |
 | P3 | 0 |
 
 ## P0 and P1
@@ -151,6 +151,8 @@ Snapshot: `97f5256d0de769bb8bdc8ffbb0413e770541cc0d` generated `2026-11-24T10:00
 | `project_in_unauthorised_tranche` | `T5` | P1 | project is active in tranche 10 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T6` | P1 | project is active in tranche 11 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T8` | P1 | project is active in tranche 11 whose state is 'planned' |
+| `seed_live_drift` | `T5` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `T6` | P1 | seed status 'closed' != live status 'active' |
 | `unpublished_declared_output` | `S04` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S05` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S06` | P1 | declared outputs are not published: project-brief |
@@ -213,7 +215,7 @@ Snapshot: `97f5256d0de769bb8bdc8ffbb0413e770541cc0d` generated `2026-11-24T10:00
 | S18 | closed | 9 | 1 | 4 | 0 | 0 |
 | S19 | active | 8 | 0 | 3 | 1 | 0 |
 | S20 | closed | 9 | 1 | 4 | 0 | 0 |
-| S21 | closed | 9 | 1 | 4 | 0 | 0 |
+| S21 | closed | 9 | 1 | 4 | 1 | 0 |
 | SPEC-V2 | closed | 0 | 0 | 1 | 0 | 0 |
 | T0 | closed | 0 | 0 | 1 | 0 | 0 |
 | T1 | closed | 1 | 0 | 2 | 2 | 0 |
@@ -226,12 +228,12 @@ Snapshot: `97f5256d0de769bb8bdc8ffbb0413e770541cc0d` generated `2026-11-24T10:00
 | T16 | closed | 4 | 2 | 3 | 0 | 0 |
 | T17 | active | 5 | 0 | 3 | 1 | 0 |
 | T18 | active | 4 | 0 | 4 | 1 | 0 |
-| T19 | closed | 4 | 1 | 0 | 2 | 0 |
+| T19 | closed | 4 | 1 | 0 | 3 | 0 |
 | T2 | closed | 2 | 0 | 2 | 2 | 0 |
 | T3 | closed | 3 | 1 | 3 | 0 | 0 |
 | T4 | closed | 4 | 2 | 1 | 2 | 0 |
-| T5 | active | 10 | 0 | 3 | 1 | 0 |
-| T6 | active | 11 | 0 | 3 | 1 | 0 |
+| T5 | active | 10 | 0 | 4 | 1 | 0 |
+| T6 | active | 11 | 0 | 4 | 1 | 0 |
 | T7 | closed | 5 | 2 | 3 | 0 | 0 |
 | T8 | active | 11 | 0 | 4 | 1 | 0 |
 | T9 | closed | 4 | 1 | 1 | 2 | 0 |
