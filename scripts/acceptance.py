@@ -5,8 +5,9 @@ One checked-in manifest (`acceptance/native.toml`) and one command that refuses 
 release reachable on partial evidence:
 
   * **contexts** — every required CI context must be present on the commit under test and
-    conclude `success`; the repository's own required-check authority (ruleset, else branch
-    protection) must not name a context the manifest omits;
+    conclude its declared `conclusion` (defaulting to `success`); the repository's own
+    required-check authority (ruleset, else branch protection) must not name a context the
+    manifest omits;
   * **probes** — every declared surface must answer its declared status; 404/422/5xx are never
     "reachable", and a 401 counts only where the manifest declares it (e.g. `/mcp`);
   * **commands** — each executable check runs and must select at least one test. Zero-selected
