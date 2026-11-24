@@ -361,9 +361,10 @@
           526,
           545,
           569,
-          572
+          572,
+          660
         ],
-        "open": 16,
+        "open": 17,
         "ready": 5,
         "unknown": 0
       }
@@ -1503,16 +1504,18 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           15,
           581,
           590,
           599,
           612,
-          624
+          624,
+          649,
+          656
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2004,14 +2007,15 @@
       "track": "v2",
       "tranche": 5,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           87,
-          629
+          629,
+          655
         ],
         "open": 1,
-        "ready": 0,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -2110,12 +2114,13 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           605,
-          606
+          606,
+          650
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2284,11 +2289,12 @@
       "tranche": 10,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
-          77
+          77,
+          653
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2324,8 +2330,8 @@
       "track": "v2",
       "tranche": 11,
       "units": {
-        "blocked": 1,
-        "claimed": 0,
+        "blocked": 0,
+        "claimed": 1,
         "numbers": [
           80
         ],
@@ -2411,13 +2417,13 @@
       "track": "v2",
       "tranche": 11,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           79
         ],
         "open": 1,
-        "ready": 0,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -2730,8 +2736,8 @@
       },
       "total": 50,
       "uncovered": [],
-      "with_open_units": 16,
-      "without_open_units": 34
+      "with_open_units": 17,
+      "without_open_units": 33
     },
     "screens": {
       "actions_invoked": 39,

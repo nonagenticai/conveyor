@@ -7805,9 +7805,9 @@ window.CONVEYOR_REWORK = {
             "S17",
             "S18",
             "S20",
-            "S21",
             "T11",
             "T16",
+            "T5",
             "T7",
             "T13",
             "T14",
@@ -7883,16 +7883,6 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "S21"
-        },
-        {
-          "detail": "seed status 'closed' != live status 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
           "subject": "T11"
         },
         {
@@ -7904,6 +7894,16 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T16"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T5"
         },
         {
           "detail": "seed status 'closed' != live status 'active'",
