@@ -2,7 +2,7 @@
 key = "T6"
 name = "Development project"
 gate = "T6 is NOT built, and its acceptance — `SPEC_V2` §12: 'a real feature lands: lane → PR → CI → review → merge → deploy → live verify; the project cannot change its own gates; rollback tested' — is the condition on which it may be closed, not a claim that it is met."
-gate_checks = ["T6-project", "T6-baseline", "T6-charter", "T6-contract", "T6-review", "T6-waivers", "T6-pi-cadence", "T6-pi-plan", "T6-pi-objectives", "T6-wsjf", "T6-demo-credits", "T6-lessons", "T6-product"]
+gate_checks = ["T6-project", "T6-baseline", "T6-charter", "T6-contract", "T6-review", "T6-waivers", "T6-pi-cadence", "T6-pi-plan", "T6-pi-objectives", "T6-wsjf", "T6-demo-credits", "T6-lessons", "T6-product", "T6-artefact-standard", "T6-rework"]
 [[check]]
 id = "T6-project"
 check = "project"
@@ -92,3 +92,15 @@ id = "T6-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "T6-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "T6-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

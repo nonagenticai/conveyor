@@ -2,8 +2,7 @@
 key = "S07"
 name = "Requirements, catalogues, revisions, quality scoring, search"
 gate = "the relevance eval set beats the agreed baseline — 3 revisions with a dense sequence, an idempotent seed, both GIN indexes used, relevance targets met, traceability in both directions with 0 cross-tenant rows, quality read-only, and no orphan"
-gate_checks = ["S07-project", "S07-baseline", "S07-charter", "S07-closure-outputs", "S07-contract", "S07-review", "S07-closure-gate", "S07-waivers", "S07-pi-cadence", "S07-pi-plan", "S07-pi-objectives", "S07-lessons", "S07-wsjf", "S07-demo-credits", "S07-product"]
-
+gate_checks = ["S07-project", "S07-baseline", "S07-charter", "S07-closure-outputs", "S07-contract", "S07-review", "S07-closure-gate", "S07-waivers", "S07-pi-cadence", "S07-pi-plan", "S07-pi-objectives", "S07-lessons", "S07-wsjf", "S07-demo-credits", "S07-product", "S07-artefact-standard", "S07-rework"]
 [[check]]
 id = "S07-project"
 check = "project"
@@ -104,3 +103,15 @@ id = "S07-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S07-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S07-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

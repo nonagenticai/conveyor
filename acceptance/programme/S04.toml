@@ -2,8 +2,7 @@
 key = "S04"
 name = "Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest"
 gate = "20 actions identical over HTTP and MCP — one value in three projections, duplicates fail closed, schema-invalid input returns RFC 9457 with populated `errors[]` and never a 500, an idempotent replay yields one `action_invocation`, and the lock catches drift while breaking ingest is refused"
-gate_checks = ["S04-project", "S04-baseline", "S04-charter", "S04-closure-outputs", "S04-contract", "S04-review", "S04-closure-gate", "S04-waivers", "S04-pi-cadence", "S04-pi-plan", "S04-pi-objectives", "S04-lessons", "S04-wsjf", "S04-demo-credits", "S04-product"]
-
+gate_checks = ["S04-project", "S04-baseline", "S04-charter", "S04-closure-outputs", "S04-contract", "S04-review", "S04-closure-gate", "S04-waivers", "S04-pi-cadence", "S04-pi-plan", "S04-pi-objectives", "S04-lessons", "S04-wsjf", "S04-demo-credits", "S04-product", "S04-artefact-standard", "S04-rework"]
 [[check]]
 id = "S04-project"
 check = "project"
@@ -105,3 +104,15 @@ id = "S04-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S04-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S04-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

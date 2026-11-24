@@ -2,8 +2,7 @@
 key = "DESIGN-PUBLISH"
 name = "Publish the SPEC_V2 studio design pack, live"
 gate = "The closure review exists and every declared closure output is published; the project re-closes through the one gate."
-gate_checks = ["DESIGN-PUBLISH-project", "DESIGN-PUBLISH-baseline", "DESIGN-PUBLISH-charter", "DESIGN-PUBLISH-closure-outputs", "DESIGN-PUBLISH-contract", "DESIGN-PUBLISH-review", "DESIGN-PUBLISH-closure-gate", "DESIGN-PUBLISH-waivers", "DESIGN-PUBLISH-pi-cadence", "DESIGN-PUBLISH-wsjf", "DESIGN-PUBLISH-demo-credits", "DESIGN-PUBLISH-product"]
-
+gate_checks = ["DESIGN-PUBLISH-project", "DESIGN-PUBLISH-baseline", "DESIGN-PUBLISH-charter", "DESIGN-PUBLISH-closure-outputs", "DESIGN-PUBLISH-contract", "DESIGN-PUBLISH-review", "DESIGN-PUBLISH-closure-gate", "DESIGN-PUBLISH-waivers", "DESIGN-PUBLISH-pi-cadence", "DESIGN-PUBLISH-wsjf", "DESIGN-PUBLISH-demo-credits", "DESIGN-PUBLISH-product", "DESIGN-PUBLISH-artefact-standard", "DESIGN-PUBLISH-rework"]
 [[check]]
 id = "DESIGN-PUBLISH-project"
 check = "project"
@@ -86,3 +85,15 @@ id = "DESIGN-PUBLISH-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "DESIGN-PUBLISH-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "DESIGN-PUBLISH-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

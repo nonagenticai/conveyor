@@ -2,7 +2,7 @@
 key = "T5"
 name = "Kata"
 gate = "T5 is NOT built, and its acceptance — `SPEC_V2` §12: 'a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened' — is the condition on which it may be closed, not a claim that it is met."
-gate_checks = ["T5-project", "T5-baseline", "T5-charter", "T5-contract", "T5-review", "T5-waivers", "T5-pi-cadence", "T5-pi-plan", "T5-pi-objectives", "T5-wsjf", "T5-demo-credits", "T5-lessons", "T5-product"]
+gate_checks = ["T5-project", "T5-baseline", "T5-charter", "T5-contract", "T5-review", "T5-waivers", "T5-pi-cadence", "T5-pi-plan", "T5-pi-objectives", "T5-wsjf", "T5-demo-credits", "T5-lessons", "T5-product", "T5-artefact-standard", "T5-rework"]
 [[check]]
 id = "T5-project"
 check = "project"
@@ -92,3 +92,15 @@ id = "T5-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "T5-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "T5-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

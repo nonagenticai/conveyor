@@ -2,8 +2,7 @@
 key = "T0"
 name = "Model and contracts"
 gate = "The A–D set is approved; the project re-closes through the one gate."
-gate_checks = ["T0-project", "T0-baseline", "T0-charter", "T0-closure-outputs", "T0-contract", "T0-review", "T0-closure-gate", "T0-waivers", "T0-pi-cadence", "T0-wsjf", "T0-demo-credits", "T0-product"]
-
+gate_checks = ["T0-project", "T0-baseline", "T0-charter", "T0-closure-outputs", "T0-contract", "T0-review", "T0-closure-gate", "T0-waivers", "T0-pi-cadence", "T0-wsjf", "T0-demo-credits", "T0-product", "T0-artefact-standard", "T0-rework"]
 [[check]]
 id = "T0-project"
 check = "project"
@@ -86,3 +85,15 @@ id = "T0-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "T0-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "T0-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

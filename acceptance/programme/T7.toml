@@ -2,8 +2,7 @@
 key = "T7"
 name = "Operations"
 gate = "An injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable."
-gate_checks = ["T7-project", "T7-baseline", "T7-charter", "T7-closure-outputs", "T7-contract", "T7-review", "T7-closure-gate", "T7-waivers", "T7-pi-cadence", "T7-pi-plan", "T7-pi-objectives", "T7-wsjf", "T7-demo-credits", "T7-lessons", "T7-product"]
-
+gate_checks = ["T7-project", "T7-baseline", "T7-charter", "T7-closure-outputs", "T7-contract", "T7-review", "T7-closure-gate", "T7-waivers", "T7-pi-cadence", "T7-pi-plan", "T7-pi-objectives", "T7-wsjf", "T7-demo-credits", "T7-lessons", "T7-product", "T7-artefact-standard", "T7-rework"]
 [[check]]
 id = "T7-project"
 check = "project"
@@ -104,3 +103,15 @@ id = "T7-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "T7-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "T7-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

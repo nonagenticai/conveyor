@@ -2,8 +2,7 @@
 key = "S01"
 name = "UI spike — Leptos CSR vs Leptos SSR"
 gate = "The decision record states what is observable and marks the rest not recoverable; the project re-closes through the one gate."
-gate_checks = ["S01-project", "S01-baseline", "S01-charter", "S01-closure-outputs", "S01-contract", "S01-review", "S01-closure-gate", "S01-waivers", "S01-decision-record", "S01-pi-cadence", "S01-wsjf", "S01-demo-credits", "S01-product"]
-
+gate_checks = ["S01-project", "S01-baseline", "S01-charter", "S01-closure-outputs", "S01-contract", "S01-review", "S01-closure-gate", "S01-waivers", "S01-decision-record", "S01-pi-cadence", "S01-wsjf", "S01-demo-credits", "S01-product", "S01-artefact-standard", "S01-rework"]
 [[check]]
 id = "S01-project"
 check = "project"
@@ -109,3 +108,15 @@ id = "S01-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S01-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S01-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

@@ -2,8 +2,7 @@
 key = "S10"
 name = "Copilot / AG-UI — one action surface, proposals, conversations"
 gate = "S10 is accepted when a scripted agent session passes — the tool list is the projection of the ActionSpecs the caller's scopes admit, a destructive tool call becomes an S06 approval, and the conversation is two tables plus an SSE stream, not a second action system."
-gate_checks = ["S10-project", "S10-baseline", "S10-charter", "S10-closure-outputs", "S10-contract", "S10-review", "S10-closure-gate", "S10-waivers", "S10-pi-cadence", "S10-pi-plan", "S10-pi-objectives", "S10-wsjf", "S10-demo-credits", "S10-lessons", "S10-product"]
-
+gate_checks = ["S10-project", "S10-baseline", "S10-charter", "S10-closure-outputs", "S10-contract", "S10-review", "S10-closure-gate", "S10-waivers", "S10-pi-cadence", "S10-pi-plan", "S10-pi-objectives", "S10-wsjf", "S10-demo-credits", "S10-lessons", "S10-product", "S10-artefact-standard", "S10-rework"]
 [[check]]
 id = "S10-project"
 check = "project"
@@ -104,3 +103,15 @@ id = "S10-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S10-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S10-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

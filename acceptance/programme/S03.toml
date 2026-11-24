@@ -2,8 +2,7 @@
 key = "S03"
 name = "Domain and schema — aggregates, state machines, baseline domain migration"
 gate = "proptest on transitions and schema review — no transition leaves `list.kind` and `archived_at` contradictory, a claim never succeeds twice without release or expiry, one pending approval per (run, gate), and truncate/archive invariants hold"
-gate_checks = ["S03-project", "S03-baseline", "S03-charter", "S03-closure-outputs", "S03-contract", "S03-review", "S03-closure-gate", "S03-waivers", "S03-pi-cadence", "S03-pi-plan", "S03-pi-objectives", "S03-lessons", "S03-wsjf", "S03-demo-credits", "S03-product"]
-
+gate_checks = ["S03-project", "S03-baseline", "S03-charter", "S03-closure-outputs", "S03-contract", "S03-review", "S03-closure-gate", "S03-waivers", "S03-pi-cadence", "S03-pi-plan", "S03-pi-objectives", "S03-lessons", "S03-wsjf", "S03-demo-credits", "S03-product", "S03-artefact-standard", "S03-rework"]
 [[check]]
 id = "S03-project"
 check = "project"
@@ -105,3 +104,15 @@ id = "S03-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S03-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S03-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

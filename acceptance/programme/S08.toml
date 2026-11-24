@@ -2,8 +2,7 @@
 key = "S08"
 name = "Governance, modelling, render and export"
 gate = "S08's gate is golden SVG/PNG/PDF/XMI fixtures, and Part A's round-trip is the governance floor."
-gate_checks = ["S08-project", "S08-baseline", "S08-charter", "S08-closure-outputs", "S08-contract", "S08-review", "S08-closure-gate", "S08-waivers", "S08-pi-cadence", "S08-pi-plan", "S08-pi-objectives", "S08-wsjf", "S08-demo-credits", "S08-lessons", "S08-product"]
-
+gate_checks = ["S08-project", "S08-baseline", "S08-charter", "S08-closure-outputs", "S08-contract", "S08-review", "S08-closure-gate", "S08-waivers", "S08-pi-cadence", "S08-pi-plan", "S08-pi-objectives", "S08-wsjf", "S08-demo-credits", "S08-lessons", "S08-product", "S08-artefact-standard", "S08-rework"]
 [[check]]
 id = "S08-project"
 check = "project"
@@ -104,3 +103,15 @@ id = "S08-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S08-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S08-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

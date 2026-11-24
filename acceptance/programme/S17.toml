@@ -2,7 +2,7 @@
 key = "S17"
 name = "Native benchmark harness"
 gate = "`conveyor-bench` is absorbed: the conveyor becomes the whole measurement loop — seed the SWE-bench subset, produce a patch per instance for an arm, run the graded test in a sandbox, parse the log with a ported swebench parser, resolve it, store the verdict, and compare runs."
-gate_checks = ["S17-project", "S17-baseline", "S17-charter", "S17-contract", "S17-review", "S17-waivers", "S17-pi-cadence", "S17-pi-plan", "S17-pi-objectives", "S17-wsjf", "S17-demo-credits", "S17-lessons", "S17-product"]
+gate_checks = ["S17-project", "S17-baseline", "S17-charter", "S17-contract", "S17-review", "S17-waivers", "S17-pi-cadence", "S17-pi-plan", "S17-pi-objectives", "S17-wsjf", "S17-demo-credits", "S17-lessons", "S17-product", "S17-artefact-standard", "S17-rework"]
 [[check]]
 id = "S17-project"
 check = "project"
@@ -92,3 +92,15 @@ id = "S17-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S17-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S17-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"
