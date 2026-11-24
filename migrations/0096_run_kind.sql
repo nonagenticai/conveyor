@@ -17,11 +17,18 @@
 
 ALTER TABLE run ADD COLUMN kind text;
 
+-- `run` is FORCE RLS (the tenant_isolation policy applies to its owner too), so a bare UPDATE
+-- with `app.current_tenant` unset matches ZERO rows and the NOT NULL below fails on a multi-tenant
+-- dump. The backfill must see every tenant's rows; 0098 uses the same pattern.
+ALTER TABLE run NO FORCE ROW LEVEL SECURITY;
+
 UPDATE run
    SET kind = CASE
                   WHEN parent_run_id IS NULL AND job_binding_id IS NOT NULL THEN 'job'
                   ELSE 'project'
               END;
+
+ALTER TABLE run FORCE ROW LEVEL SECURITY;
 
 ALTER TABLE run
     -- A raw insert (a fixture, a repair) that says nothing is a project run: the safe default,

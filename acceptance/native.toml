@@ -38,6 +38,12 @@ conclusion = "success"
 name = "secret-scan"
 conclusion = "success"
 
+# The `main` ruleset requires DCO on every PR commit; the manifest must cover the whole
+# authority or the release check fails on a context the product already satisfies.
+[[contexts]]
+name = "dco"
+conclusion = "success"
+
 # The deployed surfaces. A 404, a 422 or any 5xx is a refusal, never a pass.
 [[probes]]
 path = "/health"
