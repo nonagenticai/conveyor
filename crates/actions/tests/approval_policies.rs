@@ -100,30 +100,6 @@ async fn pending(pg: &support::Pg, tenant: TenantId, gate: &str, requested_by: U
     approval.id
 }
 
-/// Record `approval`/`self_approval` for `action` through the real action, as `actor`.
-async fn set_policy(
-    pg: &support::Pg,
-    tenant: TenantId,
-    actor: Uuid,
-    action: &str,
-    approval: &str,
-    self_approval: &str,
-) {
-    invoke(
-        &pg.runtime,
-        registry(),
-        tenant,
-        request_as(
-            actor,
-            "approval_policies.set",
-            json!({"action": action, "approval": approval, "self_approval": self_approval}),
-            None,
-        ),
-    )
-    .await
-    .unwrap_or_else(|error| panic!("approval_policies.set refused: {}", error.detail));
-}
-
 /// Record the complete policy, including the approver kind the tenant declares non-governance.
 async fn set_policy_kind(
     pg: &support::Pg,
@@ -152,6 +128,49 @@ async fn set_policy_kind(
     )
     .await
     .unwrap_or_else(|error| panic!("approval_policies.set refused: {}", error.detail));
+}
+
+/// The earned-waiver shape D34 requires: an `auto` approver, a typed condition set and a future
+/// expiry. `max_reverts = 0` is a real term — any revert revokes the policy.
+fn earned_waiver_input(action: &str) -> Value {
+    json!({
+        "action": action,
+        "approval": "waived",
+        "self_approval": "forbidden",
+        "approver_kind": "auto",
+        "conditions": {"max_reverts": 0},
+        "expires_at": (chrono::Utc::now() + chrono::Duration::days(1)).to_rfc3339(),
+    })
+}
+
+/// The same earned row written straight to the table, for fixtures whose subject is the gate's
+/// read rather than the policy write.
+async fn seed_earned_waiver(
+    pg: &support::Pg,
+    tenant: TenantId,
+    action: &str,
+    expires_at: chrono::DateTime<chrono::Utc>,
+) {
+    let mut tx = store::scope::begin_scoped(&pg.runtime, tenant)
+        .await
+        .expect("scope the earned waiver");
+    store::approval_policy::set(
+        &mut tx,
+        tenant,
+        &store::approval_policy::ApprovalPolicy {
+            action: action.to_owned(),
+            approval: store::approval_policy::ApprovalRequirement::Waived,
+            self_approval: store::approval_policy::SelfApproval::Forbidden,
+            approver_kind: conveyor_domain::development::ApproverKind::Auto,
+            conditions: json!({"max_reverts": 0}),
+            expires_at: Some(expires_at),
+            required_decisions: 1,
+        },
+        None,
+    )
+    .await
+    .expect("seed the earned waiver");
+    tx.commit().await.expect("commit the earned waiver");
 }
 
 /// A request from a principal of `actor_kind`: the decide path turns `agent`/`service` into a
@@ -324,20 +343,19 @@ async fn the_default_policy_is_required() {
     assert_eq!(outcome.body["output"]["dry_run"], json!(true));
 }
 
-/// P2.2 — a waiver covers exactly the action it names.
+/// P2.2 — a waiver covers exactly the action it names. The row is D34's earned shape; this test
+/// is the gate's read, so it is seeded rather than written through the (now gated) action.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_waived_policy_covers_only_its_action() {
     let pg = support::Pg::fresh().await;
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
     support::set_env("OPS_API_URL", "http://127.0.0.1:1");
     support::set_env("OPS_TOKEN", "");
-    set_policy(
+    seed_earned_waiver(
         &pg,
         seeded.tenant,
-        seeded.user_id,
         "ops.scale",
-        "waived",
-        "forbidden",
+        chrono::Utc::now() + chrono::Duration::days(1),
     )
     .await;
 
@@ -367,6 +385,202 @@ async fn a_waived_policy_covers_only_its_action() {
     .expect_err("a waiver for scale must not admit restart");
     assert_eq!(refused.status, 403, "{}", refused.detail);
     assert_eq!(refused.code, "approval_required");
+}
+
+/// D34 — a bare `waived` row is not a waiver. Without an `auto` approver, typed conditions and a
+/// future expiry the write is refused, and the refusal names the field that is missing.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_bare_waived_write_is_refused() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+
+    let refused = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            seeded.user_id,
+            "approval_policies.set",
+            json!({"action": "ops.scale", "approval": "waived", "self_approval": "forbidden"}),
+            None,
+        ),
+    )
+    .await
+    .expect_err("an unconditional waiver is no longer writable");
+    assert_eq!(refused.status, 422, "{}", refused.detail);
+    assert_eq!(refused.errors.len(), 1, "{:?}", refused.errors);
+    assert_eq!(refused.errors[0].field, "approver_kind");
+    assert!(
+        refused.errors[0].detail.contains("auto"),
+        "the refusal names the earning approver: {}",
+        refused.errors[0].detail
+    );
+}
+
+/// D34 — even the earned shape cannot be written ungated: the policy change itself needs an
+/// approved `approval_policies.set` gate naming the action it governs.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_earned_waiver_without_an_approval_is_refused() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+
+    let refused = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            seeded.user_id,
+            "approval_policies.set",
+            earned_waiver_input("ops.scale"),
+            None,
+        ),
+    )
+    .await
+    .expect_err("the policy change is itself gated");
+    assert_eq!(refused.status, 403, "{}", refused.detail);
+    assert_eq!(refused.code, "approval_required");
+    assert!(
+        refused.detail.contains("approval_policies.set"),
+        "the refusal names the gated change: {}",
+        refused.detail
+    );
+
+    // The refused write recorded nothing: the strict default still answers.
+    let got = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            seeded.user_id,
+            "approval_policies.get",
+            json!({"action": "ops.scale"}),
+            None,
+        ),
+    )
+    .await
+    .expect("read the default policy");
+    assert_eq!(got.body["output"]["approval"], json!("required"));
+}
+
+/// D34 — a human approver cannot waive its own gate, even when the policy change itself is
+/// properly approved: the waiver must be earned by the `auto` kind.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_human_approver_waived_write_is_refused() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let approval_id = approved(&pg, seeded.tenant, "approval_policies.set", "ops.scale").await;
+
+    let refused = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            seeded.user_id,
+            "approval_policies.set",
+            json!({"action": "ops.scale", "approval": "waived", "self_approval": "forbidden"}),
+            Some(approval_id),
+        ),
+    )
+    .await
+    .expect_err("a human policy cannot waive its gate");
+    assert_eq!(refused.status, 422, "{}", refused.detail);
+    assert_eq!(refused.errors[0].field, "approver_kind");
+}
+
+/// D34 — the conditions are typed, never an empty document; an unparseable set is refused at the
+/// field it names.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_earned_waiver_requires_typed_conditions() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let approval_id = approved(&pg, seeded.tenant, "approval_policies.set", "ops.scale").await;
+    let mut input = earned_waiver_input("ops.scale");
+    input["conditions"] = json!({});
+
+    let refused = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            seeded.user_id,
+            "approval_policies.set",
+            input,
+            Some(approval_id),
+        ),
+    )
+    .await
+    .expect_err("an empty condition set earns nothing");
+    assert_eq!(refused.status, 422, "{}", refused.detail);
+    assert_eq!(refused.errors[0].field, "conditions");
+}
+
+/// D34 — an expired auto waiver fails closed: the gate's read answers `required`, so the
+/// destructive call still demands its approval.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_expired_auto_waiver_does_not_waive() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    support::set_env("OPS_API_URL", "http://127.0.0.1:1");
+    support::set_env("OPS_TOKEN", "");
+    seed_earned_waiver(
+        &pg,
+        seeded.tenant,
+        "ops.scale",
+        chrono::Utc::now() - chrono::Duration::hours(1),
+    )
+    .await;
+
+    let refused = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(seeded.user_id, "ops.scale", scale_input(), None),
+    )
+    .await
+    .expect_err("an expired policy is not in force");
+    assert_eq!(refused.status, 403, "{}", refused.detail);
+    assert_eq!(refused.code, "approval_required");
+}
+
+/// D34 — an earned waiver with the gated change approved is written, and it admits the call it
+/// names. This is the whole path: decision → policy row → gate's read.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_waiver_change_with_a_valid_approval_succeeds() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    support::set_env("OPS_API_URL", "http://127.0.0.1:1");
+    support::set_env("OPS_TOKEN", "");
+    let approval_id = approved(&pg, seeded.tenant, "approval_policies.set", "ops.scale").await;
+
+    let written = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            seeded.user_id,
+            "approval_policies.set",
+            earned_waiver_input("ops.scale"),
+            Some(approval_id),
+        ),
+    )
+    .await
+    .expect("an approved policy change is written");
+    assert_eq!(written.body["output"]["approval"], json!("waived"));
+    assert_eq!(written.body["output"]["approver_kind"], json!("auto"));
+    assert_eq!(
+        written.body["output"]["conditions"],
+        json!({"max_reverts": 0})
+    );
+
+    let outcome = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(seeded.user_id, "ops.scale", scale_input(), None),
+    )
+    .await
+    .expect("the earned waiver admits the call with no approval");
+    assert_eq!(outcome.body["output"]["dry_run"], json!(true));
 }
 
 /// Write a historical `self_approval = 'allowed'` row straight to the table, as a deployment
@@ -621,13 +835,11 @@ async fn policies_are_tenant_scoped() {
     let alice = support::seed(&pg, "dev-a", "alice", "Alice").await;
     let bob = support::seed(&pg, "dev-b", "bob", "Bob").await;
 
-    set_policy(
+    seed_earned_waiver(
         &pg,
         alice.tenant,
-        alice.user_id,
         "ops.scale",
-        "waived",
-        "forbidden",
+        chrono::Utc::now() + chrono::Duration::days(1),
     )
     .await;
 

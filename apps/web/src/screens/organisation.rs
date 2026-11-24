@@ -433,8 +433,9 @@ fn OrganisationBody(data: OrgData, refresh: Callback<()>) -> impl IntoView {
                 <span>"Approval"</span>
                 <select class="input" on:change=move |event| policy_approval.set(event_target_value(&event))>
                     <option value="required">"required"</option>
-                    <option value="waived">"waived"</option>
                 </select></label>
+            <p class="hint">"An earned waiver (auto approver, typed conditions, future expiry) is
+            set through the approval-gated policy action; a bare waiver is refused (SPEC §6.4)."</p>
             <label class="field">
                 <span>"Self approval"</span>
                 <select class="input" on:change=move |event| policy_self.set(event_target_value(&event))>
