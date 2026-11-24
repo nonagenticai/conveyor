@@ -16,11 +16,15 @@
 //! - [`development_projects.merge_gate`] reads the tenant's `approval_policy` row for the earned
 //!   auto-merge decision (§6.4): the approver kind, the typed conditions and the expiry are
 //!   data, never constants. A red CI verdict is a refusal, never a retry;
-//! - [`development_projects.deploy_gate`] refuses a deploy with no tested rollback plan (§9.3);
+//! - [`development_projects.deploy_gate`] refuses a deploy with no tested rollback plan (§9.3).
+//!   Every migration must be expand/contract (backward-compatible with the immediately prior
+//!   release); a plan that declares the deploy's migrations non-additive must name the restore
+//!   path, and an application-only rollback is then refused (issue #669);
 //! - [`development_projects.close`] writes the closure record linking the lane, PR, CI run,
-//!   reviewer, merge SHA, deployed digest and live check;
+//!   reviewer, merge SHA, deployed digest, applied migration generation and live check;
 //! - [`development_projects.rollback`] records an exercised rollback (the prior digest serves
-//!   again), the evidence P3.2's live scenario names;
+//!   again), naming both digests and the applied migration generation at deploy time — the
+//!   evidence P3.2's live scenario names;
 //! - [`development_projects.change_judging_surface`] is the project's attempt to change the
 //!   gates, policy or instrument that judge it: always refused, and recorded by the invoke
 //!   layer's refusal audit (§9.3).
@@ -278,6 +282,9 @@ pub struct DevelopmentRollbackIn {
     pub deployed_digest: String,
     /// The prior release's digest that serves again after the rollback.
     pub restored_digest: String,
+    /// The max applied migration version at deploy time — the schema generation the rollback
+    /// names. It must equal the deploy step's recorded generation when that carries one.
+    pub migration_generation: i64,
     /// `/health` at the restored digest. P3.2 requires 200.
     pub health_status: u16,
     /// What proves the rollback was exercised (commands, timestamps, links).
@@ -1151,7 +1158,10 @@ async fn development_projects_deploy_gate(
                 422,
                 "rollback_plan_missing",
                 "the deploy gate is refused: no recorded rollback plan exists. §9.3 requires a \
-                 tested rollback before a deployable change is deployed",
+                 tested rollback before a deployable change is deployed. Every migration must be \
+                 expand/contract (backward-compatible with the immediately prior release); a \
+                 non-additive migration requires a restore-based rollback through the gated ops \
+                 path, never an application-only rollback",
             )
         })?;
     if plan.evidence.get("tested").and_then(Value::as_bool) != Some(true) {
@@ -1160,6 +1170,28 @@ async fn development_projects_deploy_gate(
             "rollback_untested",
             "the deploy gate is refused: the recorded rollback plan is marked untested. A deploy \
              without a tested rollback is refused",
+        ));
+    }
+    let restore_path = plan
+        .evidence
+        .get("restore_path")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|path| !path.is_empty());
+    if plan
+        .evidence
+        .get("backward_compatible")
+        .and_then(Value::as_bool)
+        == Some(false)
+        && restore_path.is_none()
+    {
+        return Err(ActionError::new(
+            422,
+            "restore_path_missing",
+            "the deploy gate is refused: the rollback plan declares the deploy's migrations \
+             non-additive (`backward_compatible: false`) but names no restore path. A non-additive \
+             migration requires a restore-based rollback through the gated ops path; an \
+             application-only rollback is refused",
         ));
     }
     if plan
@@ -1223,6 +1255,7 @@ async fn development_projects_rollback(
     let evidence = json!({
         "deployed_digest": input.deployed_digest,
         "restored_digest": input.restored_digest,
+        "migration_generation": input.migration_generation,
         "health_status": input.health_status,
         "evidence": input.evidence,
     });
@@ -1243,6 +1276,56 @@ async fn development_projects_rollback(
             "deployed_digest",
             "invalid_value",
             format!("the deployed digest is {deployed:?}, not the rollback's deployed digest"),
+        ));
+    }
+    if let Some(deployed_generation) = deploy
+        .evidence
+        .get("migration_generation")
+        .and_then(Value::as_i64)
+        && deployed_generation != input.migration_generation
+    {
+        return Err(invalid(
+            "migration_generation",
+            "invalid_value",
+            format!(
+                "the deploy recorded migration generation {deployed_generation}, not {}; the \
+                 rollback must name the generation the deploy applied",
+                input.migration_generation
+            ),
+        ));
+    }
+    // The rollback plan is schema-aware (issue #669): a plan that declares the deploy's
+    // migrations non-additive forbids an application-only rollback. The prior release cannot be
+    // trusted against a schema it was not built for; the plan names the restore path instead.
+    let plan = load_step(&mut *tx, ctx.tenant, project.id, Step::RollbackPlan)
+        .await?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "step_out_of_order",
+                "a rollback plan exists before the deploy (§9.1 8)",
+            )
+        })?;
+    if plan
+        .evidence
+        .get("backward_compatible")
+        .and_then(Value::as_bool)
+        == Some(false)
+    {
+        let restore = plan
+            .evidence
+            .get("restore_path")
+            .and_then(Value::as_str)
+            .unwrap_or("the gated ops restore path");
+        return Err(ActionError::new(
+            409,
+            "schema_restore_required",
+            format!(
+                "the application rollback is refused: the recorded rollback plan declares the \
+                 deploy's migrations non-additive, so the prior release cannot serve against the \
+                 newer schema. Restore the database to the matching generation through the gated \
+                 ops path and record that as the rollback evidence: {restore}"
+            ),
         ));
     }
     let row = store::development::record_step_tx(
@@ -1400,6 +1483,13 @@ async fn development_projects_close(
         .and_then(Value::as_str)
         .unwrap_or_default()
         .to_owned();
+    // The schema generation the deploy applied (P3.2: the closure is schema-aware). Older
+    // records, written before #669, carry no generation and render `null` honestly.
+    let migration_generation = deployed
+        .evidence
+        .get("migration_generation")
+        .cloned()
+        .unwrap_or(Value::Null);
 
     let closure = json!({
         "development_project_id": project.id,
@@ -1417,7 +1507,11 @@ async fn development_projects_close(
         },
         "merge": {"approval_id": merge.approval.id, "merge_sha": merge_sha},
         "rollback_plan": plan.evidence,
-        "deploy": {"approval_id": deploy.approval.id, "digest": deployed_digest},
+        "deploy": {
+            "approval_id": deploy.approval.id,
+            "digest": deployed_digest,
+            "migration_generation": migration_generation,
+        },
         "live_check": live.evidence,
         "rollback": rollback.map(|row| row.evidence.clone()),
     });
