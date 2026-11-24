@@ -411,7 +411,9 @@ async fn a_delegated_rule_decision_approves_the_plan() {
         &f,
         reviewer,
         "agent",
-        Authority::Role,
+        // A machine principal reaches an action through the engine's Internal arm; the Role
+        // lane refuses every non-user actor (S06d's fail-closed guard).
+        Authority::Internal,
         "approve",
         delegation,
     )
@@ -455,7 +457,9 @@ async fn a_platform_owned_delegation_approves_the_plan() {
         &f,
         reviewer,
         "agent",
-        Authority::Role,
+        // A machine principal reaches an action through the engine's Internal arm; the Role
+        // lane refuses every non-user actor (S06d's fail-closed guard).
+        Authority::Internal,
         "approve",
         delegation,
     )
@@ -498,7 +502,9 @@ async fn a_rule_without_a_published_decision_is_refused() {
         &f,
         seeded.user_id,
         "agent",
-        Authority::Role,
+        // A machine principal reaches an action through the engine's Internal arm; the Role
+        // lane refuses every non-user actor (S06d's fail-closed guard).
+        Authority::Internal,
         "approve",
         delegation,
     )
@@ -516,7 +522,9 @@ async fn a_rule_without_a_published_decision_is_refused() {
         &f,
         seeded.user_id,
         "agent",
-        Authority::Role,
+        // A machine principal reaches an action through the engine's Internal arm; the Role
+        // lane refuses every non-user actor (S06d's fail-closed guard).
+        Authority::Internal,
         "approve",
         delegation,
     )
@@ -533,7 +541,9 @@ async fn a_rule_without_a_published_decision_is_refused() {
         &f,
         seeded.user_id,
         "agent",
-        Authority::Role,
+        // A machine principal reaches an action through the engine's Internal arm; the Role
+        // lane refuses every non-user actor (S06d's fail-closed guard).
+        Authority::Internal,
         "approve",
         Uuid::now_v7(),
     )
@@ -589,9 +599,10 @@ async fn a_service_decision_cannot_approve_a_plan() {
             .expect("count decisions");
     assert_eq!(decisions, 0, "the refusal wrote no decision");
 
-    // The generic surface lets a service decide an ordinary gate. It is recorded as such —
-    // and it still does not unlock the plan.
-    let decided = invoke(
+    // The generic surface refuses it too: a machine decision needs the tenant's explicit
+    // declaration that the gate admits that decider kind (§10.4) — absent one, the gate is a
+    // person's. The refusal writes no decision, so the plan stays unapproved.
+    let refused = invoke(
         &pg.runtime,
         registry(),
         f.tenant,
@@ -604,13 +615,14 @@ async fn a_service_decision_cannot_approve_a_plan() {
         ),
     )
     .await
-    .expect("the generic surface records the service decision");
-    assert_eq!(decided.status, 200, "{}", decided.body);
-    assert_eq!(approval_status(&pg, approval).await, "approved");
-    let refused = materialise(&pg, &f).await;
+    .expect_err("the generic surface refuses an undeclared machine decision");
+    assert_eq!(refused.status, 403, "{}", refused.detail);
+    assert_eq!(refused.code, "human_only_gate", "{}", refused.detail);
+    assert_eq!(approval_status(&pg, approval).await, "pending");
+    let refused_plan = materialise(&pg, &f).await;
     assert!(
-        matches!(&refused, Err(PlanStoreError::PiPlanNotApproved)),
-        "a service decision must not approve the plan: {refused:?}"
+        matches!(&refused_plan, Err(PlanStoreError::PiPlanNotApproved)),
+        "a service decision must not approve the plan: {refused_plan:?}"
     );
     assert_eq!(drafted(&pg, &f).await, 0);
 
