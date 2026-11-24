@@ -332,7 +332,10 @@ mod tests {
                 // #526 (the kata union): the lane's candidate and propagation records on main's
                 // kata loop — the columns the coach/ops/architecture `kata_candidate_id`s need —
                 // and the pre-registration fields (0094_kata_union.sql).
-                (94, "kata union".to_owned())
+                (94, "kata union".to_owned()),
+                // #526 (v1-w1b-5): the tenant's meta-role × action authority matrix; an absent
+                // row is the compiled §6.7 default (0095_job_authority.sql).
+                (95, "job authority".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
