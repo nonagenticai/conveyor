@@ -1062,6 +1062,158 @@ async fn pm_get(
     }))
 }
 
+/// `pm.status` — the PM's status report: a draft governed asset computed from the live row.
+///
+/// §6.1 lists the status report among the PM's outputs. The body is not free prose: it is
+/// recomputed from the project, its WBS, every baseline, every gate and the open changes, and
+/// the caller's narrative sits beside those citations. The asset is written `draft` — the
+/// report is gated and versioned like every governed artefact, never published by this action.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct PmStatusIn {
+    /// The PM's active job binding.
+    pub job_binding_id: Uuid,
+    /// The project the report is about.
+    pub project_id: Uuid,
+    /// The PM's status narrative.
+    pub narrative: String,
+}
+
+/// `pm.status`'s result.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct PmStatusOut {
+    /// The project.
+    pub project_id: Uuid,
+    /// The draft status-report asset.
+    pub status_report_asset_id: Uuid,
+}
+
+#[crate::action(
+    name = "pm.status",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn pm_status(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: PmStatusIn,
+) -> Result<HandlerOutput<PmStatusOut>, ActionError> {
+    // Input is refused before the binding is resolved: an empty narrative is not a report.
+    let narrative = input.narrative.trim();
+    if narrative.is_empty() {
+        return Err(invalid(
+            "narrative",
+            "status_narrative_required",
+            "a status report needs the PM's narrative in `narrative`",
+        ));
+    }
+    assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
+    let project = store::project::get_project_tx(&mut *tx, ctx.tenant, input.project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "pm.status: read project");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| ActionError::resource_not_found("project"))?;
+    let wbs = store::spine::list_wbs_tx(&mut *tx, ctx.tenant, input.project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "pm.status: wbs");
+            ActionError::internal()
+        })?;
+    let baselines = store::spine::list_baselines_tx(&mut *tx, ctx.tenant, input.project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "pm.status: baselines");
+            ActionError::internal()
+        })?;
+    let gates: Vec<(Uuid, String, String)> = sqlx::query_as(
+        "SELECT id, gate, status FROM approval WHERE tenant_id = $1 AND project_id = $2 \
+         ORDER BY created_at DESC, id DESC",
+    )
+    .bind(ctx.tenant.as_uuid())
+    .bind(input.project_id)
+    .fetch_all(&mut *tx)
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "pm.status: gates");
+        ActionError::internal()
+    })?;
+    let changes =
+        store::spine::list_register_tx(&mut *tx, ctx.tenant, input.project_id, Some("change"))
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "pm.status: changes");
+                ActionError::internal()
+            })?;
+    // Every citation is the live row, by id — the same rows the gates and the baseline read.
+    // `open` is a change the change gate has not approved yet (approval sets `approved`).
+    let report = json!({
+        "narrative": narrative,
+        "project": {
+            "id": project.id,
+            "key": project.key,
+            "name": project.name,
+            "status": project.status,
+            "version": project.version,
+        },
+        "baselines": baselines
+            .iter()
+            .map(|row| json!({
+                "id": row.id, "kind": row.kind, "approved_by": row.approved_by,
+                "change_id": row.change_id, "taken_at": row.taken_at,
+            }))
+            .collect::<Vec<_>>(),
+        "wbs": wbs
+            .iter()
+            .map(|node| json!({
+                "id": node.id, "kind": node.kind, "title": node.title, "status": node.status,
+            }))
+            .collect::<Vec<_>>(),
+        "gates": gates
+            .iter()
+            .map(|(id, gate, status)| json!({ "id": id, "gate": gate, "status": status }))
+            .collect::<Vec<_>>(),
+        "pending_changes": changes
+            .iter()
+            .filter(|row| row.status == "open")
+            .map(|row| json!({
+                "id": row.id, "title": row.title, "status": row.status,
+                "baseline_ref": row.baseline_ref,
+            }))
+            .collect::<Vec<_>>(),
+    });
+    // A `Value` has no serialisation failure: the pretty form is the readable report, the
+    // compact form the fallback no caller should ever see.
+    let body = serde_json::to_string_pretty(&report).unwrap_or_else(|_| report.to_string());
+    let mut asset = NewAsset::new(
+        AssetKind::StatusReport,
+        format!("{}-STATUS-{}", project.key, Uuid::now_v7().simple()),
+        format!("Status report — {}", project.name),
+    );
+    asset.body = body;
+    asset.project_id = Some(project.id);
+    asset.owner_user_id = Some(ctx.actor_id);
+    asset.author_id = Some(ctx.actor_id);
+    // Draft: the report is gated and versioned like every governed artefact; this action
+    // never opens a gate and never publishes.
+    let asset = store::governance::insert_asset_tx(&mut *tx, ctx.tenant, &asset)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "pm.status: insert status report");
+            ActionError::internal()
+        })?;
+    Ok(HandlerOutput::created(PmStatusOut {
+        project_id: project.id,
+        status_report_asset_id: asset.id,
+    }))
+}
+
 /// `changes.request` — the only path that advances an approved baseline.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ChangeRequestIn {

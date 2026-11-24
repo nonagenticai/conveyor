@@ -85,6 +85,7 @@
         "pm.charter",
         "pm.plan",
         "pm.get",
+        "pm.status",
         "pm.route_gate",
         "pm.close",
         "changes.request"
