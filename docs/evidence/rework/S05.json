@@ -124,7 +124,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "22 mandatory artefact package(s) open: std-togaf-benefits-diagram-s05:S05, std-togaf-candidate-solutions-s05:S05, std-togaf-phase-g-s05-g:S05, std-togaf-phase-h-s05-h:S05, std-togaf-project-context-diagram-s05:S05, std-pmp-project-baseline-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-architecture-artifact-instance-01a20ec8-1479-7d97-8c92-428ed9ea0b6f:S05, +14 more",
+      "detail": "19 mandatory artefact package(s) open: std-togaf-phase-g-s05-g:S05, std-togaf-phase-h-s05-h:S05, std-pmp-project-baseline-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-architecture-artifact-instance-01a20ec8-1479-7d97-8c92-428ed9ea0b6f:S05, std-togaf-architecture-artifact-instance-01a20ec8-15b2-7709-b738-34a9e7488ef6:S05, std-togaf-architecture-artifact-instance-01a20ec8-16d8-76aa-8be3-d675f9691ee2:S05, std-togaf-architecture-artifact-instance-01a20ec8-1813-72f9-9ed8-89dff7f44d4a:S05, +11 more",
       "id": "S05-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -133,7 +133,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "6 unresolved P0/P1 package(s): v1-s05-1:S05 (P1), std-togaf-benefits-diagram-s05:S05 (P1), std-togaf-candidate-solutions-s05:S05 (P1), std-togaf-phase-g-s05-g:S05 (P1), std-togaf-phase-h-s05-h:S05 (P1), std-togaf-project-context-diagram-s05:S05 (P1)",
+      "detail": "3 unresolved P0/P1 package(s): v1-s05-1:S05 (P1), std-togaf-phase-g-s05-g:S05 (P1), std-togaf-phase-h-s05-h:S05 (P1)",
       "id": "S05-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -150,21 +150,21 @@
     }
   ],
   "failures": [
-    "S05-artefact-standard (P1): 22 mandatory artefact package(s) open: std-togaf-benefits-diagram-s05:S05, std-togaf-candidate-solutions-s05:S05, std-togaf-phase-g-s05-g:S05, std-togaf-phase-h-s05-h:S05, std-togaf-project-context-diagram-s05:S05, std-pmp-project-baseline-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-architecture-artifact-instance-01a20ec8-1479-7d97-8c92-428ed9ea0b6f:S05, +14 more",
-    "S05-rework (P0): 6 unresolved P0/P1 package(s): v1-s05-1:S05 (P1), std-togaf-benefits-diagram-s05:S05 (P1), std-togaf-candidate-solutions-s05:S05 (P1), std-togaf-phase-g-s05-g:S05 (P1), std-togaf-phase-h-s05-h:S05 (P1), std-togaf-project-context-diagram-s05:S05 (P1)",
+    "S05-artefact-standard (P1): 19 mandatory artefact package(s) open: std-togaf-phase-g-s05-g:S05, std-togaf-phase-h-s05-h:S05, std-pmp-project-baseline-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-architecture-artifact-instance-01a20ec8-1479-7d97-8c92-428ed9ea0b6f:S05, std-togaf-architecture-artifact-instance-01a20ec8-15b2-7709-b738-34a9e7488ef6:S05, std-togaf-architecture-artifact-instance-01a20ec8-16d8-76aa-8be3-d675f9691ee2:S05, std-togaf-architecture-artifact-instance-01a20ec8-1813-72f9-9ed8-89dff7f44d4a:S05, +11 more",
+    "S05-rework (P0): 3 unresolved P0/P1 package(s): v1-s05-1:S05 (P1), std-togaf-phase-g-s05-g:S05 (P1), std-togaf-phase-h-s05-h:S05 (P1)",
     "gate (P0): the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass"
   ],
   "gate": "replay a board export, win a two-client race and survive the 1k-card load \u2014 zero deltas on 1,000 cards, one 200 and one 412 with the current representation, p95 \u2264 120 ms at 20 rps, the exact webhook shape, SSE within 200 ms, and no second store",
-  "generated_at": "2026-11-24T18:21:38.776855+00:00",
+  "generated_at": "2026-11-24T18:25:29.412976+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S05.toml",
   "name": "Board \u2014 projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
   "project": "S05",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T18:21:19.882071+00:00",
-    "git_sha": "3ad3d913340497e302bf1db2ed6e9ed4bf9102eb",
-    "path": "retained-snapshot/3ad3d913340497e302bf1db2ed6e9ed4bf9102eb"
+    "generated_at": "2026-11-24T18:25:22.625551+00:00",
+    "git_sha": "641bad589c9b0af74ad8c8f3ac56d7c2dfb68b31",
+    "path": "retained-snapshot/641bad589c9b0af74ad8c8f3ac56d7c2dfb68b31"
   },
   "verdict": "red",
   "warnings": []
