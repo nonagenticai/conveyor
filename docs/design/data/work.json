@@ -11,6 +11,773 @@
       "via": {
         "channel": "internal"
       }
+    },
+    {
+      "approval_id": "01a1fbb1-43b4-7c55-ae77-493c426731fa",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T01:21:05.898594+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1fbb1-58da-7b46-b1c3-f6ecb0027d74",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1fbb1-b0c6-7348-8f86-2b3c4b4c620a",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T11:15:46.123875+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1fdd1-c894-7358-ae29-6253dbd2bd17",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T11:20:54.250212+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1fdd6-7c38-7aee-a963-fbd2b318bb53",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1fdd8-a348-7c44-a08c-1ba2f29162b9",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T11:23:20.399959+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1fdd8-b712-72c9-87bc-51da9f9775be",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1fdd8-d052-7532-8e66-944a4db595ab",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T11:23:38.379267+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1fdd8-fd55-7662-8727-aa1f5bfde661",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff2e-16ac-7c92-b0a6-0cc3385a57a7",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T17:36:18.441736+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff2e-2d4e-7742-b9e3-6dd02570c7b3",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff31-7348-7c52-b06f-e57cf09796e9",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T17:39:58.128294+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff31-876c-7fee-8123-228a66ae47c3",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff34-00a1-75eb-9022-02be586d0bb3",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T17:42:45.401096+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff34-14db-7e15-9cbf-3788b7c15ece",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff37-8bae-7976-bf95-98ccac0c7735",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T17:46:38.348793+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff37-a2cc-7123-b692-f8d4f63ec4a9",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff39-8dc8-78db-bb58-2d18f93d0b35",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T17:48:48.880013+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff39-a0ba-7382-b76b-798a9f5fd707",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff3b-1a6d-7952-be39-4a4f470ad5c3",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T17:50:30.807955+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff3b-2ed0-776b-b60a-9b4a78670e11",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff3c-3804-71e8-bb10-4618621cb4c6",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T17:51:45.03777+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff3c-50d2-7495-bc6f-f855315e46dc",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff3e-5250-70a7-bdd4-c16e15c3a99a",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T17:54:02.472603+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff3e-69bc-7c16-8f5b-eaf82583cdcf",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff3f-cc40-7000-bce5-85f41c4c0b13",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T17:55:38.354543+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff3f-e03b-729b-8fce-0c5f7f3c28bc",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff40-c4d6-71ed-8a42-171bcab5aa5e",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T17:56:42.886021+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff40-dc44-7618-a55d-a1bf4c32d853",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff42-bac3-73c0-a04d-d3c13e99dfb1",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T17:58:50.971984+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff42-d0a0-769f-8029-af387340915c",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff44-4454-72c4-803f-78cbc73dfbe0",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T18:00:31.3185+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff44-5898-7f08-b24d-fe539c8c2266",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff45-7691-7359-a888-763344d97f67",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T18:01:49.835645+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff45-8b55-70f8-a481-ef80e9f925ca",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff47-50a2-719f-9d61-71fcf97f5f08",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T18:03:51.022685+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff47-64b0-7092-bbec-2dcdd7e0a017",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff48-c258-72af-9643-1c830af6b92f",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T18:05:25.19634+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff48-d48a-7e40-8014-048abfc0cd19",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff83-f0c8-7113-bb51-101be2b0f7ea",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:10:04.360766+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff84-0597-77e0-ac67-8d158171472c",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff85-fb0a-7e74-b5c5-cf27a530f0a8",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:12:18.393901+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff86-1126-77f0-81e4-de4a86f83aca",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff87-d283-7952-b2e1-7512a8ad7864",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:14:18.509715+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff87-e655-7f47-9d0a-4a4fb21507ed",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff88-c067-79d4-b056-5b6c12861371",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:15:19.34457+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff88-d3f6-7e7f-9aac-63f97954aa2b",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff8a-b550-7e62-a155-0a1f00699022",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:17:27.521225+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff8a-c8a8-7122-8a56-23d13983c747",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff8c-5646-741c-82c6-0665f98c3adb",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:19:15.012565+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff8c-6c8c-7616-b3bb-014d015ac4c2",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff8d-5f2a-765f-a457-414200b9f65c",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:20:22.645322+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff8d-74c1-73b7-b329-f81755b83928",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff8f-482a-746a-bd48-67924668daf2",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:22:27.339913+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff8f-5be2-729c-a352-f9e74cafd4fa",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ff90-fcdb-7ed1-bf51-54e24deb923d",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:24:19.492303+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ff91-11f1-738b-a18f-a932b35e6de5",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ffa2-ba35-7c57-be77-105d7ca09f92",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:43:41.458729+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ffa2-ccf3-798b-9574-382dbc992316",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ffa4-4a14-7fd2-9cf2-08714286b017",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:45:24.019355+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ffa4-5d75-7a2d-b712-0220c370f6b0",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ffa6-62ce-747b-abac-c41e9679dde8",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:47:41.786716+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ffa6-77ab-7a2e-a223-310d25beb5da",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a1ffa9-76b2-7956-98ba-c1d0be651017",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T19:51:03.837075+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a1ffa9-8cfb-724c-a5e2-5ac365783100",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a2005a-2c3a-7398-a907-cf482afe3f85",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T23:04:05.020203+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a2005a-43e7-7080-b169-2b9547981882",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a2005c-5ab0-79f9-84d9-c014517687e8",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T23:06:29.057003+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a2005c-7686-722f-8e3d-a3dc66217f20",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a20060-baee-70c8-babc-9a959e21fb82",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T23:11:13.86128+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a20060-cf0f-739b-955e-ea49005273da",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a20061-6a52-7da5-ba79-788ac48dc14f",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T23:11:58.779376+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a20061-7e85-7feb-882f-8144adadaec1",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a20063-7b58-7840-b544-cdfc5b38232f",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T23:14:14.070483+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a20063-8eff-7df3-90b6-6e03e5a84426",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a20073-737a-7574-954a-2d54d6be5af5",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-21T23:31:40.833045+00:00",
+      "decided_by_kind": "service",
+      "decision": "approve",
+      "id": "01a20073-87e7-7fa6-af16-1d64e5a7adbe",
+      "via": {
+        "channel": "internal"
+      }
+    },
+    {
+      "approval_id": "01a20095-d07b-737e-90e6-b235f3159cde",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T07:18:53.738427+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a2021f-63e4-7837-a721-0a376f5cb630",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+      }
+    },
+    {
+      "approval_id": "01a20222-df0f-77b5-ad70-b53bcea5ecb9",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T07:22:52.352429+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a20222-eeea-7d00-bdfa-ff151ed0a4d7",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+      }
+    },
+    {
+      "approval_id": "01a20223-29bf-734c-9b5f-2543c7f2abed",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T07:23:11.466704+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a20223-399a-7a81-9280-7f15ae2f9c4a",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+      }
+    },
+    {
+      "approval_id": "01a20230-46b3-7161-8b4d-0dfa7244375e",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T07:37:34.308846+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a20230-6bb6-7c04-8bfa-b9f22d5a5737",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+      }
+    },
+    {
+      "approval_id": "01a20231-0d43-74ad-80ca-42088a1be984",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T07:38:25.404039+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a20231-2f4d-70f6-b894-a068e61ef8bc",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+      }
+    },
+    {
+      "approval_id": "01a20231-bd2b-744e-b9f0-0daf9b21e25a",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T07:39:10.419282+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a20231-e191-7765-a3f2-9f517fac9e64",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+      }
+    },
+    {
+      "approval_id": "01a20232-12d8-70ff-afc9-320a80c262d6",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T07:39:32.247641+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a20232-3651-7f3a-a0eb-cfca90682f64",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+      }
+    },
+    {
+      "approval_id": "01a20255-6578-7a4d-b99b-81d6d03d8880",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T08:18:04.080107+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a20255-77e8-7fe8-a421-4ed4e9847ee8",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+      }
+    },
+    {
+      "approval_id": "01a20256-466e-7670-9a2b-5fad19bc3e08",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T08:19:02.106253+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a20256-5af6-742e-b4da-9bff4c4d6f7d",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+      }
+    },
+    {
+      "approval_id": "01a20270-c046-7214-8aca-d2c89b386bd0",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T08:48:00.371944+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a20270-e1fd-7b15-8041-c204f85742fe",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+      }
+    },
+    {
+      "approval_id": "01a20277-92f1-7e49-9675-5bb2717081e8",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T08:55:26.310036+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a20277-aec2-732a-a536-536d053913fe",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+      }
+    },
+    {
+      "approval_id": "01a20279-8672-70c6-86b4-975cad387b8c",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T08:57:33.781641+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a20279-a08c-70d3-8913-8f340f7b1844",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+      }
+    },
+    {
+      "approval_id": "01a2027e-53b5-76c1-8782-ea026cf4b0ee",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T09:02:49.181852+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a2027e-70a1-7915-9297-4ef10c28162a",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+      }
+    },
+    {
+      "approval_id": "01a20287-143c-70bb-96f6-108c33dd29bc",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T09:12:22.821934+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a20287-333c-796b-bdf4-ed3ad41f195f",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+      }
+    },
+    {
+      "approval_id": "01a2028b-88c8-73af-a738-ede088c07761",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T09:17:14.579812+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a2028b-a667-7c28-9ef4-a2c7141ef30b",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+      }
+    },
+    {
+      "approval_id": "01a20280-7305-7fe4-b40c-998a13c392fc",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T09:43:21.961187+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a202a3-8fab-7cdb-a651-bfe1fcd2cf37",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+      }
+    },
+    {
+      "approval_id": "01a20289-7d0e-7f76-87e9-f4ffd042a582",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T09:44:21.811703+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a202a4-79c8-749b-a60d-dccce3af357b",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+      }
+    },
+    {
+      "approval_id": "01a2028d-e2ad-71fb-b3a9-656be39ce8ba",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T09:45:22.454329+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a202a5-6685-7198-9bcf-f3d7fa432f66",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+      }
+    },
+    {
+      "approval_id": "01a202c2-eae1-76ac-8d64-6a548051cc27",
+      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "approver_name": "conveyor-approver",
+      "created_at": "2026-11-22T10:17:43.67327+00:00",
+      "decided_by_kind": "rule",
+      "decision": "approve",
+      "id": "01a202c3-0555-7b75-9b2f-46ac65d795fa",
+      "via": {
+        "channel": "internal",
+        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+      }
+    },
+    {
+      "approval_id": "01a20c89-5d47-754f-a183-b5074804c7d3",
+      "approver_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "approver_name": "FR Test",
+      "created_at": "2026-11-24T07:55:12.305673+00:00",
+      "decided_by_kind": "human",
+      "decision": "approve",
+      "id": "01a20c8d-3c4f-71a0-bef1-e46ddf3fefef",
+      "via": {
+        "channel": "web",
+        "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+        "surface": "meeting"
+      }
+    },
+    {
+      "approval_id": "01a20c8c-1428-79d4-a64e-fdeaa033a182",
+      "approver_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "approver_name": "FR Test",
+      "created_at": "2026-11-24T08:09:21.819118+00:00",
+      "decided_by_kind": "human",
+      "decision": "approve",
+      "id": "01a20c9a-32bc-7e42-9a9d-2f92941328be",
+      "via": {
+        "channel": "web"
+      }
+    },
+    {
+      "approval_id": "01a20c89-bc7e-791c-b9cf-381d0b352562",
+      "approver_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "approver_name": "FR Test",
+      "created_at": "2026-11-24T08:19:08.868783+00:00",
+      "decided_by_kind": "human",
+      "decision": "approve",
+      "id": "01a20ca3-27f4-7165-a643-1046af3671cd",
+      "via": {
+        "channel": "mcp",
+        "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+        "surface": "meeting"
+      }
+    },
+    {
+      "approval_id": "01a20c87-0fd0-7a68-be24-c1e0f5be9f77",
+      "approver_id": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "approver_name": "conveyor-e2e",
+      "created_at": "2026-11-24T08:22:27.516211+00:00",
+      "decided_by_kind": "service",
+      "decision": "reject",
+      "id": "01a20ca6-3128-75a7-b942-c2fce17891e0",
+      "via": {
+        "channel": "internal"
+      }
     }
   ],
   "approvals": [
@@ -27,6 +794,936 @@
       "run_id": null,
       "status": "approved",
       "updated_at": "2026-11-20T08:05:27.223057+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T01:21:00.2986+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a1fbb1-43b4-7c55-ae77-493c426731fa",
+      "kind": "pm",
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T01:21:05.898594+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T01:21:28.099656+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a1fbb1-b0c6-7348-8f86-2b3c4b4c620a",
+      "kind": "pm",
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T11:15:46.123875+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T11:20:03.655377+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda",
+      "kind": "pm",
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T11:20:54.250212+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T11:23:15.154352+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a1fdd8-a348-7c44-a08c-1ba2f29162b9",
+      "kind": "pm",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T11:23:20.399959+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T11:23:26.290608+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a1fdd8-d052-7532-8e66-944a4db595ab",
+      "kind": "pm",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T11:23:38.379267+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T17:36:12.464739+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a1ff2e-16ac-7c92-b0a6-0cc3385a57a7",
+      "kind": "pm",
+      "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T17:36:18.441736+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T17:39:52.695711+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a1ff31-7348-7c52-b06f-e57cf09796e9",
+      "kind": "pm",
+      "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T17:39:58.128294+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T17:42:39.980183+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a1ff34-00a1-75eb-9022-02be586d0bb3",
+      "kind": "pm",
+      "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T17:42:45.401096+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T17:46:32.264807+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a1ff37-8bae-7976-bf95-98ccac0c7735",
+      "kind": "pm",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T17:46:38.348793+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T17:48:43.761438+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a1ff39-8dc8-78db-bb58-2d18f93d0b35",
+      "kind": "pm",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T17:48:48.880013+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T17:50:25.358626+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a1ff3b-1a6d-7952-be39-4a4f470ad5c3",
+      "kind": "pm",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T17:50:30.807955+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T17:51:38.522667+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a1ff3c-3804-71e8-bb10-4618621cb4c6",
+      "kind": "pm",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T17:51:45.03777+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T17:53:56.128695+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a1ff3e-5250-70a7-bdd4-c16e15c3a99a",
+      "kind": "pm",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T17:54:02.472603+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T17:55:32.990877+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a1ff3f-cc40-7000-bce5-85f41c4c0b13",
+      "kind": "pm",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T17:55:38.354543+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T17:56:36.680451+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a1ff40-c4d6-71ed-8a42-171bcab5aa5e",
+      "kind": "pm",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T17:56:42.886021+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T17:58:45.10455+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a1ff42-bac3-73c0-a04d-d3c13e99dfb1",
+      "kind": "pm",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T17:58:50.971984+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T18:00:25.884334+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a1ff44-4454-72c4-803f-78cbc73dfbe0",
+      "kind": "pm",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T18:00:31.3185+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T18:01:44.370157+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a1ff45-7691-7359-a888-763344d97f67",
+      "kind": "pm",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T18:01:49.835645+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T18:03:45.609503+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a1ff47-50a2-719f-9d61-71fcf97f5f08",
+      "kind": "pm",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T18:03:51.022685+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T18:05:20.307942+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a1ff48-c258-72af-9643-1c830af6b92f",
+      "kind": "pm",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T18:05:25.19634+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:09:58.850624+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a1ff83-f0c8-7113-bb51-101be2b0f7ea",
+      "kind": "pm",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:10:04.360766+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:12:12.47338+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a1ff85-fb0a-7e74-b5c5-cf27a530f0a8",
+      "kind": "pm",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:12:18.393901+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:14:12.961851+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a1ff87-d283-7952-b2e1-7512a8ad7864",
+      "kind": "pm",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:14:18.509715+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:15:14.159079+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a1ff88-c067-79d4-b056-5b6c12861371",
+      "kind": "pm",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:15:19.34457+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:17:22.31215+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a1ff8a-b550-7e62-a155-0a1f00699022",
+      "kind": "pm",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:17:27.521225+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:19:09.060486+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a1ff8c-5646-741c-82c6-0665f98c3adb",
+      "kind": "pm",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:19:15.012565+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:20:16.918541+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a1ff8d-5f2a-765f-a457-414200b9f65c",
+      "kind": "pm",
+      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:20:22.645322+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:22:22.038135+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a1ff8f-482a-746a-bd48-67924668daf2",
+      "kind": "pm",
+      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:22:27.339913+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:24:13.845806+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a1ff90-fcdb-7ed1-bf51-54e24deb923d",
+      "kind": "pm",
+      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:24:19.492303+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:43:36.423876+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a1ffa2-ba35-7c57-be77-105d7ca09f92",
+      "kind": "pm",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:43:41.458729+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:45:18.822161+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a1ffa4-4a14-7fd2-9cf2-08714286b017",
+      "kind": "pm",
+      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:45:24.019355+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:47:36.191544+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a1ffa6-62ce-747b-abac-c41e9679dde8",
+      "kind": "pm",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:47:41.786716+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T19:50:58.253042+00:00",
+      "expires_at": null,
+      "gate": "tranches.review",
+      "id": "01a1ffa9-76b2-7956-98ba-c1d0be651017",
+      "kind": "action",
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T19:51:03.837075+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T23:03:58.781533+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a2005a-2c3a-7398-a907-cf482afe3f85",
+      "kind": "pm",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T23:04:05.020203+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T23:06:21.585567+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a2005c-5ab0-79f9-84d9-c014517687e8",
+      "kind": "pm",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T23:06:29.057003+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T23:11:08.459918+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a20060-baee-70c8-babc-9a959e21fb82",
+      "kind": "pm",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T23:11:13.86128+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T23:11:53.421894+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a20061-6a52-7da5-ba79-788ac48dc14f",
+      "kind": "pm",
+      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T23:11:58.779376+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T23:14:08.772733+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a20063-7b58-7840-b544-cdfc5b38232f",
+      "kind": "pm",
+      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T23:14:14.070483+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-21T23:31:35.358094+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a20073-737a-7574-954a-2d54d6be5af5",
+      "kind": "pm",
+      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-21T23:31:40.833045+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T00:09:07.12046+00:00",
+      "expires_at": null,
+      "gate": "tranche.resume",
+      "id": "01a20095-d07b-737e-90e6-b235f3159cde",
+      "kind": "gate",
+      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+      "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T07:19:14.063568+00:00",
+      "version": 3
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T07:22:48.736236+00:00",
+      "expires_at": null,
+      "gate": "projects.close",
+      "id": "01a20222-df0f-77b5-ad70-b53bcea5ecb9",
+      "kind": "action",
+      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T07:22:52.352429+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T07:23:07.862649+00:00",
+      "expires_at": null,
+      "gate": "projects.close",
+      "id": "01a20223-29bf-734c-9b5f-2543c7f2abed",
+      "kind": "action",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T07:23:11.466704+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T07:37:26.397051+00:00",
+      "expires_at": null,
+      "gate": "projects.close",
+      "id": "01a20230-46b3-7161-8b4d-0dfa7244375e",
+      "kind": "action",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T07:37:34.308846+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T07:38:14.710917+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a20231-0d43-74ad-80ca-42088a1be984",
+      "kind": "pm",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T07:38:25.404039+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T07:38:59.827308+00:00",
+      "expires_at": null,
+      "gate": "closure",
+      "id": "01a20231-bd2b-744e-b9f0-0daf9b21e25a",
+      "kind": "pm",
+      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T07:39:10.419282+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T07:39:24.31498+00:00",
+      "expires_at": null,
+      "gate": "projects.close",
+      "id": "01a20232-12d8-70ff-afc9-320a80c262d6",
+      "kind": "action",
+      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T07:39:32.247641+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T08:17:59.090556+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a20255-6578-7a4d-b99b-81d6d03d8880",
+      "kind": "pm",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T08:18:04.080107+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T08:18:56.640334+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a20256-466e-7670-9a2b-5fad19bc3e08",
+      "kind": "pm",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T08:19:02.106253+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T08:47:51.804813+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a20270-c046-7214-8aca-d2c89b386bd0",
+      "kind": "pm",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T08:48:00.371944+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T08:55:18.027529+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a20277-92f1-7e49-9675-5bb2717081e8",
+      "kind": "pm",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T08:55:26.310036+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T08:57:26.477641+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a20279-8672-70c6-86b4-975cad387b8c",
+      "kind": "pm",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T08:57:33.781641+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T09:02:41.432864+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a2027e-53b5-76c1-8782-ea026cf4b0ee",
+      "kind": "pm",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T09:02:49.181852+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T09:05:00.383623+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a20280-7305-7fe4-b40c-998a13c392fc",
+      "kind": "pm",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T09:43:21.961187+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T09:12:14.97167+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a20287-143c-70bb-96f6-108c33dd29bc",
+      "kind": "pm",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T09:12:22.821934+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T09:14:52.60631+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a20289-7d0e-7f76-87e9-f4ffd042a582",
+      "kind": "pm",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T09:44:21.811703+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T09:17:07.051694+00:00",
+      "expires_at": null,
+      "gate": "charter",
+      "id": "01a2028b-88c8-73af-a738-ede088c07761",
+      "kind": "pm",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T09:17:14.579812+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T09:19:40.844998+00:00",
+      "expires_at": null,
+      "gate": "baseline",
+      "id": "01a2028d-e2ad-71fb-b3a9-656be39ce8ba",
+      "kind": "pm",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T09:45:22.454329+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-22T10:17:36.77133+00:00",
+      "expires_at": null,
+      "gate": "change",
+      "id": "01a202c2-eae1-76ac-8d64-6a548051cc27",
+      "kind": "pm",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-22T10:17:43.67327+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-24T07:48:27.429958+00:00",
+      "expires_at": null,
+      "gate": "t19_live_gate_web",
+      "id": "01a20c87-0fd0-7a68-be24-c1e0f5be9f77",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "rejected",
+      "updated_at": "2026-11-24T08:22:27.516211+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-24T07:50:58.376814+00:00",
+      "expires_at": null,
+      "gate": "t19_live_gate_web_v2",
+      "id": "01a20c89-5d47-754f-a183-b5074804c7d3",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-24T07:55:12.305673+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-24T07:51:22.746435+00:00",
+      "expires_at": null,
+      "gate": "t19_live_gate_mcp",
+      "id": "01a20c89-bc7e-791c-b9cf-381d0b352562",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-24T08:19:08.868783+00:00",
+      "version": 2
+    },
+    {
+      "card_id": "01a20c8a-3370-7a8f-b903-faf5f7cff917",
+      "created_at": "2026-11-24T07:53:56.197132+00:00",
+      "expires_at": null,
+      "gate": "meeting_minutes",
+      "id": "01a20c8c-1428-79d4-a64e-fdeaa033a182",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-24T08:09:21.819118+00:00",
       "version": 2
     }
   ],
@@ -414,6 +2111,38 @@
       "position": 0,
       "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
       "version": 1
+    },
+    {
+      "created_at": "2026-11-19T07:36:44.012+00:00",
+      "id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "name": "Board",
+      "position": 0,
+      "project_id": "01a1f2bc-86f7-7904-ac48-b45cad0d1393",
+      "version": 1
+    },
+    {
+      "created_at": "2026-11-19T07:40:36.265466+00:00",
+      "id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "name": "Board",
+      "position": 0,
+      "project_id": "01a1f2c0-1239-7b59-a0bd-e0609219fa8b",
+      "version": 1
+    },
+    {
+      "created_at": "2026-11-24T07:41:22.15583+00:00",
+      "id": "01a20c80-b7cc-7d05-bc66-6ed9d667e927",
+      "name": "Board",
+      "position": 0,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "version": 1
+    },
+    {
+      "created_at": "2026-11-24T07:41:22.15583+00:00",
+      "id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "name": "Board",
+      "position": 0,
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "version": 1
     }
   ],
   "card_types": [
@@ -660,6 +2389,31 @@
       "id": "01a1d039-0ce0-7e6f-b3b0-b953708f906b",
       "is_active": true,
       "label": "Bdd test improvement",
+      "version": 1
+    },
+    {
+      "code": "benchmark",
+      "definition": {
+        "acceptance": [
+          "READY: instance_id_and_base_commit_pinned",
+          "DOING: patch_is_one_unified_diff_against_the_base_commit",
+          "DONE: patch_collected"
+        ],
+        "human_task": false,
+        "inputs": [
+          "instance_id",
+          "base_commit"
+        ],
+        "outputs": [
+          "patch"
+        ],
+        "rules": [
+          "repo_write"
+        ]
+      },
+      "id": "01a20c80-7f9f-74ad-8ebe-4579e9940ebe",
+      "is_active": true,
+      "label": "Benchmark",
       "version": 1
     },
     {
@@ -1551,6 +3305,53 @@
       "id": "01a1d039-0ce6-7f77-b60d-a0edad179f1d",
       "is_active": true,
       "label": "Library refactoring",
+      "version": 1
+    },
+    {
+      "code": "meeting",
+      "definition": {
+        "acceptance": [
+          "READY: agenda_has_evidence",
+          "DOING: positions_recorded_per_seat",
+          "QA: every_agenda_item_closed_with_an_outcome",
+          "DONE: minutes_published"
+        ],
+        "definition_of_done": "agenda_closed_and_minutes_published",
+        "human_task": true,
+        "inputs": [],
+        "outputs": [
+          "meeting_id",
+          "minutes_asset_id"
+        ],
+        "rules": []
+      },
+      "id": "01a20c80-868d-72b8-8112-fca9e0d91b72",
+      "is_active": true,
+      "label": "Meeting",
+      "version": 1
+    },
+    {
+      "code": "meeting_action",
+      "definition": {
+        "acceptance": [
+          "READY: owner_and_due_named",
+          "QA: closed_with_evidence",
+          "DONE: card_closed"
+        ],
+        "definition_of_done": "card_closed",
+        "human_task": true,
+        "inputs": [
+          "meeting_id",
+          "agenda_item_id"
+        ],
+        "outputs": [
+          "card_id"
+        ],
+        "rules": []
+      },
+      "id": "01a20c80-86a6-745e-a606-6b69b96dc79c",
+      "is_active": true,
+      "label": "Meeting action",
       "version": 1
     },
     {
@@ -2527,6 +4328,9 @@
       "plan": "docs/plans/slices/S00-usage-inventory.md",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-S00",
       "updated_at": "2026-11-13T12:21:10.211392+00:00",
       "version": 2
@@ -2549,6 +4353,9 @@
       "plan": "docs/plans/slices/S01-ui-spike.md",
       "position": 1024,
       "process_key": "architecture_spike.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-S01",
       "updated_at": "2026-11-13T12:21:10.795686+00:00",
       "version": 2
@@ -2571,6 +4378,9 @@
       "plan": "docs/plans/slices/S02-skeleton.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-2",
       "updated_at": "2026-11-13T12:21:11.38532+00:00",
       "version": 2
@@ -2593,6 +4403,9 @@
       "plan": "docs/plans/slices/S03-domain-schema.md",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-S03",
       "updated_at": "2026-11-13T12:21:11.73836+00:00",
       "version": 2
@@ -2615,6 +4428,9 @@
       "plan": "docs/plans/slices/S04-action-registry.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-3",
       "updated_at": "2026-11-13T12:21:12.096151+00:00",
       "version": 2
@@ -2637,6 +4453,9 @@
       "plan": "docs/plans/slices/S05-board.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-S05",
       "updated_at": "2026-11-13T12:21:12.451183+00:00",
       "version": 2
@@ -2659,6 +4478,9 @@
       "plan": "docs/plans/slices/S06-control-plane.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-4",
       "updated_at": "2026-11-13T12:21:12.804176+00:00",
       "version": 2
@@ -2681,6 +4503,9 @@
       "plan": "docs/plans/slices/S06a-mcp-server-channel.md",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-S06a",
       "updated_at": "2026-11-13T12:21:13.157913+00:00",
       "version": 2
@@ -2703,6 +4528,9 @@
       "plan": "docs/plans/slices/S06b-agent-direct-interface.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-S06b",
       "updated_at": "2026-11-13T12:21:13.513032+00:00",
       "version": 2
@@ -2725,6 +4553,9 @@
       "plan": "docs/plans/slices/S06c-mcp-tasks.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-S06c",
       "updated_at": "2026-11-13T12:21:13.87078+00:00",
       "version": 2
@@ -2747,6 +4578,9 @@
       "plan": "docs/plans/slices/S06d-connector-standard.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-S06d",
       "updated_at": "2026-11-13T12:21:14.225255+00:00",
       "version": 2
@@ -2769,6 +4603,9 @@
       "plan": "docs/plans/slices/S07-requirements-search.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-S07",
       "updated_at": "2026-11-13T12:21:14.58181+00:00",
       "version": 2
@@ -2791,6 +4628,9 @@
       "plan": "docs/plans/slices/S08-governance-modelling.md",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-S08",
       "updated_at": "2026-11-13T12:21:14.938769+00:00",
       "version": 2
@@ -2813,6 +4653,9 @@
       "plan": "docs/plans/slices/S09-documents-integrations.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-S09",
       "updated_at": "2026-11-13T12:21:15.289563+00:00",
       "version": 2
@@ -2835,6 +4678,9 @@
       "plan": "docs/plans/slices/S10-copilot-ag-ui.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-S10",
       "updated_at": "2026-11-13T12:21:15.640708+00:00",
       "version": 2
@@ -2857,6 +4703,9 @@
       "plan": "docs/plans/slices/S11-procedures.md",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-5",
       "updated_at": "2026-11-13T12:21:15.993361+00:00",
       "version": 2
@@ -2879,6 +4728,9 @@
       "plan": "docs/plans/slices/S12-ui-buildout.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-6",
       "updated_at": "2026-11-13T12:21:16.358277+00:00",
       "version": 2
@@ -2901,6 +4753,9 @@
       "plan": "docs/plans/slices/S12-ui-buildout.md",
       "position": 2048,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-26",
       "updated_at": "2026-11-13T12:21:16.711637+00:00",
       "version": 2
@@ -2923,6 +4778,9 @@
       "plan": "docs/plans/slices/S12-ui-buildout.md",
       "position": 3072,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-27",
       "updated_at": "2026-11-13T12:21:17.066339+00:00",
       "version": 2
@@ -2945,6 +4803,9 @@
       "plan": "docs/plans/slices/S12-ui-buildout.md",
       "position": 4096,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-28",
       "updated_at": "2026-11-13T12:21:17.418321+00:00",
       "version": 2
@@ -2967,6 +4828,9 @@
       "plan": "docs/plans/slices/S13-n8n-engine.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-7",
       "updated_at": "2026-11-13T12:21:17.770793+00:00",
       "version": 2
@@ -2989,6 +4853,9 @@
       "plan": "docs/plans/slices/S14-cutover.md",
       "position": 1024,
       "process_key": "release_planning.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-8",
       "updated_at": "2026-11-13T12:21:18.120034+00:00",
       "version": 2
@@ -3011,6 +4878,9 @@
       "plan": "docs/plans/slices/S14-cutover.md",
       "position": 2048,
       "process_key": "release_planning.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-29",
       "updated_at": "2026-11-13T12:21:18.476104+00:00",
       "version": 2
@@ -3033,6 +4903,9 @@
       "plan": "docs/plans/slices/S15-capability-knowledge-memory.md",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-9",
       "updated_at": "2026-11-13T12:21:18.826554+00:00",
       "version": 2
@@ -3055,6 +4928,9 @@
       "plan": "docs/plans/slices/S16-inference-audit.md",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-10",
       "updated_at": "2026-11-13T12:21:19.17842+00:00",
       "version": 2
@@ -3077,6 +4953,9 @@
       "plan": "docs/plans/slices/S17-benchmark-harness.md",
       "position": 1024,
       "process_key": "bdd_test_development.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-11",
       "updated_at": "2026-11-13T12:21:19.532937+00:00",
       "version": 2
@@ -3099,6 +4978,9 @@
       "plan": "docs/plans/slices/S18-kata-improvement.md",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-12",
       "updated_at": "2026-11-13T12:21:19.882751+00:00",
       "version": 2
@@ -3121,6 +5003,9 @@
       "plan": "docs/plans/slices/S18-kata-improvement.md",
       "position": 2048,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-30",
       "updated_at": "2026-11-13T12:21:20.237026+00:00",
       "version": 2
@@ -3143,6 +5028,9 @@
       "plan": "docs/plans/slices/S19-eval-builder.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-13",
       "updated_at": "2026-11-13T12:21:20.773985+00:00",
       "version": 2
@@ -3165,6 +5053,9 @@
       "plan": "docs/plans/slices/S19-eval-builder.md",
       "position": 2048,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-31",
       "updated_at": "2026-11-13T12:21:21.124876+00:00",
       "version": 2
@@ -3187,6 +5078,9 @@
       "plan": "docs/plans/slices/S20-eval-hillclimb.md",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-14",
       "updated_at": "2026-11-13T12:21:21.483575+00:00",
       "version": 2
@@ -3209,6 +5103,9 @@
       "plan": "docs/plans/slices/S21-message-construction.md",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-15",
       "updated_at": "2026-11-13T12:21:21.841109+00:00",
       "version": 2
@@ -3231,6 +5128,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-34",
       "updated_at": "2026-11-13T12:21:22.200513+00:00",
       "version": 2
@@ -3253,6 +5153,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T1",
       "updated_at": "2026-11-13T12:21:22.559807+00:00",
       "version": 2
@@ -3275,6 +5178,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T2",
       "updated_at": "2026-11-13T12:21:22.919569+00:00",
       "version": 2
@@ -3297,6 +5203,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T3",
       "updated_at": "2026-11-13T12:21:23.275467+00:00",
       "version": 2
@@ -3319,6 +5228,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T4",
       "updated_at": "2026-11-13T12:21:23.632741+00:00",
       "version": 2
@@ -3341,6 +5253,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T5",
       "updated_at": "2026-11-13T12:21:23.990213+00:00",
       "version": 2
@@ -3363,6 +5278,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T6",
       "updated_at": "2026-11-13T12:21:24.350162+00:00",
       "version": 2
@@ -3385,6 +5303,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T7",
       "updated_at": "2026-11-13T12:21:24.71787+00:00",
       "version": 2
@@ -3407,6 +5328,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T8",
       "updated_at": "2026-11-13T12:21:25.074882+00:00",
       "version": 2
@@ -3429,6 +5353,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T9",
       "updated_at": "2026-11-13T12:21:25.428169+00:00",
       "version": 2
@@ -3451,6 +5378,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T10",
       "updated_at": "2026-11-13T12:21:25.784669+00:00",
       "version": 2
@@ -3473,6 +5403,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T11",
       "updated_at": "2026-11-13T12:21:26.142825+00:00",
       "version": 2
@@ -3495,6 +5428,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T12",
       "updated_at": "2026-11-13T12:21:26.501063+00:00",
       "version": 2
@@ -3517,6 +5453,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T13",
       "updated_at": "2026-11-13T12:21:26.854778+00:00",
       "version": 2
@@ -3539,6 +5478,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "development_chore.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T14",
       "updated_at": "2026-11-13T12:21:27.211169+00:00",
       "version": 2
@@ -3561,6 +5503,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T15",
       "updated_at": "2026-11-13T12:21:27.565693+00:00",
       "version": 2
@@ -3583,6 +5528,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T16",
       "updated_at": "2026-11-13T12:21:27.917171+00:00",
       "version": 2
@@ -3605,6 +5553,9 @@
       "plan": "docs/SPEC_V2.md#12",
       "position": 1024,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "plan-T17",
       "updated_at": "2026-11-13T12:21:28.268959+00:00",
       "version": 2
@@ -3627,6 +5578,9 @@
       "plan": "docs/design/STUDIO-SPEC.md",
       "position": 1024,
       "process_key": "design_packaging.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-32",
       "updated_at": "2026-11-13T12:21:28.62759+00:00",
       "version": 2
@@ -3649,6 +5603,9 @@
       "plan": "docs/design/STUDIO-SPEC.md",
       "position": 2048,
       "process_key": "design_packaging.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-33",
       "updated_at": "2026-11-13T12:21:28.990696+00:00",
       "version": 2
@@ -3671,6 +5628,9 @@
       "plan": "docs/design/STUDIO-SPEC.md",
       "position": 3072,
       "process_key": "design_packaging.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-36",
       "updated_at": "2026-11-13T12:21:29.345537+00:00",
       "version": 2
@@ -3693,6 +5653,9 @@
       "plan": "docs/design/STUDIO-SPEC.md",
       "position": 4096,
       "process_key": "design_packaging.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-37",
       "updated_at": "2026-11-13T12:21:29.704053+00:00",
       "version": 2
@@ -3715,6 +5678,9 @@
       "plan": "docs/plans/development-process-speed.md",
       "position": 1024,
       "process_key": "development_chore.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-17",
       "updated_at": "2026-11-13T12:21:30.061587+00:00",
       "version": 2
@@ -3737,6 +5703,9 @@
       "plan": "docs/plans/development-process-speed.md",
       "position": 2048,
       "process_key": "development_chore.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-22",
       "updated_at": "2026-11-13T12:21:30.418063+00:00",
       "version": 2
@@ -3759,6 +5728,9 @@
       "plan": "docs/plans/development-process-speed.md",
       "position": 3072,
       "process_key": "development_chore.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-43",
       "updated_at": "2026-11-13T12:21:30.772138+00:00",
       "version": 2
@@ -3781,6 +5753,9 @@
       "plan": "docs/plans/development-process-speed.md",
       "position": 4096,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-44",
       "updated_at": "2026-11-13T12:21:31.126348+00:00",
       "version": 2
@@ -3803,6 +5778,9 @@
       "plan": "docs/plans/development-process-speed.md",
       "position": 5120,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-45",
       "updated_at": "2026-11-13T12:21:31.482158+00:00",
       "version": 2
@@ -3825,6 +5803,9 @@
       "plan": "docs/plans/development-process-speed.md",
       "position": 6144,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-46",
       "updated_at": "2026-11-13T12:21:31.838645+00:00",
       "version": 2
@@ -3847,6 +5828,9 @@
       "plan": "docs/plans/development-process-speed.md",
       "position": 7168,
       "process_key": "development_chore.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-55",
       "updated_at": "2026-11-13T12:21:32.196746+00:00",
       "version": 2
@@ -3869,6 +5853,9 @@
       "plan": "docs/plans/development-process-speed.md",
       "position": 8192,
       "process_key": "development_feature_new.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-57",
       "updated_at": "2026-11-13T12:21:32.55161+00:00",
       "version": 2
@@ -3891,6 +5878,9 @@
       "plan": "docs/SPEC_V2.md",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "issue-24",
       "updated_at": "2026-11-13T12:21:32.912543+00:00",
       "version": 2
@@ -3913,6 +5903,9 @@
       "plan": "docs/SPEC_V2.md",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "T0",
       "updated_at": "2026-11-13T12:21:44.987551+00:00",
       "version": 1
@@ -3935,6 +5928,9 @@
       "plan": "docs/plans/P0-programme-definition.md",
       "position": 1024,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "P0",
       "updated_at": "2026-11-16T09:41:39.706855+00:00",
       "version": 2
@@ -3957,6 +5953,9 @@
       "plan": "docs/plans/P0-programme-definition.md",
       "position": 2048,
       "process_key": "architecture_task.READY",
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": "P0",
       "updated_at": "2026-11-16T10:36:52.923789+00:00",
       "version": 2
@@ -3979,9 +5978,87 @@
       "plan": null,
       "position": 1024,
       "process_key": null,
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
       "unit_key": null,
       "updated_at": "2026-11-18T19:36:51.683026+00:00",
       "version": 3
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "card_type_id": "01a1d039-0ce8-7d5c-83dc-f2034fbfd24c",
+      "created_at": "2026-11-19T07:36:44.012+00:00",
+      "created_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "due_at": null,
+      "id": "01a1f2bc-8723-751a-af62-a8c8f05e1e51",
+      "issue": null,
+      "list_changed_at": "2026-11-19T07:36:44.012+00:00",
+      "list_id": "01a1f2bc-8703-7235-80d1-4a02d820a14f",
+      "name": "Project start request analysis",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
+      "unit_key": null,
+      "updated_at": "2026-11-19T07:36:44.012+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": "2026-11-19T07:41:22.881078+00:00",
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "card_type_id": "01a1d039-0ce8-7d5c-83dc-f2034fbfd24c",
+      "created_at": "2026-11-19T07:40:36.265466+00:00",
+      "created_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "due_at": null,
+      "id": "01a1f2c0-128d-78ec-8ed2-122c54c70284",
+      "issue": null,
+      "list_changed_at": "2026-11-19T07:41:22.881078+00:00",
+      "list_id": "01a1f2c0-125e-7507-9b9b-03a147fc78d4",
+      "name": "Project start request analysis",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
+      "unit_key": null,
+      "updated_at": "2026-11-19T07:41:22.536194+00:00",
+      "version": 2
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "card_type_id": "01a1f2a5-894f-7b79-9d59-aa940e6d50d4",
+      "created_at": "2026-11-19T08:00:59.913448+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1f2d2-c174-7b94-9e80-cd31c35f9c8e",
+      "issue": null,
+      "list_changed_at": "2026-11-19T08:00:59.913448+00:00",
+      "list_id": "01a1f2bc-8703-7235-80d1-4a02d820a14f",
+      "name": "Coach: Project start request analysis",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 2048,
+      "process_key": null,
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
+      "unit_key": null,
+      "updated_at": "2026-11-19T08:00:59.913448+00:00",
+      "version": 1
     },
     {
       "archived_at": null,
@@ -4001,9 +6078,787 @@
       "plan": null,
       "position": 1024,
       "process_key": null,
+      "rework_key": null,
+      "rule": null,
+      "severity": "sev2",
       "unit_key": null,
       "updated_at": "2026-11-20T08:06:24.556902+00:00",
       "version": 5
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce7-7fa0-900d-2e91460958c1",
+      "created_at": "2026-11-21T18:37:12.911661+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ff65-ef71-7ccb-96de-373594bc2670",
+      "issue": null,
+      "list_changed_at": "2026-11-21T18:37:12.911661+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Publish the project's closure review [DESIGN-PUBLISH]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": "closed_without_closure_review:DESIGN-PUBLISH",
+      "rule": "closed_without_closure_review",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T18:37:12.911661+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce7-7fa0-900d-2e91460958c1",
+      "created_at": "2026-11-21T21:00:32.802458+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffe9-2a40-715f-96cd-743a858d709a",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:00:32.802458+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Publish the project's closure review [T14]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 2048,
+      "process_key": null,
+      "rework_key": "closed_without_closure_review:T14",
+      "rule": "closed_without_closure_review",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:00:32.802458+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce7-7fa0-900d-2e91460958c1",
+      "created_at": "2026-11-21T21:00:35.574456+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffe9-3514-7a53-b44c-118fedc6bd5a",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:00:35.574456+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Publish the project's closure review [T16]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 3072,
+      "process_key": null,
+      "rework_key": "closed_without_closure_review:T16",
+      "rule": "closed_without_closure_review",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:00:35.574456+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce7-7fa0-900d-2e91460958c1",
+      "created_at": "2026-11-21T21:00:38.324976+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffe9-3fcf-7bd6-a9ec-647eb8182158",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:00:38.324976+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Publish the project's closure review [T2]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 4096,
+      "process_key": null,
+      "rework_key": "closed_without_closure_review:T2",
+      "rule": "closed_without_closure_review",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:00:38.324976+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce7-7fa0-900d-2e91460958c1",
+      "created_at": "2026-11-21T21:00:41.074983+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffe9-4a90-7c9e-bf88-afb3f1bf68fa",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:00:41.074983+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Publish the project's closure review [T3]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 5120,
+      "process_key": null,
+      "rework_key": "closed_without_closure_review:T3",
+      "rule": "closed_without_closure_review",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:00:41.074983+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce7-7fa0-900d-2e91460958c1",
+      "created_at": "2026-11-21T21:00:43.8508+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffe9-557f-7390-bc56-8d70f35106c5",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:00:43.8508+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Publish the project's closure review [T7]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 6144,
+      "process_key": null,
+      "rework_key": "closed_without_closure_review:T7",
+      "rule": "closed_without_closure_review",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:00:43.8508+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-97bd-79d2-b5c0-dc329ab72137",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:00:54.794888+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffe9-803d-7264-b4d3-853dfc66338d",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:00:54.794888+00:00",
+      "list_id": "01a1ffe9-6a61-72b6-b2b9-fa853838538e",
+      "name": "Authorise or re-plan a tranche that is delivering without a gate decision [tranche-10]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": "project_in_unauthorised_tranche:tranche-10",
+      "rule": "project_in_unauthorised_tranche",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:00:54.794888+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-521b-70de-b072-7e28f7ad63a0",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:01:05.274467+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffe9-a930-7688-a409-a4ab5cb86e02",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:01:05.274467+00:00",
+      "list_id": "01a1ffe9-9542-7c70-9762-e9d7dfa94675",
+      "name": "Authorise or re-plan a tranche that is delivering without a gate decision [tranche-3]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": "project_in_unauthorised_tranche:tranche-3",
+      "rule": "project_in_unauthorised_tranche",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:01:05.274467+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:01:08.096376+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffe9-b41d-70b4-8b7a-fa5533e0f485",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:01:08.096376+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Authorise or re-plan a tranche that is delivering without a gate decision [tranche-4]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 7168,
+      "process_key": null,
+      "rework_key": "project_in_unauthorised_tranche:tranche-4",
+      "rule": "project_in_unauthorised_tranche",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:01:08.096376+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-572f-756a-98ea-35c53c40bd64",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:01:18.909271+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffe9-de67-7e7d-802a-7f2e76aae912",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:01:18.909271+00:00",
+      "list_id": "01a1ffe9-ca28-7c37-808c-b5420235cfed",
+      "name": "Authorise or re-plan a tranche that is delivering without a gate decision [tranche-5]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": "project_in_unauthorised_tranche:tranche-5",
+      "rule": "project_in_unauthorised_tranche",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:01:18.909271+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:01:21.868488+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffe9-ea22-76cb-9cee-369d1ac8db4f",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:01:21.868488+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Authorise or re-plan a tranche that is delivering without a gate decision [tranche-6]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 8192,
+      "process_key": null,
+      "rework_key": "project_in_unauthorised_tranche:tranche-6",
+      "rule": "project_in_unauthorised_tranche",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:01:21.868488+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-793c-779a-88d6-94f04a96a5d2",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:01:32.779608+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffea-1497-7292-a2a7-93aff9094684",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:01:32.779608+00:00",
+      "list_id": "01a1ffe9-ff75-70f7-abd7-b3788f2f5577",
+      "name": "Authorise or re-plan a tranche that is delivering without a gate decision [tranche-7]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": "project_in_unauthorised_tranche:tranche-7",
+      "rule": "project_in_unauthorised_tranche",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:01:32.779608+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-8379-7885-ac9e-5ef7c2be5f41",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:01:43.247741+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffea-3d79-7ae4-9f9a-423047c00ab8",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:01:43.247741+00:00",
+      "list_id": "01a1ffea-28ac-750e-adfb-848b18fe7af3",
+      "name": "Authorise or re-plan a tranche that is delivering without a gate decision [tranche-8]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": "project_in_unauthorised_tranche:tranche-8",
+      "rule": "project_in_unauthorised_tranche",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:01:43.247741+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:01:46.122724+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffea-48b5-7eb2-ab4f-eb59d2670fac",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:01:46.122724+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Project start passes when the programme has no tranche row [T10]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 9216,
+      "process_key": null,
+      "rework_key": "v1-w2b-2:T10",
+      "rule": "v1-w2b-2",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:01:46.122724+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:01:48.956091+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffea-53c7-7da2-a240-7d2a6c6fe796",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:01:48.956091+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Baseline change guard trusts a self-declared 'approved' status on a register row [T3]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 10240,
+      "process_key": null,
+      "rework_key": "v1-w2c-3:T3",
+      "rule": "v1-w2c-3",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:01:48.956091+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:01:52.113011+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffea-6016-74b3-a32c-31e0e598c037",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:01:52.113011+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Publish the tranche's PI plan before its cards materialise [tranche-2]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 11264,
+      "process_key": null,
+      "rework_key": "pi_plan_missing:tranche-2",
+      "rule": "pi_plan_missing",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:01:52.113011+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:01:55.027045+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffea-6b7c-7b9d-9a97-d747bd6c91ac",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:01:55.027045+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Coach remedies are recorded, never applied [T4]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 12288,
+      "process_key": null,
+      "rework_key": "v1-p6-1:T4",
+      "rule": "v1-p6-1",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:01:55.027045+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:01:58.662998+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffea-79b1-79e3-bfef-b22726135492",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:01:58.662998+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "PI plan auto-materialises with no human approval [T10]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 13312,
+      "process_key": null,
+      "rework_key": "v1-p82-1:T10",
+      "rule": "v1-p82-1",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:01:58.662998+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:02:01.773768+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffea-85db-765e-8830-fa70cf58acdb",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:02:01.773768+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Gate evidence is caller-opt-in, not required [PLATFORM]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 14336,
+      "process_key": null,
+      "rework_key": "v1-p5-1:PLATFORM",
+      "rule": "v1-p5-1",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:02:01.773768+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-8dac-7b87-8d7d-44d35bae7117",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:02:12.399692+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffea-af57-7cc4-b680-6314108c9947",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:02:12.399692+00:00",
+      "list_id": "01a1ffea-9b7a-7b01-92f0-4e088cdd4321",
+      "name": "WBS nodes accepted on a checkbox [T1]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": "v1-p5-2:T1",
+      "rule": "v1-p5-2",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:02:12.399692+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-a74c-756b-85c8-2a37fb7e8c58",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:02:23.864268+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffea-dc29-7042-a1e6-6650cd4e214b",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:02:23.864268+00:00",
+      "list_id": "01a1ffea-c7c3-75e8-b7e9-c3778ffc1c2e",
+      "name": "Budget enforcement is off by default and no run/binding declares a budget [T11]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": "v1-p75-1:T11",
+      "rule": "v1-p75-1",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:02:23.864268+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:02:26.840496+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffea-e7c0-7e2f-b3c0-ecf72a9eb689",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:02:26.840496+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Output pages and programme.csv bypass the redaction and programme filters [PLATFORM]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 15360,
+      "process_key": null,
+      "rework_key": "v1-pack-6:PLATFORM",
+      "rule": "v1-pack-6",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:02:26.840496+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-8b22-7c70-af0b-d06d9afc2275",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:02:37.406178+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffeb-10fc-721d-a1f9-308a4b7c3b4b",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:02:37.406178+00:00",
+      "list_id": "01a1ffea-fd90-7f31-b5df-5b6217e65026",
+      "name": "Release compile ignores the knowledge layers and can never refuse release_not_ready or department_conflict [T0]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": "v1-w1a-2:T0",
+      "rule": "v1-w1a-2",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:02:37.406178+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:02:40.232948+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffeb-1c16-76f9-be67-5dea3016b303",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:02:40.232948+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "The L3 human gate on a generated draft is forgeable by any service principal, and any accepted non-rule decision on the card qualifies [T2]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 16384,
+      "process_key": null,
+      "rework_key": "v1-w1c-2:T2",
+      "rule": "v1-w1c-2",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:02:40.232948+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:02:45.624804+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffeb-311e-708e-a994-83eb40fd3a69",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:02:45.624804+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "No spend budget gate: 429 tool_budget_exceeded is unimplemented and tool_call.cost is never written [T13]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 17408,
+      "process_key": null,
+      "rework_key": "v1-w4a-1:T13",
+      "rule": "v1-w4a-1",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:02:45.624804+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:02:48.817156+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffeb-3da6-7093-a936-be6c79576976",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:02:48.817156+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Write-verify is unenforced: no checks[]/verdict at call time and no publication gate for a write tool without verification [T13]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 18432,
+      "process_key": null,
+      "rework_key": "v1-w4a-2:T13",
+      "rule": "v1-w4a-2",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:02:48.817156+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce0-7487-b2a0-930543f8b98a",
+      "created_at": "2026-11-21T21:02:51.664295+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffeb-4900-7007-b262-2e7959803552",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:02:51.664295+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Phase gates are vacuous without a hand-authored profile, and the caller may choose a draft profile [T9]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 19456,
+      "process_key": null,
+      "rework_key": "v1-p81-1:T9",
+      "rule": "v1-p81-1",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:02:51.664295+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce0-7487-b2a0-930543f8b98a",
+      "created_at": "2026-11-21T21:02:54.622543+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffeb-5445-733d-af3b-a320b82fe4d6",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:02:54.622543+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Phase G is not a gate: no contract/review required at design or phase advance, and programme-track projects skip it [T9]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 20480,
+      "process_key": null,
+      "rework_key": "v1-p81-2:T9",
+      "rule": "v1-p81-2",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:02:54.622543+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce0-7487-b2a0-930543f8b98a",
+      "created_at": "2026-11-21T21:02:57.583231+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffeb-5fd8-7f91-adfd-fbe5716a699c",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:02:57.583231+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "Board-adopted ADM profile can be rewritten after adoption and adoption cites an unvalidated decision [T9]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 21504,
+      "process_key": null,
+      "rework_key": "v1-p81-3:T9",
+      "rule": "v1-p81-3",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:02:57.583231+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "card_type_id": "01a1d039-0ce4-7215-94a4-0e8be2f8e38a",
+      "created_at": "2026-11-21T21:03:22.583046+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1ffeb-c188-7619-bc69-536eccded212",
+      "issue": null,
+      "list_changed_at": "2026-11-21T21:03:22.583046+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "name": "The andon cord can be released by a machine: andon.release never checks that the actor is a person [T7]",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 22528,
+      "process_key": null,
+      "rework_key": "v1-w3a-1:T7",
+      "rule": "v1-w3a-1",
+      "severity": "P0",
+      "unit_key": null,
+      "updated_at": "2026-11-21T21:03:22.583046+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "card_type_id": "01a20c80-868d-72b8-8112-fca9e0d91b72",
+      "created_at": "2026-11-24T07:51:52.718141+00:00",
+      "created_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "due_at": null,
+      "id": "01a20c8a-3370-7a8f-b903-faf5f7cff917",
+      "issue": null,
+      "list_changed_at": "2026-11-24T07:51:52.718141+00:00",
+      "list_id": "01a20c80-ba6b-7fc7-81aa-b385ad40273c",
+      "name": "T19 live gate — decision forum",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
+      "unit_key": null,
+      "updated_at": "2026-11-24T07:51:52.718141+00:00",
+      "version": 1
     }
   ],
   "comments": [
@@ -7686,9 +10541,149 @@
       "id": "01a1f029-90ab-75eb-acef-0bc6a7482e3d",
       "updated_at": "2026-11-18T19:36:58.01638+00:00",
       "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1f2bc-8723-751a-af62-a8c8f05e1e51",
+      "created_at": "2026-11-19T08:00:59.484041+00:00",
+      "edited_at": null,
+      "id": "01a1f2d2-bcfc-79cf-8ce7-1230d5b2bcc7",
+      "updated_at": "2026-11-19T08:00:59.484041+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1f2c0-128d-78ec-8ed2-122c54c70284",
+      "created_at": "2026-11-19T08:29:47.674883+00:00",
+      "edited_at": null,
+      "id": "01a1f2ed-1c53-79eb-bb52-d33a44b3ef8c",
+      "updated_at": "2026-11-19T08:29:47.674883+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1ff65-ef71-7ccb-96de-373594bc2670",
+      "created_at": "2026-11-21T21:03:00.39406+00:00",
+      "edited_at": null,
+      "id": "01a1ffeb-6a0d-7c42-a555-7a30c9f5ea42",
+      "updated_at": "2026-11-21T21:03:00.39406+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1ffea-85db-765e-8830-fa70cf58acdb",
+      "created_at": "2026-11-21T21:33:18.44076+00:00",
+      "edited_at": null,
+      "id": "01a20007-27da-73e4-9d55-7859f95136e5",
+      "updated_at": "2026-11-21T21:33:18.44076+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1ffea-af57-7cc4-b680-6314108c9947",
+      "created_at": "2026-11-21T21:33:21.095458+00:00",
+      "edited_at": null,
+      "id": "01a20007-3235-7659-a581-58629db53188",
+      "updated_at": "2026-11-21T21:33:21.095458+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1ffea-6b7c-7b9d-9a97-d747bd6c91ac",
+      "created_at": "2026-11-21T21:33:23.706182+00:00",
+      "edited_at": null,
+      "id": "01a20007-3c6a-7c5e-be92-fcc8addd685e",
+      "updated_at": "2026-11-21T21:33:23.706182+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1ffeb-4900-7007-b262-2e7959803552",
+      "created_at": "2026-11-21T21:33:26.372146+00:00",
+      "edited_at": null,
+      "id": "01a20007-46d9-717c-9050-314f3ed38d2f",
+      "updated_at": "2026-11-21T21:33:26.372146+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1ffeb-5445-733d-af3b-a320b82fe4d6",
+      "created_at": "2026-11-21T21:33:29.491108+00:00",
+      "edited_at": null,
+      "id": "01a20007-52fb-7ad6-a83a-177e459a71de",
+      "updated_at": "2026-11-21T21:33:29.491108+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1ffeb-5fd8-7f91-adfd-fbe5716a699c",
+      "created_at": "2026-11-21T21:33:32.493483+00:00",
+      "edited_at": null,
+      "id": "01a20007-5eb8-75f9-96c0-bd567d4629ee",
+      "updated_at": "2026-11-21T21:33:32.493483+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1ffea-e7c0-7e2f-b3c0-ecf72a9eb689",
+      "created_at": "2026-11-21T21:33:35.266274+00:00",
+      "edited_at": null,
+      "id": "01a20007-6990-75c0-9917-9cb493c1dcdb",
+      "updated_at": "2026-11-21T21:33:35.266274+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1ffeb-1c16-76f9-be67-5dea3016b303",
+      "created_at": "2026-11-21T21:33:37.938604+00:00",
+      "edited_at": null,
+      "id": "01a20007-7403-74a3-821d-b21fbb028ada",
+      "updated_at": "2026-11-21T21:33:37.938604+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1ffea-48b5-7eb2-ab4f-eb59d2670fac",
+      "created_at": "2026-11-21T21:33:40.721293+00:00",
+      "edited_at": null,
+      "id": "01a20007-7ee2-75c8-9640-a7830df07006",
+      "updated_at": "2026-11-21T21:33:40.721293+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1ffea-53c7-7da2-a240-7d2a6c6fe796",
+      "created_at": "2026-11-21T21:33:43.442604+00:00",
+      "edited_at": null,
+      "id": "01a20007-8982-713a-9465-39eab9e20bce",
+      "updated_at": "2026-11-21T21:33:43.442604+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1ffeb-c188-7619-bc69-536eccded212",
+      "created_at": "2026-11-21T21:33:46.640184+00:00",
+      "edited_at": null,
+      "id": "01a20007-95fc-7238-9d41-f6329ecfae0c",
+      "updated_at": "2026-11-21T21:33:46.640184+00:00",
+      "version": 1
     }
   ],
-  "generated_at": "2026-11-20T11:50:50.848127361+00:00",
+  "generated_at": "2026-11-24T10:10:00Z",
   "lists": [
     {
       "board_id": "01a1d3e7-473e-7ccb-88ca-dbbc10d8e5e5",
@@ -7941,6 +10936,16 @@
       "wip_limit": null
     },
     {
+      "board_id": "01a1d3e7-521b-70de-b072-7e28f7ad63a0",
+      "color": null,
+      "id": "01a1ffe9-9542-7c70-9762-e9d7dfa94675",
+      "kind": "intake",
+      "name": "Conformance rework",
+      "position": 6144,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
       "board_id": "01a1d3e7-54ad-7c55-b70f-43dd2f139507",
       "color": null,
       "id": "01a1d3e7-54fb-7f6a-84dc-d09ea6dc99d6",
@@ -8037,6 +11042,16 @@
       "kind": "archive",
       "name": "Archive",
       "position": 5120,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1d3e7-572f-756a-98ea-35c53c40bd64",
+      "color": null,
+      "id": "01a1ffe9-ca28-7c37-808c-b5420235cfed",
+      "kind": "intake",
+      "name": "Conformance rework",
+      "position": 6144,
       "version": 1,
       "wip_limit": null
     },
@@ -8691,6 +11706,16 @@
       "wip_limit": null
     },
     {
+      "board_id": "01a1d3e7-793c-779a-88d6-94f04a96a5d2",
+      "color": null,
+      "id": "01a1ffe9-ff75-70f7-abd7-b3788f2f5577",
+      "kind": "intake",
+      "name": "Conformance rework",
+      "position": 6144,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
       "board_id": "01a1d3e7-7bc1-7ce8-957f-839f2cdbde15",
       "color": null,
       "id": "01a1d3e7-7c0e-7bae-92e2-8caf03d48291",
@@ -8891,6 +11916,16 @@
       "wip_limit": null
     },
     {
+      "board_id": "01a1d3e7-8379-7885-ac9e-5ef7c2be5f41",
+      "color": null,
+      "id": "01a1ffea-28ac-750e-adfb-848b18fe7af3",
+      "kind": "intake",
+      "name": "Conformance rework",
+      "position": 6144,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
       "board_id": "01a1d3e7-8624-7801-9e18-17672372304e",
       "color": null,
       "id": "01a1d3e7-8671-7424-949a-6e0e2ec91f98",
@@ -9041,6 +12076,16 @@
       "wip_limit": null
     },
     {
+      "board_id": "01a1d3e7-8b22-7c70-af0b-d06d9afc2275",
+      "color": null,
+      "id": "01a1ffea-fd90-7f31-b5df-5b6217e65026",
+      "kind": "intake",
+      "name": "Conformance rework",
+      "position": 6144,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
       "board_id": "01a1d3e7-8dac-7b87-8d7d-44d35bae7117",
       "color": null,
       "id": "01a1d3e7-8df9-7644-8217-3f8635f01788",
@@ -9087,6 +12132,16 @@
       "kind": "archive",
       "name": "Archive",
       "position": 5120,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1d3e7-8dac-7b87-8d7d-44d35bae7117",
+      "color": null,
+      "id": "01a1ffea-9b7a-7b01-92f0-4e088cdd4321",
+      "kind": "intake",
+      "name": "Conformance rework",
+      "position": 6144,
       "version": 1,
       "wip_limit": null
     },
@@ -9287,6 +12342,16 @@
       "kind": "archive",
       "name": "Archive",
       "position": 5120,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1d3e7-97bd-79d2-b5c0-dc329ab72137",
+      "color": null,
+      "id": "01a1ffe9-6a61-72b6-b2b9-fa853838538e",
+      "kind": "intake",
+      "name": "Conformance rework",
+      "position": 6144,
       "version": 1,
       "wip_limit": null
     },
@@ -9587,6 +12652,16 @@
       "kind": "archive",
       "name": "Archive",
       "position": 5120,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1d3e7-a74c-756b-85c8-2a37fb7e8c58",
+      "color": null,
+      "id": "01a1ffea-c7c3-75e8-b7e9-c3778ffc1c2e",
+      "kind": "intake",
+      "name": "Conformance rework",
+      "position": 6144,
       "version": 1,
       "wip_limit": null
     },
@@ -9991,6 +13066,16 @@
       "wip_limit": null
     },
     {
+      "board_id": "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c",
+      "color": null,
+      "id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
+      "kind": "intake",
+      "name": "Conformance rework",
+      "position": 6144,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
       "board_id": "01a1d3e7-c0c9-7417-982a-f678fe054dc3",
       "color": null,
       "id": "01a1d3e7-c114-7843-840d-5689134844df",
@@ -10089,6 +13174,206 @@
       "position": 5120,
       "version": 1,
       "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "color": null,
+      "id": "01a1f2bc-8703-7235-80d1-4a02d820a14f",
+      "kind": "intake",
+      "name": "Intake",
+      "position": 1024,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "color": null,
+      "id": "01a1f2bc-8708-726a-9974-87afa1adad20",
+      "kind": "active",
+      "name": "Active",
+      "position": 2048,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "color": null,
+      "id": "01a1f2bc-870c-7ad0-a7d9-065775095f4e",
+      "kind": "waiting",
+      "name": "Waiting",
+      "position": 3072,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "color": null,
+      "id": "01a1f2bc-8710-7ebd-989d-c7536856d8e4",
+      "kind": "done",
+      "name": "Done",
+      "position": 4096,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "color": null,
+      "id": "01a1f2bc-8715-78a2-b7a0-81440c77f632",
+      "kind": "archive",
+      "name": "Archive",
+      "position": 5120,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "color": null,
+      "id": "01a1f2c0-1248-7f2d-8518-bab9e22e945f",
+      "kind": "intake",
+      "name": "Intake",
+      "position": 1024,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "color": null,
+      "id": "01a1f2c0-124e-77a5-8163-c33190322a1a",
+      "kind": "active",
+      "name": "Active",
+      "position": 2048,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "color": null,
+      "id": "01a1f2c0-1253-7b96-aa03-c5302a2dbec1",
+      "kind": "waiting",
+      "name": "Waiting",
+      "position": 3072,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "color": null,
+      "id": "01a1f2c0-1258-7af4-915c-c18e35f87bab",
+      "kind": "done",
+      "name": "Done",
+      "position": 4096,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "color": null,
+      "id": "01a1f2c0-125e-7507-9b9b-03a147fc78d4",
+      "kind": "archive",
+      "name": "Archive",
+      "position": 5120,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-b7cc-7d05-bc66-6ed9d667e927",
+      "color": null,
+      "id": "01a20c80-b84d-7f0f-9c44-50dee3f09063",
+      "kind": "intake",
+      "name": "Intake",
+      "position": 1024,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-b7cc-7d05-bc66-6ed9d667e927",
+      "color": null,
+      "id": "01a20c80-b89c-75ad-8873-8e9a176bcaeb",
+      "kind": "active",
+      "name": "Active",
+      "position": 2048,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-b7cc-7d05-bc66-6ed9d667e927",
+      "color": null,
+      "id": "01a20c80-b8ea-7834-81ef-b6dd1b4a71f6",
+      "kind": "waiting",
+      "name": "Waiting",
+      "position": 3072,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-b7cc-7d05-bc66-6ed9d667e927",
+      "color": null,
+      "id": "01a20c80-b937-765d-9288-2339a98262a1",
+      "kind": "done",
+      "name": "Done",
+      "position": 4096,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-b7cc-7d05-bc66-6ed9d667e927",
+      "color": null,
+      "id": "01a20c80-b984-7486-868c-47b24d217310",
+      "kind": "archive",
+      "name": "Archive",
+      "position": 5120,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "color": null,
+      "id": "01a20c80-ba6b-7fc7-81aa-b385ad40273c",
+      "kind": "intake",
+      "name": "Intake",
+      "position": 1024,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "color": null,
+      "id": "01a20c80-bab8-74bc-af89-7c6daa99ddad",
+      "kind": "active",
+      "name": "Active",
+      "position": 2048,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "color": null,
+      "id": "01a20c80-bb05-7045-9477-96b9308813b6",
+      "kind": "waiting",
+      "name": "Waiting",
+      "position": 3072,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "color": null,
+      "id": "01a20c80-bb51-739d-bbb9-de60a19d60c4",
+      "kind": "done",
+      "name": "Done",
+      "position": 4096,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "color": null,
+      "id": "01a20c80-bb9d-7380-b456-62dd2ba219ba",
+      "kind": "archive",
+      "name": "Archive",
+      "position": 5120,
+      "version": 1,
+      "wip_limit": null
     }
   ],
   "people": [
@@ -10115,6 +13400,263 @@
       "id": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
       "kind": "human",
       "status": "active"
+    }
+  ],
+  "project_activity": [
+    {
+      "last_activity_at": "2026-11-13T12:21:10.399086+00:00",
+      "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:10.990459+00:00",
+      "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:11.497185+00:00",
+      "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:11.848199+00:00",
+      "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-21T21:01:05.274467+00:00",
+      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:12.561989+00:00",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-21T21:01:18.909271+00:00",
+      "project_id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:13.270217+00:00",
+      "project_id": "01a1d039-0d2a-779c-8d89-3bc79003b513",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:13.627511+00:00",
+      "project_id": "01a1d039-0d2a-7ea9-b809-929452f221fd",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:13.981809+00:00",
+      "project_id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:14.337665+00:00",
+      "project_id": "01a1d039-0d2b-7b80-93fe-c1daf60c5c1f",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:14.695302+00:00",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:15.049526+00:00",
+      "project_id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:15.400277+00:00",
+      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:15.750505+00:00",
+      "project_id": "01a1d039-0d2d-787e-853e-fef542ec8815",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:16.103294+00:00",
+      "project_id": "01a1d039-0d2d-7ec6-aef0-4096ea66e7a4",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:17.528646+00:00",
+      "project_id": "01a1d039-0d2e-7585-8cb4-ab197d2e6dab",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:17.880764+00:00",
+      "project_id": "01a1d039-0d2e-7ed4-9cda-a7fce9fffa8e",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:18.58682+00:00",
+      "project_id": "01a1d039-0d2f-75f2-a1fb-aa95893aa206",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-21T21:01:32.779608+00:00",
+      "project_id": "01a1d039-0d2f-7ca0-9d3d-534ca7d673fb",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:19.289112+00:00",
+      "project_id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:19.643073+00:00",
+      "project_id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:20.358618+00:00",
+      "project_id": "01a1d039-0d30-7f95-9d93-30eaabfec6da",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-21T21:01:43.247741+00:00",
+      "project_id": "01a1d039-0d31-77b6-80e2-1c7205d63f99",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:21.594373+00:00",
+      "project_id": "01a1d039-0d31-7d0f-ab1f-16240952e223",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:21.954911+00:00",
+      "project_id": "01a1d039-0d32-71f6-bad4-81493c102060",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-21T21:02:37.406178+00:00",
+      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-21T21:02:12.399692+00:00",
+      "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:23.030693+00:00",
+      "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:23.388868+00:00",
+      "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:23.74553+00:00",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-21T21:00:54.794888+00:00",
+      "project_id": "01a1d039-0d34-73db-975e-5d178d729cef",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:24.462876+00:00",
+      "project_id": "01a1d039-0d34-7973-8989-0b83246fc888",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-20T08:04:51.913389+00:00",
+      "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:25.185118+00:00",
+      "project_id": "01a1d039-0d35-76bb-a22e-be49e3e95d16",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:25.540207+00:00",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:25.896267+00:00",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-21T21:02:23.864268+00:00",
+      "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:26.613167+00:00",
+      "project_id": "01a1d039-0d36-7de8-891c-4d3dcf110cf5",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-18T19:36:51.683026+00:00",
+      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:27.321956+00:00",
+      "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:27.676494+00:00",
+      "project_id": "01a1d039-0d37-7f20-9959-979c31daeb5e",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:28.028157+00:00",
+      "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:28.382308+00:00",
+      "project_id": "01a1d039-0d38-7db1-b685-d76bd4cebf47",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:29.817083+00:00",
+      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-21T21:03:22.583046+00:00",
+      "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-13T12:21:33.023256+00:00",
+      "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+      "started_at": "2026-11-13T07:55:11.729458+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-16T10:36:54.1832+00:00",
+      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+      "started_at": "2026-11-16T02:59:03.927994+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-19T08:15:43.924145+00:00",
+      "project_id": "01a1f2bc-86f7-7904-ac48-b45cad0d1393",
+      "started_at": "2026-11-19T07:36:44.012+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-19T08:29:42.337419+00:00",
+      "project_id": "01a1f2c0-1239-7b59-a0bd-e0609219fa8b",
+      "started_at": "2026-11-19T07:40:36.265466+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-24T07:51:52.718141+00:00",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "started_at": "2026-11-24T07:51:52.718141+00:00"
     }
   ],
   "run_steps": [
@@ -23383,6 +26925,114 @@
       "started_at": "2026-11-16T10:36:52.472548+00:00",
       "status": "succeeded",
       "updated_at": "2026-11-16T10:36:54.1832+00:00"
+    },
+    {
+      "action": "agent.run",
+      "attempt": 1,
+      "created_at": "2026-11-19T07:36:44.012+00:00",
+      "duration_ms": null,
+      "finished_at": "2026-11-19T07:50:56.816487+00:00",
+      "id": "01a1f2bc-874f-7b44-9020-efd48620130f",
+      "input_hash": null,
+      "node_id": null,
+      "output_hash": null,
+      "position": 1,
+      "procedure_version": 1,
+      "process_step_id": "01a1d3e9-ed25-77a8-b38f-d28533d36c88",
+      "run_id": "01a1f2bc-8747-775d-8799-9cf197b0b4b7",
+      "started_at": "2026-11-19T07:47:44.781777+00:00",
+      "status": "failed",
+      "updated_at": "2026-11-19T07:50:56.816487+00:00"
+    },
+    {
+      "action": "cards.move",
+      "attempt": 1,
+      "created_at": "2026-11-19T07:36:44.012+00:00",
+      "duration_ms": null,
+      "finished_at": "2026-11-19T07:50:56.816487+00:00",
+      "id": "01a1f2bc-8751-7651-89ee-d8703867b587",
+      "input_hash": null,
+      "node_id": null,
+      "output_hash": null,
+      "position": 2,
+      "procedure_version": null,
+      "process_step_id": "01a1d3e9-ed42-7b16-b042-08d1898ace0e",
+      "run_id": "01a1f2bc-8747-775d-8799-9cf197b0b4b7",
+      "started_at": null,
+      "status": "skipped",
+      "updated_at": "2026-11-19T07:50:56.816487+00:00"
+    },
+    {
+      "action": "agent.run",
+      "attempt": 1,
+      "created_at": "2026-11-19T07:40:36.265466+00:00",
+      "duration_ms": null,
+      "finished_at": "2026-11-19T08:20:43.797457+00:00",
+      "id": "01a1f2c0-12dd-752d-84f7-59770a732495",
+      "input_hash": null,
+      "node_id": null,
+      "output_hash": null,
+      "position": 1,
+      "procedure_version": 1,
+      "process_step_id": "01a1d3e9-ed25-77a8-b38f-d28533d36c88",
+      "run_id": "01a1f2c0-12d2-7218-8053-e049920e49ba",
+      "started_at": "2026-11-19T07:51:04.450486+00:00",
+      "status": "succeeded",
+      "updated_at": "2026-11-19T08:20:43.797457+00:00"
+    },
+    {
+      "action": "cards.move",
+      "attempt": 1,
+      "created_at": "2026-11-19T07:40:36.265466+00:00",
+      "duration_ms": null,
+      "finished_at": "2026-11-19T08:29:42.337419+00:00",
+      "id": "01a1f2c0-12e0-7169-9137-510365185c95",
+      "input_hash": null,
+      "node_id": null,
+      "output_hash": null,
+      "position": 2,
+      "procedure_version": 1,
+      "process_step_id": "01a1d3e9-ed42-7b16-b042-08d1898ace0e",
+      "run_id": "01a1f2c0-12d2-7218-8053-e049920e49ba",
+      "started_at": "2026-11-19T08:29:41.241801+00:00",
+      "status": "failed",
+      "updated_at": "2026-11-19T08:29:42.337419+00:00"
+    },
+    {
+      "action": "agent.run",
+      "attempt": 1,
+      "created_at": "2026-11-19T08:00:59.913448+00:00",
+      "duration_ms": null,
+      "finished_at": "2026-11-19T08:15:43.924145+00:00",
+      "id": "01a1f2d2-c6a4-7fb1-a78f-07c3c5176255",
+      "input_hash": null,
+      "node_id": null,
+      "output_hash": null,
+      "position": 1,
+      "procedure_version": 1,
+      "process_step_id": "01a1f2a6-567e-7706-be1d-fd6ff5ba2e52",
+      "run_id": "01a1f2d2-c5e7-7872-8eb2-12391226777b",
+      "started_at": "2026-11-19T08:10:42.543771+00:00",
+      "status": "failed",
+      "updated_at": "2026-11-19T08:15:43.924145+00:00"
+    },
+    {
+      "action": "coach.remedy",
+      "attempt": 1,
+      "created_at": "2026-11-19T08:00:59.913448+00:00",
+      "duration_ms": null,
+      "finished_at": "2026-11-19T08:15:43.924145+00:00",
+      "id": "01a1f2d2-c6bf-7b8a-aacf-19a5ee2a9b5f",
+      "input_hash": null,
+      "node_id": null,
+      "output_hash": null,
+      "position": 2,
+      "procedure_version": null,
+      "process_step_id": "01a1f2a6-569b-75ef-bdaa-946490ccecfa",
+      "run_id": "01a1f2d2-c5e7-7872-8eb2-12391226777b",
+      "started_at": null,
+      "status": "skipped",
+      "updated_at": "2026-11-19T08:15:43.924145+00:00"
     }
   ],
   "runs": [
@@ -31478,6 +35128,72 @@
       "status": "succeeded",
       "step_id": null,
       "updated_at": "2026-11-16T10:36:54.1832+00:00",
+      "version": 3,
+      "workflow_id": null,
+      "workflow_step_id": null
+    },
+    {
+      "attempt": 1,
+      "capability_agent_id": "01a1d3e9-e904-7be0-be1d-35204dbe36ef",
+      "capability_id": "01a1d039-0cfe-71a0-905c-cd4b4311f6ce",
+      "card_id": "01a1f2bc-8723-751a-af62-a8c8f05e1e51",
+      "created_at": "2026-11-19T07:36:44.012+00:00",
+      "depth": 0,
+      "error_class": "process_step_failed",
+      "finished_at": "2026-11-19T07:50:56.816487+00:00",
+      "id": "01a1f2bc-8747-775d-8799-9cf197b0b4b7",
+      "parent_run_id": null,
+      "process_id": "01a1d3e9-ecff-7539-a4a9-8db1d2a72cf7",
+      "process_version": 1,
+      "project_id": "01a1f2bc-86f7-7904-ac48-b45cad0d1393",
+      "started_at": "2026-11-19T07:36:44.012+00:00",
+      "status": "failed",
+      "step_id": null,
+      "updated_at": "2026-11-19T07:50:56.816487+00:00",
+      "version": 3,
+      "workflow_id": null,
+      "workflow_step_id": null
+    },
+    {
+      "attempt": 1,
+      "capability_agent_id": "01a1d3e9-e904-7be0-be1d-35204dbe36ef",
+      "capability_id": "01a1d039-0cfe-71a0-905c-cd4b4311f6ce",
+      "card_id": "01a1f2c0-128d-78ec-8ed2-122c54c70284",
+      "created_at": "2026-11-19T07:40:36.265466+00:00",
+      "depth": 0,
+      "error_class": "process_step_failed",
+      "finished_at": "2026-11-19T08:29:42.337419+00:00",
+      "id": "01a1f2c0-12d2-7218-8053-e049920e49ba",
+      "parent_run_id": null,
+      "process_id": "01a1d3e9-ecff-7539-a4a9-8db1d2a72cf7",
+      "process_version": 1,
+      "project_id": "01a1f2c0-1239-7b59-a0bd-e0609219fa8b",
+      "started_at": "2026-11-19T07:40:36.265466+00:00",
+      "status": "failed",
+      "step_id": null,
+      "updated_at": "2026-11-19T08:29:42.337419+00:00",
+      "version": 3,
+      "workflow_id": null,
+      "workflow_step_id": null
+    },
+    {
+      "attempt": 1,
+      "capability_agent_id": "01a1f2a6-48a3-737e-a232-bb5dd7f32c64",
+      "capability_id": "01a1d039-0cfd-71e9-99ed-2c1e8707de00",
+      "card_id": "01a1f2d2-c174-7b94-9e80-cd31c35f9c8e",
+      "created_at": "2026-11-19T08:00:59.913448+00:00",
+      "depth": 0,
+      "error_class": "process_step_failed",
+      "finished_at": "2026-11-19T08:15:43.924145+00:00",
+      "id": "01a1f2d2-c5e7-7872-8eb2-12391226777b",
+      "parent_run_id": null,
+      "process_id": "01a1f2a6-5647-79e5-86eb-f4a703ac658f",
+      "process_version": 1,
+      "project_id": "01a1f2bc-86f7-7904-ac48-b45cad0d1393",
+      "started_at": "2026-11-19T08:00:59.913448+00:00",
+      "status": "failed",
+      "step_id": null,
+      "updated_at": "2026-11-19T08:15:43.924145+00:00",
       "version": 3,
       "workflow_id": null,
       "workflow_step_id": null

@@ -1,0 +1,21 @@
+== write: programmes.refresh ==
+{
+  "boards_created": 0,
+  "created": 0,
+  "skipped": 51,
+  "updated": 0
+}
+== read-back: programmes.list ==
+{
+  "items": [
+    {
+      "created_at": "2026-11-12T14:46:02.275593Z",
+      "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "name": "conveyor buildout",
+      "owner_user_id": null,
+      "status": "active",
+      "updated_at": "2026-11-12T14:46:02.275593Z",
+      "version": 1
+    }
+  ]
+}

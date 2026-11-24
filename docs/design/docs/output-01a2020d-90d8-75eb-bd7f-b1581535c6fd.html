@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Driver/Goal/Objective Catalog — T11 Metrics, metering and maturity (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Driver/Goal/Objective Catalog — T11 Metrics, metering and maturity (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: The drivers that make stored measurement untrustworthy and the objectives T11 delivered against each.</li>
+<li>Scope: SPEC_V2 §7.5 and decisions D37, D50 and D52.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>D1 Metrics stored as opinions (D37) / G1 Computed read models</strong> - {"objective": "No metric table exists. metrics.flow, metrics.job, metrics.usage, metrics.programme and metrics.maturity aggregate card, event, run, approval, inference_call, tool_call and benefit rows at read time; migration 0059 adds only the threshold configuration and the reconciliation verdict."}</li>
+<li><strong>D2 Spend invisible below the tenant total (D52) / G2 Metering at every organisational level</strong> - {"objective": "metrics.usage serves tenant, department, programme, project, job, run, step and call; every level sums to the tenant, and an unattributed call is reported in its own bucket, not dropped."}</li>
+<li><strong>D3 Money copied into a column drifts from the ledger / G3 Cost derived at read time</strong> - {"objective": "Tokens are stored; cost_usd is computed from the pinned commercial_price row (token or unit pricing) and priced and unpriced calls are returned separately."}</li>
+<li><strong>D4 Maturity asserted rather than measured (D50) / G4 C0–C5 from recorded configuration</strong> - {"objective": "metric_threshold stores one versioned row per tenant and level; a level names the version it used and moves only when every named evidence figure meets its recorded minimum."}</li>
+<li><strong>D5 A gate that never refused looks healthy / G5 Never-refused gates are flagged</strong> - {"objective": "metrics.programme lists every gate with decided approvals and zero rejections in the window; one rejection clears the flag."}</li>
+<li><strong>D6 Billing divergence absorbed silently / G6 Exact reconciliation or an incident</strong> - {"objective": "metrics.reconcile compares the derived cost with the declared billing.summary total at six decimals; a difference opens an incident card carrying both figures, and an unreachable service is unavailable, never a zero."}</li>
+<li><strong>D7 A missing ledger reported as zero / G7 Unavailable with a reason</strong> - {"objective": "flow reports knowledge.pack_hit_rate and knowledge.lesson_promotion_rate as unavailable because their ledgers do not exist; an unmeasured benefit is unmeasured; a missing evidence metric never lifts a maturity level."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Metrics, metering and maturity · conveyor output · published 2026-11-24T10:10:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

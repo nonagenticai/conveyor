@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Rework mandate — every viable project is reworked by the book · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Rework mandate — every viable project is reworked by the book</h1>
+<h2>Context</h2>
+<p>The conformance audit measures 22 P0 / 131 P1 / 12 P2 against the programme's own standard. The earlier draft of this exercise treated "rework vs close" as a choice; the owner rejected that: a project with a point gets its missing artefacts and its lifecycle re-run, and only a project with no live surface, no open issue and no declared-but-unpublished output may be closed by decision. The 19 closed projects in tranches 1–8 were never authorised at all.</p>
+<h2>Decision</h2>
+<ul>
+<li><strong>47 projects are reworked</strong> — 42 backfill-and-verify over the delivered capability, and 5 inception projects (T5, T6, T12, T15, T17) whose artefacts and contracts precede their delivery work.</li>
+<li><strong>1 project is folded</strong> — S06a: its slice is marked superseded by S06b and says "nothing here is built or to be built"; the supersession is recorded, not deleted.</li>
+<li><strong>0 projects are closed by decision.</strong></li>
+<li>Each rework runs the same lifecycle: charter, Statement of Architecture Work, the A–D artefact set, design gate and delivery contract, acceptance manifest and verification, Phase-G compliance review, project baseline, closure review, benefit link; each batch ends with its tranche review and authorisation.</li>
+<li>A project closes only after its declared acceptance has been re-run and passed at a named SHA. A failing clause blocks the project's closure and its tranche's authorisation; a clause is never deleted to make a project pass.</li>
+</ul>
+<h2>Consequences</h2>
+<ul>
+<li>The public register will show reworked projects reopen and re-close through the gates; the original closure rows remain and the new closure supersedes them.</li>
+<li>Pre-transition benefit baselines that can no longer be observed are recorded <code>unavailable</code> and re-scoped; they are never claimed as realised.</li>
+<li>The burn-down ledger (153 entries, each with a disposition, owner and expiry) may only shrink; a new fingerprint or a worsened severity fails.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li>Issue #511; the owner's instruction of 2026-11-20.</li>
+<li><code>docs/evidence/conformance-baseline.json</code> (152 rework, 1 fold).</li>
+<li>The live triage: every project's <code>meta.viability</code> is written through <code>projects.programme_meta</code>.</li>
+<li><code>docs/plans/03-DELIVERY.md</code> (the per-delivery acceptance contract).</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-24T10:10:00Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

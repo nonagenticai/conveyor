@@ -1,0 +1,42 @@
+== write: approvals.request ==
+{
+  "approvals": 0,
+  "card_id": null,
+  "created_at": "2026-11-24T07:48:27.429958Z",
+  "decisions": [],
+  "description": "Decision item 1 for the T19 live gate: approve the evidence record for the web-room decision.",
+  "expires_at": null,
+  "gate": "t19_live_gate_web",
+  "id": "01a20c87-0fd0-7a68-be24-c1e0f5be9f77",
+  "kind": "meeting",
+  "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+  "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+  "requested_by_label": "FR Test",
+  "required_decisions": 1,
+  "run_id": null,
+  "status": "pending",
+  "version": 1
+}
+== read-back: approvals.list ==
+{
+  "items": [
+    {
+      "approvals": 0,
+      "card_id": null,
+      "created_at": "2026-11-24T07:48:27.429958Z",
+      "decisions": [],
+      "description": "Decision item 1 for the T19 live gate: approve the evidence record for the web-room decision.",
+      "expires_at": null,
+      "gate": "t19_live_gate_web",
+      "id": "01a20c87-0fd0-7a68-be24-c1e0f5be9f77",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "requested_by_label": "FR Test",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "pending",
+      "version": 1
+    }
+  ]
+}

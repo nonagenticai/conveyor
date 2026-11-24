@@ -1,0 +1,7 @@
+SET
+migration_max|65
+migration_tail|63:async invocation, 64:authoring, 65:meetings
+t19_project|01a20c80-b9b8-7214-abc6-f2c4f75a1fc1|T19|closed
+t19_board|01a20c80-ba1e-7dcc-8398-018a70414523
+b7_benefit|B7|draft
+meeting_card_type|1

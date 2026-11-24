@@ -24,34 +24,72 @@
       >
     </header>
     <main class="doc-body"><h1>T5 — Kata</h1>
-<p><strong>Track:</strong> v2 · <strong>Tranche:</strong> 10 · <strong>Measured status:</strong> proposed · <strong>Plan:</strong> <code>docs/SPEC_V2.md#12</code>
-<strong>Dependencies:</strong> T2, S16, S17, S18, S19, S20, P0 · <strong>Issues:</strong> #77</p>
+<ul>
+<li><strong>Status:</strong> published</li>
+<li><strong>Version:</strong> 1.0</li>
+<li><strong>Author / date:</strong> conveyor programme session / 2026-11-21</li>
+<li><strong>Reviewer / review date:</strong> #347 independent review / 2026-11-18; owner publication / 2026-11-21</li>
+<li><strong>Related project:</strong> T5 — Kata · issue #77 · live document <code>01a1e008-7d05-75d4-ae9d-4e2d485271b4</code></li>
+<li><strong>Rationale:</strong> state the inception basis for T5 Kata: the outcome, the boundary it must not cross, the surfaces it reuses, and how the delivery unit is accepted.</li>
+<li><strong>Published document:</strong> <code>01a1e008-7d05-75d4-ae9d-4e2d485271b4</code> — published 2026-11-21</li>
+<li><strong>Contract:</strong> pending</li>
+<li><strong>ADM phase / plateau:</strong> A / PSA for the artefact (project row: G / capability)</li>
+<li><strong>Entries:</strong> outcome, boundary, reuse sources, inception units, dependencies, acceptance, capabilities, plan, risks, links.</li>
+<li><strong>Derivation / realization / reuse / dependency:</strong> derived from SPEC_V2 §6.3, §9.3–§9.4 and §12 T5, and P0 §4; realized by #77; reuse sources below; depends on T2, S16–S20 and P0.</li>
+<li><strong>Links:</strong> issue #77; <code>docs/SPEC_V2.md</code> §12; <code>01-inception-analysis.md</code>; <code>02-architecture-design.md</code>; <code>seed/programme.json</code>.</li>
+</ul>
 <h2>Outcome</h2>
 <p>A procedure change is measured on a held-out instrument, adopted only when it wins, and reverted when it regresses.</p>
 <h2>Boundary</h2>
-<p>In scope: the V2 slice as defined in SPEC_V2 §12. Out of scope: V1's built slices (they are not re-opened) and the product surfaces outside this slice's aggregates.</p>
+<p>In scope: the kata lifecycle — open on a replayable flow, measure a candidate change on a held-out instrument, adopt on a win, revert on a regression, close with the evidence — built over the existing <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code> and <code>event</code> surfaces.</p>
+<p>Out of scope: the V1 built slices (not re-opened); the benchmark/eval instrument itself (reused, never redefined or edited by a kata); organisational-memory storage (T8 owns <code>lessons.propose</code>; T5 emits candidates); a second runtime, service or action client; any code path outside <code>crates/</code>.</p>
 <h2>Reuse sources</h2>
-<p>V1's <code>project</code>, <code>board</code>, <code>card</code>, <code>document</code> and <code>action registry</code> surfaces in <code>crates/</code> (the aggregates this slice extends); the estate capabilities in <code>docs/plans/04-TOOL-ESTATE-INVENTORY.md</code>; the SPEC_V2 §12 gate names the new tables and actions. The inception analysis resolves the exact symbols and boundaries.</p>
+<ul>
+<li><code>apps/server/src/benchmark_improvement.rs:run</code> — the comparability rule (controls passed, McNemar p &lt; 0.05); reuse it for eval measurements rather than writing a second verdict.</li>
+<li><code>crates/domain/src/eval/climb.rs</code> — the eval hillclimb; the instrument a kata reads and signs, never defines.</li>
+<li><code>migrations/0034_s18_kata_arm.sql:benchmark_run</code> — <code>subject_version</code>, <code>improvement_verdict ∈ keep|revert|inconclusive</code>, <code>improvement_of_run_id</code>; reuse the verdict vocabulary.</li>
+<li><code>crates/store/src/eval/runs.rs</code> + <code>eval_signoffs</code> — the pinned version, split and sign-off a kata must carry.</li>
+<li><code>seed/processes/named.yaml:kata.open</code> — the seeded one-step kata flow, called as a child by the coach.</li>
+<li><code>crates/actions/src/control/approvals.rs</code> + <code>migrations/0050_approval_policies.sql</code> — approval rows and the per-action policy; adoption is a human decision.</li>
+<li><code>crates/actions/src/pm/mod.rs</code> — the PM actions that gate a delivery project.</li>
+<li>Estate capabilities, by role: the coding fleet and system-one; an adopted code candidate becomes a development project (T6).</li>
+<li>Upstream: Postgres, sqlx and the workspace crates — every rule stays a constraint or an action in <code>crates/actions</code>.</li>
+</ul>
 <h2>Inception units</h2>
 <ol>
-<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
-<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+<li><code>inception-analysis</code> — <code>01-inception-analysis.md</code>; live <code>01a1ee4b-fbb1-7433-8ad7-2e75199c733f</code> (published 2026-11-21).</li>
+<li><code>architecture-design</code> — <code>02-architecture-design.md</code>; live <code>01a1ee4c-04d8-757b-ad3d-1807a55e0ae1</code> (published 2026-11-21).</li>
 </ol>
-<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<p>Both are published on the project with <code>meta.category</code> set (owner publication, 2026-11-21); the inception gate is met. This brief does not authorise the tranche.</p>
 <h2>Dependencies</h2>
-<p>Blocked-by: T2, S16, S17, S18, S19, S20, P0.</p>
+<p>Typed, from <code>seed/programme.json</code>: blocked-by T2, S16, S17, S18, S19, S20 and P0; related #77 (delivery). The delivery unit is <code>status:blocked</code> because tranche 10 is not authorised, not because a code dependency is unmet.</p>
 <h2>Acceptance</h2>
-<p>a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened</p>
-<p>Verify: the gate above, recorded on this project as the run/evidence output</p>
+<p>The project gate: a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened.</p>
+<p>Verify: the gate is exercised by the delivery unit's own scenarios at #77 (<code>crates/actions/tests/</code> targets, to create there); at inception the acceptance is the published analysis+design pair, which this draft does not yet satisfy.</p>
 <h2>Capabilities</h2>
-<p><code>kata</code></p>
-<h2>Gaps</h2>
+<p><code>kata</code> — the capability that owns the outcome; no other capability may fork the kata lifecycle.</p>
+<h2>Plan</h2>
+<p><code>docs/SPEC_V2.md</code> §6.3, §9.3–§9.4 and §12 row T5. The delivery unit is #77; there is no separate <code>S##</code> slice file for T5, so #77's parts are the implementation plan. Target tranche <strong>10 — not authorised</strong>. The plan below is preparation only.</p>
+<h2>Risks</h2>
 <ul>
-<li>None recorded beyond the inception units themselves.</li>
+<li>A train-split measurement is adopted → check: an adoption refusal test on <code>split &lt;&gt; 'test'</code>.</li>
+<li>The instrument is edited between prediction and measurement → check: pin <code>eval_version.digest</code> and <code>split_sha256</code>; a mismatch voids the measurement.</li>
+<li>The kata approves its own change → check: the approver principal is compared to the kata run's executor.</li>
+<li>Revert is recorded but nothing restored → check: the base version is read back after <code>kata.close</code>.</li>
+<li>A second kata opens on the same signature → check: a partial unique index on the open state.</li>
+<li><code>kata_executor</code> is mistaken for the kata job → check: <code>crates/auth/src/principal.rs:is_kata_executor</code> is a machine tenant-admin role, not a job.</li>
+<li>A failed kata releases the andon cord on a timer → check: no release path from <code>kata.close</code>.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Issue #77 (delivery; blocked).</li>
+<li><code>docs/SPEC_V2.md</code> §6.3, §9.3–§9.4, §12 T5.</li>
+<li><code>seed/programme.json</code> row T5.</li>
+<li><code>01-inception-analysis.md</code>, <code>02-architecture-design.md</code>.</li>
 </ul>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Kata · conveyor output · published 2026-11-20T11:50:50.848127361+00:00</code> at publish time.</span>
+      <span>Rendered from <code>Kata · conveyor output · published 2026-11-24T10:10:00Z</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

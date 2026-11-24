@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data Entity / Data Component Catalog — DESIGN-PUBLISH - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Data Entity / Data Component Catalog — DESIGN-PUBLISH</li>
+<li>Phase: c</li>
+<li>Kind: catalog</li>
+<li>Purpose: List what the pack publishes and who writes it, so a reader can tell a generated row from a hand-written page.</li>
+<li>Scope: The files the pack serves under docs/design/data/ and docs/design/docs/, at the snapshot generated 2026-11-20T11:50:50Z.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>architecture.json / artifacts, board, contracts, links, maturity, profiles, skills and standard</strong> - the architecture store; 78 records including 3 artefacts and 10 standard types</li>
+<li><strong>documents.json / design-docs/v1: 112 documents with source, section, sha256 and source_url</strong> - build-docs.py; Plans 57, Evidence 39, Decisions 8, Spec 4, Design 3, Root 1</li>
+<li><strong>manifest.json / design-snapshot/v1: 12 files with bytes, records and sha256; tenant nonagentic; git_sha a33e6562; migration 60 (procedure ingestion)</strong> - written by the snapshot; check-data.cjs verifies every hash</li>
+<li><strong>msp.json / benefit profiles, links, transitions, tranches, reviews, cadences, WBS nodes and baselines</strong> - the programme store; 6 profiles, 6 links, 14 tranches, 1 review; cadences, WBS and baselines are empty in the snapshot</li>
+<li><strong>outputs.js / the published-output index: path, category, project_key, attachments per entry</strong> - written by conveyor snapshot --outputs-dir; 165 entries against 165 committed pages (generated 2026-11-20T11:50:50Z); the live index held 102 entries at 2026-11-21T17:36Z</li>
+<li><strong>programme.json / programme, 48 projects, a 235-issue registry, feedback, schema and generated_at</strong> - served live from the tenant's rows (#433); the live copy was generated 2026-11-21T17:23:48Z</li>
+<li><strong>secrets.json / metadata only — no value, ciphertext or key id</strong> - check-data.cjs refuses anything else</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Publish the SPEC_V2 studio design pack, live · conveyor output · published 2026-11-24T10:10:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

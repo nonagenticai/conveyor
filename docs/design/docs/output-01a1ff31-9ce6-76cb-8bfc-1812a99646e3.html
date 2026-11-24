@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — S01 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Closure review — S01 UI spike</h1>
+<h2>Outcome vs acceptance</h2>
+<p>The declared gate is "the decision record states what is observable and marks the rest not
+recoverable." The ADR records CSR as the decision with the measured TTI, first render, bundle, drag,
+auth and cold-build numbers, and names the values that were never measured.</p>
+<h2>Evidence</h2>
+<p>ADR 0001 (<code>docs/decisions/0001-ui-stack.md</code>), the acceptance manifest, and the slice plan. The
+observable numbers are the ADR's measured table; the spike workspace (<code>spikes/web</code>) was deleted after
+the ADR, so the raw runs are gone.</p>
+<h2>Open items</h2>
+<p>Metrics 5–7 are <strong>not recoverable</strong>: metric 5 was captured once for CSR and never for SSR; metric 6 was
+skipped by the time-box; metric 7's SSR set is two runs, stated not averaged. Re-running the spike
+would be a new project and is not claimed here.</p>
+<h2>Decision</h2>
+<p>Close the project. The original closure row (2026-11-17) remains; this review supersedes it and is
+dated 2026-11-21.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>UI spike — Leptos CSR vs Leptos SSR · conveyor output · published 2026-11-24T10:10:00Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
