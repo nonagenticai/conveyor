@@ -227,8 +227,15 @@ async fn a_gate_with_no_refusal_is_flagged_and_one_refusal_clears_it() {
     assert_eq!(tranche["with_evidence"], 3);
     assert_eq!(tranche["latency_seconds"], 3600.0);
 
-    // P4.2 — one rejection clears the flag; the other gate is untouched.
-    approval(&pg, &seeded, "tranche_review", true, true).await;
+    // v1-w4b-5 — a recorded refusal clears the flag too, with no rejection at all.
+    sqlx::query(
+        "INSERT INTO gate_refusal (tenant_id, gate, action, reason)
+         VALUES ($1, 'benefit_review', 'pm.route_gate', 'gate_evidence_missing')",
+    )
+    .bind(seeded.tenant_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("a refusal row");
     let second = programme_metrics(&running, programme).await;
     let never = second["never_refused"]
         .as_array()
@@ -236,8 +243,20 @@ async fn a_gate_with_no_refusal_is_flagged_and_one_refusal_clears_it() {
         .iter()
         .filter_map(Value::as_str)
         .collect::<Vec<_>>();
-    assert!(!never.contains(&"tranche_review"), "{second}");
-    assert!(never.contains(&"benefit_review"), "{second}");
+    assert!(!never.contains(&"benefit_review"), "{second}");
+    assert!(never.contains(&"tranche_review"), "{second}");
+
+    // P4.2 — one rejection clears the flag; the gate cleared by its refusal stays clear.
+    approval(&pg, &seeded, "tranche_review", true, true).await;
+    let third = programme_metrics(&running, programme).await;
+    let never = third["never_refused"]
+        .as_array()
+        .expect("never_refused")
+        .iter()
+        .filter_map(Value::as_str)
+        .collect::<Vec<_>>();
+    assert!(!never.contains(&"tranche_review"), "{third}");
+    assert!(!never.contains(&"benefit_review"), "{third}");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]

@@ -420,7 +420,10 @@ mod tests {
                 (103, "ladder option set union".to_owned()),
                 // #526 (v1-w1c-6): the knowledge-retrieval ledger behind the flow's pack-hit
                 // rate (0104_knowledge_retrieval_ledger.sql, SPEC_V2 §11.9).
-                (104, "knowledge retrieval ledger".to_owned())
+                (104, "knowledge retrieval ledger".to_owned()),
+                // #526 (v1-w4b-5): the refusal ledger behind the "gate that never refused"
+                // flag (0105_gate_refusal_ledger.sql, SPEC_V2 §7.5).
+                (105, "gate refusal ledger".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

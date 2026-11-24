@@ -51,6 +51,9 @@ pub struct GateCount {
     pub rejected: i64,
     pub decided: i64,
     pub with_evidence: i64,
+    /// Refusals the gate made in the window, from the ledger the engine writes after a call is
+    /// refused (v1-w4b-5) — rejections are only one of the ways a gate says no.
+    pub refused: i64,
     pub latency_seconds: Option<f64>,
 }
 
@@ -169,26 +172,57 @@ pub async fn insert_threshold_tx(
 }
 
 /// The governance counts per gate over `[since, until)`; the never-refused rule reads these.
+/// Record one refused gate call (v1-w4b-5). Called by the engine's failure bookkeeping, in the
+/// committed short transaction that also records the invocation and the audit event — a refusal
+/// rolls the handler's own transaction back, so this cannot be written there.
+pub async fn record_gate_refusal_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    gate: &str,
+    action: &str,
+    reason: &str,
+) -> Result<(), MetricsStoreError> {
+    sqlx::query(
+        "INSERT INTO gate_refusal (tenant_id, gate, action, reason)
+         VALUES ($1, $2, $3, $4)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(gate)
+    .bind(action)
+    .bind(reason)
+    .execute(conn)
+    .await?;
+    Ok(())
+}
+
 pub async fn gate_counts_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     since: DateTime<Utc>,
     until: DateTime<Utc>,
 ) -> Result<Vec<GateCount>, MetricsStoreError> {
-    let sql = "SELECT gate,
-                      count(*) FILTER (WHERE status = 'approved')::bigint AS approved,
-                      count(*) FILTER (WHERE status = 'rejected')::bigint AS rejected,
-                      count(*) FILTER (WHERE status IN ('approved', 'rejected'))::bigint AS decided,
-                      count(*) FILTER (WHERE status IN ('approved', 'rejected')
-                        AND ((meta ? 'evidence_ref' AND btrim(meta ->> 'evidence_ref') <> '')
-                          OR (jsonb_typeof(meta -> 'evidence') = 'array'
-                              AND jsonb_array_length(meta -> 'evidence') > 0)))::bigint AS with_evidence,
-                      (avg(extract(epoch FROM (updated_at - created_at)))
-                        FILTER (WHERE status IN ('approved', 'rejected')))::double precision AS latency_seconds
-                 FROM approval
-                WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3
-                GROUP BY gate
-                ORDER BY gate";
+    let sql = "WITH refusals AS (
+                   SELECT gate, count(*)::bigint AS refused
+                     FROM gate_refusal
+                    WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3
+                    GROUP BY gate
+               )
+               SELECT a.gate,
+                      count(*) FILTER (WHERE a.status = 'approved')::bigint AS approved,
+                      count(*) FILTER (WHERE a.status = 'rejected')::bigint AS rejected,
+                      count(*) FILTER (WHERE a.status IN ('approved', 'rejected'))::bigint AS decided,
+                      count(*) FILTER (WHERE a.status IN ('approved', 'rejected')
+                        AND ((a.meta ? 'evidence_ref' AND btrim(a.meta ->> 'evidence_ref') <> '')
+                          OR (jsonb_typeof(a.meta -> 'evidence') = 'array'
+                              AND jsonb_array_length(a.meta -> 'evidence') > 0)))::bigint AS with_evidence,
+                      coalesce(r.refused, 0)::bigint AS refused,
+                      (avg(extract(epoch FROM (a.updated_at - a.created_at)))
+                        FILTER (WHERE a.status IN ('approved', 'rejected')))::double precision AS latency_seconds
+                 FROM approval a
+                 LEFT JOIN refusals r ON r.gate = a.gate
+                WHERE a.tenant_id = $1 AND a.created_at >= $2 AND a.created_at < $3
+                GROUP BY a.gate, r.refused
+                ORDER BY a.gate";
     Ok(
         sqlx::query_as::<_, GateCount>(AssertSqlSafe(sql.to_owned()))
             .bind(tenant.as_uuid())
