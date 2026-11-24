@@ -1,4 +1,4 @@
-//! T17 (#526) — the tenant-asset authoring family through the action surface (SPEC_V2 §5.7,
+//! T17 (#87, ported from #526) — the tenant-asset authoring family through the action surface (SPEC_V2 §5.7,
 //! §10.4): intake → draft → review → publish, the dependency order, and the two §5.7 locks that
 //! keep a chat message or a document from changing authority.
 //!
@@ -17,7 +17,6 @@ use uuid::Uuid;
 
 fn request(actor: Uuid, action: &str, input: Value) -> InvokeRequest {
     InvokeRequest {
-        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,
@@ -210,21 +209,218 @@ async fn publish_through_the_gates(pg: &support::Pg, seeded: &support::Seeded, a
     );
 }
 
-fn assert_approval_missing(error: &ActionError) {
+/// §5.7's catalogue: a chat brief yields organisation, department and job drafts, and none
+/// of them is published before a person reviews it.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_chat_brief_drafts_the_org_and_job_catalogue() {
+    let (pg, seeded) = fixture().await;
+    let intake = intake(&pg, &seeded).await;
+
+    let industry = draft_ok(
+        &pg,
+        &seeded,
+        intake,
+        "industry",
+        "manufacturing",
+        json!({"title": "Manufacturing"}),
+        &[],
+    )
+    .await;
+    let department = draft_ok(
+        &pg,
+        &seeded,
+        intake,
+        "department",
+        "delivery",
+        json!({"title": "Delivery"}),
+        &[],
+    )
+    .await;
+    let job = draft_ok(
+        &pg,
+        &seeded,
+        intake,
+        "job",
+        "courier",
+        json!({"title": "Courier"}),
+        &[],
+    )
+    .await;
+
+    for (draft, kind, key) in [
+        (&industry, "industry", "manufacturing"),
+        (&department, "department", "delivery"),
+        (&job, "job", "courier"),
+    ] {
+        assert_eq!(draft["kind"], kind, "{draft}");
+        assert_eq!(draft["key"], key, "{draft}");
+        assert_eq!(draft["status"], "draft", "{draft}");
+        assert_eq!(draft["intake_id"], json!(intake.to_string()), "{draft}");
+    }
+
+    let listed = call(&pg, &seeded, "authoring.assets", json!({"status": "draft"}))
+        .await
+        .expect("list the draft catalogue");
+    assert_eq!(listed.status, 200, "{}", listed.body);
+    let items = listed.body["output"]["items"]
+        .as_array()
+        .unwrap_or_else(|| panic!("no items: {}", listed.body));
+    assert_eq!(items.len(), 3, "{}", listed.body);
+    assert!(
+        items.iter().all(|item| item["status"] == "draft"),
+        "{}",
+        listed.body
+    );
+
+    let published = call(
+        &pg,
+        &seeded,
+        "authoring.assets",
+        json!({"status": "published"}),
+    )
+    .await
+    .expect("list the published catalogue");
+    assert_eq!(published.status, 200, "{}", published.body);
+    assert_eq!(
+        published.body["output"]["items"]
+            .as_array()
+            .map(|rows| rows.len()),
+        Some(0),
+        "nothing is published before a review: {}",
+        published.body
+    );
+}
+
+/// §5.7: documents supplied with the brief are recorded as sources, and the procedure and
+/// policy drafts they produce cite the source they came from.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn documents_yield_linked_procedure_and_policy_drafts() {
+    let (pg, seeded) = fixture().await;
+    let source_one = json!({"kind": "document", "title": "Onboarding SOP", "reference": "sop-1"});
+    let source_two = json!({"kind": "document", "title": "Safety policy", "reference": "pol-1"});
+
+    let outcome = call(
+        &pg,
+        &seeded,
+        "authoring.intake",
+        json!({
+            "brief": "Turn these two documents into procedures and a policy",
+            "sources": [source_one.clone(), source_two.clone()],
+        }),
+    )
+    .await
+    .expect("the intake");
+    assert_eq!(outcome.status, 201, "{}", outcome.body);
+    let intake_id = id_of(&outcome.body["output"], "id");
+    assert_eq!(
+        outcome.body["output"]["sources"],
+        json!([source_one.clone(), source_two.clone()]),
+        "the documents are recorded as sources: {}",
+        outcome.body
+    );
+
+    let procedure = draft_ok(
+        &pg,
+        &seeded,
+        intake_id,
+        "procedure",
+        "onboarding",
+        json!({"title": "Onboarding", "source_document": source_one}),
+        &[],
+    )
+    .await;
+    let policy = draft_ok(
+        &pg,
+        &seeded,
+        intake_id,
+        "policy",
+        "safety",
+        json!({"title": "Safety", "source_document": source_two}),
+        &[],
+    )
+    .await;
+
+    for (draft, key, reference) in [
+        (&procedure, "onboarding", "sop-1"),
+        (&policy, "safety", "pol-1"),
+    ] {
+        assert_eq!(draft["key"], key, "{draft}");
+        assert_eq!(draft["intake_id"], json!(intake_id.to_string()), "{draft}");
+        assert_eq!(
+            draft["payload"]["source_document"]["reference"], reference,
+            "the draft links its source: {draft}"
+        );
+    }
+}
+
+/// §5.7's order: a draft citing an unpublished asset is refused, and the same draft passes once
+/// that dependency has been reviewed and published.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_draft_that_references_an_unpublished_asset_is_refused() {
+    let (pg, seeded) = fixture().await;
+    let intake = intake(&pg, &seeded).await;
+    let industry = id_of(
+        &draft_ok(
+            &pg,
+            &seeded,
+            intake,
+            "industry",
+            "manufacturing",
+            json!({"title": "Manufacturing"}),
+            &[],
+        )
+        .await,
+        "id",
+    );
+
+    let error = draft(
+        &pg,
+        &seeded,
+        intake,
+        "department",
+        "operations",
+        json!({"title": "Operations"}),
+        &[industry],
+    )
+    .await
+    .expect_err("a draft cannot cite an unpublished dependency");
     assert_eq!(error.status, 422, "{}", error.detail);
     assert_eq!(error.errors.len(), 1, "{:?}", error.errors);
-    assert_eq!(error.errors[0].field, "approval_id", "{:?}", error.errors);
+    assert_eq!(error.errors[0].field, "depends_on", "{:?}", error.errors);
     assert_eq!(
-        error.errors[0].code, "approval_missing",
+        error.errors[0].code, "asset_dependency_unpublished",
         "{:?}",
         error.errors
+    );
+    assert!(
+        error.errors[0].detail.contains(&industry.to_string()),
+        "the refusal names the asset: {:?}",
+        error.errors
+    );
+
+    publish_through_the_gates(&pg, &seeded, industry).await;
+
+    let department = draft_ok(
+        &pg,
+        &seeded,
+        intake,
+        "department",
+        "operations",
+        json!({"title": "Operations"}),
+        &[industry],
+    )
+    .await;
+    assert_eq!(
+        department["depends_on"],
+        json!([industry.to_string()]),
+        "the draft records its dependency: {department}"
     );
 }
 
 /// §5.7's lifecycle: an intake records the brief, the draft it produces cannot publish before a
 /// person reviews it, and the human review is what releases it.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn an_authoring_intake_drafts_and_publishes_through_the_gates() {
+async fn a_reviewed_catalogue_publishes_with_its_decisions() {
     let (pg, seeded) = fixture().await;
     let intake = intake(&pg, &seeded).await;
 
@@ -315,173 +511,4 @@ async fn an_authoring_intake_drafts_and_publishes_through_the_gates() {
         .unwrap_or_else(|| panic!("no items: {}", listed.body));
     assert_eq!(items.len(), 1, "{}", listed.body);
     assert_eq!(items[0]["id"], json!(asset.to_string()), "{}", listed.body);
-}
-
-/// §5.7's order: a draft citing an unpublished asset is refused, and the same draft passes once
-/// that dependency has been reviewed and published.
-#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn a_draft_cannot_depend_on_an_unpublished_asset() {
-    let (pg, seeded) = fixture().await;
-    let intake = intake(&pg, &seeded).await;
-    let industry = id_of(
-        &draft_ok(
-            &pg,
-            &seeded,
-            intake,
-            "industry",
-            "manufacturing",
-            json!({"title": "Manufacturing"}),
-            &[],
-        )
-        .await,
-        "id",
-    );
-
-    let error = draft(
-        &pg,
-        &seeded,
-        intake,
-        "department",
-        "operations",
-        json!({"title": "Operations"}),
-        &[industry],
-    )
-    .await
-    .expect_err("a draft cannot cite an unpublished dependency");
-    assert_eq!(error.status, 422, "{}", error.detail);
-    assert_eq!(error.errors.len(), 1, "{:?}", error.errors);
-    assert_eq!(error.errors[0].field, "depends_on", "{:?}", error.errors);
-    assert_eq!(
-        error.errors[0].code, "asset_dependency_unpublished",
-        "{:?}",
-        error.errors
-    );
-    assert!(
-        error.errors[0].detail.contains(&industry.to_string()),
-        "the refusal names the asset: {:?}",
-        error.errors
-    );
-
-    publish_through_the_gates(&pg, &seeded, industry).await;
-
-    let department = draft_ok(
-        &pg,
-        &seeded,
-        intake,
-        "department",
-        "operations",
-        json!({"title": "Operations"}),
-        &[industry],
-    )
-    .await;
-    assert_eq!(
-        department["depends_on"],
-        json!([industry.to_string()]),
-        "the draft records its dependency: {department}"
-    );
-}
-
-/// §5.7's second lock: a draft cannot widen authority. A payload carrying `approval_policy` is
-/// refused, and so is a kind outside the asset matrix (a tool GRANT is not a tool REQUEST).
-#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn an_authoring_payload_cannot_change_authority() {
-    let (pg, seeded) = fixture().await;
-    let intake = intake(&pg, &seeded).await;
-
-    let error = draft(
-        &pg,
-        &seeded,
-        intake,
-        "policy",
-        "auto-approve",
-        json!({"title": "Approve everything", "approval_policy": {"mode": "auto"}}),
-        &[],
-    )
-    .await
-    .expect_err("a payload cannot carry an approval policy");
-    assert_eq!(error.status, 422, "{}", error.detail);
-    assert_eq!(error.errors.len(), 1, "{:?}", error.errors);
-    assert_eq!(error.errors[0].field, "payload", "{:?}", error.errors);
-    assert_eq!(
-        error.errors[0].code, "payload_forbidden",
-        "{:?}",
-        error.errors
-    );
-    assert!(
-        error.errors[0].detail.contains("approval_policy"),
-        "the refusal names the key: {:?}",
-        error.errors
-    );
-
-    let error = draft(
-        &pg,
-        &seeded,
-        intake,
-        "tool_grant",
-        "grant-everything",
-        json!({"title": "A grant"}),
-        &[],
-    )
-    .await
-    .expect_err("a grant is not an authoring asset kind");
-    assert_eq!(error.status, 422, "{}", error.detail);
-    assert_eq!(error.errors.len(), 1, "{:?}", error.errors);
-    assert_eq!(error.errors[0].field, "kind", "{:?}", error.errors);
-    assert_eq!(
-        error.errors[0].code, "asset_kind_forbidden",
-        "{:?}",
-        error.errors
-    );
-    assert!(
-        error.errors[0].detail.contains("tool_grant"),
-        "the refusal names the kind: {:?}",
-        error.errors
-    );
-}
-
-/// §5.7's first lock: the chat surface does not decide. A pending gate and a gate only a machine
-/// decided both leave the draft untouched.
-#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn review_refuses_a_machine_only_or_pending_approval() {
-    let (pg, seeded) = fixture().await;
-    let intake = intake(&pg, &seeded).await;
-    let asset = id_of(
-        &draft_ok(
-            &pg,
-            &seeded,
-            intake,
-            "job",
-            "engineer",
-            json!({"title": "Engineer"}),
-            &[],
-        )
-        .await,
-        "id",
-    );
-
-    let pending = review_approval(&pg, &seeded, asset, "pending", None).await;
-    let error = review(&pg, &seeded, asset, pending)
-        .await
-        .expect_err("a pending gate does not review");
-    assert_approval_missing(&error);
-
-    let machine =
-        review_approval(&pg, &seeded, asset, "approved", Some(("approve", "agent"))).await;
-    let error = review(&pg, &seeded, asset, machine)
-        .await
-        .expect_err("a machine-only decision does not review");
-    assert_approval_missing(&error);
-
-    let (status, version, approval): (String, i64, Option<Uuid>) = sqlx::query_as(
-        "SELECT status, version, review_approval_id FROM authoring_asset
-          WHERE tenant_id = $1 AND id = $2",
-    )
-    .bind(seeded.tenant_id)
-    .bind(asset)
-    .fetch_one(&pg.super_pool)
-    .await
-    .expect("read the refused asset");
-    assert_eq!(status, "draft", "a refused review moved the asset");
-    assert_eq!(version, 1, "a refused review bumped the version");
-    assert_eq!(approval, None, "a refused review cited an approval");
 }

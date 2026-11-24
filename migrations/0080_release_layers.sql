@@ -1,4 +1,4 @@
--- 0064_release_layers.sql — the layered kind store a release compiles from (SPEC_V2 §4.1;
+-- 0080_release_layers.sql — the layered kind store a release compiles from (SPEC_V2 §4.1;
 -- finding v1-w1a-2, conveyor#526).
 --
 -- A release compiles **base → industry → department archetype → each department in declared

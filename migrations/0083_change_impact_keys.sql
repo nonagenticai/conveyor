@@ -1,4 +1,4 @@
--- 0067_change_impact_keys.sql — a change's impact block carries a real §5.5 analysis (SPEC_V2
+-- 0083_change_impact_keys.sql — a change's impact block carries a real §5.5 analysis (SPEC_V2
 -- §5.5; finding v1-p5-3, conveyor#526).
 --
 -- 0044's `project_register_item_change_impact` only tested that `meta` HAS an `impact` key and

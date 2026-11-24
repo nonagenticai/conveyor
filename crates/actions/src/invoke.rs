@@ -471,6 +471,17 @@ impl ActionError {
         )
     }
 
+    /// `502` for an external service that never answered (connect, reset, TLS). Deliberately a
+    /// different code from [`ActionError::upstream_failed`], whose 5xx the service DID answer:
+    /// only the latter is safe to replay.
+    pub fn upstream_unreachable(service: &str) -> Self {
+        Self::new(
+            502,
+            "action-upstream-unreachable",
+            format!("{service} could not be reached"),
+        )
+    }
+
     /// `503` when the per-action breaker is open.
     pub fn circuit_open(action: &str) -> Self {
         Self::new(
@@ -1597,7 +1608,10 @@ async fn invoke_external(
         Err(_) => return failure(ActionError::timeout(spec.name, spec.timeout_ms), false).await,
         Ok(Err(error)) => {
             tracing::warn!(%error, action = spec.name, "external call failed");
-            return failure(ActionError::upstream_failed(service, 502), true).await;
+            // Distinct from `upstream_failed`: the service never ANSWERED, so a caller cannot
+            // tell a refused connection from a reset after delivery. It must not retry this the
+            // way it retries a 5xx (the request may already have been served and billed).
+            return failure(ActionError::upstream_unreachable(service), true).await;
         }
         Ok(Ok(response)) => response,
     };

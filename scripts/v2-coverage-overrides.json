@@ -18,10 +18,10 @@
       "note": "The mock page is a design study; the app's /organisation route renders the T0/T2 organisation reads, and the write verbs remain T0/T2's."
     },
     "destination:Procedures": {
-      "note": "V1 has the process list/detail and the process map at /build/processes and /build/process-map; V2 adds SOP/RDF/OWL/BPMN intake, PDDL/PKO and the publish gates (T16)."
+      "note": "The real /procedures screen reads the tenant's procedures, processes and capabilities and operates the T16 intake, source review and both publication gates. The V1 /build/processes and /build/process-map remain the executable's editor and map. The PKO editor was ruled out on 2026-11-19 and is replaced by the knowledge-pack pairing."
     },
     "destination:Authoring": {
-      "note": "No route and no authoring actions; the destination is T17."
+      "note": "The /authoring route renders the live authored-asset catalogue: `authoring.assets` is the read, the draft/review/publish gates are governed actions, and the dependency order is T17 (#87)."
     },
     "destination:Portfolio": {
       "note": "The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10."

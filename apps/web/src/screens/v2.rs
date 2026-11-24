@@ -14,7 +14,7 @@ use leptos::prelude::*;
 use leptos_router::components::A;
 use serde_json::json;
 
-use crate::api::{ApiError, InvokeOptions, Page};
+use crate::api::{ApiError, Client, InvokeOptions, Page};
 use crate::components::{Empty, ErrorPanel, StatusPill, Tile, age, fmt_int};
 use crate::models::{BoardView, CardOut, ProgrammeOut, ProjectOut, ProjectView, UsageReport};
 use crate::state::AppCtx;
@@ -58,17 +58,36 @@ fn page<T: serde::de::DeserializeOwned>(
     serde_json::from_value(value).map_err(|error| ApiError::Network(format!("{what}: {error}")))
 }
 
+/// Every project page, not only the first: `/api/projects` is a keyset page and the portfolio
+/// must not silently truncate at 200.
+async fn load_projects(client: &Client) -> Result<Vec<ProjectOut>, ApiError> {
+    let mut projects = Vec::new();
+    let mut cursor: Option<String> = None;
+    for _ in 0..50 {
+        let path = match cursor.as_deref() {
+            Some(cursor) => format!("/api/projects?limit=200&cursor={cursor}"),
+            None => "/api/projects?limit=200".to_owned(),
+        };
+        let page = page::<ProjectOut>(client.get(&path).await?, "projects")?;
+        projects.extend(page.items);
+        match page.next_cursor {
+            Some(next) if !next.is_empty() => cursor = Some(next),
+            _ => return Ok(projects),
+        }
+    }
+    Ok(projects)
+}
+
 async fn load_portfolio(ctx: AppCtx) -> Result<PortfolioData, ApiError> {
     let client = ctx.client();
-    let value = client.get("/api/projects?limit=200").await?;
-    let projects = page::<ProjectOut>(value, "projects")?.items;
+    let projects = load_projects(&client).await?;
 
     let mut programmes = Vec::new();
     if ctx.has_action("programmes.list")
         && let Ok(invocation) = client
             .invoke(
                 "programmes.list",
-                json!({ "page": { "limit": 50 } }),
+                json!({ "limit": 200 }),
                 InvokeOptions::default(),
             )
             .await
@@ -86,21 +105,22 @@ async fn load_portfolio(ctx: AppCtx) -> Result<PortfolioData, ApiError> {
             "until": until.to_rfc3339(),
             "group_by": "project",
         });
-        if let Ok(invocation) = client
+        // A failed report is not "no spend": show the error rather than marking every row
+        // "no priced call".
+        let invocation = client
             .invoke("inference_usage.report", input, InvokeOptions::default())
-            .await
-            && let Ok(report) = serde_json::from_value::<UsageReport>(invocation.output)
-        {
-            for row in report.rows {
-                spend.insert(
-                    row.bucket,
-                    Spend {
-                        cost_usd: row.cost_usd,
-                        priced: row.priced_calls,
-                        unpriced: row.unpriced_calls,
-                    },
-                );
-            }
+            .await?;
+        let report: UsageReport = serde_json::from_value(invocation.output)
+            .map_err(|error| ApiError::Network(format!("usage report: {error}")))?;
+        for row in report.rows {
+            spend.insert(
+                row.bucket,
+                Spend {
+                    cost_usd: row.cost_usd,
+                    priced: row.priced_calls,
+                    unpriced: row.unpriced_calls,
+                },
+            );
         }
     }
 
@@ -145,13 +165,12 @@ async fn load_programmes(ctx: AppCtx) -> Result<ProgrammeData, ApiError> {
     let invocation = client
         .invoke(
             "programmes.list",
-            json!({ "page": { "limit": 50 } }),
+            json!({ "limit": 200 }),
             InvokeOptions::default(),
         )
         .await?;
     let programmes = page::<ProgrammeOut>(invocation.output, "programmes")?.items;
-    let value = client.get("/api/projects?limit=200").await?;
-    let projects = page::<ProjectOut>(value, "projects")?.items;
+    let projects = load_projects(&client).await?;
     Ok(ProgrammeData {
         programmes,
         projects,
@@ -369,7 +388,7 @@ fn PortfolioBody(
                             let (amount, note) = spend_label(spend.get(&project.id));
                             let programme = programme_name(&project);
                             view! {
-                                <tr>
+                                <tr data-project-id=project.id.clone()>
                                     <td class="mono">{project.key.clone()}</td>
                                     <td>{project.name.clone()}</td>
                                     <td><StatusPill status=project.status.clone()/></td>

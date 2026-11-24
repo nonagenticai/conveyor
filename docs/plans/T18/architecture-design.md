@@ -21,7 +21,7 @@ renders **not yet live**.
 | Destination | Read | Write |
 |---|---|---|
 | Organisation | `industries.list`, `departments.list`, `jobs.*`, `job_releases.*`, `job_bindings.*`, `approval_policies.*`, `decision_policies.*`, `refinements.*`, `laya_configs.*`, `ladder.list` | the create/update/release/retire verbs of those families |
-| Procedures | `procedures.*`, `capabilities.*`, the process map, the published pack | `procedures.create\|update\|publish\|retire`, `procedures.ingest_*`, `procedures.validate\|review_source`, `capabilities.design\|publish` |
+| Procedures | `procedures.list\|get`, `capabilities.list\|get`, `processes.list\|get`, `approvals.list`, the process map, the published pack | `procedures.create\|update\|publish\|retire`, `procedures.ingest_sop\|ingest_process\|ingest_rdf`, `procedures.validate\|review_source`, `approvals.request\|decide` for the two publication gates; `capabilities.design\|publish` are not registered (T16's ingest creates the capability) |
 | Authoring | `authoring.assets`, the draft queue, dependency status | `authoring.intake\|draft\|review\|publish` |
 | Portfolio | the computed project/programme set, `programme_config.*`, `project_dependencies.*`, `cadences.*`, `metrics.programme` | `programmes.update`, `project_dependencies.*`, `wbs.*`/`baselines.*` where Plan owns them |
 | Programme | `programmes.*`, `benefits.*`, `tranches.*`, `stakeholders.*`, `cadences.*` | the create/update/transition/review verbs |
@@ -35,6 +35,12 @@ The read model for the delivery view is the existing `programme`/`work`/`measure
 levels (portfolio, programme, project, work package), exposed through the owning actions. The SSE
 topics are the existing `board:{id}`, `card:{id}`, `run:{id}` and `approval:{id}`; a screen without a
 topic polls explicitly.
+
+The **Execution** surface reads `runs.list|get` and writes nothing; the executor kind,
+`job_binding_id` and `release_hash` are not exposed by that read model (T0/T4/S21), and the tools
+panel waits on `tool_calls.list` (T13). The screen names both gaps and carries the step's input,
+output and judge as the provenance. The PKO workspace is not restored: the owner decision of
+2026-11-19 replaced it with the knowledge-pack pairing (SPEC_V2 §5.6).
 
 ## Decisions
 
@@ -54,7 +60,8 @@ topic polls explicitly.
   the portfolio → programme → project → work package, organisation → release → binding, procedures
   intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem,
   and the ADM phase rail from the app; the coverage record reports `exists` only from a real route
-  and its spec; no production screen renders a fixture.
+  and its spec, and a `*Gate` view is `extend` naming its owner even when its gate spec exists; no
+  production screen renders a fixture.
 - Each destination's Playwright spec asserts empty, error, happy and one refusal.
 - The T12 organisation loop, driven from the UI, is the final spec.
 

@@ -1,5 +1,5 @@
 #![forbid(unsafe_code)]
-//! T17 (#526, SPEC_V2 §5.7, §10.4): tenant asset authoring — the intake brief, the drafts it
+//! T17 (#87, ported from #526; SPEC_V2 §5.7, §10.4): tenant asset authoring — the intake brief, the drafts it
 //! produces, the review gate that settles them and the publication that releases them.
 //!
 //! Five actions over [`conveyor_store::authoring`], the family's only SQL (CONTRACT §1):

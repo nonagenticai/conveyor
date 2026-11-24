@@ -1429,6 +1429,25 @@ A prior-step body renders whole. An over-budget section refuses with the measure
 truncation path. The body is data, never instruction, and renders in the Memory section below the
 procedure and capability blocks. A child run's prompt reads only its own `run_step` rows.
 
+### 2.28 The Request source — S21 step 8 (0 new tables)
+
+The current step's declaration is read into the process (Request) section and passed unchanged to
+the judge; no table and no migration.
+
+| Row | What the level reads or writes |
+|---|---|
+| `run_step` | **read**: `input` (the resolved input persisted at claim), `process_step_id`, `position`, `attempt`, `action`, `node_id`, `on_result`. Primary-key read; no index added |
+| `process_step` (`procedure_step`) | **read**: `outputs` (declared paths), `action_text`, `gate_kind`, joined on `run_step.process_step_id`. The row is the run's frozen version (editing a published procedure is copy-forward) |
+| `prompt_section` | unchanged; the process section's `budget_chars` bounds the request |
+| `inference_call` | unchanged; `prompt_sha256` now covers the request document |
+
+The compiler never re-resolves `input_template` and never writes a step row. A synthetic run-level
+`agent.run` step (`process_step_id IS NULL`) contributes none of its `run_step.input` — that value
+is the executor envelope (§2.24), not a request; its Request is the release definition. The document
+is data, never instruction; it renders after the current-step line inside the process block, and the
+section budget refuses with the measured size rather than truncating. A workflow node without a
+`process_step_id` keeps today's rendering (residual).
+
 ## 3. State machines and enforcement
 
 Every transition is a pure function in `crates/domain`; no DB trigger, no per-flow rule, no CHECK that
@@ -1468,6 +1487,11 @@ approval settles it `running` and the `run.resume` job applies the draft and fin
 Every terminal root run of a card inserts one `attempt` memory row in the terminal transaction
 (§2.26). The prompt's Memory source also reads the run's own earlier `run_step` rows, before the
 card's hot rows and the digest (§2.27); a process run's attempt is read by the next run on the card.
+**The Request source (S21 step 8)** reads the current step's resolved input from `run_step.input` and
+its declared `outputs`/`action_text`/`gate_kind` from the frozen `process_step` row, renders one
+request document in the process section and passes the same document to the step's laya judge
+(§2.28). A synthetic run-level `internal_agent` step declares none: its release definition is the
+request and its executor envelope never renders.
 
 ### 3.3 Approval
 

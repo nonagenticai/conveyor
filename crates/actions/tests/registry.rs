@@ -127,8 +127,12 @@ use serde_json::{Value, json};
 /// **#556/#590 add 8 internal**: `storage.get|put`, `tool_bindings.create|list|retire|update`
 /// and `tools.resume|retire`. 546 → **554**.
 /// **#526 (w3-gov-assets-1) adds 5 internal**: `governed_assets.compose|get|list|submit|approve` —
-/// the generic surface for the MSP programme-artefact kinds. 554 → **559**.
-const EXPECTED: [&str; 560] = [
+/// the generic surface for the MSP programme-artefact kinds. 554 → **559**; the promotion
+/// replay's read adds 560.
+/// **T19 (#606) adds 12 internal**: the meetings family
+/// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
+/// `minutes_publish|list|get`). 560 → **572**.
+const EXPECTED: [&str; 572] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -424,6 +428,18 @@ const EXPECTED: [&str; 560] = [
     "members.list",
     "members.remove",
     "members.set_role",
+    "meetings.agenda_add",
+    "meetings.close",
+    "meetings.close_item",
+    "meetings.defer",
+    "meetings.get",
+    "meetings.invite",
+    "meetings.list",
+    "meetings.minutes_publish",
+    "meetings.open",
+    "meetings.position",
+    "meetings.respond",
+    "meetings.schedule",
     "memory.recall",
     "memory.remember",
     "metrics.flow",
@@ -788,8 +804,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // (`storage.get|put`, `tool_bindings.create|list|retire|update`, `tools.resume|retire`).
     // #526 (w3-gov-assets-1) adds five internal actions (`governed_assets.compose|get|list|submit|
     // approve`). The promotion replay adds one internal read (`architecture.reviews_list`).
-    // The merged registry is 560: 541 internal, 19 external.
-    assert_eq!((internal, external), (541, 19));
+    // T19 (#606) adds twelve internal meetings actions. The merged registry is 572: 553 internal,
+    // 19 external.
+    assert_eq!((internal, external), (553, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
@@ -1202,9 +1219,8 @@ fn no_eval_signoff_or_answer_key_action_is_machine_reachable() {
 
     assert_eq!(
         conveyor_actions::channel::MCP_DEFAULT_ACTIONS.len(),
-        43,
-        "34 before S15, plus knowledge.query and memory.recall, plus S15 step 5's four capability \
-         reads, plus S19 Part C's report, audits.get and findings.list"
+        48,
+        "43 before T19, plus the five meeting reads/writes the agent front end needs"
     );
 }
 

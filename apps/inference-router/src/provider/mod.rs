@@ -44,6 +44,8 @@ pub enum UpstreamError {
         provider: String,
         status: u16,
         body: String,
+        /// The upstream's own `Retry-After`, in whole seconds (delay-seconds or HTTP-date).
+        retry_after: Option<u64>,
     },
     /// The upstream's own 400: the request's fault, and its reason is passed through.
     #[error("provider {provider} rejected the request: {message}")]
@@ -59,7 +61,23 @@ pub enum UpstreamError {
     Unsupported { provider: String },
 }
 
+/// How long a caller is told to wait after a queue shed, when the failure carries no hint of its
+/// own. The slot wait is the server's; this is the pacing the caller can act on.
+pub const SHED_RETRY_AFTER_SECS: u64 = 5;
+
 impl UpstreamError {
+    /// The `Retry-After` the caller should receive, in whole seconds.
+    ///
+    /// A queue shed means "the provider is saturated, come back": that always carries the shelf
+    /// hint. An upstream status carries its own header (429/503); anything else has no pacing.
+    pub fn retry_after(&self) -> Option<u64> {
+        match self {
+            Self::QueueRejected { .. } => Some(SHED_RETRY_AFTER_SECS),
+            Self::Status { retry_after, .. } => *retry_after,
+            _ => None,
+        }
+    }
+
     /// The `X-IR-Error-Classification` value the live service returns.
     pub fn classification(&self) -> &'static str {
         match self {

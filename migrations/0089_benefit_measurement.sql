@@ -1,4 +1,4 @@
--- 0074_benefit_measurement.sql — the measurements a benefit's evaluation reads
+-- 0089_benefit_measurement.sql — the measurements a benefit's evaluation reads
 -- (SPEC_V2 §8.3; ADR 0010 docs/decisions/0010-no-deferrals.md; plan v5 §4.3).
 --
 -- Before this migration a benefit's "realised" claim rested on two nullable timestamps on

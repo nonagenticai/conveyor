@@ -253,55 +253,68 @@ mod tests {
                 // (0063_async_invocation.sql). Adopted from main unchanged: production has
                 // applied this checksum, so its bytes never change.
                 (63, "async invocation".to_owned()),
+                // T17 (#87): the tenant asset authoring intake, drafts, review gate and the
+                // one-published-row-per-(kind, key) catalogue (0064_authoring.sql, SPEC_V2 §5.7).
+                (64, "authoring".to_owned()),
+                // T19 (#606): the decision forum — meeting types, meetings, agenda items,
+                // attendance, positions and the participant extension (0065_meetings.sql,
+                // SPEC_V2 §6.8, D66).
+                (65, "meetings".to_owned()),
+                // ── The lane's reserved block (0080+), after main's 0066/0067 (T5's kata pair
+                // when #636 merges). Versions 0066–0079 stay free for main; the block's SQL is
+                // unchanged, only its version moved.
                 // v1-w1a-2 (#526): the release's layered kind store — base → industry →
                 // department archetype → department → job — and `department.archetype`
-                // (0064_release_layers.sql, SPEC_V2 §4.1).
-                (64, "release layers".to_owned()),
+                // (0080_release_layers.sql, SPEC_V2 §4.1).
+                (80, "release layers".to_owned()),
                 // v1-w4a-2 (#526): the write tool's declared verification path on the version
-                // it was published with (0065_tool_verify.sql, SPEC_V2 §11.3).
-                (65, "tool verify".to_owned()),
+                // it was published with (0081_tool_verify.sql, SPEC_V2 §11.3).
+                (81, "tool verify".to_owned()),
                 // v1-p82-2 (#526): `programme_cadence.state` becomes a closed set
-                // (0066_cadence_state.sql, SPEC_V2 §8.2).
-                (66, "cadence state".to_owned()),
+                // (0082_cadence_state.sql, SPEC_V2 §8.2).
+                (82, "cadence state".to_owned()),
                 // v1-p5-3 (#526): a change's impact block is an object carrying at least one of
-                // scope/schedule/cost/risk (0067_change_impact_keys.sql, SPEC_V2 §5.5).
-                (67, "change impact keys".to_owned()),
-                // v1-w3b-3 (#526): the tenant-asset authoring family — the intake brief, the
-                // asset drafts, the human review gate and one published row per (kind, key)
-                // (0068_authoring.sql, SPEC_V2 §5.7, §10.4).
-                (68, "authoring".to_owned()),
+                // scope/schedule/cost/risk (0083_change_impact_keys.sql, SPEC_V2 §5.5).
+                (83, "change impact keys".to_owned()),
                 // #77 (T5): the kata loop — the pinned hypothesis, the candidates, the immutable
                 // held-out measurement and the per-target propagation rows
-                // (0069_kata.sql, SPEC_V2 §6.3, §9.3–§9.4, §12 T5).
-                (69, "kata".to_owned()),
+                // (0084_kata.sql, SPEC_V2 §6.3, §9.3–§9.4, §12 T5). Reconciled with main's
+                // 0066/0067 when #636 merges; the lane's design carries the candidates and
+                // propagation rows.
+                (84, "kata".to_owned()),
                 // v1-p82-3 (#526): `programme.shared_config` — the programme's shared values and
                 // the keys it locks against per-project override
-                // (0070_programme_shared_config.sql, SPEC_V2 §8.2).
-                (70, "programme shared config".to_owned()),
+                // (0085_programme_shared_config.sql, SPEC_V2 §8.2).
+                (85, "programme shared config".to_owned()),
                 // v1-w1c-3 (#526): an L1 decision names the verified `laya.classify`
                 // invocation behind its answer and the request/response hashes it was
-                // verified against (0071_ladder_laya_provenance.sql, SPEC_V2 §7.2).
-                (71, "ladder laya provenance".to_owned()),
+                // verified against (0086_ladder_laya_provenance.sql, SPEC_V2 §7.2).
+                (86, "ladder laya provenance".to_owned()),
                 // v1-w1c-4 (#526): the authored option set, its per-option tenant
                 // refinement and the decision's set pins — options are rows, never a
-                // caller's list (0072_ladder_option_sets.sql, SPEC_V2 §7.2).
-                (72, "ladder option sets".to_owned()),
-                // (0073): a register row belongs to a project OR a programme, and carries its
-                // next review date and response (0073_programme_risk_register.sql, SPEC_V2
+                // caller's list (0087_ladder_option_sets.sql, SPEC_V2 §7.2).
+                (87, "ladder option sets".to_owned()),
+                // (0088): a register row belongs to a project OR a programme, and carries its
+                // next review date and response (0088_programme_risk_register.sql, SPEC_V2
                 // §8.3–§8.4).
-                (73, "programme risk register".to_owned()),
-                // (0074): the baseline/interim/post readings a benefit's evaluation reads, and
+                (88, "programme risk register".to_owned()),
+                // (0089): the baseline/interim/post readings a benefit's evaluation reads, and
                 // the seven programme strategy/plan asset kinds
-                // (0074_benefit_measurement.sql, SPEC_V2 §8.3).
-                (74, "benefit measurement".to_owned()),
+                // (0089_benefit_measurement.sql, SPEC_V2 §8.3).
+                (89, "benefit measurement".to_owned()),
                 // SPEC_V2 §11.3 (T13, v1-w4a-5): a call that exceeds the tool's own
                 // `timeout_secs` is `pending`; the resume token travels with the pending row
-                // (0075_tool_call_resume.sql).
-                (75, "tool call resume".to_owned()),
+                // (0090_tool_call_resume.sql).
+                (90, "tool call resume".to_owned()),
                 // SPEC_V2 §6.2 (T4, v1-p6-5): an interruption records which input opened it —
                 // a failed run, a WIP breach, a stale lease, a gate timeout or a board event
-                // (0076_coach_interruption_trigger.sql).
-                (76, "coach interruption trigger".to_owned())
+                // (0091_coach_interruption_trigger.sql).
+                (91, "coach interruption trigger".to_owned()),
+                // (0092_benefit_measurement_typed.sql): the typed baseline/interim/post readings
+                // a benefit's evaluation reads.
+                (92, "benefit measurement typed".to_owned()),
+                // (0093_approval_policy_approver_kind.sql): who may decide a gate, as tenant data.
+                (93, "approval policy approver kind".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

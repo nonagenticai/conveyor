@@ -35,7 +35,7 @@ pub mod connectors;
 /// long-lived and unattended, so "an admin may do it" is not a reason to expose it. The
 /// human-only actions (`eval_signoffs.*`, `eval_runs.start|cancel`, `eval_results.label`) and
 /// the held-out reads stay out — see [`crate::spec::ActionSpec::machine_forbidden`].
-pub const MCP_DEFAULT_ACTIONS: [&str; 43] = [
+pub const MCP_DEFAULT_ACTIONS: [&str; 48] = [
     "approvals.decide",
     "approvals.list",
     "approvals.request",
@@ -59,6 +59,11 @@ pub const MCP_DEFAULT_ACTIONS: [&str; 43] = [
     "inference_calls.list",
     "inference_usage.report",
     "knowledge.query",
+    "meetings.agenda_add",
+    "meetings.get",
+    "meetings.list",
+    "meetings.position",
+    "meetings.respond",
     "memory.recall",
     "process_runs.start",
     "processes.create",
@@ -84,13 +89,17 @@ pub const MCP_DEFAULT_ACTIONS: [&str; 43] = [
 /// The operator lifecycle a provisioned text connector may invoke by default: create, run,
 /// approve, answer, close, rerun — and only the reads needed to address them. Everything
 /// administrative is both absent here and refused by the floor.
-pub const CONNECTOR_DEFAULT_ACTIONS: [&str; 18] = [
+pub const CONNECTOR_DEFAULT_ACTIONS: [&str; 22] = [
     "approvals.decide",
     "approvals.list",
     "boards.get",
     "cards.get",
     "cards.list",
     "events.list",
+    "meetings.get",
+    "meetings.list",
+    "meetings.position",
+    "meetings.respond",
     "process_runs.start",
     "processes.get",
     "processes.list",

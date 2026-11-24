@@ -12,6 +12,8 @@
 //! the turn `refused` — the refusal names the tool, because the model is the caller's own agent, not
 //! an untrusted third party.
 
+use std::time::Duration;
+
 use axum::Json;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
@@ -581,6 +583,12 @@ async fn run(
 ///
 /// The compiled system prompt is passed in so the ledger row carries the recipe's identity —
 /// key, version and the sha256 of the exact text — rather than a literal name (S16 W7).
+/// How many times one round asks the engine for the model's answer. Each attempt re-claims the
+/// same `(turn, round)` idempotency key; the engine releases that claim when an external call
+/// fails (`invoke.rs::record_failure`), so a retry after a transient failure re-executes rather
+/// than replaying a stale refusal.
+const MODEL_ATTEMPTS: u32 = 3;
+
 async fn call_model(
     state: &AppState,
     caller: &Caller,
@@ -599,41 +607,60 @@ async fn call_model(
         max_tokens: Some(1024),
         response_format: None,
     };
-    let outcome = invoke(
-        &state.pool,
-        registry(),
-        caller.tenant,
-        InvokeRequest {
-            credential_alias: None,
-            action: "completions.create".to_owned(),
-            input: serde_json::to_value(&input).map_err(ActionError::serialize)?,
-            precondition: None,
-            idempotency_key: Some(format!("turn:{turn_id}:{round}")),
-            approval_id: None,
-            actor_id: caller.principal.user_id.as_uuid(),
-            actor_kind: caller.principal.kind.as_actor_kind().to_owned(),
-            role: caller.role,
-            policy: caller.policy.clone(),
-            authority: Authority::of(caller),
-            request_id: None,
-            trace_id: None,
-            depth: 0,
-            app_key: state.config.app_key.clone(),
-            usage: Some(conveyor_actions::UsageContext {
-                caller_kind: conveyor_domain::inference::CallerKind::Copilot,
-                run_id: None,
-                run_step_id: None,
-                conversation_turn_id: Some(turn_id),
-                eval_run_id: None,
-                prompt_ref: Some(compiled.key.clone()),
-                prompt_version: Some(compiled.version.clone()),
-                prompt_sha256: Some(compiled.sha256.clone()),
-                correlation_id: Some(format!("turn:{turn_id}")),
-            }),
-        },
-    )
-    .await?;
-    parse_answer(&outcome.body)
+    let request = InvokeRequest {
+        credential_alias: None,
+        action: "completions.create".to_owned(),
+        input: serde_json::to_value(&input).map_err(ActionError::serialize)?,
+        precondition: None,
+        idempotency_key: Some(format!("turn:{turn_id}:{round}")),
+        approval_id: None,
+        actor_id: caller.principal.user_id.as_uuid(),
+        actor_kind: caller.principal.kind.as_actor_kind().to_owned(),
+        role: caller.role,
+        policy: caller.policy.clone(),
+        authority: Authority::of(caller),
+        request_id: None,
+        trace_id: None,
+        depth: 0,
+        app_key: state.config.app_key.clone(),
+        usage: Some(conveyor_actions::UsageContext {
+            caller_kind: conveyor_domain::inference::CallerKind::Copilot,
+            run_id: None,
+            run_step_id: None,
+            conversation_turn_id: Some(turn_id),
+            eval_run_id: None,
+            prompt_ref: Some(compiled.key.clone()),
+            prompt_version: Some(compiled.version.clone()),
+            prompt_sha256: Some(compiled.sha256.clone()),
+            correlation_id: Some(format!("turn:{turn_id}")),
+        }),
+    };
+    // A router that answered a transient failure (a shed slot, an upstream 5xx) is a 502 here;
+    // the turn would otherwise die on a blip. Retry only that: a service that never ANSWERED
+    // (`action-upstream-unreachable`) may already have been served and billed, a timeout (504)
+    // certainly may have, and a 4xx is the request's own fault. The answer is parsed only after
+    // the final attempt, so a paid-for malformed reply is never re-bought.
+    let mut attempt = 1;
+    loop {
+        match invoke(&state.pool, registry(), caller.tenant, request.clone()).await {
+            Ok(outcome) => return parse_answer(&outcome.body),
+            Err(error)
+                if attempt < MODEL_ATTEMPTS
+                    && error.status == 502
+                    && error.code == "action-upstream-failed" =>
+            {
+                tracing::warn!(
+                    attempt,
+                    turn = %turn_id,
+                    round,
+                    "copilot_model_transient_retry"
+                );
+                tokio::time::sleep(Duration::from_millis(250_u64 << (attempt - 1))).await;
+                attempt += 1;
+            }
+            Err(error) => return Err(error),
+        }
+    }
 }
 
 /// Read the router's OpenAI-compatible answer.

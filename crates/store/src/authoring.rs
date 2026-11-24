@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 //! Tenant asset authoring — the intake brief and the asset drafts it produces (SPEC_V2 §5.7,
-//! §10.4; T17, finding v1-w3b-3).
+//! §10.4; T17 #87, ported from #526, finding v1-w3b-3).
 //!
 //! The family is three writes around one lifecycle (`0068_authoring.sql`):
 //!

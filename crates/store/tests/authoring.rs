@@ -1,4 +1,4 @@
-//! T17 (#526) — tenant asset authoring (SPEC_V2 §5.7, §10.4; finding v1-w3b-3).
+//! T17 (#87, ported from #526) — tenant asset authoring (SPEC_V2 §5.7, §10.4; finding v1-w3b-3).
 //!
 //! The store half of the family: an intake brief, dependency-ordered asset drafts, a review
 //! that only a HUMAN `authoring.review` decision can settle, and a publication that is the
