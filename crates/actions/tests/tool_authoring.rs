@@ -902,6 +902,90 @@ async fn a_destructive_tool_needs_a_named_approver() {
     assert_eq!(gates, 0, "the refusal opens no gate either");
 }
 
+/// v1-u5a-tool-idempotency-publish-1 / v1-p118-2: the published tool version carries the
+/// manifest's declared idempotency policy and its output schema, not just the draft.
+#[tokio::test]
+async fn a_published_tool_carries_its_idempotency_and_output_schema() {
+    let fixture = Fixture::new().await;
+    let stub = Stub::start().await;
+
+    let mut document = widgets_document("purgeOp");
+    document["paths"]["/widgets"]["post"]["x-effect"] = json!("destructive");
+    document["paths"]["/widgets"]["post"]["x-idempotency"] = json!("required");
+    let (status, imported) = fixture
+        .invoke(
+            "toolkits.import_openapi",
+            "dev:alice",
+            json!({
+                "key": "purge",
+                "title": "Purge",
+                "document": document,
+                "base_url": &stub.base,
+            }),
+        )
+        .await;
+    assert_eq!(status, 201, "{imported}");
+    let draft_id = imported["draft_id"].as_str().expect("draft id");
+
+    let (status, reviewed) = fixture
+        .invoke(
+            "tool_authoring.review",
+            "dev:alice",
+            json!({"draft_id": draft_id, "decision": "approve", "named_approver": "Alice"}),
+        )
+        .await;
+    assert_eq!(status, 200, "{reviewed}");
+
+    let (status, pending) = fixture
+        .invoke(
+            "tool_authoring.publish",
+            "dev:alice",
+            json!({"draft_id": draft_id}),
+        )
+        .await;
+    assert_eq!(status, 200, "{pending}");
+    let approval_id = pending["approval_id"].as_str().expect("the gate");
+    let (status, decided) = fixture
+        .invoke(
+            "approvals.decide",
+            &fixture.reviewer,
+            json!({"approval_id": approval_id, "decision": "approve"}),
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+    let (status, published) = fixture
+        .invoke(
+            "tool_authoring.publish",
+            "dev:alice",
+            json!({"draft_id": draft_id, "approval_id": approval_id}),
+        )
+        .await;
+    assert_eq!(status, 200, "{published}");
+    assert_eq!(published["outcome"], "published", "{published}");
+
+    let mut tx = store::begin_scoped(&fixture.pg.owner, fixture.tenant)
+        .await
+        .expect("scoped tx");
+    let (output_schema, idempotency): (Option<Value>, String) = sqlx::query_as(
+        "SELECT t.output_schema, t.idempotency
+           FROM tool t JOIN toolkit k ON k.id = t.toolkit_id
+          WHERE t.tenant_id = $1 AND k.key = 'purge'",
+    )
+    .bind(fixture.tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the published tool row");
+    tx.commit().await.expect("commit");
+    assert!(
+        output_schema.is_some(),
+        "the response schema is stored on the tool version"
+    );
+    assert_eq!(
+        idempotency, "required",
+        "the declared idempotency policy is stored"
+    );
+}
+
 #[tokio::test]
 async fn the_publishing_job_cannot_widen_its_own_effect_ceiling() {
     let fixture = Fixture::new().await;
