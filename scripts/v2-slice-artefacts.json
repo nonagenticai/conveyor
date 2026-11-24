@@ -112,10 +112,32 @@
       "gap": null
     },
     "T5": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "tables": [
+        "kata",
+        "kata_get",
+        "kata_measurement",
+        "kata_adoption",
+        "kata_revert"
       ],
-      "gap": "no kata.* action family and no measured procedure-change loop"
+      "actions": [
+        "kata.adopt",
+        "kata.analyse",
+        "kata.get",
+        "kata.hypothesise",
+        "kata.measure",
+        "kata.observe",
+        "kata.open",
+        "kata.propose"
+      ],
+      "modules": [
+        "kata"
+      ],
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "migrations/0066_kata.sql",
+        "migrations/0067_kata_gate.sql"
+      ],
+      "gap": null
     },
     "T6": {
       "evidence": [
