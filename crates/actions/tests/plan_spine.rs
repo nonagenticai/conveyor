@@ -162,6 +162,61 @@ async fn create_wbs(running: &support::Running, project: &str, title: &str) -> S
     id_of(output(&body), "id")
 }
 
+/// The project's board and its active lane, as `projects.create` makes them.
+async fn board_and_lane(running: &support::Running, project: &str) -> (String, String) {
+    let (status, view) = running
+        .invoke(
+            "projects.get",
+            "dev:alice",
+            json!({"id": project}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{view}");
+    let board = id_of(&output(&view)["boards"][0], "id");
+    let (status, board_view) = running
+        .invoke(
+            "boards.get",
+            "dev:alice",
+            json!({"id": board}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{board_view}");
+    let lane = output(&board_view)["lists"]
+        .as_array()
+        .expect("lists")
+        .iter()
+        .find(|row| row["list"]["kind"] == "active")
+        .unwrap_or_else(|| panic!("no active lane in {board_view}"));
+    (board, id_of(&lane["list"], "id"))
+}
+
+/// A `feature` card on the project's board — the work package's executor.
+async fn create_card(running: &support::Running, board: &str, lane: &str) -> String {
+    let (status, card) = running
+        .invoke(
+            "cards.create",
+            "dev:alice",
+            json!({
+                "board_id": board,
+                "list_id": lane,
+                "name": format!("Work package {}", uuid::Uuid::now_v7().simple()),
+                "card_type_code": "feature",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{card}");
+    id_of(output(&card), "id")
+}
+
 /// A baseline row as `baselines.take` writes it: unapproved until a second principal decides.
 async fn create_unapproved_baseline(
     running: &support::Running,
@@ -1474,4 +1529,88 @@ async fn accepting_a_wbs_node_without_evidence_is_refused() {
         .await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["status"], "accepted", "{body}");
+}
+
+/// v1-p5-5 (SPEC_V2 §5.1) — a work package with no card has no path to the work: the create is
+/// refused `422 card_required` at the field that is missing, and nothing is written.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_work_package_without_a_card_is_refused() {
+    let (pg, running, _seeded) = fixture().await;
+    let project = create_project(&running, "Cardless work package").await;
+
+    let (status, body) = running
+        .invoke(
+            "wbs.create",
+            "dev:alice",
+            json!({"project_id": project, "kind": "work_package", "title": "Ship it"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["errors"][0]["code"], "card_required", "{body}");
+    assert_eq!(body["errors"][0]["field"], "card_id", "{body}");
+    let rows: i64 = sqlx::query_scalar("SELECT count(*) FROM wbs_node WHERE project_id = $1::uuid")
+        .bind(&project)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("count the project's nodes");
+    assert_eq!(rows, 0, "the refusal wrote a row");
+}
+
+/// v1-p5-5 (SPEC_V2 §5.1) — the chain is real end to end: the work package's node stores the
+/// card that was named, and a run started from that card carries the same card.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_work_package_names_its_card_and_run() {
+    let (pg, running, _seeded) = fixture().await;
+    let project = create_project(&running, "Carded work package").await;
+    let (board, lane) = board_and_lane(&running, &project).await;
+    let card = create_card(&running, &board, &lane).await;
+
+    let (status, created) = running
+        .invoke(
+            "wbs.create",
+            "dev:alice",
+            json!({
+                "project_id": project,
+                "kind": "work_package",
+                "title": "Ship it",
+                "card_id": card
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    let node = id_of(output(&created), "id");
+    assert_eq!(output(&created)["card_id"], card, "{created}");
+
+    let (status, run) = running
+        .invoke(
+            "runs.create",
+            "dev:alice",
+            json!({"card_id": card}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{run}");
+    let run_id = id_of(output(&run), "id");
+    assert_eq!(output(&run)["card_id"], card, "{run}");
+
+    let card_id: uuid::Uuid = uuid::Uuid::parse_str(&card).expect("a card id");
+    let stored: (Option<uuid::Uuid>, Option<uuid::Uuid>) = sqlx::query_as(
+        "SELECT w.card_id, r.card_id FROM wbs_node w, run r
+          WHERE w.id = $1::uuid AND r.id = $2::uuid",
+    )
+    .bind(&node)
+    .bind(&run_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the node and its run");
+    assert_eq!(stored.0, Some(card_id), "the node persists its card");
+    assert_eq!(stored.1, Some(card_id), "the run carries the same card");
 }

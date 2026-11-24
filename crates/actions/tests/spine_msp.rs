@@ -573,7 +573,9 @@ async fn msp_deletes_and_refusals() {
             "wbs.create",
             "dev:alice",
             json!({
-                "project_id": project, "parent_id": parent_id, "kind": "work_package",
+                "project_id": project, "parent_id": parent_id, "kind": "deliverable",
+                // The test is the parent/child delete rule; the child's kind is incidental, and
+                // a `work_package` would owe a card (v1-p5-5).
                 "title": "Child", "business_value": 1, "time_criticality": 1,
                 "risk_reduction": 1, "job_size": 1
             }),

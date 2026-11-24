@@ -212,7 +212,9 @@ async fn baseline(running: &support::Running, project: &str) {
                 "project_id": project,
                 "baseline_kind": "scope",
                 "wbs": [{
-                    "kind": "work_package",
+                    // The baseline is fixture for the close gate; the kind is not what it reads,
+                    // and a `work_package` would owe a card (v1-p5-5).
+                    "kind": "deliverable",
                     "title": "Deliver the project",
                     "business_value": 1,
                     "time_criticality": 1,
