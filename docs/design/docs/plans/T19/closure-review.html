@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19 — Decision forums: closure review · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/closure-review.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19--decision-forums-closure-review">T19 — Decision forums: closure review</h1>
+<p>Whether the project delivered its acceptance, on its evidence, and the decision that follows.</p>
+<h2 id="outcome-vs-acceptance">Outcome vs acceptance</h2>
+<table>
+<thead>
+<tr>
+<th>Acceptance criterion</th>
+<th>Evidence</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Every D-scenario in <code>docs/plans/T19-decision-forums.md</code> §5 passes</td>
+<td>26 scenarios across the eight <code>meetings_*</code> test files; table in <code>docs/plans/T19/evidence.md</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>The repo gate is green at the exact head</td>
+<td>PR #640's <code>preflight</code> and <code>ci-public</code>; merge commit <code>3880d28a</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>The five tables and two alterations are in the migration ledger</td>
+<td><code>(65, "meetings")</code>; live <code>_sqlx_migrations</code> max is 65</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>The registry, parity and OpenAPI lock agree</td>
+<td>530 actions / 512 internal; <code>registry</code>, <code>parity_http_mcp</code>, <code>--check-lock</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>The console and design/docs/coverage gates pass</td>
+<td><code>check-v2</code>, <code>check-console</code>, <code>check-coverage</code>, <code>check-docs</code>, <code>check-data</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>The real app's Meetings destination is proven</td>
+<td><code>apps/web/e2e/meetings.spec.ts</code> in <code>web.yml</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>One PR <code>Closes #606</code> merged</td>
+<td>PR #640 merged 2026-11-24T02:29:06Z</td>
+<td>pass</td>
+</tr>
+<tr>
+<td><strong>The live gate</strong>: the owner decides one item in the web room and one over MCP, both <code>via='meeting'</code></td>
+<td><code>scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed</code> — 15/15 rows pass on deployed <code>a8f67c3e</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>The meeting's own DoD: every item closed with an outcome and the minutes published</td>
+<td>minutes asset <code>01a20ca3-7d7a-72f0-b63d-96a09064c6df</code>; meeting <code>closed</code> 2026-11-24T08:19:39Z</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>T19 is a live programme row with its benefit</td>
+<td>project <code>T19</code> on its board; benefit B7; <code>migrate --seed --tenant nonagentic</code> read-back</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table>
+<h2 id="evidence">Evidence</h2>
+<ul>
+<li>Implementation: PR #640 (<code>3880d28a</code>), deployed revision <code>a8f67c3e</code>; the twelve <code>meetings.*</code> actions and migration <code>0065_meetings</code> are present in the running engine.</li>
+<li>Live gate: <code>docs/plans/T19/evidence.md</code> § "The live gate"; raw read-backs in <code>docs/evidence/t19/</code> (<code>live-gate.json</code>, <code>live-gate-check.txt</code>, <code>meeting-schedule.json</code>, <code>minutes-publish.json</code>, <code>meeting-close.json</code>, <code>refresh-readback.json</code>, <code>seed-readback.txt</code>). The human seat was exercised by the tenant admin identity <code>FR Test</code>, supplied by the owner; the record names that identity, not the owner's personal account.</li>
+<li>Deployment fixes the gate required, both merged in <code>gitops-production</code>: #5429 (the public MCP host was not in <code>CONVEYOR_MCP_ALLOWED_HOSTS</code>, so every handshake was <code>403 Host header is not allowed</code>) and #5432 (the MCP session lives in one pod; a DestinationRule now pins it on <code>mcp-session-id</code>, and the probe went from 6/8 failures to 8/8 served).</li>
+<li>Programme: <code>migrate --seed --tenant nonagentic</code> created the catalogue's <code>meeting</code> card type and T19 with its board; <code>programmes.refresh</code> then reported created=0, updated=0, skipped=51. The published snapshot is regenerated in the same unit.</li>
+</ul>
+<h2 id="open-items">Open items</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Owner</th>
+<th>Next step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The <code>meeting_type</code> authoring route (a policy change is a new version through a governance route)</td>
+<td>programme-architect</td>
+<td>a versioned follow-up unit; not part of D1–D8</td>
+</tr>
+<tr>
+<td>The T9 board / T10 cadence binding to meeting types</td>
+<td>programme-architect</td>
+<td>the plan's declared follow-up integration unit</td>
+</tr>
+<tr>
+<td>T19's wider MSP chain (charter, approved baseline, WBS/WSJF, SoAW + delivery contract, Phase-G review, demo credit)</td>
+<td>the #526 programme-rework lane</td>
+<td>recorded there under its own verdict; this closure does not claim it</td>
+</tr>
+<tr>
+<td>The homepage mirror of the design pack</td>
+<td>programme-manager</td>
+<td>a separate gated <code>make verify</code> + PR in the homepage repository</td>
+</tr>
+<tr>
+<td>The superseded approval <code>t19_live_gate_web</code> (the first request, made by the seat itself)</td>
+<td>programme-manager</td>
+<td>rejected with a note so the queue shows it was replaced by <code>t19_live_gate_web_v2</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="decision">Decision</h2>
+<p>Close. T19's D1–D8 acceptance and its live gate are met on the evidence above, the meeting closed on its own DoD, and the project is a live programme row with benefit B7. The open items are named follow-ups with owners; the wider MSP chain is the #526 lane's record, not a condition of this closure.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T19/closure-review.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

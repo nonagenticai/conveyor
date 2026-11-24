@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S04 Driver, Goal and Objective Catalogue - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: S04 Driver, Goal and Objective Catalogue</li>
+<li>Phase: a</li>
+<li>Purpose: Record why S04 exists and what it must achieve: one declaration per invocable operation, from which manifest, OpenAPI operation, MCP tool and route are generated so HTTP and MCP cannot diverge.</li>
+<li>Scope: S04 action registry slice. It replaces the 24 node packages and fr's 88 capability declarations; later slices add actions, never a surface. Domain actions (S05-S11), kind: workflow (S13), channel-mcp delivery rows (S06) and the signed mcp_server channel (S06-alpha) are out of scope.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Driver / Four artifacts drifting</strong> - {"detail": "fr's registry is the lesson: any projection reading a second source is the bug. S04 derives every projection from one ActionSpec.", "objective": "Remove the drift surface between HTTP, MCP, manifest and OpenAPI."}</li>
+<li><strong>Driver / Legacy surface proliferation</strong> - {"detail": "Later slices add actions, never a surface.", "objective": "Replace 24 node packages and fr's 88 capability declarations with one registry."}</li>
+<li><strong>Goal / Gate SPEC section 8 S4</strong> - {"detail": "The gate covers the 16 internal actions plus the four fixtures.* external actions.", "objective": "20 actions identical over HTTP and MCP."}</li>
+<li><strong>Objective / Single declaration</strong> - {"detail": "The attribute supplies name, version, kind, scopes, idempotent, timeout_ms, effect, confirm and tenancy.", "objective": "ActionSpec plus #[action] emit the spec value and an inventory::submit! from the same tokens."}</li>
+<li><strong>Objective / Fail-closed registry</strong> - {"detail": "It fails on a duplicate name, an MCP-form collision, an MCP name outside the charset, a handler-less internal action or an unknown Scope.", "objective": "assert_registry_consistent runs in serve, worker and every test."}</li>
+<li><strong>Objective / Invocation integrity</strong> - {"detail": "One transaction writes the mutation, action_invocation and audit_event; S04 declares no events, so it writes no outbox row.", "objective": "Compose tenancy scope, idempotency claim, deadline and transaction around every call."}</li>
+<li><strong>Objective / External integration</strong> - {"detail": "Store spec and schema_hash; refuse a breaking refresh until conveyor admin actions approve &lt;name&gt; --version &lt;n&gt;.", "objective": "Ingest external OpenAPI operations as kind: external actions."}</li>
+<li><strong>Objective / MCP parity and fail-closed access</strong> - {"detail": "A refused tool is absent, not noisy; an unresolvable tenant is 401 and a failed JWT bearer is never retried as a licence token.", "objective": "Serve MCP tools from the same Registry, scope-filtered."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

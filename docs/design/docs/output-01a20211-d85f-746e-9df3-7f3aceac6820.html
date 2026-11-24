@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Requirements Catalog — T0 Model and contracts (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Requirements Catalog — T0 Model and contracts (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: The requirements the T0 gate and its contracts must satisfy, each with an executable acceptance.</li>
+<li>Scope: schema, invariants, executor seam and action contracts.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>R1 / One organisation spine</strong> - {"acceptance": "industry and the extended department (industry_id, ordinal, is_primary) exist with FORCE RLS; one primary department per industry. crates/store/tests/organisation.rs::organisation_tables_are_forced_rls and ::job_departments_are_ordered_and_placement_is_validated.", "priority": "must"}</li>
+<li><strong>R2 / A job, a release and a binding</strong> - {"acceptance": "A job is created, job_releases.publish writes one release with a 64-hex release_hash over the canonical snapshot, and job_bindings.create pins it. crates/store/tests/organisation.rs::release_hash_is_deterministic_and_publish_is_idempotent.", "priority": "must"}</li>
+<li><strong>R3 / A stale pin is refused</strong> - {"acceptance": "A run naming a retired binding, or a release other than the binding's pin, is 409 job_binding_stale naming both hashes before any model call. crates/store/tests/organisation.rs::a_run_pins_its_binding_and_a_retired_or_mismatched_pin_is_refused; the action surface in crates/actions/tests/sop_ingestion.rs::a_bound_job_runs_the_pddl_steps.", "priority": "must"}</li>
+<li><strong>R4 / No concept has two stores</strong> - {"acceptance": "The SPEC_V2 \u00a710.1 ownership matrix assigns each fact one system of record; job_catalogue, job_release and job_binding join the conveyor's own rows; there is no imported manifest and no live copy of another system's data.", "priority": "must"}</li>
+<li><strong>R5 / An extensible executor kind</strong> - {"acceptance": "executor_kind is an open slug (^[a-z][a-z0-9_]{1,31}$) stored as TEXT with no value CHECK; a test-only third kind registers and resolves without editing the run path. crates/domain/src/executor.rs; crates/store/tests/organisation.rs::third_executor_kind_registers_without_editing_the_run_path.", "priority": "must"}</li>
+<li><strong>R6 / Decision-ladder types, no evaluation</strong> - {"acceptance": "The five decision tables exist with FORCE RLS and no evaluation path is added (T2). migrations/0040_organisation.sql; crates/actions/tests/decision_ladder.rs exercises the audit shape T2 will use.", "priority": "must"}</li>
+<li><strong>R7 / One action contract</strong> - {"acceptance": "Every organisation action is one ActionSpec served over HTTP, MCP and OpenAPI and pinned in served-spec.lock.json: industries.create|get|list, departments.create|list, job_catalogue.create|update|retire|get|list, job_releases.publish|retire|list, job_bindings.create|retire|get|list.", "priority": "must"}</li>
+<li><strong>R8 / Tenant separation</strong> - {"acceptance": "Every tenant-owned table carries tenant_id, ENABLE and FORCE ROW LEVEL SECURITY and the tenant_isolation policy; the seed proves AHTAPol sees only its industry. crates/store/tests/organisation.rs::ahtapol_receives_only_its_industry.", "priority": "must"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Model and contracts · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

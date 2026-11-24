@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Requirements Catalog — T2 Decision ladder (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Requirements Catalog — T2 Decision ladder (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: The requirements the T2 gate and its contracts must satisfy, each with an executable check and its current status.</li>
+<li>Scope: the four §12 clauses, the issue-#73 scenarios P1.1–P4.2, and the contract requirements the six admitted findings concern.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>R1 P1.1 / A rule, a laya and a human decision share one audit shape</strong> - {"acceptance": "<code>decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape</code> lists three rows with identical column sets and distinct rungs rule, laya and human; every row names <code>policy_id</code>, <code>policy_version</code>, <code>answer</code>, <code>confidence</code>, <code>actor_kind</code> and <code>latency_ms</code>.", "priority": "must"}</li>
+<li><strong>R2 P2.1 / A tenant refinement changes a threshold with no code change</strong> - {"acceptance": "<code>decision_ladder.rs::a_refinement_changes_a_threshold_without_a_code_change</code> publishes a 0.5 override on a 0.8 policy and the same 0.7 answer moves from <code>refused</code> to <code>accepted</code>, pinning refinement version 1 and policy version 1.", "priority": "must"}</li>
+<li><strong>R3 P3.1 / Every decision pins the policy, refinement and laya-config versions it read</strong> - {"acceptance": "<code>decision_ladder.rs::every_decision_pins_the_refinement_and_laya_config_versions</code>: an L1 decision with no laya config is <code>422 pins_incomplete</code>; with one, the row pins policy 1, refinement 1 and laya config 1; after the policy moves to 2, the stored first row still reads 1.", "priority": "must"}</li>
+<li><strong>R4 P4.1/P4.2 / A generated draft cannot transition a card on the apply or update path</strong> - {"acceptance": "<code>decision_ladder.rs::a_generated_draft_cannot_transition_a_card</code> refuses a refused L1 decision and an accepted L1 decision with 422 <code>draft_requires_gate</code>; the human <code>draft.apply</code> decision backed by an approved gate on the card applies the draft; <code>documents.update</code> attaching the generated class is 409 <code>draft_requires_gate</code>; <code>ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft</code> bars a routine accepted decision.", "priority": "must"}</li>
+<li><strong>R5 P4.1 (create path) / A generated draft cannot be attached by <code>documents.compose</code></strong> - {"acceptance": "OPEN \u2014 v1-t2-1: <code>documents.compose</code> accepts <code>card_id</code> and <code>meta.generated = true</code> and creates an attached document with no <code>draft.apply</code> check. This is the P0 finding that blocks the fourth clause and the project's closure.", "priority": "must"}</li>
+<li><strong>R6 P1.1 (human) / A human decision is a person's act on a resolved human approval</strong> - {"acceptance": "<code>ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision</code> returns <code>403 person_required</code>; <code>::a_human_decision_without_an_approved_human_gate_is_refused</code> refuses a missing, pending or agent-decided approval; <code>::a_pending_approval_cannot_gate_a_draft</code> refuses a pending gate.", "priority": "must"}</li>
+<li><strong>R7 P1.1 (gate identity) / A human decision cites the approval of its own gate</strong> - {"acceptance": "OPEN \u2014 v1-t2-6: <code>ladder.record</code> passes <code>None</code> for the gate to <code>human_approved_gate_tx</code>, so any approved approval with a human approve decision on the same card qualifies. The check must compare <code>approval.gate</code> with the decision's gate.", "priority": "must"}</li>
+<li><strong>R8 §7.2 (options) / Options are authored, versioned rows</strong> - {"acceptance": "OPEN \u2014 v1-t2-4: <code>ladder.evaluate</code> accepts an inline <code>options</code> array and records it with <code>option_set_version</code>; there is no authored option-set row the tenant versions independently of the request.", "priority": "must"}</li>
+<li><strong>R9 §7.2 (questions) / Questions are rows with fire_when, min_confidence and fail_policy</strong> - {"acceptance": "OPEN \u2014 v1-t2-4: <code>decision_policy</code> carries kind, gate, threshold, fail_policy, action and meta; the question is an optional free string on the request, defaulted to the kind, and <code>fire_when</code>/<code>min_confidence</code> have no columns.", "priority": "must"}</li>
+<li><strong>R10 §7.2 (gated refinement) / Publishing a refinement is a gated policy change</strong> - {"acceptance": "OPEN \u2014 v1-t2-3: <code>refinements.publish</code> has <code>confirm = \"none\"</code>, writes the override and bumps the version with no approval; <code>decision_policies.update</code> is likewise ungated.", "priority": "must"}</li>
+<li><strong>R11 §7.2 (laya) / L1 asks the laya client and records its answer</strong> - {"acceptance": "OPEN \u2014 v1-t2-2: no T2 path calls <code>POST /v1/systemone</code>; the answer and confidence are supplied by the caller, and <code>laya_configs</code> only pins model_ref, params and timeout.", "priority": "must"}</li>
+<li><strong>R12 §7.5 (budget) / An over-budget run is refused before the next call</strong> - {"acceptance": "OPEN \u2014 v1-t2-5: no inference budget is declared or enforced in T2; the tree's only budget refusal is <code>429 tool_budget_exceeded</code>, not the \u00a77.5 spelling <code>429 budget_exceeded</code>.", "priority": "must"}</li>
+<li><strong>R13 / Tenant isolation on every ladder table</strong> - {"acceptance": "the five decision tables are tenant-scoped with FORCE RLS as shipped by T0 in <code>migrations/0040_organisation.sql</code>; <code>migrations/0046_decision_ladder.sql</code> only adds columns, constraints and indexes, and both new indexes lead with <code>tenant_id</code>; the one-refinement and one-policy indexes are tenant-scoped.", "priority": "must"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision ladder · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

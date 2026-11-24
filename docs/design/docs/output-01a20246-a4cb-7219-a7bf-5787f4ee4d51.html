@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Technology Standards Catalog — S02 Skeleton (retrospective, 2026-11-21) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Technology Standards Catalog — S02 Skeleton (retrospective, 2026-11-21)</li>
+<li>Phase: d</li>
+<li>Kind: catalog</li>
+<li>Purpose: Record the standards, pins and connection rules S02 set, so a later slice bumps deliberately instead of drifting.</li>
+<li>Scope: The S02 plan's pins and the delivered Cargo.toml, Dockerfile, compose.yaml, migrations and crates; recorded retrospectively on 2026-11-21.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Rust workspace / Edition and safety</strong> - {"source": "plan \u00a75; Cargo.toml", "standard": "edition 2024; every crate carries #![forbid(unsafe_code)]; ten members (eight crates + two apps) at S02"}</li>
+<li><strong>Toolchain / Pin</strong> - {"source": "docs/plans/slices/S02-skeleton.md \u00a75; Cargo.toml", "standard": "1.99.0 in the S02 plan; the current Cargo.toml declares rust-version 1.100.0"}</li>
+<li><strong>Dependency pins / Exact versions</strong> - {"source": "Cargo.toml [workspace.dependencies]; plan \u00a75", "standard": "tokio 1.53.3; axum 0.8.9; sqlx 0.9.0 (runtime-tokio, tls-rustls, postgres, migrate, macros, json); utoipa 6.0.0; utoipa-axum 0.3.0; clap 4.6.7; thiserror 2.0.21; serde 1.0.229; serde_json 1.0.154; tower 0.5; tower-http 0.7.1"}</li>
+<li><strong>Postgres / Version and image</strong> - {"source": "plan \u00a75, \u00a710 Q5", "standard": "Postgres 18; compose image pgvector/pgvector:0.8.7-pg18; the vector and pg_trgm extensions belong to S07, not 0001"}</li>
+<li><strong>Connection discipline / Pooler versus direct</strong> - {"source": "plan \u00a75 Env, \u00a78 trap 3; compose.yaml", "standard": "DATABASE_URL is the pgbouncer runtime URL on 6439 (transaction pooling); DATABASE_MIGRATE_URL is the direct owner connection on 5439; DATABASE_LISTEN_URL is direct 5439 because LISTEN is session-scoped"}</li>
+<li><strong>Roles and grants / Least privilege</strong> - {"source": "scripts/db-roles.sql; migrations/0001_platform.sql", "standard": "conveyor_migrate owns the schema; conveyor_runtime is NOSUPERUSER NOBYPASSRLS; REVOKE ALL ON _sqlx_migrations; audit_event grants SELECT and INSERT only"}</li>
+<li><strong>Row-level security / Force it</strong> - {"source": "migrations/0001_platform.sql; plan \u00a78 trap 1", "standard": "ENABLE and FORCE on every tenant-owned table; one FOR ALL tenant_isolation policy with USING and WITH CHECK; the owner is included; no BYPASSRLS role exists (S2-D3)"}</li>
+<li><strong>Migrations / Root and forward-only</strong> - {"source": "crates/store/src/migrate.rs; plan \u00a75, \u00a78 trap 2", "standard": "migrations/ at the workspace root; sqlx::migrate!("../../migrations"); a unit test asserts the embedded set is exactly [(1, "platform")]; forward only after the slice closes (CONTRACT \u00a72)"}</li>
+<li><strong>Ports / Same inside and outside; never 8000</strong> - {"source": "compose.yaml; plan \u00a75, \u00a78 trap 6", "standard": "app 8930; db 5439 (postgres -p 5439); pgbouncer 6439; each published on [redacted-ip] with the same container port"}</li>
+<li><strong>Container / Non-root</strong> - {"source": "Dockerfile; plan \u00a78 trap 7", "standard": "UID/GID 65532; .dockerignore excludes target/, .git/ and .env*"}</li>
+<li><strong>Authentication / One realm, strict issuer and audience</strong> - {"source": "crates/auth/src/jwks.rs; plan \u00a75", "standard": "realm conveyor; an unlisted iss is rejected before JWKS; JWKS_TTL 600 s; JWKS_MIN_REFRESH 30 s; aud and azp required"}</li>
+<li><strong>Licence / Fail closed</strong> - {"source": "crates/auth/src/licence.rs; plan \u00a75", "standard": "non-JWT licence tokens; app_licence read only; LICENCE_MAX_AGE_SECS 3600; absent/stale/expired/revoked/unknown refuse"}</li>
+<li><strong>SSE / Bounded replay</strong> - {"source": "crates/api/src/routes/events.rs", "standard": "Last-Event-ID = event.seq; replay LIMIT 500; keepalive 15 s; a 64-slot channel; resync rather than unbounded buffering"}</li>
+<li><strong>API documentation / One document</strong> - {"source": "plan \u00a75; project conventions", "standard": "/api is one OpenApiRouter built with .routes(); a second crate folds with OpenApiRouter::merge, never Router::merge; only /mcp uses Router::merge outside the document; routes are unversioned /api/&lt;resource&gt;"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

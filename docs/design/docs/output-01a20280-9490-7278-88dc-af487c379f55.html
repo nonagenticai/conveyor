@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — T9 (retrospective, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project brief — T9 TOGAF ADM capability (retrospective, 2026-11-22)</h1>
+<h2>Outcome</h2>
+<p>The conveyor has an architecture capability, not a document library. The Preliminary phase establishes the typed artefact standard and repository, the tailored <code>adm_profile</code>, the Architecture Board, the four contract kinds, the compliance review and waiver register, and the nine-dimension maturity and seven-category skills assessments. An <code>architecture</code> project walks Preliminary and A–H as WBS nodes, each phase closing on an approved contract once its mandatory artefacts are approved; a delivery project is refused at design without a live contract. Six P1/P2 findings remain open, and the Phase-H exactly-one clause is not proved.</p>
+<h2>Boundary</h2>
+<p>T9 owns the eleven tables of SPEC_V2 §10.3, the 26 <code>architecture.*</code> actions of §10.4, the four contract kinds, the six compliance levels, the waiver register, the Board row, the two assessments and the Architecture destination of §10.5. It does not own an ArchiMate editor or live metamodel, a diagram renderer, full TOGAF conformance, a portfolio optimiser, the T1 plan rows, the T3 PM job, or the T10 tranche reviews and benefits realization.</p>
+<h2>Reuse sources</h2>
+<p><code>migrations/0044_plan_spine.sql</code> — <code>wbs_node</code>, <code>project_register_item</code> and the plan spine from T1. <code>migrations/0040_organisation.sql</code> — the tenant and governance foundations. The approval primitive (<code>approval</code>, <code>approval_decision</code>, dual control). <code>trace_link</code> in both directions. <code>governed_asset</code> for requirements, principles and ADRs. <code>document</code> plus MinIO for artefact documents. T3's PM gate routing. The real-Postgres test harness.</p>
+<h2>Inception units</h2>
+<p>No T9-specific inception analysis or architecture design existed at the 2026-11-18 close; this rework authored both. The inception claim is <code>docs/SPEC_V2.md</code> §8.1, §8.5 and §10.3–§10.5, the T9 row of §12, <code>docs/plans/T9-architecture-capability.md</code> and issue #81.</p>
+<h2>Dependencies</h2>
+<ul>
+<li>blocked-by: T1 (#72), T3 (#74) and P0 (#122, #121).</li>
+<li>blocks: T12 (#88), whose <code>meta.depends_on</code> includes T9.</li>
+<li>related: #216 (the MSP layer) and #221 (output-standard categories).</li>
+</ul>
+<h2>Acceptance</h2>
+<p>The SPEC_V2 §12 T9 gate. The artefact, Preliminary, A–F, design-gate and compliance clauses are proved by the named tests listed in the review evidence. The fifth clause, an H review producing exactly one change or kata, is not proved: v1-p81-6 is open and the plan's <code>a_systemic_finding_produces_a_kata_candidate</code> is absent at HEAD. The acceptance instrument is <code>acceptance/programme/T9.toml</code>.</p>
+<h2>Capabilities</h2>
+<p>A typed artefact repository; approve and supersede immutability; reuse search across plateaus; profile-driven mandatory sets; the A–F phase gates; measured maturity and skills; the design gate; the one-level compliance review and dated waiver; the Phase-H typed outcome; the Architecture console destination.</p>
+<h2>Plan</h2>
+<p>Held to <code>docs/plans/T9-architecture-capability.md</code> and <code>docs/SPEC_V2.md</code> §12 T9; the programme row's plan pointer is <code>docs/SPEC_V2.md#12</code> with <code>plan_status: draft</code>. Delivered at <code>c8204432</code> (2026-11-18, #81/#350) with the measured state at <code>ddf489ad</code> (#356/#358); finding fixes at <code>92e6b223</code> (2026-11-21). Reworked retrospectively 2026-11-22.</p>
+<h2>Risks</h2>
+<ul>
+<li>v1-p81-4: a draft Board can govern and be approved with an empty charter.</li>
+<li>v1-p81-5: artefacts and links are not fully typed or projected and lack tenant/project consistency.</li>
+<li>v1-p81-6: Phase H enforces existence, not exactly one typed outcome.</li>
+<li>v1-w2a-3: profile adoption accepts any UUID as its board decision.</li>
+<li>v1-w2a-4: <code>contracts_request</code> can retire another project's live contract.</li>
+<li>v1-w2a-6: <code>phase_progress</code> accepts draft artefacts and superseded contracts as evidence.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Issue: https://github.com/nonagenticai/conveyor/issues/81</li>
+<li>Commits: <code>c8204432</code>, <code>ddf489ad</code>, <code>92e6b223</code></li>
+<li>Specification: <code>docs/SPEC_V2.md</code> §8.1, §8.5, §10.3–§10.5 and §12 (T9)</li>
+<li>Plan: <code>docs/plans/T9-architecture-capability.md</code></li>
+<li>Tests: <code>crates/api/tests/architecture_artifacts.rs</code>, <code>architecture_capability.rs</code>, <code>togaf_architecture_phases.rs</code>, <code>togaf_delivery_design_gate.rs</code>, <code>architecture_compliance.rs</code>, <code>togaf_h_change.rs</code>; <code>crates/actions/tests/togaf_kata_outcome.rs</code></li>
+<li>Standing delegation: <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code></li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

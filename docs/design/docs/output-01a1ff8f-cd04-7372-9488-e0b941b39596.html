@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Evidence — T11 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Evidence — T11 metrics, metering and maturity</h1>
+<h2>Claim</h2>
+<p>T11 delivered computed metrics, eight-level metering, C0–C5 maturity from versioned thresholds and an exact-or-incident billing reconciliation; every figure is a read-time aggregate over the conveyor's own rows and no metric or cost is stored. The console Metering screen reads the published snapshot's live inference aggregates and borrows no fixture number.</p>
+<h2>Evidence</h2>
+<ul>
+<li><strong>Coverage:</strong> <code>docs/evidence/v2-coverage.json</code> records <code>actions:metrics</code> as <code>exists</code>; the T11 row is <code>built</code> with 8/8 actions, 3/3 modules and 2/2 tables, citing <code>crates/actions/src/metrics</code>, <code>crates/domain/src/metrics.rs</code>, <code>crates/store/src/metrics.rs</code> and <code>migrations/0059_metrics.sql</code>.</li>
+<li><strong>Delivery:</strong> issue #84 merged 2026-11-19 (commit <code>183f5111</code>, PR #404): migration <code>0059_metrics.sql</code>, the pure rules, the read models, the eight actions and the integration tests. The coverage correction followed in commit <code>f7062f35</code> (PR #429). Issue #458 merged 2026-11-20 (commit <code>0a8a6e95</code>, PR #499): <code>meteringLive()</code> renders <code>measure.inference</code>.</li>
+<li><strong>Schema:</strong> <code>metric_threshold</code> holds one versioned row per tenant and C0–C5 level; <code>metric_reconciliation</code> holds <code>matched | difference | unavailable</code> with <code>numeric(18,6)</code> figures, a shape CHECK and an incident-card FK. Both tables enable and force RLS. No metric table exists.</li>
+<li><strong>Proof:</strong> <code>crates/actions/tests/metrics.rs</code> has eight integration tests — every metering level sums to its children (tenant 3 calls / 3,150 tokens and every level equal, with an <code>unattributed</code> bucket); the run drill-down sums to 4,500 tokens; flow recomputes (throughput 1; lead about 3,600 s, cycle 1,800 s, queue 1,800 s, block 540 s and efficiency 0.35, each within the test's tolerance) and a missing ledger is unavailable; the C0–C5 ladder moves only across recorded threshold versions 1→2→3; a never-refused gate is flagged and one rejection clears it; benefits recompute and an unmeasured baseline is not zero; a dependency slip names the benefits at risk; reconciliation matches 0.002 exactly, opens an incident on the 0.003 difference and records 503 as unavailable.</li>
+<li><strong>Tenant isolation:</strong> <code>crates/store/tests/rls_domain.rs::metric_thresholds_are_tenant_isolated</code> proves tenant A sees only its own threshold and a forged write under A's scope fails WITH CHECK.</li>
+<li><strong>Live aggregates:</strong> the published snapshot's <code>measure.json</code> (generated 2026-11-21T18:50:29Z) reports 609 calls, 9,458,468 tokens (9,374,195 prompt and 84,273 completion), 606 cache misses, 0 hits, 3 unknown cache classes and 0 non-ok calls; by caller, agent_run 604 calls / 9,457,017 tokens and other 5 / 1,451; by model, claude-sonnet-5-5 81 calls / 970,518 tokens, image_gen 3 / 0 and local-llm 525 / 8,487,950. Its note fixes cost as a read-time derivation, not a stored figure.</li>
+</ul>
+<h2>Verification</h2>
+<ul>
+<li><code>cargo test -p conveyor-actions --test metrics</code> — the eight integration tests listed above.</li>
+<li><code>cargo test -p conveyor-store --test rls_domain metric_thresholds_are_tenant_isolated</code> — tenant isolation of the threshold configuration.</li>
+<li><code>python3 scripts/verify-project.py --project T11 --snapshot &lt;published-snapshot&gt;/data</code> — the manifest, including its governance checks.</li>
+<li><code>node docs/design/scripts/check-v2.cjs</code> — the console checks 9b–9d for the live Metering screen.</li>
+<li>Read <code>migrations/0059_metrics.sql</code>, <code>crates/domain/src/metrics.rs</code>, <code>crates/store/src/metrics.rs</code> and <code>crates/actions/src/metrics/mod.rs</code> for the absence of a stored metric.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li><code>docs/SPEC_V2.md</code> §7.5, §10.4 and §12; <code>acceptance/programme/T11.toml</code>; <code>docs/evidence/v2-coverage.json</code>; <code>served-spec.lock.json</code>.</li>
+<li>Issues #84 and #458; commits <code>183f5111</code>, <code>f7062f35</code> and <code>0a8a6e95</code>.</li>
+<li><code>crates/actions/tests/metrics.rs</code>, <code>crates/store/tests/rls_domain.rs</code>, <code>migrations/0059_metrics.sql</code>.</li>
+<li><code>docs/design/v2.js</code> <code>meteringLive()</code>; the snapshot <code>measure.json</code>.</li>
+</ul>
+<h2>Gap</h2>
+<ul>
+<li><strong>Governance record:</strong> the original charter, Statement of Architecture Work, delivery contract, Phase-G review and closure review were never authored; the contemporaneous record is the merged code, the coverage row and the git history. This set is retrospective.</li>
+<li><strong>Outputs:</strong> the project closed with <code>project-brief</code>, <code>evidence</code> and <code>closure-review</code> unpublished; this rework publishes them.</li>
+<li><strong>Manifest:</strong> the green <code>acceptance/programme/T11.toml</code> run is the rework's closing gate; no earlier green run is claimed here.</li>
+<li><strong>Quality family:</strong> eval- and benchmark-backed metrics (first-pass yield, rework rate, defect escapes, eval score, benchmark delta) remain S17–S20; T11's implemented quality evidence is approval- and run-derived.</li>
+<li><strong>Knowledge metrics:</strong> pack hit rate and lesson promotion rate are <code>unavailable</code> until their ledgers exist (T8); they are not zero and not claimed.</li>
+<li><strong>Threshold values:</strong> no live tenant C0–C5 threshold row is asserted by this record; the mechanism, the closed vocabulary and their tests are what is evidenced.</li>
+<li><strong>Measurement window:</strong> the snapshot aggregates are the whole ledger at 2026-11-21T18:50:29Z, not a bounded period; the window is an API parameter.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Metrics, metering and maturity · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

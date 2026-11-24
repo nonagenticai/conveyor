@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data Entity/Data Component Catalog — S03 Domain and schema (Phase C) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Data Entity/Data Component Catalog — S03 Domain and schema (Phase C)</li>
+<li>Phase: c</li>
+<li>Kind: catalog</li>
+<li>Purpose: The entities S03 adds, each with its owner and its one invariant.</li>
+<li>Scope: the fourteen tables of migrations/0002_domain.sql, the claim primitive and the tenant policy.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>programme / the programme row</strong> - {"note": "tenant-scoped with FORCE RLS; the name is the programme identity", "owner": "domain", "table": "programme"}</li>
+<li><strong>project / the project row</strong> - {"note": "belongs to a programme; carries project_type_code and status; FORCE RLS", "owner": "domain", "table": "project"}</li>
+<li><strong>board / the board</strong> - {"note": "belongs to a project; position per project; FORCE RLS", "owner": "domain", "table": "board"}</li>
+<li><strong>list / the list lane</strong> - {"note": "kind is text CHECK intake|active|waiting|done|archive; wip_limit is the instance, the catalogue row is the template; position per board", "owner": "domain", "table": "list"}</li>
+<li><strong>card_type / the card type and its rules</strong> - {"note": "carries the rules/meta that may_move reads through project_type.meta.matrix; is_active index", "owner": "domain", "table": "card_type"}</li>
+<li><strong>card / the card</strong> - {"note": "no state/status column; claim columns and paired-null CHECK; prev_list_id and list_changed_at; generated tsv; version; three partial indexes plus gin(tsv)", "owner": "domain", "table": "card"}</li>
+<li><strong>run / the run</strong> - {"note": "status CHECK queued|running|waiting_approval|succeeded|failed|cancelled; 0002's uq_run_live is the card-wide form; the tree lands in 0037", "owner": "domain", "table": "run"}</li>
+<li><strong>approval / the approval</strong> - {"note": "status pending|approved|rejected|expired|voided; uq_appr_pending partial unique; pending-expiry index", "owner": "domain", "table": "approval"}</li>
+<li><strong>approval_decision / the decision fact</strong> - {"note": "decided_by_kind and via; no version; immutable after insert; approver index", "owner": "domain", "table": "approval_decision"}</li>
+<li><strong>governed_asset / the governed asset</strong> - {"note": "kind is a column, not a fork; status Draft|InReview|Approved|Superseded|Archived; superseded implies superseded_by_id as an immediate CHECK", "owner": "domain", "table": "governed_asset"}</li>
+<li><strong>trace_link / the trace edge</strong> - {"note": "typed from/to edges with indexes in both directions", "owner": "domain", "table": "trace_link"}</li>
+<li><strong>catalogue_entry / the catalogue row</strong> - {"note": "kind has no CHECK by design; S03 fixes the eleven labels; the delivery matrix is a project_type row with meta.matrix", "owner": "domain", "table": "catalogue_entry"}</li>
+<li><strong>revision / the revision</strong> - {"note": "seq = governed_asset.version, both from 1 (S3-D4); pruning is a job-applied policy on entity_type, never a trigger", "owner": "domain", "table": "revision"}</li>
+<li><strong>andon_state / the andon row</strong> - {"note": "one lazily created row per tenant; pk tenant_id; engaged partial index", "owner": "domain", "table": "andon_state"}</li>
+<li><strong>claim_card_tx / the claim primitive</strong> - {"component": "crates/store/src/card.rs", "note": "one UPDATE with the version precondition and the lease arm; returns Option&lt;ClaimGranted{claim_fence, version}&gt;; the same assignee may renew", "owner": "store"}</li>
+<li><strong>tenant_isolation / the tenancy policy</strong> - {"component": "migrations/0002_domain.sql and migrations/0001_platform.sql::app_current_tenant()", "note": "FOR ALL USING and WITH CHECK on all fourteen tables; ENABLE and FORCE; the runtime role is scoped, the owner sees 0 and a superuser both", "owner": "domain"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Domain and schema — aggregates, state machines, baseline domain migration · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

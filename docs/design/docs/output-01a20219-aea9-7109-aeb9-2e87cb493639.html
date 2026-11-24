@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Solution Concept Diagram — S02 Skeleton (retrospective, 2026-11-21) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Solution Concept Diagram — S02 Skeleton (retrospective, 2026-11-21)</li>
+<li>Phase: a</li>
+<li>Kind: diagram</li>
+<li>Purpose: Show the runtime shape that carries the S2 gate: one binary, one scoped store, one database, a fenced worker and a replaying stream.</li>
+<li>Scope: The delivered S02 components in apps/server, crates/store, crates/auth and crates/api plus compose.yaml; recorded retrospectively on 2026-11-21.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>conveyor binary (serve | migrate | worker | admin) / serves</strong> - {"target": "crates/api OpenApiRouter: /health, /health/live, /health/ready, /metrics, /api/me, /api/events"}</li>
+<li><strong>crates/api / calls through</strong> - {"target": "crates/store in a begin_scoped transaction; TenantId is the first argument after the connection"}</li>
+<li><strong>crates/auth / resolves a verified subject through</strong> - {"target": "membership to exactly one (app_user, tenant); dev:alice is the dev-a principal"}</li>
+<li><strong>crates/store runtime pool (10 connections, 5 s acquire) / connects to</strong> - {"target": "pgbouncer [redacted-ip]:6439 (transaction pooling)"}</li>
+<li><strong>pgbouncer / forwards to</strong> - {"target": "Postgres 18 + pgvector on [redacted-ip]:5439"}</li>
+<li><strong>migrate subcommand / connects directly to</strong> - {"target": "Postgres 18 as conveyor_migrate on 5439; embeds sqlx::migrate!("../../migrations")"}</li>
+<li><strong>worker subcommand / claims from</strong> - {"target": "job table with FOR UPDATE SKIP LOCKED and a fenced lease_token/lease_until (JOB_LEASE_SECS default 60)"}</li>
+<li><strong>event outbox writer / rings the doorbell with</strong> - {"target": "pg_notify('conveyor_event', seq::text) on a dedicated direct LISTEN connection (DATABASE_LISTEN_URL)"}</li>
+<li><strong>GET /api/events / replays then follows</strong> - {"target": "event rows seq &gt; Last-Event-ID AND topic = ANY(topics), LIMIT 500, inside the subscriber's tenant scope; 15 s keepalive"}</li>
+<li><strong>FORCE RLS on nine tenant-owned tables / confines</strong> - {"target": "every API, worker and migrate transaction; no BYPASSRLS role exists (S2-D3)"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

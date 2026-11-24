@@ -24,10 +24,10 @@
       >
     </header>
     <main class="doc-body"><h1 id="t19--architecture-design-psa-and-hld">T19 — Architecture design (PSA and HLD)</h1>
-<h2 id="1-context-and-boundary">1. Context and boundary</h2>
+<h2 id="context-and-boundary">Context and boundary</h2>
 <p>T19 adds a decision forum over the existing four units. It does not add a fifth unit, a chat system, a second decision store or a calendar dependency. The architecture covers the meeting aggregate, the participant extension to <code>approval_decision</code>, the <code>minutes</code> governed-asset kind, the <code>meetings.*</code> action family, the Meetings destination and the two consumer seams (<code>governance_body</code> and <code>programme_cadence</code>). The T18 UI lane is a consumer of the destination row and is not rebuilt.</p>
 <p>This is a tailored ADM set for a software delivery slice; it is a document set now and imports as typed <code>architecture_artifact</code> rows when the T9 repository is used. Every artefact carries the standard's common metadata: title, status, version, owner, reviewer, review date, purpose, stakeholders, scope, related project and its published document; links use <code>derivation | realization | reuse | dependency</code>.</p>
-<h2 id="2-artefact-catalogue-common-metadata">2. Artefact catalogue (common metadata)</h2>
+<h2 id="architecture-artefacts">Architecture artefacts</h2>
 <table>
 <thead>
 <tr>
@@ -189,7 +189,8 @@
 </tbody>
 </table>
 <p>The published document is this file for every row; the future typed repository rows derive from it. No row is approved yet; the review date is the Architecture Board's sitting in tranche 4.</p>
-<h2 id="3-project-start-architecture-phase-a">3. Project Start Architecture (Phase A)</h2>
+<h2 id="aggregates-tables-and-actions">Aggregates, tables and actions</h2>
+<h3 id="project-start-architecture-phase-a">Project Start Architecture (Phase A)</h3>
 <h3 id="a1--principles-applied-catalog">A1 — Principles applied (catalog)</h3>
 <table>
 <thead>
@@ -459,7 +460,7 @@
 commitment → project_dependency | card        action → card        decision → approval result</code></pre>
 <h3 id="a6--statement-of-architecture-work-draft">A6 — Statement of Architecture Work (draft)</h3>
 <p>Assignment: build T19 to the §12 gate. Scope: §3 of the plan. Responsibilities: the programme architect owns the set; the Architecture Board reviews; the SRO accepts the benefit and tranche evidence. Acceptance: the six gate clauses plus D1–D8. The contract is a document now; T9's <code>architecture.contracts_approve</code> makes it live when the repository is used.</p>
-<h2 id="4-high-level-design-phases-bd">4. High-Level Design (Phases B–D)</h2>
+<h3 id="high-level-design-phases-bd">High-Level Design (Phases B–D)</h3>
 <h3 id="b1--business-interaction-matrix">B1 — Business interaction matrix</h3>
 <table>
 <thead>
@@ -795,8 +796,64 @@ commitment → project_dependency | card        action → card        decision 
 </tr>
 </tbody>
 </table>
-<h2 id="6-compliance-and-contract">6. Compliance and contract</h2>
+<h2 id="decisions">Decisions</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Decision</th>
+<th>Rationale</th>
+<th>Where it shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AD1</td>
+<td>A meeting is a card over the four existing units; no fifth unit and no second decision store</td>
+<td>the record stays one approval row per decision</td>
+<td><code>meeting</code> is a card; decisions are <code>approval_decision</code> rows</td>
+</tr>
+<tr>
+<td>AD2</td>
+<td>The participant extension is additive on <code>approval_decision</code> (nullable <code>approver_id</code>, <code>job_binding_id</code>, <code>participant_kind</code>)</td>
+<td>required decisions and distinct approvers count on the decision rows themselves</td>
+<td>migration 0065</td>
+</tr>
+<tr>
+<td>AD3</td>
+<td>Positions are deliberation, never decisions; <code>close_item</code> derives one decision row per qualifying seat</td>
+<td>a second store would make the record ambiguous</td>
+<td><code>meeting_position</code> + <code>close_item</code></td>
+</tr>
+<tr>
+<td>AD4</td>
+<td>The stricter policy wins: the meeting rule first, then the linked approval's dual control, evidence and P4 exclusions; a refusal is not a close</td>
+<td>a meeting must never weaken a gate</td>
+<td><code>close_item</code> arithmetic</td>
+</tr>
+<tr>
+<td>AD5</td>
+<td>The agenda is an L0 query over <code>agenda_sources[]</code>; the LLM never selects an item</td>
+<td>selection must be reproducible</td>
+<td><code>agenda_add</code> + the materialised query</td>
+</tr>
+<tr>
+<td>AD6</td>
+<td>Minutes are a governed asset behind the chair's approval; the rows remain the record</td>
+<td>the DoD needs a published artefact without a second record</td>
+<td><code>minutes_publish</code></td>
+</tr>
+<tr>
+<td>AD7</td>
+<td>Participant-hours derive from attendance × duration at read time; no stored metric row</td>
+<td>metering follows D37/D52's read-time rule</td>
+<td>the instruments</td>
+</tr>
+</tbody>
+</table>
+<h2 id="acceptance">Acceptance</h2>
 <p>The delivery design gate: T19 is an ordinary delivery project under the P0 brief and the T9 capability. The set above is the PSA/HLD evidence; a deviation (a second decision table, a chat transcript as a decision, a calendar dependency) is a change request, never a silent fork. The compliance review records one level against the statement of architecture work when the project closes. The full TOGAF repository rows are T9's; this set is publishable now and importable later.</p>
+<p>The acceptance itself is the D1–D8 scenarios in <code>docs/plans/T19-decision-forums.md</code> §5, the live gate recorded in <code>docs/plans/T19/evidence.md</code>, and the decision in <code>docs/plans/T19/closure-review.md</code>.</p>
 <h2 id="7-review-and-links">7. Review and links</h2>
 <ul>
 <li>Review date: 2026-11-30 (Architecture Board, tranche 4)</li>

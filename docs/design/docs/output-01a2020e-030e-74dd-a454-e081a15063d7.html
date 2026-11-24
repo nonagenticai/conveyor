@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Driver/Goal/Objective Catalog — T1 Plan spine (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Driver/Goal/Objective Catalog — T1 Plan spine (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: The drivers behind the plan spine, the goals it serves and the objective each row installs.</li>
+<li>Scope: baseline and change control, dual control, WSJF, the portfolio read, dependency edges and the MSP rows.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>D1 A programme cannot answer what it promised / G1 Freeze the promise</strong> - {"objective": "project_baseline stores an immutable approved snapshot of the WBS, register and budget facts; a later row edit never moves it (D-T1-2; plan_spine.rs::a_baseline_does_not_move_when_rows_change)."}</li>
+<li><strong>D2 A change can happen by a silent row edit / G2 Change control with an impact block</strong> - {"objective": "a change is project_register_item(kind='change') carrying a required impact block and a baseline_ref; without them the row is refused 422 change_impact_missing (D-T1-3; P1.2)."}</li>
+<li><strong>D3 A requester can decide the gate judging their work / G3 Dual control on every gate</strong> - {"objective": "approvals.decide compares the pending row's requested_by (and the executor) with the actor and refuses before an approval_decision row is written, for every gate (D-T1-8; approval_dual.rs::the_requester_cannot_decide_their_own_gate)."}</li>
+<li><strong>D4 Priority is opinion, and a stored score goes stale / G4 Arithmetic priority</strong> - {"objective": "WSJF = (business_value + time_criticality + risk_reduction) / job_size, computed on read from four non-negative integers with job_size &gt; 0; no score column exists (D-T1-4; P2.1)."}</li>
+<li><strong>D5 No one can say what is in flight / G5 A computed portfolio view</strong> - {"objective": "portfolio.in_flight is a read model with no row over the tenant's configured status set, default active,paused (D-T1-7; P3.1)."}</li>
+<li><strong>D6 Dependency order is a JSON list that cannot express edges or cycles / G6 An acyclic dependency graph</strong> - {"objective": "project_dependency edges are blocks|needs|supersedes|informs; a cycle is refused 409 dependency_cycle by a recursive reachability query in the creating transaction, leaving no partial row (D-T1-5/D-T1-6; P4.1, P4.2)."}</li>
+<li><strong>D7 A benefit is prose and a review can be evidence-free / G7 A benefit is a measurement record and a tranche review carries evidence</strong> - {"objective": "benefit_profile requires baseline, target, measurement_method and a benefit owner; benefit_link names all five levels; tranches.review requires baselines, benefit status and the risk register (D-T1-9/D-T1-10; P5.1\u2013P5.3)."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Plan spine · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

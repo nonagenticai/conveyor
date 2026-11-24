@@ -25,7 +25,7 @@
     </header>
     <main class="doc-body"><h1 id="t19--decision-forums-evidence">T19 — Decision forums: evidence</h1>
 <h2 id="claim">Claim</h2>
-<p>Issue #606's D1–D8 are implemented on <code>issue/606-t19-meetings</code>: the meeting is a typed card whose agenda resolves existing approvals, whose seats record positions, and whose outcome is derived by arithmetic over those positions and the linked approval's stricter policy — with the human seat available in the web room, over Telegram and over MCP, and the minutes a chaired governed asset.</p>
+<p>Issue #606's D1–D8 are implemented on <code>issue/606-t19-meetings</code> and exercised on the deployed engine (<code>a8f67c3e</code>): the meeting is a typed card whose agenda resolves existing approvals, whose seats record positions, and whose outcome is derived by arithmetic over those positions and the linked approval's stricter policy — with the human seat available in the web room, over Telegram and over MCP, and the minutes a chaired governed asset. The live gate is recorded below.</p>
 <h2 id="evidence">Evidence</h2>
 <p>Every D-part has its named test file and every scenario has a passing row; the commands below were run at the branch head (the PR's CI is the merge gate).</p>
 <table>
@@ -207,17 +207,17 @@
 </thead>
 <tbody>
 <tr>
-<td>the registry and the committed action dump agree (525 actions, 507 internal)</td>
+<td>the registry and the committed action dump agree (530 actions, 512 internal)</td>
 <td><code>cargo test -p conveyor-actions --test registry</code></td>
 <td>pass</td>
 </tr>
 <tr>
-<td>HTTP and MCP return the same body for all 525 actions</td>
+<td>HTTP and MCP return the same body for all 530 actions</td>
 <td><code>cargo test -p conveyor-actions --test parity_http_mcp</code></td>
 <td>pass</td>
 </tr>
 <tr>
-<td>the migration ledger has <code>(64, "meetings")</code></td>
+<td>the migration ledger has <code>(65, "meetings")</code></td>
 <td><code>cargo test -p conveyor-store migrate</code></td>
 <td>pass</td>
 </tr>
@@ -238,6 +238,48 @@
 </tr>
 </tbody>
 </table>
+<h3 id="the-live-gate--deployed-a8f67c3e-tenant-nonagentic-2026-11-24">The live gate — deployed <code>a8f67c3e</code>, tenant <code>nonagentic</code>, 2026-11-24</h3>
+<p>The human seat was exercised by the tenant's admin identity <code>FR Test</code> (app_user <code>01a1cf1e-09dd-7580-99cc-de395f3e86cc</code>), supplied by the owner for this proof; the evidence names the identity exactly and does not claim the owner's personal account. The meeting <code>01a20c8a-33ac-7f2a-b02f-0d2165ef05d5</code> was scheduled on the T19 board, opened, the chair invited and accepted, and two deciding items added (approvals <code>…5d47…</code> and <code>…bc7e…</code>). The seat approved item 1 in the web room and item 2 through the public <code>/mcp</code> transport; each item was closed from its own surface. The chair's minutes approval (<code>…a182</code>) was decided, the minutes governed asset <code>01a20ca3-7d7a-72f0-b63d-96a09064c6df</code> published, and the meeting closed at <code>2026-11-24T08:19:39Z</code>.</p>
+<p><code>python3 scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed</code> reads the rows back through the deployed read actions — never SQL, never a captured fixture:</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the live project is T19 and its board is a row</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>one active <code>meeting</code> card type; benefit B7 is a row</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>the meeting is <code>closed</code>; two agenda items closed as <code>decision</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>web: one meeting decision row, approval <code>approved</code>, <code>via.channel='web'</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>mcp: one meeting decision row, approval <code>approved</code>, <code>via.channel='mcp'</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>both rows name one approver, and it is the seated principal</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>the minutes approval is <code>approved</code> (and <code>meetings.close</code> refuses without the published asset)</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table>
+<p>The gate found and closed two deployment defects, both in <code>gitops-production</code>: <code>CONVEYOR_MCP_ALLOWED_HOSTS</code> was unset, so rmcp's localhost-only allowlist answered every public handshake <code>403 Host header is not allowed</code> (#5429); and the MCP session lives in one pod's memory while the two-replica Service round-robins, so 6 of 8 post-initialize calls 404'd until a DestinationRule pinned the session on <code>mcp-session-id</code> (#5432). After the rollout, the same probe served 8 of 8.</p>
 <h2 id="verification">Verification</h2>
 <pre class="bash"><code>cargo test -p conveyor-api --test meetings_policy
 cargo test -p conveyor-api --test meetings_agenda
@@ -250,19 +292,22 @@ cargo test -p conveyor-api --test meetings_console
 cargo test -p conveyor-actions --test registry
 cargo test -p conveyor-actions --test parity_http_mcp
 cargo test -p conveyor-store migrate
-npx playwright test apps/web/e2e/meetings.spec.ts</code></pre>
+npx playwright test apps/web/e2e/meetings.spec.ts
+python3 scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed</code></pre>
 <p>The Rust suites were run through <code>~/.claude/scripts/cargo-guard.py</code> on m4 (the estate's sanctioned interactive route); the compile/lint verdict is the branch's GitHub-hosted <code>preflight.yml</code>, and the PR's CI is the merge gate. The Playwright suite runs in <code>web.yml</code>, which is the first local-capable run of the real app (no <code>cargo-leptos</code> is installed on m4, and installing it would compile locally).</p>
 <h2 id="links">Links</h2>
 <ul>
 <li>Plan: <code>docs/plans/T19-decision-forums.md</code></li>
-<li>Issue: #606 (<code>Closes #606</code> in the PR)</li>
+<li>Issue: #606 (<code>Closes #606</code> in the PR); close-out: #650</li>
 <li>Specification: <code>docs/SPEC_V2.md</code> §6.8, §8.1–§8.3, §10.3–§10.5, §12 T19, D66</li>
 <li>Programme: <code>docs/design/Program_Architecture_and_Benefits_Realization.md</code>; B7 in <code>seed/programme-definition.json</code></li>
 <li>Architecture: <code>docs/plans/T19/architecture-design.md</code>; MSP: <code>docs/plans/T19/msp-profile.md</code>; SAFe: <code>docs/plans/T19/safe-epic.md</code></li>
 <li>Console: <code>apps/web/src/screens/meetings.rs</code>; design reference: <code>docs/design/v2.js</code> <code>meetings</code></li>
+<li>Live gate state and read-backs: <code>docs/evidence/t19/</code>; checker: <code>scripts/t19-live-gate-check.py</code></li>
+<li>Deployment fixes the gate required: gitops-production #5429 (MCP allowed hosts) and #5432 (MCP session affinity)</li>
 </ul>
 <h2 id="gap">Gap</h2>
-<p>The deployment-gated live proof — the owner deciding one item in the web room and one over MCP at the deployed revision, both <code>via='meeting'</code> — is acceptance-blocked by the lane release, not waived: the unit tests prove the two surfaces and the first-decision rule, and the Playwright spec proves the room. No other gap is claimed; the type-authoring route (a policy change is a new <code>meeting_type</code> version through the governance route) is a planned follow-up, not part of D1–D8.</p>
+<p>None. The live gate is recorded above at the deployed revision. Two items remain declared follow-ups rather than gaps: the <code>meeting_type</code> authoring route (a policy change is a new version through the governance route) and the T9 board / T10 cadence binding to meeting types; both are recorded as open items with owners in <code>docs/plans/T19/closure-review.md</code>.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/plans/T19/evidence.md</code> at build time.</span>

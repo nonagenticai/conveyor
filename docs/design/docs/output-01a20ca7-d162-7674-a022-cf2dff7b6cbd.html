@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T19 — Project brief · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T19 — Project brief</h1>
+<h2>Outcome</h2>
+<p>A tenant convenes a cross-department meeting, resolves existing approvals through typed agenda
+items and positions, records each outcome by the forum's rule and the linked approval's stricter
+policy, and keeps the commitments, actions, dissent and minutes as governed rows — with any human,
+including the owner, deciding live in the web room or asynchronously over MCP.</p>
+<h2>Boundary</h2>
+<p><strong>In:</strong> the five meeting tables and the two additive alterations; the <code>meetings.*</code> action family;
+the meeting card and DoD; the Meetings console destination; the <code>governance_body</code> and
+<code>programme_cadence</code> consumer seams; the seven decision instruments and the never-decided flag.</p>
+<p><strong>Out:</strong> chat, transcripts, AV integration, a calendar dependency, an LLM that selects or decides,
+a second decision store, a rebuild of T9's board or T10's cadence, and the T18 UI lane
+(#562–#566, PR #603). The approval primitive is extended for job-binding participants; no other
+V1 table changes.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>Source</th><th>Path:symbol</th><th>Question the analysis answers</th></tr></thead><tbody>
+<tr><td>Approval primitive</td><td><code>migrations/0002_domain.sql:188</code> <code>approval</code>; <code>:231</code> <code>approval_decision</code></td><td>can a job-binding seat write a decision row? (No — extension required)</td></tr>
+<tr><td>Surface record</td><td><code>migrations/0002_domain.sql:241</code> <code>approval_decision.via jsonb</code>; <code>crates/api/tests/approval_dual.rs:147</code></td><td>how is a surface recorded today?</td></tr>
+<tr><td>Human participants</td><td><code>migrations/0002_domain.sql</code> <code>app_user</code></td><td>can every human hold a seat? (Yes)</td></tr>
+<tr><td>Card and DoD</td><td><code>card</code>, <code>card_type</code>; <code>seed/catalogue.json</code></td><td>is <code>meeting</code> a card type, or a new unit? (A card)</td></tr>
+<tr><td>Governed assets</td><td><code>migrations/0044_plan_spine.sql:411-419</code></td><td>is <code>minutes</code> a kind? (No — widen)</td></tr>
+<tr><td>Dependencies</td><td><code>migrations/0044_plan_spine.sql</code> <code>project_dependency</code></td><td>commitment → dependency edge</td></tr>
+<tr><td>Board context</td><td><code>migrations/0054_architecture.sql</code> <code>governance_body</code></td><td>convener seam, built by T9</td></tr>
+<tr><td>Cadence context</td><td><code>migrations/0056_cadence_tranche.sql</code> <code>programme_cadence</code></td><td>cadence-slot agenda source, built by T10</td></tr>
+<tr><td>Action registry</td><td><code>crates/actions/src/control/approvals.rs</code>; <code>crates/actions/tests/</code></td><td>the declaration → HTTP/MCP/OpenAPI pattern</td></tr>
+<tr><td>Console</td><td><code>apps/web/src/app.rs</code>; <code>docs/design/v2.js</code> §10.5</td><td>route and screen contract, owned by T18/T19</td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<p>The analysis and architecture outputs are published with this brief:
+<code>docs/plans/T19/inception-analysis.md</code> and <code>docs/plans/T19/architecture-design.md</code>. Both carry the
+standard's metadata; the architecture set is catalogued in <code>artifact-register.md</code>.</p>
+<h2>Dependencies</h2>
+<table><thead><tr><th>Relation</th><th>Issue</th><th>Why</th></tr></thead><tbody>
+<tr><td>blocked-by</td><td>#72 (T1)</td><td>plan spine, registers, <code>project_dependency</code></td></tr>
+<tr><td>blocked-by</td><td>#73 (T2)</td><td>L3 ladder and policy evaluation</td></tr>
+<tr><td>blocked-by</td><td>#74 (T3)</td><td>gate routing and the card/closure path</td></tr>
+<tr><td>blocked-by</td><td>#120 (P0)</td><td>the programme gate and this brief's standard</td></tr>
+<tr><td>related</td><td>#81 (T9)</td><td><code>governance_body</code> consumer; follow-up binding, not a rebuild</td></tr>
+<tr><td>related</td><td>#82 (T10)</td><td><code>programme_cadence</code> consumer; follow-up binding, not a rebuild</td></tr>
+<tr><td>related</td><td>#562–#566</td><td>T18 UI lane, separate files</td></tr>
+</tbody></table>
+<h2>Acceptance</h2>
+<p>The SPEC §12 T19 gate, in six clauses: a three-department majority with recorded dissent; an
+<code>inquorate</code> deferral that cannot decide; no lowering of dual control or waiving of evidence; the
+owner decides one item live and one over MCP, both <code>via-&gt;&gt;'surface'='meeting'</code>; minutes behind the
+chair's gate and every action a card; a decision-free forum flagged. The plan's D1–D8 carry the
+per-part BDD; the implementation issue is #606.</p>
+<h2>Capabilities</h2>
+<p>Programme manager, programme architect, business analyst, project manager, the SRO/BCM and the
+department positions that must be represented. The organization's high-level work is the
+capability this brief serves; the meeting is its decision forum, not a new job.</p>
+<h2>Plan</h2>
+<p><code>docs/plans/T19-decision-forums.md</code> (this unit). Implementation: #606.</p>
+<h2>Risks</h2>
+<table><thead><tr><th>Risk</th><th>Posture</th></tr></thead><tbody>
+<tr><td>R20 meeting theatre</td><td>typed items, evidence minimum, closed outcomes, owner+date commitments, minutes matching rows, metered and retired</td></tr>
+<tr><td>Lowering dual control or waiving evidence</td><td>stricter-wins arithmetic; the approval's policy is evaluated after the meeting rule</td></tr>
+<tr><td>Job-seat misattribution</td><td>the participant extension is explicit and tested; no human approver is borrowed</td></tr>
+<tr><td>Calendar/AV dependency</td><td>attendance is the record; ICS is a read; no calendar or AV service is required</td></tr>
+<tr><td>T18 lane collision</td><td>different files and routes; T19 owns <code>/meetings</code>, T18's shell links it</td></tr>
+</tbody></table>
+<h2>Gaps</h2>
+<p>The meeting code, migrations, actions and screen are absent; this unit delivers the plan and the
+programme artefacts only. The <code>approval_decision</code> participant extension and the <code>minutes</code> kind are
+the two measured schema gaps.</p>
+<h2>Links</h2>
+<ul>
+<li>Plan: <code>docs/plans/T19-decision-forums.md</code></li>
+<li>Analysis: <code>docs/plans/T19/inception-analysis.md</code></li>
+<li>Architecture: <code>docs/plans/T19/architecture-design.md</code></li>
+<li>MSP: <code>docs/plans/T19/msp-profile.md</code></li>
+<li>SAFe: <code>docs/plans/T19/safe-epic.md</code></li>
+<li>Register: <code>docs/plans/T19/artifact-register.md</code></li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §6.8, §8.1–§8.3, §10.3–§10.5, §12 T19, D66</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision forums (meetings) · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

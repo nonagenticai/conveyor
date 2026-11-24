@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>PI objectives — tranche 0 (retrospective) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>PI objectives — tranche 0 (retrospective)</h1>
+<h2>Objectives</h2>
+<p>Seven objectives, one per project, in outcome form:</p>
+<ul>
+<li>P0: the programme definition set is verified and the project re-closes through the one gate.</li>
+<li>PLATFORM: the standing platform row carries an approved charter and baseline.</li>
+<li>DESIGN-PUBLISH: the design pack is published and its closure review recorded.</li>
+<li>SPEC-V2: the specification is published and its closure record recorded.</li>
+<li>S00: the usage inventory is published as evidence and the decision record closes.</li>
+<li>S01: the UI-stack decision record states what is observable and marks the rest not recoverable.</li>
+<li>T0: the model and contracts are published and their invariants tested.</li>
+</ul>
+<h2>Business value</h2>
+<p>Planned business value, typed: P0 8, SPEC-V2 8, T0 8, DESIGN-PUBLISH 5, S00 5, PLATFORM 5, S01 3.
+The actual value is assessed at the PI close and recorded in the tranche review.</p>
+<h2>Measurement</h2>
+<p>Each objective is judged by the project's acceptance manifest (<code>acceptance/programme/&lt;KEY&gt;.toml</code>),
+run by <code>scripts/verify-project.py</code> against a fresh snapshot at the branch SHA. A red manifest
+withholds the objective and blocks that project's closure. The SAFe checks in each manifest (PI
+cadence, WSJF inputs, demo credit) are part of that judgement.</p>
+<h2>Evidence</h2>
+<ul>
+<li>the manifests and their runs in <code>docs/evidence/rework/&lt;KEY&gt;.json</code></li>
+<li>the demo credits and the tranche-0 retro lessons</li>
+<li>the tranche-0 review of 2026-11-17 and this PI's cadence rows</li>
+</ul>
+<h2>Risks</h2>
+<p>The six closed projects carry their old closure rows until they are reopened and re-closed; the
+record keeps the old row and supersedes it rather than erasing it.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

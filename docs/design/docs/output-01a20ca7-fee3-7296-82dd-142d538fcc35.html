@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T19 — Architecture design (PSA and HLD) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T19 — Architecture design (PSA and HLD)</h1>
+<h2>Context and boundary</h2>
+<p>T19 adds a decision forum over the existing four units. It does not add a fifth unit, a chat
+system, a second decision store or a calendar dependency. The architecture covers the meeting
+aggregate, the participant extension to <code>approval_decision</code>, the <code>minutes</code> governed-asset kind, the
+<code>meetings.*</code> action family, the Meetings destination and the two consumer seams (<code>governance_body</code>
+and <code>programme_cadence</code>). The T18 UI lane is a consumer of the destination row and is not rebuilt.</p>
+<p>This is a tailored ADM set for a software delivery slice; it is a document set now and imports as
+typed <code>architecture_artifact</code> rows when the T9 repository is used. Every artefact carries the
+standard's common metadata: title, status, version, owner, reviewer, review date, purpose,
+stakeholders, scope, related project and its published document; links use
+<code>derivation | realization | reuse | dependency</code>.</p>
+<h2>Architecture artefacts</h2>
+<table><thead><tr><th>ID</th><th>Artefact</th><th>Type</th><th>Phase / plateau</th><th>Version</th><th>Owner</th><th>Reviewer</th><th>Review date</th><th>Status</th></tr></thead><tbody>
+<tr><td>A1</td><td>Principles applied</td><td>catalog</td><td>A / PSA</td><td>1</td><td>programme-architect</td><td>Architecture Board</td><td>2026-11-30</td><td>draft</td></tr>
+<tr><td>A2</td><td>Requirements catalog</td><td>catalog</td><td>A / PSA</td><td>1</td><td>business-analyst</td><td>programme-architect</td><td>2026-11-30</td><td>draft</td></tr>
+<tr><td>A3</td><td>Stakeholder map</td><td>matrix</td><td>A / PSA</td><td>1</td><td>business-analyst</td><td>SRO</td><td>2026-11-30</td><td>draft</td></tr>
+<tr><td>A4</td><td>Drivers, goals, objectives</td><td>catalog</td><td>A / PSA</td><td>1</td><td>programme-manager</td><td>SRO</td><td>2026-11-30</td><td>draft</td></tr>
+<tr><td>A5</td><td>Solution concept</td><td>diagram</td><td>A / PSA</td><td>1</td><td>programme-architect</td><td>Architecture Board</td><td>2026-11-30</td><td>draft</td></tr>
+<tr><td>A6</td><td>Statement of Architecture Work</td><td>contract</td><td>A / PSA</td><td>1</td><td>programme-architect</td><td>SRO</td><td>2026-11-30</td><td>draft</td></tr>
+<tr><td>B1</td><td>Business interaction matrix</td><td>matrix</td><td>B / HLD</td><td>1</td><td>business-analyst</td><td>SRO</td><td>2026-11-30</td><td>draft</td></tr>
+<tr><td>B2</td><td>Actor / role matrix</td><td>matrix</td><td>B / HLD</td><td>1</td><td>business-analyst</td><td>programme-architect</td><td>2026-11-30</td><td>draft</td></tr>
+<tr><td>C1</td><td>Data entity catalog</td><td>catalog</td><td>C / HLD</td><td>1</td><td>programme-architect</td><td>Architecture Board</td><td>2026-11-30</td><td>draft</td></tr>
+<tr><td>C2</td><td>Application / function matrix</td><td>matrix</td><td>C / HLD</td><td>1</td><td>programme-architect</td><td>Architecture Board</td><td>2026-11-30</td><td>draft</td></tr>
+<tr><td>C3</td><td>Conceptual data diagram</td><td>diagram</td><td>C / HLD</td><td>1</td><td>programme-architect</td><td>Architecture Board</td><td>2026-11-30</td><td>draft</td></tr>
+<tr><td>D1</td><td>Technology view</td><td>catalog</td><td>D / HLD</td><td>1</td><td>platform lead</td><td>Architecture Board</td><td>2026-11-30</td><td>draft</td></tr>
+<tr><td>F1</td><td>Migration and delivery diagram</td><td>diagram</td><td>F / HLD</td><td>1</td><td>programme-manager</td><td>SRO</td><td>2026-11-30</td><td>draft</td></tr>
+</tbody></table>
+<p>The published document is this file for every row; the future typed repository rows derive from it.
+No row is approved yet; the review date is the Architecture Board's sitting in tranche 4.</p>
+<h2>Aggregates, tables and actions</h2>
+<h3>Project Start Architecture (Phase A)</h3>
+<h3>A1 — Principles applied (catalog)</h3>
+<table><thead><tr><th>ID</th><th>Principle</th><th>Rationale</th><th>Implication</th></tr></thead><tbody>
+<tr><td>P1</td><td>Decisions are rows, not recollections</td><td>an audit needs the decision and its deliberation</td><td>the meeting writes approval_decision rows and typed positions; no transcript is a decision</td></tr>
+<tr><td>P2</td><td>One decision store</td><td>a second store makes the record ambiguous</td><td><code>meeting_position</code> is never a decision; the linked approval remains authoritative</td></tr>
+<tr><td>P3</td><td>The stricter policy wins</td><td>a meeting must not weaken a gate</td><td>evaluate the approval's dual control, evidence and conflict rules after the meeting rule</td></tr>
+<tr><td>P4</td><td>Cross-department by construction</td><td>the purpose is the departments' positions</td><td>required participation is policy; a missing department defers <code>inquorate</code></td></tr>
+<tr><td>P5</td><td>The record outlives the room</td><td>a room may be replaced</td><td>attendance is the record; an ICS feed is a read; no calendar dependency</td></tr>
+<tr><td>P6</td><td>Generation drafts, it never decides</td><td>the LLM is not a position</td><td>the LLM drafts wording, pre-reads and minutes; it has no selection or position action</td></tr>
+<tr><td>P7</td><td>Policy is data</td><td>a tenant's forums differ</td><td><code>meeting_type</code> is versioned and tenant-scoped; who may convene is an authority row</td></tr>
+</tbody></table>
+<h3>A2 — Requirements catalog (typed)</h3>
+<table><thead><tr><th>ID</th><th>Type</th><th>Requirement</th><th>Source</th></tr></thead><tbody>
+<tr><td>R1</td><td>condition</td><td>A meeting is a card with a chair and a DoD; it is not a fifth unit</td><td>§6.8</td></tr>
+<tr><td>R2</td><td>condition</td><td>A deciding item names exactly one pre-opened approval with evidence</td><td>§6.8, §10.3</td></tr>
+<tr><td>R3</td><td>constraint</td><td>A meeting cannot lower dual control, waive evidence or bypass P4</td><td>§6.8, D66</td></tr>
+<tr><td>R4</td><td>constraint</td><td>A required department's absence defers the item <code>inquorate</code></td><td>§6.8, §12 T19</td></tr>
+<tr><td>R5</td><td>constraint</td><td>One live position per participant per item; immutable after close</td><td>§6.8, §10.3</td></tr>
+<tr><td>R6</td><td>condition</td><td>A commitment needs an owner and a date; an action becomes a card</td><td>§6.8</td></tr>
+<tr><td>R7</td><td>condition</td><td>Minutes are a chaired <code>governed_asset</code>; every line matches a row</td><td>§6.8</td></tr>
+<tr><td>R8</td><td>condition</td><td>A human seat is an ordinary <code>app_user</code>; any seat role</td><td>§6.8</td></tr>
+<tr><td>R9</td><td>condition</td><td>The owner can decide live or asynchronously over web/Telegram/MCP; first wins</td><td>§6.8, D66</td></tr>
+<tr><td>R10</td><td>constraint</td><td>No calendar or AV dependency; ICS is a read</td><td>§6.8</td></tr>
+<tr><td>R11</td><td>condition</td><td>Participant-hours enter the D52 roll-up as a third source</td><td>§6.8</td></tr>
+<tr><td>R12</td><td>condition</td><td>A forum with no decision over a cycle is flagged and retired</td><td>§6.8, P10</td></tr>
+<tr><td>R13</td><td>assumption</td><td>T9's <code>governance_body</code> and T10's <code>programme_cadence</code> remain the consumer seams</td><td>#81, #82</td></tr>
+<tr><td>R14</td><td>delta</td><td><code>approval_decision</code> must accept a job-binding participant</td><td>measured gap, §4.1 of the plan</td></tr>
+</tbody></table>
+<h3>A3 — Stakeholder map (matrix)</h3>
+<table><thead><tr><th>Stakeholder</th><th>Concern</th><th>Influence</th><th>Interest</th><th>Engagement</th></tr></thead><tbody>
+<tr><td>Owner / sponsoring group</td><td>the decision and the dissent are the record; can join any forum</td><td>high</td><td>high</td><td>seat in the room or async; decides items</td></tr>
+<tr><td>Chair</td><td>the agenda is adopted, minutes publish behind its gate</td><td>high</td><td>high</td><td>chair seat; adopts agenda; publishes minutes</td></tr>
+<tr><td>Operations department</td><td>its position is not outvoted silently; conditions are visible</td><td>high</td><td>high</td><td>required department on operational items</td></tr>
+<tr><td>Security department</td><td>evidence and conflict rules are not waived</td><td>high</td><td>high</td><td>required department on security items</td></tr>
+<tr><td>Delivery department</td><td>commitments have owners and dates</td><td>high</td><td>high</td><td>required department on delivery items</td></tr>
+<tr><td>Job bindings</td><td>their position and evidence are typed</td><td>medium</td><td>high</td><td>member/presenter seats</td></tr>
+<tr><td>Observers</td><td>they can read and be recorded, never count</td><td>low</td><td>medium</td><td>observer seat</td></tr>
+<tr><td>Architecture Board (T9)</td><td>board sittings are meetings</td><td>high</td><td>medium</td><td><code>governance_body</code> convener</td></tr>
+<tr><td>Programme cadence (T10)</td><td>PI planning/demo/I&amp;A are meeting instances</td><td>high</td><td>medium</td><td>cadence agenda source</td></tr>
+</tbody></table>
+<h3>A4 — Drivers, goals, objectives (catalog)</h3>
+<table><thead><tr><th>ID</th><th>Statement</th></tr></thead><tbody>
+<tr><td>DR1</td><td>High-level work is decided in cross-department meetings; only the approval survives today</td></tr>
+<tr><td>G1</td><td>Every decision that needed several positions carries those positions, conditions and dissent</td></tr>
+<tr><td>G2</td><td>A meeting never weakens a gate; the stricter policy wins</td></tr>
+<tr><td>O1</td><td>T19's §12 gate passes with a three-department majority, an <code>inquorate</code> deferral and a live owner decision</td></tr>
+<tr><td>O2</td><td>Decision latency, agenda conversion, quorum-miss, commitment slippage and action closure recompute from rows</td></tr>
+</tbody></table>
+<h3>A5 — Solution concept (diagram)</h3>
+<pre><code>card(meeting) 1──1 meeting ──* meeting_agenda_item ──1 approval ──* approval_decision
+     │                │                    │
+     │                │                    └──* meeting_position (participant, stance, evidence)
+     │                └──* meeting_attendance (job_binding | app_user, seat, department)
+     └── governed_asset(kind='minutes') ← drafted from the rows, published behind the chair's gate
+commitment → project_dependency | card        action → card        decision → approval result
+</code></pre>
+<h3>A6 — Statement of Architecture Work (draft)</h3>
+<p>Assignment: build T19 to the §12 gate. Scope: §3 of the plan. Responsibilities: the programme
+architect owns the set; the Architecture Board reviews; the SRO accepts the benefit and tranche
+evidence. Acceptance: the six gate clauses plus D1–D8. The contract is a document now; T9's
+<code>architecture.contracts_approve</code> makes it live when the repository is used.</p>
+<h3>High-Level Design (Phases B–D)</h3>
+<h3>B1 — Business interaction matrix</h3>
+<table><thead><tr><th>Meeting type</th><th>Framework</th><th>Convener</th><th>Agenda sources</th><th>Rule</th><th>Outcome</th></tr></thead><tbody>
+<tr><td>Programme board</td><td>MSP</td><td>sponsoring group / SRO</td><td>programme register, benefit-at-risk, tranche decisions</td><td>chair</td><td>decision/commitment</td></tr>
+<tr><td>Tranche review</td><td>MSP</td><td>sponsoring group</td><td>baselines, benefit status, risk register</td><td>unanimous or chair per type</td><td>continue/pause/stop</td></tr>
+<tr><td>Architecture Board</td><td>TOGAF</td><td><code>governance_body</code></td><td>architecture contracts, compliance, waivers, change requests</td><td>majority</td><td>decision/action</td></tr>
+<tr><td>Design Board</td><td>TOGAF</td><td><code>governance_body</code></td><td>solution designs, design gate, deviations</td><td>majority</td><td>decision/action</td></tr>
+<tr><td>PI planning</td><td>SAFe</td><td>programme manager</td><td>backlog by WSJF, capacity, plan approval</td><td>majority</td><td>decision/commitment</td></tr>
+<tr><td>System demo</td><td>SAFe</td><td>programme manager</td><td>completed deliverables and evidence</td><td>chair</td><td>information/decision</td></tr>
+<tr><td>Inspect &amp; adapt</td><td>SAFe</td><td>coach</td><td>retro findings, lessons, kata candidates</td><td>majority</td><td>action/commitment</td></tr>
+<tr><td>Incident review</td><td>operations</td><td>incident commander</td><td>incident, postmortem, runbook findings</td><td>chair</td><td>decision/action</td></tr>
+</tbody></table>
+<h3>B2 — Actor / role matrix</h3>
+<table><thead><tr><th>Seat</th><th>May invite</th><th>May add item</th><th>May position</th><th>Counts</th><th>May publish minutes</th></tr></thead><tbody>
+<tr><td>chair</td><td>yes</td><td>yes</td><td>yes</td><td>policy rule</td><td>yes (behind its approval)</td></tr>
+<tr><td>member</td><td>no</td><td>yes (authority)</td><td>yes</td><td>yes</td><td>no</td></tr>
+<tr><td>presenter</td><td>no</td><td>via chair</td><td>yes (on its items)</td><td>yes if the type says so</td><td>no</td></tr>
+<tr><td>delegate</td><td>per type</td><td>per type</td><td>yes</td><td>per type</td><td>no</td></tr>
+<tr><td>observer</td><td>no</td><td>no</td><td>recorded, never counts</td><td>no</td><td>no</td></tr>
+</tbody></table>
+<h3>C1 — Data entity catalog</h3>
+<table><thead><tr><th>Entity</th><th>Key content</th><th>Relationships</th></tr></thead><tbody>
+<tr><td><code>meeting_type</code></td><td>policy, required participation, quorum, rule, evidence, window, outcomes, version</td><td>1→* <code>meeting</code></td></tr>
+<tr><td><code>meeting</code></td><td>card, convener, type version, window, cadence slot</td><td>1→* agenda items, attendance; 1→1 card</td></tr>
+<tr><td><code>meeting_agenda_item</code></td><td>sequence, resolved object, departments, evidence, outcome</td><td><em>→1 approval; 1→</em> positions</td></tr>
+<tr><td><code>meeting_attendance</code></td><td>participant kind/id, seat, department, invitation/response</td><td>*→1 meeting</td></tr>
+<tr><td><code>meeting_position</code></td><td>participant, stance, rationale, conditions, commitment, surface</td><td>*→1 item</td></tr>
+<tr><td><code>approval_decision</code> (extended)</td><td>human or job participant; <code>via</code> surface</td><td>*→1 approval</td></tr>
+<tr><td><code>governed_asset(kind='minutes')</code></td><td>minutes body, status, approval</td><td>1→1 meeting</td></tr>
+</tbody></table>
+<h3>C2 — Application / function matrix</h3>
+<table><thead><tr><th>Action</th><th>Service</th><th>Writes</th><th>Emits</th></tr></thead><tbody>
+<tr><td><code>meetings.schedule</code></td><td>meetings</td><td>card, meeting</td><td>—</td></tr>
+<tr><td><code>meetings.open</code></td><td>meetings</td><td>meeting status</td><td><code>meeting.opened</code></td></tr>
+<tr><td><code>meetings.invite</code> / <code>respond</code></td><td>meetings</td><td>attendance</td><td>—</td></tr>
+<tr><td><code>meetings.agenda_add</code></td><td>meetings</td><td>agenda item</td><td>—</td></tr>
+<tr><td><code>meetings.position</code></td><td>meetings</td><td>position</td><td>—</td></tr>
+<tr><td><code>meetings.defer</code></td><td>meetings</td><td>item outcome</td><td>—</td></tr>
+<tr><td><code>meetings.close_item</code></td><td>meetings + approvals</td><td>decision rows, item outcome</td><td><code>meeting_item.closed</code></td></tr>
+<tr><td><code>meetings.close</code></td><td>meetings</td><td>meeting status</td><td><code>meeting.closed</code></td></tr>
+<tr><td><code>meetings.minutes_publish</code></td><td>meetings + governed assets</td><td>minutes asset</td><td><code>meeting_minutes.published</code></td></tr>
+<tr><td><code>meetings.list</code> / <code>get</code></td><td>meetings</td><td>read only</td><td>—</td></tr>
+</tbody></table>
+<h3>C3 — Conceptual data diagram</h3>
+<p><code>meeting_type</code> (policy) → <code>meeting</code> (instance) → <code>meeting_agenda_item</code> (resolved approval) →
+<code>meeting_position</code> (participant stance) and <code>approval_decision</code> (one per qualifying seat);
+<code>meeting_attendance</code> binds participants to seats; <code>governed_asset(minutes)</code> derives from the rows;
+<code>project_dependency</code> receives commitments; <code>card</code> receives actions.</p>
+<h3>D1 — Technology view</h3>
+<p>PostgreSQL 18 with RLS on every new table; the existing Rust action registry and HTTP/MCP surfaces;
+the Leptos console route <code>/meetings</code>; the existing Telegram channel adapter and MCP task input
+request; an ICS feed rendered from attendance. No Redis, no new port, no hosted model, no calendar
+service, no AV service.</p>
+<h3>F1 — Migration and delivery diagram</h3>
+<pre><code>D1 policy + participant extension → D2 agenda → D3 attendance/positions → D4 arithmetic
+→ D5 outcomes/minutes → D6 human surfaces → D7 metering → D8 console + seams
+</code></pre>
+<p>The order is also the build order: D1's migration must land before any action; D4 depends on D1–D3;
+D5 on D4; D6–D8 consume the prior parts. The slice is one PR (#606). Tranche 4 authorises it; the
+tranche review reads the D7 instruments.</p>
+<h2>5. Artefact links</h2>
+<table><thead><tr><th>From</th><th>Kind</th><th>To</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>A2 requirements</td><td>derivation</td><td>A5 solution concept</td><td>each requirement maps to an entity or action</td></tr>
+<tr><td>A5 solution concept</td><td>realization</td><td>C1 data entities and C2 functions</td><td>the diagram names them</td></tr>
+<tr><td>A4 goals</td><td>derivation</td><td>A2 requirements</td><td>R1–R12 serve G1–G2</td></tr>
+<tr><td>A1 principles</td><td>derivation</td><td>A5 solution concept</td><td>P1–P7 shape the model</td></tr>
+<tr><td>A3 stakeholders</td><td>dependency</td><td>B1 interaction matrix</td><td>each forum names its stakeholders</td></tr>
+<tr><td>B1 interaction matrix</td><td>realization</td><td>C2 functions</td><td>each forum uses the action family</td></tr>
+<tr><td>C1 data entities</td><td>realization</td><td>D1 technology view</td><td>PostgreSQL tables and RLS</td></tr>
+<tr><td>F1 migration</td><td>dependency</td><td>D1–D8</td><td>the build order</td></tr>
+<tr><td>T9 <code>governance_body</code></td><td>reuse</td><td>A3/B1</td><td>the Board is a convener, not a new body</td></tr>
+<tr><td>T10 <code>programme_cadence</code></td><td>reuse</td><td>B1</td><td>the cadence supplies the slot, the meeting the record</td></tr>
+</tbody></table>
+<h2>Decisions</h2>
+<table><thead><tr><th>ID</th><th>Decision</th><th>Rationale</th><th>Where it shows</th></tr></thead><tbody>
+<tr><td>AD1</td><td>A meeting is a card over the four existing units; no fifth unit and no second decision store</td><td>the record stays one approval row per decision</td><td><code>meeting</code> is a card; decisions are <code>approval_decision</code> rows</td></tr>
+<tr><td>AD2</td><td>The participant extension is additive on <code>approval_decision</code> (nullable <code>approver_id</code>, <code>job_binding_id</code>, <code>participant_kind</code>)</td><td>required decisions and distinct approvers count on the decision rows themselves</td><td>migration 0065</td></tr>
+<tr><td>AD3</td><td>Positions are deliberation, never decisions; <code>close_item</code> derives one decision row per qualifying seat</td><td>a second store would make the record ambiguous</td><td><code>meeting_position</code> + <code>close_item</code></td></tr>
+<tr><td>AD4</td><td>The stricter policy wins: the meeting rule first, then the linked approval's dual control, evidence and P4 exclusions; a refusal is not a close</td><td>a meeting must never weaken a gate</td><td><code>close_item</code> arithmetic</td></tr>
+<tr><td>AD5</td><td>The agenda is an L0 query over <code>agenda_sources[]</code>; the LLM never selects an item</td><td>selection must be reproducible</td><td><code>agenda_add</code> + the materialised query</td></tr>
+<tr><td>AD6</td><td>Minutes are a governed asset behind the chair's approval; the rows remain the record</td><td>the DoD needs a published artefact without a second record</td><td><code>minutes_publish</code></td></tr>
+<tr><td>AD7</td><td>Participant-hours derive from attendance × duration at read time; no stored metric row</td><td>metering follows D37/D52's read-time rule</td><td>the instruments</td></tr>
+</tbody></table>
+<h2>Acceptance</h2>
+<p>The delivery design gate: T19 is an ordinary delivery project under the P0 brief and the T9
+capability. The set above is the PSA/HLD evidence; a deviation (a second decision table, a chat
+transcript as a decision, a calendar dependency) is a change request, never a silent fork. The
+compliance review records one level against the statement of architecture work when the project
+closes. The full TOGAF repository rows are T9's; this set is publishable now and importable later.</p>
+<p>The acceptance itself is the D1–D8 scenarios in <code>docs/plans/T19-decision-forums.md</code> §5, the live
+gate recorded in <code>docs/plans/T19/evidence.md</code>, and the decision in
+<code>docs/plans/T19/closure-review.md</code>.</p>
+<h2>7. Review and links</h2>
+<ul>
+<li>Review date: 2026-11-30 (Architecture Board, tranche 4)</li>
+<li>Brief: <code>docs/plans/T19/project-brief.md</code></li>
+<li>Analysis: <code>docs/plans/T19/inception-analysis.md</code></li>
+<li>Plan: <code>docs/plans/T19-decision-forums.md</code></li>
+<li>MSP: <code>docs/plans/T19/msp-profile.md</code></li>
+<li>SAFe: <code>docs/plans/T19/safe-epic.md</code></li>
+<li>Register: <code>docs/plans/T19/artifact-register.md</code></li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision forums (meetings) · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

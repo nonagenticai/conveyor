@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — S02 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project brief — S02 Skeleton (retrospective, 2026-11-21)</h1>
+<p>One page: what S02 changed, what it reused, and how it is accepted. Recorded retrospectively on 2026-11-21 under delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>; S02 closes on the P2 proof landed in this batch; issue #2 named a test that did not exist and now does (<code>apps/server/tests/jobs_lease_two_workers.rs</code>, d367a4a9).</p>
+<h2>Outcome</h2>
+<p>conveyor has a running ten-member Rust workspace and one <code>conveyor</code> binary over Postgres 18, with eleven platform tables under forced row-level security, OIDC and dev login resolved through <code>membership</code>, a fail-closed <code>app_licence</code> gate, a fenced job runner and a replaying SSE stream — so every later slice starts from one tenant-scoped base instead of forking one.</p>
+<h2>Boundary</h2>
+<p>Out of S02: domain aggregates and tables (S03); the action registry (S04); board/run/approval endpoints (S03–S06); the Keycloak realm and cluster deploy (S14); the licences service (D12); pgvector/search (S07); the UI (S12); and <code>.github/</code>/git (CONTRACT §13).</p>
+<p>Surfaces this project must not fork: the tenant is resolved from membership and never a client header (CONTRACT §9); <code>/api</code> routes stay unversioned; <code>apps/web</code> stays a dependency-free placeholder until S12 (S2-D7).</p>
+<h2>Reuse sources</h2>
+<ul>
+<li><code>agent</code> <code>crates/agent-api/src/tenancy.rs</code> and <code>migrations/0001_tenancy.sql</code> — tenant-first transaction scope, <code>app_current_tenant()</code>, <code>tenant_isolation</code>, <code>NOBYPASSRLS</code>; the swallowed-<code>DO</code> pattern was not carried.</li>
+<li><code>agent</code> <code>crates/agent-api/src/auth.rs</code> and <code>licensing/gate.rs</code> — JWKS cache and exhaustive refusal paths; the eight-role breadth and the synchronous licences call were not carried.</li>
+<li><code>agent</code> <code>crates/agent-api/src/sse_hub.rs</code>, <code>conversations/hub.rs</code>, <code>provision/outbox.rs</code> and <code>audit/</code> — replay ring, keepalive, claim SQL, lease fencing and append-only audit.</li>
+<li><code>template-rust-service</code> <code>Cargo.toml</code>, <code>rust-toolchain.toml</code> and <code>src/{lib,db,tenant,config,error,main}.rs</code> — the version set, <code>OpenApiRouter</code>, <code>AppState</code> and <code>--print-openapi</code>; <code>query!</code> and the trusted tenant header were not carried.</li>
+<li><code>strata_rag</code> <code>src/tenant.rs</code>, <code>src/metrics.rs</code> and <code>tests/common/mod.rs</code> — <code>Tenant(Uuid)</code>, <code>OnceLock</code> metrics and container cleanup; token scopes were not carried.</li>
+<li><code>fr</code> <code>backend/src/lib/licence-introspect.ts</code>, <code>require-fr-license.ts</code> and <code>backend/src/workers/</code> — the positive-only cache and the 14 <code>setInterval</code> names as job kinds; the Redis cache and the timers were not carried.</li>
+</ul>
+<h2>Inception units</h2>
+<ul>
+<li>The ten-member workspace and exact pins are the base every later slice extends (plan §5).</li>
+<li>Eleven platform tables exactly, with nine tenant-owned tables under ENABLE + FORCE RLS and a <code>FOR ALL</code> policy that carries both USING and WITH CHECK (plan §5).</li>
+<li><code>TenantId</code> is typed into the store layer, so an unscoped query is a compile error; <code>begin_scoped</code> is the only tenant GUC writer (plan §5 Tenancy; S2-D1).</li>
+<li>Login resolves a verified subject through <code>membership</code> to exactly one <code>(app_user, tenant)</code>; dev auth is a development transport only (plan §5 Auth; S2-D6).</li>
+<li>The licence gate reads <code>app_licence</code> only and fails closed; core requests never call the licences service (plan §5 Auth).</li>
+<li>Jobs are claimed with <code>FOR UPDATE SKIP LOCKED</code> and a fenced lease token; a stale token writes nothing (plan §5 Jobs; <code>crates/store/src/jobs.rs</code>).</li>
+<li><code>/api/events</code> replays by <code>event.seq</code> inside the subscriber's tenant scope; <code>pg_notify</code> is a doorbell, not a payload channel (plan §5 SSE; S2-D4).</li>
+</ul>
+<h2>Dependencies</h2>
+<ul>
+<li>blocked-by: S00 (facts <code>meta.depends_on = ["S00"]</code>).</li>
+<li>acceptance-blocked-by: issue #2 "S02 — prove long-job lease/recovery under two workers" — the P2 proof lands at d367a4a9; the issue closes with the lane PR.</li>
+<li>blocks (by plan §3's scope split): S03 domain aggregates and tables; S12 UI, which consumes the declared <code>shell/login</code> surface; S14 estate, which consumes the OIDC issuer input and the deploy boundary.</li>
+<li>related: T1 and T11, the other two tranche-1 projects.</li>
+</ul>
+<h2>Acceptance</h2>
+<p>Scenario: two tenants are isolated including RLS.
+Given tenant A and tenant B each have a row in <code>event</code>, when the runtime role is scoped to A, then <code>count(*) FROM event</code> returns none of B's rows, a forged <code>tenant_id = B</code> insert fails <code>WITH CHECK</code>, the owner also sees 0, and the superuser sees both.
+Verify: <code>cargo test -p conveyor-server --test rls -- --nocapture</code></p>
+<p>Scenario: login works.
+Given <code>migrate --dev-seed</code> has created dev-a/alice and dev-b/bob, when <code>Bearer dev:alice</code> calls <code>/api/me</code>, then it returns 200; and with <code>APP_ENV=production</code> the process exits non-zero.
+Verify: plan §7 row "Login works"; <code>apps/server/tests/rls.rs</code>.</p>
+<p>Scenario: a job survives a kill.
+Given <code>JOB_LEASE_SECS=2</code> and a worker killed with SIGKILL mid-handler, when a second worker starts, then the row is reclaimed on lease expiry, <code>attempts</code> increments, and the stale token completes nothing.
+Verify: <code>cargo test -p conveyor-store --test jobs</code> and <code>cargo test -p conveyor-server --test jobs_kill</code>.</p>
+<p>Scenario: SSE replay.
+Given three events and a reconnect with <code>Last-Event-ID</code> of the first, when the stream resumes, then the second and third arrive once each in <code>seq</code> order and tenant B's events are absent.
+Verify: <code>cargo test -p conveyor-server --test events</code>.</p>
+<p>Scenario: audit is append-only and the licence gate fails closed.
+Given the runtime role, when <code>UPDATE audit_event</code> runs, then permission is denied; given no <code>app_licence</code> row or an unknown status, when a gated request runs, then it returns 403 problem+json.
+Verify: <code>cargo test -p conveyor-store --test audit_idempotency</code> and <code>cargo test -p conveyor-auth --test licence</code>.</p>
+<p>Scenario: a long handler is not reclaimed under two workers (issue #2 P2).
+Given <code>JOB_LEASE_SECS=2</code> and a handler held for four leases, when two worker processes poll the same tenant, then the handler runs once (<code>attempts = 1</code>, one stub call), the finish is <code>succeeded</code>, and the lease is cleared and not resurrected.
+Verify: <code>cargo test -p conveyor-server --test jobs_lease_two_workers</code></p>
+<p>Full gate (plan §7): <code>cargo fmt --check</code>; <code>cargo clippy --workspace --all-targets -- -D warnings</code>; <code>cargo test --workspace</code>; <code>cargo run -p conveyor-server -- --print-openapi | jq -e '.paths["/api/events"]'</code>; <code>cargo run -p conveyor-server -- migrate</code>; <code>docker compose up -d --build &amp;&amp; curl -sf localhost:8930/health/ready</code>.</p>
+<h2>Capabilities</h2>
+<ul>
+<li>Tenancy and identity — owned by the programme architect; approved by the Architecture Board.</li>
+<li>Durable work execution — delivery teams consume the fenced job contract unchanged.</li>
+<li>Event streaming — S12 owns the consumer; S02 owns the replay and tenant-scope contract.</li>
+<li>Audit, idempotency and entitlement — the compliance and licensing owners rely on the append-only record and the fail-closed <code>app_licence</code> gate.</li>
+<li>Workspace and operability — the programme owner holds the outcome; operators consume <code>/health</code>, <code>/metrics</code> and the SSE stream.</li>
+</ul>
+<h2>Plan</h2>
+<p><code>docs/plans/slices/S02-skeleton.md</code>, held to SPEC §5.1, §5.2, §5.3, §5.4, §5.6, §5.9, §7, §8 S2 and §11 R6/R8.</p>
+<h2>Risks</h2>
+<ul>
+<li>RLS owner bypass: without FORCE the owner reads everything, so an owner-role test passes while production leaks. First check: run the isolation test as <code>conveyor_runtime</code> and print <code>current_user</code>, with a superuser positive control.</li>
+<li><code>sqlx::migrate!</code> path: it resolves against the defining crate's manifest directory. First check: the embedded-set test asserts exactly <code>[(1, "platform")]</code>.</li>
+<li>LISTEN versus PgBouncer: <code>LISTEN</code> is session-scoped and PgBouncer is transaction-pooled. First check: the SSE test uses a dedicated direct <code>DATABASE_LISTEN_URL</code>.</li>
+<li><code>pg_notify</code> payload limit is 8,000 bytes. First check: the doorbell sends <code>seq::text</code> only.</li>
+<li>R6 and R8: the plan forbids adding Redis for rate limits or caches and names auth/tenancy the highest bug surface. First check: rate limits and caches are in-process or Postgres advisory locks, and current <code>compose.yaml</code> carries db, pgbouncer and app only; the RLS test's three-role control.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Issue #2 (P2 proved at d367a4a9; closes with the lane PR): https://github.com/nonagenticai/conveyor/issues/2</li>
+<li>Plan: <code>docs/plans/slices/S02-skeleton.md</code></li>
+<li>Acceptance manifest: <code>acceptance/programme/S02.toml</code></li>
+<li>Published evidence output: <code>01a1e686-be0d-74cc-b003-4d26b09fd40b</code> (2026-11-16T22:42:34Z)</li>
+<li>Delegation: <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code></li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

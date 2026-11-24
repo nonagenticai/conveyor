@@ -186,8 +186,8 @@
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
       "section": "Design",
-      "sha256": "03296e4716d4562df9467a801c36025e0cc5c1aa851abcf9dfa85aaebb9ed474",
-      "bytes": 16426,
+      "sha256": "b2bea63b00832621fc26d0067a41f1e53e2aaeb860f6136a9a637bc8e563dd18",
+      "bytes": 16781,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md"
     },
     {
@@ -623,6 +623,24 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/produce-capture-2026-11-16.md"
     },
     {
+      "title": "T19 close-out — live write evidence",
+      "path": "docs/evidence/t19/live-write-evidence.html",
+      "source": "docs/evidence/t19/live-write-evidence.md",
+      "section": "Evidence",
+      "sha256": "b3b6ff1653e1ba823045a13b384f4a642dc41512d212d839ff0c4d4942f7efb2",
+      "bytes": 931,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/live-write-evidence.md"
+    },
+    {
+      "title": "T19 close-out — programmes.refresh evidence",
+      "path": "docs/evidence/t19/refresh-evidence.html",
+      "source": "docs/evidence/t19/refresh-evidence.md",
+      "section": "Evidence",
+      "sha256": "ddac071a949b01161f9bb16d0a38c5749705b774a6b2935b6ef7caf52ad3cc2d",
+      "bytes": 486,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/refresh-evidence.md"
+    },
+    {
       "title": "V1 → SPECV2 coverage",
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
@@ -636,8 +654,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "bf610285e2368b01fc2e9799cd067f81f886214c551fa3d10286609dee867c63",
-      "bytes": 256915,
+      "sha256": "535be65f06ed234430fe6182c82f41a1b2fb5e798f3eea177616018c4528aa92",
+      "bytes": 257438,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -789,8 +807,8 @@
       "path": "docs/plans/T19-decision-forums.html",
       "source": "docs/plans/T19-decision-forums.md",
       "section": "Plans",
-      "sha256": "8f8c85d67e6cc6928bf174ccf600ed55d1f46ab72764da88a25ed7f79c4cebd4",
-      "bytes": 25846,
+      "sha256": "316edd9323a47737bda6eb12239bd5f1bcefe40431f99e0a2069e8b09d4a4bf2",
+      "bytes": 25864,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19-decision-forums.md"
     },
     {
@@ -798,8 +816,8 @@
       "path": "docs/plans/T19/architecture-design.html",
       "source": "docs/plans/T19/architecture-design.md",
       "section": "Plans",
-      "sha256": "53c9df699470184dad570edcd6f82e3c09ef3c0fa61a76092ae1b96382240ef0",
-      "bytes": 14788,
+      "sha256": "730266ca5fa0006d7f9059267ba4c6e1bc8e381ffb018e511d888c5f0ebd0371",
+      "bytes": 16429,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/architecture-design.md"
     },
     {
@@ -807,17 +825,26 @@
       "path": "docs/plans/T19/artifact-register.html",
       "source": "docs/plans/T19/artifact-register.md",
       "section": "Plans",
-      "sha256": "d6bac4601bfb5ad7b91263ecfb7d18876d016886e16be46913e6533b6a2cc40b",
-      "bytes": 3686,
+      "sha256": "64449b597c0895220a1b6bfd97ca18a28ea0995d3aa5a70188ace2cf2dcd6172",
+      "bytes": 3855,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/artifact-register.md"
+    },
+    {
+      "title": "T19 — Decision forums: closure review",
+      "path": "docs/plans/T19/closure-review.html",
+      "source": "docs/plans/T19/closure-review.md",
+      "section": "Plans",
+      "sha256": "3547669389ef7b12c30c0ea5c9e472fbe778f25fdce0d4ccafb5c8da3e2096b7",
+      "bytes": 4339,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/closure-review.md"
     },
     {
       "title": "T19 — Decision forums: evidence",
       "path": "docs/plans/T19/evidence.html",
       "source": "docs/plans/T19/evidence.md",
       "section": "Plans",
-      "sha256": "92dfa8f9a8bfe3f52ec25c32e17a9263e551b77898c39ab02a6516897457ccf1",
-      "bytes": 6828,
+      "sha256": "f752b33890b84a5172cbe0ce5e0329c95fc9aea3af415fc611246032d2c02057",
+      "bytes": 9164,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/evidence.md"
     },
     {
@@ -825,8 +852,8 @@
       "path": "docs/plans/T19/inception-analysis.html",
       "source": "docs/plans/T19/inception-analysis.md",
       "section": "Plans",
-      "sha256": "69b54af6f41e775bb59149461d8fb3e642786af83981935f8657f20ad9b95820",
-      "bytes": 6382,
+      "sha256": "77aa784a87f54ce444e5991f2b883e01ae0404aec2efdc443b25675754e7c12a",
+      "bytes": 6378,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/inception-analysis.md"
     },
     {

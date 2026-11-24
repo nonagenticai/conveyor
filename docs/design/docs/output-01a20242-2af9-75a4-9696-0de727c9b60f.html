@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data entity catalogue — SPEC-V2 (retrospective, 2026-11-21) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Data entity catalogue — SPEC-V2 (retrospective, 2026-11-21)</li>
+<li>Phase: c</li>
+<li>Kind: catalog</li>
+<li>Purpose: The entities the model adds and the tables it reuses.</li>
+<li>Scope: SPEC_V2.md §10.3 and §11.8.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>industry_department / the organisation spine</strong> - {"owner": "organisation", "table": "industry / department"}</li>
+<li><strong>job_catalogue / the position: key, placement, status</strong> - {"owner": "organisation", "table": "job_catalogue"}</li>
+<li><strong>job_release / the immutable compiled release</strong> - {"owner": "organisation", "table": "job_release"}</li>
+<li><strong>job_binding / position → release / capability / procedure / executor</strong> - {"owner": "organisation", "table": "job_binding"}</li>
+<li><strong>approval_policy / per-gate approvals: decisions, approver kinds, expiry</strong> - {"owner": "governance", "table": "approval_policy"}</li>
+<li><strong>wbs_node / phase / deliverable / work package / milestone tree</strong> - {"owner": "work", "table": "wbs_node"}</li>
+<li><strong>project_baseline / frozen, approved scope / schedule / cost</strong> - {"owner": "work", "table": "project_baseline"}</li>
+<li><strong>programme_cadence / PI / sprint / demo / retro / refinement</strong> - {"owner": "programme", "table": "programme_cadence"}</li>
+<li><strong>programme_tranche / the unit the programme manages and reviews together</strong> - {"owner": "programme", "table": "programme_tranche"}</li>
+<li><strong>programme_baseline / management, governance and boundary baselines</strong> - {"owner": "programme", "table": "programme_baseline"}</li>
+<li><strong>register / risk / issue / assumption / dependency / benefit / change</strong> - {"owner": "work", "table": "project_register_item"}</li>
+<li><strong>benefit / the measurable improvement and the benefits map</strong> - {"owner": "programme", "table": "benefit_profile / benefit_link / benefit_transition"}</li>
+<li><strong>stakeholder / concerns, influence, interest, exposure, engagement</strong> - {"owner": "programme", "table": "stakeholder_profile"}</li>
+<li><strong>architecture_artefact / typed artefact, entries and links</strong> - {"owner": "architecture", "table": "architecture_artifact / architecture_artifact_entry / architecture_artifact_link / artifact_type / adm_profile"}</li>
+<li><strong>architecture_governance / contracts, compliance reviews, waivers, the board</strong> - {"owner": "architecture", "table": "architecture_contract / architecture_compliance_review / architecture_waiver / governance_body"}</li>
+<li><strong>architecture_assessment / maturity (nine dimensions) and skills (seven categories)</strong> - {"owner": "architecture", "table": "architecture_maturity / architecture_skill_assessment"}</li>
+<li><strong>decision / the ladder's records, policies and refinements</strong> - {"owner": "decisions", "table": "decision / decision_option / decision_policy / decision_policy_refinement / laya_inference_config"}</li>
+<li><strong>lesson / organisational memory: evidence refs, review state</strong> - {"owner": "memory", "table": "lesson"}</li>
+<li><strong>project_dependency / project-level edges: blocks | needs | supersedes | informs</strong> - {"owner": "programme", "table": "project_dependency"}</li>
+<li><strong>tool / the tool estate and its call ledger</strong> - {"owner": "tools", "table": "tool / toolkit / tool_binding / tool_call"}</li>
+<li><strong>programme / extended with shared_config</strong> - {"owner": "programme", "table": "programme (extended)"}</li>
+<li><strong>governed_asset / charter, closure, postmortem, SOP source and the MSP definition kinds</strong> - {"owner": "project", "table": "governed_asset (extended kind)"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SPEC V2 — the organisational operating model · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

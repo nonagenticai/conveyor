@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Technology standards — SPEC-V2 (retrospective, 2026-11-21) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Technology standards — SPEC-V2 (retrospective, 2026-11-21)</li>
+<li>Phase: d</li>
+<li>Kind: catalog</li>
+<li>Purpose: The standards the model commits the programme to.</li>
+<li>Scope: SPEC_V2.md §4–§11 and §10.6.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Rust / the substrate</strong> - {"usage": "One binary, typed actions, compiler-enforced crate boundaries; no flow generator (\u00a71.4)."}</li>
+<li><strong>PostgreSQL / the one store</strong> - {"usage": "Same binary, same Postgres, same namespace; no new port (8930) (\u00a710.6)."}</li>
+<li><strong>ActionSpec / the interface</strong> - {"usage": "One declaration \u2192 HTTP + MCP + OpenAPI + generated client (\u00a710.4)."}</li>
+<li><strong>MCP (/mcp) / the agent seam</strong> - {"usage": "Agent \u2192 conveyor only; there is no conveyor \u2192 agent call, and the tool surface is versioned like an external API (\u00a710.2)."}</li>
+<li><strong>JSON Schema Draft 2020-12 subset / tool input</strong> - {"usage": "Closed schemas with additionalProperties: false, enums, patterns and bounds (\u00a711.3, \u00a711.7)."}</li>
+<li><strong>OpenAPI 3.1 / BYO tool import</strong> - {"usage": "A draft toolkit with per-operation effect classes and a registered destination alias (D42, \u00a711.5)."}</li>
+<li><strong>streamable-HTTP MCP / BYO remote server</strong> - {"usage": "Binding-scoped discovery; only the bound subset is exposed to the tenant's jobs (\u00a711.5)."}</li>
+<li><strong>MinIO (S3 API) / object storage</strong> - {"usage": "Direct, tenant/&lt;tenant_id&gt;/ prefix, server-side encryption, content hash, size cap; no artifact_service or storage-api dependency (D57, \u00a711.10)."}</li>
+<li><strong>strata_ingest / strata_rag / knowledge</strong> - {"usage": "Pinned-leaf retrieval, knowledge-pack import and storage; the conveyor never hosts embeddings (\u00a75.6, \u00a710.1)."}</li>
+<li><strong>laya / the decision rung</strong> - {"usage": "POST /v1/systemone, 1500 ms default / 3 s hard budget; the fail policy is the decision policy's (\u00a710.2)."}</li>
+<li><strong>PDDL / procedure steps</strong> - {"usage": "The action space: preconditions and effects over typed facts; procedural knowledge is the published procedure itself (D53)."}</li>
+<li><strong>RDF / OWL / Turtle / import only</strong> - {"usage": "Imported into a strata knowledge pack named by the procedure's knowledge_pack_ref; no RDF store, no graph store, no reasoner (D53, 2026-11-19)."}</li>
+<li><strong>BPMN 2.0 / Visio / draw.io / process-document import</strong> - {"usage": "Activities \u2192 steps, gateways \u2192 gates; the result is a procedure draft behind a review gate (\u00a75.6)."}</li>
+<li><strong>TOGAF ADM (tailored profile) / architecture method</strong> - {"usage": "A lean profile with named artefacts and gates; nine maturity dimensions and seven skills categories; no certification claim (\u00a78.1, \u00a78.6)."}</li>
+<li><strong>SAFe / MSP / PMP / programme method</strong> - {"usage": "As rows and gates; no SAFe compliance badge, PMP certification or MSP conformance badge (\u00a78.2\u2013\u00a78.4, \u00a78.6)."}</li>
+<li><strong>ArchiMate 3.1 viewpoints / diagram metadata</strong> - {"usage": "A viewpoint string on a typed artefact \u2014 not a live metamodel and no modelling tool (\u00a78.6)."}</li>
+<li><strong>Kubernetes / GitHub / Flux / Prometheus-Loki-Grafana / ops tools</strong> - {"usage": "Read verbs live; destructive verbs behind approval, a dry-run and dual control (\u00a711.2, \u00a711.4)."}</li>
+<li><strong>No Redis; no hosted model / exclusions</strong> - {"usage": "The broker is in-process; the one internal agent loop is the only runtime (\u00a710.6)."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SPEC V2 — the organisational operating model · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

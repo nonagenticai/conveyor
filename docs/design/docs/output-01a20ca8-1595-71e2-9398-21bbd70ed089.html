@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T19 — Decision forums: evidence · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T19 — Decision forums: evidence</h1>
+<h2>Claim</h2>
+<p>Issue #606's D1–D8 are implemented on <code>issue/606-t19-meetings</code> and exercised on the deployed
+engine (<code>a8f67c3e</code>): the meeting is a typed card whose agenda resolves existing approvals, whose
+seats record positions, and whose outcome is derived by arithmetic over those positions and the
+linked approval's stricter policy — with the human seat available in the web room, over Telegram
+and over MCP, and the minutes a chaired governed asset. The live gate is recorded below.</p>
+<h2>Evidence</h2>
+<p>Every D-part has its named test file and every scenario has a passing row; the commands below were
+run at the branch head (the PR's CI is the merge gate).</p>
+<table><thead><tr><th>Part</th><th>Scenario</th><th>Evidence</th><th>Result</th></tr></thead><tbody>
+<tr><td>D1</td><td>one live meeting per cadence slot</td><td><code>crates/api/tests/meetings_policy.rs::a_second_live_meeting_in_a_slot_is_refused</code></td><td>pass</td></tr>
+<tr><td>D1</td><td>the meeting is a card with its DoD and <code>meeting.opened</code></td><td><code>meetings_policy.rs::a_meeting_is_a_card_with_its_dod</code></td><td>pass</td></tr>
+<tr><td>D1</td><td>the type version is pinned</td><td><code>meetings_policy.rs::a_meeting_pins_its_type_version</code></td><td>pass</td></tr>
+<tr><td>D1</td><td>a job seat writes one participant decision</td><td><code>meetings_policy.rs::a_job_seat_writes_a_participant_decision</code></td><td>pass</td></tr>
+<tr><td>D2</td><td>the item set is L0 over the sources</td><td><code>meetings_agenda.rs::the_item_set_is_l0_over_the_sources</code></td><td>pass</td></tr>
+<tr><td>D2</td><td>an item without evidence is 422</td><td><code>meetings_agenda.rs::an_item_without_evidence_is_refused</code></td><td>pass</td></tr>
+<tr><td>D2</td><td>one item, one approval</td><td><code>meetings_agenda.rs::an_item_names_exactly_one_approval</code></td><td>pass</td></tr>
+<tr><td>D3</td><td>one live position per participant</td><td><code>meetings_attendance.rs::one_live_position_per_participant</code></td><td>pass</td></tr>
+<tr><td>D3</td><td>a missing department defers <code>inquorate</code></td><td><code>meetings_attendance.rs::a_missing_department_defers_inquorate</code></td><td>pass</td></tr>
+<tr><td>D3</td><td>a closed item's position is immutable</td><td><code>meetings_attendance.rs::a_closed_item_position_is_immutable</code></td><td>pass</td></tr>
+<tr><td>D4</td><td>majority records each seat and keeps dissent</td><td><code>meetings_decision.rs::majority_records_each_seat_and_keeps_dissent</code></td><td>pass</td></tr>
+<tr><td>D4</td><td>a meeting never lowers dual control</td><td><code>meetings_decision.rs::a_meeting_never_lowers_dual_control</code></td><td>pass</td></tr>
+<tr><td>D4</td><td>a tie defers; observers never count</td><td><code>meetings_decision.rs::a_tie_defers_and_observers_do_not_count</code></td><td>pass</td></tr>
+<tr><td>D4</td><td>P4 excludes the judged seat</td><td><code>meetings_decision.rs::the_conflict_rule_excludes_the_judged_seat</code></td><td>pass</td></tr>
+<tr><td>D4</td><td>a unanimous reject resolves rejected</td><td><code>meetings_decision.rs::a_unanimous_reject_resolves_rejected</code></td><td>pass</td></tr>
+<tr><td>D5</td><td>a commitment needs owner and date</td><td><code>meetings_outcomes.rs::a_commitment_needs_owner_and_date</code></td><td>pass</td></tr>
+<tr><td>D5</td><td>an action becomes a card</td><td><code>meetings_outcomes.rs::an_action_becomes_a_card</code></td><td>pass</td></tr>
+<tr><td>D5</td><td>minutes need the chair and match the rows</td><td><code>meetings_outcomes.rs::minutes_need_the_chair_and_match_the_rows</code></td><td>pass</td></tr>
+<tr><td>D5</td><td>close refuses an open item</td><td><code>meetings_outcomes.rs::close_refuses_an_open_item</code></td><td>pass</td></tr>
+<tr><td>D6</td><td>the first decision across surfaces counts</td><td><code>meetings_human_seat.rs::the_first_decision_across_surfaces_counts</code></td><td>pass</td></tr>
+<tr><td>D6</td><td>the owner decides on web and MCP via meeting</td><td><code>meetings_human_seat.rs::the_owner_decides_on_web_and_mcp_via_meeting</code></td><td>pass</td></tr>
+<tr><td>D6</td><td>the ICS feed is a read</td><td><code>meetings_human_seat.rs::an_ics_feed_is_a_read</code></td><td>pass</td></tr>
+<tr><td>D7</td><td>participant-hours enter the roll-up</td><td><code>meetings_metering.rs::participant_hours_enter_the_rollup</code></td><td>pass</td></tr>
+<tr><td>D7</td><td>a never-decided forum is flagged</td><td><code>meetings_metering.rs::a_forum_with_no_decision_is_flagged</code></td><td>pass</td></tr>
+<tr><td>D8</td><td>a governance body convenes its standing meeting</td><td><code>meetings_console.rs::a_governance_body_convenes_its_standing_meeting</code></td><td>pass</td></tr>
+<tr><td>D8</td><td>a cadence slot resolves to a meeting</td><td><code>meetings_console.rs::a_cadence_slot_resolves_to_a_meeting</code></td><td>pass</td></tr>
+</tbody></table>
+<p>Supporting gates at the same head:</p>
+<table><thead><tr><th>Gate</th><th>Evidence</th><th>Result</th></tr></thead><tbody>
+<tr><td>the registry and the committed action dump agree (530 actions, 512 internal)</td><td><code>cargo test -p conveyor-actions --test registry</code></td><td>pass</td></tr>
+<tr><td>HTTP and MCP return the same body for all 530 actions</td><td><code>cargo test -p conveyor-actions --test parity_http_mcp</code></td><td>pass</td></tr>
+<tr><td>the migration ledger has <code>(65, "meetings")</code></td><td><code>cargo test -p conveyor-store migrate</code></td><td>pass</td></tr>
+<tr><td>the OpenAPI lock matches the 12 new operations</td><td><code>conveyor --print-openapi --write-lock</code> ran; <code>served-spec.lock.json</code> updated</td><td>pass</td></tr>
+<tr><td>the mock UI registers and renders the Meetings destination</td><td><code>node docs/design/scripts/check-v2.cjs</code>, <code>check-console.cjs</code></td><td>pass</td></tr>
+<tr><td>the real app's Meetings destination has a Playwright spec</td><td><code>apps/web/e2e/meetings.spec.ts</code> (empty, happy, refusal and phone/tablet layout)</td><td>runs in <code>web.yml</code> on the PR</td></tr>
+</tbody></table>
+<h3>The live gate — deployed <code>a8f67c3e</code>, tenant <code>nonagentic</code>, 2026-11-24</h3>
+<p>The human seat was exercised by the tenant's admin identity <code>FR Test</code> (app_user
+<code>01a1cf1e-09dd-7580-99cc-de395f3e86cc</code>), supplied by the owner for this proof; the evidence names
+the identity exactly and does not claim the owner's personal account. The meeting
+<code>01a20c8a-33ac-7f2a-b02f-0d2165ef05d5</code> was scheduled on the T19 board, opened, the chair invited
+and accepted, and two deciding items added (approvals <code>…5d47…</code> and <code>…bc7e…</code>). The seat approved
+item 1 in the web room and item 2 through the public <code>/mcp</code> transport; each item was closed from
+its own surface. The chair's minutes approval (<code>…a182</code>) was decided, the minutes governed asset
+<code>01a20ca3-7d7a-72f0-b63d-96a09064c6df</code> published, and the meeting closed at
+<code>2026-11-24T08:19:39Z</code>.</p>
+<p><code>python3 scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed</code> reads the
+rows back through the deployed read actions — never SQL, never a captured fixture:</p>
+<table><thead><tr><th>Check</th><th>Result</th></tr></thead><tbody>
+<tr><td>the live project is T19 and its board is a row</td><td>pass</td></tr>
+<tr><td>one active <code>meeting</code> card type; benefit B7 is a row</td><td>pass</td></tr>
+<tr><td>the meeting is <code>closed</code>; two agenda items closed as <code>decision</code></td><td>pass</td></tr>
+<tr><td>web: one meeting decision row, approval <code>approved</code>, <code>via.channel='web'</code></td><td>pass</td></tr>
+<tr><td>mcp: one meeting decision row, approval <code>approved</code>, <code>via.channel='mcp'</code></td><td>pass</td></tr>
+<tr><td>both rows name one approver, and it is the seated principal</td><td>pass</td></tr>
+<tr><td>the minutes approval is <code>approved</code> (and <code>meetings.close</code> refuses without the published asset)</td><td>pass</td></tr>
+</tbody></table>
+<p>The gate found and closed two deployment defects, both in <code>gitops-production</code>:
+<code>CONVEYOR_MCP_ALLOWED_HOSTS</code> was unset, so rmcp's localhost-only allowlist answered every public
+handshake <code>403 Host header is not allowed</code> (#5429); and the MCP session lives in one pod's memory
+while the two-replica Service round-robins, so 6 of 8 post-initialize calls 404'd until a
+DestinationRule pinned the session on <code>mcp-session-id</code> (#5432). After the rollout, the same probe
+served 8 of 8.</p>
+<h2>Verification</h2>
+<pre><code class="language-bash">cargo test -p conveyor-api --test meetings_policy
+cargo test -p conveyor-api --test meetings_agenda
+cargo test -p conveyor-api --test meetings_attendance
+cargo test -p conveyor-api --test meetings_decision
+cargo test -p conveyor-api --test meetings_outcomes
+cargo test -p conveyor-api --test meetings_human_seat
+cargo test -p conveyor-api --test meetings_metering
+cargo test -p conveyor-api --test meetings_console
+cargo test -p conveyor-actions --test registry
+cargo test -p conveyor-actions --test parity_http_mcp
+cargo test -p conveyor-store migrate
+npx playwright test apps/web/e2e/meetings.spec.ts
+python3 scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed
+</code></pre>
+<p>The Rust suites were run through <code>~/.claude/scripts/cargo-guard.py</code> on m4 (the estate's sanctioned
+interactive route); the compile/lint verdict is the branch's GitHub-hosted <code>preflight.yml</code>, and the
+PR's CI is the merge gate. The Playwright suite runs in <code>web.yml</code>, which is the first local-capable
+run of the real app (no <code>cargo-leptos</code> is installed on m4, and installing it would compile locally).</p>
+<h2>Links</h2>
+<ul>
+<li>Plan: <code>docs/plans/T19-decision-forums.md</code></li>
+<li>Issue: #606 (<code>Closes #606</code> in the PR); close-out: #650</li>
+<li>Specification: <code>docs/SPEC_V2.md</code> §6.8, §8.1–§8.3, §10.3–§10.5, §12 T19, D66</li>
+<li>Programme: <code>docs/design/Program_Architecture_and_Benefits_Realization.md</code>; B7 in <code>seed/programme-definition.json</code></li>
+<li>Architecture: <code>docs/plans/T19/architecture-design.md</code>; MSP: <code>docs/plans/T19/msp-profile.md</code>; SAFe: <code>docs/plans/T19/safe-epic.md</code></li>
+<li>Console: <code>apps/web/src/screens/meetings.rs</code>; design reference: <code>docs/design/v2.js</code> <code>meetings</code></li>
+<li>Live gate state and read-backs: <code>docs/evidence/t19/</code>; checker: <code>scripts/t19-live-gate-check.py</code></li>
+<li>Deployment fixes the gate required: gitops-production #5429 (MCP allowed hosts) and #5432 (MCP session affinity)</li>
+</ul>
+<h2>Gap</h2>
+<p>None. The live gate is recorded above at the deployed revision. Two items remain declared follow-ups
+rather than gaps: the <code>meeting_type</code> authoring route (a policy change is a new version through the
+governance route) and the T9 board / T10 cadence binding to meeting types; both are recorded as open
+items with owners in <code>docs/plans/T19/closure-review.md</code>.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision forums (meetings) · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

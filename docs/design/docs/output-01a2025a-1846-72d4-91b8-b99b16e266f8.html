@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S04 Solution Concept Diagram - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: S04 Solution Concept Diagram</li>
+<li>Phase: a</li>
+<li>Purpose: Show the declaration, registry, invocation, MCP, OpenAPI/ingest and persistence components and the flows between them.</li>
+<li>Scope: The solution shape for the S04 slice only; workflow execution, signed MCP channel and domain actions belong to later slices.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Component / crates/actions-derive</strong> - {"detail": "A 10th workspace member with proc-macro = true because a proc macro cannot live in a normal crate; a hand-written registry would name each schema twice.", "objective": "Derive the spec value and inventory::submit! from #[action] tokens."}</li>
+<li><strong>Component / crates/actions Registry</strong> - {"detail": "validate_name, from_inventory, assert_registry_consistent (six checks) and spec_hash live here.", "objective": "Collect inventory once into Registry and validate it."}</li>
+<li><strong>Flow / Invocation path</strong> - {"detail": "Tenancy scope, then idempotency claim, then deadline, then one transaction composing mutation, action_invocation and audit_event.", "objective": "POST /api/actions/&lt;name&gt;/invocations drives the call."}</li>
+<li><strong>Component / MCP surface</strong> - {"detail": "tools/list and tools/call read the same Registry; tools/list is scope-filtered.", "objective": "rmcp streamable HTTP at /mcp, one session per tenant."}</li>
+<li><strong>Component / OpenAPI fold and lock</strong> - {"detail": "--print-openapi --write-lock regenerates served-spec.lock.json with a per-operation sha256; --check-lock exits 1 on any added, removed or changed operation.", "objective": "Fold a literal path item per action into the spec built from OpenApiRouter exports."}</li>
+<li><strong>Component / External ingester</strong> - {"detail": "operationId maps to &lt;resource&gt;.&lt;verb&gt; where parseable, else (tag, path, method); spec and schema_hash are stored.", "objective": "openapiv3 reads a service's openapi.json and derives kind: external actions."}</li>
+<li><strong>Data / action_registry</strong> - {"detail": "The table is taken verbatim from section 2.14; kind is external or workflow; RLS is ENABLE+FORCE+policy with grants.", "objective": "Persist external and workflow actions in migrations/0003_action_registry.sql."}</li>
+<li><strong>Flow / Boot assertion</strong> - {"detail": "Exit 1 on an approved workflow row with no handler or an external row whose service is unconfigured.", "objective": "Fail startup before bind when the binary and DB disagree."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

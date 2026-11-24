@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Technology Standards Catalog — DESIGN-PUBLISH - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Technology Standards Catalog — DESIGN-PUBLISH</li>
+<li>Phase: d</li>
+<li>Kind: catalog</li>
+<li>Purpose: Record the standards the pack is built and checked against, so a new page inherits them rather than re-deciding them.</li>
+<li>Scope: The standards visible in the pack and its gates at 2026-11-21.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Markdown rendering / one renderer for the preview and the public page; raw HTML is neutralised</strong> - crates/render/src/markdown.rs (conveyor_render::markdown)</li>
+<li><strong>Output standard v2 / 36 categories, one template each with required headings; publishing an incomplete output is 409 output_incomplete</strong> - seed/output-standard.json and crates/domain/src/output_standard.rs</li>
+<li><strong>Pinned browser gate / Playwright 1.62.1 with a headless chromium, no package.json in the pack, a 20-minute job</strong> - .github/workflows/ci-public.yml, design-pack</li>
+<li><strong>PostgreSQL with forced RLS / every tenant-owned table is RLS-enabled and forced, and every query runs under the tenant's scope</strong> - crates/store/src/scope.rs (begin_scoped; a session GUC through a pooler is forbidden)</li>
+<li><strong>sha256 content addressing / every data file and every rendered document carries its hash in an index</strong> - check-data.cjs and build-docs.py</li>
+<li><strong>Static, pre-rendered / no bundler, no runtime Mermaid dependency; light and dark SVGs are committed</strong> - docs/design/architecture/diagrams</li>
+<li><strong>TOGAF ADM vocabulary / 9 phases, 3 plateaus, 4 artefact kinds, 4 link kinds, 4 contract kinds, 6 compliance levels</strong> - crates/domain/src/architecture.rs — one definition for the migration CHECK, the actions and the tests</li>
+<li><strong>Unversioned API routes / /api/&lt;resource&gt;, never /api/v1/&lt;resource&gt;</strong> - the repository's hard rule; the console calls the same actions the app serves</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Publish the SPEC_V2 studio design pack, live · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

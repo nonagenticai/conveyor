@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>PI plan — tranche 2 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>PI plan — tranche 2 (retrospective, 2026-11-21)</h1>
+<p>Tranche 2 covers S03 (Domain and schema) and T2 (Decision ladder). Both are already delivered as
+code; this increment records their programme evidence and burns down what the audit found. It is
+planned now and executed now, so the plan is retrospective in the same sense as the tranche-0 and
+tranche-1 sets.</p>
+<h2>Objectives</h2>
+<ul>
+<li><strong>O1 — S03 is re-recorded and closed on its own manifest.</strong> Charter, Statement of Architecture
+Work, the seven Phase A–D artefacts, the delivery contract, the Phase-G review, the two expected
+outputs and the closure review all exist and are published; <code>acceptance/programme/S03.toml</code> is
+green at the closing snapshot. Its two audit findings are recorded and owned; a P1 does not block
+closure under this programme's P0-only product gate.</li>
+<li><strong>O2 — T2's programme record exists and names its blocking gate.</strong> The same record is produced
+for T2, and its Phase-G review states that <code>v1-t2-1</code> (a generated draft attached by
+<code>documents.compose</code> with no <code>draft.apply</code> decision) blocks closure. T2 stays open; its status is
+a recorded consequence of that gate, not an omission.</li>
+<li><strong>O3 — the tranche is reviewed on evidence.</strong> The review reads each project's manifest result at
+the closing snapshot and records a typed outcome: <code>continue</code> if both objectives are met, <code>pause</code>
+where one is blocked.</li>
+</ul>
+<h2>Plan</h2>
+<table><thead><tr><th>Deliverable</th><th>Project</th><th>WSJF (BV, TC, RR, size)</th><th>Evidence of done</th></tr></thead><tbody>
+<tr><td>The domain and schema — aggregates, state machines, leases and the baseline domain migration</td><td>S03</td><td>8, 5, 8, 8</td><td><code>acceptance/programme/S03.toml</code> green; closure review published</td></tr>
+<tr><td>The decision ladder — four rungs, the laya contract and the draft gate</td><td>T2</td><td>8, 8, 8, 8</td><td><code>acceptance/programme/T2.toml</code>; Phase-G review naming <code>v1-t2-1</code></td></tr>
+<tr><td>The compose gate on a generated draft (<code>v1-t2-1</code>, P0)</td><td>T2</td><td>8, 8, 9, 5</td><td>a test proving <code>documents.compose</code> cannot attach a generated draft to a card</td></tr>
+<tr><td>Publishing a refinement is a gated policy change (<code>v1-t2-3</code>, P1)</td><td>T2</td><td>5, 5, 7, 5</td><td>a test proving an unapproved refinement never reaches evaluation</td></tr>
+<tr><td>A human decision names its gate, not any approved approval (<code>v1-t2-6</code>, P1)</td><td>T2</td><td>5, 6, 7, 8</td><td>a test proving an approval for another gate is refused</td></tr>
+<tr><td>The claim-exclusivity race proves the lease arm (<code>v1-s03-1</code>, P1)</td><td>S03</td><td>5, 5, 6, 5</td><td>32 distinct principals against one live lease; exactly one grant</td></tr>
+<tr><td>Budget code and index-claim corrections (<code>v1-t2-5</code>, <code>v1-s03-2</code>, P2)</td><td>T2, S03</td><td>2, 2, 2, 2</td><td>the exact refusal code asserted; the index claim restated</td></tr>
+</tbody></table>
+<h2>WSJF order</h2>
+<ol>
+<li><code>v1-t2-1</code> — 25 / 5 = <strong>5.0</strong> (the one defect that lets a model's output reach a card ungated)</li>
+<li><code>v1-t2-3</code> — 17 / 5 = <strong>3.4</strong></li>
+<li><code>v1-s03-1</code> — 16 / 5 = <strong>3.2</strong></li>
+<li>S03's lifecycle re-record — 21 / 8 = <strong>2.6</strong></li>
+<li><code>v1-t2-6</code> — 18 / 8 = <strong>2.25</strong></li>
+<li>the two P2 corrections — <strong>3.0</strong> as a pair, released with their owners</li>
+</ol>
+<p>The ordering is deliberately not the cheapest-first order: the ungated compose path is first because
+it makes a published §7.4 invariant unenforceable, and no amount of evidence work is worth anything
+while that is true.</p>
+<h2>Capacity and WIP</h2>
+<p>The work-in-progress limit is three packages: two code packages and one lifecycle record. At the
+time of planning, S03's lifecycle and T2's record are the two in-flight records, and <code>v1-t2-1</code> is
+the only code package in flight. The remaining four packages are queued behind it and are not
+started until it lands, because each of them touches the same ladder surface.</p>
+<h2>Evidence</h2>
+<ul>
+<li>The audit that produced the packages: <code>docs/evidence/rework/tranche-2/findings.json</code>, every
+evidence quote re-verified line by line against the tree at <code>7fa223b6</code>.</li>
+<li>The manifests: <code>acceptance/programme/S03.toml</code>, <code>acceptance/programme/T2.toml</code>.</li>
+<li>The acts: <code>docs/evidence/rework/tranche-2/acts.md</code>.</li>
+<li>The gate definitions: <code>docs/plans/slices/S03-domain-schema.md</code>; <code>docs/SPEC_V2.md</code> §7 and §12 T2.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Conveyor architecture principles — PF-1 - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Conveyor architecture principles — PF-1</li>
+<li>Phase: preliminary</li>
+<li>Kind: principles_catalog</li>
+<li>Purpose: The principles every delivery project designs under, adopted by the Architecture Board.</li>
+<li>Scope: The conveyor programme and every project in it; the estate services it absorbs.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>P1 / One model, one store, one action registry</strong> - {"evidence": "crates/actions/src/lib.rs; migrations/*.sql; crates/actions/tests/registry.rs", "implications": "A new capability is a table plus actions in this workspace, not a new service; no feature keeps a private file or cache as its record of truth.", "rationale": "The estate's pain is distributed fragments of one model; one registry makes permission, audit and replay uniform, and its exact set is asserted by its own test.", "statement": "A programme, its projects, their work, their decisions and their evidence are rows in one Postgres database written through one action registry; a concept has one table and one set of actions."}</li>
+<li><strong>P2 / Every mutation is an action; the database is not the API</strong> - {"evidence": "crates/actions/src/invoke.rs; the registry test committed_action_dump_matches_the_registry", "implications": "A new write is an action with a schema, a scope and a test; a read-only probe is BEGIN READ ONLY.", "rationale": "RFC 9457 errors, If-Match/_version preconditions, revision history and audit hang off the action envelope; a SQL write bypasses every one of them.", "statement": "A write goes through an action with its scope, tenant, precondition and event; no handler, UI or script writes rows by SQL."}</li>
+<li><strong>P3 / Tenant isolation is structural, not a filter</strong> - {"evidence": "crates/store/src/scope.rs; crates/actions/tests/registry.rs a_foreign_tenant_parent_id_resolves_to_404_never_to_a_write", "implications": "A new table ships with its policy in the same migration and a foreign-tenant 404 test; a session-level GUC through a pooler is forbidden.", "rationale": "The store's begin_scoped is the only path that sets the tenant GUC; a filtered query is one forgotten predicate away from a leak.", "statement": "Every tenant-owned table has RLS enabled and forced, and every query runs under the tenant's scope; a cross-tenant id resolves to 404."}</li>
+<li><strong>P4 / Publication is a decision, never a side effect</strong> - {"evidence": "crates/actions/src/documents/revisions.rs; crates/render/src/markdown.rs", "implications": "A new public surface filters on the public bit and carries the tenant; preview uses the same renderer as the public page.", "rationale": "The executor never approves its own work; documents.publish is the only action that moves the public bit, and the renderer neutralises raw HTML.", "statement": "A row is public only when an admin's publish decision makes it public; an author's write never publishes and author markup is never executable on the public page."}</li>
+<li><strong>P5 / Every output is versioned, attributable and reversible</strong> - {"evidence": "migrations/0042_document_workflow.sql; crates/store/src/document.rs", "implications": "A new aggregate that holds work products reuses the document model or carries the same provenance; deletion is a tombstone.", "rationale": "The programme is judged on its intermediate work products; an output a reviewer cannot trace to author, version and evidence is not auditable.", "statement": "A text output carries its author, a content hash and a revision history; every edit is versioned and a restore copies a version forward."}</li>
+<li><strong>P6 / Programme truth is computed, never hand-written</strong> - {"evidence": "scripts/build-coverage.py; scripts/build-programme-seed.py; scripts/check-output-standard.py", "implications": "A new programme fact gets a generator and a --check gate; a document may explain the truth but may not be its only home.", "rationale": "A hand-written status is the first thing to rot; the standard generates every project's expected set and the pack is built from the tree.", "statement": "A project's status, units, dependencies and expected outputs come from measured sources and are regenerated by scripts; a checklist is derived from the standard."}</li>
+<li><strong>P7 / Gates refuse; a gate that never refuses is broken</strong> - {"evidence": "crates/actions/tests/authoring_standard.rs; the 409 blocked_by gate in crates/actions/src/programme.rs", "implications": "A gate names what is missing and offers the next step; a refusal is covered at the boundary the caller uses.", "rationale": "The programme's publish and dependency gates exist because a publish without evidence happened; a refusal is the product, not an error path.", "statement": "A quality gate is a refusal with an actionable reason, exercised by a test that proves the refusal; a gate that never refused in a full cycle is treated as broken."}</li>
+<li><strong>P8 / Typed dependencies, explicit gates</strong> - {"evidence": "migrations/0044_plan_spine.sql; crates/actions/tests/plan_spine.rs", "implications": "A project's inception names its dependencies and the contract it sits under; a deviation is a decision record.", "rationale": "Untyped coupling hides the order the programme actually needs; the gate answers 409 blocked_by naming the open dependency.", "statement": "A dependency between projects is typed and the programme gate enforces the blocking kind; a tranche review is a programme decision on evidence."}</li>
+<li><strong>P9 / Secrets never leave their boundary</strong> - {"evidence": "crates/actions/src/documents/secrets.rs; scripts/ci/no-private-refs.sh", "implications": "A credential is referenced, never printed; a public output and the snapshot are scanned before publication.", "rationale": "The repository is public, so a leak is permanent; the secret aggregate stores only a sealed form.", "statement": "A secret is write-only; no action returns its value, and no secret, token or private host enters the public repository or a published output."}</li>
+<li><strong>P10 / The estate is one deployable service per concept, absorbed not duplicated</strong> - {"evidence": "docs/decisions/0005-absorption-sequence-and-repo-scope.md; crates/actions/src/ops/", "implications": "A new integration adds an action and a client in this workspace; a retired service's data is migrated, not forked.", "rationale": "ADR 0005 fixes the absorption sequence; the public repository cannot carry a hidden dependency on a private host.", "statement": "A service the organisation depends on is either this workspace's own code or an absorbed, contract-tested module behind an action; a second deployment of the same concept is retired."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>CI, runners and platform · conveyor output · published 2026-11-24T08:29:31.004848+00:00 · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
