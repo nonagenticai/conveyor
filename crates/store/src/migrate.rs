@@ -335,7 +335,10 @@ mod tests {
                 (94, "kata union".to_owned()),
                 // #526 (v1-w1b-5): the tenant's meta-role × action authority matrix; an absent
                 // row is the compiled §6.7 default (0095_job_authority.sql).
-                (95, "job authority".to_owned())
+                (95, "job authority".to_owned()),
+                // #526 (v1-w1a-5): the run kind, and the CHECK that a job run carries its binding
+                // and release pin (0096_run_kind.sql).
+                (96, "run kind".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
