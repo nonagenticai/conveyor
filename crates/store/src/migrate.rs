@@ -341,7 +341,10 @@ mod tests {
                 (96, "run kind".to_owned()),
                 // #526 (v1-p5-5): the work-package card CHECK and the job-run card CHECK
                 // (0097_work_package_card.sql).
-                (97, "work package card".to_owned())
+                (97, "work package card".to_owned()),
+                // #526 (v1-p55-1): the declared register links shape and its default
+                // (0098_register_links_shape.sql).
+                (98, "register links shape".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
