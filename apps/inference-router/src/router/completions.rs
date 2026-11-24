@@ -6,7 +6,6 @@
 
 use std::collections::VecDeque;
 use std::convert::Infallible;
-use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context as TaskContext, Poll};
 use std::time::{Duration, Instant};
@@ -716,11 +715,10 @@ async fn stream_completion(
     let outcome = if grace_ms == 0 {
         Some(open.as_mut().await)
     } else {
-        match tokio::time::timeout(Duration::from_millis(grace_ms), open.as_mut()).await {
-            Ok(outcome) => Some(outcome),
-            // The head goes out now; the open future stays alive in the body.
-            Err(_) => None,
-        }
+        // The head goes out now; the open future stays alive in the body.
+        tokio::time::timeout(Duration::from_millis(grace_ms), open.as_mut())
+            .await
+            .ok()
     };
 
     match outcome {
@@ -837,7 +835,7 @@ struct GracefulStream {
 
 enum Stage {
     Pending,
-    Open(RelayStream),
+    Open(Box<RelayStream>),
     Frames(VecDeque<Bytes>),
     Done,
 }
@@ -857,7 +855,7 @@ impl Stream for GracefulStream {
                     }
                     return Poll::Ready(None);
                 }
-                Stage::Open(mut relay) => match Pin::new(&mut relay).poll_next(cx) {
+                Stage::Open(mut relay) => match Pin::new(relay.as_mut()).poll_next(cx) {
                     Poll::Ready(Some(item)) => {
                         this.stage = Stage::Open(relay);
                         return Poll::Ready(Some(item));
@@ -902,7 +900,7 @@ fn open_graceful(this: &mut GracefulStream, outcome: StreamOutcome) {
     );
     match outcome.stream {
         Ok(served) => {
-            this.stage = Stage::Open(RelayStream::new(
+            this.stage = Stage::Open(Box::new(RelayStream::new(
                 this.state.clone(),
                 context,
                 this.request.clone(),
@@ -910,7 +908,7 @@ fn open_graceful(this: &mut GracefulStream, outcome: StreamOutcome) {
                 this.gate.reservation_id.clone(),
                 served,
                 this.started,
-            ));
+            )));
         }
         Err(refusal) => {
             let status = refusal.status;
