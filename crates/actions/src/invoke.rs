@@ -960,6 +960,46 @@ pub async fn precheck<'a>(
         enforce_run_budget(pool, registry, tenant, run_id).await?;
     }
 
+    // #526 (finding v1-w1b-5): the tenant's meta-role authority, resolved through the run's job
+    // binding (§6.7). This is the enforcement half of `store::job_authority::enforce_run_tx`: a
+    // binding narrows the tenant matrix and can never widen it (§4.4), so a delivery binding
+    // calling `coach.remedy` or `projects.baseline` is refused unless the tenant granted it or
+    // the binding's own `meta.authority` names the action. It runs before the input is parsed
+    // and before any handler transaction opens, so a refusal writes nothing.
+    //
+    // A `run_id` that names no row in this tenant is **not** gated: the same rule as the budget
+    // gate above — the engine's attribution may dangle, and a dangling id has no run (and so no
+    // binding meta-role) whose authority could be read.
+    if let Some(run_id) = request.usage.as_ref().and_then(|usage| usage.run_id) {
+        let mut tx = store::begin_scoped_read_only(pool, tenant)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, run = %run_id, "scope the run's job authority read");
+                ActionError::internal()
+            })?;
+        let authority =
+            store::job_authority::enforce_run_tx(&mut tx, tenant, run_id, spec.name).await;
+        let _ = tx.rollback().await;
+        match authority {
+            Ok(()) | Err(store::job_authority::JobAuthorityError::RunNotFound { .. }) => {}
+            Err(store::job_authority::JobAuthorityError::Forbidden { meta_role, action }) => {
+                return Err(ActionError::new(
+                    403,
+                    "job_authority_forbidden",
+                    format!(
+                        "SPEC_V2 §6.7: the run's job binding resolves meta-role \
+                         {meta_role:?}, which the tenant has not granted {action}; the tenant \
+                         must grant it before this action may run"
+                    ),
+                ));
+            }
+            Err(store::job_authority::JobAuthorityError::Database(error)) => {
+                tracing::error!(%error, run = %run_id, "read the run's job authority");
+                return Err(ActionError::internal());
+            }
+        }
+    }
+
     // The reserved `_version` member is stripped BEFORE validation (CONTRACT §6); the
     // header, when present, has already been folded into `precondition` by the route. A
     // JSON number is a row version; a JSON string is an opaque ETag (a table with no
