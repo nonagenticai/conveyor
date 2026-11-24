@@ -61,6 +61,10 @@ ALTER TABLE decision_option_entry
 
 ALTER TABLE decision_option_entry DROP CONSTRAINT decision_option_set_option_pkey;
 ALTER TABLE decision_option_entry ADD PRIMARY KEY (id);
+-- Both insert paths (S21's author_option_set_tx and the lane's insert_option_entry_tx) rely on
+-- the id being generated: the lane's 0087 declared `id uuid PRIMARY KEY DEFAULT uuidv7()`, and
+-- main's child had no id at all. Without the default every authoring insert violates NOT NULL.
+ALTER TABLE decision_option_entry ALTER COLUMN id SET DEFAULT uuidv7();
 ALTER TABLE decision_option_entry
     ADD CONSTRAINT decision_option_entry_tenant_fk
         FOREIGN KEY (tenant_id) REFERENCES tenant (id) ON DELETE CASCADE,
