@@ -338,7 +338,10 @@ mod tests {
                 (95, "job authority".to_owned()),
                 // #526 (v1-w1a-5): the run kind, and the CHECK that a job run carries its binding
                 // and release pin (0096_run_kind.sql).
-                (96, "run kind".to_owned())
+                (96, "run kind".to_owned()),
+                // #526 (v1-p5-5): the work-package card CHECK and the job-run card CHECK
+                // (0097_work_package_card.sql).
+                (97, "work package card".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
