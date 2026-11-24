@@ -2781,6 +2781,11 @@
   },
   {
    "id": "v1-w4b-5",
+   "resolved_by": {
+    "commit": "798bec56daeabca7aa016ee1e16724db65e49325",
+    "test": "crates/actions/tests/approval_evidence.rs::a_destructive_gate_refuses_an_evidence_less_request; crates/actions/tests/metrics.rs::a_gate_with_no_refusal_is_flagged_and_one_refusal_clears_it",
+    "evidence": "cargo-guard test -p conveyor-actions --test metrics: 14 passed; --test approval_evidence: 7 passed; -p conveyor-store --test s07_schema: 3 passed at 798bec56. The engine records each refusal in its committed failure transaction (evidence, target, expiry); a refusal row clears the never-refused flag without a rejection"
+   },
    "area": "\u00a714/R5",
    "standard": "SPEC",
    "spec": "\u00a75.4, \u00a77.5",
