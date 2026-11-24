@@ -53,6 +53,9 @@ pub mod inference;
 pub mod ingest;
 pub mod integrations;
 pub mod invoke;
+// T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata — six Gets, the pre-registered
+// prediction and the held-out measurement, on an ordinary V2 binding.
+pub mod kata;
 // S15: capability-bound retrieval from strata platform packs.
 pub mod knowledge;
 pub mod lock;

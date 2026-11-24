@@ -118,7 +118,7 @@ use serde_json::{Value, json};
 /// asset authoring family. 513 → 518. **T19 (#606) adds 12 internal**: the meetings family
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
 /// `minutes_publish|list|get`) — 518 → **530**.
-const EXPECTED: [&str; 530] = [
+const EXPECTED: [&str; 538] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -350,6 +350,14 @@ const EXPECTED: [&str; 530] = [
     "job_releases.retire",
     "jobs.list",
     "jobs.retry",
+    "kata.adopt",
+    "kata.analyse",
+    "kata.get",
+    "kata.hypothesise",
+    "kata.measure",
+    "kata.observe",
+    "kata.open",
+    "kata.propose",
     "knowledge.query",
     "labels.create",
     "labels.delete",
@@ -746,7 +754,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // T17 (#87) adds five internal actions (`authoring.intake|draft|review|publish|assets`):
     // 495 -> 500; external stays 18. T19 (#606) adds twelve internal meetings actions:
     // 500 -> 512; external stays 18.
-    assert_eq!((internal, external), (512, 18));
+    // T5 (#77) adds eight internal actions — P1's `kata.open|get|observe|analyse|hypothesise|`
+    // `propose|measure` and P2–P4's `kata.adopt`: internal 512 -> 520; external stays 18.
+    assert_eq!((internal, external), (520, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

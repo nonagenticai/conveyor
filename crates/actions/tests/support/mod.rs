@@ -12,6 +12,7 @@
 //! dev principals `dev-a`/`alice` and `dev-b`/`bob` **with active app_licence rows** —
 //! because the invocation route is licence-gated (S04 decision 9).
 
+pub mod kata;
 pub mod redis;
 
 use std::net::SocketAddr;
