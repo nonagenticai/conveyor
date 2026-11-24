@@ -4,10 +4,12 @@
 //! headers; every one is optional and a malformed value is simply absent — a bad header must
 //! never fail a customer's inference.
 
+use std::collections::VecDeque;
 use std::convert::Infallible;
+use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context as TaskContext, Poll};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use axum::Json;
 use axum::body::{Body, Bytes};
@@ -27,10 +29,10 @@ use crate::metering::{
     CostEvent, ZERO_COST_USD, licence_is_absent, tenant_id_rejection_reason, tenant_is_unattributed,
 };
 use crate::policy::{self, ResolvedHop};
-use crate::provider::ChunkStream;
+use crate::provider::{BoxFuture, ChunkStream};
 use crate::routing::{
     CompletionOutcome, OUTCOME_EMPTY, OUTCOME_EMPTY_RESULT, OUTCOME_ERROR, OUTCOME_OK,
-    ProviderAttempt, Refusal, ServedHop, ServedStream,
+    ProviderAttempt, Refusal, ServedHop, ServedStream, StreamOutcome,
 };
 use crate::state::AppState;
 use crate::stream::{
@@ -661,6 +663,11 @@ fn cost_event(
 /// chunk unchanged and books exactly one row when the stream ends (completed, upstream error or
 /// client disconnect). A stream that never opens still books one row, with `stream_status` null
 /// and the HTTP code as its status.
+///
+/// The head is flushed before the upstream's first chunk when the open takes longer than
+/// `stream_headers_grace_ms`: a callers' first-byte budget must not be spent on a prefill.
+/// Failures that arrive inside the grace keep their HTTP status, because the grace covers the
+/// provider slot wait — a shed is still a 503, never a mid-stream surprise.
 async fn stream_completion(
     state: AppState,
     headers: HeaderMap,
@@ -671,12 +678,20 @@ async fn stream_completion(
     let started = Instant::now();
     let x_provider = headers
         .get("x-provider")
-        .and_then(|value| value.to_str().ok());
-    let decision = match tenant_policy(&state, &identity, &effective, &request, x_provider).await {
+        .and_then(|value| value.to_str().ok())
+        .map(str::to_owned);
+    let decision = match tenant_policy(
+        &state,
+        &identity,
+        &effective,
+        &request,
+        x_provider.as_deref(),
+    )
+    .await
+    {
         Ok(decision) => decision,
         Err(refusal) => return refusal.into_response(),
     };
-    let hops = decision.as_ref().map(|decision| decision.hops.as_slice());
     let tenant = effective.tenant_id.as_deref().unwrap_or_default();
     let gate = state
         .deps()
@@ -686,52 +701,304 @@ async fn stream_completion(
     if state.config().budget_gate_mode == GateMode::Enforce && gate.reason.deniable() {
         return budget_refusal(&gate).into_response();
     }
-    let outcome = state.router().stream(&request, x_provider, hops).await;
-    let context = attributed(
+
+    // Owned so the response body can keep waiting after the head has been sent.
+    let open_router = state.router_shared();
+    let open_request = request.clone();
+    let open_hops = decision.as_ref().map(|decision| decision.hops.clone());
+    let mut open: BoxFuture<'static, StreamOutcome> = Box::pin(async move {
+        open_router
+            .stream(&open_request, x_provider.as_deref(), open_hops.as_deref())
+            .await
+    });
+
+    let grace_ms = state.config().stream_headers_grace_ms;
+    let outcome = if grace_ms == 0 {
+        Some(open.as_mut().await)
+    } else {
+        match tokio::time::timeout(Duration::from_millis(grace_ms), open.as_mut()).await {
+            Ok(outcome) => Some(outcome),
+            // The head goes out now; the open future stays alive in the body.
+            Err(_) => None,
+        }
+    };
+
+    match outcome {
+        Some(outcome) => {
+            let context = stream_context(
+                &state,
+                &headers,
+                &identity,
+                &effective,
+                decision.as_ref(),
+                outcome.served_hop.as_ref(),
+            );
+            match outcome.stream {
+                Ok(served) => sse_response(Body::from_stream(RelayStream::new(
+                    state,
+                    context,
+                    request,
+                    outcome.attempts,
+                    gate.reservation_id.clone(),
+                    served,
+                    started,
+                ))),
+                Err(refusal) => {
+                    record_unopened_stream(
+                        &state,
+                        context,
+                        &request,
+                        &outcome.attempts,
+                        refusal.status,
+                        gate.reservation_id.as_deref(),
+                        started,
+                    )
+                    .await;
+                    refusal.into_response()
+                }
+            }
+        }
+        None => {
+            let ticker =
+                tokio::time::interval(Duration::from_millis(state.config().stream_keepalive_ms));
+            let body = GracefulStream {
+                state,
+                headers,
+                request,
+                identity,
+                effective,
+                decision,
+                gate,
+                started,
+                open,
+                ticker,
+                stage: Stage::Pending,
+            };
+            sse_response(Body::from_stream(body))
+        }
+    }
+}
+
+/// A legal SSE comment: parsers ignore it, but it is a body byte, so the caller's idle watchdog
+/// and every proxy between here and it see progress while the upstream is still prefilling.
+const SSE_KEEPALIVE: &[u8] = b": keepalive\n\n";
+
+fn sse_response(body: Body) -> Response {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header("content-type", "text/event-stream; charset=utf-8")
+        .header("cache-control", "no-cache")
+        .header("connection", "keep-alive")
+        .header("x-accel-buffering", "no")
+        .body(body)
+        .expect("a static response head is valid")
+}
+
+fn stream_context(
+    state: &AppState,
+    headers: &HeaderMap,
+    identity: &CallerIdentity,
+    effective: &EffectiveTenant,
+    decision: Option<&PolicyDecision>,
+    served_hop: Option<&ServedHop>,
+) -> CallContext {
+    attributed(
         CallContext {
             tenant_id: effective.tenant_id.clone(),
             license_id: identity.license_id.clone(),
             delegated_by: effective.delegated_by.clone(),
-            actor_id: actor_id(&headers, state.config().service_actor_id.as_deref()),
+            actor_id: actor_id(headers, state.config().service_actor_id.as_deref()),
             ..CallContext::default()
         },
-        &headers,
-        decision.as_ref(),
+        headers,
+        decision,
+        served_hop,
+    )
+}
+
+/// The body of a stream whose head went out before the upstream opened. It yields keepalives
+/// while the open is pending, then relays everything exactly as the buffered path does. An open
+/// that fails after the head becomes an OpenAI-style `{"error": …}` frame plus `[DONE]`, with the
+/// same never-opened ledger row the buffered path writes (the refusal's HTTP code is the row's
+/// status even though the client already has a 200).
+struct GracefulStream {
+    state: AppState,
+    headers: HeaderMap,
+    request: ChatCompletionRequest,
+    identity: CallerIdentity,
+    effective: EffectiveTenant,
+    decision: Option<PolicyDecision>,
+    gate: crate::billing::GateDecision,
+    started: Instant,
+    open: BoxFuture<'static, StreamOutcome>,
+    ticker: tokio::time::Interval,
+    stage: Stage,
+}
+
+enum Stage {
+    Pending,
+    Open(RelayStream),
+    Frames(VecDeque<Bytes>),
+    Done,
+}
+
+impl Stream for GracefulStream {
+    type Item = Result<Bytes, Infallible>;
+
+    fn poll_next(self: Pin<&mut Self>, cx: &mut TaskContext<'_>) -> Poll<Option<Self::Item>> {
+        let this = self.get_mut();
+        loop {
+            match std::mem::replace(&mut this.stage, Stage::Done) {
+                Stage::Done => return Poll::Ready(None),
+                Stage::Frames(mut frames) => {
+                    if let Some(frame) = frames.pop_front() {
+                        this.stage = Stage::Frames(frames);
+                        return Poll::Ready(Some(Ok(frame)));
+                    }
+                    return Poll::Ready(None);
+                }
+                Stage::Open(mut relay) => match Pin::new(&mut relay).poll_next(cx) {
+                    Poll::Ready(Some(item)) => {
+                        this.stage = Stage::Open(relay);
+                        return Poll::Ready(Some(item));
+                    }
+                    Poll::Ready(None) => return Poll::Ready(None),
+                    Poll::Pending => {
+                        this.stage = Stage::Open(relay);
+                        return Poll::Pending;
+                    }
+                },
+                Stage::Pending => {
+                    if let Poll::Ready(outcome) = this.open.as_mut().poll(cx) {
+                        open_graceful(this, outcome);
+                        continue;
+                    }
+                    match this.ticker.poll_tick(cx) {
+                        Poll::Ready(_) => {
+                            this.stage = Stage::Pending;
+                            return Poll::Ready(Some(Ok(Bytes::from_static(SSE_KEEPALIVE))));
+                        }
+                        Poll::Pending => {
+                            this.stage = Stage::Pending;
+                            return Poll::Pending;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// The open resolved after the head was sent: hand over to the normal relay, or end the stream
+/// with an error frame and the never-opened ledger row.
+fn open_graceful(this: &mut GracefulStream, outcome: StreamOutcome) {
+    let context = stream_context(
+        &this.state,
+        &this.headers,
+        &this.identity,
+        &this.effective,
+        this.decision.as_ref(),
         outcome.served_hop.as_ref(),
     );
     match outcome.stream {
         Ok(served) => {
-            let relay = RelayStream::new(
+            this.stage = Stage::Open(RelayStream::new(
+                this.state.clone(),
+                context,
+                this.request.clone(),
+                outcome.attempts,
+                this.gate.reservation_id.clone(),
+                served,
+                this.started,
+            ));
+        }
+        Err(refusal) => {
+            let status = refusal.status;
+            let attempts = outcome.attempts;
+            let frame = stream_error_frame(&refusal);
+            if let Ok(handle) = tokio::runtime::Handle::try_current() {
+                let state = this.state.clone();
+                let request = this.request.clone();
+                let reservation_id = this.gate.reservation_id.clone();
+                let started = this.started;
+                handle.spawn(async move {
+                    record_unopened_stream(
+                        &state,
+                        context,
+                        &request,
+                        &attempts,
+                        status,
+                        reservation_id.as_deref(),
+                        started,
+                    )
+                    .await;
+                });
+            }
+            this.stage = Stage::Frames(VecDeque::from([
+                frame,
+                Bytes::from_static(b"data: [DONE]\n\n"),
+            ]));
+        }
+    }
+}
+
+/// An OpenAI-shaped error frame for a failure that happened after the head went out. A `detail`
+/// refusal is wrapped; an `error` refusal is sent as-is.
+fn stream_error_frame(refusal: &Refusal) -> Bytes {
+    let payload = if refusal.body.get("error").is_some() {
+        refusal.body.clone()
+    } else {
+        serde_json::json!({
+            "error": {
+                "message": refusal
+                    .body
+                    .get("detail")
+                    .and_then(serde_json::Value::as_str)
+                    .unwrap_or("the upstream stream could not be opened"),
+                "type": "upstream_error",
+                "code": refusal.status.as_u16(),
+            }
+        })
+    };
+    Bytes::from(format!("data: {payload}\n\n"))
+}
+
+impl Drop for GracefulStream {
+    fn drop(&mut self) {
+        // A consumer that stops polling before the open is a disconnect, exactly as it is for
+        // RelayStream; the row is written here because no stream was ever opened.
+        if !matches!(self.stage, Stage::Pending) {
+            return;
+        }
+        let Ok(handle) = tokio::runtime::Handle::try_current() else {
+            tracing::warn!("stream ledger write skipped: no runtime at disconnect");
+            return;
+        };
+        let context = stream_context(
+            &self.state,
+            &self.headers,
+            &self.identity,
+            &self.effective,
+            self.decision.as_ref(),
+            None,
+        );
+        let state = self.state.clone();
+        let request = self.request.clone();
+        let reservation_id = self.gate.reservation_id.clone();
+        let started = self.started;
+        handle.spawn(async move {
+            finalise_stream(
                 state,
                 context,
                 request,
-                outcome.attempts,
-                gate.reservation_id.clone(),
-                served,
+                Vec::new(),
+                reservation_id,
                 started,
-            );
-            Response::builder()
-                .status(StatusCode::OK)
-                .header("content-type", "text/event-stream; charset=utf-8")
-                .header("cache-control", "no-cache")
-                .header("connection", "keep-alive")
-                .header("x-accel-buffering", "no")
-                .body(Body::from_stream(relay))
-                .expect("a static response head is valid")
-        }
-        Err(refusal) => {
-            record_unopened_stream(
-                &state,
-                context,
-                &request,
-                &outcome.attempts,
-                refusal.status,
-                gate.reservation_id.as_deref(),
-                started,
+                StreamCapture::default(),
+                STREAM_CLIENT_DISCONNECT,
             )
             .await;
-            refusal.into_response()
-        }
+        });
     }
 }
 
@@ -1064,6 +1331,8 @@ mod tests {
     struct Stub {
         body: Value,
         last: Mutex<Option<Value>>,
+        delay: std::time::Duration,
+        fail_status: Option<u16>,
     }
 
     async fn handler(
@@ -1073,6 +1342,18 @@ mod tests {
         use axum::response::IntoResponse;
 
         *stub.last.lock().await = Some(body.clone());
+        if !stub.delay.is_zero() {
+            tokio::time::sleep(stub.delay).await;
+        }
+        if let Some(status) = stub.fail_status {
+            return (
+                axum::http::StatusCode::from_u16(status).expect("valid stub status"),
+                axum::Json(json!({
+                    "error": {"message": "stub provider failure", "type": "server_error"}
+                })),
+            )
+                .into_response();
+        }
         if body.get("stream").and_then(Value::as_bool).unwrap_or(false) {
             // The same five frames the oracle stub sends: four content/finish frames and the
             // usage-bearing terminal frame, then [DONE].
@@ -1099,6 +1380,14 @@ mod tests {
     }
 
     async fn state_with_stub() -> (AppState, Arc<Stub>) {
+        state_with_stub_options(std::time::Duration::ZERO, None, &[]).await
+    }
+
+    async fn state_with_stub_options(
+        delay: std::time::Duration,
+        fail_status: Option<u16>,
+        env: &[(&str, &str)],
+    ) -> (AppState, Arc<Stub>) {
         let stub = Arc::new(Stub {
             body: json!({
                 "id": "chatcmpl-test",
@@ -1107,6 +1396,8 @@ mod tests {
                 "usage": {"prompt_tokens": 1, "completion_tokens": 2, "total_tokens": 3}
             }),
             last: Mutex::new(None),
+            delay,
+            fail_status,
         });
         let app = Router::new()
             .route("/v1/chat/completions", post(handler))
@@ -1121,7 +1412,12 @@ mod tests {
             "providers:\n  - name: pgx-local\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: local-llm\n    model_aliases:\n      local-llm: local-llm\ndefault_chain: [pgx-local]\n"
         );
         let catalog = Catalog::from_yaml(&yaml).expect("catalog");
-        let config = crate::config::Config::from_lookup(|_| None).expect("defaults");
+        let map: std::collections::HashMap<String, String> = env
+            .iter()
+            .map(|(key, value)| ((*key).to_owned(), (*value).to_owned()))
+            .collect();
+        let config =
+            crate::config::Config::from_lookup(|key| map.get(key).cloned()).expect("config");
         let router =
             RouterService::new(catalog, std::time::Duration::from_secs(1)).expect("router");
         (AppState::new(config, router), stub)
@@ -1197,6 +1493,133 @@ mod tests {
         assert!(text.contains("\"served_provider\":\"pgx-local\""));
         assert!(text.contains("\"served_model\":\"stub-model\""));
         assert!(text.contains("\"provider_request_id\":\"chatcmpl-stub\""));
+    }
+
+    fn stream_request() -> Request<Body> {
+        Request::post("/api/chat/completions")
+            .header("content-type", "application/json")
+            .body(body(true))
+            .expect("request")
+    }
+
+    async fn body_text(response: axum::response::Response) -> String {
+        let bytes = axum::body::to_bytes(response.into_body(), usize::MAX)
+            .await
+            .expect("body");
+        String::from_utf8(bytes.to_vec()).expect("utf8")
+    }
+
+    /// The head must go out inside the caller's first-byte budget, not after a long prefill.
+    #[tokio::test]
+    async fn a_slow_open_flushes_headers_and_keepalives() {
+        let (state, _stub) = state_with_stub_options(
+            std::time::Duration::from_millis(400),
+            None,
+            &[
+                ("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS", "50"),
+                ("INFERENCE_ROUTER_STREAM_KEEPALIVE_MS", "20"),
+                ("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT", "0.05"),
+            ],
+        )
+        .await;
+        let started = std::time::Instant::now();
+        let response = crate::router::router(state)
+            .oneshot(stream_request())
+            .await
+            .expect("router answers");
+        let head = started.elapsed();
+        assert_eq!(response.status(), axum::http::StatusCode::OK);
+        assert!(
+            head < std::time::Duration::from_millis(300),
+            "the head waited for the first chunk: {head:?}"
+        );
+        let text = body_text(response).await;
+        assert!(text.starts_with(": keepalive\n\n"), "{text}");
+        assert_eq!(text.matches("data: ").count(), 6);
+        assert!(text.ends_with("data: [DONE]\n\n"));
+        assert!(text.contains("\"content\":\"stub \""));
+    }
+
+    #[tokio::test]
+    async fn keepalives_are_emitted_while_the_open_is_pending() {
+        let (state, _stub) = state_with_stub_options(
+            std::time::Duration::from_millis(300),
+            None,
+            &[
+                ("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS", "20"),
+                ("INFERENCE_ROUTER_STREAM_KEEPALIVE_MS", "20"),
+                ("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT", "0.02"),
+            ],
+        )
+        .await;
+        let response = crate::router::router(state)
+            .oneshot(stream_request())
+            .await
+            .expect("router answers");
+        let text = body_text(response).await;
+        assert!(
+            text.matches(": keepalive").count() >= 2,
+            "one keepalive is not a cadence: {text}"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_refusal_after_the_grace_ends_with_an_error_frame() {
+        let (state, _stub) = state_with_stub_options(
+            std::time::Duration::from_millis(300),
+            Some(500),
+            &[
+                ("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS", "50"),
+                ("INFERENCE_ROUTER_STREAM_KEEPALIVE_MS", "20"),
+                ("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT", "0.05"),
+            ],
+        )
+        .await;
+        let response = crate::router::router(state)
+            .oneshot(stream_request())
+            .await
+            .expect("router answers");
+        assert_eq!(response.status(), axum::http::StatusCode::OK);
+        let text = body_text(response).await;
+        assert!(text.starts_with(": keepalive\n\n"), "{text}");
+        assert!(text.contains("data: {\"error\""), "{text}");
+        assert!(text.ends_with("data: [DONE]\n\n"), "{text}");
+    }
+
+    /// A failure inside the grace is still an HTTP refusal: the early-flush path must not have
+    /// started, so shed/connect statuses keep their meaning for retrying callers.
+    #[tokio::test]
+    async fn a_refusal_inside_the_grace_keeps_its_status() {
+        let (baseline, _) = state_with_stub_options(
+            std::time::Duration::from_millis(30),
+            Some(500),
+            &[
+                ("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS", "0"),
+                ("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT", "0.05"),
+            ],
+        )
+        .await;
+        let baseline_status = crate::router::router(baseline)
+            .oneshot(stream_request())
+            .await
+            .expect("router answers")
+            .status();
+        let (early, _) = state_with_stub_options(
+            std::time::Duration::from_millis(30),
+            Some(500),
+            &[
+                ("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS", "5000"),
+                ("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT", "0.05"),
+            ],
+        )
+        .await;
+        let status = crate::router::router(early)
+            .oneshot(stream_request())
+            .await
+            .expect("router answers")
+            .status();
+        assert_eq!(status, baseline_status);
+        assert!(!status.is_success());
     }
 
     #[test]
