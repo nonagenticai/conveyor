@@ -276,9 +276,38 @@ pub fn validate_evidence(step: Step, evidence: &Value) -> Result<(), EvidenceErr
                 return Err(EvidenceError("`tested` must be a boolean".to_owned()));
             }
             string_array(evidence, "evidence")?;
+            // Every migration must be expand/contract (backward-compatible with the
+            // immediately prior release), because the runtime migrator lets the prior release
+            // start against the newer schema. A deploy whose migrations are *not* additive
+            // forbids an application-only rollback: the plan must name the restore path
+            // instead (issue #669; `migrations/README.md`).
+            let backward_compatible = evidence
+                .get("backward_compatible")
+                .and_then(Value::as_bool)
+                .ok_or_else(|| {
+                    EvidenceError("`backward_compatible` must be a boolean".to_owned())
+                })?;
+            if !backward_compatible {
+                non_empty(evidence, "restore_path").map_err(|_| {
+                    EvidenceError(
+                        "`restore_path` is required when `backward_compatible` is false: a \
+                         non-additive migration requires a restore-based rollback through the \
+                         gated ops path, never an application-only rollback"
+                            .to_owned(),
+                    )
+                })?;
+            }
         }
         Step::Deploy => {
             non_empty(evidence, "digest")?;
+            let generation = integer(evidence, "migration_generation")?;
+            if generation < 1 {
+                return Err(EvidenceError(
+                    "`migration_generation` must be the positive max applied migration version \
+                     at deploy time"
+                        .to_owned(),
+                ));
+            }
         }
         Step::LiveVerify => {
             let status = integer(evidence, "health_status")?;
@@ -310,6 +339,14 @@ pub fn validate_evidence(step: Step, evidence: &Value) -> Result<(), EvidenceErr
                 return Err(EvidenceError(format!(
                     "`health_status` must be 200, got {status}"
                 )));
+            }
+            let generation = integer(evidence, "migration_generation")?;
+            if generation < 1 {
+                return Err(EvidenceError(
+                    "`migration_generation` must be the positive max applied migration version \
+                     at deploy time"
+                        .to_owned(),
+                ));
             }
             string_array(evidence, "evidence")?;
         }
@@ -569,7 +606,87 @@ mod tests {
                     "prior_digest": "sha256:old",
                     "method": "flux rollback",
                     "tested": true,
+                    "backward_compatible": true,
                     "evidence": ["staging rollback 2026-11-24"],
+                })
+            )
+            .is_ok()
+        );
+        assert!(
+            validate_evidence(
+                Step::RollbackPlan,
+                &json!({
+                    "prior_digest": "sha256:old",
+                    "method": "flux rollback",
+                    "tested": true,
+                    "evidence": ["staging rollback 2026-11-24"],
+                })
+            )
+            .is_err(),
+            "a rollback plan must declare whether the deploy's migrations are expand/contract"
+        );
+        assert!(
+            validate_evidence(
+                Step::RollbackPlan,
+                &json!({
+                    "prior_digest": "sha256:old",
+                    "method": "restore the database",
+                    "tested": true,
+                    "backward_compatible": false,
+                    "evidence": ["staging restore exercised 2026-11-24"],
+                })
+            )
+            .is_err(),
+            "a non-additive deploy must name the restore path, not an application rollback"
+        );
+        assert!(
+            validate_evidence(
+                Step::RollbackPlan,
+                &json!({
+                    "prior_digest": "sha256:old",
+                    "method": "restore the database",
+                    "tested": true,
+                    "backward_compatible": false,
+                    "restore_path": "ops: restore the nightly dump to generation 69",
+                    "evidence": ["staging restore exercised 2026-11-24"],
+                })
+            )
+            .is_ok()
+        );
+        assert!(
+            validate_evidence(
+                Step::Deploy,
+                &json!({"digest": "sha256:new", "migration_generation": 70})
+            )
+            .is_ok()
+        );
+        assert!(
+            validate_evidence(Step::Deploy, &json!({"digest": "sha256:new"})).is_err(),
+            "a deploy records the max applied migration version (the schema generation)"
+        );
+        assert!(
+            validate_evidence(
+                Step::RollbackExercise,
+                &json!({
+                    "deployed_digest": "sha256:new",
+                    "restored_digest": "sha256:new",
+                    "migration_generation": 70,
+                    "health_status": 200,
+                    "evidence": ["health 200"],
+                })
+            )
+            .is_err(),
+            "a rollback that restored the same digest did not roll back"
+        );
+        assert!(
+            validate_evidence(
+                Step::RollbackExercise,
+                &json!({
+                    "deployed_digest": "sha256:new",
+                    "restored_digest": "sha256:old",
+                    "migration_generation": 70,
+                    "health_status": 200,
+                    "evidence": ["health 200 at the prior digest"],
                 })
             )
             .is_ok()
@@ -579,13 +696,13 @@ mod tests {
                 Step::RollbackExercise,
                 &json!({
                     "deployed_digest": "sha256:new",
-                    "restored_digest": "sha256:new",
+                    "restored_digest": "sha256:old",
                     "health_status": 200,
-                    "evidence": ["health 200"],
+                    "evidence": ["health 200 at the prior digest"],
                 })
             )
             .is_err(),
-            "a rollback that restored the same digest did not roll back"
+            "a rollback names the schema generation it exercised against"
         );
     }
 

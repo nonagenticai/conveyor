@@ -213,7 +213,7 @@ pub use list::{ListStoreError, NewList};
 pub use listen::{EventListen, ListenError, probe_direct};
 pub use migrate::{
     MIGRATOR, RUNTIME_GRANTS_SQL, RUNTIME_ROLE, StoreMigrateError, apply_runtime_grants,
-    assert_runtime_role, migrate,
+    assert_runtime_role, migrate, runtime_migrator,
 };
 // The model store functions are called through `store::model::`; the import path's
 // head-only writer is re-exported here too because it is the SECOND public freeze entry
