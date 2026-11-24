@@ -40,12 +40,14 @@ rework `v1-w1c-3:T2`, `v1-w1c-4:T2`, `v1-w1c-5:T2`
 5. **Options are authored, versioned rows.** Migration `0068` adds `decision_option_set` and
    `decision_option_set_option`: one live set per `(tenant, kind, gate)`, a monotonically increasing
    `version`, and rows carrying `key`, `label`, `payload` and an explicit `payload.outcome ∈
-   accepted | refused | escalated`. `decision_option_sets.set` authors a set (a version bump, never
-   an in-place edit) and `decision_option_sets.get` reads it. A `choice` question is built from the
-   authored labels; the answer must be an authored key (`422 laya_answer_not_in_options`); a case
-   that needs a `choice` and has no authored set is refused `409 option_set_missing`, never
-   answered from free text. `decision_option` remains the per-decision record of the option set it
-   evaluated, written from the authored rows.
+   accepted | refused | escalated`. `decision_option_sets.set` authors a set (the one row's version
+   increments and its children are replaced in the same transaction) and `decision_option_sets.get`
+   reads it. A policy declares the question type as `meta.question_type = "choice"` (absent means
+   `score`); a `choice` question's criteria are the authored **keys** and its instructions list
+   `key — label`. The answer must be an authored key (`422 laya_answer_not_in_options`); a declared
+   choice with no authored set is refused `409 option_set_missing`, never answered from free text.
+   `decision_option` remains the per-decision record of the option set it evaluated, written from
+   the authored rows.
 
 6. **`Unavailable` follows the fail policy; it is never a pass.** `domain::ladder::unavailable`
    already maps `closed → refused` and `open → the policy's action` (handover → escalated, block →
@@ -59,9 +61,11 @@ rework `v1-w1c-3:T2`, `v1-w1c-4:T2`, `v1-w1c-5:T2`
 
 7. **`fire_when` decides whether the case is asked.** `decision_policy` gains a nullable
    `fire_when` expression in migration `0068`. When it does not hold for the resolved case, no laya
-   request is made and no decision is written. Its first form is a small structured expression
-   (`{"all_of": [...]}` / `{"any_of": [...]}` over `{kind, gate, field}` predicates), evaluated in
-   `crates/domain`; an unparseable expression refuses the policy at authoring time.
+   request is made, no decision is written, and the step proceeds. Its first form is a small
+   structured expression (`{"all_of": [...]}` / `{"any_of": [...]}` over `{kind, gate, field}`
+   predicates), evaluated in `crates/domain`; `field` names a member of the case's fact document
+   `{output, criteria, facts}` and must be present and non-null. An unparseable expression refuses
+   the policy at authoring time (`422 invalid_fire_when`).
 
 8. **The executor's gate becomes a client of the same path.** `internal_agent` stops calling
    `laya.judge` and stops handing an answer to the ladder. It builds the case with the shared

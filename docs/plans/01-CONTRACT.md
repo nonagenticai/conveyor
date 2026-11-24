@@ -1064,11 +1064,13 @@ laya_call_unverified` and writes nothing.
 
 **Options are authored, versioned rows.** One live option set per `(tenant, kind, gate)`, versioned;
 each row carries `key`, `label`, `payload` and `payload.outcome ∈ accepted | refused | escalated`.
-`decision_option_sets.set` authors a set (a version bump, never an in-place edit);
-`decision_option_sets.get` reads it. A `choice` question is built from the authored labels; an
-answer outside the set is `422 laya_answer_not_in_options`; a case that needs a choice and has no
-authored set is `409 option_set_missing`. Inline options are `422 invalid_input`.
-`decision_option` remains the per-decision record and is written from the authored rows.
+`decision_option_sets.set` authors a set (the one row's version increments and its children are
+replaced in the same transaction); `decision_option_sets.get` reads it. A policy declares
+`meta.question_type = "choice"` (absent means the SOP judge's `score`); a `choice` question's
+criteria are the authored keys and its instructions list `key — label`. An answer outside the set is
+`422 laya_answer_not_in_options`; a declared choice with no authored set is `409 option_set_missing`.
+Inline options are `422 invalid_input`. `decision_option` remains the per-decision record and is
+written from the authored rows.
 
 **`Unavailable` follows the fail policy.** An outage — the service unreachable, the call never
 completed — leaves no recorded exchange, so `ladder.evaluate` writes no decision and the caller (the
@@ -1080,9 +1082,11 @@ a pass and never a silent refusal — the mapping is `domain::ladder::unavailabl
 every caller reads.
 
 **`fire_when` decides whether the case is asked.** A policy's nullable `fire_when` is evaluated when
-the case resolves; when it does not hold, no request is made and no decision is written. The
-expression is structured (`all_of` / `any_of` over `{kind, gate, field}` predicates), so an
-unparseable policy is refused at authoring time, not at evaluation.
+the case resolves; when it does not hold, no request is made, no decision is written, and the step
+proceeds. The expression is structured (`all_of` / `any_of` over `{kind, gate, field}` predicates),
+where `field` names a member of the case's fact document `{output, criteria, facts}` that must be
+present and non-null; an unparseable policy is refused at authoring time (`422
+invalid_fire_when`), not at evaluation.
 
 **The executor is a client of this path.** `internal_agent`'s `gate.precheck` builds the case with
 the shared builder, invokes `ladder.precheck`, then `ladder.evaluate` with the returned key. It

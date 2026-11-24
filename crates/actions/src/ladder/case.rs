@@ -27,18 +27,35 @@ pub struct Case {
     /// `{model, state, questions}` — the body posted to `ladder.precheck`, unchanged.
     pub body: Value,
     /// [`store::idempotency::request_hash`] of `body`. Equality with the engine's recorded
-    /// `idempotency_key.request_hash` is what proves the call was about *this* case.
+    /// `idempotency_key.request_hash` is what proves the call was about *this* case. It is the
+    /// engine's FNV claim hash, not a sha256: the decision's `input_hash` is [`Case::sha256`].
     pub hash: String,
+    /// The sha256 of `body`: the decision's `input_hash` and `meta.case_sha256`.
+    pub sha256: String,
     /// The `Idempotency-Key` the caller must send. Derived from the case, never chosen by a
     /// caller, and tenant-scoped so two tenants' identical facts never share a claim.
     pub call_key: String,
 }
 
+/// Whether a policy declares a `choice` case.
+///
+/// The signal is `decision_policy.meta.question_type = "choice"`; anything else — absent, or an
+/// unrecognised value — is the SOP judge's `score` question. A declared `choice` with no authored
+/// set is refused by the caller (`409 option_set_missing`), never answered from free text.
+pub fn question_is_choice(policy_meta: &Value) -> bool {
+    policy_meta
+        .get("question_type")
+        .and_then(Value::as_str)
+        .is_some_and(|kind| kind.trim().eq_ignore_ascii_case("choice"))
+}
+
 /// Build the case for one L1 decision.
 ///
 /// `model` is the tenant's laya config's `model_ref`; `output` is the text the question is about;
-/// `criteria` is what it is judged against; `facts` is anything the answer may consume. The
-/// numbers are no part of the case: the same inputs must always hash the same.
+/// `criteria` is what it is judged against; `facts` is anything the answer may consume; `options`
+/// is the authored menu when the policy declares a `choice` case. The numbers are no part of the
+/// case: the same inputs must always hash the same.
+#[allow(clippy::too_many_arguments)]
 pub fn build(
     tenant: TenantId,
     kind: &str,
@@ -47,13 +64,27 @@ pub fn build(
     output: &Value,
     criteria: &Value,
     facts: Option<&Value>,
+    options: Option<&[store::ladder::OptionSetOption]>,
 ) -> Case {
-    let body = crate::process::judge::request(model, output, criteria, facts);
+    let body = match options {
+        Some(options) => {
+            let pairs = options
+                .iter()
+                .map(|option| (option.key.clone(), option.label.clone()))
+                .collect::<Vec<_>>();
+            crate::process::judge::request_choice(model, output, criteria, facts, &pairs)
+        }
+        None => crate::process::judge::request(model, output, criteria, facts),
+    };
     let hash = store::idempotency::request_hash(&body);
+    let sha256 = serde_json::to_vec(&body)
+        .map(|bytes| crate::spec::sha256_hex(&bytes))
+        .unwrap_or_default();
     let call_key = call_key(tenant, kind, gate, &hash);
     Case {
         body,
         hash,
+        sha256,
         call_key,
     }
 }
@@ -93,6 +124,7 @@ mod tests {
             &json!({"draft": "text"}),
             &criteria,
             Some(&facts),
+            None,
         );
         let b = build(
             tenant(),
@@ -102,6 +134,7 @@ mod tests {
             &json!({"draft": "text"}),
             &criteria,
             Some(&facts),
+            None,
         );
         assert_eq!(a.hash, b.hash);
         assert_eq!(a.call_key, b.call_key);
@@ -118,6 +151,7 @@ mod tests {
             &json!({"draft": "one"}),
             &criteria,
             None,
+            None,
         );
         let b = build(
             tenant(),
@@ -126,6 +160,7 @@ mod tests {
             Some("system-1"),
             &json!({"draft": "two"}),
             &criteria,
+            None,
             None,
         );
         assert_ne!(a.hash, b.hash);
@@ -142,6 +177,7 @@ mod tests {
             &json!({"draft": "text"}),
             &json!([{"criterion": "x"}]),
             None,
+            None,
         );
         assert_eq!(case.body["model"], json!("system-1"));
         assert!(case.body["state"].as_str().is_some_and(|s| !s.is_empty()));
@@ -151,6 +187,15 @@ mod tests {
         );
         assert!(case.call_key.starts_with("ladder.precheck:"));
         assert!(case.call_key.ends_with(&case.hash));
+        assert_eq!(
+            case.sha256.len(),
+            64,
+            "the decision's input_hash is a sha256"
+        );
+        assert_ne!(
+            case.sha256, case.hash,
+            "the claim hash and the decision hash are different witnesses"
+        );
     }
 
     #[test]
@@ -164,6 +209,7 @@ mod tests {
             &json!({}),
             &criteria,
             None,
+            None,
         );
         let two = build(
             tenant(),
@@ -173,8 +219,52 @@ mod tests {
             &json!({}),
             &criteria,
             None,
+            None,
         );
         assert_eq!(one.hash, two.hash, "the body is the same document");
         assert_ne!(one.call_key, two.call_key, "the gate is part of the claim");
+    }
+
+    #[test]
+    fn a_declared_choice_renders_the_authored_keys() {
+        let options = vec![
+            store::ladder::OptionSetOption {
+                key: "accept".to_owned(),
+                label: "Accept it".to_owned(),
+                payload: json!({"outcome": "accepted"}),
+                position: 0,
+            },
+            store::ladder::OptionSetOption {
+                key: "refuse".to_owned(),
+                label: "Refuse it".to_owned(),
+                payload: json!({"outcome": "refused"}),
+                position: 1,
+            },
+        ];
+        let case = build(
+            tenant(),
+            "gate.precheck",
+            None,
+            Some("system-1"),
+            &json!({"draft": "text"}),
+            &json!([{"criterion": "x"}]),
+            None,
+            Some(&options),
+        );
+        assert!(question_is_choice(&json!({"question_type": "choice"})));
+        assert!(!question_is_choice(&json!({})));
+        assert_eq!(
+            case.body["questions"][CASE_QUESTION]["type"],
+            json!("choice")
+        );
+        assert_eq!(
+            case.body["questions"][CASE_QUESTION]["criteria"],
+            json!(["accept", "refuse"])
+        );
+        assert!(
+            case.body["questions"][CASE_QUESTION]["instructions"]
+                .as_str()
+                .is_some_and(|text| text.contains("accept — Accept it"))
+        );
     }
 }

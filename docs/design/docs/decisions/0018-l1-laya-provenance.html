@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0018 — The L1 laya gate makes its own call · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0018-l1-laya-provenance.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0018--the-l1-laya-gate-makes-its-own-call">0018 — The L1 laya gate makes its own call</h1>
+<p>Status: Accepted · Date: 2026-11-24 · Issue: #656 · Resolves: S21 §22, SPEC_V2 §7.2, §7.3, §4.5, rework <code>v1-w1c-3:T2</code>, <code>v1-w1c-4:T2</code>, <code>v1-w1c-5:T2</code></p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><p><strong>The ladder owns the case; the caller supplies facts, never a verdict.</strong> A case is <code>{model, state, questions}</code> in SPEC_V2 §7.2's wire shape: <code>model</code> is the tenant's <code>laya_inference_config.model_ref</code>, <code>state</code> is the task text derived from the caller's declared input, and each <code>questions.&lt;qid&gt;</code> is <code>{type, instructions, criteria}</code> derived from the effective <code>decision_policy</code> and the authored option set. <code>ladder.evaluate</code> no longer accepts <code>answer</code>, <code>confidence</code>, <code>probabilities</code>, <code>latency_ms</code> or <code>options</code>; a request that carries any of them is refused <code>422 caller_supplied_verdict</code>.</p></li>
+<li><p><strong>The engine makes the call, outside any transaction.</strong> The L1 request is the external action <code>ladder.precheck</code> (<code>POST /v1/systemone</code>, service <code>laya</code>, bearer from the sealed <code>laya.token</code>, <code>governance:write</code>, tenant-scoped, effect <code>read</code>). <code>laya.judge</code> stays the SOP step judge: its question, its threshold and its consumers are a different case with a different owner (CONTRACT §21). Two decisions, two actions, one laya service.</p></li>
+<li><p><strong>A read action hands the caller the exact case.</strong> <code>ladder.case</code> takes the same facts <code>ladder.evaluate</code> takes and returns <code>{case, case_hash, laya_call_key}</code>. It exists so a caller outside the process can obtain the exact bytes it must post to <code>ladder.precheck</code>; in-process callers (the executor) use the same builder function directly. The builder is deterministic: the same facts, policy and option-set version produce the same <code>case_hash</code>.</p></li>
+<li><p><strong>Only a verified recorded exchange produces a decision.</strong> <code>ladder.evaluate</code> takes <code>laya_call_key</code> and rebuilds the case itself. It then requires <strong>all</strong> of: <code>store::idempotency::lookup(tenant, "ladder.precheck", key, request_hash(case))</code> to return <code>Replay { status_code: 2xx, response }</code> — so the engine ran a call whose recorded input hash is this case's — and <code>store::actions::find_invocation_by_key</code> to name the invocation, whose <code>outcome</code> is <code>ok</code> and whose <code>duration_ms</code> is the decision's latency. The answer, confidence and probabilities are parsed from the stored response, never from the request. Anything else — <code>Miss</code>, <code>InFlight</code>, <code>ConflictHash</code>, a non-2xx status, an unreadable body — is <code>422 laya_call_unverified</code> and writes no decision. The decision records <code>meta.laya_call_key</code>, <code>meta.laya_invocation_id</code>, <code>meta.case_hash</code>, the option-set version and the measured latency, so §7.2's "a decision is reproducible from the row" holds.</p></li>
+<li><p><strong>Options are authored, versioned rows.</strong> Migration <code>0068</code> adds <code>decision_option_set</code> and <code>decision_option_set_option</code>: one live set per <code>(tenant, kind, gate)</code>, a monotonically increasing <code>version</code>, and rows carrying <code>key</code>, <code>label</code>, <code>payload</code> and an explicit <code>payload.outcome ∈ accepted | refused | escalated</code>. <code>decision_option_sets.set</code> authors a set (a version bump, never an in-place edit) and <code>decision_option_sets.get</code> reads it. A <code>choice</code> question is built from the authored labels; the answer must be an authored key (<code>422 laya_answer_not_in_options</code>); a case that needs a <code>choice</code> and has no authored set is refused <code>409 option_set_missing</code>, never answered from free text. <code>decision_option</code> remains the per-decision record of the option set it evaluated, written from the authored rows.</p></li>
+<li><p><strong><code>Unavailable</code> follows the fail policy; it is never a pass.</strong> <code>domain::ladder::unavailable</code> already maps <code>closed → refused</code> and <code>open → the policy's action</code> (handover → escalated, block → refused, annotate → accepted with the note). Two shapes, one policy. An <strong>outage</strong> — the service unreachable, the call never completed — leaves no recorded exchange, so <code>ladder.evaluate</code> cannot and does not write a decision: the caller applies the policy, and the executor is that caller. A <strong>recorded</strong> call that completed without a readable answer has provenance, so the action writes the decision <code>unavailable</code> with <code>meta.gate_unavailable = true</code>, following the same policy. The executor consumes the action's outcome for a recorded call and applies the policy itself for an outage.</p></li>
+<li><p><strong><code>fire_when</code> decides whether the case is asked.</strong> <code>decision_policy</code> gains a nullable <code>fire_when</code> expression in migration <code>0068</code>. When it does not hold for the resolved case, no laya request is made and no decision is written. Its first form is a small structured expression (<code>{"all_of": [...]}</code> / <code>{"any_of": [...]}</code> over <code>{kind, gate, field}</code> predicates), evaluated in <code>crates/domain</code>; an unparseable expression refuses the policy at authoring time.</p></li>
+<li><p><strong>The executor's gate becomes a client of the same path.</strong> <code>internal_agent</code> stops calling <code>laya.judge</code> and stops handing an answer to the ladder. It builds the case with the shared builder, invokes <code>ladder.precheck</code>, and calls <code>ladder.evaluate</code> with the returned key. Exactly one laya request per gate is a test assertion.</p></li>
+</ol>
+<h2 id="why">Why</h2>
+<p>SPEC_V2 §7.2 makes the laya answer the evidence behind every gated choice: "Laya inference is tenant-scoped … Every decision is recorded with the option set version, the answer, probabilities where the type provides them, confidence, policy, latency and input hash. A decision is reproducible from the row." Nothing in the pre-0018 ladder requests anything. <code>ladder.evaluate</code> reads <code>answer</code>, <code>confidence</code> and <code>latency_ms</code> from the request body and stamps <code>rung='laya'</code>, so a caller with <code>governance:write</code> can record a calibrated-looking decision it invented — rework <code>v1-w1c-3</code>, and the same defect makes <code>v1-w1c-4</code> (options as inline text, never checked) and <code>v1-w1c-5</code> (an outage cannot become <code>gate_unavailable</code>) possible. The executor was the one honest caller, and even it recorded the verdict without the call that produced it.</p>
+<p>The verification design is forced by an existing architectural rule: a handler runs inside an open transaction, and <code>process/judge.rs</code> forbids holding one across an HTTP call ("a judge call must never hold a database transaction"). The call therefore belongs to the engine's external-action path, and the ladder's job is to <em>prove</em> the call happened and is about this case. The idempotency store already carries exactly that proof: <code>request_hash</code> (an equality witness over the canonical body), <code>status_code</code> and the stored <code>response</code>, written by the engine under <code>(tenant, scope="ladder.precheck", key)</code>, with <code>lookup</code> refusing a key that names a different body. <code>action_invocation</code> adds the measured <code>duration_ms</code> and the <code>outcome</code>. No new provenance table is needed.</p>
+<h2 id="alternatives-rejected">Alternatives rejected</h2>
+<ul>
+<li><strong>A laya client inside <code>ladder_evaluate</code>.</strong> It would hold a database transaction across a 60 s external call, against <code>judge.rs</code>'s stated rule, and it would make the action's latency the caller's problem in a way a retry cannot bound.</li>
+<li><strong>A job-driven evaluation (<code>ladder.evaluate</code> enqueues a job; the worker calls laya).</strong> It makes the gate asynchronous and needs a new parked run state and a resume path — a different, much larger unit, for no gain: the gate needs a verdict before it can decide anything.</li>
+<li><strong>Trusting a <code>laya_call_id</code> the caller supplies as opaque proof.</strong> Without re-deriving the case and comparing <code>request_hash</code>, a caller could point at a call for a different question and inherit its answer.</li>
+<li><strong>Keeping inline options and validating them.</strong> SPEC_V2 §7.2 says options are authored, versioned rows, never free text from a prompt; validating inline text would still let the caller choose the menu.</li>
+<li><strong>Treating an unreadable answer as a refusal.</strong> That is how an outage becomes a blocked card; §7.2 makes <code>Unavailable</code> follow the fail policy, and <code>closed</code> already means refuse.</li>
+<li><strong>Reusing <code>laya.judge</code> for the L1 request.</strong> Its scope is <code>processes:write</code> and its question is the SOP step's; sharing it would let a governance caller reach a process action and blur two different decisions.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>The action surface gains <code>ladder.case</code>, <code>ladder.precheck</code> and <code>decision_option_sets.set|get</code>, and <code>ladder.evaluate</code> loses six input fields. The served-spec lock moves by those operations; the registry counts and the parity sample move with them.</li>
+<li>Migration <code>0068</code> adds two tables and one nullable column. A tenant with a <code>gate.precheck</code> policy and no authored option set is refused <code>409 option_set_missing</code> until one is authored — a deliberate fail-closed: the alternative is answering a question whose menu the caller chose.</li>
+<li>Every existing test that posted <code>answer</code>/<code>confidence</code> to <code>ladder.evaluate</code> now encodes a contract the product no longer has. They are rewritten to go through <code>ladder.case</code> → <code>ladder.precheck</code> (with the harness's laya stub) → <code>ladder.evaluate</code>, never relaxed.</li>
+<li>The executor's <code>gate.precheck</code> path is rewritten around the same builder; its existing transition tests stay, and a new assertion pins one laya request per gate.</li>
+<li><code>v1-w1c-3</code>, <code>v1-w1c-4</code> and <code>v1-w1c-5</code> are cleared by this unit; the register records the PR.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0018-l1-laya-provenance.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

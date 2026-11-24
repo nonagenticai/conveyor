@@ -20,7 +20,9 @@
 //! payload `{entity, id, op}` and the topic `<entity>:<id>`.
 
 use chrono::{DateTime, Utc};
-use conveyor_domain::ladder::{FailPolicy, LadderError, Outcome, Rung, evaluate, unavailable};
+use conveyor_domain::ladder::{
+    FailPolicy, FireWhen, LadderError, Outcome, Rung, evaluate, unavailable,
+};
 use conveyor_store as store;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -154,6 +156,12 @@ fn ladder_error(error: LadderStoreError, action: &str) -> ActionError {
             "approval_wrong_card",
             "the cited approval belongs to another card",
         ),
+        LadderStoreError::Illegal(LadderError::OptionSetInvalid { detail }) => {
+            invalid("options", "option_set_invalid", detail)
+        }
+        LadderStoreError::Illegal(LadderError::InvalidFireWhen { detail }) => {
+            invalid("fire_when", "invalid_fire_when", detail)
+        }
         LadderStoreError::Vocabulary { what, value } => {
             tracing::error!(what, value = %value, "a stored ladder value is outside the domain");
             ActionError::internal()
@@ -168,6 +176,15 @@ fn trimmed(value: Option<String>) -> Option<String> {
         .map(str::trim)
         .filter(|text| !text.is_empty())
         .map(str::to_owned)
+}
+
+/// The fact document a policy's `fire_when` predicates address.
+pub(crate) fn case_facts(output: &Value, criteria: &Value, facts: Option<&Value>) -> Value {
+    serde_json::json!({
+        "output": output,
+        "criteria": criteria,
+        "facts": facts.unwrap_or(&Value::Null),
+    })
 }
 
 /// The sha256 of the inputs a decision consumed.
@@ -216,6 +233,8 @@ pub struct PolicyOut {
     pub action: String,
     /// Free-form metadata.
     pub meta: Value,
+    /// Whether this case is asked at all; `null` fires always.
+    pub fire_when: Option<Value>,
     /// The If-Match version.
     pub version: i64,
     /// Creation time.
@@ -233,10 +252,19 @@ fn policy_out(record: &PolicyRecord) -> PolicyOut {
         fail_policy: record.fail_policy.clone(),
         action: record.action.clone(),
         meta: record.meta.clone(),
+        fire_when: record.fire_when.clone(),
         version: record.version,
         created_at: record.created_at,
         updated_at: record.updated_at,
     }
+}
+
+/// A member whose presence is meaningful: absent keeps, an explicit `null` clears.
+fn deserialize_present<'de, D>(deserializer: D) -> Result<Option<Option<Value>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    Option::<Value>::deserialize(deserializer).map(Some)
 }
 
 /// `decision_policies.create`.
@@ -254,6 +282,8 @@ pub struct PolicyCreateIn {
     pub action: Option<String>,
     /// Free-form metadata.
     pub meta: Option<Value>,
+    /// Whether this case is asked at all; omit to ask every case.
+    pub fire_when: Option<Value>,
 }
 
 /// Create a decision policy for one case.
@@ -287,6 +317,7 @@ async fn decision_policies_create(
             fail_policy: input.fail_policy.unwrap_or_else(|| "closed".to_owned()),
             action: input.action.unwrap_or_else(|| "handover".to_owned()),
             meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
+            fire_when: input.fire_when,
         },
     )
     .await
@@ -308,6 +339,9 @@ pub struct PolicyUpdateIn {
     pub action: Option<String>,
     /// Free-form metadata.
     pub meta: Option<Value>,
+    /// Absent keeps the expression; an explicit `null` clears it.
+    #[serde(default, deserialize_with = "deserialize_present")]
+    pub fire_when: Option<Option<Value>>,
 }
 
 /// Change a policy; a policy change is a new version and its gate re-opens.
@@ -348,6 +382,7 @@ async fn decision_policies_update(
             fail_policy: input.fail_policy,
             action: input.action,
             meta: input.meta,
+            fire_when: input.fire_when,
         },
         Some(expected),
     )
@@ -388,6 +423,156 @@ async fn decision_policies_list(
         items: records.iter().map(policy_out).collect(),
         next_cursor: None,
     })
+}
+
+// ── authored option sets ─────────────────────────────────────────────────────────────────
+
+/// One authored option as `decision_option_sets.*` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, PartialEq)]
+pub struct OptionSetOptionOut {
+    /// The key an answer must name.
+    pub key: String,
+    /// The human label the question shows.
+    pub label: String,
+    /// The option's meaning; `payload.outcome` is `accepted | refused | escalated`.
+    pub payload: Value,
+    /// The menu order.
+    pub position: i32,
+}
+
+/// The authored set for one case.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct OptionSetOut {
+    /// The header id.
+    pub id: String,
+    /// The case kind.
+    pub kind: String,
+    /// The gate, when the set is gate-specific.
+    pub gate: Option<String>,
+    /// The monotonic version every decision records.
+    pub version: i64,
+    /// The menu, in position order.
+    pub options: Vec<OptionSetOptionOut>,
+}
+
+fn option_set_out(record: &store::ladder::OptionSetRecord) -> OptionSetOut {
+    OptionSetOut {
+        id: record.id.to_string(),
+        kind: record.kind.clone(),
+        gate: record.gate.clone(),
+        version: record.version,
+        options: record
+            .options
+            .iter()
+            .map(|option| OptionSetOptionOut {
+                key: option.key.clone(),
+                label: option.label.clone(),
+                payload: option.payload.clone(),
+                position: option.position,
+            })
+            .collect(),
+    }
+}
+
+/// One option to author; its position is its place in the array.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct AuthoredOptionIn {
+    /// The key an answer must name.
+    pub key: String,
+    /// The human label the question shows.
+    #[serde(default)]
+    pub label: String,
+    /// Its meaning; must carry `outcome ∈ accepted | refused | escalated`.
+    pub payload: Value,
+}
+
+/// `decision_option_sets.set` — author the menu a `choice` case answers from.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct OptionSetSetIn {
+    /// The case kind.
+    pub kind: String,
+    /// The gate, when the set is gate-specific.
+    pub gate: Option<String>,
+    /// The whole menu; authoring replaces the previous version.
+    pub options: Vec<AuthoredOptionIn>,
+}
+
+#[crate::action(
+    name = "decision_option_sets.set",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn decision_option_sets_set(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: OptionSetSetIn,
+) -> Result<HandlerOutput<OptionSetOut>, ActionError> {
+    let kind = input.kind.trim();
+    if kind.is_empty() {
+        return Err(invalid("kind", "missing", "a case kind is required"));
+    }
+    let gate = trimmed(input.gate);
+    let options = input
+        .options
+        .iter()
+        .enumerate()
+        .map(|(index, option)| store::ladder::OptionSetOption {
+            key: option.key.trim().to_owned(),
+            label: option.label.clone(),
+            payload: option.payload.clone(),
+            position: i32::try_from(index).unwrap_or(i32::MAX),
+        })
+        .collect::<Vec<_>>();
+    let record =
+        store::ladder::author_option_set_tx(&mut *tx, ctx.tenant, kind, gate.as_deref(), &options)
+            .await
+            .map_err(|error| ladder_error(error, ctx.action))?;
+    emit_decision_event(&mut *tx, &ctx, "decision_option_set", record.id, "set").await?;
+    Ok(HandlerOutput::ok(option_set_out(&record)))
+}
+
+/// `decision_option_sets.get` — read the menu in force for a case.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct OptionSetGetIn {
+    /// The case kind.
+    pub kind: String,
+    /// The gate, when the set is gate-specific.
+    pub gate: Option<String>,
+}
+
+#[crate::action(
+    name = "decision_option_sets.get",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:read"],
+    idempotent = true,
+    timeout_ms = 10000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn decision_option_sets_get(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: OptionSetGetIn,
+) -> Result<HandlerOutput<OptionSetOut>, ActionError> {
+    let kind = input.kind.trim();
+    if kind.is_empty() {
+        return Err(invalid("kind", "missing", "a case kind is required"));
+    }
+    let gate = trimmed(input.gate);
+    let record =
+        store::ladder::effective_option_set_tx(&mut *tx, ctx.tenant, kind, gate.as_deref())
+            .await
+            .map_err(|error| ladder_error(error, ctx.action))?
+            .ok_or_else(|| ActionError::resource_not_found("decision_option_set"))?;
+    Ok(HandlerOutput::ok(option_set_out(&record)))
 }
 
 /// A tenant refinement as `refinements.*` returns it.
@@ -756,6 +941,8 @@ pub struct EvaluateIn {
     pub probabilities: Option<Value>,
     /// A caller-supplied latency. Refused.
     pub latency_ms: Option<i32>,
+    /// Caller-supplied options. Refused: the menu is authored, never sent with the request.
+    pub options: Option<Value>,
 }
 
 /// Record one L1 decision from the call the engine made.
@@ -790,6 +977,13 @@ async fn ladder_evaluate(
             "a laya decision is recorded from the call the engine made, never from a verdict in the request",
         ));
     }
+    if input.options.is_some() {
+        return Err(invalid(
+            "options",
+            "inline_options",
+            "options are authored, versioned rows, never supplied with the request",
+        ));
+    }
     let kind = input.kind.trim();
     if kind.is_empty() {
         return Err(invalid("kind", "missing", "a case kind is required"));
@@ -799,13 +993,7 @@ async fn ladder_evaluate(
         .await
         .map_err(|error| ladder_error(error, ctx.action))?
         .ok_or_else(|| ladder_error(LadderError::PolicyMissing.into(), ctx.action))?;
-    let threshold = effective.threshold().ok_or_else(|| {
-        invalid(
-            "threshold",
-            "threshold_missing",
-            "the decision policy has no threshold",
-        )
-    })?;
+    let threshold = effective.threshold();
     let action = effective
         .action()
         .map_err(|error| ladder_error(error, ctx.action))?;
@@ -818,6 +1006,43 @@ async fn ladder_evaluate(
             ctx.action,
         )
     })?;
+
+    // `fire_when` decides whether the case is asked at all. A case that does not fire records no
+    // decision: nothing was asked, so there is nothing to reproduce.
+    let facts = case_facts(&input.output, &input.criteria, input.facts.as_ref());
+    if let Some(fire_when) = &effective.policy.fire_when {
+        let expression = FireWhen::parse(fire_when)
+            .map_err(|error| ladder_error(LadderStoreError::Illegal(error), ctx.action))?;
+        if let Some(expression) = expression
+            && !expression.fires(kind, gate.as_deref(), &facts)
+        {
+            return Err(ActionError::new(
+                409,
+                "case_not_fired",
+                "the policy's fire_when does not hold for this case",
+            ));
+        }
+    }
+
+    // A declared `choice` case answers from the authored menu. With no set there is no menu to
+    // answer from, and free text is never the fallback.
+    let choice = case::question_is_choice(&effective.policy.meta);
+    let set = if choice {
+        Some(
+            store::ladder::effective_option_set_tx(&mut *tx, ctx.tenant, kind, gate.as_deref())
+                .await
+                .map_err(|error| ladder_error(error, ctx.action))?
+                .ok_or_else(|| {
+                    ActionError::new(
+                        409,
+                        "option_set_missing",
+                        "a choice case needs an authored option set",
+                    )
+                })?,
+        )
+    } else {
+        None
+    };
 
     // The claim must be this case's, and it must name a call the engine actually completed for
     // this body. `ladder.case` derived it; a caller cannot pick one that names another case.
@@ -833,6 +1058,7 @@ async fn ladder_evaluate(
         &input.output,
         &input.criteria,
         input.facts.as_ref(),
+        set.as_ref().map(|set| set.options.as_slice()),
     );
     if input.call_key != built.call_key {
         return Err(call_unverified("the claim does not name this case"));
@@ -881,23 +1107,84 @@ async fn ladder_evaluate(
         ));
     };
 
-    let verdict = response
+    // The stored response is the invocation envelope; laya's document is its `output`. Reading
+    // the envelope itself makes every answer unreadable, so the unwrap is the contract, not a
+    // convenience.
+    let answer_document = response
         .as_ref()
-        .and_then(|body| crate::process::judge::parse_verdict(body, Some(threshold)).ok());
-    let outage = verdict.is_none();
-    let (answer, confidence, outcome) = match &verdict {
-        Some(verdict) => {
-            let answer = if verdict.accepted { "accept" } else { "refuse" };
-            let confidence = verdict.score.unwrap_or(0.0);
-            let outcome = evaluate(confidence, threshold, action)
-                .map_err(|error| ladder_error(error.into(), ctx.action))?;
-            (answer.to_owned(), confidence, outcome)
+        .and_then(|envelope| envelope.get("output").cloned());
+    let mut option_set_version = None;
+    let mut options = Vec::new();
+    let (answer, confidence, outcome, outage) = if let Some(set) = &set {
+        match answer_document
+            .as_ref()
+            .and_then(|body| crate::process::judge::parse_choice(body).ok())
+        {
+            Some((key, confidence)) => {
+                let authored = set.outcome(&key).ok_or_else(|| {
+                    ActionError::new(
+                        422,
+                        "laya_answer_not_in_options",
+                        "the answer names no authored option",
+                    )
+                })?;
+                let outcome = match authored {
+                    "accepted" => Outcome::Accepted,
+                    "refused" => Outcome::Refused,
+                    "escalated" => Outcome::Escalated,
+                    other => {
+                        tracing::error!(
+                            outcome = other,
+                            "a stored option outcome is outside the domain"
+                        );
+                        return Err(ActionError::internal());
+                    }
+                };
+                option_set_version = Some(set.version);
+                options = set
+                    .options
+                    .iter()
+                    .map(|option| NewOption {
+                        key: option.key.clone(),
+                        label: option.label.clone(),
+                        payload: option.payload.clone(),
+                    })
+                    .collect();
+                (key, confidence, outcome, false)
+            }
+            None => (
+                "unavailable".to_owned(),
+                None,
+                unavailable(fail_policy, action),
+                true,
+            ),
         }
-        None => (
-            "unavailable".to_owned(),
-            0.0,
-            unavailable(fail_policy, action),
-        ),
+    } else {
+        let threshold = threshold.ok_or_else(|| {
+            invalid(
+                "threshold",
+                "threshold_missing",
+                "the decision policy has no threshold",
+            )
+        })?;
+        match answer_document
+            .as_ref()
+            .and_then(|body| crate::process::judge::parse_verdict(body, Some(threshold)).ok())
+        {
+            Some(verdict) => {
+                let answer = if verdict.accepted { "accept" } else { "refuse" };
+                let confidence = verdict.score.unwrap_or(0.0);
+                let outcome = evaluate(confidence, threshold, action)
+                    .map_err(|error| ladder_error(error.into(), ctx.action))?;
+                (answer.to_owned(), Some(confidence), outcome, false)
+            }
+            None => (
+                "unavailable".to_owned(),
+                None,
+                unavailable(fail_policy, action),
+                true,
+            ),
+        }
     };
 
     let question = input.question.clone().unwrap_or_else(|| kind.to_owned());
@@ -918,7 +1205,10 @@ async fn ladder_evaluate(
             "laya_invocation_id".to_owned(),
             serde_json::json!(invocation.id.to_string()),
         );
-        object.insert("case_hash".to_owned(), serde_json::json!(built.hash));
+        object.insert(
+            "case_sha256".to_owned(),
+            serde_json::json!(built.sha256.clone()),
+        );
         if outage {
             object.insert("gate_unavailable".to_owned(), serde_json::json!(true));
         }
@@ -933,10 +1223,10 @@ async fn ladder_evaluate(
             card_id: input.card_id,
             question,
             answer,
-            option_set_version: None,
+            option_set_version,
             probabilities: serde_json::json!({}),
-            confidence: Some(confidence),
-            input_hash: Some(built.hash),
+            confidence,
+            input_hash: Some(built.sha256),
             policy_id: Some(effective.policy.id),
             policy_version: pins.policy_version,
             policy_refinement_id: effective.refinement.as_ref().map(|row| row.id),
@@ -950,7 +1240,7 @@ async fn ladder_evaluate(
             outcome,
             decided_at,
             meta,
-            options: Vec::new(),
+            options,
         },
     )
     .await
@@ -1417,12 +1707,17 @@ pub struct CaseIn {
 /// The case, its canonical hash and the claim the call must carry.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CaseOut {
-    /// `{model, state, questions}` — post this to `ladder.precheck` unchanged.
-    pub case: Value,
-    /// The canonical request hash of `case`. The decision records it; the verification compares it.
-    pub case_hash: String,
-    /// The `Idempotency-Key` the `ladder.precheck` call must carry.
-    pub call_key: String,
+    /// Whether the policy fires for this case. `false`: do not call and do not evaluate.
+    pub fires: bool,
+    /// `{model, state, questions}` — post this to `ladder.precheck` unchanged; absent when not
+    /// fired.
+    pub case: Option<Value>,
+    /// The canonical request hash of `case`; absent when not fired.
+    pub case_hash: Option<String>,
+    /// The `Idempotency-Key` the `ladder.precheck` call must carry; absent when not fired.
+    pub call_key: Option<String>,
+    /// The authored option set's version, when the case is a `choice`.
+    pub option_set_version: Option<i64>,
     /// The policy version the case was built under.
     pub policy_version: i64,
     /// The laya config version in force, when the tenant has one.
@@ -1455,6 +1750,46 @@ async fn ladder_case(
         .await
         .map_err(|error| ladder_error(error, ctx.action))?
         .ok_or_else(|| ladder_error(LadderError::PolicyMissing.into(), ctx.action))?;
+    // `fire_when` decides whether the case is asked at all; a case that does not fire has no
+    // body, hash or claim to hand out.
+    let facts = case_facts(&input.output, &input.criteria, input.facts.as_ref());
+    if let Some(fire_when) = &effective.policy.fire_when {
+        let expression = FireWhen::parse(fire_when)
+            .map_err(|error| ladder_error(LadderStoreError::Illegal(error), ctx.action))?;
+        if let Some(expression) = expression
+            && !expression.fires(kind, gate.as_deref(), &facts)
+        {
+            return Ok(HandlerOutput::ok(CaseOut {
+                fires: false,
+                case: None,
+                case_hash: None,
+                call_key: None,
+                option_set_version: None,
+                policy_version: effective
+                    .pins()
+                    .policy_version
+                    .unwrap_or(effective.policy.version),
+                laya_config_version: effective.pins().laya_config_version,
+            }));
+        }
+    }
+    let choice = case::question_is_choice(&effective.policy.meta);
+    let set = if choice {
+        Some(
+            store::ladder::effective_option_set_tx(&mut *tx, ctx.tenant, kind, gate.as_deref())
+                .await
+                .map_err(|error| ladder_error(error, ctx.action))?
+                .ok_or_else(|| {
+                    ActionError::new(
+                        409,
+                        "option_set_missing",
+                        "a choice case needs an authored option set",
+                    )
+                })?,
+        )
+    } else {
+        None
+    };
     let model = effective
         .laya_config
         .as_ref()
@@ -1467,11 +1802,14 @@ async fn ladder_case(
         &input.output,
         &input.criteria,
         input.facts.as_ref(),
+        set.as_ref().map(|set| set.options.as_slice()),
     );
     Ok(HandlerOutput::ok(CaseOut {
-        case: built.body,
-        case_hash: built.hash,
-        call_key: built.call_key,
+        fires: true,
+        case: Some(built.body),
+        case_hash: Some(built.sha256),
+        call_key: Some(built.call_key),
+        option_set_version: set.as_ref().map(|set| set.version),
         policy_version: effective
             .pins()
             .policy_version

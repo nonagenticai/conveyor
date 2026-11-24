@@ -910,6 +910,65 @@ impl Stub {
     }
 }
 
+// ── the laya stub ────────────────────────────────────────────────────────────────────────
+
+/// Serializes tests that point `CONVEYOR_EXTERNAL_LAYA_URL` at a stub.
+///
+/// The variable is process-global, so two tests that set it concurrently would each call the
+/// other's server. Every laya test in a binary holds this for its stub's lifetime.
+pub static LAYA_ENV: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+
+/// A laya stub: one answer document (re-settable) at `/v1/systemone`, with a call counter.
+///
+/// The document is what `process::judge` reads — `{"answers": {"accept": {...}}}` — not the
+/// invocation envelope. `calls()` is the "exactly one call per gate" witness.
+pub struct LayaStub {
+    /// The base URL to put in `CONVEYOR_EXTERNAL_LAYA_URL`.
+    pub base: String,
+    /// How many times `/v1/systemone` was asked.
+    pub hits: Arc<std::sync::Mutex<usize>>,
+    answer: Arc<std::sync::Mutex<Value>>,
+}
+
+impl LayaStub {
+    /// Start a stub answering `answer` for every call.
+    pub async fn start(answer: Value) -> LayaStub {
+        let answer = Arc::new(std::sync::Mutex::new(answer));
+        let hits: Arc<std::sync::Mutex<usize>> = Arc::new(std::sync::Mutex::new(0));
+        let answer_state = answer.clone();
+        let hit_state = hits.clone();
+        let app = Router::new().route(
+            "/v1/systemone",
+            post(move || {
+                let answer_state = answer_state.clone();
+                let hit_state = hit_state.clone();
+                async move {
+                    *hit_state.lock().expect("laya hits") += 1;
+                    axum::Json(answer_state.lock().expect("laya answer").clone())
+                }
+            }),
+        );
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("bind laya stub");
+        let base = format!("http://{}", listener.local_addr().expect("laya stub addr"));
+        tokio::spawn(async move {
+            let _ = axum::serve(listener, app).await;
+        });
+        LayaStub { base, hits, answer }
+    }
+
+    /// Replace the answer for the next calls.
+    pub fn set(&self, answer: Value) {
+        *self.answer.lock().expect("laya answer") = answer;
+    }
+
+    /// How many calls the stub has answered.
+    pub fn calls(&self) -> usize {
+        *self.hits.lock().expect("laya hits")
+    }
+}
+
 /// The answer every external service's path gets from the stub.
 ///
 /// A JSON object naming the path: an external action passes a service's document through unchanged, so the stub

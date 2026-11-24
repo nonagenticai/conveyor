@@ -6765,6 +6765,9 @@ fn ladder_samples() -> Vec<Sample> {
         ),
         expecting(plain("laya_configs.list", json!({}), None), 200),
         {
+            // A claim no engine call backs: both transports must refuse it identically. The
+            // verified happy path is `crates/actions/tests/ladder_laya.rs`'s, not a parity
+            // sample — a parity sample cannot make an external call to a real laya.
             let mut sample = plain("ladder.evaluate", json!({}), None);
             sample.prepare = true;
             sample.input = Box::new(|ctx: &Ctx| {
@@ -6772,12 +6775,39 @@ fn ladder_samples() -> Vec<Sample> {
                 json!({
                     "kind": format!("parity.evaluate.{}", policy.as_str().unwrap_or_default()),
                     "gate": "parity_gate",
-                    "answer": "pass",
-                    "confidence": 0.9,
-                    "input": {"subject": "parity"}
+                    "output": {"draft": "parity"},
+                    "criteria": [{"criterion": "names the change"}],
+                    "call_key": "parity-unverified-claim"
                 })
             });
-            expecting(sample, 201)
+            expecting(sample, 422)
+        },
+        expecting(
+            plain(
+                "decision_option_sets.set",
+                json!({
+                    "kind": "parity.options.set",
+                    "gate": "parity_gate",
+                    "options": [
+                        {"key": "accept", "label": "Accept", "payload": {"outcome": "accepted"}},
+                        {"key": "refuse", "label": "Refuse", "payload": {"outcome": "refused"}}
+                    ]
+                }),
+                None,
+            ),
+            200,
+        ),
+        {
+            // The set was authored by the sample above, earlier in this round: both transports
+            // read the same row. A deterministic sample cannot use `prepare` — that branch of the
+            // harness runs no prepare at all.
+            let mut sample = plain(
+                "decision_option_sets.get",
+                json!({"kind": "parity.options.set", "gate": "parity_gate"}),
+                None,
+            );
+            sample.deterministic = true;
+            expecting(sample, 200)
         },
         {
             let mut sample = plain("ladder.case", json!({}), None);

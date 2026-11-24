@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S21 step 10 — the L1 laya gate: receipt · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-LAYA.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s21-step-10--the-l1-laya-gate-receipt">S21 step 10 — the L1 laya gate: receipt</h1>
+<p>Issue #656 · branch <code>issue/656-s21-l1-laya</code> · ADR <code>0018-l1-laya-provenance</code> · CONTRACT §28 · S21 §22 · resolves rework <code>v1-w1c-3</code>, <code>v1-w1c-4</code>, <code>v1-w1c-5</code></p>
+<p><strong>State: skeleton.</strong> The measured scenarios, reversal proofs, test counts and residuals are filled at completion, from the exact head, like <code>docs/evidence/S21-APPLY.md</code> and <code>S21-HANDOFF.md</code>.</p>
+<h2 id="what-changes-at-this-level">What changes at this level</h2>
+<p>Before: <code>ladder.evaluate</code> took <code>answer</code>, <code>confidence</code>, <code>latency_ms</code> and <code>probabilities</code> from its request body and wrote <code>rung = 'laya'</code>, so any <code>governance:write</code> caller could record a calibrated-looking L1 decision it had invented; options were inline request text; an outage could not become <code>gate_unavailable</code>.</p>
+<p>After: the ladder builds the case from the effective policy and an authored option set; the engine performs the request as the external action <code>ladder.precheck</code>; <code>ladder.evaluate</code> records a decision only from the engine's recorded exchange (input-hash equality, 2xx, measured duration), and an unavailable answer follows the policy's fail action.</p>
+<h2 id="scenarios-filled-at-completion">Scenarios (filled at completion)</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Command / test</th>
+<th>Result</th>
+<th>SHA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The precheck call records the case under the ladder's key</td>
+<td><code>crates/actions/tests/ladder_laya.rs::the_precheck_call_records_the_case</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Evaluate derives the verdict from the recording</td>
+<td><code>::evaluate_derives_the_verdict_from_the_recording</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>A caller-supplied confidence is refused</td>
+<td><code>::a_caller_supplied_confidence_is_refused</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>A call for another case is refused</td>
+<td><code>::a_call_for_another_case_is_refused</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>The gate makes one laya call</td>
+<td><code>crates/actions/tests/internal_agent_runtime.rs::the_gate_makes_one_laya_call</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>The question comes from the authored set</td>
+<td><code>::the_question_comes_from_the_authored_set</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>An inline options array is refused</td>
+<td><code>::an_inline_options_array_is_refused</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>An answer outside the set is refused</td>
+<td><code>::an_answer_outside_the_set_is_refused</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>A case with no authored set is refused</td>
+<td><code>::a_case_without_an_authored_set_is_refused</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Authoring twice increments the set version</td>
+<td><code>::the_set_version_increments</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>The authoring action is parity-sampled</td>
+<td><code>parity_http_mcp.rs::decision_option_sets_set</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>An outage follows the fail policy</td>
+<td><code>::an_outage_follows_the_fail_policy</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>A case that does not fire is not asked</td>
+<td><code>::a_case_that_does_not_fire_is_not_asked</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Registry, parity and the lock</td>
+<td><code>crates/actions/tests/registry.rs</code>, <code>parity_http_mcp.rs</code>, <code>--check-lock</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reversal-proofs-fired-red-reverted-green--filled-at-completion">Reversal proofs (fired, red, reverted, green — filled at completion)</h2>
+<ol type="1">
+<li>Accept a caller-supplied confidence again → a fabricated row lands.</li>
+<li>Skip the case verification → a call for another case is accepted.</li>
+<li>Skip the option check → an out-of-set answer is recorded.</li>
+<li>Ignore <code>fail_policy</code> → an outage is treated as a pass.</li>
+<li>Let the executor call laya itself → two requests per gate.</li>
+</ol>
+<h2 id="rework-register">Rework register</h2>
+<p><code>v1-w1c-3</code>, <code>v1-w1c-4</code>, <code>v1-w1c-5</code> gain <code>resolved_by</code> at completion; the audit's <code>--rework-check</code> must print each as cleared.</p>
+<h2 id="residuals-kept-not-fixed-here">Residuals (kept, not fixed here)</h2>
+<ul>
+<li>Automatic apply of an L1-accepted draft (ADR 0011:77) — the decision now exists honestly; what happens to an accepted draft is its own unit.</li>
+<li>The SOP judge (<code>laya.judge</code>, <code>process/step.rs</code>) keeps its own question and threshold.</li>
+<li>A tenant-authored <code>fire_when</code> UI; the structured expression is authored through the action.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S21-LAYA.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

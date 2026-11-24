@@ -1477,11 +1477,11 @@
         "migrations/0030_prompt_catalogue.sql",
         "migrations/0068_ladder_option_sets.sql"
       ],
-      "gap": "action decision_option_sets.set, action decision_option_sets.get",
+      "gap": null,
       "key": "S21",
       "measured": {
         "actions": [
-          8,
+          10,
           10
         ],
         "modules": [
@@ -1499,7 +1499,7 @@
         "S20"
       ],
       "plan": "docs/plans/slices/S21-message-construction.md",
-      "status": "partial",
+      "status": "built",
       "track": "v1",
       "tranche": 9,
       "units": {
@@ -2723,16 +2723,14 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 41,
-        "partial": 2,
+        "built": 42,
+        "partial": 1,
         "planned": 0,
         "proposed": 5,
         "standing": 1
       },
       "total": 50,
-      "uncovered": [
-        "S21"
-      ],
+      "uncovered": [],
       "with_open_units": 16,
       "without_open_units": 34
     },

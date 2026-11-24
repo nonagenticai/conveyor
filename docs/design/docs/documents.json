@@ -191,6 +191,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0017-card-handoff.md"
     },
     {
+      "title": "0018 — The L1 laya gate makes its own call",
+      "path": "docs/decisions/0018-l1-laya-provenance.html",
+      "source": "docs/decisions/0018-l1-laya-provenance.md",
+      "section": "Decisions",
+      "sha256": "9cb5f6a4cd5e1f6de348be8e6d981d936ef4c820f2ca645699e6538dd9ffefbe",
+      "bytes": 9238,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0018-l1-laya-provenance.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
@@ -488,6 +497,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-HANDOFF.md"
     },
     {
+      "title": "S21 step 10 — the L1 laya gate: receipt",
+      "path": "docs/evidence/S21-LAYA.html",
+      "source": "docs/evidence/S21-LAYA.md",
+      "section": "Evidence",
+      "sha256": "43ad95a4058c45669e60c0fb171a29ba13c03087e2874b11e7229b41a59fb571",
+      "bytes": 3604,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-LAYA.md"
+    },
+    {
       "title": "S21 step 7 — the run's episodic memory",
       "path": "docs/evidence/S21-MEMORY.html",
       "source": "docs/evidence/S21-MEMORY.md",
@@ -645,7 +663,7 @@
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "6fc8339071e30cf72f988bed2b6891efed61630377e1a641f50e793461a6ac1c",
+      "sha256": "8d45e1a437c55c838fe828b0436bbedcb5b9ac337240b397a89c09ea4a461f5a",
       "bytes": 14949,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
@@ -654,8 +672,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "f89a480234b60572776c884a7501c25031599629089095fd338a84dd6bff3c91",
-      "bytes": 257563,
+      "sha256": "50705c6fdb0789241a061843a3527d8805f4932cdd9b2a9b72484e3d4637662b",
+      "bytes": 258451,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -663,8 +681,8 @@
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "0b38c7c6257b40030579b9a276794968ce448e6d1ccd56a3f362dd5e4770699b",
-      "bytes": 85381,
+      "sha256": "8c0dbcea5eefbb052aa4a86b111899b6d437272b9f0e2507a9c2cf2fadaf0990",
+      "bytes": 89930,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -672,8 +690,8 @@
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "77e80ec2e18a0bac679ee84ded7452fb19ccca8c228664b85e8cd51cec0b39ea",
-      "bytes": 152574,
+      "sha256": "70d39594d7cd2073e7840a2256e1e9dfcc0660f080031bd2a2d9770d72c6b445",
+      "bytes": 155537,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -1275,8 +1293,8 @@
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "4c90dacf0b3752e0f30a6349b8424ca032fb6866c33040233b850531f86fd40d",
-      "bytes": 53018,
+      "sha256": "1c6536618c4e403f62becd4a4834141e2858687fe23bf234f23804b97db1700d",
+      "bytes": 58145,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]
