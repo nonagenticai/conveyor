@@ -462,6 +462,32 @@ pub fn evaluate(
 ///   invocation that produced its answer, and a refined one pins the refinement.
 /// * A human decision cites the approval it records.
 pub fn missing_pins(rung: Rung, pins: &Pins, approval_id: Option<uuid::Uuid>) -> Vec<&'static str> {
+    missing_pins_for_kind("", rung, pins, approval_id)
+}
+
+/// The decision kinds the step executor records for its judge verdicts (v1-p101-1).
+///
+/// A step judge's verdict is one `decision` row — the same store every ladder decision uses —
+/// but it is not a case the ladder's policy resolved: the SOP's inspection decided, and the row
+/// pins the SOP version and the `laya.judge` invocation that answered, not a `decision_policy`
+/// and its laya config. The per-rung pin contract therefore does not apply to this prefix; every
+/// other kind keeps it.
+pub const STEP_JUDGE_KIND_PREFIX: &str = "process.step.";
+
+/// [`missing_pins`], with the decision kind in hand so the step judge's own store can be exempt.
+///
+/// v1-p101-1: a `process.step.` decision carries no ladder policy pins — there is no policy row
+/// behind a step judge — so the usual per-rung fields are not owed. The exemption is scoped to
+/// that prefix alone; a ladder case's pins are unchanged.
+pub fn missing_pins_for_kind(
+    kind: &str,
+    rung: Rung,
+    pins: &Pins,
+    approval_id: Option<uuid::Uuid>,
+) -> Vec<&'static str> {
+    if kind.starts_with(STEP_JUDGE_KIND_PREFIX) {
+        return Vec::new();
+    }
     let mut missing = Vec::new();
     match rung {
         Rung::Rule => {
