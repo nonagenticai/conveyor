@@ -2698,6 +2698,11 @@
   },
   {
    "id": "v1-w4b-3",
+   "resolved_by": {
+    "commit": "c9066d52c09c7b1ce0ac4425ac9a1e219689ba84",
+    "test": "crates/actions/tests/approval_policies.rs::a_bare_waived_write_is_refused; ::an_earned_waiver_without_an_approval_is_refused; ::a_human_approver_waived_write_is_refused; ::an_earned_waiver_requires_typed_conditions; ::an_expired_auto_waiver_does_not_waive; ::a_waiver_change_with_a_valid_approval_succeeds",
+    "evidence": "cargo-guard test -p conveyor-actions --test approval_policies --test approval_standalone --test judge --test development_project --test parity_http_mcp: 56 passed; -p conveyor-api --test mcp_agent: 5 passed (commit d0ce9fe9, rebased here as c9066d52). waives() requires an unexpired auto policy with typed conditions; every waiver/auto write is approval-gated"
+   },
    "area": "\u00a714/R6",
    "standard": "SPEC",
    "spec": "\u00a79.3, D34, P11",

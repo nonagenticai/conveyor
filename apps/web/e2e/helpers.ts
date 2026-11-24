@@ -81,11 +81,41 @@ export async function setApprovalPolicy(
   action: string,
   approval: "required" | "waived",
 ): Promise<void> {
-  await invoke(request, "approval_policies.set", {
-    action,
-    approval,
-    self_approval: "forbidden",
+  if (approval === "required") {
+    await invoke(request, "approval_policies.set", {
+      action,
+      approval,
+      self_approval: "forbidden",
+    });
+    return;
+  }
+  // An earned waiver is itself a gated change (§6.4, v1-w4b-3): open a gate whose target is the
+  // governed action (a literal target, the shape a console fixture uses), have the distinct
+  // reviewer decide it, then write the earned row with the approval id. A bare `waived` row is
+  // refused and no longer skips the gate.
+  const gate = await invoke<{ id: string }>(request, "approvals.request", {
+    gate: "approval_policies.set",
+    kind: "action",
+    target: action,
+    description: `e2e: an earned waiver for ${action}`,
+    evidence_waiver_reason: FIXTURE_EVIDENCE_WAIVER,
   });
+  await decideAsReviewer(request, "approvals.decide", gate.id);
+  await invoke(
+    request,
+    "approval_policies.set",
+    {
+      action,
+      approval: "waived",
+      self_approval: "forbidden",
+      approver_kind: "auto",
+      conditions: { max_reverts: 0 },
+      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    },
+    undefined,
+    "alice",
+    gate.id,
+  );
 }
 
 /**

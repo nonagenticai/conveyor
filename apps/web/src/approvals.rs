@@ -92,7 +92,10 @@ async fn attempt(
 ) -> Destructive {
     let (approval, self_approval) = policy(ctx, action).await;
     if approval == "waived" {
-        return call(ctx, action, input, options).await;
+        let client = ctx.client();
+        if earned_waiver(&client, action).await {
+            return call(ctx, action, input, options).await;
+        }
     }
 
     // A retry after someone approved the gate this session is waiting on: finish the call with
@@ -233,6 +236,35 @@ pub async fn policy_for(client: &crate::api::Client, gate: &str) -> (String, Str
 async fn policy(ctx: AppCtx, action: &str) -> (String, String) {
     let client = ctx.client();
     policy_for(&client, action).await
+}
+
+/// Whether the tenant's policy for `gate` is an **earned** waiver: `waived`, an `auto` approver,
+/// typed conditions and an unexpired `expires_at` (SPEC_V2 §6.4; finding v1-w4b-3).
+///
+/// A bare `waived` row no longer skips the gate. The server enforces the same rule, so this keeps
+/// the console from calling an action the engine will refuse — the gate, not the client, remains
+/// the authority.
+pub async fn earned_waiver(client: &crate::api::Client, gate: &str) -> bool {
+    let Ok(invocation) = client
+        .invoke(
+            "approval_policies.get",
+            json!({ "action": gate }),
+            InvokeOptions::default(),
+        )
+        .await
+    else {
+        return false;
+    };
+    let row = &invocation.output;
+    let waived = row.get("approval").and_then(Value::as_str) == Some("waived");
+    let auto = row.get("approver_kind").and_then(Value::as_str) == Some("auto");
+    let typed = row.get("conditions").is_some_and(Value::is_object);
+    let unexpired = row
+        .get("expires_at")
+        .and_then(Value::as_str)
+        .map(js_sys::Date::parse)
+        .is_some_and(|at| at > js_sys::Date::now());
+    waived && auto && typed && unexpired
 }
 
 fn text(output: &Value, field: &str, fallback: &str) -> String {
