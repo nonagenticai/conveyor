@@ -11,9 +11,9 @@
       "sha256": "af821f73b2a20f8edb2d3fc98949348eaac2a59ab472767b9756c916b0401c6a"
     },
     {
-      "bytes": 179888,
+      "bytes": 196503,
       "path": "docs/SPEC_V2.md",
-      "sha256": "54641394bc00f676f0a0fe4f028488fe2d06dd0407258ee108b9dc5a9d2b5966"
+      "sha256": "2c944b95a7cd14b570996d8a6997766ddf3d1dfef0ad44eac867a258a557581e"
     },
     {
       "bytes": 11057,
@@ -71,11 +71,6 @@
       "sha256": "33cd8c2783d3d65b1a4998dcca1866788e1c08c7d7c568ac34d65b3bba42b547"
     },
     {
-      "bytes": 3961,
-      "path": "docs/decisions/0012-no-deferrals.md",
-      "sha256": "2b57f4a79a4b4fe3c48d5e9eebadee4ac5453aa1474764bb622a1185ddbfcccc"
-    },
-    {
       "bytes": 3686,
       "path": "docs/decisions/0013-real-v2-ui.md",
       "sha256": "36f048c336414c3935a808810b696c751727bc2a7986dd82a11a99e446c18f88"
@@ -86,24 +81,39 @@
       "sha256": "844653aa52f5f68de2eb38a28151d502e37711d9e322376c49517fd6ac37b7b7"
     },
     {
-      "bytes": 13342,
+      "bytes": 5457,
+      "path": "docs/decisions/0015-run-episodic-memory.md",
+      "sha256": "919ba6c1a13514c4555c07aed216ebc3f7d77de17f407fe2f258b521b7535424"
+    },
+    {
+      "bytes": 5342,
+      "path": "docs/decisions/0016-request-source.md",
+      "sha256": "0f0238e5905c39957db243d6750fff728ff64207d1fda8c05ceaf21c75d6b154"
+    },
+    {
+      "bytes": 6053,
+      "path": "docs/decisions/0017-card-handoff.md",
+      "sha256": "c4bd4334f99b72a699394cba7b9e80a693e5ef1af3000d2bd2ded36943c469ad"
+    },
+    {
+      "bytes": 18121,
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.md",
-      "sha256": "b04c408f23e99cecc79ab12c285544d533dd7454797a78c000a739826b1f9474"
+      "sha256": "b534cd0891d6cdf0923586016878c357274a5a80e4c5f0708e2bc3f66b5f1b91"
     },
     {
-      "bytes": 27726,
+      "bytes": 25352,
       "path": "docs/design/README.md",
-      "sha256": "385938f37db98b800ef02cfae9b757fe7e9ec0e3c61f59537a93e53ad4ec4ffa"
+      "sha256": "06d0c2b70541870e0a2f72c2e40712e39b54cf816cdeaf4591d785b5db9dd1f0"
     },
     {
-      "bytes": 82514,
+      "bytes": 80862,
       "path": "docs/design/STUDIO-SPEC.md",
-      "sha256": "ec86aa608d7319aa0455fef75343a545acbfbe3079c31e541ff6c20178b5611e"
+      "sha256": "bceb5d63a826ae0e2401707e4175cada58740f922fec7c073ff29caf7524b992"
     },
     {
-      "bytes": 21848,
+      "bytes": 24244,
       "path": "docs/design/data/conformance.md",
-      "sha256": "37671c0350d52dceb75ed4c31e78e39a4b4fc7e3278899f0753ecd1050e67017"
+      "sha256": "6679e33aa06451668e2c1882e14af92e616d674c190aa9e1ac096c7e7d0fccfb"
     },
     {
       "bytes": 10909,
@@ -206,9 +216,9 @@
       "sha256": "a8e6c72285ab9aac044a19d265a418b5dc8d340aee6d809237d3aa760b2be367"
     },
     {
-      "bytes": 20263,
+      "bytes": 21463,
       "path": "docs/evidence/S17-CORE.md",
-      "sha256": "cb40b63ab1fbe75fa90142a73f723522c6a7cff927b725df8c8f241d49bef66c"
+      "sha256": "2966312bda4a98572dd9ca92f791cc7fa1a7c9c44e226c5e9fd6a2a8e60fbad6"
     },
     {
       "bytes": 6913,
@@ -219,6 +229,11 @@
       "bytes": 6895,
       "path": "docs/evidence/S18-B.md",
       "sha256": "b587959cf368573f414979b43df3b837112589f1198da935ff85b53155ce1314"
+    },
+    {
+      "bytes": 9299,
+      "path": "docs/evidence/S18-loop-29cc3820.md",
+      "sha256": "38f4ea475bfd481ff05fa76bca25ff3dd1e4d437823575bb3d1d28cb5d2d2427"
     },
     {
       "bytes": 5596,
@@ -251,14 +266,29 @@
       "sha256": "5b86488e0e1a049d3b2afd58f4d7918d2b03e7d2e3f81caa4343a86b091dda2c"
     },
     {
+      "bytes": 6021,
+      "path": "docs/evidence/S21-HANDOFF.md",
+      "sha256": "452b7a1da7ba507706a804c221cdb73fb73a045ee1944e943e8f2a950c7b9af2"
+    },
+    {
+      "bytes": 3602,
+      "path": "docs/evidence/S21-MEMORY.md",
+      "sha256": "7c7c32eab5d050917e7839725bcc90e7dc6135cac68c591c901564987d0ef54c"
+    },
+    {
       "bytes": 9316,
       "path": "docs/evidence/S21-PLAN.md",
       "sha256": "d443636e29dde0a62fbc76c71113ff2e6cdaa2e9d8bdd64135d26e9bd73213f1"
     },
     {
-      "bytes": 7406,
+      "bytes": 4401,
+      "path": "docs/evidence/S21-REQUEST.md",
+      "sha256": "99d3a0465e423dd2411d940a089fd4f259f00b0a051ec4bbb544e0e98d6fc152"
+    },
+    {
+      "bytes": 7430,
       "path": "docs/evidence/S21-RUN.md",
-      "sha256": "d02376ff2af8864e85be31e6bea6b654dec8ec859d63fbc66ef1f9e4c162de8f"
+      "sha256": "bc5bdfb9adfd6b58c11570bfde7fa58cbf9a6b9f3d35aa3fd01a0bb45b2b3327"
     },
     {
       "bytes": 5255,
@@ -266,19 +296,19 @@
       "sha256": "d7ce665d7ac7e8ce18f9ca8434a3324ef83061e1d0651fe6ecf16c26a3177cab"
     },
     {
+      "bytes": 4302,
+      "path": "docs/evidence/T19-plan-audit.md",
+      "sha256": "74e99f19a2c24033195e63f2e31e30c1cd6f8c8086091c950987a7c418c7d084"
+    },
+    {
       "bytes": 28868,
       "path": "docs/evidence/analysis-capture-2026-11-15.md",
       "sha256": "6c5b53d667640bb8531b7dbd336742d364518e2c7b7733de9f4971c1148e8307"
     },
     {
-      "bytes": 2927,
-      "path": "docs/evidence/benefits/token-spend-baseline.md",
-      "sha256": "ab5219fe8f61cc74ed63eff6d44c2ffa0492d6e2ae4cabb898c54614c0198f24"
-    },
-    {
-      "bytes": 21848,
+      "bytes": 24273,
       "path": "docs/evidence/conformance-gap-register.md",
-      "sha256": "37671c0350d52dceb75ed4c31e78e39a4b4fc7e3278899f0753ecd1050e67017"
+      "sha256": "6f4885caed405068ff0855f3cc5d8d21c94a5f3335ffc526320c254d0b10d0a4"
     },
     {
       "bytes": 33072,
@@ -326,194 +356,169 @@
       "sha256": "077ef6e3f3ba3fad737cc65bb288092663d58dc22e7d70192af9b5f21638afed"
     },
     {
-      "bytes": 2654,
-      "path": "docs/evidence/record/inputs/safe-tr3/inspect-adapt.md",
-      "sha256": "886f74f06a74d940f1f14344c652cacad8321dcb56cc5979645009474d3b460e"
+      "bytes": 2030,
+      "path": "docs/evidence/t19/gov/approve-business_capability_map.md",
+      "sha256": "7fd4c2de463fde87e329b973e5f2fe82643b269a6da2c68903d6aa85d0ec44c6"
     },
     {
-      "bytes": 2377,
-      "path": "docs/evidence/record/inputs/safe-tr3/pi-objectives.md",
-      "sha256": "36c63fdec345d49ed4670e7a13ae20b428852b748cd85068a7a4306d16fc7711"
+      "bytes": 2062,
+      "path": "docs/evidence/t19/gov/approve-data_entity_catalog.md",
+      "sha256": "88005bbb23aecebff413297fe780a6ea04bc52bd796363e48f8d9d95a5437f90"
     },
     {
-      "bytes": 3368,
-      "path": "docs/evidence/record/inputs/safe-tr3/pi-plan.md",
-      "sha256": "119b5ddd2d17537a885f81229a0ea430e01eefd873f7544346d9b501ff3edb50"
+      "bytes": 2016,
+      "path": "docs/evidence/t19/gov/approve-driver_goal_objective.md",
+      "sha256": "93baae4f132c8d6cb4d39c697e758b117056b69ecf961d19bc825852da48148d"
     },
     {
-      "bytes": 1587,
-      "path": "docs/evidence/record/inputs/safe-tr3/system-demo.md",
-      "sha256": "598e60361b43f5fa0bff696db4ae4c0cbe30a3ab1499bc38ffdc59a21c753eac"
+      "bytes": 2083,
+      "path": "docs/evidence/t19/gov/approve-requirements_catalog.md",
+      "sha256": "a8aacbfe8fdff979f1ce714483853900e4a204dce0500327479e929be298c1f8"
     },
     {
-      "bytes": 210,
-      "path": "docs/evidence/rework/DESIGN-PUBLISH/acts.md",
-      "sha256": "3901f1fc89b48ac444cb17656498001ac435dad98e2fedea6c3a350f1100789c"
+      "bytes": 1989,
+      "path": "docs/evidence/t19/gov/approve-solution_concept.md",
+      "sha256": "16c8a62e9f5171e7c9e4fd24ad0bcc7b5c6272deceba3fba09f979ac6dddd96d"
     },
     {
-      "bytes": 1073,
-      "path": "docs/evidence/rework/DESIGN-PUBLISH.md",
-      "sha256": "2a9b17b3ca28bc518dde5f77d2b3cc8bbbcc03a7c2f4eb20188e3c990e15bc6f"
+      "bytes": 2066,
+      "path": "docs/evidence/t19/gov/approve-stakeholder_map.md",
+      "sha256": "a8d5285a5545c3b8e1a491a9cfc06ff523e7aa775ddcffbdc6a12dc886e56def"
     },
     {
-      "bytes": 1109,
-      "path": "docs/evidence/rework/P0.md",
-      "sha256": "476617563b448a2e336ca05b8b5b538c822b5728b59a593d954905ebde9d12f1"
+      "bytes": 2003,
+      "path": "docs/evidence/t19/gov/approve-technology_standards.md",
+      "sha256": "c3982a09c3ce22886af7fb006f5f18f859859bded32a7199abaab0149d826951"
     },
     {
-      "bytes": 490,
-      "path": "docs/evidence/rework/PLATFORM/acts.md",
-      "sha256": "28267762f6593a3b0c20aa110119a8962afa96f772b4ea934239742aab044fb8"
+      "bytes": 1913,
+      "path": "docs/evidence/t19/gov/artifact-business_capability_map.md",
+      "sha256": "527f326d18fd4154f02c4b12692ccf8c25d46935df36b966d44c5f974c3e7cc6"
     },
     {
-      "bytes": 823,
-      "path": "docs/evidence/rework/PLATFORM.md",
-      "sha256": "47950a2528083fd6740fd8bfd5708abbeb955196872b9f30e5ba4d317738cacc"
+      "bytes": 1941,
+      "path": "docs/evidence/t19/gov/artifact-data_entity_catalog.md",
+      "sha256": "5a3fbf01c6bba568513d3679ff90551a6eefa985a1dc4c67015743ceef85690a"
     },
     {
-      "bytes": 199,
-      "path": "docs/evidence/rework/S00/acts.md",
-      "sha256": "e4ae08cf7d42f5282ceaf52d2e4a0bdd8d815de1a2188129cd2076905c52cbc3"
+      "bytes": 8889,
+      "path": "docs/evidence/t19/gov/artifact-document-compose.md",
+      "sha256": "6f2f04321ff2e1ac84bfe3ce7d97eeffdeeb13f2a4646d28ecbbe2444e9e462a"
     },
     {
-      "bytes": 997,
-      "path": "docs/evidence/rework/S00.md",
-      "sha256": "b2e42b232ae47a156c94a9f9f5ed40a4e8e18c0766b1175e3693236386dd85fd"
+      "bytes": 9022,
+      "path": "docs/evidence/t19/gov/artifact-document-publish.md",
+      "sha256": "543005b025ce8caf75341cc381a94a97de7744e1c2948c36330547b6b23d4e67"
     },
     {
-      "bytes": 199,
-      "path": "docs/evidence/rework/S01/acts.md",
-      "sha256": "8200bd9968fc0dc72efde91e0a4e29c830076d9d22a0bdb93152ab7a17b09720"
+      "bytes": 8966,
+      "path": "docs/evidence/t19/gov/artifact-document-update.md",
+      "sha256": "d164208672b99dae79b15cda592f267f3f2427cddbd15e5e64ac1549b71c8df1"
     },
     {
-      "bytes": 1138,
-      "path": "docs/evidence/rework/S01.md",
-      "sha256": "5a838cba86e1850befbeb4b913b326f4a9ea061c2c6d6dfa82f5d46cc8529755"
+      "bytes": 1897,
+      "path": "docs/evidence/t19/gov/artifact-driver_goal_objective.md",
+      "sha256": "e9c8fb004eda844b0e6faf3e653cdaf0eaf2f9033da3439935d22e8e819bc5f0"
     },
     {
-      "bytes": 208,
-      "path": "docs/evidence/rework/S02/acts.md",
-      "sha256": "e4224027f0a45b55c18c24de92fb901a07b8f63af5dd34af3bb87584de3aab68"
+      "bytes": 5965,
+      "path": "docs/evidence/t19/gov/artifact-links.md",
+      "sha256": "697222d4d84cad812dedb2541adb094ca01fc67982b6bf5d61e5eaaf467ed605"
     },
     {
-      "bytes": 114,
-      "path": "docs/evidence/rework/S03/acts.md",
-      "sha256": "6f9cac7b549b401d8fe5dc3867ccd05849835d25e60caf7de3d121496045c8e0"
+      "bytes": 1963,
+      "path": "docs/evidence/t19/gov/artifact-requirements_catalog.md",
+      "sha256": "0f09d05d2d74e3a9b734008d189ed0824902610f01f31e5c3f79e3145c7f2bfc"
     },
     {
-      "bytes": 203,
-      "path": "docs/evidence/rework/SPEC-V2/acts.md",
-      "sha256": "bc63295d14d532022accf9bb60db5e9d293386414eecda2cc5a4dff2cd71293c"
+      "bytes": 1865,
+      "path": "docs/evidence/t19/gov/artifact-solution_concept.md",
+      "sha256": "ff30fa53c52b33dc7286194c3b493406fee8f81b0389d20f7c69698739f27a5d"
     },
     {
-      "bytes": 1059,
-      "path": "docs/evidence/rework/SPEC-V2.md",
-      "sha256": "481aaadae294b845de126a4b9ed2a80c7391795ed589b3ad9e7c00aa85704a0b"
+      "bytes": 1940,
+      "path": "docs/evidence/t19/gov/artifact-stakeholder_map.md",
+      "sha256": "7708bcc10eb26ecec9e5a7963bcb3d635c2d53363b57aa8394f888775f637e24"
     },
     {
-      "bytes": 198,
-      "path": "docs/evidence/rework/T0/acts.md",
-      "sha256": "806b7de781b9c8eed32518898d0654b03dcfbf3ac2b62ac7a03901639a51f29c"
+      "bytes": 1883,
+      "path": "docs/evidence/t19/gov/artifact-technology_standards.md",
+      "sha256": "572d19c7eddaf01227125dfe305198b20469bf7b2a8b56b7d744b36af672687c"
     },
     {
-      "bytes": 1140,
-      "path": "docs/evidence/rework/T0.md",
-      "sha256": "e74e602354ff0c787034201a7daeaa3b00d2f71049ed03a6d95f609d923864c4"
+      "bytes": 3174,
+      "path": "docs/evidence/t19/gov/benefit-b7-baseline.md",
+      "sha256": "8ee36b8bd3312e7b5b94f5152e0c351a4f092476db4dd1eeb4286c4d7f6f838d"
     },
     {
-      "bytes": 206,
-      "path": "docs/evidence/rework/T1/acts.md",
-      "sha256": "6959ada52d0dd78f7e217dc380a2045c56285274d6ad92ec2d122df1d06b3698"
+      "bytes": 3198,
+      "path": "docs/evidence/t19/gov/compliance-review-delivery.md",
+      "sha256": "cb339730018c2a706dfaf9dd6093139dc6016ea9680f05b995c946b69f49398d"
     },
     {
-      "bytes": 934,
-      "path": "docs/evidence/rework/T10/acts.md",
-      "sha256": "498c85898ed29a8e10f9bb7f790c28761162aec827f8a37a4676fcfc2a0b05ef"
+      "bytes": 3197,
+      "path": "docs/evidence/t19/gov/compliance-review-soaw.md",
+      "sha256": "e6f066eee9929ccd767fbdf9fb39426a5a549ade6241e8d6b9d085d7f1a087ea"
     },
     {
-      "bytes": 208,
-      "path": "docs/evidence/rework/T11/acts.md",
-      "sha256": "9dbde481a2c8a7d1ef38bf70131b1eaf3789d40478289911c3d60af15ef772d0"
+      "bytes": 3451,
+      "path": "docs/evidence/t19/gov/contract-approve.md",
+      "sha256": "369a9cd13f9bbc086624102fc4ffa6ddfc367c18ba84e255f57927d8e3364144"
     },
     {
-      "bytes": 1450,
-      "path": "docs/evidence/rework/T13/acts.md",
-      "sha256": "86c0a74e3862b0ee47033fff5d2ff6d9ae132e7a5322c0356bb06f753ec86d91"
+      "bytes": 1759,
+      "path": "docs/evidence/t19/gov/contract-board-decision.md",
+      "sha256": "d8514ebdf40156d5f87c78cec84e6f0b933f8a8536e2d9ab42e9fcf53ad6b253"
     },
     {
-      "bytes": 113,
-      "path": "docs/evidence/rework/T2/acts.md",
-      "sha256": "786025e18c85c0704d20dc2212bfd6f36b9f113602881c90cd1926a5338bfc88"
+      "bytes": 3213,
+      "path": "docs/evidence/t19/gov/contract-request.md",
+      "sha256": "a5dc3f5faa5c18ed30ca3bd212da7d3d827b6d62df3500f71a1a43ba1c85a9ce"
     },
     {
-      "bytes": 975,
-      "path": "docs/evidence/rework/T4/acts.md",
-      "sha256": "fd33c15247f2ae9b606254bb6dfc5c98687ef3cf974c5dd0be870143afa393b5"
+      "bytes": 3501,
+      "path": "docs/evidence/t19/gov/delivery-contract-approve.md",
+      "sha256": "10e41d0df321c6792b76ad2a4ddc88a6b40491cad5602bd287a4599912441706"
     },
     {
-      "bytes": 1041,
-      "path": "docs/evidence/rework/T9/acts.md",
-      "sha256": "f36d1f1268240d7d8094e99be5ccec6f8498c7eb429b36890aac9f01f8ea811b"
+      "bytes": 1676,
+      "path": "docs/evidence/t19/gov/delivery-contract-board-decision.md",
+      "sha256": "9acdf5bda93125e39b37a437c3057254392ae9e861216fc102f5febf17171a5e"
     },
     {
-      "bytes": 7461,
-      "path": "docs/evidence/rework/full-fidelity-snapshot.md",
-      "sha256": "cdcade5af26cc716355263c0e0d3c4af64a549a60aa11e250e1c331e05a52804"
+      "bytes": 3268,
+      "path": "docs/evidence/t19/gov/delivery-contract-request.md",
+      "sha256": "935a5f9bda3536b30d38d99d8569aead712868287252699fc6e25a096ee63d68"
     },
     {
-      "bytes": 2443,
-      "path": "docs/evidence/rework/s04-phase-g.md",
-      "sha256": "bcdc051e358717417cba1b679a5eb133f512f75b0b1fe74920509611da0acc2e"
+      "bytes": 931,
+      "path": "docs/evidence/t19/live-write-evidence.md",
+      "sha256": "b3b6ff1653e1ba823045a13b384f4a642dc41512d212d839ff0c4d4942f7efb2"
     },
     {
-      "bytes": 1564,
-      "path": "docs/evidence/rework/tr3-cadences.md",
-      "sha256": "bc971218428530a4924787e059f58fccce3194b8a8d2dea4093320aeb2c9ad07"
+      "bytes": 486,
+      "path": "docs/evidence/t19/refresh-evidence.md",
+      "sha256": "ddac071a949b01161f9bb16d0a38c5749705b774a6b2935b6ef7caf52ad3cc2d"
     },
     {
-      "bytes": 2118,
-      "path": "docs/evidence/rework/tranche-0/acts.md",
-      "sha256": "ae8185dbafc1c1d273f455622a8972513ac29722f69342c257b4ab7eec01f059"
-    },
-    {
-      "bytes": 5510,
-      "path": "docs/evidence/rework/tranche-1/acts.md",
-      "sha256": "6e9d9c19adaf042df7534aa90232d73747763618cddc8d7c3649177dbaecb189"
-    },
-    {
-      "bytes": 3871,
-      "path": "docs/evidence/rework/tranche-2/T2-recontract.md",
-      "sha256": "afab38bbfac1680bd43f7842ac574baaa3b08610e0e2356273551dad747e7807"
-    },
-    {
-      "bytes": 7532,
-      "path": "docs/evidence/rework/tranche-2/acts.md",
-      "sha256": "004fbf3c23db7b9448068107194445dc0d38e35053379447f1df5246406f3453"
-    },
-    {
-      "bytes": 4576,
-      "path": "docs/evidence/rework/tranche-2/lessons.md",
-      "sha256": "a63136f8953dd645d439f5b438ee4c0e00d2281c154b4ae149e243e2098228fc"
-    },
-    {
-      "bytes": 13291,
+      "bytes": 15126,
       "path": "docs/evidence/v2-coverage.md",
-      "sha256": "51cdef94334244015abcb3e76a1d6d063304c7f47ec0650d86e3514bd49729c6"
+      "sha256": "86b1d7cae243683cf134c6db31affaf95e5c96d23393a891d13dc1c55d8a2e2a"
     },
     {
-      "bytes": 255219,
+      "bytes": 258086,
       "path": "docs/plans/00-INDEX.md",
-      "sha256": "a2d35832d9795c80438a3505d039999d0b1bfed411e7755746c399d74cdf8af8"
+      "sha256": "9a4e6f8a35a1b40feb9ddc59fe3a892576fd5ceae64439c4cf95b92cfa1c9261"
     },
     {
-      "bytes": 77290,
+      "bytes": 85381,
       "path": "docs/plans/01-CONTRACT.md",
-      "sha256": "a0663367c870a1edfa8a6121490a62a400ce8ffc8feeaa2f483b61b7783d787e"
+      "sha256": "0b38c7c6257b40030579b9a276794968ce448e6d1ccd56a3f362dd5e4770699b"
     },
     {
-      "bytes": 147521,
+      "bytes": 152574,
       "path": "docs/plans/02-DATA-ARCHITECTURE.md",
-      "sha256": "e02d8f71ec61e14676795c5cc8e969adf73f14c1c0f1ca88f222ab01fd263621"
+      "sha256": "77e80ec2e18a0bac679ee84ded7452fb19ccca8c228664b85e8cd51cec0b39ea"
     },
     {
       "bytes": 17526,
@@ -563,12 +568,12 @@
     {
       "bytes": 13658,
       "path": "docs/plans/P0-programme-definition.md",
-      "sha256": "538f4aa69586234a3a03c4adb93a51fb30dac859e0b6dc7681ef04988f18cd50"
+      "sha256": "cd7d2968eee9c16df04adc05d3dd3c79a52ce91d09b58c391d3ce3644b05f3b8"
     },
     {
-      "bytes": 5908,
+      "bytes": 6641,
       "path": "docs/plans/T18/architecture-design.md",
-      "sha256": "f106e4bc5763a242a949f56afb79206d9d37ba1e4d917730ce8b500f6cb2e182"
+      "sha256": "8f6e0b4e433229ef620dd6a5ea5a3948035183361bd7d013d80ce4925324ee28"
     },
     {
       "bytes": 4318,
@@ -581,9 +586,54 @@
       "sha256": "a532c8aab5ef93d8bd5b13d390544ed18050c2fe205ee026fd51e6f0f53b0cc4"
     },
     {
-      "bytes": 15774,
+      "bytes": 17688,
       "path": "docs/plans/T18-real-v2-ui.md",
-      "sha256": "d7788d99bef64cd2988433c5deb0ebdf60cbafde34453b04718ec9985ebfe75e"
+      "sha256": "d8fd549f7f47dc9fdd510575d957bedf84b942d8bcafeb0b61ee93441e3d1b23"
+    },
+    {
+      "bytes": 16429,
+      "path": "docs/plans/T19/architecture-design.md",
+      "sha256": "730266ca5fa0006d7f9059267ba4c6e1bc8e381ffb018e511d888c5f0ebd0371"
+    },
+    {
+      "bytes": 5995,
+      "path": "docs/plans/T19/artifact-register.md",
+      "sha256": "44a1f02c2fc887a787a2b50033e7775ae2aec73b28878b1da4452d04208bfd02"
+    },
+    {
+      "bytes": 6122,
+      "path": "docs/plans/T19/closure-review.md",
+      "sha256": "d7fe5b981be971797a2768ed5ba67c390ae52edc4afc293d4429ee741abede8d"
+    },
+    {
+      "bytes": 12563,
+      "path": "docs/plans/T19/evidence.md",
+      "sha256": "aeb7d5ed9e5b54fcf67288a57e0d8b4aa66c0f343351bdb97b90e99c142ce6a6"
+    },
+    {
+      "bytes": 6378,
+      "path": "docs/plans/T19/inception-analysis.md",
+      "sha256": "77aa784a87f54ce444e5991f2b883e01ae0404aec2efdc443b25675754e7c12a"
+    },
+    {
+      "bytes": 8527,
+      "path": "docs/plans/T19/msp-profile.md",
+      "sha256": "3f4ccfc6d33185e201bb06775a61134e489407aeec9f3f682d3b2c4cbbfa944a"
+    },
+    {
+      "bytes": 5364,
+      "path": "docs/plans/T19/project-brief.md",
+      "sha256": "28ff3029a69911da34695a9862f6ae6e9d83c3b84fe55de010a05a38e8bb4c4f"
+    },
+    {
+      "bytes": 5420,
+      "path": "docs/plans/T19/safe-epic.md",
+      "sha256": "c4cd154bc3d1047bdb8bcfb9aec7f62d96580fcdb99b046305b76ed070a2763b"
+    },
+    {
+      "bytes": 25864,
+      "path": "docs/plans/T19-decision-forums.md",
+      "sha256": "316edd9323a47737bda6eb12239bd5f1bcefe40431f99e0a2069e8b09d4a4bf2"
     },
     {
       "bytes": 18552,
@@ -611,9 +661,9 @@
       "sha256": "d2e7f63c6b77c7e11157a31ab9bb654d1611eb8efb3b2e0e516aaa2171e7acd5"
     },
     {
-      "bytes": 9507,
+      "bytes": 9065,
       "path": "docs/plans/inception/T12/01-inception-analysis.md",
-      "sha256": "dff731d10db43f15985b5c84db029266b6988433c686f8ca7be259cdbbc1aa55"
+      "sha256": "e8ca1399d3dc1a8429ec88e4b99a20468b0a5bf929d7ecb0f336afa14081cb57"
     },
     {
       "bytes": 12615,
@@ -626,9 +676,9 @@
       "sha256": "fe3917e9d6f1381fc31dc42e6ace96225672470e02831b8ffe2608f03ad75309"
     },
     {
-      "bytes": 8542,
+      "bytes": 8364,
       "path": "docs/plans/inception/T15/01-inception-analysis.md",
-      "sha256": "f895c183bb6cb18ae889e4613ca14583cdb9c41da2d8ca6f7a2c229d63a992bc"
+      "sha256": "c17ca9fc0b22060b1077d7a6e7e0d803ff0e9c07e141c21888be21f9b7bed730"
     },
     {
       "bytes": 15480,
@@ -641,9 +691,9 @@
       "sha256": "d93c168904196ed3533ebfb90b991ec5e45485e9468a867e3ff560a142c040aa"
     },
     {
-      "bytes": 8536,
+      "bytes": 8179,
       "path": "docs/plans/inception/T17/01-inception-analysis.md",
-      "sha256": "79bf45414e45ff91d922de559e1c65fde071708d71af593f7e3f94ff70a86f0e"
+      "sha256": "ab364e21781bad8ae1c0ef89fd113d0229469ef64fac21acce9825e94c99a5aa"
     },
     {
       "bytes": 12450,
@@ -656,9 +706,9 @@
       "sha256": "c2d519527e772922fa6f66e729ce2cfa8d69fd305f84ea4e78593838a6a46a50"
     },
     {
-      "bytes": 8496,
+      "bytes": 8283,
       "path": "docs/plans/inception/T5/01-inception-analysis.md",
-      "sha256": "9f92bd5193def589a00f3db0a8e2b727a411d1eb0395dcd896027941840850f8"
+      "sha256": "41aa3ab11c0019d422f3331d0cc7ae934b96def70b1f0e842aab0616bf814ec9"
     },
     {
       "bytes": 14985,
@@ -671,9 +721,9 @@
       "sha256": "1f9e65d281e540e9e6867213053dbb63f9d405a8f5e4977ea016da955d36e23f"
     },
     {
-      "bytes": 8816,
+      "bytes": 8299,
       "path": "docs/plans/inception/T6/01-inception-analysis.md",
-      "sha256": "0cf51afcbee040facc466f695c57a12f4e166f7ae33058df26e0ea32b56a6646"
+      "sha256": "590d7054a62c3a6d84272eaa80b552225590f3792144f7edbfcdbfcad2eb53a6"
     },
     {
       "bytes": 12860,
@@ -696,14 +746,14 @@
       "sha256": "aff1bb9c11aff26bf4eda2c84d16e50f8fbfbe2f327e120ed2a120184bcc07e4"
     },
     {
-      "bytes": 16946,
+      "bytes": 16774,
       "path": "docs/plans/slices/S03-domain-schema.md",
-      "sha256": "9a2335a54bf8d155f6ccbda7db2471717b497e9f025bbab0b97c8302839d93c6"
+      "sha256": "efb7fdd749ac7b46ab2e6be92ddf53d95c68f24aa2c87bd555137affc2dbf70b"
     },
     {
-      "bytes": 17629,
+      "bytes": 16539,
       "path": "docs/plans/slices/S04-action-registry.md",
-      "sha256": "e1f3896cecea77e4238ddddfb91d73829499c9ad358f7fd124699eaed9be6672"
+      "sha256": "4721e81552ac49eb099c635c1e3163ccad3ba7d36d35139df75c783494f7d85d"
     },
     {
       "bytes": 18455,
@@ -711,9 +761,9 @@
       "sha256": "b8adbc2670bca5a8da8ec4957297afd7f0af7b9215bc828e39466fc2b8328da8"
     },
     {
-      "bytes": 18362,
+      "bytes": 17432,
       "path": "docs/plans/slices/S06-control-plane.md",
-      "sha256": "c13315ed10f9e70528377e93c7ffc958edb36129f827b4f904b5100d13d92a32"
+      "sha256": "b95b74ba3cb050003b6e7e39dffb814480bac966525660af4482b17803b2b94c"
     },
     {
       "bytes": 21947,
@@ -726,14 +776,14 @@
       "sha256": "7a0354acb12292ded1a952669d7c464519f76999c3045ce9fd49c8d34631dde8"
     },
     {
-      "bytes": 15810,
+      "bytes": 15409,
       "path": "docs/plans/slices/S06c-mcp-tasks.md",
-      "sha256": "bb1b382eb97ef286ffd7deecd948b766c97c59651d625c17b52e9d1af54c71e2"
+      "sha256": "566852202066e8d200246af688c232d4190e7322c681a89edb7b73bbcdeefb1a"
     },
     {
-      "bytes": 7402,
+      "bytes": 7009,
       "path": "docs/plans/slices/S06d-connector-standard.md",
-      "sha256": "fd5af704226ac75fca1f845e2931bce976c2a1aff7f08a2fc9f55744540fffb4"
+      "sha256": "525f40e88ca51ace2068e7d32f3241ab0abb3fbf422fd49c9ae1e4c6038174ef"
     },
     {
       "bytes": 21171,
@@ -751,14 +801,14 @@
       "sha256": "f22757af3303bfeb36eb2aac979b8cacc9d74533c8ad3d49fa5bcca61cde083a"
     },
     {
-      "bytes": 15964,
+      "bytes": 15668,
       "path": "docs/plans/slices/S10-copilot-ag-ui.md",
-      "sha256": "8ece4fe88e38fa7e8fc1e4e5bdaaeb24e31b566fa70956547afcec94e51532b3"
+      "sha256": "0c38f565318901ec238886a4a1f5d6dc8981260e20d44daaeb9e28739d3f7dfa"
     },
     {
-      "bytes": 29001,
+      "bytes": 27293,
       "path": "docs/plans/slices/S11-procedures.md",
-      "sha256": "b2772c10d7808e7462a3ec25ef2c7f2f0b062db1d9ceb413a576720f422c9d5d"
+      "sha256": "36eac8d191f4f88ac2783ab9188e531bf8d9a9302d6252fa22f45ed59a648d7d"
     },
     {
       "bytes": 15913,
@@ -771,46 +821,46 @@
       "sha256": "215b89f9e03249df69ab88f11541c6b06baad27fc35cbca1c53195662fe08c9e"
     },
     {
-      "bytes": 26519,
+      "bytes": 23511,
       "path": "docs/plans/slices/S14-cutover.md",
-      "sha256": "7a923f572c995f29cf1a9a6f27721a889cfea273c4786a211e4f8670109aa1df"
+      "sha256": "58ed33a4f895ab284e17a7d8894f0066012bb6cfb67ff5fe5fa7006406d341c4"
     },
     {
-      "bytes": 30282,
+      "bytes": 27130,
       "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
-      "sha256": "9067a85b1b1d9537a588c523d3e41d3ec6ffa23aaf0b96b1cc2a4956e30ec3cd"
+      "sha256": "5f7fa98ce36c52f8b31836e9393725dcdb638dc0fddac586be692e6f91e19bed"
     },
     {
-      "bytes": 24524,
+      "bytes": 21382,
       "path": "docs/plans/slices/S16-inference-audit.md",
-      "sha256": "12069dba85c8f59e3823ffbd23d0cad329ab8c56791a645fd451f8cfd177b695"
+      "sha256": "b5d48d960766805e212a6543cf88539dda6a02ce487e5fcde4269f3f9be28ee5"
     },
     {
-      "bytes": 16779,
+      "bytes": 15479,
       "path": "docs/plans/slices/S17-benchmark-harness.md",
-      "sha256": "457a40697cf3216490bcf0bf718616cfa94c79105495b127a431bb3a08f8d523"
+      "sha256": "d65b5338dc303b5f38b2343ff21592f64e454b8d5df73d3504043a94d32cd859"
     },
     {
-      "bytes": 10151,
+      "bytes": 9778,
       "path": "docs/plans/slices/S18-kata-improvement.md",
-      "sha256": "93b3fe4b71821936ef4b1766a2d3d2abf9cdcc2d759340567ab14102da36acb8"
+      "sha256": "d82a209c37fc298bb416496dd6a86af64342e3cb1da89e017f81edb1467ca461"
     },
     {
-      "bytes": 22950,
+      "bytes": 21929,
       "path": "docs/plans/slices/S19-eval-builder.md",
-      "sha256": "bc3ae71d4d2be786a099497e55a6c81cb31c34969f193bcda8a25c3b899510c9"
+      "sha256": "2f6947dafbc8d9480a7cb908bf4cee1057474922fc10163ee57b74a2c42750f8"
     },
     {
-      "bytes": 16078,
+      "bytes": 15685,
       "path": "docs/plans/slices/S20-eval-hillclimb.md",
-      "sha256": "d27a21c0cf30bc3d5fe25b4a06f27d39bf94d1f3c7093a7acfcbbc0df7731191"
+      "sha256": "b3fa237121c8a38186c333f826f94e8ee9d21b7ac8774a7c5f933b1bb397e038"
     },
     {
-      "bytes": 42454,
+      "bytes": 53018,
       "path": "docs/plans/slices/S21-message-construction.md",
-      "sha256": "40f53201039af39e6ecbdc1a49e73fc43e93506e529add04ae46a05d34f51f23"
+      "sha256": "4c90dacf0b3752e0f30a6349b8424ca032fb6866c33040233b850531f86fd40d"
     }
   ],
-  "generated_at": "2026-11-23T09:36:22Z",
+  "generated_at": "2026-11-24T16:30:00Z",
   "schema": "design-snapshot/v1"
 }

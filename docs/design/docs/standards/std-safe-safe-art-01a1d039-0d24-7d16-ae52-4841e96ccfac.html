@@ -17,7 +17,6 @@
       .std-meta dd { margin:.15rem 0 0; }
       .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
       .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
-      .std-intent { max-width:68ch; }
       .std-source { font-size:.85rem; opacity:.8; }
       .std-index { list-style:none; padding:0; }
       .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
@@ -37,42 +36,36 @@
         <div><dt>Standard</dt><dd>SAFe</dd></div>
         <div><dt>Level</dt><dd>programme</dd></div>
         <div><dt>Subject</dt><dd>conveyor buildout</dd></div>
-        <div><dt>Status</dt><dd>absent</dd></div>
+        <div><dt>Status</dt><dd>evidenced</dd></div>
         <div><dt>SPEC</dt><dd>§8.2</dd></div>
         <div><dt>Gate</dt><dd>not recorded</dd></div>
         <div><dt>Package</dt><dd><code>std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-23T09:36:22Z · 2067e01a</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-24T16:30:00Z · a2ef9194eb2c</dd></div>
       </dl>
       <h2>ART charter</h2>
-<p class="std-intent">The record the section derives from, or an explicit absence.</p>
 <p class="std-source">Source: <code>programme.json#/programme</code> — 1 row(s)</p>
 <ul>
 <li>conveyor buildout <span class="std-state">active</span></li>
 </ul><h2>Solution intent</h2>
-<p class="std-intent">The record the section derives from, or an explicit absence.</p>
 <p class="std-source">Source: <code>programme_summary</code> — 1 row(s)</p>
 <ul>
 <li>summary</li>
 </ul><h2>Backlog with WSJF</h2>
-<p class="std-intent">The record the section derives from, or an explicit absence.</p>
-<p class="std-source">Source: <code>wsjf_order</code> — 23 row(s)</p>
+<p class="std-source">Source: <code>msp.json#/wbs_nodes</code> — 32 row(s)</p>
 <ul>
-<li>A baseline change travels as a change request with its impact and its own gate <span class="std-state">accepted</span></li>
-<li>Closure against the frozen baseline: close_request, a distinct decision and projects.close <span class="std-state">accepted</span></li>
-<li>Dual control on every PM gate: charter, baseline and change are approved by a distinct approver <span class="std-state">accepted</span></li>
-<li>Publish the studio design pack and its retrospective closure record <span class="std-state">accepted</span></li>
-<li>The PM request-to-plan path: pm.plan writes the WBS and the scope baseline <span class="std-state">accepted</span></li>
-<li>The T3 acceptance record: the manifest&#x27;s checks execute against the live rows <span class="std-state">accepted</span></li>
-<li>ActionSpec derive crate <span class="std-state">accepted</span></li>
-<li>The model and contracts — organisation spine, decision-ladder types and the Executor seam <span class="std-state">accepted</span></li>
-<li>The coach loop — one card, one triage, one remedy, per-signature escalation and the depth cap <span class="std-state">accepted</span></li>
-<li>Registry and spec vocabularies <span class="std-state">accepted</span></li>
-<li>The tool platform — one governed call path, the call ledger, the schema and effect gates, and tenant-prefixed storage <span class="std-state">accepted</span></li>
-<li>The decision ladder — four rungs, the laya contract and the draft gate <span class="std-state">accepted</span></li>
-</ul><h2>Shared configuration</h2>
-<p class="std-intent">The programme values every project inherits and the keys it locks against override.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Shared configuration&#x27;; a document exists but lacks the heading (see <code>std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p><h2>Published document</h2>
-<p class="std-absent">Not evidenced — No published safe-art document for the programme (see <code>std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p>
+<li>The usage inventory and its evidence record <span class="std-state">accepted</span></li>
+<li>The UI-stack decision record <span class="std-state">accepted</span></li>
+<li>S02 — Skeleton: tenancy, auth, jobs and SSE on Postgres 18 <span class="std-state">accepted</span></li>
+<li>The domain and schema — aggregates, state machines, leases and the baseline domain migration <span class="std-state">accepted</span></li>
+<li>ActionSpec derive crate <span class="std-state">open</span></li>
+<li>Registry and spec vocabularies <span class="std-state">open</span></li>
+<li>The 16 internal actions <span class="std-state">open</span></li>
+<li>Invocation path with idempotency and audit <span class="std-state">open</span></li>
+<li>Store transaction helpers <span class="std-state">open</span></li>
+<li>Migration 0003 action registry <span class="std-state">open</span></li>
+<li>Manifest endpoint <span class="std-state">open</span></li>
+<li>MCP endpoint <span class="std-state">open</span></li>
+</ul>
     </main>
   </body>
 </html>

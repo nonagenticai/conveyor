@@ -73,6 +73,39 @@ test -f "$register" || {
   exit 1
 }
 
+# 3b. WRITE GUARD — the record must not outrun the published register. A snapshot whose
+#     issue-driven seed has moved past the last live publish derives a different register; writing
+#     the record here would ship a record that names packages the register lacks. `--check` skips
+#     this on purpose: the committed pack belongs to the live publish, so a moved seed is not pack
+#     staleness (proven on the refresh #665 tree).
+if [ "$mode" = "" ]; then
+  python3 scripts/audit-programme-conformance.py \
+    --snapshot "$snapshot" --out "$tmp/audit" \
+    --findings docs/evidence/v1-conformance-findings.json \
+    --findings "$tmp/standards-findings.json" \
+    --rework-out "$tmp/derived-rework.json" >/dev/null
+  # Canonical JSON equality, not bytes: the audit escapes non-ASCII and sorts keys; the published
+  # register is the Rust snapshot's serialisation.
+  python3 - "$tmp/derived-rework.json" "$register" <<'PY'
+import json
+import sys
+
+derived = json.load(open(sys.argv[1], encoding="utf-8"))
+published = json.load(open(sys.argv[2], encoding="utf-8"))
+if derived != published:
+    print(
+        "publish-standards: the snapshot derives a different register than the published one",
+        file=sys.stderr,
+    )
+    print(
+        "publish-standards: the seed has moved past the last live publish; "
+        "run docs/design/scripts/publish-data.sh",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+PY
+fi
+
 # 4. Pass 2: the record, one page per artefact and the register global. The generator writes
 #    `standards.json`, `standards.js` and `rework.js`; the canonical register stays JSON.
 python3 scripts/generate-standards.py \
