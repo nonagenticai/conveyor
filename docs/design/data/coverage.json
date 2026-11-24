@@ -1749,9 +1749,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T17"
-      ],
+      "blocked_by": [],
       "evidence": [
         "apps/server/tests/organisation_loop.rs"
       ],
@@ -1975,22 +1973,22 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "migrations/0064_authoring.sql"
       ],
-      "gap": "no tenant asset authoring intake or review queue",
+      "gap": null,
       "key": "T17",
       "measured": {
         "actions": [
-          0,
-          0
+          6,
+          6
         ],
         "modules": [
           0,
           0
         ],
         "tables": [
-          0,
-          0
+          1,
+          1
         ]
       },
       "name": "Tenant asset authoring",
@@ -2001,7 +1999,7 @@
         "T7"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 5,
       "units": {
@@ -2729,10 +2727,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 45,
+        "built": 46,
         "partial": 1,
         "planned": 0,
-        "proposed": 2,
+        "proposed": 1,
         "standing": 1
       },
       "total": 50,

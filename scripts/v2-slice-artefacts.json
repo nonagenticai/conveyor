@@ -378,10 +378,17 @@
       ]
     },
     "T17": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "tables": [
+        "authoring_intake"
       ],
-      "gap": "no tenant asset authoring intake or review queue"
+      "actions": [
+        "authoring.intake",
+        "authoring.intakes",
+        "authoring.draft",
+        "authoring.review",
+        "authoring.publish",
+        "authoring.assets"
+      ]
     },
     "T18": {
       "status": "proposed",
