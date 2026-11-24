@@ -636,8 +636,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "bf610285e2368b01fc2e9799cd067f81f886214c551fa3d10286609dee867c63",
-      "bytes": 256915,
+      "sha256": "f89a480234b60572776c884a7501c25031599629089095fd338a84dd6bff3c91",
+      "bytes": 257563,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -645,8 +645,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "caa747a2eef3c21295c9ce32e883fbe2b6f0adcd6f6fef08b6e41cfdb0479f6b",
-      "bytes": 81989,
+      "sha256": "08465349498d3737494b10995ac9e67757fe3443460676d304b4ace6e3e130e7",
+      "bytes": 85256,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -654,8 +654,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "c122850c3507a8d1f37ba122caf037ba442a49815b030e3f42d51304c421d116",
-      "bytes": 150776,
+      "sha256": "77e80ec2e18a0bac679ee84ded7452fb19ccca8c228664b85e8cd51cec0b39ea",
+      "bytes": 152574,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -1257,8 +1257,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "1974a35c3c44801056a6fe2adb35991cf861d5b97ef37f449010901fcc7e79f5",
-      "bytes": 49489,
+      "sha256": "f798427f49c3837c0750e9f73393e125220b9728daddbe08db2fedb553547b67",
+      "bytes": 52926,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]
