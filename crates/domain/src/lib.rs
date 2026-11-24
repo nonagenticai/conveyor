@@ -74,6 +74,9 @@ pub mod ladder;
 // T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata's surfaces, the six Gets and the
 // held-out movement arithmetic.
 pub mod kata;
+// T6 (SPEC_V2 §5.4, §6.4, §9.1, §9.3; issue #80): the development step order, the typed
+// evidence and the auto-merge condition vocabulary.
+pub mod development;
 // T1 (SPEC_V2 §5, §8.2, §8.3): the plan spine's WSJF arithmetic and refusal vocabulary.
 pub mod process;
 pub mod spine;

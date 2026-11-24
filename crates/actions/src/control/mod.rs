@@ -246,6 +246,15 @@ pub fn approval_error(error: store::ApprovalStoreError, action: &str) -> ActionE
                  not approvals:write alone"
             ),
         ),
+        store::ApprovalStoreError::ImplementerCannotDecide => ActionError::new(
+            403,
+            "implementer_cannot_decide",
+            format!(
+                "{action:?}: the implementing principal of a development project cannot decide \
+                 the gate that judges its own work (SPEC_V2 §5.4); the gate stays pending for a \
+                 different principal"
+            ),
+        ),
         store::ApprovalStoreError::Database(error) => store_error(error, action),
     }
 }

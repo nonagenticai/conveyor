@@ -585,6 +585,33 @@ async fn seed_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     .await
 }
 
+/// A chartered development project for the `development_projects.*` samples (T6, #80).
+///
+/// Each round gets its own project + charter, and the implementer is the fixture's alice (a
+/// member), so every sample reaches the rule it is sampling rather than a membership refusal.
+/// The gates then assert their own precondition (`ci_missing`, `merge_missing`, `steps_missing`);
+/// the successful delivery path has its own suite (`development_project.rs`).
+async fn seed_parity_development_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let project = seed_project(pg, ctx).await;
+    let lane = format!("issue/parity-{}", Uuid::now_v7().simple());
+    scoped(pg, ctx, async |conn| {
+        sqlx::query_scalar(
+            "INSERT INTO development_project
+                 (tenant_id, project_id, repo, lane, implementer_id, acceptance_command)
+             VALUES ($1, $2, 'nonagenticai/conveyor', $3, $4, 'cargo test')
+             RETURNING id",
+        )
+        .bind(ctx.tenant_id)
+        .bind(project)
+        .bind(lane)
+        .bind(ctx.alice_user)
+        .fetch_one(&mut *conn)
+        .await
+        .expect("prepared development project")
+    })
+    .await
+}
+
 /// A CLOSED project carrying the retrospective's `rework` verdict, for `projects.reopen`:
 /// each round gets its own row, so the reopen is a real transition in both rounds.
 async fn seed_reopenable_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
@@ -2431,6 +2458,18 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             .await;
             ctx.push(sample.name, kata);
         }
+        // T6 (#80): each development-project sample gets its own chartered project per round.
+        "development_projects.get"
+        | "development_projects.record_step"
+        | "development_projects.review_gate"
+        | "development_projects.merge_gate"
+        | "development_projects.deploy_gate"
+        | "development_projects.close"
+        | "development_projects.change_judging_surface"
+        | "development_projects.rollback" => {
+            let development_project = seed_parity_development_project(pg, ctx).await;
+            ctx.push(sample.name, development_project);
+        }
         "invites.revoke" => {
             let id = seed_invite(pg, ctx).await;
             ctx.push(sample.name, id);
@@ -3599,6 +3638,107 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             let mut sample = plain("kata.adopt", json!({}), None);
             sample.input = Box::new(|_ctx: &Ctx| json!({"kata_id": Uuid::nil(), "note": "parity"}));
             expecting(sample, 404)
+        },
+        // ── T6: the development project (#80) ────────────────────────────────────────────
+        {
+            // A real charter: the implementer is the fixture's alice, and the title/lane carry
+            // a fresh UUID so the derived project key cannot collide across the two rounds.
+            let mut sample = plain("development_projects.charter", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "title": format!("Parity development {}", Uuid::now_v7().simple()),
+                    "repo": "nonagenticai/conveyor",
+                    "lane": format!("issue/parity-{}", Uuid::now_v7().simple()),
+                    "implementer_id": ctx.alice_user,
+                    "acceptance_command": "cargo test -p conveyor-actions --test development_project",
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("development_projects.get", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.get")}),
+            );
+            expecting(sample, 200)
+        },
+        {
+            // The first step has no predecessor, so this is a real write on both transports.
+            let mut sample = plain("development_projects.record_step", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "development_project_id": ctx.pop("development_projects.record_step"),
+                    "step": "branch",
+                    "evidence": {"name": "issue/parity", "base": "main"},
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("development_projects.review_gate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.review_gate")}),
+            );
+            expecting(sample, 409)
+        },
+        {
+            let mut sample = plain("development_projects.merge_gate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.merge_gate")}),
+            );
+            expecting(sample, 409)
+        },
+        {
+            let mut sample = plain("development_projects.deploy_gate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.deploy_gate")}),
+            );
+            expecting(sample, 409)
+        },
+        {
+            let mut sample = plain("development_projects.close", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.close")}),
+            );
+            expecting(sample, 409)
+        },
+        {
+            // The project's own attempt to change the gates that judge it: the refusal is the
+            // feature, and it is the same body over both transports.
+            let mut sample = plain(
+                "development_projects.change_judging_surface",
+                json!({}),
+                None,
+            );
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "development_project_id": ctx.pop("development_projects.change_judging_surface"),
+                    "surface": "gate_set",
+                    "change": {"value": "parity"},
+                })
+            });
+            expecting(sample, 403)
+        },
+        {
+            let mut sample = plain("development_projects.rollback", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "development_project_id": ctx.pop("development_projects.rollback"),
+                    "deployed_digest": "sha256:parity-deployed",
+                    "restored_digest": "sha256:parity-restored",
+                    "health_status": 200,
+                    "evidence": ["parity rollback evidence"],
+                })
+            });
+            expecting(sample, 409)
         },
         plain("departments.create", json!({"name": "engineering"}), None),
         plain("audit.list", json!({"limit": 10}), None),

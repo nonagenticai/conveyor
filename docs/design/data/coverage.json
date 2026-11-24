@@ -1751,8 +1751,7 @@
     {
       "blocked_by": [
         "T15",
-        "T17",
-        "T6"
+        "T17"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -1886,9 +1885,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T6"
-      ],
+      "blocked_by": [],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -2302,22 +2299,23 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/development.rs",
+        "migrations/0068_development_project.sql"
       ],
-      "gap": "no development-project path over conveyor and a dependency repo",
+      "gap": null,
       "key": "T6",
       "measured": {
         "actions": [
-          0,
-          0
+          9,
+          9
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
-          0,
-          0
+          3,
+          3
         ]
       },
       "name": "Development project",
@@ -2326,7 +2324,7 @@
         "T8"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 11,
       "units": {
@@ -2728,10 +2726,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 42,
+        "built": 43,
         "partial": 1,
         "planned": 0,
-        "proposed": 5,
+        "proposed": 4,
         "standing": 1
       },
       "total": 50,
