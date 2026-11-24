@@ -260,9 +260,27 @@ mod tests {
                 // attendance, positions and the participant extension (0065_meetings.sql,
                 // SPEC_V2 §6.8, D66).
                 (65, "meetings".to_owned()),
-                // ── The lane's reserved block (0080+), after main's 0066/0067 (T5's kata pair
-                // when #636 merges). Versions 0066–0079 stay free for main; the block's SQL is
-                // unchanged, only its version moved.
+                // T5 (#77): the kata's record, its six Gets and its held-out measurement
+                // (0066_kata.sql, SPEC_V2 §6.3, §9.3–§9.4).
+                (66, "kata".to_owned()),
+                // T5 P2–P4 (#77): the open-time measurability gate, the pinned pre-kata
+                // procedure version, and the append-only revert and adoption evidence
+                // (0067_kata_gate.sql).
+                (67, "kata gate".to_owned()),
+                // T6: the development charter, its immutable step evidence, the closure record,
+                // the one-pending development gate index and the approval-policy auto-merge terms.
+                (68, "development project".to_owned()),
+                // T8 (#79): the lesson lifecycle — the independent-evidence CHECK, the proposer/
+                // reviewer record and the governed-asset source draft promotion
+                // (0069_lesson_lifecycle.sql, SPEC_V2 §7.6, §10.3, §10.4, §12 T8, D36).
+                (69, "lesson lifecycle".to_owned()),
+                // #526 (the kata union): the lane's candidate and propagation records on main's
+                // kata loop — the columns the coach/ops/architecture `kata_candidate_id`s need
+                // (0070_kata_union.sql).
+                (70, "kata union".to_owned()),
+                // ── The lane's reserved block (0080+), after main's 0066–0069 and the 0070 union.
+                // Versions 0071–0079 stay free for main; the block's SQL is unchanged, only its
+                // version moved.
                 // v1-w1a-2 (#526): the release's layered kind store — base → industry →
                 // department archetype → department → job — and `department.archetype`
                 // (0080_release_layers.sql, SPEC_V2 §4.1).
@@ -276,12 +294,6 @@ mod tests {
                 // v1-p5-3 (#526): a change's impact block is an object carrying at least one of
                 // scope/schedule/cost/risk (0083_change_impact_keys.sql, SPEC_V2 §5.5).
                 (83, "change impact keys".to_owned()),
-                // #77 (T5): the kata loop — the pinned hypothesis, the candidates, the immutable
-                // held-out measurement and the per-target propagation rows
-                // (0084_kata.sql, SPEC_V2 §6.3, §9.3–§9.4, §12 T5). Reconciled with main's
-                // 0066/0067 when #636 merges; the lane's design carries the candidates and
-                // propagation rows.
-                (84, "kata".to_owned()),
                 // v1-p82-3 (#526): `programme.shared_config` — the programme's shared values and
                 // the keys it locks against per-project override
                 // (0085_programme_shared_config.sql, SPEC_V2 §8.2).

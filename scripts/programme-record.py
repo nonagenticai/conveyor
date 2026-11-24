@@ -108,7 +108,7 @@ READBACK_MAP = {
     "cadences.create": "cadences.list",
     "cadences.update": "cadences.list",
     "cadences.credit_demo": "cadences.credit_list",
-    "lessons.propose": "lessons.list",
+    "lessons.propose": "programme_lessons.list",
     "wbs.create": "wbs.get",
     "wbs.update": "wbs.get",
     "tranches.review": "tranches.review_list",
@@ -149,6 +149,9 @@ READ_ONLY_ACTIONS = {
     "programmes.baselines_list",
     "projects.get",
     "architecture.board_get",
+    # The plural reads do not end in `list`/`get`, so the suffix rule below misses them.
+    "architecture.artifacts_links",
+    "architecture.artifacts_entries",
     "approvals.list",
     "documents.get",
     "pm.get",

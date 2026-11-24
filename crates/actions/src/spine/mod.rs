@@ -332,6 +332,15 @@ fn plan_approval_error(error: store::ApprovalStoreError, action: &str) -> Action
                 "{action:?}: this gate requires an answer; a decision with no note answers nothing"
             ),
         ),
+        store::ApprovalStoreError::ImplementerCannotDecide => ActionError::new(
+            403,
+            "implementer_cannot_decide",
+            format!(
+                "{action:?}: the implementing principal of a development project cannot decide \
+                 the gate that judges its own work (SPEC_V2 §5.4); the gate stays pending for a \
+                 different principal"
+            ),
+        ),
         store::ApprovalStoreError::Database(error) => store_error(error, action),
     }
 }
@@ -4287,7 +4296,12 @@ fn lesson_out(record: &LessonRecord) -> LessonOut {
     }
 }
 
-/// `lessons.propose`.
+/// `programme_lessons.propose` — the programme's lessons-learned register.
+///
+/// SPEC_V2 §D36's organisational memory keeps the `lessons.*` names (T8): a lesson there must
+/// cite resolvable, independent evidence and pass a person's review. This family is the MSP
+/// register a retro closes over — the same `lesson` table, scoped to a programme and a finding,
+/// with the evidence refs stored as the caller gives them.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct LessonProposeIn {
     /// The programme whose memory receives the lesson.
@@ -4302,7 +4316,7 @@ pub struct LessonProposeIn {
     pub evidence: Value,
 }
 
-/// `lessons.list`.
+/// `programme_lessons.list`.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct LessonListIn {
     /// The programme whose lessons are read.
@@ -4311,7 +4325,7 @@ pub struct LessonListIn {
 
 /// Propose a lesson for a retro finding.
 #[crate::action(
-    name = "lessons.propose",
+    name = "programme_lessons.propose",
     version = 1,
     kind = "internal",
     scopes = ["portfolio:write"],
@@ -4368,7 +4382,7 @@ async fn lessons_propose(
 
 /// List a programme's lessons.
 #[crate::action(
-    name = "lessons.list",
+    name = "programme_lessons.list",
     version = 1,
     kind = "internal",
     scopes = ["portfolio:read"],

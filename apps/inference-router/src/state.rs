@@ -134,6 +134,12 @@ impl AppState {
         &self.router
     }
 
+    /// An owned handle for work that outlives the request frame: the streaming body keeps the
+    /// open future alive after the response head has been sent.
+    pub fn router_shared(&self) -> Arc<RouterService> {
+        Arc::clone(&self.router)
+    }
+
     pub fn deps(&self) -> &AppDeps {
         &self.deps
     }

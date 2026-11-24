@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19 Phase-G compliance review — deliverycontract · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/compliance-review-delivery.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19-phase-g-compliance-review--delivery_contract">T19 Phase-G compliance review — delivery_contract</h1>
+<p>Action <code>architecture.reviews_record</code> on contract 01a20cea-91bb-77f4-a880-044c90bb5f0e (delivery_contract), level <code>conformant</code>, recorded by the tenant's <code>conveyor-approver</code> seat under the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3. The platform has no read action for compliance reviews, so the read-back below is the governing contract; the review row itself is verified by the regenerated conformance audit (<code>compliance_review_missing</code> clears) and the snapshot's <code>architecture.compliance_reviews</code>.</p>
+<pre><code>== write: architecture.reviews_record ==
+{
+  &quot;contract_id&quot;: &quot;01a20cea-91bb-77f4-a880-044c90bb5f0e&quot;,
+  &quot;evidence&quot;: {
+    &quot;basis&quot;: &quot;docs/plans/T19/evidence.md and docs/plans/T19/closure-review.md&quot;,
+    &quot;contract_id&quot;: &quot;01a20cea-91bb-77f4-a880-044c90bb5f0e&quot;,
+    &quot;delegation_ref&quot;: &quot;01a1fb9f-ac2d-732d-b274-1079be3dd2b3&quot;
+  },
+  &quot;findings&quot;: [
+    {
+      &quot;item&quot;: &quot;meeting_type authoring route&quot;,
+      &quot;kind&quot;: &quot;follow-up&quot;,
+      &quot;owner&quot;: &quot;programme-architect&quot;
+    },
+    {
+      &quot;item&quot;: &quot;T9 board / T10 cadence binding to meeting types&quot;,
+      &quot;kind&quot;: &quot;follow-up&quot;,
+      &quot;owner&quot;: &quot;programme-architect&quot;
+    },
+    {
+      &quot;item&quot;: &quot;tranche-4 authorisation is the programme&#39;s retrospective chain (#526), not a T19 delivery deviation&quot;,
+      &quot;kind&quot;: &quot;note&quot;
+    }
+  ],
+  &quot;id&quot;: &quot;01a20ceb-66b2-75a4-ac9f-6ceae8ab187d&quot;,
+  &quot;level&quot;: &quot;conformant&quot;,
+  &quot;outcome&quot;: null,
+  &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+  &quot;reviewed_at&quot;: &quot;2026-11-24T09:38:03.239657Z&quot;,
+  &quot;reviewed_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: architecture.contracts_get ==
+{
+  &quot;approval_id&quot;: &quot;01a20cea-a68f-7e08-8d0c-399759ef16e0&quot;,
+  &quot;approved_at&quot;: &quot;2026-11-24T09:37:19.527985Z&quot;,
+  &quot;approved_by&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+  &quot;body&quot;: {
+    &quot;approval&quot;: &quot;The Architecture Board approves this contract under the standing delegation; the board decision is cited in the approval field of the contract row.&quot;,
+    &quot;commitments&quot;: [
+      &quot;The twelve meetings.* actions, the five tables and the approval_decision participant extension are delivered and live (migration 0065).&quot;,
+      &quot;The human seat is available in the web room, over Telegram and over MCP, and the first decision across surfaces counts.&quot;,
+      &quot;Minutes are a governed asset published behind the chair&#39;s approval; the meeting closes only with them.&quot;,
+      &quot;The slice&#39;s acceptance is the D1\u2013D8 evidence and the live gate recorded in docs/plans/T19/evidence.md.&quot;
+    ],
+    &quot;compliance_method&quot;: &quot;The Architecture Board&#39;s Phase-G compliance review reads the delivered rows against the Statement of Architecture Work; each deviation is a change request or a recorded waiver.&quot;,
+    &quot;delegation_ref&quot;: &quot;01a1fb9f-ac2d-732d-b274-1079be3dd2b3&quot;
+  },
+  &quot;id&quot;: &quot;01a20cea-91bb-77f4-a880-044c90bb5f0e&quot;,
+  &quot;kind&quot;: &quot;delivery_contract&quot;,
+  &quot;phase_code&quot;: &quot;f&quot;,
+  &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+  &quot;requested_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;requester_unknown&quot;: false,
+  &quot;status&quot;: &quot;live&quot;,
+  &quot;superseded_by_id&quot;: null,
+  &quot;supersedes_id&quot;: null,
+  &quot;title&quot;: &quot;Delivery contract \u2014 T19 decision forums (2026-11-24)&quot;,
+  &quot;version&quot;: 2
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19/gov/compliance-review-delivery.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

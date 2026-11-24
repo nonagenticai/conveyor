@@ -184,6 +184,19 @@ READ_ACTIONS = {
 # absence is visible rather than implicit.
 MEASUREMENT_LIST_ACTION = "benefits.measurement_list"
 
+# The union gave SPEC_V2 §D36's organisational memory the `lessons.*` names (T8, main's
+# resolved-evidence lifecycle) and moved the lane's programme lessons register to
+# `programme_lessons.*`. The journal records each act under its recording-time name; every wire
+# call uses the merged name. Both spellings read the same `lesson` table.
+WIRE_ACTION = {
+    "lessons.propose": "programme_lessons.propose",
+    "lessons.list": "programme_lessons.list",
+}
+
+
+def wire_action(action: str) -> str:
+    return WIRE_ACTION.get(action, action)
+
 TOKEN = r"[A-Za-z0-9][A-Za-z0-9._-]*"
 RISK_KEY_RE = re.compile(rf"^risk:({TOKEN})(?:/(update))?$")
 BENEFIT_KEY_RE = re.compile(
@@ -1278,6 +1291,7 @@ class ActionClient:
         approval_id: str | None = None,
         actor: str | None = None,
     ) -> Any:
+        action = wire_action(action)
         # The HTTP principal is the bearer token's; the journal's actor cannot be assumed
         # there. The local transport (--local-bin) is the record's own and passes it.
         del actor
@@ -1381,6 +1395,7 @@ class LocalActionClient:
         approval_id: str | None = None,
         actor: str | None = None,
     ) -> Any:
+        action = wire_action(action)
         stdin = self.build_stdin(payload)
         environment = dict(os.environ)
         environment.setdefault("RUST_LOG", "error")
@@ -3840,6 +3855,7 @@ class FakeClient:
         approval_id: str | None = None,
         actor: str | None = None,
     ) -> Any:
+        action = wire_action(action)
         self.calls.append(
             (action, copy.deepcopy(payload), if_match, approval_id)
         )
@@ -4230,7 +4246,7 @@ class FakeClient:
                     row["state"] = "closed"
                     return copy.deepcopy(row)
             raise PromoteError("retros.close: no cadence")
-        if action == "lessons.list":
+        if action == "programme_lessons.list":
             return {
                 "items": [
                     copy.deepcopy(row)
@@ -4239,7 +4255,7 @@ class FakeClient:
                 ],
                 "next_cursor": None,
             }
-        if action == "lessons.propose":
+        if action == "programme_lessons.propose":
             row = copy.deepcopy(payload)
             row.update(id=self._id("lesson"), state="proposed", version=1)
             self.state.lessons.append(row)

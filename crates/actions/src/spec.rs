@@ -304,11 +304,26 @@ pub enum Scope {
     OrganisationRead,
     /// Create and change industries, jobs, releases and bindings.
     OrganisationWrite,
+    // T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata. A read is open; a write is work on the
+    // tenant's own improvement record (a member's and the kata executor's), not platform
+    // administration — adoption is P3's separate, human-only gate.
+    /// Read a kata, its six Gets and its measurement.
+    KataRead,
+    /// Open a kata and record its Gets and its held-out measurement.
+    KataWrite,
+    // T8 (SPEC_V2 §7.6, §10.3, §10.4, §12 T8, D36; issue #79): organisational memory. A job's
+    // executor proposes a lesson (`lessons:write`); only a person may review or promote it
+    // (`lessons:review`, granted to the two human roles literally — never the machine
+    // `kata_executor`).
+    /// Propose a lesson with its independent evidence references.
+    LessonsWrite,
+    /// Review a lesson and promote it to a knowledge-source draft — a person's act.
+    LessonsReview,
 }
 
 impl Scope {
     /// Every scope this build knows.
-    pub const ALL: [Scope; 70] = [
+    pub const ALL: [Scope; 74] = [
         Scope::ActionsRead,
         Scope::ActionsWrite,
         Scope::MeRead,
@@ -378,6 +393,10 @@ impl Scope {
         Scope::CapabilitiesWrite,
         Scope::OrganisationRead,
         Scope::OrganisationWrite,
+        Scope::KataRead,
+        Scope::KataWrite,
+        Scope::LessonsWrite,
+        Scope::LessonsReview,
         Scope::OpsWrite,
     ];
 
@@ -454,6 +473,10 @@ impl Scope {
             Self::CapabilitiesWrite => "capabilities:write",
             Self::OrganisationRead => "organisation:read",
             Self::OrganisationWrite => "organisation:write",
+            Self::KataRead => "kata:read",
+            Self::KataWrite => "kata:write",
+            Self::LessonsWrite => "lessons:write",
+            Self::LessonsReview => "lessons:review",
         }
     }
 
@@ -511,7 +534,8 @@ impl Scope {
             | Self::WorkflowsRead
             | Self::CapabilitiesRead
             | Self::ToolsRead
-            | Self::OrganisationRead => true,
+            | Self::OrganisationRead
+            | Self::KataRead => true,
             Self::RunsWrite
             | Self::ApprovalsWrite
             | Self::AndonWrite
@@ -530,7 +554,9 @@ impl Scope {
             | Self::EvalsRead
             | Self::EvalsWrite
             | Self::WorkflowsWrite
-            | Self::CapabilitiesWrite => member,
+            | Self::CapabilitiesWrite
+            | Self::KataWrite
+            | Self::LessonsWrite => member,
             Self::ChannelsWrite
             | Self::CataloguesWrite
             | Self::ActionsWrite
@@ -550,6 +576,10 @@ impl Scope {
             // ⛔ NOT the `admin` predicate: that includes `Role::KataExecutor`, a machine
             // role, and a scope a machine holds cannot be a sign-off (CONTRACT §20 trap 1).
             Self::EvalsApprove => matches!(role, Role::Admin),
+            // D36's person's review, likewise literal: `admin` and `member` are the two roles a
+            // human can hold. `kata_executor` is machine-only, so a job's executor can propose
+            // (`lessons:write`) but never review or promote its own lesson.
+            Self::LessonsReview => matches!(role, Role::Admin | Role::Member),
         }
     }
 }
@@ -908,7 +938,7 @@ impl ActionSpec {
     pub fn machine_forbidden(&self) -> bool {
         self.scopes
             .iter()
-            .any(|scope| scope.as_str() == crate::channel::MACHINE_DENIED_SCOPE)
+            .any(|scope| crate::channel::is_denied_scope(scope.as_str()))
             || crate::channel::is_denied_action(self.name)
             || crate::channel::is_denied_resource(crate::channel::resource_of(self.name))
     }
@@ -1088,8 +1118,12 @@ mod tests {
         assert_eq!(Scope::CapabilitiesWrite.as_str(), "capabilities:write");
         assert_eq!(Scope::OrganisationRead.as_str(), "organisation:read");
         assert_eq!(Scope::OrganisationWrite.as_str(), "organisation:write");
+        assert_eq!(Scope::KataRead.as_str(), "kata:read");
+        assert_eq!(Scope::KataWrite.as_str(), "kata:write");
+        assert_eq!(Scope::LessonsWrite.as_str(), "lessons:write");
+        assert_eq!(Scope::LessonsReview.as_str(), "lessons:review");
         assert_eq!(Scope::OpsWrite.as_str(), "ops:write");
-        assert_eq!(Scope::ALL.len(), 70);
+        assert_eq!(Scope::ALL.len(), 74);
     }
 
     #[test]

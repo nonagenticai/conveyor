@@ -4174,13 +4174,16 @@ pub async fn propose_lesson_tx(
             why: "the statement is required",
         });
     }
-    let independent_count = i32::try_from(
-        evidence
-            .as_array()
-            .map(|refs| refs.len())
-            .unwrap_or_default(),
-    )
-    .unwrap_or(i32::MAX);
+    // T8's rule reaches the retro too: the count is the distinct referenced objects, and a
+    // single independent reference is never stored (the table CHECK is the backstop).
+    let independent_count = crate::lesson::independent_count(evidence);
+    if independent_count == 1 {
+        return Err(PlanStoreError::Conflict {
+            what: "lesson",
+            why: "a lesson needs at least two independent evidence references; one reference \
+                  is not evidence",
+        });
+    }
     sqlx::query_scalar(
         "INSERT INTO lesson (tenant_id, programme_id, cadence_id, finding_key, statement,
                              evidence, independent_count)

@@ -31,6 +31,7 @@ pub mod channels;
 pub mod messages;
 // #282: the tenant's decision about how one destructive action is gated.
 pub mod policies;
+pub mod run_create;
 pub mod runs;
 pub mod views;
 
@@ -250,6 +251,15 @@ pub fn approval_error(error: store::ApprovalStoreError, action: &str) -> ActionE
             format!(
                 "{action:?}: deciding an eval sign-off requires the evals:approve scope, \
                  not approvals:write alone"
+            ),
+        ),
+        store::ApprovalStoreError::ImplementerCannotDecide => ActionError::new(
+            403,
+            "implementer_cannot_decide",
+            format!(
+                "{action:?}: the implementing principal of a development project cannot decide \
+                 the gate that judges its own work (SPEC_V2 §5.4); the gate stays pending for a \
+                 different principal"
             ),
         ),
         store::ApprovalStoreError::Database(error) => store_error(error, action),

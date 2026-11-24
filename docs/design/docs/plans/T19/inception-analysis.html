@@ -179,7 +179,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="build-versus-reuse">Build versus reuse</h2>
+<h2 id="build-vs-reuse">Build vs reuse</h2>
 <p><strong>Build:</strong> the five meeting tables; the twelve actions; the console screen; the participant extension; the <code>minutes</code> kind; the card type and seed; the instruments and flag.</p>
 <p><strong>Reuse, never rebuild:</strong> the approval lifecycle, the card/run path, the governed-asset lifecycle, the dependency edge, the board and cadence rows. The meeting is a composition over these primitives; a second decision table, a separate meeting-decision table, or a chat store is rejected by §6.8's first principle.</p>
 <p><strong>The one core-table decision:</strong> a job-binding seat must write an <code>approval_decision</code> row. The existing <code>approver_id</code> FK is human-only, so T19 adds nullable <code>approver_id</code>, <code>job_binding_id</code>, <code>participant_kind</code>, an exactly-one CHECK, and a partial unique index. The alternative — writing L1 <code>decision</code> rows for job seats — would split the decision record and is rejected.</p>

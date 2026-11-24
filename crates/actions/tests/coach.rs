@@ -185,6 +185,35 @@ async fn create_card(
     text(output(&body), "id")
 }
 
+/// A card that names its job binding — the binding a measurable kata opens under (§4.4).
+async fn create_bound_card(
+    running: &support::Running,
+    board: &str,
+    lane: &str,
+    card_type_code: &str,
+    name: &str,
+    binding: Uuid,
+) -> String {
+    let (status, body) = running
+        .invoke(
+            "cards.create",
+            TOKEN,
+            json!({
+                "board_id": board,
+                "list_id": lane,
+                "name": name,
+                "card_type_code": card_type_code,
+                "job_binding_id": binding,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    text(output(&body), "id")
+}
+
 /// v1-p6-6: a coach card exists only as the record of an interruption. The public create path
 /// (a person or an agent) is refused, so an orphan coach card nothing can triage is impossible;
 /// the coach's own path creates its card inside `coach.interrupt`.
@@ -902,16 +931,22 @@ async fn a_systemic_class_without_a_pinned_instrument_escalates() {
 async fn a_systemic_class_opens_one_measured_kata() {
     let (pg, running, seeded) = fixture().await;
     publish_processes(&running).await;
-    // The policy names the instrument, the held-out split and the pre-registered prediction.
+    // The card names its binding and the policy names a real locked instrument, the held-out
+    // split and the pre-registered prediction — the three things §6.3 says a kata measures.
+    let spine = support::kata::spine(&pg, &seeded).await;
+    let instrument = support::kata::instrument(&pg, &seeded, &[0.5], &[0.0], &[0.5], &[0.0]).await;
     let pin = json!({
         "systemic_classes": ["conveyor_defect"],
         "kata": {
             "instrument_kind": "eval",
-            "instrument_id": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+            "instrument_id": instrument.version_id,
             "instrument_version": "eval@1",
             "split": "test",
-            "split_sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-            "prediction": {"statement": "the coach removes the systemic class"},
+            "split_sha256": "a".repeat(64),
+            "prediction": {
+                "statement": "the coach removes the systemic class",
+                "threshold": 0.05,
+            },
             "base_ref": {"kind": "fixture", "version": 1},
         },
     });
@@ -925,7 +960,15 @@ async fn a_systemic_class_opens_one_measured_kata() {
     .await
     .expect("the coach policy");
     let (board, active, _waiting) = board_lanes(&pg, &seeded).await;
-    let card = create_card(&running, &board, &active, "feature", "systemic").await;
+    let card = create_bound_card(
+        &running,
+        &board,
+        &active,
+        "feature",
+        "systemic",
+        spine.binding_id,
+    )
+    .await;
     let run = fail_run(&pg, &seeded, &running, &card, FAILING_KEY).await;
     err_card(&pg, &seeded, &run).await;
     let (interruption, _, signature, _, _) = interruption_row(&pg, &seeded, &card).await;

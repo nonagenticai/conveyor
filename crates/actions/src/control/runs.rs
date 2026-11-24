@@ -12,7 +12,7 @@
 
 use conveyor_domain::RunStatus;
 use conveyor_store as store;
-use conveyor_store::run::{NewRun, RunRecord};
+use conveyor_store::run::RunRecord;
 use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
@@ -21,6 +21,7 @@ use crate::board::events::{RawEvent, append_raw_event};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
+use super::run_create::create_bound_run_tx;
 use super::views::{
     IdIn, RunCancelIn, RunCreateIn, RunFinishIn, RunGetIn, RunGetOut, RunListIn, RunOut,
     RunProcessRef, RunStepOut, RunTreeChildOut, RunTreeOut,
@@ -232,143 +233,18 @@ async fn runs_create(
         (Some(requested), _) => Some(requested),
         (None, on_card) => on_card,
     };
-    let board = store::board::get_board_tx(&mut *tx, ctx.tenant, card.board_id)
-        .await
-        .map_err(|error| store_error(error, action))?
-        .ok_or_else(|| ActionError::resource_not_found("board"))?;
-
-    let andon = store::andon::get_tx(&mut *tx, ctx.tenant)
-        .await
-        .map_err(|error| {
-            tracing::error!(%error, "read andon state");
-            ActionError::internal()
-        })?;
-    if andon.is_some_and(|state| state.engaged) {
-        return Err(ActionError::new(
-            409,
-            "andon-engaged",
-            "the tenant's andon cord is pulled; no run may be created while it is engaged",
-        ));
-    }
-
-    // S15's run wiring: a plain run executes under the capability its card's type binds — the
-    // same resolution `process_runs.start` uses. A card type that binds nothing is the
-    // explicit-input path: the run declares no capability, so there is nothing to check. The
-    // shared readiness guard runs before the run row, so a required pack nobody published
-    // refuses `409 capability_not_ready` with zero run rows rather than a `capability_id: None`.
-    let capability =
-        store::capability::capability_for_card_type_tx(&mut *tx, ctx.tenant, card.card_type_id)
-            .await
-            .map_err(|error| {
-                tracing::error!(%error, action, "resolve the card type's capability");
-                ActionError::internal()
-            })?;
-    let (capability_id, capability_agent_id) = match capability {
-        Some(capability) => {
-            let agents =
-                store::capability::list_agents_tx(&mut *tx, ctx.tenant, Some(capability.id), 100)
-                    .await
-                    .map_err(|error| {
-                        tracing::error!(%error, action, "list the capability's executors");
-                        ActionError::internal()
-                    })?;
-            let active: Vec<_> = agents
-                .into_iter()
-                .filter(|agent| agent.status == "active")
-                .collect();
-            let agent_id = (active.len() == 1).then(|| active[0].id);
-            (Some(capability.id), agent_id)
-        }
-        None => (None, None),
-    };
-    let bound_agents: Vec<Uuid> = capability_agent_id.into_iter().collect();
-    crate::capability::readiness::ensure_run_start_ready_tx(
+    let (run, out) = create_bound_run_tx(
         &mut *tx,
-        ctx.tenant,
-        capability_id,
-        &bound_agents,
+        &ctx,
+        &card,
+        job_binding_id,
+        input.correlation_id,
+        input.release_hash.clone(),
         action,
     )
     .await?;
 
-    let attempt = store::run::next_attempt_for_card_tx(&mut *tx, ctx.tenant, card.id)
-        .await
-        .map_err(|error| store_error(error, action))?;
-
-    // v1-p44-1 (SPEC_V2 §4.4): a ROOT run's executor is the agent its binding pins. `runs.create`
-    // has no process to resolve an agent from, so the binding is authoritative; a binding that
-    // pins no agent, or no binding at all, records `None`.
-    let mut capability_agent_id = capability_agent_id;
-    if let Some(binding_id) = input.job_binding_id {
-        let binding = store::organisation::job_binding_get_tx(&mut *tx, ctx.tenant, binding_id)
-            .await
-            // The same mapping `insert_run_tx` applies to its own pin resolution: a missing or
-            // foreign binding is a 404, a database failure is internal.
-            .map_err(|error| run_error(store::RunStoreError::from(error), action))?;
-        capability_agent_id = binding.capability_agent_id;
-
-        // #526 / D45: `runs.create` carries no run inputs, so an internal-agent binding must
-        // itself declare the ceiling; a budgetless one is refused here rather than at its first
-        // model call.
-        crate::invoke::ensure_binding_budget(
-            &mut *tx,
-            ctx.tenant,
-            binding_id,
-            &serde_json::Value::Null,
-        )
-        .await?;
-    }
-
-    let run = store::run::insert_run_tx(
-        &mut *tx,
-        ctx.tenant,
-        &NewRun {
-            card_id: Some(card.id),
-            project_id: board.project_id,
-            attempt,
-            correlation_id: input.correlation_id,
-            process_id: None,
-            inputs: serde_json::Value::Object(serde_json::Map::new()),
-            capability_id,
-            capability_agent_id,
-            // `runs.create` is a ROOT: a plain run has no parent, no step and pins no process.
-            parent_run_id: None,
-            step_id: None,
-            workflow_step_id: None,
-            depth: 0,
-            process_version: 1,
-            // T0: a run may name the organisation binding (and the release it claims) it
-            // executes under. The store refuses a retired binding or a stale pin 409 before
-            // the INSERT (SPEC_V2 §4.4). S21 step 6: a card's own binding is inherited when
-            // the request omits one.
-            job_binding_id,
-            release_hash: input.release_hash.clone(),
-        },
-    )
-    .await
-    .map_err(|error| run_error(error, action))?;
-
-    store::run::enqueue_run_execute_tx(&mut *tx, ctx.tenant, run.id)
-        .await
-        .map_err(|error| store_error(error, action))?;
-
-    let record = read_record(tx, &ctx, run.id, action).await?;
-    let out = run_out(&record);
-    emit_run_event(
-        &mut *tx,
-        &ctx,
-        run.id,
-        "run.created",
-        serde_json::json!({
-            "run_id": run.id,
-            "card_id": run.card_id,
-            "attempt": run.attempt,
-        }),
-        serde_json::to_value(&out).unwrap_or(serde_json::Value::Null),
-    )
-    .await?;
-
-    Ok(HandlerOutput::created(out).with_etag(run.version.etag()))
+    Ok(HandlerOutput::created(out).with_etag(run.run.version.etag()))
 }
 
 /// Move a queued run to `running`.

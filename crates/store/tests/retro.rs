@@ -110,7 +110,8 @@ async fn lesson(db: &support::TestDb, f: &Fixture, key: &str) -> Uuid {
         Some(f.cadence),
         key,
         &format!("lesson for {key}"),
-        &json!([{ "run_id": "r-1" }]),
+        // T8's rule applies to a retro proposal too: one referenced object is not evidence.
+        &json!([{ "run_id": "r-1" }, { "run_id": "r-2" }]),
     )
     .await
     .expect("propose a lesson");

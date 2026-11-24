@@ -49,7 +49,7 @@ Measured at `main@b9a6e293` on 2026-11-23.
 | Action declaration | `crates/actions/src/control/approvals.rs`; `crates/actions/tests/` | Reuse the `ActionSpec` pattern for `meetings.*` |
 | Console contract | `apps/web/src/app.rs`; `docs/design/v2.js` §10.5 | Extend the T18 route registry with `/meetings` and its spec |
 
-## Build versus reuse
+## Build vs reuse
 
 **Build:** the five meeting tables; the twelve actions; the console screen; the participant
 extension; the `minutes` kind; the card type and seed; the instruments and flag.

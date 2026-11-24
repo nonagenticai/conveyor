@@ -1,29 +1,25 @@
 #![forbid(unsafe_code)]
 //! How a tenant wants its destructive actions gated (conveyor#282, SPEC_V2 §10.4 / §11.4 / §5.4).
 //!
-//! Two settings per (tenant, action):
+//! Two questions per (tenant, action), and nothing else:
 //!
 //! * `approval` — `required` (the default, and §11.4's rule) or `waived` (this tenant's opt-out);
-//! * `approver_kind` — `human` (the default, and §5.4's rule) or the one non-human kind
-//!   (`triage_agent`, `rule`, `agent`, `service`) this tenant explicitly declares
-//!   non-governance for the gate.
-//!
-//! `self_approval` is **not** a setting: §5.4 / P4 make the requester's exclusion an invariant,
-//! so [`SelfApproval::Forbidden`] is the only storable value and no read path returns permission.
-//! The `allowed` spelling survives only so a row written before ledger v1-w4b-4 still reads; such
-//! a row is inert data.
+//! * `self_approval` — `forbidden` (the default, and §5.4's rule) or `allowed`.
 //!
 //! ⛔ **An absent row is the safe default, never "no policy".** Every reader in this module
 //! answers with `required` / `forbidden` when the row is missing, so a tenant that has decided
 //! nothing gets the strict behaviour it never opted out of. Only `set` writes a row.
 //!
 //! `action` is the action's own name, which is the same string `approval.gate` carries for a
-//! destructive gate — that equality is what lets [`waives`] read the policy for the gate it is
-//! about to admit without any caller naming the action again.
+//! destructive gate — that equality is what lets the decide path read this policy for the gate it
+//! is about to resolve without any caller naming the action again.
 
 use std::str::FromStr;
 
-use conveyor_domain::{DeciderKind, TenantId};
+use conveyor_domain::TenantId;
+use conveyor_domain::Timestamp;
+use conveyor_domain::development::ApproverKind;
+use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -40,13 +36,9 @@ pub enum ApprovalPolicyStoreError {
         /// The stored value.
         value: String,
     },
-    /// `self_approval = allowed` was offered for storage. §5.4 / P4 make the requester's
-    /// exclusion an invariant, so `forbidden` is the only storable spelling; a historical
-    /// `allowed` row still reads (ledger v1-w4b-4).
-    #[error(
-        "self_approval cannot be `allowed`: the requester can never decide their own gate \
-         (SPEC_V2 §5.4)"
-    )]
+    /// The policy tried to store `self_approval = allowed`; SPEC_V2 §5.4 makes self-approval
+    /// an invariant, not a tenant permission (ledger v1-w4b-4).
+    #[error("SPEC_V2 §5.4: self-approval cannot be stored as `allowed`")]
     SelfApprovalAllowed,
     /// The database refused the statement.
     #[error(transparent)]
@@ -87,15 +79,12 @@ impl std::str::FromStr for ApprovalRequirement {
     }
 }
 
-/// The `self_approval` column's vocabulary. `Forbidden` is the only storable value.
+/// Whether the person who requested a gate may decide it.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SelfApproval {
-    /// §5.4 / P4: the requester cannot decide the gate that judges their own work. The default
-    /// and the only value `set` accepts.
+    /// §5.4: the requester cannot decide the gate that judges their own work. The default.
     Forbidden,
-    /// A **historical** value only. It exists so a row written before ledger v1-w4b-4 still
-    /// reads, and it never authorises a decision: the writer refuses a self-decision
-    /// unconditionally and [`set`] refuses to store this variant.
+    /// This tenant has opted out for this action.
     Allowed,
 }
 
@@ -124,18 +113,26 @@ impl std::str::FromStr for SelfApproval {
     }
 }
 
-/// A tenant's gating policy for one action.
-#[derive(Clone, Debug, Eq, PartialEq)]
+/// One tenant's decision about one action.
+///
+/// The first two fields are #282's destructive-action policy. The second three are T6's
+/// auto-merge extension on the same row (§6.4): an approver kind (`human` by default, so
+/// auto-merge is off until a tenant records it), the typed conditions that earn it and its
+/// expiry. A row with `approver_kind = 'human'` keeps `conditions = {}` and `expires_at = NULL`.
+#[derive(Clone, Debug, PartialEq)]
 pub struct ApprovalPolicy {
     /// The action the policy governs.
     pub action: String,
     /// Whether the action is gated.
     pub approval: ApprovalRequirement,
-    /// The requester's exclusion; `Forbidden` for every policy `set` accepts.
+    /// Whether its requester may decide its gate.
     pub self_approval: SelfApproval,
-    /// The approver kind this tenant authorises for the gate. `Human` is the default and the
-    /// §5.4 rule; a non-human kind is an explicit non-governance declaration for this gate.
-    pub approver_kind: DeciderKind,
+    /// Who decides the gate: a person (the default) or the tenant's earned policy.
+    pub approver_kind: ApproverKind,
+    /// The typed conditions an auto policy carries (§6.4).
+    pub conditions: Value,
+    /// When an auto policy stops applying. An expired policy falls back to a human.
+    pub expires_at: Option<Timestamp>,
 }
 
 impl ApprovalPolicy {
@@ -145,7 +142,9 @@ impl ApprovalPolicy {
             action: action.to_owned(),
             approval: ApprovalRequirement::Required,
             self_approval: SelfApproval::Forbidden,
-            approver_kind: DeciderKind::Human,
+            approver_kind: ApproverKind::Human,
+            conditions: Value::Object(serde_json::Map::new()),
+            expires_at: None,
         }
     }
 }
@@ -156,37 +155,34 @@ struct PolicyRow {
     approval: String,
     self_approval: String,
     approver_kind: String,
+    conditions: Value,
+    expires_at: Option<Timestamp>,
 }
 
 impl PolicyRow {
     fn into_policy(self) -> Result<ApprovalPolicy, ApprovalPolicyStoreError> {
+        // §5.4 is an invariant, not a stored permission: a historical `allowed` row still
+        // parses (it must read), and NO read path returns it as permission (ledger v1-w4b-4).
+        let self_approval = match SelfApproval::from_str(&self.self_approval)? {
+            SelfApproval::Allowed | SelfApproval::Forbidden => SelfApproval::Forbidden,
+        };
         Ok(ApprovalPolicy {
             approval: ApprovalRequirement::from_str(&self.approval)?,
-            self_approval: SelfApproval::from_str(&self.self_approval)?,
-            approver_kind: parse_approver_kind(&self.approver_kind)?,
+            self_approval,
             action: self.action,
+            approver_kind: ApproverKind::from_str(&self.approver_kind).map_err(|_| {
+                ApprovalPolicyStoreError::Vocabulary {
+                    what: "approval_policy.approver_kind",
+                    value: self.approver_kind,
+                }
+            })?,
+            conditions: self.conditions,
+            expires_at: self.expires_at,
         })
     }
 }
 
-/// The stored `approval_policy.approver_kind`, in the domain's `DeciderKind` spelling.
-///
-/// A value outside the migration's CHECK vocabulary is a typed error, never a coerced default.
-fn parse_approver_kind(text: &str) -> Result<DeciderKind, ApprovalPolicyStoreError> {
-    match text {
-        "human" => Ok(DeciderKind::Human),
-        "triage_agent" => Ok(DeciderKind::TriageAgent),
-        "rule" => Ok(DeciderKind::Rule),
-        "agent" => Ok(DeciderKind::Agent),
-        "service" => Ok(DeciderKind::Service),
-        other => Err(ApprovalPolicyStoreError::Vocabulary {
-            what: "approval_policy.approver_kind",
-            value: other.to_owned(),
-        }),
-    }
-}
-
-const COLUMNS: &str = "action, approval, self_approval, approver_kind";
+const COLUMNS: &str = "action, approval, self_approval, approver_kind, conditions, expires_at";
 
 /// The tenant's policy for one action, or `None` when it has set none.
 ///
@@ -220,10 +216,6 @@ pub async fn list(
 }
 
 /// Insert or replace the tenant's policy for one action.
-///
-/// ⛔ `self_approval = allowed` is refused (ledger v1-w4b-4). §5.4 / P4 is an invariant, not a
-/// permission: reads still parse a historical `allowed` row, but no write may record the value,
-/// so `forbidden` is the only storable spelling.
 pub async fn set(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -235,12 +227,14 @@ pub async fn set(
     }
     sqlx::query(
         "INSERT INTO approval_policy (tenant_id, action, approval, self_approval, approver_kind,
-                                      updated_by)
-         VALUES ($1, $2, $3, $4, $5, $6)
+                                      conditions, expires_at, updated_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          ON CONFLICT (tenant_id, action) DO UPDATE
             SET approval = excluded.approval,
                 self_approval = excluded.self_approval,
                 approver_kind = excluded.approver_kind,
+                conditions = excluded.conditions,
+                expires_at = excluded.expires_at,
                 updated_by = excluded.updated_by,
                 updated_at = now()",
     )
@@ -249,6 +243,8 @@ pub async fn set(
     .bind(policy.approval.as_str())
     .bind(policy.self_approval.as_str())
     .bind(policy.approver_kind.as_str())
+    .bind(&policy.conditions)
+    .bind(policy.expires_at)
     .bind(updated_by)
     .execute(conn)
     .await?;
@@ -272,30 +268,42 @@ pub async fn waives(
     }
 }
 
-// ⛔ There is deliberately no `allows_self_approval` reader (ledger v1-w4b-4): §5.4 / P4 is an
-// invariant, so no decision path may turn a stored row into a permission. The decision writer
-// refuses a requester's own decision unconditionally; a historical `allowed` row reads but is
-// inert. Reintroducing a permission read would reopen the finding.
-
-/// Whether `approver` may decide a gate on `action`. **The decide path's human-default read.**
+/// Whether the requester of a gate on `action` may decide it themselves. **The decide path's read.**
 ///
-/// A human approver is always admitted (§5.4's default). A non-human kind is admitted only when
-/// the tenant's row for this gate names that exact kind — the explicit non-governance
-/// declaration. A missing row, an unreadable row or a corrupt value all keep `false`: a machine
-/// decision is never admitted because the policy could not be read.
-pub async fn allows_approver_kind(
+/// A missing row answers `false`: §5.4 is the default, not a permission.
+pub async fn allows_self_approval(
     conn: &mut PgConnection,
     tenant: TenantId,
     action: &str,
-    approver: DeciderKind,
 ) -> Result<bool, ApprovalPolicyStoreError> {
-    if approver == DeciderKind::Human {
-        return Ok(true);
-    }
     match get(conn, tenant, action).await {
-        Ok(Some(policy)) => Ok(policy.approver_kind == approver),
+        Ok(Some(policy)) => Ok(policy.self_approval == SelfApproval::Allowed),
         Ok(None) => Ok(false),
         Err(ApprovalPolicyStoreError::Vocabulary { .. }) => Ok(false),
         Err(error) => Err(error),
     }
+}
+
+/// Whether the tenant's policy lets this decider kind decide the action's gate.
+///
+/// The lane's rule (SPEC_V2 §5.4): a policy's `approver_kind` names who may decide; an absent
+/// policy is the strict `human` default. The union's vocabulary adds `auto` (T6's earned
+/// auto-merge policy), whose decisions are the deterministic policy engine's, so a `rule`
+/// decider satisfies it. The writer still refuses a requester deciding their own gate.
+pub async fn allows_approver_kind(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    action: &str,
+    decider: conveyor_domain::DeciderKind,
+) -> Result<bool, ApprovalPolicyStoreError> {
+    let policy = match get(&mut *conn, tenant, action).await? {
+        Some(policy) => policy,
+        None => ApprovalPolicy::default_for(action),
+    };
+    let wanted = match policy.approver_kind {
+        // An auto policy is decided by the engine's deterministic rule path.
+        ApproverKind::Auto => ApproverKind::Rule,
+        other => other,
+    };
+    Ok(wanted == ApproverKind::from(decider))
 }

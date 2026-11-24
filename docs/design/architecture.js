@@ -88,7 +88,13 @@ window.ArchitecturePack = (function () {
   participant BR as Tool broker
   participant G as Approval gate
   participant EV as Evidence
-  P->>API: start a run for a card
+  alt explicit runs.create
+    P->>API: start a run for a card
+  else cards.assign — the handoff (S21 step 9)
+    P->>API: hand off a card: the binding and what the receiver must know
+    API->>KM: the note becomes one hot memory row, same transaction
+    API-->>P: 409 card_has_live_run when the card already has a live root run
+  end
   API->>B: inherit the card's job_binding_id (or refuse a conflict)
   API->>WF: enqueue the run
   WF->>B: check the pinned release_hash
@@ -125,8 +131,7 @@ window.ArchitecturePack = (function () {
     WF->>KM: one attempt hot row, in the terminal transaction (root card runs)
     WF->>EV: run, step, tool_call and inference_call rows
     WF-->>P: terminal result
-  end
-  `,
+  end`,
     "broker-sequence": `sequenceDiagram
   autonumber
   participant EX as Executor

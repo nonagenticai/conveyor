@@ -589,3 +589,48 @@ async fn only_a_process_step_declares_a_request() {
         "the executor envelope is never a request"
     );
 }
+
+#[tokio::test]
+async fn a_handoff_note_is_a_hot_memory_row_the_facts_select() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "prompt-handoff").await;
+
+    // The row `cards.assign` writes (S21 step 9): a handoff fact from a person, carrying the
+    // run it was handed with. It is an ordinary hot row, not a special class.
+    sqlx::query(
+        "INSERT INTO work_package_memory
+             (tenant_id, project_id, card_id, run_id, kind, source, body)
+         VALUES ($1, $2, $3, $4, 'fact', 'human', $5)",
+    )
+    .bind(seeded.tenant)
+    .bind(seeded.project)
+    .bind(seeded.card)
+    .bind(seeded.run)
+    .bind("the brief is in document 42; split it before drafting")
+    .execute(&db.super_pool)
+    .await
+    .expect("handoff memory row");
+
+    let mut tx = begin_scoped(&db.runtime, tenant(&seeded))
+        .await
+        .expect("scope");
+    let facts = facts_for_run_tx(
+        &mut tx,
+        tenant(&seeded),
+        seeded.run,
+        None,
+        &MemorySelector::default(),
+        None,
+    )
+    .await
+    .expect("facts");
+    tx.commit().await.expect("commit");
+
+    let line = facts
+        .memory
+        .iter()
+        .find(|line| line.body == "the brief is in document 42; split it before drafting")
+        .unwrap_or_else(|| panic!("the handoff note is not selected: {:?}", facts.memory));
+    assert_eq!(line.kind, conveyor_domain::memory::MemoryKind::Fact);
+    assert_eq!(line.source, conveyor_domain::memory::MemorySource::Human);
+}

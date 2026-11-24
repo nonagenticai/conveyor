@@ -131,13 +131,15 @@ use serde_json::{Value, json};
 /// replay's read adds 560.
 /// **T19 (#606) adds 12 internal**: the meetings family
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
-/// `minutes_publish|list|get`). 560 → **572**.
-const EXPECTED: [&str; 572] = [
+/// **S21 step 9 (#649) adds `cards.assign`**, **T5 (#77) `kata.hypothesise`**, **T6 (#80)
+/// the development-project family**, **T8 (#79) the `lessons.*` lifecycle**, and the lane adds
+/// its own families. The merged registry is **585: 566 internal, 19 external**.
+const EXPECTED: [&str; 586] = [
     "actions.describe",
     "actions.list",
+    "agent.run",
     "analyse.site",
     "analyse.video",
-    "agent.run",
     "andon.engage",
     "andon.release",
     "approval_policies.get",
@@ -146,9 +148,6 @@ const EXPECTED: [&str; 572] = [
     "approvals.decide",
     "approvals.list",
     "approvals.request",
-    // T9 (#81): the TOGAF ADM capability — artefacts and their entries/links, the repository,
-    // the profile, the Board, contracts, phase advances, compliance reviews and waivers, and the
-    // two Preliminary assessments. Twenty-six internal actions.
     "architecture.artifacts_approve",
     "architecture.artifacts_create",
     "architecture.artifacts_entries",
@@ -232,14 +231,15 @@ const EXPECTED: [&str; 572] = [
     "card_types.list",
     "cards.add_label",
     "cards.archive",
+    "cards.assign",
     "cards.claim",
     "cards.comment",
     "cards.create",
     "cards.duplicate",
     "cards.get",
-    "cards.list",
     "cards.ledger_append",
     "cards.ledger_list",
+    "cards.list",
     "cards.move",
     "cards.release",
     "cards.remove_label",
@@ -264,20 +264,14 @@ const EXPECTED: [&str; 572] = [
     "coach.triage",
     "coding_jobs.create",
     "coding_jobs.get",
-    "completions.create",
     "comments.delete",
     "comments.update",
+    "completions.create",
     "custom_fields.clear_value",
     "custom_fields.create",
     "custom_fields.delete",
     "custom_fields.set_value",
     "custom_fields.update",
-    "decisions.create",
-    "decisions.get",
-    "decisions.list",
-    "decisions.transition",
-    "decisions.update",
-    "decks.render",
     "decision_options.create",
     "decision_options.get",
     "decision_options.publish",
@@ -286,8 +280,23 @@ const EXPECTED: [&str; 572] = [
     "decision_policies.create",
     "decision_policies.list",
     "decision_policies.update",
+    "decisions.create",
+    "decisions.get",
+    "decisions.list",
+    "decisions.transition",
+    "decisions.update",
+    "decks.render",
     "departments.create",
     "departments.list",
+    "development_projects.change_judging_surface",
+    "development_projects.charter",
+    "development_projects.close",
+    "development_projects.deploy_gate",
+    "development_projects.get",
+    "development_projects.merge_gate",
+    "development_projects.record_step",
+    "development_projects.review_gate",
+    "development_projects.rollback",
     "documents.compose",
     "documents.create",
     "documents.delete",
@@ -385,6 +394,7 @@ const EXPECTED: [&str; 572] = [
     "kata.analyse",
     "kata.close",
     "kata.get",
+    "kata.hypothesise",
     "kata.list",
     "kata.measure",
     "kata.observe",
@@ -404,8 +414,9 @@ const EXPECTED: [&str; 572] = [
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
-    "lessons.list",
+    "lessons.promote",
     "lessons.propose",
+    "lessons.review",
     "licences.get",
     "lists.create",
     "lists.move",
@@ -425,9 +436,6 @@ const EXPECTED: [&str; 572] = [
     "media.run_gherkin",
     "media.thumbnail",
     "media.transcribe",
-    "members.list",
-    "members.remove",
-    "members.set_role",
     "meetings.agenda_add",
     "meetings.close",
     "meetings.close_item",
@@ -440,8 +448,12 @@ const EXPECTED: [&str; 572] = [
     "meetings.position",
     "meetings.respond",
     "meetings.schedule",
+    "members.list",
+    "members.remove",
+    "members.set_role",
     "memory.recall",
     "memory.remember",
+    "messages.send",
     "metrics.flow",
     "metrics.job",
     "metrics.maturity",
@@ -450,7 +462,6 @@ const EXPECTED: [&str; 572] = [
     "metrics.threshold_get",
     "metrics.threshold_update",
     "metrics.usage",
-    "messages.send",
     "model_elements.create",
     "model_elements.delete",
     "model_elements.list",
@@ -487,10 +498,10 @@ const EXPECTED: [&str; 572] = [
     "ops.events",
     "ops.flag_flip",
     "ops.flux_status",
-    "ops.incident",
     "ops.host_logs",
     "ops.host_restart_unit",
     "ops.host_status",
+    "ops.incident",
     "ops.logs",
     "ops.mitigate",
     "ops.pods",
@@ -524,7 +535,6 @@ const EXPECTED: [&str; 572] = [
     "procedures.review_source",
     "procedures.update",
     "procedures.validate",
-    "produce.speech",
     "process_maps.create",
     "process_maps.get",
     "process_maps.list",
@@ -539,9 +549,12 @@ const EXPECTED: [&str; 572] = [
     "processes.retire",
     "processes.update",
     "produce.script",
+    "produce.speech",
     "programmes.baseline",
     "programmes.baseline_approve",
     "programmes.baselines_list",
+    "programme_lessons.list",
+    "programme_lessons.propose",
     "programmes.create",
     "programmes.get",
     "programmes.list",
@@ -690,16 +703,16 @@ const EXPECTED: [&str; 572] = [
     "webhooks.test",
     "webhooks.update",
     "workers.list",
+    "workflow_runs.cancel",
+    "workflow_runs.get",
+    "workflow_runs.start",
+    "workflow_traces.export",
     "workflows.create",
     "workflows.get",
     "workflows.list",
     "workflows.publish",
     "workflows.retire",
     "workflows.update",
-    "workflow_runs.cancel",
-    "workflow_runs.get",
-    "workflow_runs.start",
-    "workflow_traces.export",
     "youtube.client_get",
     "youtube.client_set",
     "youtube.connect",
@@ -800,13 +813,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
     // 520 -> 525; external stays 14.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
-    // `trend` and `scientific_formal.translate|verify`. #556/#590 add eight internal actions
-    // (`storage.get|put`, `tool_bindings.create|list|retire|update`, `tools.resume|retire`).
-    // #526 (w3-gov-assets-1) adds five internal actions (`governed_assets.compose|get|list|submit|
-    // approve`). The promotion replay adds one internal read (`architecture.reviews_list`).
-    // T19 (#606) adds twelve internal meetings actions. The merged registry is 572: 553 internal,
-    // 19 external.
-    assert_eq!((internal, external), (553, 19));
+    // The merged registry is 586: 567 internal (the lane's 553 + main's 13 new kata/T6/T8
+    // actions + `programme_lessons.propose`, the lane's programme register which the union
+    // renamed out of SPEC §D36's `lessons.*` family), 19 external. T5's kata names are one
+    // family: main's eight implementations plus the lane's `kata.list`/`propagate`/`close`.
+    assert_eq!((internal, external), (567, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
@@ -1337,8 +1348,16 @@ fn journal_inputs_match_their_action_schemas() {
         if action == "wbs.update" && input.get("id").is_none() {
             input["id"] = json!("00000000-0000-0000-0000-000000000000");
         }
+        // The union renamed the lane's programme lessons register out of SPEC §D36's
+        // `lessons.*` family; the journal keeps the recording-time name, and the schema the
+        // replay actually sends is the merged action's (see `WIRE_ACTION` in
+        // `scripts/promote-record.py`).
+        let wire = match action {
+            "lessons.propose" => "programme_lessons.propose",
+            other => other,
+        };
         let spec = registry()
-            .get(action)
+            .get(wire)
             .unwrap_or_else(|| panic!("journal names unregistered action {action}"));
         let errors = validate_input(&spec.input_schema(), &input);
         if !errors.is_empty() {

@@ -253,6 +253,15 @@ fn variant_path(kind: &str, value: &str) -> syn::Result<String> {
         // administration like `departments:write`.
         ("scope", "organisation:read") => "OrganisationRead",
         ("scope", "organisation:write") => "OrganisationWrite",
+        // T5. The kata's pair: a read is open, a write is work on the tenant's own improvement
+        // record (member and the kata executor) — adoption stays P3's separate human gate.
+        ("scope", "kata:read") => "KataRead",
+        ("scope", "kata:write") => "KataWrite",
+        // T8 (#79). Organisational memory: a job's executor proposes (write), and only the two
+        // human roles hold the review scope — `lessons:review` is never granted to
+        // `kata_executor`, so a machine cannot sign off its own lesson (D36).
+        ("scope", "lessons:write") => "LessonsWrite",
+        ("scope", "lessons:review") => "LessonsReview",
         (kind, other) => {
             return Err(syn::Error::new(
                 proc_macro2::Span::call_site(),
