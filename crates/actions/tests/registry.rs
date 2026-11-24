@@ -132,7 +132,12 @@ use serde_json::{Value, json};
 /// `authoring.intakes` → **565**. **S21 step 10 (#656) adds 4**: `ladder.case` and
 /// `decision_option_sets.get|set` (internal) and `ladder.precheck` (external) — 565 → **569**,
 /// internal 547 → 550, external 18 → 19.
-const EXPECTED: [&str; 574] = [
+/// **T14 (#561) adds 5 external reads**: `webscraper.scrape_url|scrape_bulk` and
+/// `lean4.check|elaborate|prove` — 569 → **574**, external 19 → 24.
+/// **#557 adds 8 internal**: `tool_bindings.create|update|retire|list`, `tools.list|get`,
+/// `toolkits.list` and `tool_calls.list` — 574 → **582**, internal 550 → 558, external
+/// stays 24.
+const EXPECTED: [&str; 582] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -658,12 +663,20 @@ const EXPECTED: [&str; 574] = [
     "tool_authoring.review",
     "tool_authoring.test",
     "tool_authoring.validate",
+    "tool_bindings.create",
+    "tool_bindings.list",
+    "tool_bindings.retire",
+    "tool_bindings.update",
+    "tool_calls.list",
     "toolkits.discover_mcp",
     "toolkits.import_openapi",
+    "toolkits.list",
     "toolkits.publish",
     "toolkits.register_mcp",
     "tools.call",
     "tools.dispatch",
+    "tools.get",
+    "tools.list",
     "tools.probe",
     "tools.usage",
     "trace_links.create",
@@ -829,7 +842,10 @@ fn the_registry_is_exactly_the_declared_set() {
     // T14 (#561) adds five external reads (`webscraper.scrape_url|scrape_bulk`,
     // `lean4.check|elaborate|prove`): internal stays 550, external 19 -> 24 — each call
     // dispatches to a Rust service, not a new internal action.
-    assert_eq!((internal, external), (550, 24));
+    // #557 adds eight internal actions (`tool_bindings.create|update|retire|list`,
+    // `tools.list|get`, `toolkits.list`, `tool_calls.list`): internal 550 -> 558;
+    // external stays 24.
+    assert_eq!((internal, external), (558, 24));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

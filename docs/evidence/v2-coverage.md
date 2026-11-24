@@ -5,8 +5,8 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | the real route and its Playwright spec exist | 59 |
-| `extend` | a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner | 7 |
+| `exists` | the real route and its Playwright spec exist | 60 |
+| `extend` | a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner | 6 |
 | `new` | neither the route nor an ancestor exists | 3 |
 
 ## Rows
@@ -68,7 +68,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:operations` | §10.4 | actions | operations | `exists` | actions: ops.* found (ops.ci_status, ops.deployments, ops.events…) |
 | `actions:analysis` | §10.4 | actions | analysis | `exists` | actions: analyse.* found (analyse.site, analyse.video) |
 | `actions:production` | §10.4 | actions | production | `exists` | actions: produce.* found (produce.script) |
-| `actions:tools` | §10.4 | actions | tools | `extend` | actions: tool_authoring.* found (tool_authoring.draft, tool_authoring.promote, tool_authoring.publish…)<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* found (toolkits.discover_mcp, toolkits.import_openapi, toolkits.publish…)<br>actions: tools.* found (tools.probe, tools.usage) |
+| `actions:tools` | §10.4 | actions | tools | `exists` | actions: tool_authoring.* found (tool_authoring.draft, tool_authoring.promote, tool_authoring.publish…)<br>actions: tool_bindings.* found (tool_bindings.create, tool_bindings.list, tool_bindings.retire…)<br>actions: tool_calls.* found (tool_calls.list)<br>actions: toolkits.* found (toolkits.discover_mcp, toolkits.import_openapi, toolkits.list…)<br>actions: tools.* found (tools.get, tools.list, tools.probe…) |
 | `actions:memory` | §10.4 | actions | memory | `exists` | actions: lessons.* found (lessons.promote, lessons.propose, lessons.review) |
 | `actions:metrics` | §10.4 | actions | metrics | `exists` | actions: metrics.* found (metrics.flow, metrics.job, metrics.maturity…) |
 | `destination:Organisation` | §10.5 | destination | Organisation | `exists` | apps/web/src/app.rs: route '/organisation' found<br>apps/web/e2e/organisation.spec.ts: present<br>docs/design/v2.js: page 'organisation' — design reference, not implementation<br>*The mock page is a design study; the app's /organisation route renders the T0/T2 organisation reads, and the write verbs remain T0/T2's.* |

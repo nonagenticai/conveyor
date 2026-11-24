@@ -427,9 +427,12 @@ mod tests {
         // `ladder.precheck`: 565 -> 569.
         // T14 (#561) adds five external reads (`webscraper.scrape_url|scrape_bulk`,
         // `lean4.check|elaborate|prove`): 569 -> 574.
+        // #557 adds eight internal binding/catalogue actions
+        // (`tool_bindings.create|update|retire|list`, `tools.list|get`, `toolkits.list` and
+        // `tool_calls.list`): 574 -> 582; internal 550 -> 558, external stays 24.
         assert_eq!(
             registry.len(),
-            574,
+            582,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -463,7 +466,8 @@ mod tests {
              scientific_formal.translate|verify) (513) + T15's ten authoring/BYO actions \
              (toolkits.import_openapi|register_mcp|discover_mcp, \
              tool_authoring.draft|validate|test|review|publish|promote, tools.dispatch) — the \
-             registry total is 574 with the T6, T8, T12, #655, S21-step-10 and #561 increments above
+             registry total is 582 with the T6, T8, T12, #655, S21-step-10, #561 and #557 \
+             increments above
              it. \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
