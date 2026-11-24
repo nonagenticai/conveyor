@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | the real route and its Playwright spec exist | 58 |
+| `exists` | the real route and its Playwright spec exist | 59 |
 | `extend` | a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner | 7 |
-| `new` | neither the route nor an ancestor exists | 4 |
+| `new` | neither the route nor an ancestor exists | 3 |
 
 ## Rows
 
@@ -69,7 +69,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:analysis` | §10.4 | actions | analysis | `exists` | actions: analyse.* found (analyse.site, analyse.video) |
 | `actions:production` | §10.4 | actions | production | `exists` | actions: produce.* found (produce.script) |
 | `actions:tools` | §10.4 | actions | tools | `extend` | actions: tool_authoring.* absent<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* found (toolkits.publish)<br>actions: tools.* found (tools.probe, tools.usage) |
-| `actions:memory` | §10.4 | actions | memory | `new` | actions: lessons.* absent |
+| `actions:memory` | §10.4 | actions | memory | `exists` | actions: lessons.* found (lessons.promote, lessons.propose, lessons.review) |
 | `actions:metrics` | §10.4 | actions | metrics | `exists` | actions: metrics.* found (metrics.flow, metrics.job, metrics.maturity…) |
 | `destination:Organisation` | §10.5 | destination | Organisation | `exists` | apps/web/src/app.rs: route '/organisation' found<br>apps/web/e2e/organisation.spec.ts: present<br>docs/design/v2.js: page 'organisation' — design reference, not implementation<br>*The mock page is a design study; the app's /organisation route renders the T0/T2 organisation reads, and the write verbs remain T0/T2's.* |
 | `destination:Procedures` | §10.5 | destination | Procedures | `exists` | apps/web/src/app.rs: route '/procedures' found<br>apps/web/e2e/procedures.spec.ts: present<br>apps/web/src/app.rs: V1 ancestor '/build/processes', '/build/process-map' found<br>docs/design/v2.js: page 'procedures' — design reference, not implementation<br>*The real /procedures screen reads the tenant's procedures, processes and capabilities and operates the T16 intake, source review and both publication gates. The V1 /build/processes and /build/process-map remain the executable's editor and map. The PKO editor was ruled out on 2026-11-19 and is replaced by the knowledge-pack pairing.* |

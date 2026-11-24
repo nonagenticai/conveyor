@@ -124,8 +124,9 @@ use serde_json::{Value, json};
 /// 531 → **539**. **T6 (#80) adds 9 internal**: `development_projects.charter|record_step|`
 /// `review_gate|merge_gate|deploy_gate|close|get|rollback|change_judging_surface` — the
 /// self-development path and its gates, the earned auto-merge read and the closure record.
-/// 539 → **548**.
-const EXPECTED: [&str; 548] = [
+/// 539 → **548**. **T8 (#79) adds 3 internal**: `lessons.propose|review|promote` — the
+/// organisational-memory lifecycle. 548 → **551**.
+const EXPECTED: [&str; 551] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -386,6 +387,11 @@ const EXPECTED: [&str; 548] = [
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
+    // T8 (#79): the organisational-memory lifecycle — propose with independent evidence,
+    // a person's review, and promotion to a governed-asset source draft.
+    "lessons.promote",
+    "lessons.propose",
+    "lessons.review",
     "licences.get",
     "lists.create",
     "lists.move",
@@ -776,7 +782,10 @@ fn the_registry_is_exactly_the_declared_set() {
     // one internal (`cards.assign`): 520 -> 521; external stays 18.
     // T6 (#80) adds nine internal actions (`development_projects.*`): internal 521 -> 530;
     // external stays 18 — the evidence is rows on this tenant's own database.
-    assert_eq!((internal, external), (530, 18));
+    // T8 (#79) adds three internal actions (`lessons.propose|review|promote`): internal
+    // 530 -> 533; external stays 18 — a promotion writes this tenant's own source draft and
+    // calls no model.
+    assert_eq!((internal, external), (533, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

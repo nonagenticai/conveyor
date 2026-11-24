@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "06743388d70c028688ad550e0abfe91af2aa6e7efa26129c1e33c09014428a39",
+    "GET /api/actions": "02ffe2a800661f0884d76b9ee236315c73f38a344bb3178fc0957e7bcfba3a62",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -280,6 +280,9 @@
     "POST /api/actions/laya.judge/invocations": "954f27a600b88f9cc5618bacff2709eea62f095d102e6a3d1d5bb86942b792c1",
     "POST /api/actions/laya_configs.create/invocations": "2bc0ca22f9d0ca7c042178143d67ad8d4c8fca03bc2e5e3aba3eb3b9512edc73",
     "POST /api/actions/laya_configs.list/invocations": "166217a68586a1f498d3d96d286a795fc365cfc64dfcbe37231e8e1f010aebba",
+    "POST /api/actions/lessons.promote/invocations": "821ba3b939537b3affe5ad2f148ef629b45db9804dd9470488f8533a63665159",
+    "POST /api/actions/lessons.propose/invocations": "970d9748e85ecdd7e34da3c36ff9b4265fbc9b86ef7eeb4035538c7618caecbc",
+    "POST /api/actions/lessons.review/invocations": "6ea1af07297364ea050232b215d199cad6115e85442948b0aadaaec2d2fc8e1f",
     "POST /api/actions/licences.get/invocations": "a43e3c3412fc792cd7c8bdb97c91b0301dca5e0ee16c9b249d324451e978e608",
     "POST /api/actions/lists.create/invocations": "758f93be13149fa2a5e6505b3c1d9422291abdba031ad8001700d89ea2ba01b1",
     "POST /api/actions/lists.move/invocations": "57c8ebb5c11757760c9cdcb5a645f37371cfe98d541b4dead8edf80b06fa36ec",

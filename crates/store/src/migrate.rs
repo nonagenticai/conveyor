@@ -268,7 +268,11 @@ mod tests {
                 (67, "kata gate".to_owned()),
                 // T6: the development charter, its immutable step evidence, the closure record,
                 // the one-pending development gate index and the approval-policy auto-merge terms.
-                (68, "development project".to_owned())
+                (68, "development project".to_owned()),
+                // T8 (#79): the lesson lifecycle — the independent-evidence CHECK, the proposer/
+                // reviewer record and the governed-asset source draft promotion
+                // (0069_lesson_lifecycle.sql, SPEC_V2 §7.6, §10.3, §10.4, §12 T8, D36).
+                (69, "lesson lifecycle".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

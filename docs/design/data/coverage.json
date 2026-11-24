@@ -2387,18 +2387,20 @@
     {
       "blocked_by": [],
       "evidence": [
+        "crates/actions/src/lesson.rs",
+        "crates/store/src/lesson.rs",
         "migrations/0056_cadence_tranche.sql"
       ],
       "gap": null,
       "key": "T8",
       "measured": {
         "actions": [
-          0,
-          0
+          3,
+          3
         ],
         "modules": [
-          0,
-          0
+          2,
+          2
         ],
         "tables": [
           1,
