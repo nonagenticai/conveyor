@@ -1832,7 +1832,7 @@ async fn a_laya_config_defaults_to_fifteen_hundred_ms() {
 }
 
 /// A configured budget above the seam's hard budget is refused as a field failure — never
-/// silently clamped — and the hard budget itself is accepted and usable by `ladder.prepare`.
+/// silently clamped — and the hard budget itself is accepted.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_laya_config_timeout_is_capped_at_the_hard_budget() {
     let (_pg, running, _seeded) = fixture().await;
@@ -1870,10 +1870,6 @@ async fn a_laya_config_timeout_is_capped_at_the_hard_budget() {
         .await;
     assert_eq!(status, 201, "{accepted}");
     assert_eq!(output(&accepted)["timeout_ms"], 3000, "{accepted}");
-    let config_id = id_of(output(&accepted), "id");
-    let (status, prepared) = prepare(&running, KIND, Some(&config_id)).await;
-    assert_eq!(
-        status, 200,
-        "the hard budget is a usable seam budget: {prepared}"
-    );
+    // The dispatch bound itself is exercised by the stalled-judge test; this test is the config
+    // boundary: 3001 refused, 3000 accepted.
 }
