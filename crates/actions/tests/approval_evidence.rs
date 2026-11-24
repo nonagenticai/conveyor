@@ -142,6 +142,15 @@ async fn a_destructive_gate_refuses_an_evidence_less_request() {
         0,
         "the refused request opened an approval row"
     );
+    // v1-w4b-5: the refusal itself is recorded, in the engine's committed failure transaction.
+    let refusals: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM gate_refusal WHERE tenant_id = $1 AND gate = 'ops.scale'",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the refusal ledger");
+    assert_eq!(refusals, 1, "the refused gate call is recorded");
 }
 
 /// The §5.4 override: an explicit reason opens the gate, and the row records it. The reason is

@@ -2423,6 +2423,22 @@ async fn record_failure(
         audit::record(&mut tx, tenant, &entry)
             .await
             .map_err(|error| sqlx::Error::Decode(Box::new(error)))?;
+        // v1-w4b-5: a refusal is the gate saying no, and the handler's own transaction rolled
+        // back, so the durable record belongs here with the invocation and the audit event.
+        // The gate is the input's `gate` when it names one; otherwise the action itself is the
+        // gate a destructive call was refused by.
+        if outcome == "refused" {
+            let gate = request
+                .input
+                .get("gate")
+                .and_then(Value::as_str)
+                .map(str::trim)
+                .filter(|gate| !gate.is_empty())
+                .unwrap_or(spec.name);
+            store::metrics::record_gate_refusal_tx(&mut tx, tenant, gate, spec.name, audit_status)
+                .await
+                .map_err(|error| sqlx::Error::Decode(Box::new(error)))?;
+        }
         // A failure produced no response: release the in-flight claim so the caller can
         // retry (internal claims already rolled back; this is the external path).
         if let Some(key) = request.idempotency_key.as_deref() {

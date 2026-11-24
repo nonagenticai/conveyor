@@ -385,8 +385,11 @@ pub struct GateOut {
     pub rejected: i64,
     pub decided: i64,
     pub with_evidence: i64,
+    /// Refusals the gate made in the window (evidence, target, expiry), from the ledger the
+    /// engine writes after the handler's transaction rolled back (v1-w4b-5).
+    pub refused: i64,
     pub latency_seconds: Option<f64>,
-    /// Decided approvals with no rejection: a stamp, not health.
+    /// Decided approvals with no rejection and no recorded refusal: a stamp, not health.
     pub never_refused: bool,
 }
 
@@ -494,7 +497,7 @@ async fn metrics_programme(
     let mut gates = Vec::with_capacity(gate_rows.len());
     let mut never_refused = Vec::new();
     for gate in gate_rows {
-        let never = gate.decided > 0 && gate.rejected == 0;
+        let never = gate.decided > 0 && gate.rejected == 0 && gate.refused == 0;
         if never {
             never_refused.push(gate.gate.clone());
         }
@@ -504,6 +507,7 @@ async fn metrics_programme(
             rejected: gate.rejected,
             decided: gate.decided,
             with_evidence: gate.with_evidence,
+            refused: gate.refused,
             latency_seconds: gate.latency_seconds,
             never_refused: never,
         });
