@@ -417,7 +417,10 @@ mod tests {
                 // refinements, and the decision's set/refinement pins
                 // (0103_ladder_option_set_union.sql, SPEC_V2 §7.2). The lane-only 0087 is
                 // retired; production never applied it.
-                (103, "ladder option set union".to_owned())
+                (103, "ladder option set union".to_owned()),
+                // #526 (v1-w1c-6): the knowledge-retrieval ledger behind the flow's pack-hit
+                // rate (0104_knowledge_retrieval_ledger.sql, SPEC_V2 §11.9).
+                (104, "knowledge retrieval ledger".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

@@ -1158,6 +1158,79 @@ pub async fn usage_summary_tx(
     })
 }
 
+// ── the knowledge figures (v1-w1c-6) ────────────────────────────────────────────────────
+
+/// Record one `knowledge.query` retrieval for the pack-hit rate.
+///
+/// Called by the query handler inside its own transaction: the row exists exactly when the
+/// retrieval answered, so the rate's denominator is the number of retrievals, not of queries.
+pub async fn record_knowledge_retrieval_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    capability_id: Uuid,
+    packs: i64,
+    hits: i64,
+    degraded: bool,
+    run_id: Option<Uuid>,
+) -> Result<(), MetricsStoreError> {
+    sqlx::query(
+        "INSERT INTO knowledge_retrieval (tenant_id, capability_id, packs, hits, degraded, run_id)
+         VALUES ($1, $2, $3, $4, $5, $6)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(capability_id)
+    .bind(packs)
+    .bind(hits)
+    .bind(degraded)
+    .bind(run_id)
+    .execute(conn)
+    .await?;
+    Ok(())
+}
+
+/// Retrievals in the window, and those with at least one hit.
+pub async fn knowledge_retrieval_counts_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    since: DateTime<Utc>,
+    until: DateTime<Utc>,
+) -> Result<(i64, i64), MetricsStoreError> {
+    Ok(sqlx::query_as(
+        "SELECT count(*)::bigint,
+                count(*) FILTER (WHERE hits > 0)::bigint
+           FROM knowledge_retrieval
+          WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .bind(until)
+    .fetch_one(&mut *conn)
+    .await?)
+}
+
+/// Lessons promoted, and lessons decided (promoted or rejected), by their latest state change.
+///
+/// `updated_at` is the state transition: a proposal that is still `proposed` is not a decision
+/// and never enters the denominator.
+pub async fn lesson_promotion_counts_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    since: DateTime<Utc>,
+    until: DateTime<Utc>,
+) -> Result<(i64, i64), MetricsStoreError> {
+    Ok(sqlx::query_as(
+        "SELECT count(*) FILTER (WHERE state = 'promoted')::bigint,
+                count(*) FILTER (WHERE state IN ('promoted', 'rejected'))::bigint
+           FROM lesson
+          WHERE tenant_id = $1 AND updated_at >= $2 AND updated_at < $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .bind(until)
+    .fetch_one(&mut *conn)
+    .await?)
+}
+
 // ── flow (P1.1) ─────────────────────────────────────────────────────────────────────────
 
 /// The flow metrics, all read-time aggregates over `card`, `list` and the `card.moved` outbox.

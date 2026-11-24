@@ -128,6 +128,17 @@ async fn a_pack_bound_capability_returns_a_hit_carrying_pack_and_layer() {
         )
         .await;
     assert_eq!(status, 200, "{body}");
+    // The pack-hit source (v1-w1c-6): the query wrote exactly one retrieval row with its hits.
+    let recorded: (i64, i64) = sqlx::query_as(
+        "SELECT count(*)::bigint, coalesce(max(hits), 0)::bigint
+           FROM knowledge_retrieval WHERE tenant_id = $1",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the retrieval ledger");
+    assert_eq!(recorded.0, 1, "one row per retrieval");
+    assert!(recorded.1 >= 1, "the returned hit is counted");
     let out = output(&body);
     assert_eq!(out["packs"], json!(["design@1"]));
     let hit = &out["hits"][0];
