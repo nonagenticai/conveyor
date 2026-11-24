@@ -1,0 +1,33 @@
+{
+ "contract_id": "01a20ae5-8fcb-7e1c-a4e9-b2d17283dc26",
+ "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+ "evidence": {
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "ledger": "docs/evidence/v1-conformance-findings.json",
+  "manifest": "acceptance/programme/T4.toml",
+  "tests": [
+   "crates/actions/tests/coach.rs",
+   "crates/api/tests/computed_set.rs",
+   "apps/server/tests/approval_expire.rs",
+   "crates/store/tests/lease_sweep.rs"
+  ]
+ },
+ "findings": {
+  "met": [
+   "Clause 1 (a first interruption yields one coach card, one triage and one remedy) is now proved as a universal: per-signature repeat keys and the four flow producers are recorded, and v1-p6-4's suppression is resolved.",
+   "Clause 2 (a repeat signature escalates) is proved by coach::a_repeat_signature_escalates_instead_of_a_second_card.",
+   "Clause 3 (no coach card about a coach card) is proved by coach::a_failed_coach_run_never_opens_a_coach_card and coach::a_nested_coach_run_is_refused.",
+   "Clause 4 (a systemic class opens a kata) names its instrument, measurement and adoption gate: v1-p6-2 is resolved by coach::a_systemic_class_opens_one_measured_kata."
+  ],
+  "open": [],
+  "previous_review": "the 2026-11-22 non_conformant review is retained as history; this review attests the remediated state at the 2026-11-24 head",
+  "resolved": [
+   "v1-p6-2",
+   "v1-p6-4",
+   "v1-p6-5",
+   "v1-p6-6"
+  ]
+ },
+ "level": "compliant",
+ "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9"
+}

@@ -1,0 +1,34 @@
+{
+ "body": {
+  "acceptance": "The four findings the 2026-11-22 review named are resolved on the record: v1-p6-2 (one measured kata), v1-p6-4 (distinct signatures are never suppressed by a card-level count), v1-p6-5 (the four flow producers and the run-less interruptions), v1-p6-6 (the public create path refuses a coach card). Each resolution names a commit and a test in docs/evidence/v1-conformance-findings.json.",
+  "evidence": [
+   "crates/actions/tests/coach.rs",
+   "crates/api/tests/computed_set.rs",
+   "apps/server/tests/approval_expire.rs",
+   "crates/store/tests/lease_sweep.rs",
+   "docs/evidence/v1-conformance-findings.json"
+  ],
+  "obligations": [
+   "a repeat signature escalates instead of opening a second card",
+   "a failed coach run never opens a coach card and a nested coach run is refused",
+   "every section 6.2 producer (WIP breach, stale lease, gate timeout, board event, failed run) is observed through one admission path with its own repeat key",
+   "a systemic finding opens one kata that names its instrument, measurement and adoption gate",
+   "the public create path cannot create a coach card"
+  ],
+  "recorded_on": "2026-11-24",
+  "resolutions": {
+   "v1-p6-2": "crates/actions/tests/coach.rs::a_systemic_class_opens_one_measured_kata (commit 2fe0d30c)",
+   "v1-p6-4": "crates/api/tests/computed_set.rs::a_distinct_signature_is_never_suppressed_by_a_card_level_count (commit 8842195f)",
+   "v1-p6-5": "apps/server/tests/approval_expire.rs::a_card_scoped_gate_timeout_opens_one_interruption (commit fc020437); lease_sweep; the four card flow producers",
+   "v1-p6-6": "crates/actions/tests/coach.rs::a_coach_card_cannot_be_created_through_the_public_path (commit 8842195f)"
+  },
+  "retrospective": true,
+  "scope": "the coach loop: one card, one triage, one remedy per interruption; per-signature escalation; the depth cap; the depth-2 rule; and the systemic kata path with its instrument, measurement and adoption gate.",
+  "supersedes": "01a2028d-942b-759a-ad59-ab9c38629977"
+ },
+ "kind": "delivery_contract",
+ "phase_code": "g",
+ "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+ "supersedes_id": "01a2028d-942b-759a-ad59-ab9c38629977",
+ "title": "T4 \u2014 delivery contract v2: the remediated coach loop"
+}
