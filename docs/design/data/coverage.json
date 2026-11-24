@@ -2330,11 +2330,11 @@
       "tranche": 11,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           80
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2388,18 +2388,20 @@
     {
       "blocked_by": [],
       "evidence": [
+        "crates/actions/src/lesson.rs",
+        "crates/store/src/lesson.rs",
         "migrations/0056_cadence_tranche.sql"
       ],
       "gap": null,
       "key": "T8",
       "measured": {
         "actions": [
-          0,
-          0
+          3,
+          3
         ],
         "modules": [
-          0,
-          0
+          2,
+          2
         ],
         "tables": [
           1,
@@ -2735,8 +2737,8 @@
       },
       "total": 50,
       "uncovered": [],
-      "with_open_units": 17,
-      "without_open_units": 33
+      "with_open_units": 16,
+      "without_open_units": 34
     },
     "screens": {
       "actions_invoked": 39,

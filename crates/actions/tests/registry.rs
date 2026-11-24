@@ -124,10 +124,12 @@ use serde_json::{Value, json};
 /// 531 → **539**. **T6 (#80) adds 9 internal**: `development_projects.charter|record_step|`
 /// `review_gate|merge_gate|deploy_gate|close|get|rollback|change_judging_surface` — the
 /// self-development path and its gates, the earned auto-merge read and the closure record.
-/// 539 → **548**. **T15 (#86) adds 10 internal**: `toolkits.import_openapi|register_mcp|`
-/// `discover_mcp`, `tool_authoring.draft|validate|test|review|publish|promote` and the broker's
-/// registered-destination dispatch `tools.dispatch` — 548 → **558**.
-const EXPECTED: [&str; 558] = [
+/// 539 → **548**. **T8 (#79) adds 3 internal**: `lessons.propose|review|promote` — the
+/// organisational-memory lifecycle. 548 → **551**. **T15 (#86) adds 10 internal**:
+/// `toolkits.import_openapi|register_mcp|discover_mcp`, `tool_authoring.draft|validate|test|`
+/// `review|publish|promote` and the broker's registered-destination dispatch `tools.dispatch`
+/// — 551 → **561**.
+const EXPECTED: [&str; 561] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -388,6 +390,11 @@ const EXPECTED: [&str; 558] = [
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
+    // T8 (#79): the organisational-memory lifecycle — propose with independent evidence,
+    // a person's review, and promotion to a governed-asset source draft.
+    "lessons.promote",
+    "lessons.propose",
+    "lessons.review",
     "licences.get",
     "lists.create",
     "lists.move",
@@ -788,11 +795,14 @@ fn the_registry_is_exactly_the_declared_set() {
     // one internal (`cards.assign`): 520 -> 521; external stays 18.
     // T6 (#80) adds nine internal actions (`development_projects.*`): internal 521 -> 530;
     // external stays 18 — the evidence is rows on this tenant's own database.
+    // T8 (#79) adds three internal actions (`lessons.propose|review|promote`): internal
+    // 530 -> 533; external stays 18 — a promotion writes this tenant's own source draft and
+    // calls no model.
     // T15 (#86) adds ten internal actions (`toolkits.import_openapi|register_mcp|discover_mcp`,
     // `tool_authoring.draft|validate|test|review|publish|promote`, `tools.dispatch`):
-    // internal 530 -> 540; external stays 18 — every authored tool dispatches through the
-    // broker's registered-destination arm, not a new external declaration.
-    assert_eq!((internal, external), (540, 18));
+    // internal 533 -> 543; external stays 18 — an authored tool dispatches through the broker's
+    // registered-destination arm, not a new external declaration.
+    assert_eq!((internal, external), (543, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

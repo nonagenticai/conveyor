@@ -269,10 +269,13 @@ mod tests {
                 // T6: the development charter, its immutable step evidence, the closure record,
                 // the one-pending development gate index and the approval-policy auto-merge terms.
                 (68, "development project".to_owned()),
+                // T8 (#79): the lesson lifecycle — the independent-evidence CHECK, the proposer/
+                // reviewer record and the governed-asset source draft promotion
+                // (0069_lesson_lifecycle.sql, SPEC_V2 §7.6, §10.3, §10.4, §12 T8, D36).
+                (69, "lesson lifecycle".to_owned()),
                 // T15 (#86): the tool_draft governed-asset kind, the registered tool sources, the
                 // binding-scoped subset, the ledger's binding pin, the promotion record and the
-                // publication quorum. 69 is the parallel #79 lane's migration and is absent here
-                // until that lane merges; this branch's set skips it deliberately.
+                // publication quorum (0070_tool_authoring.sql, SPEC_V2 §11.3–§11.6, D42/D43/D50).
                 (70, "tool authoring".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \

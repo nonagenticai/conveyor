@@ -32,7 +32,7 @@ ALTER TABLE governed_asset ADD CONSTRAINT governed_asset_kind_check CHECK (
     kind IN ('requirement', 'principle', 'adr', 'charter', 'closure', 'postmortem',
              'sop_source', 'mandate', 'programme_brief', 'blueprint', 'business_case',
              'refined_vision', 'benefits_strategy', 'benefits_realization_plan',
-             'projects_dossier', 'minutes', 'tool_draft')
+             'projects_dossier', 'minutes', 'lesson_source', 'tool_draft')
 );
 
 -- ── approval_policy — the publication gate's quorum ──────────────────────────────────────

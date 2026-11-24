@@ -13,6 +13,7 @@
 //! because the invocation route is licence-gated (S04 decision 9).
 
 pub mod kata;
+pub mod lesson;
 pub mod redis;
 
 use std::net::SocketAddr;

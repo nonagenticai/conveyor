@@ -419,9 +419,10 @@ mod tests {
         // T5 (#77) adds eight internal kata actions: 530 -> 538; external stays 18.
         // S21 step 9 (#649) adds `cards.assign`: 538 -> 539.
         // T6 (#80) adds nine internal `development_projects.*` actions: 539 -> 548.
+        // T8 (#79) adds three internal `lessons.*` actions: 548 -> 551.
         assert_eq!(
             registry.len(),
-            548,
+            551,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \

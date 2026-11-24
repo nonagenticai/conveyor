@@ -1014,7 +1014,7 @@
       "key": "T6",
       "name": "Development project",
       "description": "SPEC_V2 slice T6 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",

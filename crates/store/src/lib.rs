@@ -93,6 +93,9 @@ pub mod jobs;
 // T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata record, its six Gets and the held-out
 // measurement.
 pub mod kata;
+// T8 (SPEC_V2 §7.6, §10.3, §10.4, §12 T8, D36; issue #79): the lesson lifecycle — independent
+// evidence, a person's review and promotion to a governed-asset source draft.
+pub mod lesson;
 // T6 (SPEC_V2 §5.4, §6.4, §9.1, §9.3; issue #80): the development charter, its immutable step
 // evidence and the closure record.
 pub mod development;

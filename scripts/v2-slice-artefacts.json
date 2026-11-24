@@ -194,7 +194,22 @@
     "T8": {
       "tables": [
         "lesson"
-      ]
+      ],
+      "actions": [
+        "lessons.promote",
+        "lessons.propose",
+        "lessons.review"
+      ],
+      "modules": [
+        "crates/actions/src/lesson.rs",
+        "crates/store/src/lesson.rs"
+      ],
+      "evidence": [
+        "migrations/0069_lesson_lifecycle.sql",
+        "crates/actions/tests/lessons.rs",
+        "crates/store/tests/lesson.rs"
+      ],
+      "gap": null
     },
     "T9": {
       "tables": [
