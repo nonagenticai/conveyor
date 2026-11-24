@@ -7777,7 +7777,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "mixed",
         "earliest_expires": "2027-02-18",
-        "entries": 10,
+        "entries": 9,
         "owners": [
           "programme owner"
         ]
@@ -7801,9 +7801,8 @@ window.CONVEYOR_REWORK = {
           "source": "snapshot",
           "subjects": [
             "S12",
-            "S13",
+            "S18",
             "S20",
-            "S21",
             "T11",
             "T16",
             "T7",
@@ -7821,7 +7820,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§5.3",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 10,
+      "subject_count": 9,
       "subjects": [
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -7837,11 +7836,11 @@ window.CONVEYOR_REWORK = {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
           "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "expires": null,
+          "owner": null,
+          "reason": null,
           "severity": "P1",
-          "subject": "S13"
+          "subject": "S18"
         },
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -7852,16 +7851,6 @@ window.CONVEYOR_REWORK = {
           "reason": null,
           "severity": "P1",
           "subject": "S20"
-        },
-        {
-          "detail": "seed status 'closed' != live status 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S21"
         },
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -29588,9 +29577,9 @@ window.CONVEYOR_REWORK = {
     },
     "SPEC": {
       "findings": 86,
-      "gaps": 42,
+      "gaps": 41,
       "p0": 0,
-      "p1": 7,
+      "p1": 6,
       "p2": 35,
       "packages": 107,
       "rules": 8,
@@ -29633,7 +29622,7 @@ window.CONVEYOR_REWORK = {
     "open": 326,
     "packages": 329,
     "resolved": 14,
-    "subjects": 431,
+    "subjects": 430,
     "suppressed": 3
   }
 };
