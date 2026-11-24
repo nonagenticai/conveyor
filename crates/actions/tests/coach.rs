@@ -679,6 +679,50 @@ async fn an_interruption_yields_one_coach_card_one_triage_and_one_remedy() {
     assert_eq!(remedy_count(&pg, &seeded, interruption).await, 1);
 }
 
+/// P1.1's other half: an interruption carries exactly one remedy, and a second `coach.remedy`
+/// naming the same interruption is refused by name (`409 coach.already_remedied`) without a
+/// second row. A sequential second call normally meets `coach.not_open` because the first
+/// remedy closed the interruption, so the test re-opens it to reach the existing-remedy guard —
+/// the state a concurrent writer leaves behind.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_duplicate_remedy_is_refused() {
+    let (pg, running, seeded) = fixture().await;
+    publish_processes(&running).await;
+    let (board, active, _waiting) = board_lanes(&pg, &seeded).await;
+    let card = create_card(&running, &board, &active, "feature", "duplicate remedy").await;
+    let run = fail_run(&pg, &seeded, &running, &card, FAILING_KEY).await;
+    err_card(&pg, &seeded, &run).await;
+    let (interruption, _, _, _, _) = interruption_row(&pg, &seeded, &card).await;
+
+    let (status, body) = triage(&running, interruption, "transient", 0.9).await;
+    assert_eq!(status, 200, "{body}");
+    let (status, body) = remedy(&running, interruption, None).await;
+    assert_eq!(status, 201, "{body}");
+    assert_eq!(text(output(&body), "remedy_class"), "retry");
+    assert_eq!(remedy_count(&pg, &seeded, interruption).await, 1);
+
+    // The first remedy marked the interruption `remedied`; re-open it so the second call meets
+    // the existing-remedy guard instead of the earlier `coach.not_open` state check.
+    sqlx::query("UPDATE coach_interruption SET state = 'open' WHERE tenant_id = $1 AND id = $2")
+        .bind(seeded.tenant_id)
+        .bind(interruption)
+        .execute(&pg.super_pool)
+        .await
+        .expect("re-open the interruption");
+
+    let (status, body) = remedy(&running, interruption, None).await;
+    assert_eq!(status, 409, "a duplicate remedy is refused: {body}");
+    assert_eq!(
+        body["errors"][0]["code"], "coach.already_remedied",
+        "the refusal is typed: {body}"
+    );
+    assert_eq!(
+        remedy_count(&pg, &seeded, interruption).await,
+        1,
+        "the refused duplicate wrote no second remedy"
+    );
+}
+
 // ── P1.2 — the closed sets refuse ──────────────────────────────────────────────────────────
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
