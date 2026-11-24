@@ -7850,9 +7850,9 @@ window.CONVEYOR_REWORK = {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S17"
         },
@@ -7860,9 +7860,9 @@ window.CONVEYOR_REWORK = {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S18"
         },
@@ -7870,9 +7870,9 @@ window.CONVEYOR_REWORK = {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S20"
         },
@@ -7900,9 +7900,9 @@ window.CONVEYOR_REWORK = {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T5"
         },
@@ -7910,9 +7910,9 @@ window.CONVEYOR_REWORK = {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T6"
         },
@@ -20165,61 +20165,6 @@ window.CONVEYOR_REWORK = {
       "title": "Reconcile the project's status source"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T15",
-      "apply_to": "T15",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T15"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T15",
-      "owner_project": "T15",
-      "rule": "status_source_drift",
-      "scope": "T15",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T15"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T17",
       "apply_to": "T17",
       "artefact": "status_source",
@@ -29511,11 +29456,11 @@ window.CONVEYOR_REWORK = {
     },
     "SPEC": {
       "findings": 86,
-      "gaps": 43,
+      "gaps": 42,
       "p0": 0,
       "p1": 10,
-      "p2": 33,
-      "packages": 105,
+      "p2": 32,
+      "packages": 104,
       "rules": 8,
       "rules_clean": 2,
       "rules_with_gaps": 6,
@@ -29539,24 +29484,24 @@ window.CONVEYOR_REWORK = {
     "by_severity": {
       "P0": 26,
       "P1": 149,
-      "P2": 152
+      "P2": 151
     },
     "by_standard": {
       "MSP": 66,
       "PMP": 49,
       "SAFe": 16,
-      "SPEC": 105,
+      "SPEC": 104,
       "TOGAF": 91
     },
     "by_status": {
-      "open": 324,
+      "open": 323,
       "suppressed": 3
     },
     "duplicates": 0,
-    "open": 324,
-    "packages": 327,
+    "open": 323,
+    "packages": 326,
     "resolved": 14,
-    "subjects": 432,
+    "subjects": 431,
     "suppressed": 3
   }
 };

@@ -5,8 +5,8 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 | Severity | Count |
 |---|---:|
 | P0 | 22 |
-| P1 | 133 |
-| P2 | 37 |
+| P1 | 137 |
+| P2 | 34 |
 | P3 | 0 |
 
 ## P0 and P1
@@ -159,9 +159,13 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 | `project_in_unauthorised_tranche` | `T8` | P1 | project is active in tranche 11 whose state is 'planned' |
 | `seed_live_drift` | `S12` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `S13` | P1 | seed status 'closed' != live status 'active' |
-| `seed_live_drift` | `S21` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `S17` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `S18` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `S20` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T11` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T16` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `T5` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `T6` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T7` | P1 | seed status 'closed' != live status 'active' |
 | `unpublished_declared_output` | `DESIGN-PUBLISH` | P1 | declared outputs are not published: closure-review |
 | `unpublished_declared_output` | `T11` | P1 | declared outputs are not published: evidence |
@@ -197,11 +201,11 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 | S14 | active | 11 | 0 | 2 | 1 | 0 |
 | S15 | active | 7 | 0 | 2 | 1 | 0 |
 | S16 | closed | 7 | 1 | 3 | 0 | 0 |
-| S17 | active | 5 | 0 | 2 | 1 | 0 |
-| S18 | active | 9 | 0 | 2 | 1 | 0 |
+| S17 | active | 5 | 0 | 3 | 1 | 0 |
+| S18 | active | 9 | 0 | 3 | 1 | 0 |
 | S19 | active | 8 | 0 | 2 | 1 | 0 |
-| S20 | active | 9 | 0 | 2 | 1 | 0 |
-| S21 | active | 9 | 0 | 3 | 1 | 0 |
+| S20 | active | 9 | 0 | 3 | 1 | 0 |
+| S21 | active | 9 | 0 | 2 | 1 | 0 |
 | SPEC-V2 | closed | 0 | 0 | 2 | 0 | 0 |
 | T0 | closed | 0 | 0 | 1 | 0 | 0 |
 | T1 | closed | 1 | 1 | 2 | 0 | 0 |
@@ -210,14 +214,14 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 | T12 | active | 13 | 0 | 3 | 2 | 0 |
 | T13 | closed | 3 | 1 | 2 | 1 | 0 |
 | T14 | closed | 4 | 2 | 3 | 1 | 0 |
-| T15 | active | 12 | 0 | 3 | 2 | 0 |
+| T15 | active | 12 | 0 | 3 | 1 | 0 |
 | T16 | active | 4 | 0 | 5 | 1 | 0 |
 | T17 | active | 5 | 0 | 3 | 2 | 0 |
 | T2 | closed | 2 | 1 | 2 | 0 | 0 |
 | T3 | closed | 3 | 1 | 2 | 0 | 0 |
 | T4 | closed | 4 | 1 | 2 | 0 | 0 |
-| T5 | active | 10 | 0 | 3 | 2 | 0 |
-| T6 | active | 11 | 0 | 3 | 2 | 0 |
+| T5 | active | 10 | 0 | 4 | 1 | 0 |
+| T6 | active | 11 | 0 | 4 | 1 | 0 |
 | T7 | active | 5 | 0 | 5 | 1 | 0 |
 | T8 | active | 11 | 0 | 3 | 1 | 0 |
 | T9 | closed | 4 | 1 | 1 | 1 | 0 |

@@ -555,8 +555,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "4cfd81a55cf9466384497cf43c8caf00e354a15a70fa0f28a1797c47a5a21870",
-      "bytes": 23313,
+      "sha256": "53dd7a6c401a8996da0194cc52fffd0e3d9b50e3d927e4fcf2e34ad2c8156c44",
+      "bytes": 23639,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
     {
@@ -645,8 +645,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "b8b4c5f7ac25f2e5bfd29ef905063c495d47b2f99e8be33bca28295d5b273bba",
-      "bytes": 15002,
+      "sha256": "86b1d7cae243683cf134c6db31affaf95e5c96d23393a891d13dc1c55d8a2e2a",
+      "bytes": 15126,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
