@@ -8614,11 +8614,11 @@ window.CONVEYOR_REWORK = {
           "rule": "seed_live_drift",
           "source": "snapshot",
           "subjects": [
+            "T15",
             "T5",
             "T6",
             "T8",
-            "S21",
-            "T19"
+            "S21"
           ]
         }
       ],
@@ -8632,6 +8632,16 @@ window.CONVEYOR_REWORK = {
       "status": "open",
       "subject_count": 5,
       "subjects": [
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T15"
+        },
         {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
@@ -8671,16 +8681,6 @@ window.CONVEYOR_REWORK = {
           "reason": null,
           "severity": "P2",
           "subject": "S21"
-        },
-        {
-          "detail": "seed status 'active' != live status 'closed'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T19"
         }
       ],
       "title": "Reconcile the seed with the live rows"
@@ -41528,8 +41528,8 @@ window.CONVEYOR_REWORK = {
       "findings": 86,
       "gaps": 24,
       "p0": 0,
-      "p1": 3,
-      "p2": 21,
+      "p1": 4,
+      "p2": 20,
       "packages": 101,
       "rules": 8,
       "rules_clean": 3,
