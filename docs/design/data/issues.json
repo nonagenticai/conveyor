@@ -5,7 +5,7 @@
       "title": "ci: the record half belongs to the live publish \u2014 stop the refresh and standards_pack deriving it",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/671",
-      "updatedAt": "2026-11-24T18:08:55Z",
+      "updatedAt": "2026-11-24T18:14:28Z",
       "labels": [
         {
           "name": "bug",
@@ -26,7 +26,7 @@
       "title": "rollback across a migration boundary cannot serve the prior digest (sqlx VersionMissing 70; Flux restores the pinned image)",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/669",
-      "updatedAt": "2026-11-24T18:13:38Z",
+      "updatedAt": "2026-11-24T18:15:03Z",
       "labels": [
         {
           "name": "bug",
@@ -94,7 +94,7 @@
       "title": "add: the L1 laya gate \u2014 the ladder builds the case, the engine makes the call, the decision cites it",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/656",
-      "updatedAt": "2026-11-24T17:35:12Z",
+      "updatedAt": "2026-11-24T18:17:09Z",
       "labels": [
         {
           "name": "unit",
@@ -769,15 +769,15 @@
       "title": "T18-4: Tools, Metering, Operations and Improve",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/565",
-      "updatedAt": "2026-11-24T00:08:55Z",
+      "updatedAt": "2026-11-24T18:33:50Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -1142,7 +1142,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-24T18:06:06Z",
+      "updatedAt": "2026-11-24T18:27:18Z",
       "labels": [
         {
           "name": "unit",
@@ -4545,7 +4545,7 @@
       "title": "T12 \u2014 One organisation loop (the acceptance of V2)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/88",
-      "updatedAt": "2026-11-24T18:13:30Z",
+      "updatedAt": "2026-11-24T18:15:48Z",
       "labels": [
         {
           "name": "unit",
@@ -5521,7 +5521,7 @@
       "title": "CI/ARC \u2014 the archetype rebuild (owned by its own session; do not touch)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/17",
-      "updatedAt": "2026-11-15T10:06:55Z",
+      "updatedAt": "2026-11-24T18:33:58Z",
       "labels": [
         {
           "name": "unit",

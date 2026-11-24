@@ -1,6 +1,6 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-24T10:10:00Z",
+  "generated_at": "2026-11-24T16:30:00Z",
   "issue_registry": {
     "issues": [
       {
@@ -17,7 +17,7 @@
         "number": 661,
         "state": "CLOSED",
         "title": "fix: the router flushes SSE headers before the upstream's first chunk",
-        "updatedAt": "2026-11-24T10:06:45Z",
+        "updatedAt": "2026-11-24T14:26:32Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/661"
       },
       {
@@ -30,7 +30,7 @@
         "number": 660,
         "state": "OPEN",
         "title": "conveyor-buildout — the SPEC_V2 programme",
-        "updatedAt": "2026-11-24T12:22:34Z",
+        "updatedAt": "2026-11-24T14:27:54Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/660"
       },
       {
@@ -51,7 +51,7 @@
         "number": 656,
         "state": "OPEN",
         "title": "add: the L1 laya gate — the ladder builds the case, the engine makes the call, the decision cites it",
-        "updatedAt": "2026-11-24T09:59:54Z",
+        "updatedAt": "2026-11-24T14:30:43Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/656"
       },
       {
@@ -120,9 +120,9 @@
           }
         ],
         "number": 650,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "T19 close-out: the live gate, the closure review and the published programme record",
-        "updatedAt": "2026-11-24T08:57:48Z",
+        "updatedAt": "2026-11-24T13:40:26Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/650"
       },
       {
@@ -1099,7 +1099,7 @@
         "number": 526,
         "state": "OPEN",
         "title": "#526 programme: the retrospective rework — tranche 0, all remaining tranches, benefits and the viability gate (U5a–U5h, U6, U7)",
-        "updatedAt": "2026-11-24T10:54:36Z",
+        "updatedAt": "2026-11-24T15:09:32Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/526"
       },
       {
@@ -4491,8 +4491,8 @@
             "name": "unit"
           },
           {
-            "color": "D93F0B",
-            "name": "status:blocked"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "6E7781",
@@ -4502,7 +4502,7 @@
         "number": 88,
         "state": "OPEN",
         "title": "T12 — One organisation loop (the acceptance of V2)",
-        "updatedAt": "2026-11-24T07:15:11Z",
+        "updatedAt": "2026-11-24T14:33:20Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/88"
       },
       {
@@ -4542,9 +4542,9 @@
           }
         ],
         "number": 86,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "T15 — Tool authoring and BYO",
-        "updatedAt": "2026-11-24T12:12:30Z",
+        "updatedAt": "2026-11-24T14:27:44Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/86"
       },
       {
@@ -4691,7 +4691,7 @@
         "number": 79,
         "state": "CLOSED",
         "title": "T8 — Organisational memory",
-        "updatedAt": "2026-11-24T13:02:04Z",
+        "updatedAt": "2026-11-24T14:20:36Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/79"
       },
       {

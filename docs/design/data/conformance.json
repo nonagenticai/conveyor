@@ -1,7 +1,7 @@
 {
   "counts": {
     "P0": 26,
-    "P1": 141,
+    "P1": 142,
     "P2": 39,
     "P3": 0
   },
@@ -1127,6 +1127,14 @@
       "subject": "T6"
     },
     {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T8"
+    },
+    {
       "detail": "declared outputs are not published: project-brief",
       "disposition": "rework",
       "evidence": null,
@@ -1656,8 +1664,8 @@
     }
   ],
   "snapshot": {
-    "generated_at": "2026-11-24T10:10:00Z",
-    "git_sha": "7edea5b80ede2a245d297ef7931bd60090d3482b",
+    "generated_at": "2026-11-24T16:30:00Z",
+    "git_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
     "path": "data",
     "tenant": "nonagentic"
   },

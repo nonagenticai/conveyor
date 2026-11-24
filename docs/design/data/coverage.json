@@ -2059,7 +2059,7 @@
       "tranche": 4,
       "units": {
         "blocked": 1,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           559,
           562,
@@ -2069,7 +2069,7 @@
           566
         ],
         "open": 2,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
