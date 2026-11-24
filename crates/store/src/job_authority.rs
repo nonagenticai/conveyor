@@ -96,10 +96,25 @@ pub struct JobAuthority {
 /// `pm.*` action for the four non-PM roles, answers `false`.
 pub fn compiled_default(meta_role: &str, action: &str) -> bool {
     match meta_role {
-        "pm" => action.starts_with("pm.") || action.starts_with("projects."),
+        // §6.7 PM column: the project lifecycle, its own gate routing, card create/move, the
+        // binding assignment, and opening a kata. It may not remedy (that is the Coach's row).
+        "pm" => {
+            action.starts_with("pm.")
+                || action.starts_with("projects.")
+                || matches!(
+                    action,
+                    "cards.create"
+                        | "cards.move"
+                        | "job_bindings.create"
+                        | "job_bindings.retire"
+                        | "kata.open"
+                )
+        }
+        // §6.7 Coach column: "Create/move card in project — ✅ (remedy only)". The remedy IS the
+        // coach's card move; denying it would deny the coach its own row.
         "coach" => matches!(
             action,
-            "coach.triage" | "coach.escalate" | "coach.interrupt" | "kata.open"
+            "coach.triage" | "coach.escalate" | "coach.interrupt" | "coach.remedy" | "kata.open"
         ),
         "kata" => action.starts_with("kata.") && !matches!(action, "kata.open" | "kata.adopt"),
         "delivery" => matches!(action, "cards.create" | "cards.move"),
@@ -278,38 +293,50 @@ pub async fn enforce_run_tx(
 mod tests {
     use super::*;
 
-    /// The finding's floor: the four non-PM meta-roles may never call the coach's remedy, the
-    /// project baseline, or any `pm.*` action without a tenant grant.
+    /// The finding's floor: only the Coach's own row grants `coach.remedy`, and only the PM's
+    /// row grants `projects.baseline` / `pm.*`. A delivery, kata or ops binding inherits neither
+    /// without a tenant row (§6.7).
     #[test]
-    fn the_floor_is_denied_for_the_four_non_pm_roles() {
-        for role in ["delivery", "coach", "kata", "ops"] {
+    fn the_floor_is_denied_outside_its_own_row() {
+        for role in ["delivery", "kata", "ops", "pm"] {
             assert!(!compiled_default(role, "coach.remedy"), "{role}");
+        }
+        assert!(compiled_default("coach", "coach.remedy"));
+        for role in ["delivery", "coach", "kata", "ops"] {
             assert!(!compiled_default(role, "projects.baseline"), "{role}");
             assert!(!compiled_default(role, "pm.charter"), "{role}");
             assert!(!compiled_default(role, "pm.route_gate"), "{role}");
         }
+        assert!(compiled_default("pm", "projects.baseline"));
     }
 
-    /// §6.7's PM column: the project lifecycle and its own gate routing.
+    /// §6.7's PM column: the project lifecycle, its own gate routing, card create/move, the
+    /// binding assignment, and opening a kata.
     #[test]
     fn pm_owns_projects_and_its_own_actions() {
         assert!(compiled_default("pm", "pm.charter"));
         assert!(compiled_default("pm", "pm.route_gate"));
         assert!(compiled_default("pm", "projects.baseline"));
         assert!(compiled_default("pm", "projects.close_request"));
+        assert!(compiled_default("pm", "cards.create"));
+        assert!(compiled_default("pm", "cards.move"));
+        assert!(compiled_default("pm", "job_bindings.create"));
+        assert!(compiled_default("pm", "kata.open"));
         assert!(!compiled_default("pm", "coach.remedy"));
         assert!(!compiled_default("pm", "ops.restart"));
     }
 
-    /// §6.7's Coach column: remedy only where granted; opening a kata is allowed.
+    /// §6.7's Coach column: "Create/move card in project — ✅ (remedy only)"; opening a kata is
+    /// allowed and adopting one is not.
     #[test]
-    fn the_coach_may_coach_and_open_a_kata() {
+    fn the_coach_may_remedy_and_open_a_kata() {
         assert!(compiled_default("coach", "coach.triage"));
         assert!(compiled_default("coach", "coach.escalate"));
         assert!(compiled_default("coach", "coach.interrupt"));
+        assert!(compiled_default("coach", "coach.remedy"));
         assert!(compiled_default("coach", "kata.open"));
-        assert!(!compiled_default("coach", "coach.remedy"));
         assert!(!compiled_default("coach", "kata.adopt"));
+        assert!(!compiled_default("coach", "cards.create"));
     }
 
     /// §6.7's Kata column: its own loop, propose only for adoption, never opening itself.
@@ -321,12 +348,17 @@ mod tests {
         assert!(!compiled_default("kata", "kata.adopt"));
     }
 
-    /// §6.7's Delivery column: create/move its own card, and nothing across roles.
+    /// §6.7's Delivery column: create/move its own card, and nothing across roles. This is the
+    /// finding's exact acceptance: the delivery binding is refused `coach.remedy` and
+    /// `projects.baseline` unless the tenant granted it.
     #[test]
     fn delivery_moves_cards_only() {
         assert!(compiled_default("delivery", "cards.create"));
         assert!(compiled_default("delivery", "cards.move"));
         assert!(!compiled_default("delivery", "cards.assign"));
+        assert!(!compiled_default("delivery", "coach.remedy"));
+        assert!(!compiled_default("delivery", "projects.baseline"));
+        assert!(!compiled_default("delivery", "pm.plan"));
         assert!(!compiled_default("delivery", "ops.restart"));
         assert!(!compiled_default("delivery", "kata.open"));
     }
