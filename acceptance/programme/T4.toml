@@ -2,7 +2,7 @@
 key = "T4"
 name = "Kanban coach"
 gate = "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata"
-gate_checks = ["T4-project", "T4-baseline", "T4-charter", "T4-closure-outputs", "T4-contract", "T4-review", "T4-closure-gate", "T4-waivers", "T4-pi-cadence", "T4-pi-plan", "T4-pi-objectives", "T4-wsjf", "T4-demo-credits", "T4-lessons", "T4-product", "T4-artefact-standard", "T4-rework"]
+gate_checks = ["T4-project", "T4-baseline", "T4-charter", "T4-closure-outputs", "T4-contract", "T4-review", "T4-closure-gate", "T4-waivers", "T4-pi-cadence", "T4-pi-plan", "T4-pi-objectives", "T4-wsjf", "T4-demo-credits", "T4-lessons", "T4-product", "T4-artefact-standard", "T4-rework", "T4-coach-gate"]
 [[check]]
 id = "T4-project"
 check = "project"
@@ -115,3 +115,10 @@ id = "T4-rework"
 check = "rework_resolution"
 severity = "P0"
 description = "no unresolved P0/P1 rework package remains for the project"
+
+[[check]]
+id = "T4-coach-gate"
+kind = "command"
+severity = "P0"
+description = "the named coach tests exercise the gate: an injected failure yields exactly one coach card and one remedy; a repeat signature escalates instead of a second card; no coach card about a coach card; a systemic class opens a kata; a duplicate remedy is refused"
+command = "python3 -I scripts/check-t4-coach-gate.py --self-test"
