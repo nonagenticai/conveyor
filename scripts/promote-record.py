@@ -2637,6 +2637,23 @@ class Outcome:
     detail: str = ""
 
 
+def remap_tranche_evidence(payload: dict, id_map: dict[str, str]) -> None:
+    """Map a tranche review's evidence ids through the replay's id map.
+
+    The §8.3 classes are rows the replay itself created (benefit profiles, register risks) or
+    rows the dump carried (programme baselines); a staging-era id the journal mapped is
+    replaced by its production id, and an id the map does not know is kept so the store can
+    name it if it truly does not resolve.
+    """
+    evidence = payload.get("evidence")
+    if not isinstance(evidence, dict):
+        return
+    for key in ("baselines", "benefit_status", "risk_register"):
+        ids = evidence.get(key)
+        if isinstance(ids, list):
+            evidence[key] = [id_map.get(str(item), item) for item in ids]
+
+
 def remap_payload(
     entry: Entry,
     state: State,
@@ -2820,6 +2837,17 @@ def remap_payload(
                         if row.get("kind") == "scope" and row.get("approved_by"):
                             item["id"] = row["id"]
                             break
+                elif isinstance(item, dict) and item.get("kind") == "governed_asset":
+                    # The closure narrative is composed by `projects.close_request` during the
+                    # replay, so its id is fresh in every destination. The project's closure
+                    # gate carries the asset it approved; that is the same evidence.
+                    project_id = str(entry.payload.get("project_id") or "")
+                    for gate in state.approvals:
+                        meta = gate.get("meta") or {}
+                        asset = meta.get("closure_asset_id")
+                        if asset and str(gate.get("project_id")) == project_id:
+                            item["id"] = str(asset)
+                            break
                 remapped.append(item)
             payload["evidence"] = remapped
     elif entry.action == "approvals.decide" and key.kind != "tranche_review_decide":
@@ -2968,6 +2996,7 @@ def remap_payload(
         if tranche is None:
             raise PromoteError(f"tranche-review:{key.first}: no production tranche")
         payload["id"] = tranche["id"]
+        remap_tranche_evidence(payload, id_map)
     elif entry.action == "tranches.authorise":
         staging = payload.get("review_id")
         production = id_map.get(staging) if staging else None
@@ -2991,6 +3020,7 @@ def remap_payload(
                 f"tranche-review-gate:{key.first}: no production tranche to gate"
             )
         inner["id"] = tranche["id"]
+        remap_tranche_evidence(inner, id_map)
     return payload
 
 
@@ -3509,6 +3539,25 @@ def apply_entries(
             if existing is not None:
                 production_id = str(existing["id"])
                 id_map[entry.output_id] = production_id
+                if entry.action == "projects.close_request":
+                    # A gate that already existed still owes the map the staging closure
+                    # asset and gate ids: the close chain's later approval cites the asset,
+                    # and the replay-created asset of a previous run is not this run's row.
+                    staging_gate = entry.raw.get("approval_id")
+                    if staging_gate:
+                        id_map[str(staging_gate)] = production_id
+                    staging_asset = entry.raw.get("closure_asset_id")
+                    if staging_asset and str(staging_asset) not in id_map:
+                        assets = rows(
+                            client,
+                            "governed_assets.list",
+                            {"kind": "closure", "project_id": str(key.first)},
+                        )
+                        if assets:
+                            latest = max(
+                                assets, key=lambda row: str(row.get("created_at") or "")
+                            )
+                            id_map[str(staging_asset)] = str(latest.get("id"))
                 if entry.action == "changes.request":
                     gate = gate_for_change(state, existing)
                     change_index[key.first] = {
@@ -4246,6 +4295,17 @@ class FakeClient:
                     row["state"] = "closed"
                     return copy.deepcopy(row)
             raise PromoteError("retros.close: no cadence")
+        if action == "governed_assets.list":
+            assets = [
+                copy.deepcopy(row)
+                for row in self.state.governed_assets
+                if (payload.get("kind") is None or row.get("kind") == payload.get("kind"))
+                and (
+                    payload.get("project_id") is None
+                    or str(row.get("project_id")) == str(payload.get("project_id"))
+                )
+            ]
+            return {"items": assets, "next_cursor": None}
         if action == "programme_lessons.list":
             return {
                 "items": [
