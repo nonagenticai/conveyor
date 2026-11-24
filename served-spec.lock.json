@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "ac4336bb07fb52ad4a6a2073a8a1e20affaa32d030e99d5ab705850647db1a2d",
+    "GET /api/actions": "15b36339b5c691c0b36d27e96b6b7784ab163b09cb4c95267bedfe311745f46d",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -45,7 +45,7 @@
     "POST /api/actions/architecture.artifacts_list/invocations": "caa60859539deee095b37744bd3cf14bf7454641a1c454a58e9bf297f6ac15ab",
     "POST /api/actions/architecture.artifacts_supersede/invocations": "35621c44e61dfbcf04d47c7b42b09f7d295589e0a8ee0bd79023aff3cd20acb7",
     "POST /api/actions/architecture.artifacts_update/invocations": "ddb0141a299a2f2e1c0a21321960e7c9fc60e5542e9c2a7f272321917ae24f37",
-    "POST /api/actions/architecture.board_decide/invocations": "989ff9864d48966a064ca58eec4fa103022907923aeb756d971b0b7b9d0c1ea6",
+    "POST /api/actions/architecture.board_decide/invocations": "b5ae34103f4b50b8e7e2dbd80c54bb2aa195625c235423c92e5ef2a631fa51f0",
     "POST /api/actions/architecture.board_get/invocations": "757b24f7f58f408e63045d27ca81b263cb2ab5756f610c476b5210ab2c23d5b0",
     "POST /api/actions/architecture.board_list/invocations": "18cc15237d6de47711a99ad54406a487694c84ad26b5e467bd1194615009c05e",
     "POST /api/actions/architecture.board_open/invocations": "32d5f7ebbf260ae63064a23d6c8ad53bb157f757f7d229e031435954c32dbfc9",
@@ -271,6 +271,9 @@
     "POST /api/actions/kata.observe/invocations": "813088a65cfe4a82a28da9c7b46ac7743babe89d2baf9aef8a2d68a57ba03e04",
     "POST /api/actions/kata.open/invocations": "bb99a4392a46d6e3c5c29928f7fd86f1bc3eb98eed264e8661efc8a6a7aaa4cb",
     "POST /api/actions/kata.propose/invocations": "8d04affd0c93a3fe60fae5710930eea2ca526db61e58b09347fc61f56bcb7787",
+    "POST /api/actions/kata.standardise/invocations": "723fa25b7dced148e767733add7bd8fada4f5abee4700ace4da40576267be9c0",
+    "POST /api/actions/kata.stretch/invocations": "d0279ca5724d0c911dfe75717e212d3e7d88aea1ffbea677af4bb4063ae5648e",
+    "POST /api/actions/kata.sustain/invocations": "fbb3b1e42c27023c9959da1edfdb5d4538b7c130ccc7c63300b070be8dc384db",
     "POST /api/actions/knowledge.query/invocations": "1f69d4281b008837ced412628239373057e2d5ec4966a84a3a630b1bec094781",
     "POST /api/actions/labels.create/invocations": "eca5bb2a6198acd5e5916c3aae3532af99fb0a90a507762e68b802d89a4b4cbc",
     "POST /api/actions/labels.delete/invocations": "9a759da9093bdba01d5d79751819145799d6cba39117c62adbb389b76ac3c256",

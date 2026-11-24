@@ -128,10 +128,10 @@ use serde_json::{Value, json};
 /// organisational-memory lifecycle. 548 → **551**. **T15 (#86) adds 10 internal**:
 /// `toolkits.import_openapi|register_mcp|discover_mcp`, `tool_authoring.draft|validate|test|`
 /// `review|publish|promote` and the broker's registered-destination dispatch `tools.dispatch`
-/// — 551 → **561**. **S21 step 10 (#656) adds 4**: `ladder.case` and
-/// `decision_option_sets.get|set` (internal) and `ladder.precheck` (external) — 561 → **565**,
-/// internal 543 → 546, external 18 → 19.
-const EXPECTED: [&str; 565] = [
+/// — 551 → **561**; T12 (#88) adds the three remaining kata Gets → **564**. **S21 step 10
+/// (#656) adds 4**: `ladder.case` and `decision_option_sets.get|set` (internal) and
+/// `ladder.precheck` (external) — 564 → **568**, internal 546 → 549, external 18 → 19.
+const EXPECTED: [&str; 568] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -383,6 +383,9 @@ const EXPECTED: [&str; 565] = [
     "kata.observe",
     "kata.open",
     "kata.propose",
+    "kata.standardise",
+    "kata.stretch",
+    "kata.sustain",
     "knowledge.query",
     "labels.create",
     "labels.delete",
@@ -808,9 +811,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // `tool_authoring.draft|validate|test|review|publish|promote`, `tools.dispatch`):
     // internal 533 -> 543; external stays 18 — an authored tool dispatches through the broker's
     // registered-destination arm, not a new external declaration.
+    // T12 (#88) adds three internal kata Gets (`kata.standardise|sustain|stretch`):
+    // internal 543 -> 546; external stays 18.
     // S21 step 10 (#656) adds three internal actions (`ladder.case`, `decision_option_sets.get|set`)
-    // and one external (`ladder.precheck`): internal 543 -> 546, external 18 -> 19.
-    assert_eq!((internal, external), (546, 19));
+    // and one external (`ladder.precheck`): internal 546 -> 549, external 18 -> 19.
+    assert_eq!((internal, external), (549, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

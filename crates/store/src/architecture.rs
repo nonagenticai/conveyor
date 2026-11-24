@@ -483,7 +483,7 @@ pub async fn seed_standard_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
 ) -> Result<u64, ArchitectureStoreError> {
-    let rows: [(&str, &str, &str, &str, &str, bool); 10] = [
+    let rows: [(&str, &str, &str, &str, &str, bool); 14] = [
         (
             "principles_catalog",
             "Principles Catalog",
@@ -562,6 +562,41 @@ pub async fn seed_standard_tx(
             "catalog",
             "d",
             "hld",
+            true,
+        ),
+        // E and F close on the solution and migration artefacts §8.1 names. They were absent
+        // from the first seeded standard, so a phase E/F gate had no mandatory artefact it
+        // could require; the terminal acceptance (T12) needs every phase's set to be real.
+        (
+            "project_context",
+            "Project Context Diagram",
+            "diagram",
+            "e",
+            "sd",
+            true,
+        ),
+        (
+            "benefits_diagram",
+            "Benefits Diagram",
+            "diagram",
+            "e",
+            "sd",
+            true,
+        ),
+        (
+            "implementation_roadmap",
+            "Implementation Roadmap",
+            "catalog",
+            "f",
+            "sd",
+            true,
+        ),
+        (
+            "migration_plan",
+            "Migration Plan",
+            "catalog",
+            "f",
+            "sd",
             true,
         ),
     ];
@@ -1238,6 +1273,17 @@ pub async fn get_body_tx(
         .await?)
 }
 
+/// Who took a board decision and under what authority.
+#[derive(Clone, Copy, Debug)]
+pub struct BoardDecider<'a> {
+    /// The deciding actor.
+    pub decided_by: Uuid,
+    /// `human | agent | rule` — derived from the authenticated principal.
+    pub decided_by_kind: &'a str,
+    /// The published standing delegation the act cites, when it is a delegated rule decision.
+    pub delegation_ref: Option<Uuid>,
+}
+
 /// What a board decision is about.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct BoardSubject<'a> {
@@ -1254,8 +1300,8 @@ pub async fn decide_board_tx(
     body_id: Uuid,
     decision: &str,
     evidence: Value,
-    decided_by: Uuid,
     subject: BoardSubject<'_>,
+    decider: BoardDecider<'_>,
 ) -> Result<Uuid, ArchitectureStoreError> {
     if decision != "approved" && decision != "rejected" {
         return Err(ArchitectureStoreError::Conflict {
@@ -1331,7 +1377,7 @@ pub async fn decide_board_tx(
     )
     .bind(tenant.as_uuid())
     .bind(decision)
-    .bind(decided_by)
+    .bind(decider.decided_by)
     .bind(json!({
         "body_id": body_id,
         "evidence": evidence,
@@ -1340,6 +1386,33 @@ pub async fn decide_board_tx(
     }))
     .fetch_one(&mut *conn)
     .await?;
+    // A delegated act is a recorded decision, not only an approval row: the approver, the
+    // derived kind (`rule` for the delegated service principal) and the standing delegation
+    // the act cites are written in the same transaction as the approval and decision. This is
+    // the type `approvals.decide` writes; the board macro had no decision row before, so a
+    // delegated board act left no typed record of who decided it or under what authority.
+    if let Some(delegation_ref) = decider.delegation_ref {
+        sqlx::query(
+            "INSERT INTO approval_decision
+                (tenant_id, approval_id, approver_id, decision, decided_by_kind, via)
+             VALUES ($1, $2, $3, $4, $5, $6)",
+        )
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(decider.decided_by)
+        .bind(if decision == "approved" {
+            "approve"
+        } else {
+            "reject"
+        })
+        .bind(decider.decided_by_kind)
+        .bind(json!({
+            "channel": "internal",
+            "delegation_ref": delegation_ref.to_string(),
+        }))
+        .execute(&mut *conn)
+        .await?;
+    }
     // A board convened by its own decision is active from that decision. Nothing writes the
     // status directly: this is the one writer, and it writes what the decision says.
     if subject_kind == Some("board") && decision == "approved" {
