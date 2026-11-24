@@ -713,7 +713,7 @@ async fn a_duplicate_remedy_is_refused() {
     let (status, body) = remedy(&running, interruption, None).await;
     assert_eq!(status, 409, "a duplicate remedy is refused: {body}");
     assert_eq!(
-        body["errors"][0]["code"], "coach.already_remedied",
+        body["type"], "coach.already_remedied",
         "the refusal is typed: {body}"
     );
     assert_eq!(
