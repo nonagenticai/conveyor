@@ -145,6 +145,17 @@ pub fn run_error(error: store::RunStoreError, action: &str) -> ActionError {
             "binding_required",
             "a run that names a release must name the job binding that pins it",
         ),
+        // v1-w1a-5 (SPEC_V2 §4.4): job work cannot exist without the binding and release pin
+        // it executes under.
+        store::RunStoreError::BindingRequired => invalid(
+            "job_binding_id",
+            "binding_required",
+            "a job run must name the job binding (and its pinned release) it executes under",
+        ),
+        store::RunStoreError::UnknownKind(raw) => {
+            tracing::error!(kind = %raw, "a stored run.kind is outside the four the store knows");
+            ActionError::internal()
+        }
         store::RunStoreError::ExecutorMismatch => ActionError::new(
             409,
             "executor_mismatch",

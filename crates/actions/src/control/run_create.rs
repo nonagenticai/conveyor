@@ -102,6 +102,16 @@ pub(crate) async fn create_bound_run_tx(
         .await
         .map_err(|error| store_error(error, action))?;
 
+    // v1-w1a-5 (SPEC_V2 §4.4): the kind comes from the run's claim. A request that names (or
+    // inherits) a binding, or claims a release pin, is a job run; a plain request with neither is
+    // the typed project run and keeps the plain-run path. A release claim with no binding is a
+    // job run with no pin, which the store refuses `422 binding_required` before the INSERT.
+    let kind = if job_binding_id.is_some() || release_hash.is_some() {
+        store::run::RunKind::Job
+    } else {
+        store::run::RunKind::Project
+    };
+
     // v1-p44-1 (SPEC_V2 §4.4): a ROOT run's executor is the agent its binding pins.
     if let Some(binding_id) = job_binding_id {
         let binding = store::organisation::job_binding_get_tx(&mut *tx, ctx.tenant, binding_id)
@@ -130,6 +140,7 @@ pub(crate) async fn create_bound_run_tx(
             workflow_step_id: None,
             depth: 0,
             process_version: 1,
+            kind,
             job_binding_id,
             release_hash,
         },
