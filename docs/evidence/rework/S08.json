@@ -191,7 +191,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "S08's gate is golden SVG/PNG/PDF/XMI fixtures, and Part A's round-trip is the governance floor.",
-  "generated_at": "2026-11-24T20:29:57.172446+00:00",
+  "generated_at": "2026-11-24T21:07:26.164971+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S08.toml",
   "name": "Governance, modelling, render and export",
@@ -199,8 +199,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-24T18:25:22.625551+00:00",
-    "git_sha": "ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47",
-    "path": "retained-snapshot/ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47"
+    "git_sha": "86f5da93480fa1b163dd4ee35085cd72882f9b01",
+    "path": "retained-snapshot/86f5da93480fa1b163dd4ee35085cd72882f9b01"
   },
   "verdict": "red",
   "warnings": []

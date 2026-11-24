@@ -124,7 +124,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "19 mandatory artefact package(s) open: std-togaf-phase-g-s05-g:S05, std-togaf-phase-h-s05-h:S05, std-pmp-project-baseline-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-architecture-artifact-instance-01a20ec8-1479-7d97-8c92-428ed9ea0b6f:S05, std-togaf-architecture-artifact-instance-01a20ec8-15b2-7709-b738-34a9e7488ef6:S05, std-togaf-architecture-artifact-instance-01a20ec8-16d8-76aa-8be3-d675f9691ee2:S05, std-togaf-architecture-artifact-instance-01a20ec8-1813-72f9-9ed8-89dff7f44d4a:S05, +11 more",
+      "detail": "15 mandatory artefact package(s) open: std-togaf-phase-g-s05-g:S05, std-pmp-project-baseline-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-architecture-artifact-instance-01a20ec8-1479-7d97-8c92-428ed9ea0b6f:S05, std-togaf-architecture-artifact-instance-01a20ec8-15b2-7709-b738-34a9e7488ef6:S05, std-togaf-architecture-artifact-instance-01a20ec8-16d8-76aa-8be3-d675f9691ee2:S05, std-togaf-architecture-artifact-instance-01a20ec8-1813-72f9-9ed8-89dff7f44d4a:S05, std-togaf-architecture-artifact-instance-01a20ec8-195c-753b-9f09-3e2b224a6e8e:S05, +7 more",
       "id": "S05-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -133,7 +133,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "3 unresolved P0/P1 package(s): v1-s05-1:S05 (P1), std-togaf-phase-g-s05-g:S05 (P1), std-togaf-phase-h-s05-h:S05 (P1)",
+      "detail": "2 unresolved P0/P1 package(s): v1-s05-1:S05 (P1), std-togaf-phase-g-s05-g:S05 (P1)",
       "id": "S05-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -151,12 +151,12 @@
   ],
   "failures": [
     "S05-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-    "S05-artefact-standard (P1): 19 mandatory artefact package(s) open: std-togaf-phase-g-s05-g:S05, std-togaf-phase-h-s05-h:S05, std-pmp-project-baseline-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-architecture-artifact-instance-01a20ec8-1479-7d97-8c92-428ed9ea0b6f:S05, std-togaf-architecture-artifact-instance-01a20ec8-15b2-7709-b738-34a9e7488ef6:S05, std-togaf-architecture-artifact-instance-01a20ec8-16d8-76aa-8be3-d675f9691ee2:S05, std-togaf-architecture-artifact-instance-01a20ec8-1813-72f9-9ed8-89dff7f44d4a:S05, +11 more",
-    "S05-rework (P0): 3 unresolved P0/P1 package(s): v1-s05-1:S05 (P1), std-togaf-phase-g-s05-g:S05 (P1), std-togaf-phase-h-s05-h:S05 (P1)",
+    "S05-artefact-standard (P1): 15 mandatory artefact package(s) open: std-togaf-phase-g-s05-g:S05, std-pmp-project-baseline-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-architecture-artifact-instance-01a20ec8-1479-7d97-8c92-428ed9ea0b6f:S05, std-togaf-architecture-artifact-instance-01a20ec8-15b2-7709-b738-34a9e7488ef6:S05, std-togaf-architecture-artifact-instance-01a20ec8-16d8-76aa-8be3-d675f9691ee2:S05, std-togaf-architecture-artifact-instance-01a20ec8-1813-72f9-9ed8-89dff7f44d4a:S05, std-togaf-architecture-artifact-instance-01a20ec8-195c-753b-9f09-3e2b224a6e8e:S05, +7 more",
+    "S05-rework (P0): 2 unresolved P0/P1 package(s): v1-s05-1:S05 (P1), std-togaf-phase-g-s05-g:S05 (P1)",
     "gate (P0): the gate check 'S05-charter' did not pass; the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass"
   ],
   "gate": "replay a board export, win a two-client race and survive the 1k-card load \u2014 zero deltas on 1,000 cards, one 200 and one 412 with the current representation, p95 \u2264 120 ms at 20 rps, the exact webhook shape, SSE within 200 ms, and no second store",
-  "generated_at": "2026-11-24T20:29:56.719447+00:00",
+  "generated_at": "2026-11-24T21:07:25.735984+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S05.toml",
   "name": "Board \u2014 projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
@@ -164,8 +164,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-24T18:25:22.625551+00:00",
-    "git_sha": "ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47",
-    "path": "retained-snapshot/ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47"
+    "git_sha": "86f5da93480fa1b163dd4ee35085cd72882f9b01",
+    "path": "retained-snapshot/86f5da93480fa1b163dd4ee35085cd72882f9b01"
   },
   "verdict": "red",
   "warnings": []
