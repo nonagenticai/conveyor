@@ -155,6 +155,10 @@ async fn approvals_decide(
         // names to `active` (SPEC_V2 §4.4). The effect rides the decision's transaction, so a
         // failed flip rolls the decision back.
         crate::organisation::apply_binding_gate_effect_tx(&mut *tx, ctx.tenant, &record).await?;
+        // v1-w1a-4: an approved `job_activation` gate is the only thing that flips the job it
+        // names from draft to active (SPEC_V2 §4.3). It rides the same transaction.
+        crate::organisation::apply_job_activation_gate_effect_tx(&mut *tx, ctx.tenant, &record)
+            .await?;
     }
 
     // Only a gate that actually resolved announces it: a first approve under a two-person
