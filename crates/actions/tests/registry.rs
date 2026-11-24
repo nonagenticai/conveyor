@@ -132,10 +132,12 @@ use serde_json::{Value, json};
 /// `authoring.intakes` → **565**. **S21 step 10 (#656) adds 4**: `ladder.case` and
 /// `decision_option_sets.get|set` (internal) and `ladder.precheck` (external) — 565 → **569**,
 /// internal 547 → 550, external 18 → 19.
+/// **T14 (#561) adds 5 external reads**: `webscraper.scrape_url|scrape_bulk` and
+/// `lean4.check|elaborate|prove` — 569 → **574**, external 19 → 24.
 /// **#557 adds 8 internal**: `tool_bindings.create|update|retire|list`, `tools.list|get`,
-/// `toolkits.list` and `tool_calls.list` — 569 → **577**, internal 550 → 558, external
-/// stays 19.
-const EXPECTED: [&str; 577] = [
+/// `toolkits.list` and `tool_calls.list` — 574 → **582**, internal 550 → 558, external
+/// stays 24.
+const EXPECTED: [&str; 582] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -404,6 +406,10 @@ const EXPECTED: [&str; 577] = [
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
+    // T14 (#561): the Lean prover's three read actions.
+    "lean4.check",
+    "lean4.elaborate",
+    "lean4.prove",
     // T8 (#79): the organisational-memory lifecycle — propose with independent evidence,
     // a person's review, and promotion to a governed-asset source draft.
     "lessons.promote",
@@ -699,6 +705,9 @@ const EXPECTED: [&str; 577] = [
     "webhooks.delete",
     "webhooks.test",
     "webhooks.update",
+    // T14 (#561): the webscraper's two read actions.
+    "webscraper.scrape_bulk",
+    "webscraper.scrape_url",
     "workers.list",
     "workflows.create",
     "workflows.get",
@@ -830,10 +839,13 @@ fn the_registry_is_exactly_the_declared_set() {
     // external stays 18 — the queue reads this tenant's own intake rows.
     // S21 step 10 (#656) adds three internal actions (`ladder.case`, `decision_option_sets.get|set`)
     // and one external (`ladder.precheck`): internal 547 -> 550, external 18 -> 19.
+    // T14 (#561) adds five external reads (`webscraper.scrape_url|scrape_bulk`,
+    // `lean4.check|elaborate|prove`): internal stays 550, external 19 -> 24 — each call
+    // dispatches to a Rust service, not a new internal action.
     // #557 adds eight internal actions (`tool_bindings.create|update|retire|list`,
     // `tools.list|get`, `toolkits.list`, `tool_calls.list`): internal 550 -> 558;
-    // external stays 19.
-    assert_eq!((internal, external), (558, 19));
+    // external stays 24.
+    assert_eq!((internal, external), (558, 24));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

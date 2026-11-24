@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F — Artefact register · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/artifact-register.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f--artefact-register">T19F — Artefact register</h1>
+<p>The typed catalogue of the T19F project set. Each row carries T9's common metadata: title, status, version, owner, reviewer, review date, purpose, stakeholders, scope, related project and its published document. Links use <code>derivation | realization | reuse | dependency</code>.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Artefact</th>
+<th>Type</th>
+<th>Phase / plateau</th>
+<th>Status</th>
+<th>Version</th>
+<th>Owner</th>
+<th>Reviewer</th>
+<th>Review date</th>
+<th>Document</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T19F-A0</td>
+<td>Project brief</td>
+<td>project-brief</td>
+<td>Preliminary / definition</td>
+<td>draft</td>
+<td>1</td>
+<td>programme-manager</td>
+<td>SRO</td>
+<td>2026-12-01</td>
+<td><code>docs/plans/T19F/project-brief.md</code></td>
+</tr>
+<tr>
+<td>T19F-A1</td>
+<td>Inception analysis</td>
+<td>inception-analysis</td>
+<td>Preliminary / definition</td>
+<td>draft</td>
+<td>1</td>
+<td>business-analyst</td>
+<td>programme-architect</td>
+<td>2026-12-01</td>
+<td><code>docs/plans/T19F/inception-analysis.md</code></td>
+</tr>
+<tr>
+<td>T19F-A2</td>
+<td>Architecture design (PSA + HLD)</td>
+<td>architecture-design</td>
+<td>A–F / PSA+HLD</td>
+<td>draft</td>
+<td>1</td>
+<td>programme-architect</td>
+<td>Architecture Board</td>
+<td>2026-12-01</td>
+<td><code>docs/plans/T19F/architecture-design.md</code></td>
+</tr>
+<tr>
+<td>T19F-A3</td>
+<td>MSP profile (B7 realisation increment)</td>
+<td>benefit-profile</td>
+<td>Preliminary / definition</td>
+<td>draft</td>
+<td>1</td>
+<td>BCM</td>
+<td>SRO</td>
+<td>2026-12-01</td>
+<td><code>docs/plans/T19F/msp-profile.md</code></td>
+</tr>
+<tr>
+<td>T19F-A4</td>
+<td>SAFe epic (features, enablers, WSJF, PI)</td>
+<td>epic</td>
+<td>F / HLD</td>
+<td>draft</td>
+<td>1</td>
+<td>programme-manager</td>
+<td>SRO</td>
+<td>2026-12-01</td>
+<td><code>docs/plans/T19F/safe-epic.md</code></td>
+</tr>
+<tr>
+<td>T19F-A5</td>
+<td>Follow-on plan</td>
+<td>plan</td>
+<td>E–F / HLD</td>
+<td>proposed</td>
+<td>1</td>
+<td>programme-architect</td>
+<td>Architecture Board</td>
+<td>2026-12-01</td>
+<td><code>docs/plans/T19F-meeting-bindings.md</code></td>
+</tr>
+<tr>
+<td>T19F-A6</td>
+<td>This register</td>
+<td>catalog</td>
+<td>A–F / PSA+HLD</td>
+<td>draft</td>
+<td>1</td>
+<td>programme-architect</td>
+<td>Architecture Board</td>
+<td>2026-12-01</td>
+<td>this file</td>
+</tr>
+<tr>
+<td>T19F-A7</td>
+<td>Implementation evidence</td>
+<td>evidence</td>
+<td>G / capability</td>
+<td>to create</td>
+<td>1</td>
+<td>programme-manager</td>
+<td>Architecture Board</td>
+<td>2026-12-01</td>
+<td><code>docs/plans/T19F/evidence.md</code> (to create in #684)</td>
+</tr>
+<tr>
+<td>T19F-A8</td>
+<td>Closure review</td>
+<td>closure-review</td>
+<td>G / capability</td>
+<td>to create</td>
+<td>1</td>
+<td>programme-manager</td>
+<td>Architecture Board</td>
+<td>2026-12-01</td>
+<td><code>docs/plans/T19F/closure-review.md</code> (to create in #684)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="typed-togaf-rows-to-create-in-the-live-chain-684">Typed TOGAF rows (to create in the live chain, #684)</h2>
+<p>The seven mandatory artefacts are created and approved through the deployed engine under the published standing delegation, with entries from <code>docs/plans/T19F/architecture-design.md</code>: <code>requirements_catalog</code>, <code>stakeholder_map</code>, <code>driver_goal_objective</code>, <code>solution_concept</code>, <code>business_capability_map</code>, <code>data_entity_catalog</code>, <code>technology_standards</code>. The chain also creates the seven links, the Statement of Architecture Work, the phase-F delivery contract, two Phase-G compliance reviews and the published <code>architecture-artifact</code> document. Read-back: <code>python3 scripts/governance-chain.py --project T19F --check</code>.</p>
+<h2 id="purpose-stakeholders-and-scope">Purpose, stakeholders and scope</h2>
+<p><strong>Purpose.</strong> Give T19F one navigable set of decision, architecture, programme and delivery artefacts, each with an owner, a reviewer and a linked source, so the design gate and the tranche-6 review read the same record.</p>
+<p><strong>Stakeholders.</strong> The SRO, the BCM, the programme manager and architect, the Architecture Board, the departments that staff the board's seats, and the delivery teams that use the direct board path.</p>
+<p><strong>Scope.</strong> T19F only. T19's rows, T17's authoring assets and T9/T10's consumer rows are related sets, not part of this register.</p>
+<h2 id="links">Links</h2>
+<table>
+<thead>
+<tr>
+<th>From</th>
+<th>Kind</th>
+<th>To</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T19F-A1 analysis</td>
+<td>derivation</td>
+<td>T19F-A2 architecture</td>
+<td>the measured seams shape the PSA/HLD</td>
+</tr>
+<tr>
+<td>T19F-A2 architecture</td>
+<td>realization</td>
+<td>T19F-A5 plan</td>
+<td>each plan part realises a requirement/entity/action</td>
+</tr>
+<tr>
+<td>T19F-A3 MSP</td>
+<td>dependency</td>
+<td>T19F-A5 plan</td>
+<td>B7's increment depends on the authored policy and the seated board</td>
+</tr>
+<tr>
+<td>T19F-A4 SAFe</td>
+<td>derivation</td>
+<td>T19F-A5 plan</td>
+<td>features F1–F4 map to P1–P4</td>
+</tr>
+<tr>
+<td>T19F-A2 architecture</td>
+<td>reuse</td>
+<td><code>meeting_type</code>, <code>meeting</code>, <code>close_item_tx</code>, <code>authoring.publish</code></td>
+<td>T19/T17 consumers, not rebuilds</td>
+</tr>
+<tr>
+<td>T19F-A0 brief</td>
+<td>dependency</td>
+<td>T19F-A5 plan</td>
+<td>the brief's boundary governs the plan</td>
+</tr>
+<tr>
+<td>T19F-A7 evidence</td>
+<td>realization</td>
+<td>T19F-A5 plan</td>
+<td>the measured acceptance of every part</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T19F/artifact-register.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

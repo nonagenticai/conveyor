@@ -27,6 +27,10 @@ pub mod objects;
 pub mod strata;
 // T14: the scientific processor's five read actions (`scientific_stats.*`, `scientific_formal.*`).
 pub mod scientific;
+// T14 (#561): the Lean prover's three read actions (`lean4.check|elaborate|prove`).
+pub mod lean4;
+// T14 (#561): the webscraper's two read actions (`webscraper.scrape_url|scrape_bulk`).
+pub mod research;
 // #182 slice A: Google's OAuth token endpoint, behind `crate::youtube::YouTubeProvider`.
 pub mod youtube;
 // #173: the two audio capabilities of the model hosts — `produce.speech`, `media.transcribe`.

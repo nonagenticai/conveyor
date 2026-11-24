@@ -41,9 +41,18 @@ human seat deciding one item in the web room and one over MCP, both `via='meetin
 meeting on its published minutes, and published T19, its board and benefit B7 into the programme
 snapshot. The gate found and closed two deployment defects in the MCP surface (allowed hosts and
 session affinity). `docs/plans/T19/closure-review.md` is the decision; the `meeting_type`
-authoring route and the T9/T10 binding remain declared follow-ups. T19 is independent of T18 (the
-UI lane); it consumes T1/T2/T3 and the built T9/T10 seams. The meeting ruling is D66 because
+authoring route and the T9/T10 binding are the T19F follow-on (below). T19 is independent of T18
+(the UI lane); it consumes T1/T2/T3 and the built T9/T10 seams. The meeting ruling is D66 because
 D64–D65 are the real-UI rulings.
+
+**T19F added 2026-11-24, proposed.** Decision-forum governance is the follow-on T19's closure
+review named (`docs/SPEC_V2.md` §12 T19F; `docs/plans/T19F-meeting-bindings.md`): a policy change
+is a reviewed authoring asset that publishes the next immutable `meeting_type` version, a board
+subject decision can be taken in a sitting with per-seat `via='meeting'` decisions, and a cadence
+row materialises exactly one meeting. **#682** carries the plan and the MSP/TOGAF/SAFe artefact
+set, **#683** the implementation, **#684** the deployment-gated live proof. The project is
+`active` at tranche 6 by the coverage graph (T19 tranche 4, T17 tranche 5); its closure review
+defers closure to the tranche-6 review rather than manufacturing an unledgered P0.
 
 ## Programme `conveyor-buildout`
 
@@ -56,7 +65,8 @@ registered GitHub issues are its units. `seed/programme.json` is the mapping of 
   `docs/plans/T9-architecture-capability.md` (the ADM capability, the artefact standard and the
   phase/contract gates); the `T18` row's is `docs/plans/T18-real-v2-ui.md` (the real UI, its five
   units and the delivery view); the `T19` row's is `docs/plans/T19-decision-forums.md` (the
-  meeting forum, its D1–D8 parts and the programme artefact set);
+  meeting forum, its D1–D8 parts and the programme artefact set); `T19F` is the follow-on slice
+  for forum governance (`docs/plans/T19F-meeting-bindings.md`);
 - `P0` — the programme definition (`docs/plans/P0-programme-definition.md`), the first project
   and the gate T1–T19 depend on (issues #120–#122);
 - `SPEC-V2`, `DESIGN-PUBLISH`, `PLATFORM` — the cross-cutting units.

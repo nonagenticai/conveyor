@@ -683,7 +683,7 @@
       "key": "S18",
       "name": "Kata continuous improvement",
       "description": "Plan: docs/plans/slices/S18-kata-improvement.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S18-kata-improvement.md",
@@ -791,7 +791,8 @@
           612,
           624,
           649,
-          656
+          656,
+          697
         ],
         "depends_on": [
           "S09",
@@ -1319,7 +1320,8 @@
           83,
           558,
           560,
-          561
+          561,
+          688
         ],
         "depends_on": [
           "T13",
@@ -1412,7 +1414,7 @@
       "key": "T17",
       "name": "Tenant asset authoring",
       "description": "SPEC_V2 slice T17 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1429,15 +1431,13 @@
         ],
         "plan_status": "draft",
         "status_source": "github issue state > measured coverage > plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 5,
         "expected_outputs": [
           "project-brief",
-          "inception-analysis",
-          "architecture-design"
+          "evidence"
         ],
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "adm_phase": "G",
@@ -1521,6 +1521,45 @@
         "adm_phase": "G",
         "plateau": "capability",
         "gate": "a three-department board meeting decides its agenda items by recorded majority with a recorded dissent; an item missing a required department is deferred `inquorate` and cannot be decided; a meeting cannot lower a linked approval's dual control or waive its evidence; the owner decides one item in the web meeting room and another asynchronously from the agent front end over MCP, both recorded `via='meeting'`; minutes publish behind the chair's gate and every action becomes a card; a forum with no decision over a cycle is flagged"
+      }
+    },
+    {
+      "key": "T19F",
+      "name": "Decision-forum governance (follow-on)",
+      "description": "Follow-on: docs/plans/T19F-meeting-bindings.md",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/plans/T19F-meeting-bindings.md",
+        "track": "v2",
+        "issues": [
+          682,
+          683,
+          684
+        ],
+        "depends_on": [
+          "T19",
+          "T17",
+          "T9",
+          "T10",
+          "P0"
+        ],
+        "plan_status": "proposed",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 6,
+        "expected_outputs": [
+          "project-brief",
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
+        ],
+        "adm_phase": "G",
+        "plateau": "capability",
+        "gate": "a reviewed policy asset publishes a new immutable meeting_type version while an in-flight meeting keeps its pinned version; a board subject decision is taken in a sitting whose qualifying seats each write one approval_decision with via='meeting'; a cadence row materialises exactly one meeting; the direct board path is unchanged"
       }
     },
     {
@@ -1615,6 +1654,7 @@
         "plan": "docs/plans/development-process-speed.md",
         "track": "programme",
         "issues": [
+          16,
           17,
           22,
           43,
@@ -1632,15 +1672,18 @@
           223,
           224,
           225,
-          395,
-          410,
-          426,
           435,
           476,
           526,
           569,
           572,
-          660
+          660,
+          669,
+          680,
+          681,
+          691,
+          693,
+          696
         ],
         "depends_on": [],
         "plan_status": "active",
@@ -1662,7 +1705,7 @@
       "key": "SPEC-V2",
       "name": "SPEC V2 — the organisational operating model",
       "description": "Programme-level unit (plan: docs/SPEC_V2.md)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md",

@@ -186,6 +186,29 @@ T_SLICES = [
     ("T19", "Decision forums (meetings)"),
 ]
 
+# Follow-on projects that are not SPEC_V2 §12 slices. The §12 parser only recognises `T\d+`, so a
+# follow-on is registered explicitly here rather than pretending it is a numbered slice: its plan
+# is its own document, its label is its own key, and its dependency edges keep the coverage
+# tranche honest. Added 2026-11-24 with T19F.
+FOLLOW_ON_PROJECTS = [
+    {
+        "key": "T19F",
+        "name": "Decision-forum governance (follow-on)",
+        "description": "Follow-on: docs/plans/T19F-meeting-bindings.md",
+        "plan": "docs/plans/T19F-meeting-bindings.md",
+        "track": "v2",
+        "plan_status": "proposed",
+        "depends_on": ["T19", "T17", "T9", "T10", "P0"],
+        "gate": (
+            "a reviewed policy asset publishes a new immutable meeting_type version while an "
+            "in-flight meeting keeps its pinned version; a board subject decision is taken in a "
+            "sitting whose qualifying seats each write one approval_decision with via='meeting'; "
+            "a cadence row materialises exactly one meeting; the direct board path is unchanged"
+        ),
+        "issues": [],
+    },
+]
+
 FRONTMATTER = re.compile(r"^---\n(.*?)\n---\n", re.S)
 SLICE_FILE = re.compile(r"^(S\d{2}[a-z]?)-.+\.md$")
 COMMENT = re.compile(r"\s+#.*$")
@@ -324,6 +347,18 @@ def t_slice_projects() -> list[dict]:
     ]
 
 
+def follow_on_projects() -> list[dict]:
+    """The explicitly registered follow-ons (T19F today); a copy per build."""
+    return [
+        {
+            **project,
+            "depends_on": list(project["depends_on"]),
+            "issues": list(project["issues"]),
+        }
+        for project in FOLLOW_ON_PROJECTS
+    ]
+
+
 def gh_issues() -> list[dict]:
     try:
         raw = subprocess.run(
@@ -413,7 +448,7 @@ def derive_status(project: dict, issues: list[dict], coverage: dict[str, dict]) 
 
 
 def build(issues: list[dict]) -> dict:
-    projects = slice_projects() + t_slice_projects()
+    projects = slice_projects() + t_slice_projects() + follow_on_projects()
     projects_by_key = {project["key"]: project for project in projects}
 
     for key, crossed in CROSS_CUTTING.items():

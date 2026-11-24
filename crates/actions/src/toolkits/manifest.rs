@@ -47,6 +47,18 @@ const RAW: &[(&str, &str)] = &[
         "scientific",
         include_str!("../../../../seed/toolkits/scientific.json"),
     ),
+    // T14 (#561): the webscraper and the Lean prover, each a draft until its probe is green.
+    // The media service is not here: its `/api/*` routes need an `X-Tenant-Id` header the
+    // external engine cannot send, so its five operations are recorded as drops in the
+    // provenance seed rather than published as a toolkit.
+    (
+        "webscraper",
+        include_str!("../../../../seed/toolkits/webscraper.json"),
+    ),
+    (
+        "lean4",
+        include_str!("../../../../seed/toolkits/lean4.json"),
+    ),
     // The `artifacts`, `billing` and `worker_management` manifests were removed by #450: their
     // actions are internal now, and a toolkit binds External handlers only (SPEC_V2 §11.2,
     // §11.3, D57; #46).

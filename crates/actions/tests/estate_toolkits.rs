@@ -250,8 +250,8 @@ async fn a_publish_is_idempotent_and_a_change_bumps_the_version() {
     let rows = outcomes(&first);
     // #450 removed the three manifests whose actions are internal now (`artifacts`, `billing`,
     // `worker_management`); a toolkit binds External handlers only. #560 adds the scientific
-    // processor's draft.
-    assert_eq!(rows.len(), 6, "one row per embedded manifest: {first}");
+    // processor's draft; #561 adds the webscraper and Lean prover drafts.
+    assert_eq!(rows.len(), 8, "one row per embedded manifest: {first}");
     for (key, outcome, version) in &rows {
         assert_eq!(outcome, "created", "{key} on the first publish");
         assert_eq!(*version, 1, "{key} starts at version 1");
@@ -585,4 +585,65 @@ async fn the_published_tool_carries_its_contract() {
     assert_eq!(body["output"]["verification"], "jobs_get", "{body}");
     assert!(body["output"]["output_schema"].is_object(), "{body}");
     assert!(body["output"]["redact"].is_array(), "{body}");
+}
+
+// ── #561: the research and Lean wave ─────────────────────────────────────────────────────
+
+/// #561 P4.3: the research and Lean manifests publish once, each as a draft; a draft resolves no
+/// binding, and the probe reports the destination's health path instead of inventing one.
+///
+/// A draft has no resolvable binding, so there is nothing for a failed probe to disable here; the
+/// unbind/re-enable path is the published `coding` binding in `a_failed_probe_unbinds_and_the_call_is_409`.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn the_research_and_lean_wave_publishes_once() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new().await;
+    support::set_env("CONVEYOR_EXTERNAL_WEBSCRAPER_URL", &fixture.stub.base);
+    support::set_env("CONVEYOR_EXTERNAL_LEAN4_URL", &fixture.stub.base);
+
+    let first = fixture.publish().await;
+    for key in ["webscraper", "lean4"] {
+        let row = outcomes(&first)
+            .into_iter()
+            .find(|(k, _, _)| k == key)
+            .unwrap_or_else(|| panic!("{key} row: {first}"));
+        assert_eq!(
+            row,
+            (key.to_owned(), "created".to_owned(), 1),
+            "{key}: {first}"
+        );
+        let (status, version) = fixture.toolkit_status(key).await;
+        assert_eq!((status.as_str(), version), ("draft", 1), "{key}");
+    }
+
+    let second = fixture.publish().await;
+    for key in ["webscraper", "lean4"] {
+        let row = outcomes(&second)
+            .into_iter()
+            .find(|(k, _, _)| k == key)
+            .unwrap_or_else(|| panic!("{key} row: {second}"));
+        assert_eq!(row.1, "unchanged", "{key}: {second}");
+        assert_eq!(row.2, 1, "{key}: {second}");
+    }
+
+    // A draft binds nothing: the broker refuses before any destination call.
+    fixture.bind("webscraper", "read").await;
+    let hits = fixture.stub.hits();
+    let (code, body) = fixture
+        .call(
+            "webscraper.scrape_url",
+            json!({"url": "https://example.test/page"}),
+        )
+        .await;
+    assert_eq!(code, 409, "{body}");
+    assert_eq!(body["type"], "tool_not_ready", "{body}");
+    assert_eq!(fixture.stub.hits(), hits, "no network call was made");
+
+    // The probe walks the wave and reads the manifest's health path.
+    fixture.stub.pass_health();
+    let (code, probe) = fixture
+        .invoke("tools.probe", json!({"toolkit": "webscraper"}))
+        .await;
+    assert_eq!(code, 200, "{probe}");
+    assert_eq!(probe["output"]["toolkits"][0]["probe"], "live", "{probe}");
 }

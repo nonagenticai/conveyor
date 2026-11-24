@@ -1,6 +1,6 @@
 //! `seed_programme_definition`: the buildout's own MSP definition seeds as rows.
 //!
-//! A fresh tenant gets the six benefit profiles and their map, the fourteen tranches, and each
+//! A fresh tenant gets the seven benefit profiles and their map, the fourteen tranches, and each
 //! project's ADM phase/plateau in `meta`. A second run inserts nothing and never overwrites a
 //! published row.
 //!
@@ -21,7 +21,7 @@ async fn a_fresh_tenant_seeds_its_msp_definition() {
         .expect("first run");
     let counts = first[0].1;
     assert_eq!(counts.benefits, 7, "the seven benefit profiles");
-    assert_eq!(counts.links, 8, "the benefits map");
+    assert_eq!(counts.links, 9, "the benefits map");
     assert_eq!(counts.tranches, 14, "fourteen tranches");
 
     let benefits: Vec<(String, String)> = sqlx::query_as(
@@ -56,7 +56,7 @@ async fn a_fresh_tenant_seeds_its_msp_definition() {
         .fetch_one(&db.super_pool)
         .await
         .expect("links");
-    assert_eq!(links, 8);
+    assert_eq!(links, 9);
 
     let tranches: Vec<(i32, String)> = sqlx::query_as(
         "SELECT number, state FROM programme_tranche
@@ -89,6 +89,7 @@ async fn a_fresh_tenant_seeds_its_msp_definition() {
 
     for (key, phase, plateau) in [
         ("T11", "G", "capability"),
+        ("T19F", "G", "capability"),
         ("P0", "Preliminary", "definition"),
     ] {
         let row: (Option<String>, Option<String>) = sqlx::query_as(
