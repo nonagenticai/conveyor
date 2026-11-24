@@ -485,6 +485,40 @@ impl ActionError {
         )
     }
 
+    /// `503` when a licence-gated action's tenant has not sealed its credential.
+    ///
+    /// The same `action-service-unconfigured` family as an unset base URL — the action is not
+    /// configured for this tenant — but the detail names the secret, because "no base URL is
+    /// configured" is untrue here and the caller's remedy is to seal one.
+    pub fn licence_unconfigured(tenant: TenantId) -> Self {
+        Self::new(
+            503,
+            "action-service-unconfigured",
+            format!(
+                "tenant {tenant} has no sealed \"licence.token\"; the licence-gated service \
+                 refuses an unauthenticated call, so nothing was sent"
+            ),
+        )
+    }
+
+    /// `403` when a licence-gated destination did not admit the tenant's sealed licence.
+    ///
+    /// The destinations answer 401 (`token_not_found`), 402 (`license_<state>`) or 503
+    /// (`license_unavailable`); the engine classifies all of them as the tenant's licence being
+    /// unusable and names the secret and the tenant. The upstream body is never echoed — it is
+    /// logged by the call site, like every other external refusal.
+    pub fn licence_refused(service: &str, tenant: TenantId, marker: &str) -> Self {
+        Self::new(
+            403,
+            "action-licence-refused",
+            format!(
+                "the licence gate for service {service:?} did not admit tenant {tenant}'s \
+                 sealed \"licence.token\" ({marker}); the tenant's licence is not usable for \
+                 this call"
+            ),
+        )
+    }
+
     /// `500` without a database message in the body.
     pub fn internal() -> Self {
         Self::new(
@@ -698,6 +732,40 @@ fn bearer_from_secret(bytes: Vec<u8>) -> Option<String> {
             .filter(|token| !token.trim().is_empty());
     }
     Some(text)
+}
+
+/// The marker naming why a licence-gated destination did not admit the tenant's credential.
+///
+/// Only an action presenting `licence.token` may read these statuses as licence refusals: the
+/// same 401/402/503 from any other service is its own credential/outage answer and keeps the
+/// generic mapping. A 503 carrying no licence marker (a host that has not loaded its model, a
+/// restart) is the host's outage, not the tenant's licence.
+fn licence_refusal_marker(
+    auth: Option<&'static str>,
+    status: u16,
+    body: &[u8],
+) -> Option<&'static str> {
+    if auth != Some(crate::integrations::audio::LICENCE_TOKEN_SECRET) {
+        return None;
+    }
+    let text = String::from_utf8_lossy(body);
+    for marker in [
+        "license_unavailable",
+        "token_not_found",
+        "license_none",
+        "license_expired",
+        "license_revoked",
+    ] {
+        if text.contains(marker) {
+            return Some(marker);
+        }
+    }
+    match status {
+        401 => Some("the destination rejected the credential"),
+        402 => Some("the destination requires an active licence"),
+        403 => Some("the destination refused the credential"),
+        _ => None,
+    }
 }
 
 // ── the engine ──────────────────────────────────────────────────────────────────────────
@@ -1308,7 +1376,14 @@ async fn invoke_external(
                     )
                     .await;
                     settle_claim(&claim_settled);
-                    return Err(ActionError::unconfigured(service));
+                    // A licence-gated action names the secret the tenant must seal; every other
+                    // authenticated action keeps the generic base-URL refusal.
+                    let error = if name == crate::integrations::audio::LICENCE_TOKEN_SECRET {
+                        ActionError::licence_unconfigured(ctx.tenant)
+                    } else {
+                        ActionError::unconfigured(service)
+                    };
+                    return Err(error);
                 }
             }
         }
@@ -1375,7 +1450,21 @@ async fn invoke_external(
     // The caller's tenant, for the external actions that scope themselves to it (every current
     // one). `ctx` is Copy and is not consumed until the failure recorder below.
     if spec.tenancy == Tenancy::Tenant {
-        builder = builder.header(TENANT_HEADER, ctx.tenant.to_string());
+        // The estate's licence gates read the credential from `X-Tenant-Id: Bearer <token>`
+        // first and `Authorization` second. A licence-auth action therefore puts its bearer in
+        // this header too: the bare tenant id every other external call sends is itself read as
+        // a token by the transcription gate, which is why the call answered `token_not_found`
+        // (#410, measured 2026-11-19). The gate resolves the tenant from the token, so the
+        // attribution this header normally carries is unchanged.
+        let tenant_header = match (&bearer, auth) {
+            (Some(token), Some(name))
+                if name == crate::integrations::audio::LICENCE_TOKEN_SECRET =>
+            {
+                format!("Bearer {token}")
+            }
+            _ => ctx.tenant.to_string(),
+        };
+        builder = builder.header(TENANT_HEADER, tenant_header);
         // Model calls also carry the attribution identity. Without the actor the router books
         // the cost event with no actor at all (its fallback is the router's own service
         // account); without the project it books no project, which is exactly what the two
@@ -1456,6 +1545,28 @@ async fn invoke_external(
         }
         Ok(Ok(response)) => response,
     };
+    // A licence-gated host answers its refusal with the same 401/402/503 a genuine credential or
+    // outage uses. When this action presents the tenant's licence, that answer is classified as
+    // the tenant's licence being unusable before the generic mapping would call it an upstream
+    // fault. The upstream body is logged, never echoed.
+    if let Some(marker) = licence_refusal_marker(auth, status.as_u16(), &body) {
+        let detail = String::from_utf8_lossy(&body).to_string();
+        tracing::warn!(
+            action = spec.name,
+            service,
+            status = status.as_u16(),
+            marker,
+            upstream = %truncate(&detail),
+            "the licence gate did not admit the tenant's credential"
+        );
+        // Never trip the breaker: the host is answering, the credential is what is wrong, and an
+        // open breaker would keep refusing the call after the tenant seals a valid licence.
+        return failure(
+            ActionError::licence_refused(service, ctx.tenant, marker),
+            false,
+        )
+        .await;
+    }
     if status.is_client_error() {
         let detail = String::from_utf8_lossy(&body).to_string();
         // The upstream's body is logged, never echoed: an inference or ingest service can put a

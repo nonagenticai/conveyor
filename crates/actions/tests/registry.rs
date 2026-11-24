@@ -128,8 +128,11 @@ use serde_json::{Value, json};
 /// organisational-memory lifecycle. 548 → **551**. **T15 (#86) adds 10 internal**:
 /// `toolkits.import_openapi|register_mcp|discover_mcp`, `tool_authoring.draft|validate|test|`
 /// `review|publish|promote` and the broker's registered-destination dispatch `tools.dispatch`
-/// — 551 → **561**; T12 (#88) adds the three remaining kata Gets → **564**.
-const EXPECTED: [&str; 570] = [
+/// — 551 → **561**; T12 (#88) adds the three remaining kata Gets → **564**; #655 (T17b) adds
+/// `authoring.intakes` → **565**. **S21 step 10 (#656) adds 4**: `ladder.case` and
+/// `decision_option_sets.get|set` (internal) and `ladder.precheck` (external) — 565 → **569**,
+/// internal 547 → 550, external 18 → 19.
+const EXPECTED: [&str; 574] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -270,6 +273,8 @@ const EXPECTED: [&str; 570] = [
     "decisions.transition",
     "decisions.update",
     "decks.render",
+    "decision_option_sets.get",
+    "decision_option_sets.set",
     "decision_policies.create",
     "decision_policies.list",
     "decision_policies.update",
@@ -388,8 +393,10 @@ const EXPECTED: [&str; 570] = [
     "labels.delete",
     "labels.update",
     "ladder.apply_draft",
+    "ladder.case",
     "ladder.evaluate",
     "ladder.list",
+    "ladder.precheck",
     "ladder.record",
     "laya.judge",
     "laya_configs.create",
@@ -817,10 +824,12 @@ fn the_registry_is_exactly_the_declared_set() {
     // internal 543 -> 546; external stays 18.
     // #655 (T17b) adds one internal read (`authoring.intakes`): internal 546 -> 547;
     // external stays 18 — the queue reads this tenant's own intake rows.
+    // S21 step 10 (#656) adds three internal actions (`ladder.case`, `decision_option_sets.get|set`)
+    // and one external (`ladder.precheck`): internal 547 -> 550, external 18 -> 19.
     // T14 (#561) adds five external reads (`webscraper.scrape_url|scrape_bulk`,
-    // `lean4.check|elaborate|prove`): internal stays 547, external 18 -> 23 — each call
+    // `lean4.check|elaborate|prove`): internal stays 550, external 19 -> 24 — each call
     // dispatches to a Rust service, not a new internal action.
-    assert_eq!((internal, external), (547, 23));
+    assert_eq!((internal, external), (550, 24));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

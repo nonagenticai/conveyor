@@ -274,6 +274,47 @@ pub async fn find_invocation_by_key(
     .await
 }
 
+/// The invocation an `Idempotency-Key` produced, with the fields a decision cites.
+///
+/// The ladder records a decision only from a call the engine actually made (SPEC_V2 §7.2's "a
+/// decision is reproducible from the row"): `outcome` says whether the engine saw a completed
+/// call, and `duration_ms` is the measured latency the decision records — never a number a caller
+/// supplied.
+#[derive(Clone, Debug)]
+pub struct InvocationFacts {
+    /// The `action_invocation.id` the decision cites.
+    pub id: Uuid,
+    /// `ok | refused | error | timeout`.
+    pub outcome: String,
+    /// The measured wall-clock time of the call.
+    pub duration_ms: i32,
+}
+
+/// Read the invocation an `Idempotency-Key` produced.
+pub async fn find_invocation_facts_by_key(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    action: &str,
+    idempotency_key: &str,
+) -> Result<Option<InvocationFacts>, sqlx::Error> {
+    let row: Option<(Uuid, String, i32)> = sqlx::query_as(
+        "SELECT id, outcome, duration_ms FROM action_invocation
+          WHERE tenant_id = $1 AND action = $2 AND idempotency_key = $3
+          ORDER BY created_at DESC
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(action)
+    .bind(idempotency_key)
+    .fetch_optional(conn)
+    .await?;
+    Ok(row.map(|(id, outcome, duration_ms)| InvocationFacts {
+        id,
+        outcome,
+        duration_ms,
+    }))
+}
+
 /// Release an in-flight idempotency claim after a failed invocation.
 ///
 /// Only a row that is still IN FLIGHT is deleted (`status_code IS NULL`): a completed
