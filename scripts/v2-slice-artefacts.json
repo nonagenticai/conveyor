@@ -140,10 +140,30 @@
       "gap": null
     },
     "T6": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "tables": [
+        "development_project",
+        "development_step",
+        "development_closure"
       ],
-      "gap": "no development-project path over conveyor and a dependency repo"
+      "actions": [
+        "development_projects.change_judging_surface",
+        "development_projects.charter",
+        "development_projects.close",
+        "development_projects.deploy_gate",
+        "development_projects.get",
+        "development_projects.merge_gate",
+        "development_projects.record_step",
+        "development_projects.review_gate",
+        "development_projects.rollback"
+      ],
+      "modules": [
+        "development"
+      ],
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "migrations/0068_development_project.sql"
+      ],
+      "gap": null
     },
     "T7": {
       "actions": [
@@ -174,7 +194,22 @@
     "T8": {
       "tables": [
         "lesson"
-      ]
+      ],
+      "actions": [
+        "lessons.promote",
+        "lessons.propose",
+        "lessons.review"
+      ],
+      "modules": [
+        "crates/actions/src/lesson.rs",
+        "crates/store/src/lesson.rs"
+      ],
+      "evidence": [
+        "migrations/0069_lesson_lifecycle.sql",
+        "crates/actions/tests/lessons.rs",
+        "crates/store/tests/lesson.rs"
+      ],
+      "gap": null
     },
     "T9": {
       "tables": [

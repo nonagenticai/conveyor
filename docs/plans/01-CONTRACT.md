@@ -981,3 +981,51 @@ is a store error and therefore retryable — never a silent empty request.
 **Out of this contract.** No card-driven run creation; no `memory.remember` write-back; no automatic
 apply of an L1-accepted draft; no budget mechanism (§24's note stands); no prompt-budget authoring;
 no workflow-node request (a `run_step` with no `process_step_id`); no migration.
+
+## 27. The card handoff (added 2026-11-24; S21 step 9, issue #649; implements SPEC_V2 §6.6.1–6.6.5, §4.4, §5.1)
+
+**A handoff is one action.** `cards.assign` takes `{card_id, job_binding_id?, note, kind?, meta?,
+correlation_id?}` and does three things in one transaction: it names the card's job binding, records
+what the receiver must know as memory, and starts the bound run. It is not a lane move and not a
+claim; a bare `cards.move` starts nothing.
+
+**The binding.** The target is the request's `job_binding_id` when present, else the card's; with
+neither, the handoff is refused `422 card_unassigned`. The id must resolve in the caller's tenant
+and be `active` (`422 job_binding_unusable`) — the same check `cards.update` applies. The write sets
+`card.job_binding_id` and emits `card.updated`.
+
+**The note.** One hot `work_package_memory` row: `kind` defaults to `fact`, `source` comes from the
+actor kind (`agent | human | system`), the body is the trimmed note under the existing memory-body
+rules, `run_id` is the started run, and `meta` is free detail. It is written through the same
+`remember_tx` body `memory.remember` uses, in the handoff's transaction, and emits
+`memory.recorded`. The next compiled prompt therefore renders it in the Memory section with its row
+id inside `prompt_sha256` (§25).
+
+**The run.** The bound run starts through the one run-creation path `runs.create` uses: the card
+resolves first (a foreign id is a 404), the tenant's andon is consulted (`409 andon-engaged`), the
+attempt number continues the card's history, `insert_run_tx` applies the binding's pin (a retired
+binding or a stale pin is `409` before the INSERT), the `run.execute` job is enqueued and
+`run.created` is emitted. No `release_hash` is accepted: the binding is the pin. The executor kind
+is the binding's.
+
+**One live run.** A card has at most one live root run (`uq_run_live`: `queued | running |
+waiting_approval`, `parent_run_id IS NULL`). The handoff reads the live run first and refuses `409
+card_has_live_run` naming it, before any write; the unique index is the race backstop and its
+violation is a typed 409, never a 500. A re-handoff after a terminal run is the next attempt.
+
+**Refusal order.** 404 foreign card → 409 archived → 412 a stale card (the handoff presents the
+card's version, If-Match or `_version`, like `cards.update` and `cards.move`) → the binding (`422
+card_unassigned` / `422 job_binding_unusable`) → 409 `card_has_live_run` → 422 `invalid_input` (the
+note) → 409 `andon-engaged`. Every refusal precedes the first write; a store error anywhere rolls the
+whole handoff back.
+
+**Scopes.** `cards:write` **and** `runs:write`: the action both edits the card's assignment and
+starts compute, and the registry requires every declared scope. It is agent-reachable — SPEC_V2
+§6.6.1 makes a handoff the sanctioned way a job asks another job for work — and the release grant
+still bounds an executor's surface.
+
+**Out of this contract.** No auto-start on a bare move or a claim; no claim/renew/release verb; no
+automatic apply of an L1-accepted draft; no budget mechanism (§24's note stands); no handoff of a
+project-level (card-less) run; no parent-run memory; no new event kind; no migration.
+`cards.update`'s `job_binding_id` remains a plain edit: it never starts a run, writes no memory, and
+is not live-run guarded (ADR 0017 decision 7).

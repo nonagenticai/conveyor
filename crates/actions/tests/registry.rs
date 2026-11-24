@@ -118,7 +118,15 @@ use serde_json::{Value, json};
 /// asset authoring family. 513 → 518. **T19 (#606) adds 12 internal**: the meetings family
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
 /// `minutes_publish|list|get`) — 518 → **530**.
-const EXPECTED: [&str; 538] = [
+/// **S21 step 9 (#649) adds 1 internal**: `cards.assign`, the card handoff (binding + note +
+/// bound run start). 530 → **531**. **T5 (#77) adds 8 internal**: P1's
+/// `kata.open|get|observe|analyse|hypothesise|propose|measure` and P2–P4's `kata.adopt` —
+/// 531 → **539**. **T6 (#80) adds 9 internal**: `development_projects.charter|record_step|`
+/// `review_gate|merge_gate|deploy_gate|close|get|rollback|change_judging_surface` — the
+/// self-development path and its gates, the earned auto-merge read and the closure record.
+/// 539 → **548**. **T8 (#79) adds 3 internal**: `lessons.propose|review|promote` — the
+/// organisational-memory lifecycle. 548 → **551**.
+const EXPECTED: [&str; 551] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -211,6 +219,7 @@ const EXPECTED: [&str; 538] = [
     "card_types.list",
     "cards.add_label",
     "cards.archive",
+    "cards.assign",
     "cards.claim",
     "cards.comment",
     "cards.create",
@@ -262,6 +271,15 @@ const EXPECTED: [&str; 538] = [
     "decision_policies.update",
     "departments.create",
     "departments.list",
+    "development_projects.change_judging_surface",
+    "development_projects.charter",
+    "development_projects.close",
+    "development_projects.deploy_gate",
+    "development_projects.get",
+    "development_projects.merge_gate",
+    "development_projects.record_step",
+    "development_projects.review_gate",
+    "development_projects.rollback",
     "documents.compose",
     "documents.create",
     "documents.delete",
@@ -369,6 +387,11 @@ const EXPECTED: [&str; 538] = [
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
+    // T8 (#79): the organisational-memory lifecycle — propose with independent evidence,
+    // a person's review, and promotion to a governed-asset source draft.
+    "lessons.promote",
+    "lessons.propose",
+    "lessons.review",
     "licences.get",
     "lists.create",
     "lists.move",
@@ -755,8 +778,14 @@ fn the_registry_is_exactly_the_declared_set() {
     // 495 -> 500; external stays 18. T19 (#606) adds twelve internal meetings actions:
     // 500 -> 512; external stays 18.
     // T5 (#77) adds eight internal actions — P1's `kata.open|get|observe|analyse|hypothesise|`
-    // `propose|measure` and P2–P4's `kata.adopt`: internal 512 -> 520; external stays 18.
-    assert_eq!((internal, external), (520, 18));
+    // `propose|measure` and P2–P4's `kata.adopt`: internal 512 -> 520. S21 step 9 (#649) adds
+    // one internal (`cards.assign`): 520 -> 521; external stays 18.
+    // T6 (#80) adds nine internal actions (`development_projects.*`): internal 521 -> 530;
+    // external stays 18 — the evidence is rows on this tenant's own database.
+    // T8 (#79) adds three internal actions (`lessons.propose|review|promote`): internal
+    // 530 -> 533; external stays 18 — a promotion writes this tenant's own source draft and
+    // calls no model.
+    assert_eq!((internal, external), (533, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
