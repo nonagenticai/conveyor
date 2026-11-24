@@ -72,6 +72,65 @@ fn is_conflict<T>(result: Result<T, ArchitectureStoreError>) -> bool {
     matches!(result, Err(ArchitectureStoreError::Conflict { .. }))
 }
 
+/// A delegated board act leaves the typed decision `approvals.decide` writes.
+///
+/// The board macro used to write only the approval row, so a delegated act left no record of
+/// who decided it or under what authority. The main→lane merge restored that insert in
+/// `decide_board_tx`; this proves exactly one row and its fields.
+#[tokio::test]
+async fn a_delegated_board_decision_writes_one_typed_decision() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "board-gate-delegated").await;
+    let tenant = TenantId::from_uuid(seeded.tenant).expect("tenant");
+
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let board = create_body_tx(
+        &mut tx,
+        tenant,
+        &body(
+            "delegated-board",
+            "Approve the contracts",
+            "P0 board",
+            commissioned(),
+        ),
+    )
+    .await
+    .expect("a draft board");
+    let delegation = Uuid::now_v7();
+    let approval = decide_board_tx(
+        &mut tx,
+        tenant,
+        board.id,
+        "approved",
+        json!({ "charter": "convene" }),
+        BoardSubject {
+            kind: Some("board"),
+            id: None,
+        },
+        BoardDecider {
+            decided_by: seeded.user,
+            decided_by_kind: "rule",
+            delegation_ref: Some(delegation),
+        },
+    )
+    .await
+    .expect("a delegated board decision");
+
+    let rows: Vec<(String, Option<String>)> = sqlx::query_as(
+        "SELECT decided_by_kind, via->>'delegation_ref'
+           FROM approval_decision WHERE approval_id = $1",
+    )
+    .bind(approval)
+    .fetch_all(&mut *tx)
+    .await
+    .expect("read the decision back");
+    assert_eq!(
+        rows,
+        vec![("rule".to_owned(), Some(delegation.to_string()))],
+        "a delegated act writes exactly one typed decision with its kind and delegation"
+    );
+}
+
 #[tokio::test]
 async fn a_draft_board_cannot_decide_a_contract() {
     let db = support::TestDb::fresh().await;
