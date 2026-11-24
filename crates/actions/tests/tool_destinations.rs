@@ -57,6 +57,25 @@ async fn seed_priced_call(pg: &support::Pg, seeded: &support::Seeded, model: &st
     tx.commit().await.expect("commit");
 }
 
+/// One model call the catalogue cannot price (its model has no `commercial_price` row).
+async fn seed_unpriced_call(pg: &support::Pg, seeded: &support::Seeded, model: &str) {
+    let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scope");
+    sqlx::query(
+        "INSERT INTO inference_call
+            (tenant_id, caller_kind, model, prompt_tokens, completion_tokens, created_at)
+         VALUES ($1, 'other', $2, 1000, 500, $3)",
+    )
+    .bind(seeded.tenant.as_uuid())
+    .bind(model)
+    .bind(Utc::now())
+    .execute(&mut *tx)
+    .await
+    .expect("insert the unpriced call");
+    tx.commit().await.expect("commit");
+}
+
 async fn seed_job(pg: &support::Pg, seeded: &support::Seeded, kind: &str, status: &str) {
     let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
         .await
@@ -129,6 +148,7 @@ async fn billing_summary_is_the_ledger_figure() {
     assert_eq!(output(&response)["total_usd"], 0.0, "{response}");
     assert_eq!(output(&response)["inference_calls"], 0, "{response}");
     assert_eq!(output(&response)["tool_calls"], 0, "{response}");
+    assert_eq!(output(&response)["unpriced_calls"], 0, "{response}");
 
     // 1000 prompt tokens at $1/1M plus 500 completion at $2/1M = $0.002.
     seed_priced_call(&pg, &seeded, "billing-test-model").await;
@@ -142,8 +162,26 @@ async fn billing_summary_is_the_ledger_figure() {
         .as_f64()
         .expect("a numeric total");
     assert!((total - 0.002).abs() < 1e-9, "{response}");
+    assert_eq!(output(&response)["unpriced_calls"], 0, "{response}");
     assert!(output(&response)["from"].is_string(), "{response}");
     assert!(output(&response)["to"].is_string(), "{response}");
+
+    // A call the catalogue cannot price is counted, never folded into the total as a zero
+    // (v1-p75-6).
+    seed_unpriced_call(&pg, &seeded, "billing-test-unpriced-model").await;
+    let (status, response) = running
+        .invoke("billing.summary", "dev:alice", json!({}), None, None, None)
+        .await;
+    assert_eq!(status, 200, "{response}");
+    assert_eq!(output(&response)["inference_calls"], 2, "{response}");
+    assert_eq!(output(&response)["unpriced_calls"], 1, "{response}");
+    let total = output(&response)["total_usd"]
+        .as_f64()
+        .expect("a numeric total");
+    assert!(
+        (total - 0.002).abs() < 1e-9,
+        "an unpriced call contributes no invented cost: {response}"
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
