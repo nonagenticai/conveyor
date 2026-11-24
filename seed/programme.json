@@ -123,7 +123,7 @@
           "S02",
           "S03"
         ],
-        "plan_status": "built 2026-11-22",
+        "plan_status": "planned",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 3,
@@ -651,13 +651,14 @@
       "key": "S17",
       "name": "Native benchmark harness",
       "description": "Plan: docs/plans/slices/S17-benchmark-harness.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S17-benchmark-harness.md",
         "track": "v1",
         "issues": [
-          11
+          11,
+          635
         ],
         "depends_on": [
           "S02",
@@ -682,7 +683,7 @@
       "key": "S18",
       "name": "Kata continuous improvement",
       "description": "Plan: docs/plans/slices/S18-kata-improvement.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S18-kata-improvement.md",
@@ -1644,7 +1645,8 @@
           526,
           545,
           569,
-          572
+          572,
+          637
         ],
         "depends_on": [],
         "plan_status": "active",
