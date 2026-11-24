@@ -301,6 +301,11 @@
   },
   {
    "id": "v1-p75-5",
+   "resolved_by": {
+    "commit": "2a295c05f9c39157b513f955db1be6b1a106b37d",
+    "test": "apps/billing-shim/tests/rollup.rs::the_rollup_is_translated_and_reshaped; crates/actions/tests/metrics.rs::reconciliation_is_exact_or_opens_an_incident; crates/actions/tests/metrics.rs::a_malformed_billing_rollup_is_refused_not_read_as_zero",
+    "evidence": "cargo-guard test -p conveyor-billing-shim: 7 passed; -p conveyor-actions --test metrics --test external_inventory: 14 passed; parity 7/7 (commit 054cc5f7, rebased here as 2a295c05). The declared billing.rollup action reads the Rust shim, the shim translates billing-service's six-dimension roll-up, and a differing total opens the incident"
+   },
    "area": "\u00a77.5",
    "standard": "SPEC",
    "spec": "\u00a77.5",
