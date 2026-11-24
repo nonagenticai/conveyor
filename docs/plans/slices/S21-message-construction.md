@@ -706,7 +706,8 @@ memory**, and every card has one live run. `memory.remember` has zero production
 verb can come with the card-driven entry unit").
 
 **P1 — the handoff's one transaction.** A new `cards.assign` (scopes `cards:write` + `runs:write`)
-takes `{card_id, job_binding_id?, note, kind?, meta?, correlation_id?}` and, in one transaction:
+takes `{card_id, job_binding_id?, note, kind?, meta?, correlation_id?}` and presents the card's
+version (If-Match or `_version`, like `cards.update`/`cards.move`), and, in one transaction:
 resolves the target binding (the request's, else the card's), checks it is active and in the tenant,
 refuses a card that already has a live root run (`409 card_has_live_run`), validates the note, sets
 `card.job_binding_id`, writes one hot `work_package_memory` row through the memory writer, and

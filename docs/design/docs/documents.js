@@ -182,6 +182,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0016-request-source.md"
     },
     {
+      "title": "0017 — The card handoff: assign, remember, start",
+      "path": "docs/decisions/0017-card-handoff.html",
+      "source": "docs/decisions/0017-card-handoff.md",
+      "section": "Decisions",
+      "sha256": "c4bd4334f99b72a699394cba7b9e80a693e5ef1af3000d2bd2ded36943c469ad",
+      "bytes": 6053,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0017-card-handoff.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
@@ -470,6 +479,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-EXECUTOR.md"
     },
     {
+      "title": "S21 step 9 — the work package's handoff: assign, remember, start",
+      "path": "docs/evidence/S21-HANDOFF.html",
+      "source": "docs/evidence/S21-HANDOFF.md",
+      "section": "Evidence",
+      "sha256": "452b7a1da7ba507706a804c221cdb73fb73a045ee1944e943e8f2a950c7b9af2",
+      "bytes": 6021,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-HANDOFF.md"
+    },
+    {
       "title": "S21 step 7 — the run's episodic memory",
       "path": "docs/evidence/S21-MEMORY.html",
       "source": "docs/evidence/S21-MEMORY.md",
@@ -645,8 +663,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "08465349498d3737494b10995ac9e67757fe3443460676d304b4ace6e3e130e7",
-      "bytes": 85256,
+      "sha256": "0b38c7c6257b40030579b9a276794968ce448e6d1ccd56a3f362dd5e4770699b",
+      "bytes": 85381,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -1257,8 +1275,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "f798427f49c3837c0750e9f73393e125220b9728daddbe08db2fedb553547b67",
-      "bytes": 52926,
+      "sha256": "4c90dacf0b3752e0f30a6349b8424ca032fb6866c33040233b850531f86fd40d",
+      "bytes": 53018,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

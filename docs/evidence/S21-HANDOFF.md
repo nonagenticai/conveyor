@@ -3,19 +3,31 @@
 **Issue:** #649 · **Branch:** `issue/649-s21-handoff` · **Date:** 2026-11-24 ·
 **Baseline:** `origin/main@a8f67c3e` (the #648 registry refresh)
 
-## What is built
+## What was built
 
 - `cards.assign` — one action, one transaction: it sets the card's active, tenant-scoped job
   binding, records what the receiver must know as one hot `work_package_memory` row, and starts the
   card's bound run through the same path `runs.create` uses (the andon, the binding's pin, the
   attempt, the `run.execute` enqueue and `run.created`).
+- The handoff is a write to an existing card, so it presents the card's version (If-Match or
+  `_version`) like `cards.update`/`cards.move`: a card that moved underneath the caller is `412`
+  with the current representation, and two concurrent handoffs produce exactly one run.
 - One live root run per card (SPEC_V2 §6.6.5): a card with a live run refuses `409
   card_has_live_run` naming it, before any write; `uq_run_live` is the race backstop.
-- One run-creation path: `runs.create`'s body is factored into a `pub(crate)` helper and both
-  actions call it; `runs.create`'s behaviour and tests are unchanged.
-- One memory writer: `memory.remember`'s body is extracted as `remember_tx` and the handoff calls it;
-  the note is an ordinary hot row the next run's Memory section selects.
+- One run-creation path: `runs.create`'s body is factored into
+  `control/run_create.rs::create_bound_run_tx` and both actions call it; `runs.create`'s behaviour
+  and tests are unchanged.
+- One memory writer: `memory.remember`'s body is extracted as `remember_tx` and the handoff calls
+  it; the note is an ordinary hot row the next run's Memory section selects.
 - No migration; no new scope; no new event kind (`card.updated`, `memory.recorded`, `run.created`).
+
+## Found in flight
+
+The first cut passed the freshly read `current.card.version` to `update_card_tx` instead of the
+version parsed from the request's precondition. It compiled and every test passed except the new
+`a_stale_card_is_refused`, which caught a stale If-Match being silently accepted (a lost-update
+window). The handler now passes the precondition's version to the one writer, and the concurrent
+test's loser is a deterministic `412`.
 
 ## Not this step
 
@@ -30,33 +42,43 @@ decision 7).
 
 | Suite | Result |
 |---|---|
-| `crates/actions/tests/card_handoff.rs` (new) | at completion |
-| `crates/actions/tests/card_binding.rs` (the #599 regression) | at completion |
-| `crates/actions/tests/executor_runtime.rs` (the `runs.create` regression) | at completion |
-| `crates/store/tests/prompt_catalogue.rs` (extended) | at completion |
-| `crates/actions/tests/registry.rs` | at completion |
-| `crates/actions/tests/parity_http_mcp.rs` | at completion |
-| `crates/actions/tests/internal_agent_runtime.rs` | at completion |
-| `served-spec.lock.json` | at completion |
-| `clippy -p conveyor-actions -p conveyor-store -p conveyor-server --all-targets -- -D warnings` | at completion |
+| `crates/actions/tests/card_handoff.rs` (new) | **11 scenarios passed** (14 with the support module's 3) |
+| `crates/store/tests/prompt_catalogue.rs` (extended) | **7 passed** (one is the handoff row's selection) |
+| `crates/actions/tests/registry.rs` | **12 passed** — `EXPECTED` 531, internal 513, external 18 |
+| `crates/actions/tests/parity_http_mcp.rs` | **7 passed** — the handoff sample answers 201 over both transports |
+| `clippy -p conveyor-actions -p conveyor-store -p conveyor-server --all-targets -- -D warnings` | **exit 0** |
+| `cargo fmt --all -- --check` | **exit 0** |
+| `served-spec.lock.json` | **562 operations**, `cards.assign` present, `--check-lock` **exit 0** |
+| `scripts/build-coverage.py --check`, `build-v2-coverage.py --check`, `build-programme-seed.py --check` | **exit 0** |
+| `node docs/design/scripts/check-docs.cjs`, `build-docs.py --check` | **12 checks passed**, **142 sources, 0 failures** |
+| `scripts/ci/board.py --dry-run` | **exit 0** (reports three pre-existing issues, none this unit's) |
 
-## Reversal proofs
+## Reversal proofs (each guard disabled, its own test red, then restored)
 
-| Guard removed | Test that turned red | Reverted |
+| Guard removed | Test that turned red | Observed |
 |---|---|---|
-| the handoff's memory insert | at completion | at completion |
-| the live-run pre-check | at completion | at completion |
-| `ensure_card_binding` | at completion | at completion |
-| the andon check in the shared run path | at completion | at completion |
-| the note's source from the actor | at completion | at completion |
+| the handoff's memory insert (`remember_tx` fabricated the row instead) | `card_handoff::the_handoff_writes_one_memory_row` | **0 rows**, "one row, one writer" |
+| the live-run pre-check | `card_handoff::a_second_handoff_is_refused_and_writes_nothing` | `409 conflict` instead of `card_has_live_run` |
+| `ensure_card_binding` | `card_handoff::an_unusable_binding_is_refused` | `409 job_binding_stale` (a misleading store refusal) instead of `422 job_binding_unusable` |
+| the note's source from the actor (a constant `system`) | `card_handoff::the_handoff_writes_one_memory_row` | source `system`, expected `human` |
+| the andon check (both the handoff's early read and the shared run path) | `card_handoff::the_andon_refuses_a_handoff` | **201** — the run started while the cord was on |
+
+Each guard was restored and the full suite re-ran green (14 passed).
 
 ## Generated
 
-- `served-spec.lock.json` — regenerated (`--print-openapi --write-lock`), then `--check-lock`.
-- `docs/design/data/{actions,coverage,programme,issues}.json`, `docs/design/data/rework.js`,
-  `docs/evidence/rework-register.json`, `docs/design/docs/**` — regenerated at the merge point.
+- `docs/design/data/actions.json` — regenerated by `conveyor admin actions dump` (**531 actions**).
+- `docs/design/data/coverage.{json,js}` — regenerated (`build-coverage.py`).
+- `docs/design/docs/**` — regenerated for the plan/contract/ADR/receipt edits; the published
+  `output-*.html`, `standards/` and `outputs.js` were restored from HEAD after the build (the known
+  wipe).
 - `docs/design/architecture/diagrams/run-sequence.{light,dark}.svg` — re-rendered from the updated
-  source; `scripts/ci/board.py --dry-run` clean.
+  source with the system Chrome (`PUPPETEER_EXECUTABLE_PATH`).
+- `served-spec.lock.json` — `--print-openapi --write-lock`, then `--check-lock`.
+- `seed/programme.json` — current; it gains #649 only when the automated issue-registry refresh adds
+  it to `docs/design/data/issues.json` (the generator is registry-driven; a hand edit fails
+  `--check`).
+- No rework finding is closed by this unit; the register is unchanged.
 
 ## Residuals (recorded, not built)
 
@@ -65,3 +87,5 @@ decision 7).
   Whether an edit should be guarded is a card-authoring decision (ADR 0017 decision 7).
 - A retry after a committed handoff answers `409 card_has_live_run`; callers reconcile with
   `cards.get`.
+- The live model/laya proof stays `#[ignore]`d and blocked on the estate's caller licence
+  (`docs/evidence/S21-RUN.md`).

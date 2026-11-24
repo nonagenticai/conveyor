@@ -118,7 +118,9 @@ use serde_json::{Value, json};
 /// asset authoring family. 513 → 518. **T19 (#606) adds 12 internal**: the meetings family
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
 /// `minutes_publish|list|get`) — 518 → **530**.
-const EXPECTED: [&str; 530] = [
+/// **S21 step 9 (#649) adds 1 internal**: `cards.assign`, the card handoff (binding + note +
+/// bound run start). 530 → **531**.
+const EXPECTED: [&str; 531] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -211,6 +213,7 @@ const EXPECTED: [&str; 530] = [
     "card_types.list",
     "cards.add_label",
     "cards.archive",
+    "cards.assign",
     "cards.claim",
     "cards.comment",
     "cards.create",
@@ -745,8 +748,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // `trend` and `scientific_formal.translate|verify`: internal stays 495, external 13 -> 18.
     // T17 (#87) adds five internal actions (`authoring.intake|draft|review|publish|assets`):
     // 495 -> 500; external stays 18. T19 (#606) adds twelve internal meetings actions:
-    // 500 -> 512; external stays 18.
-    assert_eq!((internal, external), (512, 18));
+    // 500 -> 512; external stays 18. S21 step 9 (#649) adds one internal action
+    // (`cards.assign`): 512 -> 513; external stays 18.
+    assert_eq!((internal, external), (513, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

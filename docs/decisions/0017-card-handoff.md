@@ -10,12 +10,15 @@ Status: Accepted · Date: 2026-11-24 · Issue: #649 · Resolves: S21 §21, SPEC_
    move keeps its board meaning and starts nothing (ADR 0014's rejected alternative stands).
 
 2. **It assigns the binding, records the note and starts the run in one transaction.** The input is
-   `{card_id, job_binding_id?, note, kind?, meta?, correlation_id?}`. The target binding is the
-   request's, else the card's; neither is `422 card_unassigned`. It must resolve in the tenant and
-   be `active` (`422 job_binding_unusable`, the same `ensure_card_binding` `cards.update` uses). The
-   note is one hot `work_package_memory` row written through the same writer `memory.remember`
-   uses — `kind` defaults to `fact`, `source` comes from the actor kind, `run_id` is set — in the
-   same transaction as the card update, the run insert, the `run.execute` enqueue and the events.
+   `{card_id, job_binding_id?, note, kind?, meta?, correlation_id?}`. It is a write to an existing
+   card, so it presents the card's version (If-Match or `_version`), exactly like `cards.update`
+   and `cards.move`: a card that moved underneath the caller is `412` with the current
+   representation. The target binding is the request's, else the card's; neither is `422
+   card_unassigned`. It must resolve in the tenant and be `active` (`422 job_binding_unusable`,
+   the same `ensure_card_binding` `cards.update` uses). The note is one hot `work_package_memory`
+   row written through the same writer `memory.remember` uses — `kind` defaults to `fact`,
+   `source` comes from the actor kind, `run_id` is set — in the same transaction as the card
+   update, the run insert, the `run.execute` enqueue and the events.
 
 3. **The run start is the same path `runs.create` uses.** The run-creation body is factored into one
    `pub(crate)` helper (board read, andon, attempt, `insert_run_tx`, `enqueue_run_execute_tx`,
@@ -40,9 +43,9 @@ Status: Accepted · Date: 2026-11-24 · Issue: #649 · Resolves: S21 §21, SPEC_
    its own pin). The handoff is the guarded, run-starting verb; the edit is an authoring act. If the
    owner wants the edit guarded too, that is a card-authoring decision, not this unit.
 
-8. **Refusals are typed and precede the first write:** 404 a foreign card; 409 archived; 422
-   `card_unassigned`; 422 `job_binding_unusable`; 409 `card_has_live_run`; 422 `invalid_input` (the
-   note); 409 `andon-engaged`.
+8. **Refusals are typed and precede the first write:** 404 a foreign card; 409 archived; 412 a
+   stale card (the version precondition); 422 `card_unassigned`; 422 `job_binding_unusable`; 409
+   `card_has_live_run`; 422 `invalid_input` (the note); 409 `andon-engaged`.
 
 9. **No migration.** `card.job_binding_id` (`0040`), `work_package_memory` (`0020`), `run`, `job`
    and the outbox (`0002`), and `uq_run_live` (`0035`) all exist.

@@ -1013,10 +1013,11 @@ waiting_approval`, `parent_run_id IS NULL`). The handoff reads the live run firs
 card_has_live_run` naming it, before any write; the unique index is the race backstop and its
 violation is a typed 409, never a 500. A re-handoff after a terminal run is the next attempt.
 
-**Refusal order.** 404 foreign card → 409 archived → the binding (`422 card_unassigned` / `422
-job_binding_unusable`) → 409 `card_has_live_run` → 422 `invalid_input` (the note) → 409
-`andon-engaged`. Every refusal precedes the first write; a store error anywhere rolls the whole
-handoff back.
+**Refusal order.** 404 foreign card → 409 archived → 412 a stale card (the handoff presents the
+card's version, If-Match or `_version`, like `cards.update` and `cards.move`) → the binding (`422
+card_unassigned` / `422 job_binding_unusable`) → 409 `card_has_live_run` → 422 `invalid_input` (the
+note) → 409 `andon-engaged`. Every refusal precedes the first write; a store error anywhere rolls the
+whole handoff back.
 
 **Scopes.** `cards:write` **and** `runs:write`: the action both edits the card's assignment and
 starts compute, and the registry requires every declared scope. It is agent-reachable — SPEC_V2

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0017 — The card handoff: assign, remember, start · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0017-card-handoff.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0017--the-card-handoff-assign-remember-start">0017 — The card handoff: assign, remember, start</h1>
+<p>Status: Accepted · Date: 2026-11-24 · Issue: #649 · Resolves: S21 §21, SPEC_V2 §6.6.1–6.6.5, §4.4, §5.1</p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><p><strong>A handoff is one explicit action, <code>cards.assign</code>.</strong> SPEC_V2 §6.6.2 names it; <code>cards.handoff</code> is rejected as a second name for an assignment. It is not a bare <code>cards.move</code> or claim: a lane move keeps its board meaning and starts nothing (ADR 0014's rejected alternative stands).</p></li>
+<li><p><strong>It assigns the binding, records the note and starts the run in one transaction.</strong> The input is <code>{card_id, job_binding_id?, note, kind?, meta?, correlation_id?}</code>. It is a write to an existing card, so it presents the card's version (If-Match or <code>_version</code>), exactly like <code>cards.update</code> and <code>cards.move</code>: a card that moved underneath the caller is <code>412</code> with the current representation. The target binding is the request's, else the card's; neither is <code>422 card_unassigned</code>. It must resolve in the tenant and be <code>active</code> (<code>422 job_binding_unusable</code>, the same <code>ensure_card_binding</code> <code>cards.update</code> uses). The note is one hot <code>work_package_memory</code> row written through the same writer <code>memory.remember</code> uses — <code>kind</code> defaults to <code>fact</code>, <code>source</code> comes from the actor kind, <code>run_id</code> is set — in the same transaction as the card update, the run insert, the <code>run.execute</code> enqueue and the events.</p></li>
+<li><p><strong>The run start is the same path <code>runs.create</code> uses.</strong> The run-creation body is factored into one <code>pub(crate)</code> helper (board read, andon, attempt, <code>insert_run_tx</code>, <code>enqueue_run_execute_tx</code>, <code>run.created</code>); <code>runs.create</code> keeps its <code>card_binding_mismatch</code> resolution and becomes a caller. One path, so the handoff cannot drift from the andon, the binding's pin or the event.</p></li>
+<li><p><strong>One live root run per card (SPEC_V2 §6.6.5).</strong> The handoff reads <code>live_run_for_card_tx</code> first and refuses <code>409 card_has_live_run</code> naming the run before any write; <code>uq_run_live</code> remains the race backstop — a concurrent loser gets the store's typed 409, never a 500. A re-handoff after a terminal run is the card's next attempt.</p></li>
+<li><p><strong>The note is memory, not a message.</strong> It is a hot row, so the existing selector renders it in the next run's Memory section (<code>[fact/&lt;source&gt;#&lt;id&gt;] …</code>) and its id is inside <code>prompt_sha256</code>. There is no separate handoff store and no second writer: <code>memory.remember</code>'s body is extracted as a shared <code>remember_tx</code>, and the handoff calls it.</p></li>
+<li><p><strong>Events are existing kinds.</strong> <code>card.updated</code> (the binding), <code>memory.recorded</code> (the note), <code>run.created</code> (the run). No new vocabulary and no <code>S05_EVENT_TYPES</code> change.</p></li>
+<li><p><strong><code>cards.update</code>'s <code>job_binding_id</code> stays a plain edit.</strong> It never starts a run and writes no memory; it is not live-run guarded (a caller may reassign a card whose run is live; the run keeps its own pin). The handoff is the guarded, run-starting verb; the edit is an authoring act. If the owner wants the edit guarded too, that is a card-authoring decision, not this unit.</p></li>
+<li><p><strong>Refusals are typed and precede the first write:</strong> 404 a foreign card; 409 archived; 412 a stale card (the version precondition); 422 <code>card_unassigned</code>; 422 <code>job_binding_unusable</code>; 409 <code>card_has_live_run</code>; 422 <code>invalid_input</code> (the note); 409 <code>andon-engaged</code>.</p></li>
+<li><p><strong>No migration.</strong> <code>card.job_binding_id</code> (<code>0040</code>), <code>work_package_memory</code> (<code>0020</code>), <code>run</code>, <code>job</code> and the outbox (<code>0002</code>), and <code>uq_run_live</code> (<code>0035</code>) all exist.</p></li>
+<li><p><strong>No new scope.</strong> The action declares the two existing scopes <code>cards:write</code> and <code>runs:write</code>; the macro requires <strong>all</strong> declared scopes, so it cannot be used to reassign work without run permission, nor to start compute without card permission.</p></li>
+</ol>
+<h2 id="why">Why</h2>
+<p>Steps 3–8 built the prompt, the executor, the gate, the card's binding, the episodic memory and the request, but nothing on the board ever starts the bound run: the work-package level is reachable only by an explicit <code>runs.create</code>. SPEC_V2 §6.6 defines the missing protocol in five sentences — create and assign a card, hand off with an action, record what the receiver must know, one live run per card — and <code>memory.remember</code> has been registered since S15 with zero production callers. The handoff is the one verb that closes all of it at the level where work actually starts.</p>
+<h2 id="alternatives-rejected">Alternatives rejected</h2>
+<ul>
+<li><strong>Auto-start from a claim or a lane move.</strong> It changes every board's semantics (ADR 0014), and a move is not a handoff: the spec's handoff names inputs, acceptance and memory, not a list change.</li>
+<li><strong>A second action for the memory note.</strong> The handoff would then be two transactions; a crash between them loses the note for a handoff that already started work. One transaction is the point.</li>
+<li><strong>Call <code>memory.remember</code> as a nested action.</strong> It declares <code>capabilities:write</code> and runs its own transaction; the shared <code>remember_tx</code> body gives the same one writer inside the handoff's transaction without a second scope.</li>
+<li><strong>A new <code>cards.handoff</code> name or a new event kind.</strong> SPEC_V2 §6.6.2 already names <code>cards.assign</code>; the three existing events say exactly what changed.</li>
+<li><strong>A handoff that starts no run.</strong> Then the level still has no entry, and the note has nowhere to be read.</li>
+<li><strong>Guard <code>cards.update</code> too.</strong> Out of this unit (decision 7); it would change the #599 contract.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>A board member now needs both <code>cards:write</code> and <code>runs:write</code> to hand off; a card edit alone cannot start compute.</li>
+<li>A handoff adds one hot memory row per invocation; the card's consolidation job drains it into the digest as for any hot row.</li>
+<li>The served spec gains one operation (<code>POST /api/actions/cards.assign/invocations</code>) and <code>GET /api/actions</code> moves; <code>served-spec.lock.json</code> is regenerated.</li>
+<li><code>runs.create</code>'s body moves into a helper; its behaviour, error codes, events and tests are unchanged.</li>
+<li>A retry after a committed handoff answers 409 <code>card_has_live_run</code> (the run exists); the caller reconciles with <code>cards.get</code>.</li>
+<li>No new action scope, no new event kind, no migration.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0017-card-handoff.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

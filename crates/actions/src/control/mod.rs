@@ -31,6 +31,7 @@ pub mod channels;
 pub mod messages;
 // #282: the tenant's decision about how one destructive action is gated.
 pub mod policies;
+pub mod run_create;
 pub mod runs;
 pub mod views;
 

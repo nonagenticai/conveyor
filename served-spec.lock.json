@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "dfdb13cd7219af8c5bfa6883b7905fcff99b628b71c49b895779dcc2621ff680",
+    "GET /api/actions": "dc57a0ebae820d4e346d92ecf82ae8a1263fc8fa7779ff94265c3f16a053a986",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -112,6 +112,7 @@
     "POST /api/actions/card_types.list/invocations": "b6a2cf9b91cc76bba51f0716b44434bbaf82543544b63bd8e00c6274103a47dd",
     "POST /api/actions/cards.add_label/invocations": "44848768898b18cc6339dd3ce5f7881c85e5c00a41ce87a23adae3898c558f4d",
     "POST /api/actions/cards.archive/invocations": "a22af0bb3ab11f8d944849e26909caa9d66f997ca6024d301f7dd07e1af28ab9",
+    "POST /api/actions/cards.assign/invocations": "ddbf64fb69d2cbbab5c5ac9269a4668d01afc3ec9bfef50072d8ae63b71cea2a",
     "POST /api/actions/cards.claim/invocations": "a2cce9ebaded65c428056ccea1c4b4f180d6e33ab234f55094d8800aef2540a4",
     "POST /api/actions/cards.comment/invocations": "a2a1a48fd93eb5d191da6d9ba152a4223850342767f30eb8bc087105367f8f2d",
     "POST /api/actions/cards.create/invocations": "7c72cd6056193dd808885132c7bc61bc1657d19e58b2dcbf4127696f9d33d95d",
