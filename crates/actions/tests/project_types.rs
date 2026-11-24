@@ -80,10 +80,16 @@ fn strings(meta: &Value, key: &str) -> Vec<String> {
         .collect()
 }
 
-/// The phase template and gate set SPEC_V2 §5.2 gives each type. `architecture` names `None`
-/// gates: its gate is the per-phase contract gate the architecture actions enforce, not a
-/// static list on the row.
-const SPEC_TYPES: [(&str, &[&str], Option<&[&str]>); 7] = [
+/// One SPEC project type: its code, its phase template and its gate set (`None` when the gate
+/// is the per-phase contract the architecture actions enforce, not a static row list).
+type SpecProjectType = (
+    &'static str,
+    &'static [&'static str],
+    Option<&'static [&'static str]>,
+);
+
+/// The phase template and gate set SPEC_V2 §5.2 gives each type.
+const SPEC_TYPES: [SpecProjectType; 7] = [
     (
         "delivery",
         &["charter", "plan", "build", "verify", "release", "close"],
