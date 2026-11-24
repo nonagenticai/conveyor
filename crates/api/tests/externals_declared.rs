@@ -212,7 +212,7 @@ fn every_external_action_declares_its_services_path_prefix() {
     //   asr                  /v1      the OpenAI-shaped transcription route: /v1/audio/transcriptions
     // #450 removed the `artifacts`, `billing_service` and `worker_management` rows: those actions
     // are internal reads now, so no external path reaches those services.
-    const PREFIXES: [(&str, &str); 9] = [
+    const PREFIXES: [(&str, &str); 11] = [
         ("fixtures", ""),
         ("image_gen", ""),
         ("coding", "/api"),
@@ -224,6 +224,10 @@ fn every_external_action_declares_its_services_path_prefix() {
         // #560: the scientific router mounts /api/stats/* and /api/formal/*
         // (apps/scientific/src/router/mod.rs).
         ("scientific", "/api"),
+        // #561: the scraper mounts /api/scrape/* (apps/research/src/router.rs) and the Lean
+        // prover mounts /api/check|elaborate|prove (apps/lean4-prover/src/routes.rs).
+        ("webscraper", "/api"),
+        ("lean4", "/api"),
     ];
 
     let mut seen: BTreeSet<&str> = BTreeSet::new();
