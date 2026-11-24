@@ -871,6 +871,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "conveyor-billing-shim"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "chrono",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tower",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "conveyor-bus"
 version = "0.1.0"
 dependencies = [

@@ -211,8 +211,10 @@ fn every_external_action_declares_its_services_path_prefix() {
     //   tts                  /api     the narration route `tts_compat.rs` mounts: /api/tts/synthesize
     //   asr                  /v1      the OpenAI-shaped transcription route: /v1/audio/transcriptions
     // #450 removed the `artifacts`, `billing_service` and `worker_management` rows: those actions
-    // are internal reads now, so no external path reaches those services.
-    const PREFIXES: [(&str, &str); 9] = [
+    // are internal reads now, so no external path reaches those services. SPEC §12 T11's
+    // reconciliation re-adds billing as a **Rust shim** destination (`billing_shim`), never the
+    // Python billing service directly (owner decision 2026-11-24).
+    const PREFIXES: [(&str, &str); 10] = [
         ("fixtures", ""),
         ("image_gen", ""),
         ("coding", "/api"),
@@ -224,6 +226,8 @@ fn every_external_action_declares_its_services_path_prefix() {
         // #560: the scientific router mounts /api/stats/* and /api/formal/*
         // (apps/scientific/src/router/mod.rs).
         ("scientific", "/api"),
+        // SPEC §12 T11: the shim serves POST /api/usage/rollup (apps/billing-shim).
+        ("billing_shim", "/api"),
     ];
 
     let mut seen: BTreeSet<&str> = BTreeSet::new();

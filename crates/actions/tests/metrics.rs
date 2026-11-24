@@ -876,7 +876,7 @@ async fn an_unpriced_period_refuses_an_exact_reconciliation() {
         .invoke(
             "metrics.reconcile",
             TOKEN,
-            json!({"period_start": today, "period_end": today, "billing_total_usd": 0.0}),
+            json!({"period_start": today, "period_end": today, "billing_rollup": {"rows": []}}),
             None,
             None,
             None,
@@ -884,6 +884,48 @@ async fn an_unpriced_period_refuses_an_exact_reconciliation() {
         .await;
     assert_eq!(status, 422, "{refused}");
     assert_eq!(output(&refused)["type"], "unpriced_calls", "{refused}");
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_malformed_billing_rollup_is_refused_not_read_as_zero() {
+    let (pg, running, seeded) = fixture().await;
+    let today = Utc::now().date_naive();
+    // Each is a document `billing.rollup` must never return: its total cannot be derived, and a
+    // silent zero would manufacture a match (P1.4/P5.4).
+    for malformed in [
+        json!({}),
+        json!({"rows": {}}),
+        json!({"rows": [{"amount_usd": 0.002}]}),
+        json!({"rows": [{"cost_usd": "0.002"}]}),
+    ] {
+        let (status, refused) = running
+            .invoke(
+                "metrics.reconcile",
+                TOKEN,
+                json!({"period_start": today, "period_end": today, "billing_rollup": malformed}),
+                None,
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 422, "{refused}");
+        assert_eq!(
+            output(&refused)["type"],
+            "billing_rollup_invalid",
+            "{refused}"
+        );
+    }
+    // A refused document records nothing: the verdict needs a real figure.
+    let records: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM metric_reconciliation WHERE tenant_id = $1")
+            .bind(seeded.tenant_id)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("records");
+    assert_eq!(
+        records, 0,
+        "a malformed roll-up writes no reconciliation row"
+    );
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -957,7 +999,7 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
         .invoke(
             "metrics.reconcile",
             TOKEN,
-            json!({"period_start": today, "period_end": today, "board_id": board, "list_id": list, "billing_total_usd": 0.002}),
+            json!({"period_start": today, "period_end": today, "board_id": board, "list_id": list, "billing_rollup": {"rows": [{"cost_usd": 0.001}, {"cost_usd": 0.001}]}}),
             None,
             None,
             None,
@@ -973,7 +1015,7 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
         .invoke(
             "metrics.reconcile",
             TOKEN,
-            json!({"period_start": today, "period_end": today, "board_id": board, "list_id": list, "billing_total_usd": 0.003}),
+            json!({"period_start": today, "period_end": today, "board_id": board, "list_id": list, "billing_rollup": {"rows": [{"cost_usd": 0.003}]}}),
             None,
             None,
             None,
