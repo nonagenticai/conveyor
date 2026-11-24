@@ -1096,3 +1096,51 @@ verdict nor re-derives the fail policy.
 **Refusal order.** `422 caller_supplied_verdict` (a verdict in the request) → `409
 option_set_missing` → `422 laya_call_unverified` → `422 laya_answer_not_in_options`. Every refusal
 precedes the decision write.
+
+## 29. The work-package execution contract (added 2026-11-24; S21 step 11, issue #697; implements SPEC_V2 §5.1, §7.1, §7.4, §7.7)
+
+**An accepted gate applies its draft when the policy says so.** The effective `gate.precheck`
+policy may declare `meta.on_accept = "apply"`; absent or `"park"` keeps the prior behaviour (the run
+succeeds, the draft stays unattached). `decision_policies.create|update` accept only those values
+and refuse anything else `422 invalid_policy_meta` before any write. The application is
+`ladder::apply_draft_tx` — the one gate `ladder.apply_draft` and `run.resume` also call — invoked by
+the executor inside its finish transaction with the recorded L1 decision; it never writes a
+decision, re-generates or calls the model again. A cardless accepted run records
+`apply_skipped: no_card` and attaches nothing. A declared apply that the gate refuses finishes the
+run `failed` with `draft_apply_invalid`, never a half-applied draft.
+
+**No model call without compiled text and a 64-hex hash.** An `internal_agent` that is `active`
+must name a `prompt_ref` resolving to an active prompt in the tenant. `validate_agent_config`
+refuses `None` for an active agent; `capability_agents.create|update` answer `422
+prompt_ref_required`; readiness returns `PromptNotConfigured`; `agent.run` refuses `409
+capability_not_ready` naming the agent before any inference. Every recorded `inference_call` for an
+internal agent carries a `prompt_sha256` matching `^[0-9a-f]{64}$`.
+
+**The recipe's character ceiling is authored with the recipe.** `prompt_recipes.create` accepts
+`budget_chars: Option<u32>` (0 is `422`) and writes it with the version, section budgets unchanged.
+`compile` refuses `PromptOverBudget` with the measured size and never truncates; a compile that
+would exceed the ceiling makes no model call.
+
+## 30. The release knowledge layers (added 2026-11-24; S21 step 11, issue #697; implements SPEC_V2 §4.1, §4.2)
+
+**One table, five levels.** Migration `0072` adds `organisation_layer`: `level ∈ base | industry |
+department_archetype | department | job`, exactly one scope id per level (`industry_id`,
+`department_id` or `job_id`), `kind`, `value` (jsonb), `required`, `version`. One live row per
+`(tenant, level, scope, kind)`; a change is a version bump. `organisation_layers.set`
+(`jobs:write`) writes one row; `.list` (`jobs:read`) reads by level and scope.
+
+**Resolution is the declared order, later wins.** `compile_release_tx` resolves each kind through
+base → industry → department archetype → each department in its declared `ordinal` → job. The
+snapshot records the winning value with its `level` and `source_key`, sorted by kind.
+
+**Required tightens downward only.** A kind is required if any layer in the path requires it; a
+lower layer may add the requirement, never remove it.
+
+**Two refusals, both before any release row.** Two sibling departments setting one kind to different
+values is `422 department_conflict` (the kind and the departments named) unless a job-layer row sets
+that kind. A required kind with no resolvable value is `409 release_not_ready` naming the kind and
+the department.
+
+**The hash is the snapshot's.** Two identical publishes are byte-for-byte identical, and the
+`layers` member is part of the hash. Existing release rows are never rewritten; a publish after
+this unit writes a new row whose snapshot carries the member.

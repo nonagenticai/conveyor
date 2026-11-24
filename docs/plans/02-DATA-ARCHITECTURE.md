@@ -1503,6 +1503,54 @@ body that the `idempotency_key.response` column already holds. That record is th
 decision cites it rather than restating it, so nothing in `decision` can be written from a request
 body.
 
+### 2.31 The accepted draft and the prompt receipt — S21 step 11 (0 new tables)
+
+Two existing columns become writable contracts; no row changes shape.
+
+| Object | What it is |
+|---|---|
+| `decision_policy.meta.on_accept` | `"park"` (default when absent) or `"apply"`; validated by `decision_policies.create|update` (`422 invalid_policy_meta`); read by the executor's `gate.precheck` |
+| `prompt.budget_chars` | the recipe's whole-prompt character ceiling, written by `prompt_recipes.create` with the version (existing column, migration `0031`; the read path and the measured refusal already existed) |
+
+| Row | What the step reads or writes |
+|---|---|
+| `decision_policy` | **read**: `meta.on_accept` for the effective policy; **write**: the value through the policy actions only |
+| `prompt` | **write**: `budget_chars` on a new recipe version; **read**: the ceiling at compile |
+| `document` | **write** (unchanged gate): `card_id` + an `applied` revision by `apply_draft_tx` when the accepted gate applies |
+| `decision` | **read**: the recorded L1 decision the apply cites (`meta.draft_document_id`, `prompt_sha256`, `run_id`) |
+| `event` | **write**: `document.applied` through the same gate |
+
+**A cardless run attaches nothing.** `apply_draft_tx` takes a card; when the run has none the
+executor records `apply_skipped: no_card` in the step judge and finishes succeeded. No document row
+is written.
+
+### 2.32 The release knowledge layers — S21 step 11 (migration `0072`)
+
+One table carries every layer SPEC_V2 §4.1 defines; nothing else changes shape.
+
+| Column | Meaning |
+|---|---|
+| `tenant_id` | RLS scope, `app_current_tenant()` default, enabled and forced |
+| `level` | `base | industry | department_archetype | department | job` |
+| `industry_id` / `department_id` / `job_id` | exactly one non-null, matching the level (CHECK) |
+| `kind` | the knowledge kind this row sets |
+| `value` | the value, jsonb (whole kinds may be structured) |
+| `required` | the layer's declaration; the resolved value is `OR` over the path |
+| `version` | bumped on change; one live row per `(tenant, level, scope, kind)` |
+
+| Row | What the publish reads or writes |
+|---|---|
+| `organisation_layer` | **read**: the whole path for the job's placement, in resolve order; **write**: through `organisation_layers.set` only |
+| `department` | **read**: the ordered placement (`ordinal`) and the archetype reference |
+| `industry` | **read**: the placement's industry key |
+| `job_catalogue` | **read**: the anatomy |
+| `job_release` | **write**: one immutable row whose snapshot carries a sorted `layers` member (`value`, `required`, `level`, `source_key` per kind) and whose hash covers it |
+
+**Resolution order.** base → industry → department archetype → each department by `ordinal` → job;
+the last setter wins. Two departments in the placement disagreeing on a kind is
+`422 department_conflict` unless a job-layer row sets that kind; a required kind with no value is
+`409 release_not_ready` naming the kind and department. Both refuse before the insert.
+
 ## 3. State machines and enforcement
 
 Every transition is a pure function in `crates/domain`; no DB trigger, no per-flow rule, no CHECK that

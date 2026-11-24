@@ -116,6 +116,11 @@ window.ArchitecturePack = (function () {
       R-->>WF: unattached draft artefact
       WF->>L: gate.precheck over the draft, with the same request document as case input
       L-->>WF: answer and confidence
+      alt accepted and the policy declares on_accept=apply
+        WF->>WF: apply the draft to its card through the one apply_draft_tx gate
+      else accepted and parked (the default)
+        Note over WF: run succeeds, the draft stays unattached
+      end
     end
     opt gate requires approval
       WF->>G: park the run (waiting_approval) and request the gate
@@ -217,6 +222,11 @@ window.ArchitecturePack = (function () {
   DEPARTMENT ||--o{ JOB_CATALOGUE : places
   JOB_CATALOGUE ||--o{ JOB_RELEASE : publishes
   JOB_RELEASE ||--o{ JOB_BINDING : pinned_by
+  TENANT ||--o{ ORGANISATION_LAYER : owns
+  INDUSTRY ||--o{ ORGANISATION_LAYER : layers
+  DEPARTMENT ||--o{ ORGANISATION_LAYER : layers
+  JOB_CATALOGUE ||--o{ ORGANISATION_LAYER : layers
+  JOB_RELEASE ||--o{ ORGANISATION_LAYER : resolves
   TENANT ||--o{ PROGRAMME : owns
   PROGRAMME ||--o{ PROJECT : groups
   PROJECT ||--o{ WBS_NODE : plans

@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S21 step 11 — the level closes: apply-on-accept, prompt receipts and the recipe budget · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-EXECUTION.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s21-step-11--the-level-closes-apply-on-accept-prompt-receipts-and-the-recipe-budget">S21 step 11 — the level closes: apply-on-accept, prompt receipts and the recipe budget</h1>
+<p>Issue #697 · branch <code>issue/697-s21-execution-loop</code> · ADR <code>0019-accepted-draft-and-prompt-receipts</code> · CONTRACT §29 · S21 §23 · resolves rework <code>v1-p77-1</code>, <code>v1-p77-2</code></p>
+<p><strong>State: planned.</strong> This file is the skeleton the issue's Definition of Done fills at the exact PR head. Nothing here is claimed until the measured tables carry the head's rows.</p>
+<h2 id="what-changes-at-this-level">What changes at this level</h2>
+<p>Before: an L1-accepted draft was never applied — the executor finished the run <code>succeeded</code> and left the document unattached, so the gate's pass changed no card. An <code>internal_agent</code> could be created and activated with no <code>prompt_ref</code>; readiness skipped the check and <code>agent.run</code> called a model with no compiled text and a NULL <code>prompt_sha256</code>. The recipe-level <code>budget_chars</code> had a reader and a measured refusal but no writer.</p>
+<p>After: the effective <code>gate.precheck</code> policy may declare <code>meta.on_accept = "apply"</code> (park is the default), and an accepted decision applies the draft through the one <code>apply_draft_tx</code> gate in the executor's finish transaction. An active <code>internal_agent</code> must resolve a prompt at creation, activation, readiness and execution, and every recorded call carries a 64-hex <code>prompt_sha256</code>. <code>prompt_recipes.create</code> writes the recipe's <code>budget_chars</code>, so the measured refusal is reachable from an authored recipe.</p>
+<h2 id="measured-suites-exact-head-pending">Measured suites (exact head <code>PENDING</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Suite</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/actions/tests/internal_agent_runtime.rs</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/draft_apply.rs</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/decision_ladder.rs</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/capability.rs</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/agent_run_resolved.rs</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/prompt_recipes.rs</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/prompt_compile.rs</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/registry.rs</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/parity_http_mcp.rs</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>clippy -D warnings</code> / <code>fmt --check</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>served-spec.lock.json</code> <code>--check-lock</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>design-pack gate</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>rework audit <code>--rework-check v1-p77-1</code>, <code>-2</code></td>
+<td>PENDING</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scenarios">Scenarios</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Test</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1.1 an accepted draft is applied under <code>on_accept=apply</code></td>
+<td><code>internal_agent_runtime::an_accepted_draft_is_applied_when_the_policy_says_apply</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P1.2 <code>park</code> leaves the draft unattached</td>
+<td><code>internal_agent_runtime::an_accepted_draft_parks_by_default</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P1.3 an unknown <code>on_accept</code> is refused at authoring</td>
+<td><code>decision_ladder::an_unknown_on_accept_value_is_refused</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P1.4 a cardless accepted run applies nothing</td>
+<td><code>internal_agent_runtime::a_cardless_run_applies_nothing</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P2.1 an active agent without a prompt is refused</td>
+<td><code>capability::an_active_agent_without_a_prompt_is_refused</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P2.2 activation without a prompt is refused</td>
+<td><code>capability::activating_an_agent_without_a_prompt_is_refused</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P2.3 readiness blocks it</td>
+<td><code>capability::readiness_blocks_an_agent_with_no_prompt</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P2.4 <code>agent.run</code> makes zero calls without compiled text</td>
+<td><code>agent_run_resolved::a_run_with_no_compiled_prompt_makes_no_call</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P2.5 every call carries a 64-hex hash</td>
+<td><code>internal_agent_runtime::every_internal_agent_call_records_a_64_hex_hash</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P3.1 a recipe budget refuses measured</td>
+<td><code>prompt_recipes::a_recipe_budget_is_written_and_refuses_measured</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P3.2 a new version changes the ceiling</td>
+<td><code>prompt_recipes::a_new_version_changes_the_ceiling</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P3.3 a zero budget is refused</td>
+<td><code>prompt_recipes::a_zero_budget_is_refused</code></td>
+<td>PENDING</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reversal-proofs">Reversal proofs</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>What is reverted</th>
+<th>Test that must go red</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>the apply call in the accepted arm</td>
+<td>P1.1</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>2</td>
+<td>the <code>on_accept</code> validation</td>
+<td>P1.3</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>3</td>
+<td>the domain's <code>prompt_ref</code> requirement</td>
+<td>P2.1</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>4</td>
+<td>the execution guard</td>
+<td>P2.4</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>5</td>
+<td>the recipe <code>budget_chars</code> write</td>
+<td>P3.1</td>
+<td>PENDING</td>
+</tr>
+</tbody>
+</table>
+<h2 id="live-proof-p5">Live proof (P5)</h2>
+<p>PENDING — the two <code>#[ignore]</code>d proofs run with the owner-provisioned licensed test caller; the exact command and the measured <code>inference_call</code>, <code>decision</code>, <code>run_step</code> and document rows are recorded here, or the exact refusal and its class. A stub is not the proof.</p>
+<h2 id="residuals">Residuals</h2>
+<ul>
+<li>Automatic apply remains opt-in by policy; a tenant without the declaration keeps the parked draft.</li>
+<li><code>v1-p66-1</code>'s lane-refusal clause is not this unit's.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S21-EXECUTION.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

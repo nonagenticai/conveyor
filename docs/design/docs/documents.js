@@ -200,6 +200,24 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0018-l1-laya-provenance.md"
     },
     {
+      "title": "0019 — The accepted draft is applied and every call is receipted",
+      "path": "docs/decisions/0019-accepted-draft-and-prompt-receipts.html",
+      "source": "docs/decisions/0019-accepted-draft-and-prompt-receipts.md",
+      "section": "Decisions",
+      "sha256": "9d1033784770be750794aea54e52f82f418bc4fad76eb3e26d0b64fd0071fd43",
+      "bytes": 5883,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0019-accepted-draft-and-prompt-receipts.md"
+    },
+    {
+      "title": "0020 — The release compiles the knowledge layers",
+      "path": "docs/decisions/0020-release-knowledge-layers.html",
+      "source": "docs/decisions/0020-release-knowledge-layers.md",
+      "section": "Decisions",
+      "sha256": "176588b133e61469c5baaeab5a76629f7a6acc83be39b202a8e0cef1c72a196f",
+      "bytes": 5895,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0020-release-knowledge-layers.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
@@ -488,6 +506,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-BUDGET.md"
     },
     {
+      "title": "S21 step 11 — the level closes: apply-on-accept, prompt receipts and the recipe budget",
+      "path": "docs/evidence/S21-EXECUTION.html",
+      "source": "docs/evidence/S21-EXECUTION.md",
+      "section": "Evidence",
+      "sha256": "02ef3f0b89b6bffc3620e5bd8198c3eda1cc679df2f8f25b1e33c9cbf477e700",
+      "bytes": 4501,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-EXECUTION.md"
+    },
+    {
       "title": "S21 step 4 — the internalagent executor runtime and its tool grant",
       "path": "docs/evidence/S21-EXECUTOR.html",
       "source": "docs/evidence/S21-EXECUTOR.md",
@@ -558,6 +585,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "d7ce665d7ac7e8ce18f9ca8434a3324ef83061e1d0651fe6ecf16c26a3177cab",
       "bytes": 5255,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-WORKPACKAGE.md"
+    },
+    {
+      "title": "T0 — the release compiles the knowledge layers: receipt",
+      "path": "docs/evidence/T0-RELEASE-LAYERS.html",
+      "source": "docs/evidence/T0-RELEASE-LAYERS.md",
+      "section": "Evidence",
+      "sha256": "ebb89da74b023f46b3dadaaa0d89d76541c11a25dc9c371227ef2454f3e528fa",
+      "bytes": 3384,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/T0-RELEASE-LAYERS.md"
     },
     {
       "title": "T19 plan audit — independent verification record",
@@ -942,8 +978,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "36eca2e9475876120ccc695318ed827ef80c34130b3c3abe2a0e17edf9a61dba",
-      "bytes": 260000,
+      "sha256": "cb2c86126b160cfce20f6f22f634ff441d87d60e6816d4bb95fa39c3813072d0",
+      "bytes": 261282,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -951,8 +987,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "24c093ecc71b23d40f9e5b37bc8f314f66fc60058cddb0221dfbaaaf025692d3",
-      "bytes": 90260,
+      "sha256": "5713da073f388bbe66bc839b92f14662ad2e889ad9ea6e854dcc0c08a12eaa28",
+      "bytes": 93664,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -960,8 +996,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "1dce63a65f1f0a11d922dc8782a448805d3ff3db25b9aec35c920d888e8c73ff",
-      "bytes": 155537,
+      "sha256": "0bc4f9388d49b3b72613bbaca2b28e41773d76a4ebb1f64fa18a06ea91b9f6fc",
+      "bytes": 158600,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -1635,8 +1671,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "0dca766d1d244ee9e415c15077ec2311311571636f3b81877b08a25eca7e11c8",
-      "bytes": 58188,
+      "sha256": "7a86783d49f24fe2f923fb3c9c27dfd5d06de0a53b5fdc8c05bdc0d266dcb4fd",
+      "bytes": 62771,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

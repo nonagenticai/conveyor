@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T0 — the release compiles the knowledge layers: receipt · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/T0-RELEASE-LAYERS.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t0--the-release-compiles-the-knowledge-layers-receipt">T0 — the release compiles the knowledge layers: receipt</h1>
+<p>Issue #697 · branch <code>issue/697-s21-execution-loop</code> · ADR <code>0020-release-knowledge-layers</code> · CONTRACT §30 · S21 §23 P4 · migration <code>0072</code> · resolves rework <code>v1-w1a-2</code></p>
+<p><strong>State: planned.</strong> This file is the skeleton the issue's Definition of Done fills at the exact PR head. Nothing here is claimed until the measured tables carry the head's rows.</p>
+<h2 id="what-changes-at-this-level">What changes at this level</h2>
+<p>Before: <code>compile_release_tx</code> built the release snapshot from <code>job_catalogue.definition</code>, the industry and the placement rows. No code read a knowledge layer, so an unresolved required kind could not stop a publish and two sibling departments could disagree silently; neither <code>release_not_ready</code> nor <code>department_conflict</code> existed anywhere under <code>crates/</code>.</p>
+<p>After: migration <code>0072</code> adds <code>organisation_layer</code> (base, industry, department archetype, each department in declared <code>ordinal</code>, job). The publish resolves each kind in that order, tightens <code>required</code> downward only, refuses <code>422 department_conflict</code> for disagreeing siblings unless a job-layer row resolves it, and refuses <code>409 release_not_ready</code> naming the kind and department when a required kind has no value. The snapshot carries every resolved value with its level and source key, sorted, so two identical publishes hash identically. <code>organisation_layers.set|list</code> author and read the rows; no new scope.</p>
+<h2 id="measured-suites-exact-head-pending">Measured suites (exact head <code>PENDING</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Suite</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/actions/tests/release_layers.rs</code> (new)</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>crates/store/tests/organisation.rs</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/registry.rs</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/parity_http_mcp.rs</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>crates/store/tests/s07_schema.rs</code> (ledger through <code>0072</code>)</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>clippy -D warnings</code> / <code>fmt --check</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td><code>served-spec.lock.json</code> <code>--check-lock</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>rework audit <code>--rework-check v1-w1a-2</code></td>
+<td>PENDING</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scenarios">Scenarios</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Test</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P4.1 the declared layer order resolves, sources named</td>
+<td><code>release_layers::the_release_resolves_layers_in_declared_order</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P4.2 an unresolved required kind refuses publish</td>
+<td><code>release_layers::an_unresolved_required_kind_refuses_publish</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P4.3 sibling departments conflict unless the job resolves</td>
+<td><code>release_layers::sibling_departments_conflict_unless_the_job_resolves</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P4.4 required only tightens downward</td>
+<td><code>release_layers::required_only_tightens_downward</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P4.5 two identical publishes hash identically</td>
+<td><code>organisation::two_identical_publishes_hash_identically</code></td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>P4.6 the two actions are parity-sampled</td>
+<td><code>parity_http_mcp</code> + <code>--check-lock</code></td>
+<td>PENDING</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reversal-proofs">Reversal proofs</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>What is reverted</th>
+<th>Test that must go red</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>the layer read in <code>compile_release_tx</code></td>
+<td>P4.1</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>2</td>
+<td>the <code>release_not_ready</code> check</td>
+<td>P4.2</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>3</td>
+<td>the sibling-conflict check</td>
+<td>P4.3</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>4</td>
+<td>the downward-only <code>required</code> merge</td>
+<td>P4.4</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>5</td>
+<td>the sorted snapshot section</td>
+<td>P4.5</td>
+<td>PENDING</td>
+</tr>
+</tbody>
+</table>
+<h2 id="residuals">Residuals</h2>
+<ul>
+<li>Region sub-layers are folded into the department level's source key; no region rows are seeded and no separate region level exists until the spec gives it content.</li>
+<li>Existing release rows keep their bytes and hashes; only publishes after this unit carry the <code>layers</code> member.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/T0-RELEASE-LAYERS.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

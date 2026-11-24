@@ -4,15 +4,15 @@ title: Message construction (the compiled prompt)
 status: built
 depends_on: [S09, S11, S13, S15, S16, T2, T13]
 spec_sections: ["§3 D27", "§8 S21", "§4.4", "§4.5", "§7.7", "§10.2", "§11.1", "§11.4"]
-adds_tables: [prompt, prompt_section, decision_option_set, decision_option_set_option]
-adds_actions: [prompt_recipes.create, prompt_recipes.list, prompt_recipes.get, prompt_recipes.activate, prompt_recipes.retire, cards.assign, ladder.case, ladder.precheck, decision_option_sets.set, decision_option_sets.get]
+adds_tables: [prompt, prompt_section, decision_option_set, decision_option_set_option, organisation_layer]
+adds_actions: [prompt_recipes.create, prompt_recipes.list, prompt_recipes.get, prompt_recipes.activate, prompt_recipes.retire, cards.assign, ladder.case, ladder.precheck, decision_option_sets.set, decision_option_sets.get, organisation_layers.set, organisation_layers.list]
 adds_modules: [prompt, memory, knowledge, executor]
 parity_ids: PENDING-S0
 ---
 
 # S21 — Message construction (the compiled prompt)
 
-Programme project: S21 · issues #15, #581, #590, #599, #612, #624, #649, #656
+Programme project: S21 · issues #15, #581, #590, #599, #612, #624, #649, #656, #697
 
 **Status:** `plan written 2026-11-09`; the v1 seam is built (D27) and steps 1–2 are built. Step 3
 (the work-package prompt envelope — recipe authoring, memory selection, knowledge content) is
@@ -30,9 +30,13 @@ receipt is `docs/evidence/S21-REQUEST.md`. Step 9 (the work package's handoff �
 assigns the binding, records what the receiver must know and starts the bound run) is **built and
 merged, #649/PR #651, 2026-11-24**; the design is §21 and the receipt is
 `docs/evidence/S21-HANDOFF.md`. Step 10 (the L1 laya gate — the ladder builds the case, the engine
-makes the call and the decision cites the recorded exchange) is **open, #656**; the design is §22,
-the decision record ADR 0018 and the receipt `docs/evidence/S21-LAYA.md` (built; the merge is the
-PR's last CI run).
+makes the call and the decision cites the recorded exchange) is **built and merged, #656/PR #674,
+2026-11-24**; the design is §22, the decision record ADR 0018 and the receipt
+`docs/evidence/S21-LAYA.md`. Step 11 (the level closes — an accepted gate applies its draft, every
+model call carries a compiled prompt and a 64-hex hash, a recipe ceiling is authorable, and a job
+release compiles its knowledge layers or refuses) is **open, #697**; the design is §23, the decision
+records ADR 0019 and ADR 0020, and the receipts are `docs/evidence/S21-EXECUTION.md` and
+`docs/evidence/T0-RELEASE-LAYERS.md`.
 **Depends on:** S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps),
 S09 (`retrieval.query` / `strata` packs).
 **Owner ruling:** George, 2026-11-09 — *a prompt is a run-time compilation from the procedure and the
@@ -796,3 +800,58 @@ evaluation; UI; PDDL storage.
 
 **Acceptance.** The issue #656 P1–P4 scenarios at the PR head; `--check-lock` exit 0; the rework
 audit clears `v1-w1c-3/4/5`; the receipt is `docs/evidence/S21-LAYA.md`.
+
+## 23. Build plan — step 11: the level closes (2026-11-24, issue #697)
+
+**Why this step.** §22 closed the gate's provenance, but the level still cannot finish. The accepted
+branch (`crates/actions/src/executor/internal_agent.rs:541`) finishes the run and leaves the draft
+unattached, so an L1 pass is indistinguishable from a parked draft unless a person acts. An
+`internal_agent` may be created and activated with no `prompt_ref` (`validate_agent_config` checks
+only `Some`; readiness skips `None`), and `agent.run` then calls a model with no compiled text and
+a NULL hash — §7.7's recorded `prompt_sha256` and §7.4's artefact binding both break. The recipe
+level's `budget_chars` has no writer (`NewPrompt` and the INSERT omit it) although the read path and
+the measured refusal exist, so §7.7's character budget is only half reachable. And the release that
+pins a job's anatomy never reads the knowledge layers §4.1 defines — it compiles from the catalogue
+row and placement alone, so `release_not_ready` and `department_conflict` cannot occur and a job can
+run with an unresolved required kind. Rework `v1-p77-1`, `v1-p77-2` and `v1-w1a-2` are these
+defects; ADR 0011:77 deferred the first as "a policy choice", and the owner has now made it —
+**park by default, the policy opts in**.
+
+**P1 — an accepted draft is applied.** `decision_policy.meta.on_accept ∈ {park, apply}` (absent =
+`park`), validated at authoring (`422 invalid_policy_meta`). The executor's `Gate` carries the
+recorded `decision_id` it already extracts (`internal_agent.rs:842`) and the policy's choice; the
+`(None, None)` arm calls `crate::ladder::apply_draft_tx` in the finish transaction with the service
+ctx, then `finish_succeeded`. A cardless run attaches nothing and records `apply_skipped: no_card`;
+an apply that refuses fails the run `draft_apply_invalid` rather than leaving a half-applied draft.
+`park` is exactly today's behaviour.
+
+**P2 — no model call without compiled text and a hash.** An active `internal_agent` must name a
+`prompt_ref` that resolves to an active prompt in the tenant: the domain's `validate_agent_config`,
+`capability_agents.create|update` (`422 prompt_ref_required`), readiness (`PromptNotConfigured`) and
+`agent.run` (a typed `409 capability_not_ready` before any call) all enforce it, and every recorded
+call's `prompt_sha256` is asserted 64-hex.
+
+**P3 — the recipe ceiling is authorable.** `prompt_recipes.create` gains `budget_chars`
+(`Option<u32>`, `0` refused); `NewPrompt` and the INSERT write it. The compile's measured refusal
+already exists; the test proves it is reachable from an authored recipe and that no model call is
+made when the ceiling is exceeded.
+
+**P4 — the release compiles its knowledge layers.** Migration `0072` adds one `organisation_layer`
+table: base, industry, department archetype, each department in declared order, job. `required`
+tightens downward only; two sibling departments disagreeing on a kind is `422 department_conflict`
+unless a job-layer row resolves it; a required kind with no leaf is `409 release_not_ready` naming
+the kind and department. The snapshot records every resolved value's source, sorted, so the hash is
+reproducible. `organisation_layers.set|list` author and read the rows (`jobs:write|read`); a table
+nobody can write would repeat the `tool_binding` defect.
+
+**P5 — the live proof.** The owner provisions a licensed test caller; the two ignored proofs run
+against the real router and laya bridge and the receipt records the measured rows or the exact
+refusal. A stub is not the proof.
+
+**Out of this step.** The programme record (tranche states, benefits, project briefs, contracts —
+#526's lane); `v1-p66-1`'s lane-refusal clause; `v1-p44-1`/`v1-w1a-5`/`v1-p42-1` pinning internals; a
+second laya client; a second prompt compiler; UI; PDDL storage; a job-driven evaluation.
+
+**Acceptance.** The issue #697 P1–P5 scenarios at the PR head; `--check-lock` exit 0; the rework
+audit clears `v1-p77-1`, `v1-p77-2` and `v1-w1a-2`; the receipts are
+`docs/evidence/S21-EXECUTION.md` and `docs/evidence/T0-RELEASE-LAYERS.md`.
