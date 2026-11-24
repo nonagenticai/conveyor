@@ -378,10 +378,28 @@
       ]
     },
     "T17": {
+      "tables": [
+        "authoring_intake",
+        "authoring_asset"
+      ],
+      "actions": [
+        "authoring.intake",
+        "authoring.draft",
+        "authoring.review",
+        "authoring.publish",
+        "authoring.assets",
+        "authoring.intakes"
+      ],
+      "modules": [
+        "authoring"
+      ],
       "evidence": [
+        "crates/actions/src/authoring/mod.rs",
+        "crates/store/src/authoring.rs",
+        "migrations/0064_authoring.sql",
         "docs/SPEC_V2.md"
       ],
-      "gap": "no tenant asset authoring intake or review queue"
+      "gap": null
     },
     "T18": {
       "status": "proposed",

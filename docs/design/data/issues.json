@@ -1,6 +1,48 @@
 {
   "issues": [
     {
+      "number": 691,
+      "title": "fix: T17's coverage row is built \u2014 its delivery unit and authoring surface are complete on main",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/691",
+      "updatedAt": "2026-11-24T22:16:55Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 688,
+      "title": "add: media-discovery accepts its licence bearer in Authorization, so the conveyor broker can call it",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/688",
+      "updatedAt": "2026-11-24T21:18:27Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "T14",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
       "number": 684,
       "title": "proof: T19F \u2014 the live gate, the published programme record and the closure review",
       "state": "OPEN",
@@ -55,7 +97,7 @@
       "title": "plan: T19F \u2014 the meeting-policy authoring route and the T9/T10 binding (plan + MSP/TOGAF/SAFe artefacts)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/682",
-      "updatedAt": "2026-11-24T20:06:04Z",
+      "updatedAt": "2026-11-24T21:36:52Z",
       "labels": [
         {
           "name": "unit",
@@ -209,9 +251,9 @@
     {
       "number": 656,
       "title": "add: the L1 laya gate \u2014 the ladder builds the case, the engine makes the call, the decision cites it",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/656",
-      "updatedAt": "2026-11-24T20:02:39Z",
+      "updatedAt": "2026-11-24T22:08:05Z",
       "labels": [
         {
           "name": "unit",
@@ -230,9 +272,9 @@
     {
       "number": 655,
       "title": "add: the authoring intake queue read (authoring.intakes)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/655",
-      "updatedAt": "2026-11-24T20:39:54Z",
+      "updatedAt": "2026-11-24T21:04:56Z",
       "labels": [
         {
           "name": "unit",
@@ -986,15 +1028,15 @@
       "title": "add: research and Lean toolkits, first wave",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/561",
-      "updatedAt": "2026-11-22T08:25:44Z",
+      "updatedAt": "2026-11-24T21:53:21Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T14",
@@ -1074,7 +1116,7 @@
       "title": "add: binding and catalogue actions, and the full published tool contract",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/557",
-      "updatedAt": "2026-11-24T20:14:44Z",
+      "updatedAt": "2026-11-24T22:11:14Z",
       "labels": [
         {
           "name": "unit",
@@ -1259,7 +1301,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-24T20:43:32Z",
+      "updatedAt": "2026-11-24T21:37:36Z",
       "labels": [
         {
           "name": "unit",
@@ -1848,13 +1890,17 @@
     {
       "number": 426,
       "title": "pre-push gate: says PUSH BLOCKED and pushes anyway, after 30-minute runner-pod timeouts",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/426",
-      "updatedAt": "2026-11-19T14:24:16Z",
+      "updatedAt": "2026-11-24T22:18:01Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -1950,13 +1996,17 @@
     {
       "number": 410,
       "title": "audio tools: produce.speech and media.transcribe are refused by the minis' licence gate (auth: None)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/410",
-      "updatedAt": "2026-11-20T07:21:40Z",
+      "updatedAt": "2026-11-24T21:58:08Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -4662,7 +4712,7 @@
       "title": "T12 \u2014 One organisation loop (the acceptance of V2)",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/88",
-      "updatedAt": "2026-11-24T20:26:41Z",
+      "updatedAt": "2026-11-24T21:00:35Z",
       "labels": [
         {
           "name": "unit",

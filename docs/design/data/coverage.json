@@ -334,7 +334,7 @@
       "tranche": 0,
       "units": {
         "blocked": 1,
-        "claimed": 1,
+        "claimed": 2,
         "numbers": [
           17,
           22,
@@ -353,8 +353,6 @@
           223,
           224,
           225,
-          410,
-          426,
           435,
           476,
           526,
@@ -362,9 +360,10 @@
           572,
           660,
           680,
-          681
+          681,
+          691
         ],
-        "open": 15,
+        "open": 14,
         "ready": 7,
         "unknown": 0
       }
@@ -1509,7 +1508,7 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           15,
           581,
@@ -1520,7 +1519,7 @@
           649,
           656
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1754,9 +1753,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T17"
-      ],
+      "blocked_by": [],
       "evidence": [
         "apps/server/tests/organisation_loop.rs"
       ],
@@ -1876,14 +1873,15 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           83,
           558,
           560,
-          561
+          561,
+          688
         ],
-        "open": 1,
+        "open": 2,
         "ready": 1,
         "unknown": 0
       }
@@ -1980,22 +1978,23 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/authoring",
+        "migrations/0064_authoring.sql"
       ],
-      "gap": "no tenant asset authoring intake or review queue",
+      "gap": null,
       "key": "T17",
       "measured": {
         "actions": [
-          0,
-          0
+          6,
+          6
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
-          0,
-          0
+          2,
+          2
         ]
       },
       "name": "Tenant asset authoring",
@@ -2006,18 +2005,18 @@
         "T7"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           87,
           629,
           655
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2129,9 +2128,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T17"
-      ],
+      "blocked_by": [],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -2781,16 +2778,16 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 45,
+        "built": 46,
         "partial": 1,
         "planned": 0,
-        "proposed": 3,
+        "proposed": 2,
         "standing": 1
       },
       "total": 51,
       "uncovered": [],
-      "with_open_units": 13,
-      "without_open_units": 38
+      "with_open_units": 11,
+      "without_open_units": 40
     },
     "screens": {
       "actions_invoked": 39,
