@@ -856,6 +856,37 @@ async fn rework_rate_is_a_read_time_ratio_over_runs_and_approvals() {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_unpriced_period_refuses_an_exact_reconciliation() {
+    let (pg, running, seeded) = fixture().await;
+    // No `price` row for this model: the call's contribution would be a silent zero.
+    inference_call(
+        &pg,
+        &seeded,
+        "metrics-unpriced",
+        None,
+        None,
+        1000,
+        500,
+        "other",
+        Utc::now(),
+    )
+    .await;
+    let today = Utc::now().date_naive();
+    let (status, refused) = running
+        .invoke(
+            "metrics.reconcile",
+            TOKEN,
+            json!({"period_start": today, "period_end": today, "billing_total_usd": 0.0}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(output(&refused)["type"], "unpriced_calls", "{refused}");
+}
+
+#[tokio::test(flavor = "multi_thread")]
 async fn reconciliation_is_exact_or_opens_an_incident() {
     let (pg, running, seeded) = fixture().await;
     // The light catalogue seed carries only the project types; the full export carries
@@ -997,4 +1028,25 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
         records, 2,
         "today (re-run, now difference) + yesterday (unavailable)"
     );
+
+    // The record has its reader: the latest state per period, the recomputed verdict, the
+    // incident link and the trend (v1-w4b-6).
+    let (status, history) = running
+        .invoke("metrics.reconciliation", TOKEN, json!({}), None, None, None)
+        .await;
+    assert_eq!(status, 200, "{history}");
+    let periods = output(&history)["periods"]
+        .as_array()
+        .expect("the periods array");
+    assert_eq!(periods.len(), 2, "{history}");
+    let today_label = today.to_string();
+    assert_eq!(periods[0]["period_start"], json!(today_label), "{history}");
+    assert_eq!(periods[0]["state"], "difference", "{history}");
+    assert_eq!(periods[0]["verdict"], "difference", "{history}");
+    assert!(
+        periods[0]["incident_card_id"].is_string(),
+        "the incident link is projected: {history}"
+    );
+    assert_eq!(periods[1]["state"], "unavailable", "{history}");
+    assert_eq!(periods[1]["verdict"], "unavailable", "{history}");
 }
