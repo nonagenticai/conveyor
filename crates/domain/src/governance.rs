@@ -52,11 +52,13 @@ pub enum AssetKind {
     BenefitsRealizationPlan,
     /// The projects dossier.
     ProjectsDossier,
+    /// The PM's status report.
+    StatusReport,
 }
 
 impl AssetKind {
     /// Every kind.
-    pub const ALL: [AssetKind; 15] = [
+    pub const ALL: [AssetKind; 16] = [
         AssetKind::Requirement,
         AssetKind::Principle,
         AssetKind::Adr,
@@ -72,6 +74,7 @@ impl AssetKind {
         AssetKind::BenefitsStrategy,
         AssetKind::BenefitsRealizationPlan,
         AssetKind::ProjectsDossier,
+        AssetKind::StatusReport,
     ];
 
     /// The stored `governed_asset.kind`.
@@ -92,6 +95,7 @@ impl AssetKind {
             AssetKind::BenefitsStrategy => "benefits_strategy",
             AssetKind::BenefitsRealizationPlan => "benefits_realization_plan",
             AssetKind::ProjectsDossier => "projects_dossier",
+            AssetKind::StatusReport => "status_report",
         }
     }
 }
