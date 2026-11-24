@@ -674,6 +674,8 @@ pub struct NewPrompt {
     pub title: String,
     /// In order.
     pub sections: Vec<NewPromptSection>,
+    /// The compiled prompt text's character ceiling; `None` is unbounded.
+    pub budget_chars: Option<u32>,
 }
 
 /// One catalogue row without its sections, for `prompt_recipes.list`.
@@ -709,8 +711,8 @@ pub async fn create_prompt_tx(
     prompt: &NewPrompt,
 ) -> Result<PromptRecord, PromptStoreError> {
     let inserted: Result<(Uuid, i32), sqlx::Error> = sqlx::query_as(
-        "INSERT INTO prompt (tenant_id, key, version, status, title)
-         SELECT $1, $2, COALESCE(MAX(version), 0) + 1, 'draft', $3
+        "INSERT INTO prompt (tenant_id, key, version, status, title, budget_chars)
+         SELECT $1, $2, COALESCE(MAX(version), 0) + 1, 'draft', $3, $4
            FROM prompt
           WHERE tenant_id = $1 AND key = $2
          RETURNING id, version",
@@ -718,6 +720,7 @@ pub async fn create_prompt_tx(
     .bind(tenant.as_uuid())
     .bind(&prompt.key)
     .bind(&prompt.title)
+    .bind(prompt.budget_chars.map(i64::from))
     .fetch_one(&mut *conn)
     .await;
     let (id, version) = inserted.map_err(|error| {
