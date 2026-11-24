@@ -21,6 +21,20 @@ async fn fixture() -> (support::Pg, support::Running, support::Seeded) {
         .await
         .expect("the catalogue seed");
     let running = support::Running::start(&pg).await;
+    // `ladder.precheck` authenticates with the tenant's sealed `laya.token`.
+    let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scoped tx");
+    conveyor_store::secret::create_secret_tx(
+        &mut tx,
+        seeded.tenant,
+        "laya.token",
+        b"test-laya-token",
+        "tenant",
+    )
+    .await
+    .expect("seal the laya token");
+    tx.commit().await.expect("commit the laya token");
     (pg, running, seeded)
 }
 
@@ -202,8 +216,7 @@ async fn human_accepted(
                 "card_id": card_id,
                 "answer": "approved",
                 "outcome": "accepted",
-                "approval_id": approval_id,
-                "meta": meta
+                "approval_id": approval_id,                "meta": meta
             }),
             None,
             None,
@@ -249,6 +262,7 @@ async fn document_card(running: &support::Running, document: &str) -> Option<Str
 
 #[tokio::test(flavor = "multi_thread")]
 async fn an_unbound_decision_cannot_apply_a_draft() {
+    let _guard = support::LAYA_ENV.lock().await;
     let (_pg, running, _seeded) = fixture().await;
     create_policy(&running).await;
     create_laya_config(&running).await;
@@ -275,6 +289,7 @@ async fn an_unbound_decision_cannot_apply_a_draft() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn a_decision_bound_to_another_draft_is_refused() {
+    let _guard = support::LAYA_ENV.lock().await;
     let (_pg, running, _seeded) = fixture().await;
     create_policy(&running).await;
     create_laya_config(&running).await;

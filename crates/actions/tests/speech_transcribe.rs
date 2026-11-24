@@ -4,6 +4,10 @@
 //! and one ledger row; an unconfigured endpoint refuses before any call; a transcription uploads the
 //! document's bytes as one multipart part and stores the text as a second document; and an unknown
 //! document is refused before anything leaves the process.
+//!
+//! #410 adds the licence credential both hosts' gates now require: the licensed path must present
+//! the tenant's sealed `licence.token`, and a gate refusal must be a typed conveyor refusal rather
+//! than a passthrough 503/401.
 
 mod support;
 
@@ -39,18 +43,27 @@ fn wav() -> Vec<u8> {
 }
 
 /// The speech host's stub: answers the JSON envelope the narration route produces when the request
-/// asks for JSON, records how often it was called, and records the `Accept` it was sent.
-async fn stub_speech_host() -> (String, Arc<AtomicUsize>, Arc<std::sync::Mutex<String>>) {
+/// asks for JSON, records how often it was called, the `Accept` it was sent and every header (the
+/// licence credential travels in `Authorization` and `X-Tenant-Id`).
+async fn stub_speech_host() -> (
+    String,
+    Arc<AtomicUsize>,
+    Arc<std::sync::Mutex<String>>,
+    Arc<std::sync::Mutex<HeaderMap>>,
+) {
     let hits = Arc::new(AtomicUsize::new(0));
     let accept = Arc::new(std::sync::Mutex::new(String::new()));
+    let headers_seen = Arc::new(std::sync::Mutex::new(HeaderMap::new()));
     let counter = hits.clone();
     let seen = accept.clone();
+    let sent = headers_seen.clone();
     let app = axum::Router::new().route(
         "/api/tts/synthesize",
         axum::routing::post(
             move |headers: HeaderMap, axum::Json(body): axum::Json<Value>| {
                 let counter = counter.clone();
                 let seen = seen.clone();
+                let sent = sent.clone();
                 async move {
                     counter.fetch_add(1, Ordering::SeqCst);
                     *seen.lock().expect("the accept lock") = headers
@@ -58,6 +71,7 @@ async fn stub_speech_host() -> (String, Arc<AtomicUsize>, Arc<std::sync::Mutex<S
                         .and_then(|value| value.to_str().ok())
                         .unwrap_or_default()
                         .to_owned();
+                    *sent.lock().expect("the headers lock") = headers;
                     axum::Json(json!({
                         "audio_base64": base64(&wav()),
                         "sample_rate": 24_000,
@@ -79,23 +93,66 @@ async fn stub_speech_host() -> (String, Arc<AtomicUsize>, Arc<std::sync::Mutex<S
     tokio::spawn(async move {
         let _ = axum::serve(listener, app).await;
     });
-    (base, hits, accept)
+    (base, hits, accept, headers_seen)
 }
 
-/// The transcription host's stub: returns OpenAI's `{"text": …}` body and keeps the uploaded bytes.
-async fn stub_transcription_host() -> (String, Arc<AtomicUsize>, Arc<std::sync::Mutex<Vec<u8>>>) {
+/// A licence-gated host that refuses: the speech gate's `503 license_unavailable` and the
+/// transcription gate's `401 INVALID_TOKEN` are the two shapes measured on 2026-11-19 (#410).
+async fn stub_refusing_host(
+    path: &'static str,
+    status: u16,
+    body: Value,
+) -> (String, Arc<AtomicUsize>) {
+    let hits = Arc::new(AtomicUsize::new(0));
+    let counter = hits.clone();
+    let app = axum::Router::new().route(
+        path,
+        axum::routing::post(move || {
+            let counter = counter.clone();
+            let body = body.clone();
+            async move {
+                counter.fetch_add(1, Ordering::SeqCst);
+                (
+                    axum::http::StatusCode::from_u16(status).expect("a valid fixture status"),
+                    axum::Json(body),
+                )
+            }
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind the refusing stub");
+    let base = format!("http://{}", listener.local_addr().expect("addr"));
+    tokio::spawn(async move {
+        let _ = axum::serve(listener, app).await;
+    });
+    (base, hits)
+}
+
+/// The transcription host's stub: returns OpenAI's `{"text": …}` body, keeps the uploaded bytes
+/// and records the headers the licence gate reads.
+async fn stub_transcription_host() -> (
+    String,
+    Arc<AtomicUsize>,
+    Arc<std::sync::Mutex<Vec<u8>>>,
+    Arc<std::sync::Mutex<HeaderMap>>,
+) {
     let hits = Arc::new(AtomicUsize::new(0));
     let body = Arc::new(std::sync::Mutex::new(Vec::new()));
+    let headers_seen = Arc::new(std::sync::Mutex::new(HeaderMap::new()));
     let counter = hits.clone();
     let seen = body.clone();
+    let sent = headers_seen.clone();
     let app = axum::Router::new().route(
         "/v1/audio/transcriptions",
-        axum::routing::post(move |bytes: Bytes| {
+        axum::routing::post(move |headers: HeaderMap, bytes: Bytes| {
             let counter = counter.clone();
             let seen = seen.clone();
+            let sent = sent.clone();
             async move {
                 counter.fetch_add(1, Ordering::SeqCst);
                 *seen.lock().expect("the body lock") = bytes.to_vec();
+                *sent.lock().expect("the headers lock") = headers;
                 axum::Json(json!({"text": "hello from the transcript"}))
             }
         }),
@@ -107,7 +164,38 @@ async fn stub_transcription_host() -> (String, Arc<AtomicUsize>, Arc<std::sync::
     tokio::spawn(async move {
         let _ = axum::serve(listener, app).await;
     });
-    (base, hits, body)
+    (base, hits, body, headers_seen)
+}
+
+/// Seal the tenant's `licence.token`, the credential both audio hosts' gates introspect.
+async fn seal_licence_token(pg: &support::Pg, seeded: &support::Seeded) {
+    let mut tx = conveyor_store::begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scoped tx");
+    conveyor_store::secret::create_secret_tx(
+        &mut tx,
+        seeded.tenant,
+        "licence.token",
+        b"test-licence-token",
+        "tenant",
+    )
+    .await
+    .expect("seal the licence token");
+    tx.commit().await.expect("commit the licence token");
+}
+
+/// The bearer the engine presented, if any.
+fn presented_bearer(headers: &HeaderMap) -> Option<&str> {
+    headers
+        .get(axum::http::header::AUTHORIZATION)
+        .and_then(|value| value.to_str().ok())
+}
+
+/// The licence token the estate's gates read first: `X-Tenant-Id: Bearer <token>`.
+fn presented_tenant_credential(headers: &HeaderMap) -> Option<&str> {
+    headers
+        .get("x-tenant-id")
+        .and_then(|value| value.to_str().ok())
 }
 
 fn base64(bytes: &[u8]) -> String {
@@ -152,7 +240,8 @@ fn request(action: &str, user_id: Uuid, input: Value) -> InvokeRequest {
 async fn speech_writes_one_object() {
     let pg = support::Pg::fresh().await;
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
-    let (base, hits, accept) = stub_speech_host().await;
+    seal_licence_token(&pg, &seeded).await;
+    let (base, hits, accept, headers_seen) = stub_speech_host().await;
     support::set_env("CONVEYOR_EXTERNAL_TTS_URL", &base);
 
     let outcome = invoke(
@@ -175,6 +264,19 @@ async fn speech_writes_one_object() {
         "application/json",
         "the envelope is only returned when JSON is asked for"
     );
+    {
+        let sent = headers_seen.lock().expect("the headers lock");
+        assert_eq!(
+            presented_bearer(&sent),
+            Some("Bearer test-licence-token"),
+            "the tenant's sealed licence is presented (#410)"
+        );
+        assert_eq!(
+            presented_tenant_credential(&sent),
+            Some("Bearer test-licence-token"),
+            "the licence gate reads the token from X-Tenant-Id first"
+        );
+    }
 
     #[derive(sqlx::FromRow)]
     struct Row {
@@ -230,7 +332,7 @@ async fn speech_writes_one_object() {
 async fn speech_without_an_endpoint_refuses() {
     let pg = support::Pg::fresh().await;
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
-    let (base, hits, _) = stub_speech_host().await;
+    let (base, hits, _, _) = stub_speech_host().await;
     // A reachable stub, but the action is pointed nowhere: the engine must refuse rather than
     // guess the host the stub is running on.
     let _ = base;
@@ -254,6 +356,7 @@ async fn speech_without_an_endpoint_refuses() {
 async fn transcribe_stores_a_transcript() {
     let pg = support::Pg::fresh().await;
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    seal_licence_token(&pg, &seeded).await;
     let running = support::Running::start(&pg).await;
 
     let (status, created) = running
@@ -276,7 +379,7 @@ async fn transcribe_stores_a_transcript() {
         .expect("the document id")
         .to_owned();
 
-    let (base, hits, uploaded) = stub_transcription_host().await;
+    let (base, hits, uploaded, headers_seen) = stub_transcription_host().await;
     support::set_env("CONVEYOR_EXTERNAL_ASR_URL", &base);
 
     let outcome = invoke(
@@ -294,6 +397,20 @@ async fn transcribe_stores_a_transcript() {
 
     assert_eq!(outcome.status, 200, "{}", outcome.body);
     assert_eq!(hits.load(Ordering::SeqCst), 1, "exactly one transcription");
+    {
+        let sent = headers_seen.lock().expect("the headers lock");
+        assert_eq!(
+            presented_bearer(&sent),
+            Some("Bearer test-licence-token"),
+            "the tenant's sealed licence is presented (#410)"
+        );
+        assert_eq!(
+            presented_tenant_credential(&sent),
+            Some("Bearer test-licence-token"),
+            "the transcription gate reads X-Tenant-Id before Authorization; a bare tenant id \
+             there is introspected as a token and answers token_not_found"
+        );
+    }
     let body = uploaded.lock().expect("the body lock").clone();
     assert!(
         body.windows(4).any(|window| window == b"RIFF"),
@@ -348,7 +465,8 @@ async fn transcribe_stores_a_transcript() {
 async fn an_unknown_document_refuses() {
     let pg = support::Pg::fresh().await;
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
-    let (base, hits, _) = stub_transcription_host().await;
+    seal_licence_token(&pg, &seeded).await;
+    let (base, hits, _, _) = stub_transcription_host().await;
     support::set_env("CONVEYOR_EXTERNAL_ASR_URL", &base);
 
     let error = invoke(
@@ -366,4 +484,171 @@ async fn an_unknown_document_refuses() {
 
     assert_eq!(error.status, 404, "{}", error.detail);
     assert_eq!(hits.load(Ordering::SeqCst), 0, "refused before the call");
+}
+
+/// #410 P2 — an unsealed tenant is refused before anything leaves the process, and the refusal
+/// names the credential the tenant must seal.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_unsealed_tenant_is_refused_before_the_call() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let (base, hits, _, _) = stub_speech_host().await;
+    support::set_env("CONVEYOR_EXTERNAL_TTS_URL", &base);
+
+    let error = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request("produce.speech", seeded.user_id, json!({"text": "hi"})),
+    )
+    .await
+    .expect_err("an unsealed licence must refuse");
+
+    assert_eq!(error.status, 503, "{}", error.detail);
+    assert_eq!(error.code, "action-service-unconfigured");
+    assert!(
+        error.detail.contains("licence.token"),
+        "the refusal names the credential: {}",
+        error.detail
+    );
+    assert!(
+        error.detail.contains(&seeded.tenant_id.to_string()),
+        "the refusal names the tenant: {}",
+        error.detail
+    );
+    assert_eq!(hits.load(Ordering::SeqCst), 0, "refused before the call");
+}
+
+/// #410 P2.1 — the speech host's `503 license_unavailable` becomes a typed conveyor refusal naming
+/// the licence and the tenant, never a passthrough `502 action-upstream-failed`.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_speech_licence_refusal_is_typed() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    seal_licence_token(&pg, &seeded).await;
+    let (base, hits) = stub_refusing_host(
+        "/api/tts/synthesize",
+        503,
+        json!({
+            "detail": "Could not verify this tenant's Studio license. This is not a statement \
+                       about your entitlement — retry shortly.",
+            "error": {"code": "license_unavailable"}
+        }),
+    )
+    .await;
+    support::set_env("CONVEYOR_EXTERNAL_TTS_URL", &base);
+
+    let error = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request(
+            "produce.speech",
+            seeded.user_id,
+            json!({"text": "a short line"}),
+        ),
+    )
+    .await
+    .expect_err("a licence refusal must not be an ok call");
+
+    assert_eq!(
+        hits.load(Ordering::SeqCst),
+        1,
+        "the refusal is the destination's, not a pre-call refusal"
+    );
+    assert_eq!(error.status, 403, "{}", error.detail);
+    assert_eq!(error.code, "action-licence-refused");
+    assert!(
+        error.detail.contains("licence.token"),
+        "the refusal names the credential: {}",
+        error.detail
+    );
+    assert!(
+        error.detail.contains(&seeded.tenant_id.to_string()),
+        "the refusal names the tenant: {}",
+        error.detail
+    );
+    assert!(
+        error.detail.contains("license_unavailable"),
+        "the destination's marker is preserved: {}",
+        error.detail
+    );
+}
+
+/// #410 P2.1 for the transcription host: its measured refusal is `401 INVALID_TOKEN
+/// token_not_found`.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_transcription_licence_refusal_is_typed() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    seal_licence_token(&pg, &seeded).await;
+    let running = support::Running::start(&pg).await;
+    let (status, created) = running
+        .invoke(
+            "documents.create",
+            "dev:alice",
+            json!({
+                "title": "narration take one",
+                "content_type": "audio/wav",
+                "content_base64": base64(&wav()),
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    let document = created["output"]["id"]
+        .as_str()
+        .expect("the document id")
+        .to_owned();
+
+    let (base, hits) = stub_refusing_host(
+        "/v1/audio/transcriptions",
+        401,
+        json!({
+            "error": {
+                "code": "INVALID_TOKEN",
+                "message": "Invalid or expired license token: token_not_found"
+            }
+        }),
+    )
+    .await;
+    support::set_env("CONVEYOR_EXTERNAL_ASR_URL", &base);
+
+    let error = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request(
+            "media.transcribe",
+            seeded.user_id,
+            json!({"document": document}),
+        ),
+    )
+    .await
+    .expect_err("a rejected licence token must not be an ok call");
+
+    assert_eq!(
+        hits.load(Ordering::SeqCst),
+        1,
+        "the refusal is the destination's, not a pre-call refusal"
+    );
+    assert_eq!(error.status, 403, "{}", error.detail);
+    assert_eq!(error.code, "action-licence-refused");
+    assert!(
+        error.detail.contains("licence.token"),
+        "the refusal names the credential: {}",
+        error.detail
+    );
+    assert!(
+        error.detail.contains(&seeded.tenant_id.to_string()),
+        "the refusal names the tenant: {}",
+        error.detail
+    );
+    assert!(
+        error.detail.contains("token_not_found"),
+        "the destination's marker is preserved: {}",
+        error.detail
+    );
 }

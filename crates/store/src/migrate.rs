@@ -333,8 +333,12 @@ mod tests {
                 // binding-scoped subset, the ledger's binding pin, the promotion record and the
                 // publication quorum (0070_tool_authoring.sql, SPEC_V2 §11.3–§11.6, D42/D43/D50).
                 (70, "tool authoring".to_owned()),
-                // ── The lane's reserved block (0080+), after main's 0066–0070. Versions
-                // 0071–0079 stay free for main; the block's SQL is unchanged, only its version
+                // S21 step 10 (#656): the authored option set and the policy's `fire_when`
+                // (0071_ladder_option_sets.sql, SPEC_V2 §7.2, §7.3). Main's row stays verbatim;
+                // #526's 0103 evolves the tables into the lane's model.
+                (71, "ladder option sets".to_owned()),
+                // ── The lane's reserved block (0080+), after main's 0066–0071. Versions
+                // 0072–0079 stay free for main; the block's SQL is unchanged, only its version
                 // moved. The kata union (the lane's candidate/propagation records and
                 // pre-registration fields on main's 0066/0067) sits at 94, after the block,
                 // because main took 70.
@@ -359,10 +363,6 @@ mod tests {
                 // invocation behind its answer and the request/response hashes it was
                 // verified against (0086_ladder_laya_provenance.sql, SPEC_V2 §7.2).
                 (86, "ladder laya provenance".to_owned()),
-                // v1-w1c-4 (#526): the authored option set, its per-option tenant
-                // refinement and the decision's set pins — options are rows, never a
-                // caller's list (0087_ladder_option_sets.sql, SPEC_V2 §7.2).
-                (87, "ladder option sets".to_owned()),
                 // (0088): a register row belongs to a project OR a programme, and carries its
                 // next review date and response (0088_programme_risk_register.sql, SPEC_V2
                 // §8.3–§8.4).
@@ -411,7 +411,13 @@ mod tests {
                 // #526 (§8.1, owner tailoring 2026-11-24): the ADM phases E–H in the artefact
                 // standard, so a phase-E/F/H requirement can resolve to a typed row
                 // (0102_phase_e_h_artifacts.sql).
-                (102, "phase e h artifacts".to_owned())
+                (102, "phase e h artifacts".to_owned()),
+                // #526 (v1-w1c-4): the option-set union on main's 0071 — the set's origin and
+                // lifecycle, one 1-based entry store with criteria, per-entry tenant
+                // refinements, and the decision's set/refinement pins
+                // (0103_ladder_option_set_union.sql, SPEC_V2 §7.2). The lane-only 0087 is
+                // retired; production never applied it.
+                (103, "ladder option set union".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

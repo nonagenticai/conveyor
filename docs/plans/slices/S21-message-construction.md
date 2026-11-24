@@ -4,15 +4,15 @@ title: Message construction (the compiled prompt)
 status: built
 depends_on: [S09, S11, S13, S15, S16, T2, T13]
 spec_sections: ["§3 D27", "§8 S21", "§4.4", "§4.5", "§7.7", "§10.2", "§11.1", "§11.4"]
-adds_tables: [prompt, prompt_section]
-adds_actions: [prompt_recipes.create, prompt_recipes.list, prompt_recipes.get, prompt_recipes.activate, prompt_recipes.retire, cards.assign]
+adds_tables: [prompt, prompt_section, decision_option_set, decision_option_set_option]
+adds_actions: [prompt_recipes.create, prompt_recipes.list, prompt_recipes.get, prompt_recipes.activate, prompt_recipes.retire, cards.assign, ladder.case, ladder.precheck, decision_option_sets.set, decision_option_sets.get]
 adds_modules: [prompt, memory, knowledge, executor]
 parity_ids: PENDING-S0
 ---
 
 # S21 — Message construction (the compiled prompt)
 
-Programme project: S21 · issues #15, #581, #590, #599, #612, #624, #649
+Programme project: S21 · issues #15, #581, #590, #599, #612, #624, #649, #656
 
 **Status:** `plan written 2026-11-09`; the v1 seam is built (D27) and steps 1–2 are built. Step 3
 (the work-package prompt envelope — recipe authoring, memory selection, knowledge content) is
@@ -27,8 +27,12 @@ live proof is recorded blocked on the estate's caller licence). Step 7 (the run'
 `docs/evidence/S21-MEMORY.md`. Step 8 (the Request source — the declared step in the process section
 and in laya's case input) is **built and merged, #624/PR #627, 2026-11-23**; the design is §20 and the
 receipt is `docs/evidence/S21-REQUEST.md`. Step 9 (the work package's handoff — `cards.assign`
-assigns the binding, records what the receiver must know and starts the bound run) is **open, #649**;
-the design is §21.
+assigns the binding, records what the receiver must know and starts the bound run) is **built and
+merged, #649/PR #651, 2026-11-24**; the design is §21 and the receipt is
+`docs/evidence/S21-HANDOFF.md`. Step 10 (the L1 laya gate — the ladder builds the case, the engine
+makes the call and the decision cites the recorded exchange) is **open, #656**; the design is §22,
+the decision record ADR 0018 and the receipt `docs/evidence/S21-LAYA.md` (built; the merge is the
+PR's last CI run).
 **Depends on:** S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps),
 S09 (`retrieval.query` / `strata` packs).
 **Owner ruling:** George, 2026-11-09 — *a prompt is a run-time compilation from the procedure and the
@@ -735,3 +739,60 @@ writer; no migration.
 `crates/store/tests/prompt_catalogue.rs`, `crates/actions/tests/registry.rs` and
 `crates/actions/tests/parity_http_mcp.rs`; `runs.create`'s existing suites stay unchanged. The
 scenarios are issue #649 P1–P3; the receipt is `docs/evidence/S21-HANDOFF.md`.
+## 22. Build plan — step 10: the L1 laya gate makes its own call (2026-11-24, issue #656)
+
+**Why this step.** §4.5's level hands generation to the internal agent and §7.4 makes every output
+a draft behind a gated action; the gate is the L1 laya decision. The ladder that records it does
+not make it. `ladder.evaluate` reads `answer`, `confidence`, `latency_ms` and `probabilities` from
+the request body and writes `rung = 'laya'` with whatever policy and laya-config versions happen to
+resolve, so a caller with `governance:write` can record a decision with an invented confidence and
+clear any threshold. Options are inline request text written per decision, and `Unavailable` — which
+`conveyor_domain::ladder` already models — is never produced by the action, so an outage cannot
+become `gate_unavailable`. The executor is the one honest caller (it invokes `laya.judge` itself
+and hands the answer over), and even it records the verdict without the call that produced it.
+Rework `v1-w1c-3`, `v1-w1c-4` and `v1-w1c-5` are these three defects.
+
+**P1 — the case is the ladder's, and the decision cites the call.** `ladder.case` (read) returns
+`{case, case_hash, laya_call_key}` built from the effective policy and the tenant's
+`laya_inference_config`; `ladder.precheck` is the external action that performs SPEC_V2 §7.2's
+`POST /v1/systemone` (`governance:write`, bearer `laya.token`, outside any transaction);
+`ladder.evaluate` loses `answer`, `confidence`, `probabilities`, `latency_ms` and `options`, takes
+`laya_call_key`, rebuilds the case itself, and verifies the engine's recorded exchange
+(`store::idempotency::lookup` with the case's request hash must return the stored 2xx response;
+`store::actions::find_invocation_by_key` must name an `ok` invocation). The answer, confidence,
+probabilities and latency come from that exchange; the decision records `meta.laya_call_key`,
+`meta.laya_invocation_id` and `meta.case_hash`. A request carrying a verdict is `422
+caller_supplied_verdict`; an unverifiable key is `422 laya_call_unverified`.
+
+**P2 — options are authored, versioned rows.** Migration `0071` adds `decision_option_set` and
+`decision_option_set_option` (one live set per `(tenant, kind, gate)`, a monotonic version, rows
+with `key`, `label`, `payload.outcome`). `decision_option_sets.set` authors a set — the one row's
+version increments and its children are replaced in the same transaction — and `.get` reads it. A
+policy declares `meta.question_type = "choice"`; the case is then a `choice` over the authored
+labels, and an answer outside the authored keys is `422 laya_answer_not_in_options`. A declared
+choice with no set is `409 option_set_missing` — never free text. `decision_option` stays the
+per-decision record, written from the authored rows. The executor's gate uses the same builder, so
+the authored menu reaches an in-process run, not only an API caller.
+
+**P3 — the fail policy is applied and `fire_when` decides.** Two shapes, one policy. An **outage** —
+laya unreachable, no completed call recorded — leaves no verified exchange, so no decision row is
+written; the executor applies `domain::ladder::unavailable(fail_policy, action)` (closed → refused;
+open → the action's outcome: handover escalates, block refuses, annotate proceeds). A **recorded**
+call that completed without a readable answer is recorded by `ladder.evaluate` as `unavailable` with
+`meta.gate_unavailable = true`, under the same policy. Never a pass. `decision_policy` gains a
+nullable `fire_when` in `0071`, validated at authoring; a case that does not fire is not asked, no
+decision is written, and the step proceeds. The executor makes exactly one laya request per gate.
+
+**P4 — the proofs and the register.** The existing tests that post a verdict are rewritten to go
+through `ladder.case` → `ladder.precheck` → `ladder.evaluate`, never relaxed; new coverage in
+`crates/actions/tests/ladder_laya.rs`; the registry, parity sample and served-spec lock move with
+the new actions; five reversal proofs (the verdict, the case verification, the option check, the
+fail policy, the single call). `v1-w1c-3/4/5` gain `resolved_by`.
+
+**Out of this step.** Automatic apply of an L1-accepted draft (ADR 0011:77, its own unit); auto-start
+on a move or a claim; any budget mechanism (the #526 lane's); release pinning (`v1-p42-1`); the SOP
+judge (`laya.judge` keeps its own question); a second laya client; a job-driven asynchronous
+evaluation; UI; PDDL storage.
+
+**Acceptance.** The issue #656 P1–P4 scenarios at the PR head; `--check-lock` exit 0; the rework
+audit clears `v1-w1c-3/4/5`; the receipt is `docs/evidence/S21-LAYA.md`.

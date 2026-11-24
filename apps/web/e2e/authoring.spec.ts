@@ -2,13 +2,14 @@ import { expect, test } from "./fixture";
 
 import { decideAsReviewer, invoke, isDevAuth } from "./helpers";
 
-// SPEC_V2 §10.5/§5.7 — the live Authoring destination. `authoring.assets` is the catalogue
-// read; intake, draft, review and publish are governed actions the screen invokes. Every fixture
-// here is created through the real actions, so no seeded row can satisfy a scenario.
+// SPEC_V2 §10.5/§5.7 — the live Authoring destination. `authoring.intakes` is the queue read,
+// `authoring.assets` the catalogue read; intake, draft, review and publish are governed actions
+// the screen invokes. Every fixture here is created through the real actions, so no seeded row
+// can satisfy a scenario.
 //
-// Two measured constraints the specs follow rather than assume: the intake queue has no read
-// action (T17 exposes intake write-only, so the queue groups the catalogue by `intake_id`), and
-// the dependency order is enforced when the draft is attempted, not at publish.
+// Two measured constraints the specs follow rather than assume: the queue reads the recorded
+// intakes (`authoring.intakes`), with the draft count joined from the catalogue by `intake_id`,
+// and the dependency order is enforced when the draft is attempted, not at publish.
 
 let sequence = 0;
 function unique(prefix: string): string {
@@ -54,9 +55,16 @@ test("the authoring destination shows the live catalogue", async ({ page, reques
 test("the intake queue reads the tenant's rows", async ({ page, request }) => {
   const stamp = Date.now();
   const brief = `E2E queue brief ${stamp}`;
+  const bareBrief = `E2E recorded brief ${stamp}`;
   const intake = await invoke<{ id: string }>(request, "authoring.intake", {
     brief,
     sources: ["document:sop-1"],
+  });
+  // A second intake with NO draft: only `authoring.intakes` can show it, so its row is the
+  // proof that the queue reads the recorded intakes rather than the catalogue's `intake_id`.
+  const bare = await invoke<{ id: string }>(request, "authoring.intake", {
+    brief: bareBrief,
+    sources: [],
   });
   const key = unique("queue-dept");
   await invoke(request, "authoring.draft", {
@@ -72,15 +80,21 @@ test("the intake queue reads the tenant's rows", async ({ page, request }) => {
     "true",
   );
 
-  // The queue is the catalogue grouped by the intake each draft cites: the row this spec
-  // created appears with its draft count — no intake read exists to show the brief itself.
-  // Ids minted seconds apart share their 8-character display prefix, so the row is matched on
-  // the full id the row carries, never on the shortened cell.
   const queue = page.getByTestId("authoring-intakes");
   const row = queue.locator(`tr[data-intake="${intake.id}"]`);
   await expect(row).toBeVisible();
+  await expect(row).toContainText(brief);
+  await expect(row).toContainText("1 source(s)");
   await expect(row).toContainText("1 draft(s)");
   await expect(row).toContainText("department");
+
+  // The draft-less intake: its brief and its open status come from the action, not a join.
+  const bareRow = queue.locator(`tr[data-intake="${bare.id}"]`);
+  await expect(bareRow).toBeVisible();
+  await expect(bareRow).toContainText(bareBrief);
+  await expect(bareRow).toContainText("0 source(s)");
+  await expect(bareRow).toContainText("yet to draft");
+  await expect(bareRow).toContainText("open");
 
   await page.getByRole("tab", { name: "Draft catalogue" }).click();
   await expect(page.getByTestId("authoring-table").locator("tr", { hasText: key })).toBeVisible();

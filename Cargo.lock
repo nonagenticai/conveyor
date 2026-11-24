@@ -1185,6 +1185,7 @@ dependencies = [
  "conveyor-auth",
  "conveyor-bus",
  "conveyor-domain",
+ "conveyor-inference-router",
  "conveyor-pack",
  "conveyor-runner",
  "conveyor-store",

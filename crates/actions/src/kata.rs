@@ -308,6 +308,11 @@ fn kata_error(error: KataStoreError, action: &str) -> ActionError {
             "get_out_of_order",
             format!("{action}: the kata is {current}; this step requires {required}"),
         ),
+        KataStoreError::MissingPrevious(get) => ActionError::new(
+            409,
+            "get_out_of_order",
+            format!("{action}: the {get} Get must be recorded before this step"),
+        ),
         KataStoreError::SignatureOpen(id) => ActionError::new(
             409,
             "kata_signature_open",
@@ -500,6 +505,38 @@ pub struct KataProposeIn {
     /// Optional description.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
+}
+
+/// `kata.standardise` — Get to Standardization.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct KataStandardiseIn {
+    /// The kata.
+    pub kata_id: Uuid,
+    /// The standard the change was folded into (a procedure/prompt/knowledge/job reference).
+    pub standard_ref: String,
+    /// Optional description of the update.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+}
+
+/// `kata.sustain` — Get to Sustainability.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct KataSustainIn {
+    /// The kata.
+    pub kata_id: Uuid,
+    /// How the change is monitored.
+    pub monitoring: String,
+    /// The guard that catches a regression.
+    pub regression_guard: String,
+}
+
+/// `kata.stretch` — Get to Stretch (yokoten).
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct KataStretchIn {
+    /// The kata.
+    pub kata_id: Uuid,
+    /// The jobs or departments the change is propagated to.
+    pub targets: Vec<String>,
 }
 
 /// `kata.measure` — the held-out measurement.
@@ -1015,6 +1052,127 @@ async fn kata_propose(
     )
     .await
     .map_err(|error| kata_error(error, "kata.propose"))?;
+    view_tx(&mut *tx, ctx.tenant, row).await
+}
+
+/// Get to Standardization: record the update to the procedure, prompt, knowledge or job.
+#[crate::action(
+    name = "kata.standardise",
+    version = 1,
+    kind = "internal",
+    scopes = ["kata:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn kata_standardise(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: KataStandardiseIn,
+) -> Result<KataView, ActionError> {
+    let standard_ref = input.standard_ref.trim();
+    if standard_ref.is_empty() {
+        return Err(invalid("standard_ref", "required", "must not be empty"));
+    }
+    let row = store::kata::record_get_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.kata_id,
+        Get::Standardisation,
+        json!({
+            "standard_ref": standard_ref,
+            "description": input.description,
+        }),
+        Some(ctx.actor_id),
+    )
+    .await
+    .map_err(|error| kata_error(error, "kata.standardise"))?;
+    view_tx(&mut *tx, ctx.tenant, row).await
+}
+
+/// Get to Sustainability: record the monitoring and the regression guard.
+#[crate::action(
+    name = "kata.sustain",
+    version = 1,
+    kind = "internal",
+    scopes = ["kata:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn kata_sustain(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: KataSustainIn,
+) -> Result<KataView, ActionError> {
+    let monitoring = input.monitoring.trim();
+    if monitoring.is_empty() {
+        return Err(invalid("monitoring", "required", "must not be empty"));
+    }
+    let regression_guard = input.regression_guard.trim();
+    if regression_guard.is_empty() {
+        return Err(invalid("regression_guard", "required", "must not be empty"));
+    }
+    let row = store::kata::record_get_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.kata_id,
+        Get::Sustainability,
+        json!({
+            "monitoring": monitoring,
+            "regression_guard": regression_guard,
+        }),
+        Some(ctx.actor_id),
+    )
+    .await
+    .map_err(|error| kata_error(error, "kata.sustain"))?;
+    view_tx(&mut *tx, ctx.tenant, row).await
+}
+
+/// Get to Stretch (yokoten): record the jobs or departments the change is propagated to.
+#[crate::action(
+    name = "kata.stretch",
+    version = 1,
+    kind = "internal",
+    scopes = ["kata:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn kata_stretch(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: KataStretchIn,
+) -> Result<KataView, ActionError> {
+    let targets: Vec<String> = input
+        .targets
+        .iter()
+        .map(|target| target.trim().to_owned())
+        .filter(|target| !target.is_empty())
+        .collect();
+    if targets.is_empty() {
+        return Err(invalid(
+            "targets",
+            "required",
+            "name at least one job or department the change is propagated to",
+        ));
+    }
+    let row = store::kata::record_get_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.kata_id,
+        Get::Stretch,
+        json!({ "targets": targets }),
+        Some(ctx.actor_id),
+    )
+    .await
+    .map_err(|error| kata_error(error, "kata.stretch"))?;
     view_tx(&mut *tx, ctx.tenant, row).await
 }
 

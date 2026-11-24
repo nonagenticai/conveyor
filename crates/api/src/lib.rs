@@ -424,9 +424,14 @@ mod tests {
         // development-project actions and `cards.assign`; the lane adds its own families
         // (`__lessons_namespace__` keeps SPEC §D36's `lessons.*`). The merged registry is 596:
         // 577 internal, 19 external.
+        // The lane's actual registry is 599 (580 internal, 19 external — the older 596 comment
+        // above predates pm.status and the job-authority actions). The main a94d2634 merge adds
+        // four more: T12's kata.standardise|stretch|sustain (3) and #655's authoring.intakes (1).
+        // S21 step 10's ladder.case, ladder.precheck and decision_option_sets.get|set are retired
+        // with the duplicate ladder path — the merged registry is 603: 584 internal, 19 external.
         assert_eq!(
             registry.len(),
-            596,
+            603,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -469,6 +474,10 @@ mod tests {
              scientific read actions (scientific_stats.meta_analysis|confidence_interval|trend, \
              scientific_formal.translate|verify) (546) + #556/#590's eight internal storage, tool-binding \
              and resume actions (554) + #526's five governed_assets actions (559). \
+             Main's a94d2634 commits add T12's kata.standardise|stretch|sustain and #655's \
+             authoring.intakes; S21 step 10's ladder.case, ladder.precheck and \
+             decision_option_sets.get|set are retired with the duplicate ladder path (603: \
+             584 internal, 19 external). \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
         );

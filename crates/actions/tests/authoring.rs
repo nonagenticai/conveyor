@@ -513,3 +513,138 @@ async fn a_reviewed_catalogue_publishes_with_its_decisions() {
     assert_eq!(items.len(), 1, "{}", listed.body);
     assert_eq!(items[0]["id"], json!(asset.to_string()), "{}", listed.body);
 }
+
+/// #655 P1.1: the queue reads the tenant's recorded intakes — brief, sources, status, version
+/// and created_at — newest first, with the exact-match status filter.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn the_intake_queue_reads_the_tenants_intakes() {
+    let (pg, seeded) = fixture().await;
+    let first = call(
+        &pg,
+        &seeded,
+        "authoring.intake",
+        json!({
+            "brief": "  The first brief  ",
+            "sources": [{"kind": "document", "title": "the SOP"}],
+        }),
+    )
+    .await
+    .expect("the first intake");
+    assert_eq!(first.status, 201, "{}", first.body);
+    let first_id = id_of(&first.body["output"], "id");
+    let second = call(
+        &pg,
+        &seeded,
+        "authoring.intake",
+        json!({"brief": "The second brief", "sources": []}),
+    )
+    .await
+    .expect("the second intake");
+    assert_eq!(second.status, 201, "{}", second.body);
+    let second_id = id_of(&second.body["output"], "id");
+
+    let queue = call(&pg, &seeded, "authoring.intakes", json!({"limit": 200}))
+        .await
+        .expect("the intake queue");
+    assert_eq!(queue.status, 200, "{}", queue.body);
+    let items = queue.body["output"]["items"]
+        .as_array()
+        .unwrap_or_else(|| panic!("no items: {}", queue.body));
+    assert_eq!(items.len(), 2, "{}", queue.body);
+    assert_eq!(
+        items[0]["id"],
+        json!(second_id.to_string()),
+        "{}",
+        queue.body
+    );
+    assert_eq!(
+        items[1]["id"],
+        json!(first_id.to_string()),
+        "{}",
+        queue.body
+    );
+    assert_eq!(items[0]["brief"], "The second brief", "{}", queue.body);
+    assert_eq!(items[1]["brief"], "The first brief", "{}", queue.body);
+    assert_eq!(
+        items[1]["sources"],
+        json!([{"kind": "document", "title": "the SOP"}])
+    );
+    assert_eq!(items[0]["status"], "open", "{}", queue.body);
+    assert_eq!(items[0]["version"], 1, "{}", queue.body);
+    assert!(
+        items[0]["created_at"].is_string(),
+        "the queue dates every intake: {}",
+        queue.body
+    );
+
+    let open = call(&pg, &seeded, "authoring.intakes", json!({"status": "open"}))
+        .await
+        .expect("the open queue");
+    assert_eq!(open.status, 200, "{}", open.body);
+    assert_eq!(
+        open.body["output"]["items"].as_array().map(Vec::len),
+        Some(2),
+        "{}",
+        open.body
+    );
+    let closed = call(
+        &pg,
+        &seeded,
+        "authoring.intakes",
+        json!({"status": "closed"}),
+    )
+    .await
+    .expect("the closed queue");
+    assert_eq!(closed.status, 200, "{}", closed.body);
+    assert_eq!(
+        closed.body["output"]["items"].as_array().map(Vec::len),
+        Some(0),
+        "{}",
+        closed.body
+    );
+}
+
+/// #655 P1.2: the queue is tenant-scoped — a second tenant's intake never appears.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn the_intake_queue_is_tenant_scoped() {
+    let (pg, seeded) = fixture().await;
+    let other = support::seed(&pg, "dev-b", "bob", "Bob").await;
+
+    intake(&pg, &seeded).await;
+    call(
+        &pg,
+        &other,
+        "authoring.intake",
+        json!({"brief": "The other tenant's brief", "sources": []}),
+    )
+    .await
+    .expect("the other tenant's intake");
+
+    let mine = call(&pg, &seeded, "authoring.intakes", json!({}))
+        .await
+        .expect("my queue");
+    assert_eq!(mine.status, 200, "{}", mine.body);
+    let items = mine.body["output"]["items"]
+        .as_array()
+        .unwrap_or_else(|| panic!("no items: {}", mine.body));
+    assert_eq!(items.len(), 1, "{}", mine.body);
+    assert_eq!(
+        items[0]["brief"], "We need a delivery department",
+        "{}",
+        mine.body
+    );
+
+    let theirs = call(&pg, &other, "authoring.intakes", json!({}))
+        .await
+        .expect("their queue");
+    assert_eq!(theirs.status, 200, "{}", theirs.body);
+    let items = theirs.body["output"]["items"]
+        .as_array()
+        .unwrap_or_else(|| panic!("no items: {}", theirs.body));
+    assert_eq!(items.len(), 1, "{}", theirs.body);
+    assert_eq!(
+        items[0]["brief"], "The other tenant's brief",
+        "{}",
+        theirs.body
+    );
+}

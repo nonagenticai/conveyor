@@ -111,6 +111,87 @@ pub fn request(
     })
 }
 
+/// Build a `choice` question over an authored menu (S21 step 10, issue #656).
+///
+/// The wire shape is [`request`]'s; only the question type changes. `options` are the authored
+/// `(key, label)` pairs: the **criteria are the keys** — an answer names a key — and the labelled
+/// menu lives in the instructions, so a human reads `key — label` while the parser reads a stable
+/// key. An empty menu is a caller error, not a free-text question.
+pub fn request_choice(
+    model: Option<&str>,
+    output: &Value,
+    acceptance_criteria: &Value,
+    case_input: Option<&Value>,
+    options: &[(String, String)],
+) -> Value {
+    let mut state = format!(
+        "Step output:\n{}",
+        serde_json::to_string(output).unwrap_or_else(|_| "null".to_owned())
+    );
+    if let Some(input) = case_input {
+        state.push_str(&format!(
+            "\n\nStep input / card facts:\n{}",
+            serde_json::to_string(input).unwrap_or_else(|_| "null".to_owned())
+        ));
+    }
+    let menu = options
+        .iter()
+        .map(|(key, label)| format!("- {key} — {label}"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    let instructions = format!(
+        "Choose one option for the step output in `state` against these acceptance criteria.\n\n\
+         Acceptance criteria:\n{}\n\nOptions:\n{menu}",
+        serde_json::to_string(acceptance_criteria).unwrap_or_else(|_| "null".to_owned())
+    );
+    let keys = options
+        .iter()
+        .map(|(key, _)| json!(key))
+        .collect::<Vec<_>>();
+    let mut questions = Map::new();
+    questions.insert(
+        JUDGE_QUESTION.to_owned(),
+        json!({
+            "type": "choice",
+            "instructions": instructions,
+            "criteria": keys,
+        }),
+    );
+    json!({
+        "model": model.unwrap_or(DEFAULT_LAYA_MODEL),
+        "state": state,
+        "questions": questions,
+    })
+}
+
+/// Read the authored key laya chose.
+///
+/// Unlike [`parse_verdict`], a key is not an accept/reject word: any non-empty string is a
+/// candidate, and the caller checks it against the authored set. A document that reports its own
+/// failure, or carries no key, is [`JudgeError::Unreadable`] — an outage, never a choice.
+pub fn parse_choice(response: &Value) -> Result<(String, Option<f64>), JudgeError> {
+    let answer = response
+        .get("answers")
+        .and_then(|answers| answers.get(JUDGE_QUESTION))
+        .ok_or(JudgeError::Unreadable)?;
+    if answer
+        .get("error")
+        .is_some_and(|error| !error.is_null() && error.as_str() != Some(""))
+    {
+        return Err(JudgeError::Unreadable);
+    }
+    let choice = answer
+        .get("choice")
+        .or_else(|| answer.get("answer"))
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|text| !text.is_empty())
+        .ok_or(JudgeError::Unreadable)?
+        .to_owned();
+    let confidence = answer.get("confidence").and_then(Value::as_f64);
+    Ok((choice, confidence))
+}
+
 /// Parse laya's answer document into a verdict.
 ///
 /// Two answer shapes are accepted, because the gateway answers a `score` question with either
