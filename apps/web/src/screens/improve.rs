@@ -350,14 +350,17 @@ fn kata_panel(
                                 <dt>"Status"</dt><dd><StatusPill status=text(&view, "status")/></dd>
                                 <dt>"Job binding"</dt><dd class="mono">{short_id(Some(&text(&view, "job_binding_id")))}</dd>
                                 <dt>"Release pin"</dt><dd class="mono">{short_id(Some(&text(&view, "release_hash")))}</dd>
-                                <dt>"Threshold"</dt><dd>{format!("{:?}", view.get("threshold").cloned().unwrap_or(Value::Null))}</dd>
+                                <dt>"Threshold"</dt><dd>{view.get("threshold").and_then(Value::as_f64).map(|value| format!("{value}")).unwrap_or_else(|| "—".to_owned())}</dd>
                                 <dt>"Gets"</dt><dd>{view.get("gets").and_then(Value::as_array).map(Vec::len).unwrap_or(0).to_string()}</dd>
                             </dl>
-                            {view.get("measurement").filter(|value| !value.is_null()).map(|measurement| view! {
-                                <div class="callout">
-                                    <strong>"Measurement"</strong>
-                                    <div class="mono">{format!("{} · {} → {} · {}", text(measurement, "verdict"), text(measurement, "baseline_score"), text(measurement, "candidate_score"), text(measurement, "metric_key"))}</div>
-                                </div>
+                            {view.get("measurement").filter(|value| !value.is_null()).map(|measurement| {
+                                let score = |key: &str| measurement.get(key).and_then(Value::as_f64).map(|value| format!("{value:.3}")).unwrap_or_else(|| "—".to_owned());
+                                view! {
+                                    <div class="callout">
+                                        <strong>"Measurement"</strong>
+                                        <div class="mono">{format!("{} · {} → {} · {}", text(measurement, "verdict"), score("baseline_score"), score("candidate_score"), text(measurement, "metric_key"))}</div>
+                                    </div>
+                                }
                             })}
                         </div>
                     }.into_any(),
