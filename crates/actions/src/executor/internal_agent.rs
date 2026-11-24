@@ -27,7 +27,8 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::invoke::{
-    ActionError, Authority, GateUnavailable, InvokeRequest, invoke, record_unavailable_decision,
+    ActionError, Authority, GateUnavailable, InvokeRequest, invoke, invoke_with_timeout,
+    record_unavailable_decision,
 };
 use crate::process::judge;
 use crate::registry::registry;
@@ -721,8 +722,11 @@ async fn decide(
         }
     };
     let classify_key = format!("{prefix}:classify");
+    // SPEC_V2 §10.2: the tenant's configured laya budget bounds this classify call; the
+    // invoker caps it at the action's own 3 s hard budget, so the override can only lower it.
+    let laya_timeout_ms = u64::try_from(laya_config.timeout_ms).ok();
     let started = std::time::Instant::now();
-    let judged = invoke(
+    let judged = invoke_with_timeout(
         pool,
         registry(),
         tenant,
@@ -744,6 +748,7 @@ async fn decide(
             usage: None,
             credential_alias: None,
         },
+        laya_timeout_ms,
     )
     .await;
     let latency_ms = i32::try_from(started.elapsed().as_millis()).ok();
