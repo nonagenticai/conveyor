@@ -14,12 +14,12 @@
 //! governed-asset lifecycle (S07), the project/board/start-card creation (S13), and the trace
 //! edge (S07).
 
-use conveyor_domain::spine::WsjfInputs;
+use conveyor_domain::spine::{WbsKind, WsjfInputs};
 use conveyor_domain::{ApprovalStatus, AssetKind, AssetStatus};
 use conveyor_store as store;
 use conveyor_store::approval::{ApprovalRecord, NewApproval};
 use conveyor_store::governance::NewAsset;
-use conveyor_store::spine::{NewRegisterItem, NewWbsNode};
+use conveyor_store::spine::{NewRegisterItem, NewWbsNode, PlanStoreError};
 use conveyor_store::trace_link::NewTraceLink;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -436,6 +436,10 @@ pub struct PmWbsNode {
     pub kind: String,
     /// The node's title.
     pub title: String,
+    /// The card a `work_package` node executes. Required for that kind — a work package with no
+    /// card has no path to the work (SPEC_V2 §5.1, v1-p5-5) — and ignored for the other kinds.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub card_id: Option<Uuid>,
     /// The index (in this array) of the parent node.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent_index: Option<usize>,
@@ -562,6 +566,15 @@ async fn plan_project(
             })?),
             None => None,
         };
+        // v1-p5-5 (SPEC_V2 §5.1): a work-package node names the card that executes it; every
+        // other kind has no executor and stores none.
+        let card_id = if node.kind.trim() == WbsKind::WorkPackage.as_str() {
+            Some(node.card_id.ok_or_else(|| {
+                crate::spine::spine_error(PlanStoreError::CardRequired, ctx.action)
+            })?)
+        } else {
+            None
+        };
         let row = store::spine::insert_wbs_tx(
             &mut *tx,
             ctx.tenant,
@@ -573,6 +586,7 @@ async fn plan_project(
                 title: node.title.clone(),
                 body: String::new(),
                 acceptance: Value::Array(Vec::new()),
+                card_id,
                 inputs: WsjfInputs {
                     business_value: node.business_value,
                     time_criticality: node.time_criticality,

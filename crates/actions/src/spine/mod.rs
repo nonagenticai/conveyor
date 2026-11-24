@@ -17,7 +17,7 @@
 //! surface uses, so a subscriber watches one row or a family.
 
 use chrono::{DateTime, NaiveDate, Utc};
-use conveyor_domain::spine::{PlanError, WsjfInputs, tranche_review_has_evidence, wsjf};
+use conveyor_domain::spine::{PlanError, WbsKind, WsjfInputs, tranche_review_has_evidence, wsjf};
 use conveyor_domain::{ApprovalError, DeciderKind, Decision, DecisionKind};
 use conveyor_store as store;
 use schemars::JsonSchema;
@@ -70,7 +70,7 @@ async fn emit_spine_event(
 }
 
 /// A plan store failure as the status the caller can act on.
-fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
+pub(crate) fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
     match error {
         PlanStoreError::NotFound { what } => ActionError::resource_not_found(what),
         PlanStoreError::Stale { what } => ActionError::new(
@@ -79,6 +79,12 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             format!("the {what} changed since it was read"),
         ),
         PlanStoreError::Parent(parent) => parent_error(parent, action),
+        // v1-p5-5 (SPEC_V2 §5.1): a work package without a card has no path to the work.
+        PlanStoreError::CardRequired => invalid(
+            "card_id",
+            "card_required",
+            "a work package must name the card that executes it",
+        ),
         PlanStoreError::Illegal(PlanError::CadenceWrongKind { expected, actual }) => invalid(
             "cadence_id",
             "cadence_wrong_kind",
@@ -443,6 +449,10 @@ pub struct WbsCreateIn {
     pub body: Option<String>,
     /// The acceptance criteria.
     pub acceptance: Option<Value>,
+    /// The card that executes this node. Required — and stored — for a `work_package` node, whose
+    /// card is the path from the plan to the work; ignored for every other kind.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub card_id: Option<Uuid>,
     /// WSJF business value.
     pub business_value: Option<i32>,
     /// WSJF time criticality.
@@ -1452,13 +1462,24 @@ async fn wbs_create(
     input: WbsCreateIn,
 ) -> Result<HandlerOutput<WbsOut>, ActionError> {
     let kind = input.kind.trim().to_owned();
-    if conveyor_domain::spine::WbsKind::parse(&kind).is_none() {
+    let Some(parsed_kind) = WbsKind::parse(&kind) else {
         return Err(invalid(
             "kind",
             "unknown_kind",
             "kind must be phase, deliverable, work_package or milestone",
         ));
-    }
+    };
+    // v1-p5-5 (SPEC_V2 §5.1): a work package's card is the path from the plan to the work, so the
+    // node owes one; every other kind has no executor and stores none.
+    let card_id = if parsed_kind == WbsKind::WorkPackage {
+        Some(
+            input
+                .card_id
+                .ok_or_else(|| spine_error(PlanStoreError::CardRequired, ctx.action))?,
+        )
+    } else {
+        None
+    };
     let title = input.title.trim().to_owned();
     if title.is_empty() {
         return Err(invalid("title", "required", "a title is required"));
@@ -1482,6 +1503,7 @@ async fn wbs_create(
             title,
             body: input.body.unwrap_or_default(),
             acceptance: input.acceptance.unwrap_or_else(|| serde_json::json!([])),
+            card_id,
             inputs,
             meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
         },
