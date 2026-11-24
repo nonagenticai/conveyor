@@ -1,0 +1,17 @@
+{
+  "_note": "T19 live-gate row ids, measured 2026-11-24 on the deployed engine a8f67c3e. UUIDs only; no personal data.",
+  "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+  "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+  "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "approver_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+  "approvals": {
+    "web": "01a20c89-5d47-754f-a183-b5074804c7d3",
+    "mcp": "01a20c89-bc7e-791c-b9cf-381d0b352562",
+    "minutes": "01a20c8c-1428-79d4-a64e-fdeaa033a182"
+  },
+  "agenda": {
+    "web": "01a20c8b-336f-7978-9efa-3f793cd1a974",
+    "mcp": "01a20c8b-5d14-77b6-9f8c-0fbebd5b8556"
+  }
+}

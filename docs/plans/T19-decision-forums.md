@@ -1,7 +1,7 @@
 ---
 slice: T19
 title: Decision forums — meetings, positions and the outcome arithmetic
-status: draft
+status: built
 depends_on: [T1, T2, T3, P0]
 spec_sections: ["§6.8", "§8.1", "§8.2", "§8.3", "§10.3", "§10.4", "§10.5", "§12 T19", "D66"]
 adds_tables: [meeting_type, meeting, meeting_agenda_item, meeting_attendance, meeting_position]
@@ -13,7 +13,7 @@ parity_ids: []
 
 # T19 — Decision forums (meetings)
 
-Programme project: T19 · issue #606
+Programme project: T19 · issue #606 · close-out #650
 
 **Gate (SPEC_V2 §12 T19):** a three-department board meeting decides its agenda items by recorded
 majority with a recorded dissent; an item missing a required department is deferred `inquorate` and

@@ -1,0 +1,42 @@
+== write: approvals.request ==
+{
+  "approvals": 0,
+  "card_id": "01a20c8a-3370-7a8f-b903-faf5f7cff917",
+  "created_at": "2026-11-24T07:53:56.197132Z",
+  "decisions": [],
+  "description": "Publish the minutes of the T19 live-gate meeting (the chair's publication gate).",
+  "expires_at": null,
+  "gate": "meeting_minutes",
+  "id": "01a20c8c-1428-79d4-a64e-fdeaa033a182",
+  "kind": "meeting",
+  "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+  "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+  "requested_by_label": "conveyor-e2e",
+  "required_decisions": 1,
+  "run_id": null,
+  "status": "pending",
+  "version": 1
+}
+== read-back: approvals.list ==
+{
+  "items": [
+    {
+      "approvals": 0,
+      "card_id": "01a20c8a-3370-7a8f-b903-faf5f7cff917",
+      "created_at": "2026-11-24T07:53:56.197132Z",
+      "decisions": [],
+      "description": "Publish the minutes of the T19 live-gate meeting (the chair's publication gate).",
+      "expires_at": null,
+      "gate": "meeting_minutes",
+      "id": "01a20c8c-1428-79d4-a64e-fdeaa033a182",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "requested_by_label": "conveyor-e2e",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "pending",
+      "version": 1
+    }
+  ]
+}

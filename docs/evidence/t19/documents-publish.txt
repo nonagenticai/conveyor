@@ -1,0 +1,30 @@
+== project-brief
+  "category": "project-brief",
+  "id": "01a20ca7-d162-7674-a022-cf2dff7b6cbd",
+    "category": "project-brief",
+  "status": "active",
+  "title": "T19 \u2014 Project brief",
+== inception-analysis
+  "category": "inception-analysis",
+  "id": "01a20ca7-e839-776b-a940-398db85449a8",
+    "category": "inception-analysis",
+  "status": "active",
+  "title": "T19 \u2014 Inception analysis",
+== architecture-design
+  "category": "architecture-design",
+  "id": "01a20ca7-fee3-7296-82dd-142d538fcc35",
+    "category": "architecture-design",
+  "status": "active",
+  "title": "T19 \u2014 Architecture design (PSA and HLD)",
+== evidence
+  "category": "evidence",
+  "id": "01a20ca8-1595-71e2-9398-21bbd70ed089",
+    "category": "evidence",
+  "status": "active",
+  "title": "T19 \u2014 Decision forums: evidence",
+== closure-review
+  "category": "closure-review",
+  "id": "01a20ca8-2a1f-75bb-8dd2-fdde95e78a09",
+    "category": "closure-review",
+  "status": "active",
+  "title": "T19 \u2014 Decision forums: closure review",

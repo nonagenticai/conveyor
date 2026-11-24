@@ -27,7 +27,8 @@ and its published document. Links use `derivation | realization | reuse | depend
 | T19-A4 | SAFe epic (features, enablers, WSJF, PI) | epic | F / HLD | draft | 1 | programme-manager | SRO | 2026-11-30 | `docs/plans/T19/safe-epic.md` |
 | T19-A5 | Implementation plan | plan | E–F / HLD | draft | 1 | programme-architect | Architecture Board | 2026-11-30 | `docs/plans/T19-decision-forums.md` |
 | T19-A6 | This register | catalog | A–F / PSA+HLD | draft | 1 | programme-architect | Architecture Board | 2026-11-30 | this file |
-| T19-A7 | Implementation evidence | evidence | G / capability | published | 1 | programme-manager | Architecture Board | 2026-11-23 | `docs/plans/T19/evidence.md` |
+| T19-A7 | Implementation evidence | evidence | G / capability | published | 2 | programme-manager | Architecture Board | 2026-11-24 | `docs/plans/T19/evidence.md` |
+| T19-A8 | Closure review | closure-review | G / capability | published | 1 | programme-manager | Architecture Board | 2026-11-24 | `docs/plans/T19/closure-review.md` |
 
 ## Purpose, stakeholders and scope
 

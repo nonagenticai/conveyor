@@ -121,7 +121,7 @@ certification or full conformance; what is claimed is testable: the artefacts an
 organisation uses are rows, the process runs, and a deviation is a decision record rather than a
 silent fork.
 
-## 5. The buildout under its own capability — measured 2026-11-23
+## 5. The buildout under its own capability — measured 2026-11-24
 
 The programme does not only describe MSP and TOGAF; it runs under them. Measured on the live
 programme at the stated date:
@@ -134,16 +134,20 @@ programme at the stated date:
   refuses a build run until a project's analysis and architecture are published.
 - **The benefit profiles are `draft`, with their baselines `not measured`** and a measurement
   method recorded; the tranche-0 review evidence lists them unmeasured and records that the BCM is
-  unstaffed as a risk. That is the honest state, not a zero. The seed now carries **seven**
-  profiles: B1–B6 and **B7 Deliberated cross-department decisions** (T19); the published snapshot
-  still shows the six it was exported with, and B7 appears after the next export.
-- **T19 (decision forums) is built at tranche 4** — the plan and programme artefacts landed at
-  #605 and the implementation at #606: the five tables, the twelve `meetings.*` actions, the
-  `approval_decision` participant extension, the `/meetings` destination and the participant-hours
-  roll-up are measured present, and the slice's evidence is `docs/plans/T19/evidence.md`. The
-  programme seed is 50 projects, and T19's coverage row is `built`. The deployment-gated live proof
-  (the owner deciding one item in the web room and one over MCP) waits on the lane release. The T18
-  UI lane (#562–#566) is in flight and independent.
+  unstaffed as a risk. That is the honest state, not a zero. The seed carries **seven** profiles:
+  B1–B6 and **B7 Deliberated cross-department decisions** (T19); the snapshot regenerated with this
+  study exports all seven.
+- **T19 (decision forums) is built and closed at tranche 4** — the plan and programme artefacts
+  landed at #605, the implementation at #606, and the close-out at #650: the five tables, the
+  twelve `meetings.*` actions, the `approval_decision` participant extension, the `/meetings`
+  destination and the participant-hours roll-up are measured present, and the slice's evidence is
+  `docs/plans/T19/evidence.md`. The live gate ran on the deployed revision on 2026-11-24: the
+  human seat decided one agenda item in the web room and one over MCP, both `via='meeting'`, and
+  the meeting closed on its published minutes. The gate exposed and closed two deployment defects
+  in the MCP surface (the public host allowlist and per-session pod affinity), both in
+  `gitops-production`. The published snapshot now carries T19, its board and B7.
+  `docs/plans/T19/closure-review.md` records the decision; the `meeting_type` authoring route and
+  the T9/T10 binding remain follow-ups. The T18 UI lane (#562–#566) is in flight and independent.
 - **Architecture contracts are the largest open gap.** Only T9's project has a contract row, and it
   is not yet approved; the other delivery projects have none. The board's approval is the
   authority act, and it is tracked separately from this study.

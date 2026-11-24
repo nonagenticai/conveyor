@@ -32,12 +32,18 @@ registration); it creates the five sequenced delivery units **#562–#566**. Tra
 construction on the spine (T0/T1/T2/T3); each destination's live acceptance waits on its owning
 slice, and the project closes after T12.
 
-**T19 added 2026-11-23.** Decision forums (meetings) are their own slice (`docs/SPEC_V2.md` §12
-T19; `docs/plans/T19-decision-forums.md`): a meeting is a card over approvals with typed
-positions, quorum and the three decision rules, and the owner can decide live or asynchronously.
-**#605** authored the plan and the MSP/TOGAF/SAFe artefact set; **#606** is the implementation
-unit, blocked by #605. T19 is independent of T18 (the UI lane); it consumes T1/T2/T3 and the built
-T9/T10 seams. The meeting ruling is D66 because D64–D65 are the real-UI rulings.
+**T19 added 2026-11-23, closed 2026-11-24.** Decision forums (meetings) are their own slice
+(`docs/SPEC_V2.md` §12 T19; `docs/plans/T19-decision-forums.md`): a meeting is a card over
+approvals with typed positions, quorum and the three decision rules, and the owner can decide
+live or asynchronously. **#605** authored the plan and the MSP/TOGAF/SAFe artefact set; **#606**
+implemented it (merged `3880d28a`); **#650** recorded the live gate on the deployed engine — the
+human seat deciding one item in the web room and one over MCP, both `via='meeting'` — closed the
+meeting on its published minutes, and published T19, its board and benefit B7 into the programme
+snapshot. The gate found and closed two deployment defects in the MCP surface (allowed hosts and
+session affinity). `docs/plans/T19/closure-review.md` is the decision; the `meeting_type`
+authoring route and the T9/T10 binding remain declared follow-ups. T19 is independent of T18 (the
+UI lane); it consumes T1/T2/T3 and the built T9/T10 seams. The meeting ruling is D66 because
+D64–D65 are the real-UI rulings.
 
 ## Programme `conveyor-buildout`
 

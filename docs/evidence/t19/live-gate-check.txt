@@ -1,0 +1,16 @@
+PASS live project is T19 (got T19)
+PASS the T19 board is a live row
+PASS one active `meeting` card type (got 1)
+PASS benefit B7 is a live row (got 1)
+PASS meeting is closed (got 'closed')
+PASS two agenda items closed as decision (got 2)
+PASS web: one meeting decision row (got 1)
+PASS web: linked approval is approved (got 'approved')
+PASS web: via.channel is web (got 'web')
+PASS mcp: one meeting decision row (got 1)
+PASS mcp: linked approval is approved (got 'approved')
+PASS mcp: via.channel is mcp (got 'mcp')
+PASS both rows name one approver (got ['01a1cf1e-09dd-7580-99cc-de395f3e86cc', '01a1cf1e-09dd-7580-99cc-de395f3e86cc'])
+PASS the approver is the expected human seat (01a1cf1e-09dd-7580-99cc-de395f3e86cc)
+PASS minutes approval is approved (got 'approved')
+all T19 live-gate checks passed
