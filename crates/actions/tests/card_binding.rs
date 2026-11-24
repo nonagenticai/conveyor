@@ -269,6 +269,45 @@ async fn a_cards_binding_reaches_its_run() {
     );
 }
 
+/// v1-w1a-5 (SPEC_V2 §4.4): a run that claims a release pin is a job run, and an unbound card
+/// has no binding to resolve that pin. The store refuses `422 binding_required` before the
+/// INSERT, so the run neither executes nor leaves a row.
+#[tokio::test]
+async fn a_run_on_an_unbound_card_is_refused() {
+    let (pg, seeded, running) = fixture().await;
+    let (board, lane) = board_and_lane(&running).await;
+    let (status, card) = create_card(&running, &board, &lane, None).await;
+    assert_eq!(status, 201, "{card}");
+    let card_id = text(output(&card), "id");
+
+    let (status, body) = running
+        .invoke(
+            "runs.create",
+            TOKEN,
+            json!({"card_id": card_id, "release_hash": "a".repeat(64)}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], "binding_required", "{body}");
+
+    // Nothing was written: the unbound card has no run.
+    let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scope");
+    let runs: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM run WHERE tenant_id = $1 AND card_id = $2")
+            .bind(seeded.tenant.as_uuid())
+            .bind(Uuid::parse_str(&card_id).expect("card id"))
+            .fetch_one(&mut *tx)
+            .await
+            .expect("count runs");
+    tx.commit().await.expect("commit");
+    assert_eq!(runs, 0, "the refusal writes no run");
+}
+
 #[tokio::test]
 async fn a_conflicting_binding_is_refused() {
     let (pg, seeded, running) = fixture().await;

@@ -34,7 +34,9 @@ use conveyor_store::project::{
     NewProgramme, NewProject, get_project_tx, insert_programme_tx, insert_project_tx,
 };
 use conveyor_store::revision::list_revisions_tx;
-use conveyor_store::run::{NewRun, RunStoreError, get_run_tx, insert_run_tx, transition_run_tx};
+use conveyor_store::run::{
+    NewRun, RunKind, RunStoreError, get_run_tx, insert_run_tx, transition_run_tx,
+};
 use rust_decimal::Decimal;
 use uuid::Uuid;
 
@@ -555,6 +557,8 @@ async fn a_project_execution_is_create_or_return_and_the_index_refuses_a_second_
         workflow_step_id: None,
         depth: 0,
         process_version: 1,
+        // A card-less root that is not job work: the plain project run.
+        kind: RunKind::Project,
         job_binding_id: None,
         release_hash: None,
     };
