@@ -91,6 +91,7 @@ struct Form {
     document: RwSignal<String>,
     mcp_url: RwSignal<String>,
     draft_id: RwSignal<String>,
+    promote_toolkit: RwSignal<String>,
     decision: RwSignal<String>,
     note: RwSignal<String>,
 }
@@ -121,6 +122,7 @@ impl Form {
             document: RwSignal::new("{\n  \"openapi\": \"3.1.0\"\n}".to_owned()),
             mcp_url: RwSignal::new(String::new()),
             draft_id: RwSignal::new(String::new()),
+            promote_toolkit: RwSignal::new(String::new()),
             decision: RwSignal::new("approve".to_owned()),
             note: RwSignal::new(String::new()),
         }
@@ -565,14 +567,35 @@ fn bindings_panel(
             notice.set(Some("Name the grant to retire".to_owned()));
             return;
         }
-        run(
-            ctx,
-            "tool_bindings.retire",
-            json!({ "id": id }),
-            notice,
-            move |_| refresh.run(()),
-            "Grant retired.",
-        );
+        // Retire is versioned (CONTRACT §3): the If-Match is the version Select filled.
+        let version = form.binding_version.get().trim().to_owned();
+        let options = match version.parse::<i64>() {
+            Ok(version) => InvokeOptions {
+                if_match: Some(version),
+                ..InvokeOptions::default()
+            },
+            Err(_) => {
+                notice.set(Some(
+                    "Retiring needs the grant's version — select its row first".to_owned(),
+                ));
+                return;
+            }
+        };
+        leptos::task::spawn_local(async move {
+            match ctx
+                .invoke("tool_bindings.retire", json!({ "id": id }), options)
+                .await
+            {
+                Ok(_) => {
+                    notice.set(Some("Grant retired.".to_owned()));
+                    refresh.run(());
+                }
+                Err(error) => notice.set(Some(format!(
+                    "tool_bindings.retire refused: {}",
+                    error_text(&error)
+                ))),
+            }
+        });
     };
 
     view! {
@@ -591,6 +614,11 @@ fn bindings_panel(
                                         let enabled = row.get("enabled").and_then(Value::as_bool).unwrap_or(false);
                                         let full_id = row.get("id").and_then(Value::as_str).unwrap_or_default().to_owned();
                                         let row_version = row.get("version").and_then(Value::as_i64).unwrap_or(0);
+                                        // Selecting the row loads its own values, so an update of one
+                                        // field cannot silently narrow the ceiling or clear the
+                                        // credential (an empty alias clears it by contract).
+                                        let row_ceiling = row.get("effect_ceiling").and_then(Value::as_str).unwrap_or("read").to_owned();
+                                        let row_credential = row.get("credential_alias").and_then(Value::as_str).unwrap_or("").to_owned();
                                         view! {
                                             <tr>
                                                 <td class="mono">{short_id(row.get("id").and_then(Value::as_str))}</td>
@@ -604,6 +632,8 @@ fn bindings_panel(
                                                 <td><button class="btn small" on:click=move |_| {
                                                     form.binding_id.set(full_id.clone());
                                                     form.binding_version.set(row_version.to_string());
+                                                    form.ceiling.set(row_ceiling.clone());
+                                                    form.credential.set(row_credential.clone());
                                                 }>"Select"</button></td>
                                             </tr>
                                         }
@@ -831,11 +861,22 @@ fn authoring_panel(
     let verb = move |action: &'static str| {
         move |_event: web_sys::MouseEvent| {
             let draft_id = form.draft_id.get().trim().to_owned();
-            if draft_id.is_empty() {
-                notice.set(Some("Name the draft".to_owned()));
-                return;
-            }
             let payload = match action {
+                // Promote names the PUBLISHED tenant toolkit, not the draft (PromoteIn).
+                "tool_authoring.promote" => {
+                    let toolkit = form.promote_toolkit.get().trim().to_owned();
+                    if toolkit.is_empty() {
+                        notice.set(Some(
+                            "Promote names the published toolkit id, not the draft".to_owned(),
+                        ));
+                        return;
+                    }
+                    json!({ "toolkit_id": toolkit })
+                }
+                _ if draft_id.is_empty() => {
+                    notice.set(Some("Name the draft".to_owned()));
+                    return;
+                }
                 "tool_authoring.review" => {
                     json!({ "draft_id": draft_id, "decision": form.decision.get(), "note": form.note.get() })
                 }
@@ -891,10 +932,19 @@ fn authoring_panel(
             </section>
             <section class="panel">
                 <div class="ph"><span>"Authoring path"</span><span class="muted">"draft → validate → test → review → publish → promote"</span></div>
-                <label class="field"><span>"Draft id"</span>
+                <label class="field"><span>"Draft id (validate, test, review, publish)"</span>
                     <input class="inp" aria-label="Draft id" prop:value=move || form.draft_id.get()
                         on:input=move |event| form.draft_id.set(input_value(&event))/></label>
-                <label class="field"><span>"Review decision / test operation"</span>
+                <label class="field"><span>"Published toolkit id (promote)"</span>
+                    <input class="inp" aria-label="Promote toolkit id" prop:value=move || form.promote_toolkit.get()
+                        on:input=move |event| form.promote_toolkit.set(input_value(&event))/></label>
+                <label class="field"><span>"Review decision"</span>
+                    <select aria-label="Review decision" prop:value=move || form.decision.get()
+                        on:change=move |event| form.decision.set(select_value(&event))>
+                        <option value="approve">"approve"</option>
+                        <option value="reject">"reject"</option>
+                    </select></label>
+                <label class="field"><span>"Review note / test operation"</span>
                     <input class="inp" aria-label="Authoring note" prop:value=move || form.note.get()
                         on:input=move |event| form.note.set(input_value(&event))/></label>
                 <div class="filterbar">
