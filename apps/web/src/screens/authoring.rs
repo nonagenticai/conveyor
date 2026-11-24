@@ -343,15 +343,19 @@ fn intake_rows(data: &Data) -> Vec<IntakeRow> {
     }
     intakes(&data.assets)
         .into_iter()
-        .map(|summary| IntakeRow {
-            id: summary.id,
-            brief: "— (no authoring.intakes read for this role)".to_owned(),
-            sources: 0,
-            status: summary.state().to_owned(),
-            version: 0,
-            recorded: "—".to_owned(),
-            drafts: summary.drafts,
-            kinds: summary.kinds,
+        .map(|summary| {
+            // `state()` borrows the summary, so it is read before `id` moves out of it.
+            let status = summary.state().to_owned();
+            IntakeRow {
+                id: summary.id,
+                brief: "— (no authoring.intakes read for this role)".to_owned(),
+                sources: 0,
+                status,
+                version: 0,
+                recorded: "—".to_owned(),
+                drafts: summary.drafts,
+                kinds: summary.kinds,
+            }
         })
         .collect()
 }
