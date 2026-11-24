@@ -344,7 +344,12 @@ mod tests {
                 (97, "work package card".to_owned()),
                 // #526 (v1-p55-1): the declared register links shape and its default
                 // (0098_register_links_shape.sql).
-                (98, "register links shape".to_owned())
+                (98, "register links shape".to_owned()),
+                // #526 (v1-p101-1): the decision row's run/step links (0099_step_decisions.sql).
+                (99, "step decisions".to_owned()),
+                // #526 (v1-p102-1): the laya config default and its hard-budget check
+                // (0100_laya_timeout_default.sql).
+                (100, "laya timeout default".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
