@@ -1381,7 +1381,7 @@ pub(crate) async fn apply_gate_effect_tx(
             if kind != "governed_asset" {
                 continue;
             }
-            if let Err(error) = store::trace_link::insert_trace_link_tx(
+            match store::trace_link::insert_trace_link_if_absent_tx(
                 &mut *tx,
                 tenant,
                 &NewTraceLink {
@@ -1394,8 +1394,22 @@ pub(crate) async fn apply_gate_effect_tx(
             )
             .await
             {
-                // A duplicate edge is the same fact recorded twice; anything else is real.
-                tracing::warn!(%error, "gate effect: trace edge");
+                // The same fact recorded twice: the statement is `ON CONFLICT DO NOTHING`, so
+                // the duplicate is a no-op and the decision's transaction stays usable.
+                Ok(_) => {}
+                // Every non-conflict failure is the decision's real cause. Returning it here
+                // stops a later statement from masking it as an aborted transaction.
+                Err(store::trace_link::TraceLinkStoreError::EndNotFound { .. }) => {
+                    return Err(ActionError::new(
+                        409,
+                        "gate_evidence_not_found",
+                        format!("the gate's evidence {id} no longer resolves in this tenant"),
+                    ));
+                }
+                Err(error) => {
+                    tracing::error!(%error, "gate effect: trace edge");
+                    return Err(ActionError::internal());
+                }
             }
         }
     }
