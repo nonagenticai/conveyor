@@ -220,6 +220,9 @@ pub enum KataStoreError {
     GetAlreadyRecorded(String),
     /// A Get arrived out of order.
     GetOutOfOrder { current: String, required: String },
+    /// A post-adoption Get arrived before the Get it follows (the status is shared, so the
+    /// order between Standardisation, Sustainability and Stretch is the recorded rows).
+    MissingPrevious(&'static str),
     /// An open kata already owns this signature (P4.2's rule).
     SignatureOpen(Uuid),
     /// The hypothesis's instrument version does not exist in this tenant.
@@ -433,6 +436,31 @@ pub async fn record_get_tx(
             current,
             required: required.to_owned(),
         });
+    }
+
+    // The three post-adoption Gets share one status, so the stored rows are what order them:
+    // the standard is updated before its monitoring is set, and monitoring exists before the
+    // change is propagated.
+    let previous = match get {
+        Get::Sustainability => Some((Get::Standardisation, "standardisation")),
+        Get::Stretch => Some((Get::Sustainability, "sustainability")),
+        _ => None,
+    };
+    if let Some((previous, name)) = previous {
+        let recorded: bool = sqlx::query_scalar(
+            "SELECT EXISTS (
+                SELECT 1 FROM kata_get
+                 WHERE tenant_id = $1 AND kata_id = $2 AND get_key = $3
+            )",
+        )
+        .bind(tenant.as_uuid())
+        .bind(kata_id)
+        .bind(previous.key())
+        .fetch_one(&mut *conn)
+        .await?;
+        if !recorded {
+            return Err(KataStoreError::MissingPrevious(name));
+        }
     }
 
     let (prediction, instrument_version_id) = if get == Get::Hypothesis {

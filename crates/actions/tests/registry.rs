@@ -131,12 +131,22 @@ use serde_json::{Value, json};
 /// replay's read adds 560.
 /// **T19 (#606) adds 12 internal**: the meetings family
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
-/// **S21 step 9 (#649) adds `cards.assign`**, **T5 (#77) `kata.hypothesise`**, **T6 (#80)
-/// the development-project family**, **T8 (#79) the `lessons.*` lifecycle**, **T15 (#86)**
-/// ten authoring/BYO actions, the lane's own families, and **#526 U5.1c's two
-/// `job_authorities.get|set` actions**. The merged registry is
-/// **598: 579 internal, 19 external**.
-const EXPECTED: [&str; 599] = [
+/// `minutes_publish|list|get`) — 518 → **530** (T19, #606). **S21 step 9 (#649) adds 1
+/// internal**: `cards.assign`, the card handoff. 530 → **531**. **T5 (#77) adds 8 internal**:
+/// P1's `kata.open|get|observe|analyse|hypothesise|propose|measure` and P2–P4's `kata.adopt` —
+/// 531 → **539**. **T6 (#80) adds 9 internal**: the `development_projects.*` self-development
+/// family and its gates. 539 → **548**. **T8 (#79) adds 3 internal**:
+/// `lessons.propose|review|promote`. 548 → **551**. **T15 (#86) adds 10 internal**: the
+/// toolkit/authoring/BYO family and the broker's `tools.dispatch`. 551 → **561**.
+/// **T12 (#88) adds 3 internal**: `kata.standardise|sustain|stretch`. 561 → **564**.
+/// **#655 (T17b) adds 1 internal**: `authoring.intakes`. 564 → **565**.
+///
+/// **The #526 merge keeps both families**: the lane's `ladder.prepare` (internal) and
+/// `laya.classify` (external), and main's T12 kata Gets and `authoring.intakes`. Main's
+/// #656 `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` are retired
+/// with their handlers, so they do not appear here. The merged registry is
+/// **603: 584 internal, 19 external**.
+const EXPECTED: [&str; 603] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -186,6 +196,7 @@ const EXPECTED: [&str; 599] = [
     "authoring.assets",
     "authoring.draft",
     "authoring.intake",
+    "authoring.intakes",
     "authoring.publish",
     "authoring.review",
     "baselines.get",
@@ -405,6 +416,9 @@ const EXPECTED: [&str; 599] = [
     "kata.open",
     "kata.propagate",
     "kata.propose",
+    "kata.standardise",
+    "kata.stretch",
+    "kata.sustain",
     "knowledge.query",
     "labels.create",
     "labels.delete",
@@ -828,13 +842,15 @@ fn the_registry_is_exactly_the_declared_set() {
     // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
     // 520 -> 525; external stays 14.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
-    // The merged registry was 598: 579 internal (the lane's 553 + main's 13 new kata/T6/T8
-    // actions + `programme_lessons.propose`, the lane's programme register which the union
-    // renamed out of SPEC §D36's `lessons.*` family + T15's ten authoring/BYO actions +
-    // #526 U5.1c's two `job_authorities.*` actions), 19 external. T5's kata names are one
-    // family: main's eight implementations plus the lane's `kata.list`/`propagate`/`close`.
-    // v1-p61-2 adds `pm.status` (internal, write): 579 -> 580, total 599; external stays 19.
-    assert_eq!((internal, external), (580, 19));
+    // `trend` and `scientific_formal.translate|verify`: internal stays 495, external 13 -> 18.
+    // The lane's later additions (T19 meetings, cards.assign, T5/T6/T8/T15 families,
+    // `job_authorities.*`, the programme registers and the governance/storage/tool families)
+    // bring the lane to 599 actions: 580 internal, 19 external.
+    // The merge keeps main's T12 kata Gets (`kata.standardise|sustain|stretch`) and
+    // `authoring.intakes` — four internal actions — and retires main's #656
+    // `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` with their handlers.
+    // Final: 584 internal + 19 external = 603.
+    assert_eq!((internal, external), (584, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

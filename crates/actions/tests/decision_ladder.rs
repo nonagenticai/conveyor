@@ -1873,3 +1873,61 @@ async fn a_laya_config_timeout_is_capped_at_the_hard_budget() {
     // The dispatch bound itself is exercised by the stalled-judge test; this test is the config
     // boundary: 3001 refused, 3000 accepted.
 }
+
+/// 0071/0103 — `fire_when` is a validated policy field (ported from main's #656 onto the lane's
+/// policy action): an unparseable expression is refused at authoring, and an explicit `null` on
+/// update clears it. The executor's not-fired early return is covered by its own test.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_policy_fire_when_is_validated_and_can_be_cleared() {
+    let (_pg, running, _seeded) = fixture().await;
+
+    let (status, created) = running
+        .invoke(
+            "decision_policies.create",
+            "dev:alice",
+            json!({
+                "kind": KIND,
+                "gate": GATE,
+                "threshold": 0.5,
+                "fail_policy": "closed",
+                "action": "handover",
+                "fire_when": {"all_of": [{"gate": "another_gate"}]}
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    let id = id_of(output(&created), "id");
+    assert!(output(&created)["fire_when"].is_object(), "{created}");
+
+    let (status, refused) = running
+        .invoke(
+            "decision_policies.create",
+            "dev:alice",
+            json!({
+                "kind": KIND,
+                "gate": "another_gate",
+                "fire_when": {"nonsense": true}
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+
+    let (status, cleared) = running
+        .invoke(
+            "decision_policies.update",
+            "dev:alice",
+            json!({"id": id, "fire_when": null}),
+            Some("1"),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{cleared}");
+    assert!(output(&cleared)["fire_when"].is_null(), "{cleared}");
+}

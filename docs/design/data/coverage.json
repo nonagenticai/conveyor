@@ -1474,22 +1474,23 @@
         "crates/actions/src/knowledge",
         "crates/actions/src/memory",
         "crates/actions/src/prompt",
-        "migrations/0030_prompt_catalogue.sql"
+        "migrations/0030_prompt_catalogue.sql",
+        "migrations/0071_ladder_option_sets.sql"
       ],
       "gap": null,
       "key": "S21",
       "measured": {
         "actions": [
-          6,
-          6
+          10,
+          10
         ],
         "modules": [
           4,
           4
         ],
         "tables": [
-          2,
-          2
+          4,
+          4
         ]
       },
       "name": "Message construction (the compiled prompt)",
@@ -1752,9 +1753,9 @@
         "T17"
       ],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "apps/server/tests/organisation_loop.rs"
       ],
-      "gap": "the one-organisation acceptance loop is not built",
+      "gap": null,
       "key": "T12",
       "measured": {
         "actions": [
@@ -1762,8 +1763,8 @@
           0
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
           0,
@@ -1773,7 +1774,7 @@
       "name": "One organisation loop",
       "parallel_with": [],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 13,
       "units": {
@@ -2264,8 +2265,8 @@
       "key": "T5",
       "measured": {
         "actions": [
-          8,
-          8
+          11,
+          11
         ],
         "modules": [
           1,
@@ -2728,10 +2729,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 44,
+        "built": 45,
         "partial": 1,
         "planned": 0,
-        "proposed": 3,
+        "proposed": 2,
         "standing": 1
       },
       "total": 50,

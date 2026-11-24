@@ -34,7 +34,7 @@
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::ladder::{
-    FailAction, FailPolicy, LadderError, Outcome, Rung, evaluate, unavailable,
+    FailAction, FailPolicy, FireWhen, LadderError, Outcome, Rung, evaluate, unavailable,
 };
 use conveyor_domain::{ApprovalStatus, TenantId};
 use conveyor_store as store;
@@ -291,6 +291,8 @@ pub struct PolicyOut {
     pub action: String,
     /// Free-form metadata.
     pub meta: Value,
+    /// Whether the case is asked at all; `None` fires always (0071).
+    pub fire_when: Option<Value>,
     /// The If-Match version.
     pub version: i64,
     /// Creation time.
@@ -308,6 +310,7 @@ fn policy_out(record: &PolicyRecord) -> PolicyOut {
         fail_policy: record.fail_policy.clone(),
         action: record.action.clone(),
         meta: record.meta.clone(),
+        fire_when: record.fire_when.clone(),
         version: record.version,
         created_at: record.created_at,
         updated_at: record.updated_at,
@@ -329,6 +332,15 @@ pub struct PolicyCreateIn {
     pub action: Option<String>,
     /// Free-form metadata.
     pub meta: Option<Value>,
+    /// A structured expression evaluated when a case resolves; `None` fires always.
+    pub fire_when: Option<Value>,
+}
+
+/// Refuse an unparseable `fire_when` before it reaches the store (SPEC_V2 §7.2, 0071).
+fn validate_fire_when(value: &Value) -> Result<(), ActionError> {
+    FireWhen::parse(value)
+        .map(|_| ())
+        .map_err(|error| invalid("fire_when", "invalid_fire_when", error.to_string()))
 }
 
 /// Create a decision policy for one case.
@@ -352,6 +364,9 @@ async fn decision_policies_create(
     if kind.is_empty() {
         return Err(invalid("kind", "missing", "a case kind is required"));
     }
+    if let Some(expression) = &input.fire_when {
+        validate_fire_when(expression)?;
+    }
     let record = store::ladder::insert_policy_tx(
         &mut *tx,
         ctx.tenant,
@@ -362,6 +377,7 @@ async fn decision_policies_create(
             fail_policy: input.fail_policy.unwrap_or_else(|| "closed".to_owned()),
             action: input.action.unwrap_or_else(|| "handover".to_owned()),
             meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
+            fire_when: input.fire_when,
         },
     )
     .await
@@ -383,6 +399,8 @@ pub struct PolicyUpdateIn {
     pub action: Option<String>,
     /// Free-form metadata.
     pub meta: Option<Value>,
+    /// `Some(None)` clears the expression; `None` keeps it.
+    pub fire_when: Option<Option<Value>>,
 }
 
 /// Change a policy; a policy change is a new version and its gate re-opens.
@@ -414,6 +432,9 @@ async fn decision_policies_update(
         )?;
         current.version
     };
+    if let Some(Some(expression)) = &input.fire_when {
+        validate_fire_when(expression)?;
+    }
     let record = store::ladder::update_policy_tx(
         &mut *tx,
         ctx.tenant,
@@ -423,6 +444,7 @@ async fn decision_policies_update(
             fail_policy: input.fail_policy,
             action: input.action,
             meta: input.meta,
+            fire_when: input.fire_when,
         },
         Some(expected),
     )

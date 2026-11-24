@@ -118,7 +118,11 @@ impl Get {
             Self::Analyse => Some("observed"),
             Self::Hypothesis => Some("analysed"),
             Self::Solution => Some("hypothesised"),
-            Self::Standardisation => Some("measured"),
+            // The last three Gets come after the person's adoption: the standard is updated,
+            // then its monitoring is set, then it is propagated. They all require `adopted`;
+            // their order among themselves is the store's predecessor check, because the
+            // status vocabulary has one post-adoption value.
+            Self::Standardisation => Some("adopted"),
             Self::Sustainability => Some("adopted"),
             Self::Stretch => Some("adopted"),
         }
@@ -131,7 +135,10 @@ impl Get {
             Self::Analyse => "analysed",
             Self::Hypothesis => "hypothesised",
             Self::Solution => "proposed",
-            Self::Standardisation | Self::Sustainability | Self::Stretch => "closed",
+            // The standardisation and its monitoring leave the kata adopted; the propagation
+            // (yokoten) is what closes it.
+            Self::Standardisation | Self::Sustainability => "adopted",
+            Self::Stretch => "closed",
         }
     }
 }

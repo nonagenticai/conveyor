@@ -666,6 +666,32 @@ async fn decide(
         "output": out.output,
         "turns": out.turns,
     });
+    // `fire_when` decides whether the gate is asked at all. Not fired: no call, no decision, and
+    // the step proceeds — the policy said this case is not its business. Its predicates address
+    // the same fact document `ladder.prepare` is handed, so both read one case.
+    let fires = match &policy.policy.fire_when {
+        None => true,
+        Some(value) => conveyor_domain::ladder::FireWhen::parse(value)
+            .map_err(|error| {
+                ExecutorFailure::permanent(format!(
+                    "the gate policy's fire_when is invalid: {error}"
+                ))
+            })?
+            .is_none_or(|expression| {
+                expression.fires(GATE_KIND, anatomy.gate.as_deref(), &case_facts)
+            }),
+    };
+    if !fires {
+        return Ok(Gate {
+            judge: json!({
+                "decision": "not_required",
+                "kind": GATE_KIND,
+                "fire_when": "does not hold",
+            }),
+            refusal: None,
+            escalation: None,
+        });
+    }
     let prepared = invoke(
         pool,
         registry(),

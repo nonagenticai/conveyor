@@ -516,7 +516,7 @@
         "actions: decision_options.* absent",
         "actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)",
         "actions: decisions.* found (decisions.create, decisions.get, decisions.list…)",
-        "actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)",
+        "actions: ladder.* found (ladder.apply_draft, ladder.case, ladder.evaluate…)",
         "actions: laya_configs.* found (laya_configs.create, laya_configs.list)",
         "actions: refinements.* found (refinements.list, refinements.publish)"
       ],
