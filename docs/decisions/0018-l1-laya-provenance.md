@@ -49,9 +49,13 @@ rework `v1-w1c-3:T2`, `v1-w1c-4:T2`, `v1-w1c-5:T2`
 
 6. **`Unavailable` follows the fail policy; it is never a pass.** `domain::ladder::unavailable`
    already maps `closed → refused` and `open → the policy's action` (handover → escalated, block →
-   refused, annotate → accepted with the note). The action now produces that outcome from a failed
-   verification and records `gate_unavailable` in the decision's meta; the executor consumes the
-   outcome rather than re-deriving it.
+   refused, annotate → accepted with the note). Two shapes, one policy. An **outage** — the service
+   unreachable, the call never completed — leaves no recorded exchange, so `ladder.evaluate` cannot
+   and does not write a decision: the caller applies the policy, and the executor is that caller. A
+   **recorded** call that completed without a readable answer has provenance, so the action writes
+   the decision `unavailable` with `meta.gate_unavailable = true`, following the same policy. The
+   executor consumes the action's outcome for a recorded call and applies the policy itself for an
+   outage.
 
 7. **`fire_when` decides whether the case is asked.** `decision_policy` gains a nullable
    `fire_when` expression in migration `0068`. When it does not hold for the resolved case, no laya

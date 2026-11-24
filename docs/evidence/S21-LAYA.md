@@ -28,8 +28,11 @@ unavailable answer follows the policy's fail action.
 | A call for another case is refused | `::a_call_for_another_case_is_refused` | — | — |
 | The gate makes one laya call | `crates/actions/tests/internal_agent_runtime.rs::the_gate_makes_one_laya_call` | — | — |
 | The question comes from the authored set | `::the_question_comes_from_the_authored_set` | — | — |
+| An inline options array is refused | `::an_inline_options_array_is_refused` | — | — |
 | An answer outside the set is refused | `::an_answer_outside_the_set_is_refused` | — | — |
 | A case with no authored set is refused | `::a_case_without_an_authored_set_is_refused` | — | — |
+| Authoring twice increments the set version | `::the_set_version_increments` | — | — |
+| The authoring action is parity-sampled | `parity_http_mcp.rs::decision_option_sets_set` | — | — |
 | An outage follows the fail policy | `::an_outage_follows_the_fail_policy` | — | — |
 | A case that does not fire is not asked | `::a_case_that_does_not_fire_is_not_asked` | — | — |
 | Registry, parity and the lock | `crates/actions/tests/registry.rs`, `parity_http_mcp.rs`, `--check-lock` | — | — |

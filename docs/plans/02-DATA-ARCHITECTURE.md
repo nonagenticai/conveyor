@@ -1486,9 +1486,15 @@ recorded laya exchange. Two tables and one column, all new; no existing row chan
 | `decision_option_set` + `_option` | **read**: the authored menu and its version — the question's labels and the answer's legal keys |
 | `idempotency_key` | **read**: the engine's record of the `ladder.precheck` call — `request_hash` must equal the case hash, `status_code` must be 2xx, `response` is the answer document |
 | `action_invocation` | **read**: the invocation named by the key, for its `outcome` and measured `duration_ms` |
-| `decision` | **write**: one row with `rung='laya'`, the response-derived answer/confidence/probabilities, the measured latency, the pins, and `meta.laya_call_key` / `meta.laya_invocation_id` / `meta.case_hash` |
+| `decision` | **write**: one row with `rung='laya'`, the response-derived answer/confidence/probabilities, the measured latency, the pins, and `meta.laya_call_key` / `meta.laya_invocation_id` / `meta.case_sha256` |
 | `decision_option` | **write**: the authored rows the decision chose between, with their set version |
 | `event` | **write**: `decision.evaluated` |
+
+**Authoring a set is one row's version bump, never a second row.** `decision_option_sets.set` updates
+the existing header (`version = version + 1`) and replaces its children inside the same transaction,
+so the partial unique indexes in `0068` are never asked to hold two live sets and a reader never sees
+a half-replaced menu. Old labels survive only in `decision_option` — the per-decision record of what
+that decision chose between; a decision is reproducible from its own row plus its set version.
 
 **The call itself writes no conveyor row of ours beyond the engine's own bookkeeping.** The laya
 service is external: `ladder.precheck` is dispatched with the tenant's sealed `laya.token`, and the

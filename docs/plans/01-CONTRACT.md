@@ -1047,7 +1047,8 @@ transaction here spans an HTTP request. `laya.judge` stays the SOP step judge (C
 two actions ask different questions and answer to different callers.
 
 **Only a verified exchange becomes a decision.** `ladder.evaluate` takes `{kind, gate, project_id?,
-card_id?, question?, input?, laya_call_key, meta?}` and rebuilds the case from the same facts. It
+card_id?, question?, output, criteria, facts?, call_key, meta?}` and rebuilds the case from the same
+facts. It
 records a decision only when the engine's record of the call proves all of:
 
 - `idempotency_key` for `(tenant, scope='ladder.precheck', key)` exists, its `request_hash` equals
@@ -1057,7 +1058,7 @@ records a decision only when the engine's record of the call proves all of:
 
 The answer, confidence and probabilities are parsed from the stored response; latency is the
 invocation's measured `duration_ms`. The decision records `meta.laya_call_key`,
-`meta.laya_invocation_id`, `meta.case_hash` and the option-set version, so §7.2's "a decision is
+`meta.laya_invocation_id`, `meta.case_sha256` and the option-set version, so §7.2's "a decision is
 reproducible from the row" holds. A missing, in-flight, expired or mismatched key is `422
 laya_call_unverified` and writes nothing.
 
@@ -1069,11 +1070,14 @@ answer outside the set is `422 laya_answer_not_in_options`; a case that needs a 
 authored set is `409 option_set_missing`. Inline options are `422 invalid_input`.
 `decision_option` remains the per-decision record and is written from the authored rows.
 
-**`Unavailable` follows the fail policy.** An unreadable answer, a failed verification or an
-unreachable service is `Unavailable` → `gate_unavailable`: `fail_policy=closed` refuses;
-`fail_policy=open` applies the policy's action (`handover` escalates, `block` refuses, `annotate`
-proceeds with the note). It is never a pass and never a silent refusal — the mapping is
-`domain::ladder::unavailable`, the same function every caller reads.
+**`Unavailable` follows the fail policy.** An outage — the service unreachable, the call never
+completed — leaves no recorded exchange, so `ladder.evaluate` writes no decision and the caller (the
+executor) applies `domain::ladder::unavailable(fail_policy, action)`: `closed` refuses; `open` applies
+the policy's action (`handover` escalates, `block` refuses, `annotate` proceeds with the note). A
+*recorded* call that completed without a readable answer is the one case the action records: the
+decision is `unavailable` with `meta.gate_unavailable = true`, following the same policy. It is never
+a pass and never a silent refusal — the mapping is `domain::ladder::unavailable`, the same function
+every caller reads.
 
 **`fire_when` decides whether the case is asked.** A policy's nullable `fire_when` is evaluated when
 the case resolves; when it does not hold, no request is made and no decision is written. The

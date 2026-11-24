@@ -765,17 +765,22 @@ caller_supplied_verdict`; an unverifiable key is `422 laya_call_unverified`.
 
 **P2 — options are authored, versioned rows.** Migration `0068` adds `decision_option_set` and
 `decision_option_set_option` (one live set per `(tenant, kind, gate)`, a monotonic version, rows
-with `key`, `label`, `payload.outcome`). `decision_option_sets.set` authors a set; `.get` reads it.
-A `choice` question is built from the authored labels; the answer must be an authored key (`422
-laya_answer_not_in_options`); a case that needs a choice and has no set is `409 option_set_missing`.
-`decision_option` stays the per-decision record, written from the authored rows.
+with `key`, `label`, `payload.outcome`). `decision_option_sets.set` authors a set — the one row's
+version increments and its children are replaced in the same transaction — and `.get` reads it. A
+policy declares `meta.question_type = "choice"`; the case is then a `choice` over the authored
+labels, and an answer outside the authored keys is `422 laya_answer_not_in_options`. A declared
+choice with no set is `409 option_set_missing` — never free text. `decision_option` stays the
+per-decision record, written from the authored rows. The executor's gate uses the same builder, so
+the authored menu reaches an in-process run, not only an API caller.
 
-**P3 — the fail policy is applied and `fire_when` decides.** A failed verification or an unreadable
-answer is `Unavailable` → `gate_unavailable`, resolved through the existing
-`domain::ladder::unavailable(fail_policy, action)` (closed → refused; open → the action's outcome),
-never a pass. `decision_policy` gains a nullable `fire_when` in `0068`; a case that does not fire is
-not asked and records no decision. The executor consumes the action's outcome instead of
-re-deriving it, and makes exactly one laya request per gate.
+**P3 — the fail policy is applied and `fire_when` decides.** Two shapes, one policy. An **outage** —
+laya unreachable, no completed call recorded — leaves no verified exchange, so no decision row is
+written; the executor applies `domain::ladder::unavailable(fail_policy, action)` (closed → refused;
+open → the action's outcome: handover escalates, block refuses, annotate proceeds). A **recorded**
+call that completed without a readable answer is recorded by `ladder.evaluate` as `unavailable` with
+`meta.gate_unavailable = true`, under the same policy. Never a pass. `decision_policy` gains a
+nullable `fire_when` in `0068`, validated at authoring; a case that does not fire is not asked, no
+decision is written, and the step proceeds. The executor makes exactly one laya request per gate.
 
 **P4 — the proofs and the register.** The existing tests that post a verdict are rewritten to go
 through `ladder.case` → `ladder.precheck` → `ladder.evaluate`, never relaxed; new coverage in
