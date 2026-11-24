@@ -473,3 +473,119 @@ async fn the_runs_prior_steps_are_selected_and_isolated() {
         facts.prior_steps
     );
 }
+
+/// S21 step 8: only a process-driven step declares a Request. Its resolved input and the frozen
+/// process step's declaration are read; a synthetic run-level step's input is the executor
+/// envelope and must never become a request.
+#[tokio::test]
+async fn only_a_process_step_declares_a_request() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "prompt-request").await;
+
+    let process: Uuid = sqlx::query_scalar(
+        "INSERT INTO process (tenant_id, key, title) VALUES ($1, 'request', 'Request') RETURNING id",
+    )
+    .bind(seeded.tenant)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("process");
+    let process_step: Uuid = sqlx::query_scalar(
+        "INSERT INTO process_step
+             (tenant_id, process_id, position, kind, actor, action, input_template, gate_kind,
+              on_result, outputs, action_text)
+         VALUES ($1, $2, 2, 'agent', 'process_agent', 'agent.run', '{}'::jsonb, 'gate.precheck',
+                 'retry', '[\"output\",\"turns\"]'::jsonb, 'draft the summary of the card')
+         RETURNING id",
+    )
+    .bind(seeded.tenant)
+    .bind(process)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("process step");
+
+    // A process-driven step: its resolved input was persisted at claim.
+    let declared: Uuid = sqlx::query_scalar(
+        "INSERT INTO run_step
+             (tenant_id, run_id, process_step_id, position, attempt, action, status, input)
+         VALUES ($1, $2, $3, 2, 1, 'agent.run', 'running',
+                 '{\"messages\":[{\"role\":\"user\",\"content\":\"go\"}]}'::jsonb)
+         RETURNING id",
+    )
+    .bind(seeded.tenant)
+    .bind(seeded.run)
+    .bind(process_step)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("declared run step");
+    // A synthetic run-level step: its input is the executor envelope, never a request.
+    let synthetic: Uuid = sqlx::query_scalar(
+        "INSERT INTO run_step
+             (tenant_id, run_id, position, attempt, action, status, input)
+         VALUES ($1, $2, 1, 1, 'agent.run', 'running',
+                 '{\"job_binding_id\":\"00000000-0000-0000-0000-000000000001\",\"budget_usd\":2}'::jsonb)
+         RETURNING id",
+    )
+    .bind(seeded.tenant)
+    .bind(seeded.run)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("synthetic run step");
+
+    let mut tx = begin_scoped(&db.runtime, tenant(&seeded))
+        .await
+        .expect("scope");
+    let facts = facts_for_run_tx(
+        &mut tx,
+        tenant(&seeded),
+        seeded.run,
+        Some(declared),
+        &MemorySelector::default(),
+        None,
+    )
+    .await
+    .expect("declared facts");
+    tx.commit().await.expect("commit");
+    let step = facts.step.expect("the current step");
+    assert_eq!(
+        step.input,
+        Some(json!({"messages": [{"role": "user", "content": "go"}]}))
+    );
+    assert_eq!(step.outputs, vec!["output".to_owned(), "turns".to_owned()]);
+    assert_eq!(
+        step.action_text.as_deref(),
+        Some("draft the summary of the card")
+    );
+    assert_eq!(step.gate.as_deref(), Some("gate.precheck"));
+    assert_eq!(step.on_result.as_deref(), Some("retry"));
+    let request = step.request().expect("a declared request");
+    assert_eq!(
+        request["input"],
+        json!({"messages": [{"role": "user", "content": "go"}]})
+    );
+    assert_eq!(request["outputs"], json!(["output", "turns"]));
+
+    let mut tx = begin_scoped(&db.runtime, tenant(&seeded))
+        .await
+        .expect("scope");
+    let facts = facts_for_run_tx(
+        &mut tx,
+        tenant(&seeded),
+        seeded.run,
+        Some(synthetic),
+        &MemorySelector::default(),
+        None,
+    )
+    .await
+    .expect("synthetic facts");
+    tx.commit().await.expect("commit");
+    let step = facts.step.expect("the synthetic step");
+    assert!(step.input.is_none(), "{:?}", step.input);
+    assert!(step.outputs.is_empty());
+    assert!(step.action_text.is_none());
+    assert!(step.gate.is_none());
+    assert!(step.on_result.is_none());
+    assert!(
+        step.request().is_none(),
+        "the executor envelope is never a request"
+    );
+}

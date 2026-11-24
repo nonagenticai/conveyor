@@ -1351,7 +1351,7 @@ destinations below and rehomes the operator navigation around them.
 | Destination | Route (app) | Screens | Owning slice | Spec |
 |---|---|---|---|---|
 | **Organisation** | `/organisation` | departments/jobs, the job catalogue + release, bindings, the authority matrix, approval policies, decision-policy refinements, laya config, job performance and metering | T0, T2 | `organisation.spec.ts` |
-| **Procedures** | `/procedures` (V1: `/build/processes`, `/build/process-map`) | capability → procedure → step, SOP intake (single/batch), RDF/OWL and BPMN/Visio/draw.io intake, the PDDL step editor, the PKO workspace, knowledge-pack pairing, the process map, publish | T16 | `procedures.spec.ts` |
+| **Procedures** | `/procedures` (V1: `/build/processes`, `/build/process-map`) | capability → procedure → step, SOP intake (single/batch), RDF/OWL and BPMN/Visio/draw.io intake, the PDDL step workspace, the knowledge-pack pairing, the process map, publish | T16 | `procedures.spec.ts` |
 | **Authoring** | `/authoring` | intake queue (chat + documents), asset draft catalogue, review/publish, asset dependency status | T17 | `authoring.spec.ts` |
 | **Portfolio** | `/portfolio`, `/portfolio/:programme_id` | the in-flight set, programme shared config + dependency graph, WSJF backlog, cadence, capacity, per-project metering; the L1/L2 delivery view | T1, T10 | `portfolio.spec.ts` |
 | **Meetings** | `/meetings`, `/meetings/:id` | my invitations and seats; the meeting room (agenda with pre-reads and evidence, participants by department and seat, live positions and the rule's outcome); the asynchronous decision queue; minutes and action items; forum history, decision latency and meeting load | T19 | `meetings.spec.ts` |
@@ -1391,7 +1391,9 @@ built renders **not yet live**, names the missing action or slice, and keeps its
 link is honest. The board remains the work surface and the execution canvas remains the run
 surface; the run inspector keeps the provenance pattern (every stage's input → output is
 inspectable), gains the tools panel (tool version, credential alias, returned evidence) and drills
-to step and tool call (D52). Metering panels appear on Portfolio, Organisation and Measure.
+to step and tool call (D52). The tools panel is T13's ledger (`tool_calls.list`); until that
+action exists the inspector names the gap and carries the step's input, output and judge. Metering
+panels appear on Portfolio, Organisation and Measure.
 
 #### 10.5.3 States and the no-fixture rule
 

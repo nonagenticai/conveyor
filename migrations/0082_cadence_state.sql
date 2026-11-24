@@ -1,4 +1,4 @@
--- 0066_cadence_state.sql — `programme_cadence.state` is a closed set (SPEC_V2 §8.2; finding
+-- 0082_cadence_state.sql — `programme_cadence.state` is a closed set (SPEC_V2 §8.2; finding
 -- v1-p82-2, conveyor#526).
 --
 -- The column was unconstrained text and `cadences.update` wrote the caller's string verbatim, so

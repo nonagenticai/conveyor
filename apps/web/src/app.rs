@@ -22,17 +22,19 @@ use crate::screens::cockpit::Cockpit;
 use crate::screens::copilot::CopilotScreen;
 use crate::screens::decision_inbox::DecisionInboxScreen;
 use crate::screens::evals::{EvalDetail, Evals};
+use crate::screens::execution::ExecutionScreen;
 use crate::screens::improve::Improve;
 use crate::screens::improvement::Improvement;
 use crate::screens::inference::InferenceEndpoint;
 use crate::screens::jobs::JobsScreen;
+use crate::screens::meetings::{MeetingRoomScreen, MeetingsScreen};
 use crate::screens::members::Members;
 use crate::screens::models::{ModelDetail, ModelsScreen};
 use crate::screens::operations::Operations;
 use crate::screens::organisation::OrganisationScreen;
 use crate::screens::plan::PlanScreen;
 use crate::screens::platform::Platform;
-use crate::screens::procedures::Procedures;
+use crate::screens::procedures::ProceduresScreen;
 use crate::screens::process_map::{ProcessMapDetail, ProcessMapList};
 use crate::screens::processes::{ProcessDetail, ProcessesScreen};
 use crate::screens::project_types::ProjectTypesScreen;
@@ -178,7 +180,7 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/settings/inference") view=InferenceEndpoint/>
                             <Route path=path!("/settings/admin") view=AdminScreen/>
                             <Route path=path!("/copilot") view=CopilotScreen/>
-                            <Route path=path!("/procedures") view=Procedures/>
+                            <Route path=path!("/procedures") view=ProceduresScreen/>
                             <Route path=path!("/authoring") view=Authoring/>
                             <Route path=path!("/improve") view=Improve/>
                             <Route path=path!("/operations") view=Operations/>
@@ -191,7 +193,10 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/agents") view=AgentsScreen/>
                             <Route path=path!("/decisions") view=DecisionInboxScreen/>
                             <Route path=path!("/project-types") view=ProjectTypesScreen/>
+                            <Route path=path!("/execution") view=ExecutionScreen/>
                             <Route path=path!("/plan") view=PlanScreen/>
+                            <Route path=path!("/meetings") view=MeetingsScreen/>
+                            <Route path=path!("/meetings/:id") view=MeetingRoomScreen/>
                             <Route path=path!("/validation") view=ValidationScreen/>
                             <Route path=path!("/tools") view=ToolsGate/>
                             <Route path=path!("/design/adm") view=AdmGate/>
@@ -303,12 +308,6 @@ fn Sidebar() -> impl IntoView {
                 })}
                 <li><A href="/boards"><span class="nav-item">"Board"</span></A></li>
                 <li><A href="/runs"><span class="nav-item">"Runs"</span></A></li>
-                {move || ctx.has_action("portfolio.in_flight").then(|| view! {
-                    <li><A href="/portfolio"><span class="nav-item">"Portfolio"</span></A></li>
-                })}
-                {move || ctx.has_action("programmes.list").then(|| view! {
-                    <li><A href="/programme"><span class="nav-item">"Programme"</span></A></li>
-                })}
                 {move || ctx.has_action("industries.list").then(|| view! {
                     <li><A href="/organisation"><span class="nav-item">"Organisation"</span></A></li>
                 })}
@@ -318,20 +317,23 @@ fn Sidebar() -> impl IntoView {
                 {move || ctx.has_action("authoring.assets").then(|| view! {
                     <li><A href="/authoring"><span class="nav-item">"Authoring"</span></A></li>
                 })}
-                {move || ctx.has_action("projects.list").then(|| view! {
-                    <li><A href="/plan"><span class="nav-item">"Plan"</span></A></li>
-                })}
                 {move || ctx.has_action("metrics.flow").then(|| view! {
                     <li><A href="/improve"><span class="nav-item">"Improve"</span></A></li>
                 })}
                 {move || ctx.has_action("workers.list").then(|| view! {
                     <li><A href="/operations"><span class="nav-item">"Operations"</span></A></li>
                 })}
+                {move || ctx.has_action("runs.list").then(|| view! {
+                    <li><A href="/execution"><span class="nav-item">"Execution room"</span></A></li>
+                })}
                 {move || ctx.has_action("approvals.list").then(|| view! {
                     <li><A href="/approvals"><span class="nav-item">"Approvals"</span></A></li>
                 })}
                 {move || ctx.has_action("wbs.list").then(|| view! {
                     <li><A href="/plan"><span class="nav-item">"Plan"</span></A></li>
+                })}
+                {move || ctx.has_action("meetings.list").then(|| view! {
+                    <li><A href="/meetings"><span class="nav-item">"Meetings"</span></A></li>
                 })}
             </ul>
             <div class="grp">"Organisation"</div>

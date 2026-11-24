@@ -45,8 +45,8 @@
 </tr>
 <tr>
 <td>Procedures</td>
-<td><code>procedures.*</code>, <code>capabilities.*</code>, the process map, the published pack</td>
-<td><code>procedures.create|update|publish|retire</code>, <code>procedures.ingest_*</code>, <code>procedures.validate|review_source</code>, <code>capabilities.design|publish</code></td>
+<td><code>procedures.list|get</code>, <code>capabilities.list|get</code>, <code>processes.list|get</code>, <code>approvals.list</code>, the process map, the published pack</td>
+<td><code>procedures.create|update|publish|retire</code>, <code>procedures.ingest_sop|ingest_process|ingest_rdf</code>, <code>procedures.validate|review_source</code>, <code>approvals.request|decide</code> for the two publication gates; <code>capabilities.design|publish</code> are not registered (T16's ingest creates the capability)</td>
 </tr>
 <tr>
 <td>Authoring</td>
@@ -91,6 +91,7 @@
 </tbody>
 </table>
 <p>The read model for the delivery view is the existing <code>programme</code>/<code>work</code>/<code>measure</code> derivation at four levels (portfolio, programme, project, work package), exposed through the owning actions. The SSE topics are the existing <code>board:{id}</code>, <code>card:{id}</code>, <code>run:{id}</code> and <code>approval:{id}</code>; a screen without a topic polls explicitly.</p>
+<p>The <strong>Execution</strong> surface reads <code>runs.list|get</code> and writes nothing; the executor kind, <code>job_binding_id</code> and <code>release_hash</code> are not exposed by that read model (T0/T4/S21), and the tools panel waits on <code>tool_calls.list</code> (T13). The screen names both gaps and carries the step's input, output and judge as the provenance. The PKO workspace is not restored: the owner decision of 2026-11-19 replaced it with the knowledge-pack pairing (SPEC_V2 §5.6).</p>
 <h2 id="decisions">Decisions</h2>
 <ul>
 <li><strong>D64</strong> — the real UI is the app; the pack is the public site and the reviewed reference.</li>
@@ -101,7 +102,7 @@
 </ul>
 <h2 id="acceptance">Acceptance</h2>
 <ul>
-<li>The SPEC_V2 §12 T18 gate: every destination route exists with its spec; a signed-in tenant drives the portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; the coverage record reports <code>exists</code> only from a real route and its spec; no production screen renders a fixture.</li>
+<li>The SPEC_V2 §12 T18 gate: every destination route exists with its spec; a signed-in tenant drives the portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; the coverage record reports <code>exists</code> only from a real route and its spec, and a <code>*Gate</code> view is <code>extend</code> naming its owner even when its gate spec exists; no production screen renders a fixture.</li>
 <li>Each destination's Playwright spec asserts empty, error, happy and one refusal.</li>
 <li>The T12 organisation loop, driven from the UI, is the final spec.</li>
 </ul>

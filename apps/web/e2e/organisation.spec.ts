@@ -105,7 +105,9 @@ test("the organisation group's other destinations render", async ({ page }) => {
     ["/project-types", "Project types"],
   ] as const) {
     await page.goto(path);
-    await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+    // Name matching is a case-insensitive substring: the Decisions screen also has an
+    // "Recorded decisions" h2, so address the destination's own h1.
+    await expect(page.getByRole("heading", { name: heading, level: 1 })).toBeVisible();
     await expect(page.locator(".problem[role=alert]")).toHaveCount(0);
   }
 });

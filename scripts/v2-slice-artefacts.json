@@ -306,7 +306,7 @@
       "gap": "no V2 route exists in apps/web; the destinations are mock pages only"
     },
     "T19": {
-      "status": "proposed",
+      "status": "built",
       "tables": [
         "meeting_type",
         "meeting",
@@ -335,7 +335,7 @@
         "docs/plans/T19-decision-forums.md",
         "docs/SPEC_V2.md"
       ],
-      "gap": "plan and programme artefacts only; no meeting code"
+      "gap": null
     }
   }
 }

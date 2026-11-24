@@ -266,12 +266,49 @@ impl Catalog {
         owner
     }
 
+    /// Whether `alias` is chain-shared (declared by two or more enabled providers). Such an alias
+    /// has no single owner, so `alias_owner` returns `None` and it rides `default_chain` by design.
+    pub fn is_shared_alias(&self, alias: &str) -> bool {
+        self.shared_aliases.iter().any(|entry| entry == alias)
+    }
+
+    /// The single enabled provider that advertises `id` as one of its own model ids (its `model`
+    /// or its `models` list). Alias keys are [`Catalog::alias_owner`]'s. `None` when no provider
+    /// serves it or when two do — an ambiguous id must not pin.
+    pub fn model_id_owner(&self, id: &str) -> Option<&str> {
+        let mut owner = None;
+        for provider in self.enabled() {
+            if serves_model_id(provider, id) {
+                if owner.is_some() {
+                    return None;
+                }
+                owner = Some(provider.name.as_str());
+            }
+        }
+        owner
+    }
+
+    /// Whether ANY enabled provider advertises `id` as one of its own model ids.
+    pub fn any_provider_serves_model(&self, id: &str) -> bool {
+        self.enabled().any(|provider| serves_model_id(provider, id))
+    }
+
     /// Whether ANY provider (enabled or not) declares the alias — the distinction between
     /// "unknown name, use the chain" and "a catalog alias nothing can serve now".
     pub fn any_provider_declares(&self, alias: &str) -> bool {
         self.providers
             .iter()
             .any(|provider| provider.model_aliases.contains_key(alias))
+    }
+}
+
+/// Whether `provider` advertises `id` as one of its own model ids (never an alias key — those
+/// auto-pin through [`Catalog::alias_owner`]).
+fn serves_model_id(provider: &ProviderEntry, id: &str) -> bool {
+    if provider.models.is_empty() {
+        provider.model == id
+    } else {
+        provider.models.iter().any(|model| model == id)
     }
 }
 

@@ -1,4 +1,5 @@
--- 0068_authoring.sql — T17 (#526): the tenant-asset authoring family (SPEC_V2 §5.7, §10.4;
+-- 0064_authoring.sql — T17 (#87, ported from #526): the tenant-asset authoring family
+-- (SPEC_V2 §5.7, §10.4;
 -- finding v1-w3b-3).
 --
 -- An intake is the tenant's brief plus its documents; every asset the authoring pipeline

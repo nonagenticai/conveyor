@@ -66,6 +66,42 @@ impl Refusal {
             headers: Vec::new(),
         }
     }
+
+    /// Tell the caller how long to wait before retrying (whole seconds).
+    pub fn with_retry_after(mut self, seconds: u64) -> Self {
+        self.headers.push(("Retry-After", seconds.to_string()));
+        self
+    }
+}
+
+/// The model spellings that mean "the router picks a provider": an omitted model arrives as the
+/// schema default `gemma`, and the estate's older clients spell the same intent `default`.
+fn router_picks(model: &str) -> bool {
+    matches!(model.trim(), "" | "default" | "gemma")
+}
+
+/// The router's answer status for a provider failure: a shed slot and an upstream 429/503 are
+/// "temporarily unavailable" (503, with pacing); every other upstream failure is a 502.
+fn refusal_status(error: &UpstreamError) -> StatusCode {
+    match error {
+        UpstreamError::QueueRejected { .. } => StatusCode::SERVICE_UNAVAILABLE,
+        UpstreamError::Status {
+            status: 429 | 503, ..
+        } => StatusCode::SERVICE_UNAVAILABLE,
+        _ => StatusCode::BAD_GATEWAY,
+    }
+}
+
+/// Attach `Retry-After` to a 503 refusal, so the caller can pace its retry instead of guessing.
+fn paced(refusal: Refusal, error: &UpstreamError) -> Refusal {
+    if refusal.status != StatusCode::SERVICE_UNAVAILABLE {
+        return refusal;
+    }
+    refusal.with_retry_after(
+        error
+            .retry_after()
+            .unwrap_or(provider::SHED_RETRY_AFTER_SECS),
+    )
 }
 
 /// The refusal the pinned path returns when the SAME provider answers blank twice.
@@ -323,15 +359,14 @@ impl RouterService {
                         served_hop: None,
                     };
                 }
-                let status = if matches!(error, UpstreamError::QueueRejected { .. }) {
-                    StatusCode::SERVICE_UNAVAILABLE
-                } else {
-                    StatusCode::BAD_GATEWAY
-                };
-                Err(Refusal::detail(
-                    status,
-                    format!("Pinned provider '{name}' failed: {}", error.describe()),
-                    error.classification(),
+                let status = refusal_status(&error);
+                Err(paced(
+                    Refusal::detail(
+                        status,
+                        format!("Pinned provider '{name}' failed: {}", error.describe()),
+                        error.classification(),
+                    ),
+                    &error,
                 ))
             }
         };
@@ -472,8 +507,21 @@ impl RouterService {
             };
         }
 
+        // A model id exactly one enabled provider serves is that provider's answer: pin it, so a
+        // request for one model can never be answered by another provider's model.
+        if let Some(owner) = self.catalog.model_id_owner(&request.model) {
+            return Route::Pinned {
+                provider: owner.to_owned(),
+                model_override: Some(request.model.clone()),
+            };
+        }
+
         // A catalog alias nothing enabled can serve must not fall through to a different model.
-        if self.catalog.any_provider_declares(&request.model) {
+        // A shared alias is the documented exception: two or more enabled providers declare it,
+        // so it has no single owner and rides `default_chain` (catalog.rs § shared_aliases).
+        if self.catalog.any_provider_declares(&request.model)
+            && !self.catalog.is_shared_alias(&request.model)
+        {
             return Route::Refused(Refusal::detail(
                 StatusCode::SERVICE_UNAVAILABLE,
                 format!(
@@ -481,6 +529,26 @@ impl RouterService {
                     request.model
                 ),
                 "steering_alias_unavailable",
+            ));
+        }
+
+        // A name nothing in the catalog declares is not a request for "whichever provider is
+        // first": answering `claude-sonnet-5-5` with the local model is the silent substitution
+        // this refusal exists to prevent (measured 2026-11-19: 81 such calls, HTTP 200). The
+        // router-pick sentinels are the documented "you choose" spellings, and a shared alias
+        // rides the chain by design.
+        if !router_picks(&request.model)
+            && !self.catalog.is_shared_alias(&request.model)
+            && !self.catalog.any_provider_serves_model(&request.model)
+        {
+            return Route::Refused(Refusal::detail(
+                StatusCode::NOT_FOUND,
+                format!(
+                    "Unknown model: '{}'. No provider declares that alias; send a declared alias, \
+                     an X-Provider header, or omit the model for the default chain.",
+                    request.model
+                ),
+                "unknown_model",
             ));
         }
 
@@ -578,16 +646,15 @@ impl RouterService {
                             served_hop: None,
                         };
                     }
-                    let status = if matches!(error, UpstreamError::QueueRejected { .. }) {
-                        StatusCode::SERVICE_UNAVAILABLE
-                    } else {
-                        StatusCode::BAD_GATEWAY
-                    };
+                    let status = refusal_status(&error);
                     return CompletionOutcome {
-                        response: Err(Refusal::detail(
-                            status,
-                            format!("Pinned provider '{name}' failed: {}", error.describe()),
-                            error.classification(),
+                        response: Err(paced(
+                            Refusal::detail(
+                                status,
+                                format!("Pinned provider '{name}' failed: {}", error.describe()),
+                                error.classification(),
+                            ),
+                            &error,
                         )),
                         attempts,
                         served_hop: None,
@@ -666,15 +733,23 @@ impl RouterService {
             }
         }
         let response = match last {
-            Some(error) => Err(Refusal::detail(
-                StatusCode::SERVICE_UNAVAILABLE,
-                format!(
-                    "All providers failed. Last error: {}: {}",
-                    error.provider(),
-                    error.describe()
-                ),
-                error.classification(),
-            )),
+            Some(error) => {
+                let refusal = Refusal::detail(
+                    StatusCode::SERVICE_UNAVAILABLE,
+                    format!(
+                        "All providers failed. Last error: {}: {}",
+                        error.provider(),
+                        error.describe()
+                    ),
+                    error.classification(),
+                );
+                // Pace the caller only when the failure itself names a wait: an auth or schema
+                // failure will not be cured by retrying in five seconds.
+                Err(match error.retry_after() {
+                    Some(seconds) => refusal.with_retry_after(seconds),
+                    None => refusal,
+                })
+            }
             None => Err(Refusal::detail(
                 StatusCode::SERVICE_UNAVAILABLE,
                 "No providers available for this request",
@@ -774,15 +849,23 @@ impl RouterService {
             }
         }
         let response = match last {
-            Some(error) => Err(Refusal::detail(
-                StatusCode::SERVICE_UNAVAILABLE,
-                format!(
-                    "All providers failed. Last error: {}: {}",
-                    error.provider(),
-                    error.describe()
-                ),
-                error.classification(),
-            )),
+            Some(error) => {
+                let refusal = Refusal::detail(
+                    StatusCode::SERVICE_UNAVAILABLE,
+                    format!(
+                        "All providers failed. Last error: {}: {}",
+                        error.provider(),
+                        error.describe()
+                    ),
+                    error.classification(),
+                );
+                // Pace the caller only when the failure itself names a wait: an auth or schema
+                // failure will not be cured by retrying in five seconds.
+                Err(match error.retry_after() {
+                    Some(seconds) => refusal.with_retry_after(seconds),
+                    None => refusal,
+                })
+            }
             None => Err(Refusal::detail(
                 StatusCode::SERVICE_UNAVAILABLE,
                 "No providers available for this request",
@@ -949,6 +1032,19 @@ mod tests {
                             provider: self.name.clone(),
                             status: 500,
                             body: (*message).to_owned(),
+                            retry_after: None,
+                        }),
+                        "rate_limited" => Err(UpstreamError::Status {
+                            provider: self.name.clone(),
+                            status: 429,
+                            body: (*message).to_owned(),
+                            retry_after: Some(30),
+                        }),
+                        "unavailable" => Err(UpstreamError::Status {
+                            provider: self.name.clone(),
+                            status: 503,
+                            body: (*message).to_owned(),
+                            retry_after: None,
                         }),
                         "bad_request" => Err(UpstreamError::BadRequest {
                             provider: self.name.clone(),
@@ -1039,7 +1135,13 @@ default_chain: [pgx-local, deepseek]
     }
 
     fn service(answer: Result<(), (&'static str, &'static str)>) -> RouterService {
-        let catalog = catalog();
+        service_with(catalog(), answer)
+    }
+
+    fn service_with(
+        catalog: Catalog,
+        answer: Result<(), (&'static str, &'static str)>,
+    ) -> RouterService {
         let mut providers: BTreeMap<String, Arc<dyn Provider>> = BTreeMap::new();
         providers.insert(
             "pgx-local".to_owned(),
@@ -1055,10 +1157,23 @@ default_chain: [pgx-local, deepseek]
         }
     }
 
+    fn header<'a>(refusal: &'a Refusal, name: &str) -> Option<&'a str> {
+        refusal
+            .headers
+            .iter()
+            .find(|(key, _)| *key == name)
+            .map(|(_, value)| value.as_str())
+    }
+
     fn request(model: &str) -> ChatCompletionRequest {
         ChatCompletionRequest {
             enable_reasoning: false,
             frequency_penalty: None,
+            presence_penalty: None,
+            stop: None,
+            parallel_tool_calls: None,
+            chat_template_kwargs: None,
+            top_p: None,
             max_tokens: None,
             messages: vec![ChatMessage {
                 content: serde_json::json!("hi"),
@@ -1170,10 +1285,10 @@ default_chain: [pgx-local]
     }
 
     #[tokio::test]
-    async fn a_non_alias_model_rides_the_chain_and_a_failure_is_a_503() {
+    async fn a_router_pick_sentinel_rides_the_chain_and_a_failure_is_a_503() {
         let service = service(Err(("status", "boom")));
         let error = service
-            .complete(&request("some-worker-name"), None, None)
+            .complete(&request("default"), None, None)
             .await
             .response
             .expect_err("chain");
@@ -1185,6 +1300,94 @@ default_chain: [pgx-local]
                 .starts_with("All providers failed. Last error:")
         );
         assert_eq!(error.headers[0].1, "upstream_5xx");
+    }
+
+    #[tokio::test]
+    async fn an_undeclared_model_is_refused_instead_of_being_substituted() {
+        // Measured live 2026-11-19: 81 `claude-sonnet-5-5` calls were answered by the local model,
+        // HTTP 200. The refusal is the fix; no upstream is called at all.
+        let service = service(Ok(()));
+        let error = service
+            .complete(&request("claude-sonnet-5-5"), None, None)
+            .await
+            .response
+            .expect_err("404");
+        assert_eq!(error.status, StatusCode::NOT_FOUND);
+        assert_eq!(error.headers[0].1, "unknown_model");
+    }
+
+    #[tokio::test]
+    async fn a_shared_alias_rides_the_chain() {
+        // Catalog validation lets an alias two enabled providers declare ride the chain; the
+        // any_provider_declares refusal must not turn that into a 503.
+        let catalog = Catalog::from_yaml(
+            r#"
+providers:
+  - name: pgx-local
+    enabled: true
+    protocol: openai
+    endpoint: http://127.0.0.1:1/v1
+    model: local-llm
+    model_aliases:
+      tier-shared: local-llm
+  - name: deepseek
+    enabled: true
+    protocol: openai
+    endpoint: https://api.example.com/v1
+    model: deepseek-v4-flash
+    api_key_env: DEEPSEEK_KEY
+    model_aliases:
+      tier-shared: deepseek-v4-flash
+shared_aliases: [tier-shared]
+default_chain: [pgx-local, deepseek]
+"#,
+        )
+        .expect("catalog");
+        // Only pgx-local is registered, so the chain filters to it and answers.
+        let outcome = service_with(catalog, Ok(()))
+            .complete(&request("tier-shared"), None, None)
+            .await;
+        assert!(
+            outcome.response.is_ok(),
+            "a shared alias must ride the chain"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_shed_503_carries_retry_after() {
+        let service = service(Err(("queue", "shed")));
+        let error = service
+            .complete(&request("default"), None, None)
+            .await
+            .response
+            .expect_err("shed");
+        assert_eq!(error.status, StatusCode::SERVICE_UNAVAILABLE);
+        assert_eq!(header(&error, "Retry-After"), Some("5"));
+    }
+
+    #[tokio::test]
+    async fn an_upstream_429_is_a_503_with_its_own_retry_after() {
+        let service = service(Err(("rate_limited", "slow down")));
+        let error = service
+            .complete(&request("default"), None, None)
+            .await
+            .response
+            .expect_err("rate limited");
+        assert_eq!(error.status, StatusCode::SERVICE_UNAVAILABLE);
+        assert_eq!(header(&error, "Retry-After"), Some("30"));
+        assert_eq!(error.headers[0].1, "rate_limited");
+    }
+
+    #[tokio::test]
+    async fn a_pinned_upstream_503_is_paced_even_without_a_hint() {
+        let service = service(Err(("unavailable", "down")));
+        let error = service
+            .complete(&request("local-llm"), Some("pgx-local"), None)
+            .await
+            .response
+            .expect_err("503");
+        assert_eq!(error.status, StatusCode::SERVICE_UNAVAILABLE);
+        assert_eq!(header(&error, "Retry-After"), Some("5"));
     }
 
     #[tokio::test]
@@ -1431,7 +1634,7 @@ default_chain: [pgx-local]
             vec![("alpha", vec![Reply::Blank]), ("beta", vec![Reply::Usable])],
             None,
         )
-        .complete(&request("some-worker-name"), None, None)
+        .complete(&request("default"), None, None)
         .await;
         let response = outcome.response.expect("the next hop served");
         assert_eq!(response.served_provider.as_deref(), Some("beta"));
@@ -1443,7 +1646,7 @@ default_chain: [pgx-local]
         // One provider: the retry lands on the same provider, and a second blank ends it.
         let outcome =
             scripted_chain_service(vec![("alpha", vec![Reply::Blank, Reply::Blank])], None)
-                .complete(&request("some-worker-name"), None, None)
+                .complete(&request("default"), None, None)
                 .await;
         assert_eq!(outcome.attempts.len(), 2, "exactly one retry");
         let error = outcome.response.expect_err("a second blank is refused");
@@ -1469,7 +1672,7 @@ default_chain: [pgx-local]
             ],
             None,
         )
-        .complete(&request("some-worker-name"), None, None)
+        .complete(&request("default"), None, None)
         .await;
         assert_eq!(outcome.attempts.len(), 2);
         let error = outcome.response.expect_err("the second blank is refused");
@@ -1482,7 +1685,7 @@ default_chain: [pgx-local]
             vec![("alpha", vec![Reply::Blank]), ("beta", vec![Reply::Usable])],
             Some("alpha"),
         )
-        .complete(&request("some-worker-name"), None, None)
+        .complete(&request("default"), None, None)
         .await;
         let response = outcome
             .response
@@ -1501,9 +1704,7 @@ default_chain: [pgx-local]
             resolved_hop(0, "alpha", true),
             resolved_hop(1, "beta", true),
         ];
-        let outcome = service
-            .complete_policy(&hops, &request("some-worker-name"))
-            .await;
+        let outcome = service.complete_policy(&hops, &request("default")).await;
         let response = outcome.response.expect("the next hop served");
         assert_eq!(response.served_provider.as_deref(), Some("beta"));
         assert_eq!(outcome.attempts.len(), 2);
@@ -1517,9 +1718,7 @@ default_chain: [pgx-local]
         let service =
             scripted_chain_service(vec![("alpha", vec![Reply::Blank, Reply::Usable])], None);
         let hops = vec![resolved_hop(0, "alpha", false)];
-        let outcome = service
-            .complete_policy(&hops, &request("some-worker-name"))
-            .await;
+        let outcome = service.complete_policy(&hops, &request("default")).await;
         let response = outcome.response.expect("the retry served");
         assert_eq!(response.served_provider.as_deref(), Some("alpha"));
         assert_eq!(outcome.attempts.len(), 2);
@@ -1531,9 +1730,7 @@ default_chain: [pgx-local]
         let service =
             scripted_chain_service(vec![("alpha", vec![Reply::Blank, Reply::Blank])], None);
         let hops = vec![resolved_hop(0, "alpha", false)];
-        let outcome = service
-            .complete_policy(&hops, &request("some-worker-name"))
-            .await;
+        let outcome = service.complete_policy(&hops, &request("default")).await;
         assert_eq!(outcome.attempts.len(), 2);
         let error = outcome.response.expect_err("a second blank is refused");
         assert_eq!(error.status, StatusCode::BAD_GATEWAY);

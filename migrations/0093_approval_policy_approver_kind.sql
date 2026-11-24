@@ -1,4 +1,4 @@
--- 0078_approval_policy_approver_kind.sql — who may decide a gate, as tenant data.
+-- 0093_approval_policy_approver_kind.sql — who may decide a gate, as tenant data.
 --
 -- SPEC_V2 §5.4: an approver is a person by default. A tenant may authorise a non-human
 -- approver for a gate only by explicitly declaring that approver kind non-governance in the

@@ -4768,7 +4768,7 @@ window.installV2 = function (api, enterprise) {
           ? snapshotProjects().length
           : db.projects.length;
     return `<div class="brand"><span class="brand-mark">${I("layers")}</span><div><div class="brand-word">conveyor</div><div class="brand-sub">THE OPERATING SYSTEM FOR WORK</div></div></div><div class="tenant-switch"><span class="tenant-mark">N</span><span class="grow">Non-Agentic AI<small>Organisation workspace</small></span><span>⌄</span></div><nav>
-      <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("programme", "Programme definition", "shield")}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("contribute", "Contribute", "grid")}${N("plan", "Plan & WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
+      <div class="nav-group"><div class="nav-label">PORTFOLIO &amp; PLAN</div>${N("overview", "Programme control", "grid")}${N("portfolio", "Portfolio", "layers")}${N("programme", "Programme definition", "shield")}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("contribute", "Contribute", "grid")}${N("plan", "Plan & WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("meetings", "Meetings", "inbox")}${N("decisions", "Decision inbox", "inbox", pending())}${N("runs", "Run history", "clock")}</div>
       <div class="nav-group"><div class="nav-label">ORGANISATION</div>${N("organisation", "Organisation", "layers")}${N("jobs", "Jobs", "board", F.jobs.length)}${N("agents", "Agents", "agent")}${N("toolkits", "Tools", "tools")}${N("types", "Project types", "grid")}</div>
       <div class="nav-group"><div class="nav-label">PROCEDURES &amp; AUTHORING</div>${N("procedures", "Procedures", "flow")}${N("capabilities", "Capabilities", "layers")}${N("authoring", "Authoring", "book")}</div>
       <div class="nav-group"><div class="nav-label">GOVERN &amp; DESIGN</div>${N("assurance", "Assurance &amp; baselines", "shield")}${N("constraints", "Flow &amp; constraints", "branch")}${N("requirements", "Requirements", "file")}${N("principles", "Principles", "book")}${N("models", "Architecture &amp; UML", "model")}${N("adm", "Architecture capability", "shield")}${N("architecture", "System architecture", "model")}${N("documents", "Documents", "file")}</div>
@@ -8030,6 +8030,101 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
     }${protocol}</div>`;
   }
 
+  // T19: the decision forum. A meeting is a card, never a chat; the record is rows — agenda,
+  // attendance, positions and the linked approval's decision rows. This page is the design
+  // study's reference for the real `/meetings` destination (SPEC_V2 §6.8, D66).
+  function meetingsPage() {
+    const agenda = [
+      ["1", "approval", "The tranche-4 exit review", "baselines, benefit status", "sponsoring group", "decision"],
+      ["2", "register_item", "Risk: the only Postgres standby", "the register row, the last restore", "operations, architecture", "action"],
+      ["3", "asset", "Waiver: the T9 contract is unapproved", "the waiver, the compliance review", "architecture", "commitment"],
+      ["4", "cadence", "PI planning: the next increment", "the backlog by WSJF, capacity", "programme, engineering", "information"],
+    ];
+    const seats = [
+      ["chair", "governance_body · Architecture Board", "accepted"],
+      ["member", "job_binding · Enterprise architect", "accepted"],
+      ["member", "app_user · Head of operations", "accepted"],
+      ["observer", "job_binding · Audit", "tentative"],
+    ];
+    const positions = [
+      ["Enterprise architect", "approve", "The evidence is complete; the dissent is the standby risk."],
+      ["Head of operations", "approve_with_conditions", "Condition: the restore drill is booked before exit."],
+      ["Audit (observer)", "request_evidence", "Recorded, never counted."],
+    ];
+    return `<div class="page enterprise">${heading(
+      "Meetings",
+      "The decision forum: agenda items resolve existing approvals, seats record typed positions, and the outcome is arithmetic over both.",
+      route("Portfolio", "portfolio", "", "layers"),
+      "PORTFOLIO &amp; PLAN",
+    )}${note(
+      "A meeting is a card, never a chat. Its DoD is every agenda item closed with an outcome and the minutes published. The LLM drafts the pre-read and the minutes; it never selects an item, decides, infers a position or marks attendance.",
+    )}<div class="grid two">${panel(
+      "The room",
+      table(
+        ["#", "Resolved", "Item", "Evidence", "Departments", "Outcome"],
+        agenda.map(
+          (row) =>
+            `<tr>${row.map((cell, i) => `<td>${i === 0 ? `<span class="mono">${E(cell)}</span>` : E(cell)}</td>`).join("")}</tr>`,
+        ),
+      ),
+    )}${panel(
+      "Seats",
+      table(
+        ["Seat", "Participant", "Response"],
+        seats.map(
+          (row) =>
+            `<tr><td>${E(row[0])}</td><td>${E(row[1])}</td><td>${E(row[2])}</td></tr>`,
+        ),
+      ),
+    )}</div><div class="grid two">${panel(
+      "Positions — the live rows",
+      table(
+        ["Participant", "Stance", "Rationale"],
+        positions.map(
+          (row) =>
+            `<tr><td>${E(row[0])}</td><td>${E(row[1])}</td><td>${E(row[2])}</td></tr>`,
+        ),
+      ) +
+        note(
+          "One live position per participant per item; a changed stance supersedes the old row. An observer's position is kept and never counted. Every qualifying seat becomes one <span class='mono'>approval_decision</span> row with <span class='mono'>via='meeting'</span>.",
+        ),
+    )}${panel(
+      "The outcome arithmetic",
+      flow([
+        ["Quorum &amp; required departments", "missing · inquorate"],
+        ["The meeting's rule", "unanimous · majority · chair"],
+        ["The approval's policy", "dual control · evidence · P4"],
+        ["The stricter result wins", "rows, dissent and minutes"],
+      ]) + kv([
+        ["Agenda conversion", "75% — three of four items decided"],
+        ["Quorum-miss rate", "0% — every required department seated"],
+        ["Decision latency", "36 minutes from open to the first decision"],
+        ["Commitment slippage", "0 — the condition is due before exit"],
+        ["Action closure", "one action card, open"],
+        ["Person-hours per decision", "1.5 — four seats × 1.2 h ÷ 3 decisions"],
+        ["Decisions per meeting", "3"],
+      ]),
+    )}</div>${panel(
+      "The framework forums",
+      table(
+        ["Framework", "Procedure", "Convener", "Agenda sources", "Rule"],
+        [
+          ["MSP", "programme board", "sponsoring group / SRO", "register, benefit-at-risk, tranche decisions", "chair"],
+          ["MSP", "tranche review", "sponsoring group", "baselines, benefit status, risk register", "unanimous or chair"],
+          ["TOGAF", "Architecture Board sitting", "governance_body", "contracts, compliance, waivers, change requests", "majority"],
+          ["SAFe", "PI planning", "programme manager", "backlog by WSJF, capacity", "majority"],
+          ["SAFe", "inspect &amp; adapt", "coach", "retro findings, lessons, kata candidates", "majority"],
+        ].map(
+          (row) =>
+            `<tr>${row.map((cell) => `<td>${E(cell)}</td>`).join("")}</tr>`,
+        ),
+      ) +
+        note(
+          "The same <span class='mono'>meeting_type</span> mechanism serves all three frameworks. A forum whose instances produce no decision over a cadence cycle is flagged and retired.",
+        ),
+    )}</div>`;
+  }
+
   const pages = {
     portfolio,
     programme: programmeDefinitionPage,
@@ -8047,6 +8142,7 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
     operations,
     toolkits,
     metering,
+    meetings: meetingsPage,
     // The architecture map is a design-study destination, not a V2 aggregate: it
     // draws the spec and the destination map. Its markup lives in architecture.js.
     architecture: () => window.ArchitecturePack.page(api),
@@ -8100,6 +8196,7 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
     operations: "Operations",
     toolkits: "Tools",
     metering: "Metering",
+    meetings: "Meetings",
     architecture: "System architecture",
     documents: "Documents",
   };

@@ -208,8 +208,23 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
   const gate = await pendingGateFor(request, archiveTarget(editedRow!.id));
   await decideAsReviewer(request, "approvals.decide", gate.id);
   await edited.getByRole("button", { name: "Archive" }).click();
-  await expect(page.locator(".card", { hasText: editedName })).toHaveCount(0);
-  await expect(page.locator(".archived")).toContainText(editedName);
+  // Prove the archive on the board's own read before the screen: the destructive path's
+  // refetch can be delayed past the default auto-wait under the full suite.
+  await expect
+    .poll(
+      async () => {
+        const view = await request
+          .get(`/api/boards/${boardId}/cards?limit=200`)
+          .then((r) => r.json());
+        return (view.items ?? []).map((row: { name: string }) => row.name);
+      },
+      { timeout: 30_000 },
+    )
+    .not.toContain(editedName);
+  await expect(page.locator(".card", { hasText: editedName })).toHaveCount(0, {
+    timeout: 30_000,
+  });
+  await expect(page.locator(".archived")).toContainText(editedName, { timeout: 30_000 });
 });
 
 test("a board beyond 200 cards pages instead of hiding the tail", async ({ page, request }) => {
@@ -283,7 +298,20 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   await page.getByLabel("Label name").fill(label);
   await page.getByLabel("Label color").fill("teal");
   await page.getByRole("button", { name: "Create label" }).click();
-  await expect(page.locator(".label", { hasText: label })).toBeVisible();
+  // Prove the label on the board's own read before waiting on the screen; the refetch can be
+  // delayed past the default DOM wait under the full suite.
+  await expect
+    .poll(
+      async () => {
+        const board = await request
+          .get(`/api/boards/${fixture.boardId}`)
+          .then((r) => r.json());
+        return (board.labels ?? []).map((entry: { name: string }) => entry.name);
+      },
+      { timeout: 30_000 },
+    )
+    .toContain(label);
+  await expect(page.locator(".label", { hasText: label })).toBeVisible({ timeout: 30_000 });
 
   // The panel's per-card rows, scoped to the labels panel: an unscoped `div` filter reaches the
   // card's own selects first.

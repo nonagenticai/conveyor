@@ -421,6 +421,9 @@ pub struct UsageRow {
     pub priced_calls: i64,
     pub unpriced_calls: i64,
     pub runs: i64,
+    /// The third D52 source (T19, #606): accepted attendance × closed duration, at the same
+    /// grain as tokens and tool calls.
+    pub participant_hours: f64,
 }
 
 /// One run step's spend.
@@ -639,12 +642,92 @@ pub async fn usage_by_level_tx(
             priced_calls: 0,
             unpriced_calls: 0,
             runs: 0,
+            participant_hours: 0.0,
         });
         row.tool_calls += tool_calls;
         row.tool_cost_usd = cost;
         row.runs = row.runs.max(runs);
     }
+    // The third source: a closed meeting's accepted seats × its actual duration (capped by the
+    // type's timebox). Run/step/call have no meeting grain, so they carry no hours.
+    if !matches!(
+        level,
+        MeteringLevel::Run | MeteringLevel::Step | MeteringLevel::Call
+    ) {
+        let hours = format!(
+            "WITH attended AS (
+                 SELECT m.id,
+                        NULL::uuid AS run_id,
+                        NULL::uuid AS run_step_id,
+                        b.project_id,
+                        CASE WHEN a.participant_kind = 'job_binding'
+                             THEN a.participant_id END AS job_binding_id,
+                        p.programme_id,
+                        coalesce(dep.name, 'unattributed') AS department,
+                        EXTRACT(EPOCH FROM least(m.closed_at - m.opens_at, t.timebox))
+                            / 3600.0 AS hours
+                   FROM meeting m
+                   JOIN meeting_type t ON t.id = m.meeting_type_id
+                        AND t.tenant_id = m.tenant_id
+                   JOIN meeting_attendance a ON a.meeting_id = m.id
+                        AND a.tenant_id = m.tenant_id
+                        AND a.response_state = 'accepted' AND a.seat <> 'observer'
+                   JOIN card c ON c.id = m.card_id AND c.tenant_id = m.tenant_id
+                   JOIN board b ON b.id = c.board_id AND b.tenant_id = m.tenant_id
+                   JOIN project p ON p.id = b.project_id AND p.tenant_id = m.tenant_id
+                   LEFT JOIN job_binding jb ON a.participant_kind = 'job_binding'
+                        AND jb.id = a.participant_id AND jb.tenant_id = m.tenant_id
+                   LEFT JOIN job_department jd ON jd.job_id = jb.job_id AND jd.is_primary
+                   LEFT JOIN department dep ON dep.id = coalesce(a.department_id, jd.department_id)
+                        AND dep.tenant_id = m.tenant_id
+                  WHERE m.tenant_id = $1 AND m.status = 'closed'
+                    AND m.closed_at IS NOT NULL AND m.opens_at IS NOT NULL
+                    AND m.closed_at >= $2 AND m.closed_at < $3{filter_clause}
+             )
+             SELECT {key} AS key,
+                    coalesce(sum(hours), 0)::double precision AS participant_hours
+               FROM attended
+              GROUP BY 1
+              ORDER BY 1"
+        );
+        for (key, participant_hours) in
+            fetch_hours_level(&mut *conn, &hours, tenant, since, until, filter, has_filter).await?
+        {
+            let row = rows.entry(key.clone()).or_insert_with(|| UsageRow {
+                key,
+                calls: 0,
+                tool_calls: 0,
+                tokens: 0,
+                cost_usd: 0.0,
+                tool_cost_usd: 0.0,
+                priced_calls: 0,
+                unpriced_calls: 0,
+                runs: 0,
+                participant_hours: 0.0,
+            });
+            row.participant_hours = participant_hours;
+        }
+    }
     Ok(rows.into_values().collect())
+}
+
+async fn fetch_hours_level(
+    conn: &mut PgConnection,
+    sql: &str,
+    tenant: TenantId,
+    since: DateTime<Utc>,
+    until: DateTime<Utc>,
+    filter: Option<Uuid>,
+    has_filter: bool,
+) -> Result<Vec<(String, f64)>, MetricsStoreError> {
+    let mut query = sqlx::query_as::<_, (String, f64)>(AssertSqlSafe(sql.to_owned()))
+        .bind(tenant.as_uuid())
+        .bind(since)
+        .bind(until);
+    if has_filter {
+        query = query.bind(filter);
+    }
+    Ok(query.fetch_all(&mut *conn).await?)
 }
 
 #[derive(Debug, sqlx::FromRow)]
@@ -688,6 +771,7 @@ async fn fetch_inference_level(
             priced_calls: row.priced_calls,
             unpriced_calls: row.unpriced_calls,
             runs: row.runs,
+            participant_hours: 0.0,
         })
         .collect())
 }

@@ -58,6 +58,18 @@ fn chat_content_schema() -> RefOr<Schema> {
         .into()
 }
 
+/// `stop`: one stop string, or an array of them.
+fn stop_schema() -> RefOr<Schema> {
+    AnyOf::builder()
+        .item(
+            Object::builder().schema_type(SchemaType::Type(utoipa::openapi::schema::Type::String)),
+        )
+        .item(Array::builder().items(
+            Object::builder().schema_type(SchemaType::Type(utoipa::openapi::schema::Type::String)),
+        ))
+        .into()
+}
+
 /// `tool_choice`: a control word, a forced-function object, or null.
 fn tool_choice_schema() -> RefOr<Schema> {
     AnyOf::builder()
@@ -111,6 +123,23 @@ pub struct ChatCompletionRequest {
     #[serde(default)]
     #[schema(minimum = -2.0, maximum = 2.0)]
     pub frequency_penalty: Option<f64>,
+    #[serde(default)]
+    #[schema(minimum = -2.0, maximum = 2.0)]
+    pub presence_penalty: Option<f64>,
+    /// One stop string or an array of them; forwarded verbatim.
+    #[serde(default)]
+    #[schema(schema_with = stop_schema)]
+    pub stop: Option<serde_json::Value>,
+    /// Whether the model may answer with several tool calls at once; forwarded verbatim.
+    #[serde(default)]
+    pub parallel_tool_calls: Option<bool>,
+    /// vLLM chat-template kwargs (e.g. `{"enable_thinking": false}`). A provider whose catalog
+    /// entry sets `force_chat_template_kwargs` overrides `enable_thinking`; other keys pass through.
+    #[serde(default)]
+    pub chat_template_kwargs: Option<AnyObject>,
+    #[serde(default)]
+    #[schema(minimum = 0.0, maximum = 1.0)]
+    pub top_p: Option<f64>,
     /// Also accepted as `max_completion_tokens` (the alias pydantic-ai and openai-python send).
     #[serde(default, alias = "max_completion_tokens")]
     #[schema(minimum = 1, maximum = 16384)]
@@ -143,6 +172,9 @@ pub struct ChatCompletionRequest {
 /// One message in the prompt or the model's answer.
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct ChatMessage {
+    /// Text, a list of content parts, or null. Absent is null: an OpenAI client replaying an
+    /// assistant tool call may omit it (gh #620).
+    #[serde(default)]
     #[schema(schema_with = chat_content_schema)]
     pub content: serde_json::Value,
     #[serde(default)]

@@ -653,10 +653,12 @@ async fn decide(
     // come from a `laya.classify` replay of EXACTLY that body (S06's verified-answer rule).
     // An executor-authored judge document can never hash to the ladder's, so the gate path is
     // prepare → classify → evaluate, and the classify key is what evaluate verifies.
+    // The case also carries the same release Request the prompt rendered (S21 step 8, CONTRACT
+    // §26): one builder (`release_request`) feeds both, so L1 and L2 cannot disagree.
     let case_facts = json!({
+        "request": conveyor_domain::prompt::release_request(anatomy),
         "run_id": run.id,
         "card_id": run.card_id,
-        "job_key": anatomy.job_key,
         "release_hash": binding.release_hash,
         "output": out.output,
         "turns": out.turns,

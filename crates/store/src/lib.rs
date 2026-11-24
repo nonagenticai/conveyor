@@ -62,8 +62,7 @@ pub mod architecture;
 // approval at all, and whether its requester may decide it. A missing row is the strict default.
 pub mod approval_policy;
 pub mod audit;
-// T17 (#526, SPEC_V2 §5.7, §10.4): tenant asset authoring — the intake brief, the asset
-// drafts it produces, the human review gate and the one-published-per-(kind, key) release.
+// T17 (#87, SPEC_V2 §5.7): the authoring intake, draft, review and publish lifecycle.
 pub mod authoring;
 pub mod benchmark;
 pub mod board;
@@ -103,6 +102,7 @@ pub mod licence;
 pub mod list;
 pub mod listen;
 // S15: work-package memory — the hot rows and the derived digest.
+pub mod meetings;
 pub mod memory;
 // T11 (SPEC_V2 §7.5, §11.9; issue #84): the metrics read models, the versioned threshold
 // configuration and the reconciliation record — no metric is stored (D37).

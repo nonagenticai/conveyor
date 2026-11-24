@@ -3910,7 +3910,7 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let project = seed_parity_project(pg, ctx).await;
             ctx.push("architecture.maturity_plan", project);
         }
-        // ── tenant-asset authoring (SPEC_V2 §5.7) ───────────────────────────────────────
+        // ── tenant-asset authoring (SPEC_V2 §5.7, T17 #87) ─────────────────────────────
         "authoring.draft" => {
             let intake = seed_parity_authoring_intake(pg, ctx).await;
             ctx.push("authoring.draft", intake);
@@ -6815,6 +6815,139 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             201,
         ),
+        // ── T19 (#606): the meetings family ────────────────────────────────────────────────
+        // An unknown id is the deterministic refusal on both transports; the meeting tests own
+        // the aggregate's lifecycle. `schedule` refuses before the list lookup because the type
+        // has no policy to create.
+        expecting(plain("meetings.list", json!({"limit": 5}), None), 200),
+        expecting(
+            plain(
+                "meetings.get",
+                json!({"meeting_id": uuid::Uuid::nil()}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.open",
+                json!({"meeting_id": uuid::Uuid::nil()}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.invite",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "participant_kind": "app_user",
+                    "participant_id": alice,
+                    "seat": "member"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.respond",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "participant_kind": "app_user",
+                    "participant_id": alice,
+                    "response": "accepted"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.agenda_add",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "resolved_kind": "approval",
+                    "resolved_id": uuid::Uuid::nil(),
+                    "evidence_refs": []
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.position",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "agenda_item_id": uuid::Uuid::nil(),
+                    "participant_kind": "app_user",
+                    "participant_id": alice,
+                    "stance": "approve",
+                    "surface": "web"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.defer",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "agenda_item_id": uuid::Uuid::nil(),
+                    "reason": "parity"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.close_item",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "agenda_item_id": uuid::Uuid::nil()
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.close",
+                json!({"meeting_id": uuid::Uuid::nil()}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.minutes_publish",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "approval_id": uuid::Uuid::nil(),
+                    "title": "Parity",
+                    "lines": []
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.schedule",
+                json!({
+                    "title": "Parity",
+                    "list_id": uuid::Uuid::nil(),
+                    "meeting_type_key": "parity_unknown",
+                    "convener_kind": "app_user",
+                    "convener_id": alice
+                }),
+                None,
+            ),
+            422,
+        ),
     ];
 
     out.extend(spine_samples());
@@ -7024,10 +7157,82 @@ fn pm_samples() -> Vec<Sample> {
 
 /// T2's decision-ladder samples, in their own frame for the same stack reason as
 /// [`spine_samples`]. The sample contract is unchanged.
-/// The tenant-asset authoring family (SPEC_V2 §5.7/§10.4): intake → draft → review → publish,
-/// plus the asset read. Each prepare builds its own rows per round, so both transports execute
-/// against a real precondition; the review gate is a fixture, its identity is what the action
-/// reads (the refusal paths live in `crates/actions/tests/authoring.rs`).
+/// A T17 authoring intake for the parity samples.
+async fn seed_parity_authoring_intake(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    scoped(pg, ctx, async |conn| {
+        store::authoring::intake_create_tx(
+            conn,
+            ctx.tenant,
+            ctx.alice_user,
+            "Parity authoring intake",
+            &json!([]),
+        )
+        .await
+        .expect("authoring intake")
+        .id
+    })
+    .await
+}
+
+/// A draft department and the approved human `authoring.review` gate naming it.
+async fn seed_parity_authoring_draft(pg: &support::Pg, ctx: &Ctx) -> (Uuid, Uuid) {
+    let intake = seed_parity_authoring_intake(pg, ctx).await;
+    let asset = scoped(pg, ctx, async move |conn| {
+        store::authoring::asset_draft_tx(
+            conn,
+            ctx.tenant,
+            ctx.alice_user,
+            intake,
+            "department",
+            &format!("parity-dept-{}", Uuid::now_v7().simple()),
+            &json!({"name": "Parity department"}),
+            &[],
+        )
+        .await
+        .expect("authoring draft")
+        .id
+    })
+    .await;
+    let approval = scoped(pg, ctx, async move |conn| {
+        let approval = store::approval::insert_approval_tx(
+            conn,
+            ctx.tenant,
+            &store::approval::NewApproval {
+                run_id: None,
+                card_id: None,
+                project_id: None,
+                eval_id: None,
+                gate: "authoring.review".to_owned(),
+                kind: "gate".to_owned(),
+                required_decisions: 1,
+                requested_by: None,
+                expires_at: None,
+                callback_url: None,
+                correlation_id: None,
+                meta: json!({"target": asset.to_string()}),
+            },
+        )
+        .await
+        .expect("authoring.review gate");
+        store::approval::record_decision_tx(
+            conn,
+            ctx.tenant,
+            approval.id,
+            &conveyor_domain::Decision::approve(ctx.alice_user),
+            false,
+        )
+        .await
+        .expect("approve the authoring.review gate");
+        approval.id
+    })
+    .await;
+    (asset, approval)
+}
+
+/// The tenant-asset authoring family (SPEC_V2 §5.7/§10.4, T17 #87): intake → draft → review →
+/// publish, plus the asset read. Each prepare builds its own rows per round; the review gate is
+/// a fixture, its identity is what the action reads (the refusal paths live in
+/// `crates/actions/tests/authoring.rs` and `asset_review.rs`).
 fn authoring_samples() -> Vec<Sample> {
     vec![
         expecting(

@@ -1,10 +1,35 @@
 import { expect, test } from "./fixture";
 
-// SPEC_V2 §10.5/§5.7 — the live Authoring destination. `authoring.assets` is the catalogue
-// read; intake, draft, review and publish are governed actions, never this screen's write. A
-// chat message or document can never grant a tool, widen a ceiling or change an approval policy.
+import { invoke } from "./helpers";
 
-test("the authoring destination lists the asset catalogue", async ({ page }) => {
+// SPEC_V2 §10.5/§5.7 — the live Authoring destination. `authoring.assets` is the catalogue
+// read; intake, draft, review and publish are governed actions, never this screen's write. This
+// spec creates its own draft through the real actions, so a fixture cannot satisfy the row.
+
+let sequence = 0;
+function uniqueKey(): string {
+  sequence += 1;
+  return `live-dept-${Date.now()}-${sequence}`;
+}
+
+test("the authoring destination shows the live catalogue", async ({ page, request }) => {
+  const key = uniqueKey();
+  const intake = await invoke<{ id: string }>(request, "authoring.intake", {
+    brief: "The live-catalogue spec's intake",
+    sources: [],
+  });
+  const draft = await invoke<{ id: string; key: string; status: string }>(
+    request,
+    "authoring.draft",
+    {
+      intake_id: intake.id,
+      kind: "department",
+      key,
+      payload: { title: "Live department" },
+    },
+  );
+  expect(draft.status).toBe("draft");
+
   await page.goto("/authoring");
   await expect(page.getByRole("heading", { name: "Authoring", exact: true })).toBeVisible();
 
@@ -17,11 +42,8 @@ test("the authoring destination lists the asset catalogue", async ({ page }) => 
     page.getByRole("heading", { name: "From intake to publication", exact: true }),
   ).toBeVisible();
 
-  const rows = page.locator("table tbody tr");
-  const empty = page.getByText("No asset in this tenant carries that kind and status.");
-  const count = await rows.count();
-  const emptyVisible = await empty.isVisible().catch(() => false);
-  expect(count > 0 || emptyVisible, "authoring shows rows or the empty state").toBeTruthy();
+  // The row this test created through the real action: live data, not a fixture.
+  await expect(page.locator("table tbody tr", { hasText: key })).toHaveCount(1);
 });
 
 test("the authoring screen has no horizontal page scroll at 1280 and 390", async ({ page }) => {

@@ -1,4 +1,4 @@
--- 0077_benefit_measurement_typed.sql — a baseline/post reading is a number and a unit
+-- 0092_benefit_measurement_typed.sql — a baseline/post reading is a number and a unit
 -- (SPEC_V2 §8.3; rework finding v1-p83-2, P1).
 --
 -- `benefit_measurement` (0074) replaced the transition's timestamps with readings, but a

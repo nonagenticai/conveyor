@@ -259,34 +259,36 @@ pub async fn facts_for_run_tx(
 }
 
 /// The Request source for a run with no published procedure: the release's own definition.
+///
+/// The facts come from the one `release_request` builder the run-level judge also uses
+/// (S21 step 8, ADR 0016), so the prompt and the judge render the same request.
 fn request_facts(anatomy: &ReleaseAnatomy) -> ProcessFacts {
-    let mut description = String::new();
-    if let Some(charter) = anatomy.charter.as_deref() {
-        description.push_str(charter);
-    }
-    if let Some(procedure) = anatomy.procedure_ref.as_deref() {
+    let request = conveyor_domain::prompt::release_request(anatomy);
+    let member = |name: &str| {
+        request
+            .get(name)
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned()
+    };
+    let mut description = member("charter");
+    let procedure = member("procedure_ref");
+    if !procedure.is_empty() {
         if !description.is_empty() {
             description.push('\n');
         }
         description.push_str(&format!("request: {procedure}"));
     }
-    if let Some(authority) = anatomy.authority.as_deref() {
+    let authority = member("authority");
+    if !authority.is_empty() {
         if !description.is_empty() {
             description.push('\n');
         }
         description.push_str(&format!("authority: {authority}"));
     }
     ProcessFacts {
-        key: if anatomy.job_key.is_empty() {
-            "job".to_owned()
-        } else {
-            anatomy.job_key.clone()
-        },
-        title: if anatomy.title.is_empty() {
-            anatomy.job_key.clone()
-        } else {
-            anatomy.title.clone()
-        },
+        key: member("job_key"),
+        title: member("title"),
         description,
         version: 0,
         steps: vec![(1, "agent.run".to_owned(), anatomy.gate.clone())],
@@ -342,33 +344,66 @@ async fn read_step(
     let Some(id) = run_step_id else {
         return Ok(None);
     };
-    let row: Option<(i32, i32, String, Option<String>)> = sqlx::query_as(
-        "SELECT position, attempt, action, node_id FROM run_step
-          WHERE tenant_id = $1 AND id = $2",
-    )
-    .bind(tenant.as_uuid())
-    .bind(id)
-    .fetch_optional(&mut *conn)
-    .await?;
-    let Some((position, attempt, action, node_id)) = row else {
-        return Ok(None);
-    };
-    // `on_result` lives on the process step, joined only when this row is process-driven.
-    let on_result: Option<String> = sqlx::query_scalar(
-        "SELECT s.on_result FROM run_step r
-           JOIN process_step s ON s.id = r.process_step_id AND s.tenant_id = r.tenant_id
+    // One read: the run's row plus the frozen process step's declaration when the row came from
+    // a published procedure. `process_step_id IS NULL` (a synthetic run-level `agent.run` step)
+    // means no declared request — its `run_step.input` is the executor envelope, never a request
+    // (S21 step 8, ADR 0016). The join is a primary-key lookup; no index is added.
+    #[allow(clippy::type_complexity)]
+    let row: Option<(
+        i32,
+        i32,
+        String,
+        Option<String>,
+        Option<Uuid>,
+        Value,
+        Option<Value>,
+        Option<String>,
+        Option<String>,
+        Option<String>,
+    )> = sqlx::query_as(
+        "SELECT r.position, r.attempt, r.action, r.node_id, r.process_step_id, r.input,
+                s.outputs, s.action_text, s.gate_kind, s.on_result
+           FROM run_step r
+           LEFT JOIN process_step s
+             ON s.id = r.process_step_id AND s.tenant_id = r.tenant_id
           WHERE r.tenant_id = $1 AND r.id = $2",
     )
     .bind(tenant.as_uuid())
     .bind(id)
     .fetch_optional(&mut *conn)
     .await?;
+    let Some((
+        position,
+        attempt,
+        action,
+        node_id,
+        process_step_id,
+        input,
+        outputs,
+        action_text,
+        gate,
+        on_result,
+    )) = row
+    else {
+        return Ok(None);
+    };
+    let declared = process_step_id.is_some();
+    let outputs: Vec<String> = outputs
+        .and_then(|value| value.as_array().cloned())
+        .unwrap_or_default()
+        .into_iter()
+        .filter_map(|value| value.as_str().map(str::to_owned))
+        .collect();
     Ok(Some(StepFacts {
         position,
         attempt,
         action,
         node_id,
-        on_result,
+        on_result: declared.then_some(on_result).flatten(),
+        action_text: declared.then_some(action_text).flatten(),
+        input: declared.then_some(input),
+        outputs: if declared { outputs } else { Vec::new() },
+        gate: declared.then_some(gate).flatten(),
     }))
 }
 

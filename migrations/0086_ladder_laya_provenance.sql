@@ -1,4 +1,4 @@
--- 0071_ladder_laya_provenance.sql — an L1 decision names the verified laya call behind it
+-- 0086_ladder_laya_provenance.sql — an L1 decision names the verified laya call behind it
 -- (SPEC_V2 §7.2; finding v1-w1c-3).
 --
 -- Before this migration `ladder.evaluate` took the answer, confidence, probabilities and
