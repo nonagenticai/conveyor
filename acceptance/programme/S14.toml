@@ -2,8 +2,7 @@
 key = "S14"
 name = "Cutover — deploy, seed, rehearse, decommission fr / RM / Planka"
 gate = "S14 is accepted when the native gate passes — every used id in `parity/native.tsv` resolves to an `action:`, `test:`, `replacement:` or `dropped:` disposition and the check refuses a missing or unknown row — and the R0–R7 cutover receipts exist; the plan records `docs/cutover/` as absent at HEAD."
-gate_checks = ["S14-project", "S14-baseline", "S14-charter", "S14-closure-outputs", "S14-contract", "S14-review", "S14-closure-gate", "S14-waivers", "S14-pi-cadence", "S14-pi-plan", "S14-pi-objectives", "S14-lessons", "S14-wsjf", "S14-demo-credits", "S14-product"]
-
+gate_checks = ["S14-project", "S14-baseline", "S14-charter", "S14-contract", "S14-review", "S14-waivers", "S14-pi-cadence", "S14-pi-plan", "S14-pi-objectives", "S14-lessons", "S14-wsjf", "S14-demo-credits", "S14-product"]
 [[check]]
 id = "S14-project"
 check = "project"
@@ -35,12 +34,6 @@ assert gates.get("charter")=="approved", gates
 '''
 
 [[check]]
-id = "S14-closure-outputs"
-check = "closure_outputs"
-severity = "P0"
-description = "the declared closure outputs are declared and published"
-
-[[check]]
 id = "S14-contract"
 check = "contract"
 severity = "P0"
@@ -51,12 +44,6 @@ id = "S14-review"
 check = "review"
 severity = "P0"
 description = "the Phase-G review cites a published standing delegation"
-
-[[check]]
-id = "S14-closure-gate"
-check = "closure_gate"
-severity = "P0"
-description = "the closure gate was decided by an approver other than its requester"
 
 [[check]]
 id = "S14-waivers"

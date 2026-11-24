@@ -2,8 +2,7 @@
 key = "T18"
 name = "The real V2 UI"
 gate = "a signed-in tenant drives portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports exists only from a real route and a present spec; no production screen renders a fixture"
-gate_checks = ["T18-project", "T18-baseline", "T18-closure-outputs", "T18-contract", "T18-review", "T18-closure-gate", "T18-waivers", "T18-pi-cadence", "T18-pi-plan", "T18-pi-objectives", "T18-wsjf", "T18-demo-credits", "T18-lessons", "T18-product", "T18-coverage"]
-
+gate_checks = ["T18-project", "T18-baseline", "T18-contract", "T18-review", "T18-waivers", "T18-pi-cadence", "T18-pi-plan", "T18-pi-objectives", "T18-wsjf", "T18-demo-credits", "T18-lessons", "T18-product", "T18-coverage"]
 [[check]]
 id = "T18-project"
 check = "project"
@@ -19,12 +18,6 @@ severity = "P0"
 description = "the scope baseline is approved; the close gate reads the approved row"
 
 [[check]]
-id = "T18-closure-outputs"
-check = "closure_outputs"
-severity = "P0"
-description = "the declared closure outputs are declared and published"
-
-[[check]]
 id = "T18-contract"
 check = "contract"
 severity = "P0"
@@ -35,12 +28,6 @@ id = "T18-review"
 check = "review"
 severity = "P0"
 description = "the Phase-G review cites a published standing delegation"
-
-[[check]]
-id = "T18-closure-gate"
-check = "closure_gate"
-severity = "P0"
-description = "the closure gate was decided by an approver other than its requester"
 
 [[check]]
 id = "T18-waivers"

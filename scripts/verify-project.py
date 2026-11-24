@@ -1182,6 +1182,42 @@ def run_project(
         failures.append(f"allow (P0): {detail}")
         if not quiet:
             print(f"FAIL  allow  {detail}")
+    # An active project cannot gate on closure: the rework factory records no closure for a
+    # project it keeps active, so such a manifest is unsatisfiable by construction (measured
+    # 2026-11-24: 16 manifests, 15 red). A project that truly closes declares status = "closed".
+    closure_gated = [
+        str(check.get("id") or "?")
+        for check in manifest.get("check", [])
+        if str(check.get("check") or "") in {"closure_outputs", "closure_gate"}
+    ]
+    declared_status = next(
+        (
+            str(check.get("status") or "")
+            for check in manifest.get("check", [])
+            if str(check.get("check") or "") == "project"
+        ),
+        "",
+    )
+    if declared_status == "active" and closure_gated:
+        detail = (
+            "the manifest declares an active project but gates on "
+            f"{', '.join(closure_gated)}; an active project records no closure — "
+            'declare status = "closed" or drop the closure checks'
+        )
+        checks.append(
+            {
+                "id": "manifest-status",
+                "check": None,
+                "kind": "manifest",
+                "severity": "P0",
+                "description": "an active project does not gate on closure",
+                "result": "fail",
+                "detail": detail,
+            }
+        )
+        failures.append(f"manifest-status (P0): {detail}")
+        if not quiet:
+            print(f"FAIL  manifest-status  {detail}")
     for index, check in enumerate(manifest.get("check", []), start=1):
         identifier = str(check.get("id") or f"check-{index}")
         name = str(check.get("check") or "")
@@ -1442,6 +1478,26 @@ expires = "2027-02-18"
         for row in refused["checks"]
     ):
         failures.append("the refused [[allow]] block was not recorded as a finding")
+
+    # An active project that gates on closure is refused as a manifest error: the factory never
+    # records a closure for a project it keeps active, so such a manifest is unsatisfiable.
+    active_manifest = workdir / "TEST-active-closure.toml"
+    active_manifest.write_text(
+        manifest.read_text().replace(
+            '[[check]]\nid = "project"\ncheck = "project"',
+            '[[check]]\nid = "project"\ncheck = "project"\nstatus = "active"',
+        )
+    )
+    active_refused = run_project(
+        "TEST", snapshot / "data", active_manifest, workdir / "evidence", quiet=True
+    )
+    if active_refused["verdict"] != "red":
+        failures.append("an active manifest gating on closure cleared the verdict")
+    if not any(
+        row.get("id") == "manifest-status" and row.get("result") == "fail"
+        for row in active_refused["checks"]
+    ):
+        failures.append("the active/closure contradiction was not recorded as a finding")
 
     # The gate contract: an active or closed project's gate is discharged only by named
     # checks in the same manifest that run and pass.

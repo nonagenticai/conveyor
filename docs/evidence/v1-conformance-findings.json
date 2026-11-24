@@ -1698,13 +1698,13 @@
     },
     {
      "path": "crates/actions/src/coach.rs",
-     "line": 1064,
-     "quote": "                let opened = crate::kata::kata_open("
+     "line": 1348,
+     "quote": "                let (kata, candidate) = crate::kata::coach_open("
     },
     {
      "path": "crates/actions/src/coach.rs",
-     "line": 1085,
-     "quote": "                store::coach::set_kata_candidate_tx(&mut *tx, ctx.tenant, interruption.id, id)"
+     "line": 1365,
+     "quote": "                store::coach::set_kata_candidate_tx("
     }
    ],
    "failure_scenario": "A systemic `conveyor_defect` opens a kata that is an ordinary document-composing agent run bound to the target project's card and tenant. It can compose and comment but cannot measure, cannot open its mandatory adoption approval, and any write it is later granted runs under the target tenant's autonomy. Every systemic signal yields a document, never a measured, adopted change.",
@@ -2424,7 +2424,7 @@
    "owner_project": "PLATFORM",
    "resolved_by": {
     "commit": "415a9e440d321c863615c20a130106e6212245fd",
-    "test": "crates/actions/tests/kata_gate.rs",
+    "test": "crates/actions/tests/kata_union.rs",
     "evidence": "The kata family is now real: `kata.open|observe|analyse|propose|measure|adopt|propagate|close` plus the `kata.get|list` reads are registered ActionSpecs (registry 12/12 at 527, 504->514 internal; the served-spec lock carries all ten operations and --check-lock is 0), backed by migration 0067 (kata, kata_candidate, kata_measurement, kata_propagation). The Improve destination reads `kata.list` into its live queue. The five \u00a712 T5 gates are proven through the action surface in crates/actions/tests/kata_gate.rs (9/9): unmeasurable kata refused, one open kata per signature, held-out split only, prediction before measurement, and a person other than the kata's opener OR MEASURER decides adoption \u2014 the measurer limb is pinned by crates/store/tests/kata.rs::the_kata_measurer_cannot_decide_its_adoption (store 9/9), which fails if that limb is removed. The seeded process key `kata.open` and the action now coexist (different registries)."
    }
   },
@@ -3312,8 +3312,8 @@
     },
     {
      "path": "crates/actions/src/channel/mod.rs",
-     "line": 79,
-     "quote": "    \"runs.create\","
+     "line": 246,
+     "quote": "            &authority(MCP, \"runs.create\", false),"
     },
     {
      "path": "docs/evidence/S06b-agent-task.md",
@@ -4832,8 +4832,8 @@
     },
     {
      "path": "crates/actions/src/broker.rs",
-     "line": 560,
-     "quote": "                422 => \"check_failed\","
+     "line": 585,
+     "quote": "                200..=299 => \"ok\","
     }
    ],
    "failure_scenario": "A tool has had no call for a cycle; the report lists it as zero_use and nothing retires or unbinds it, so stale tools stay bound indefinitely. A backend changes under its contract; every call is ledgered check_failed and no kata is opened, so the drift is a silent per-call failure.",
@@ -5250,8 +5250,8 @@
     },
     {
      "path": "crates/store/src/tool.rs",
-     "line": 195,
-     "quote": "            AND k.status = 'published'"
+     "line": 980,
+     "quote": "          WHERE t.tenant_id = $1 AND t.status = 'published' AND k.status = 'published'"
     }
    ],
    "failure_scenario": "A procedure step explicitly searches through the retrieval toolkit. The toolkit is draft, so the broker answers 409 tool_not_ready before any network call; the live, every-job retrieval estate has no callable tool and tools.probe never reports it, because an unpublished toolkit is not probed.",
@@ -5376,8 +5376,8 @@
     },
     {
      "path": "crates/store/src/tool.rs",
-     "line": 129,
-     "quote": "     k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, t.idempotency, \\"
+     "line": 136,
+     "quote": "     t.idempotency, t.timeout_secs, t.redact, t.handler_action, t.verify, t.source_id, \\"
     }
    ],
    "failure_scenario": "A destination silently renames response fields; the pinned tool version holds no output contract, so the broker passes the changed body to the run and nothing can detect drift from what was published.",

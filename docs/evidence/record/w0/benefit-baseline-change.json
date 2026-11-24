@@ -1,0 +1,14 @@
+{
+ "snapshot_sha": "fe36ca35c3b9d444ba7e15822a6d033524b5e75b",
+ "change": "record the measured baseline and its evidence on the seven benefit profiles",
+ "profiles": [
+  "B1",
+  "B2",
+  "B3",
+  "B4",
+  "B5",
+  "B6",
+  "B7"
+ ],
+ "reason": "the profile baselines carried definitions but no evidence field; the readings themselves are the existing benefit_measurement rows (B1-B6) and the pre-T19 zero (B7)"
+}

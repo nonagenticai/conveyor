@@ -2,8 +2,7 @@
 key = "S20"
 name = "Eval hillclimb"
 gate = "S20 is accepted when its gate is green: one RLS-forced table with `0029` in the ledger and no spend column, no round before the plan is signed, the train/test split immovable by a climb, a grader fix re-grading stored transcripts into a new run, the comparison refusing across versions, graders or splits, the revert rules in the domain machine, a fourth content round refused after a stall, the cost walk's gates registered before round 1, the final report naming the winner, the served surface matching the lock, and `rbuild --gate`."
-gate_checks = ["S20-project", "S20-baseline", "S20-charter", "S20-closure-outputs", "S20-contract", "S20-review", "S20-closure-gate", "S20-waivers", "S20-pi-cadence", "S20-pi-plan", "S20-pi-objectives", "S20-lessons", "S20-wsjf", "S20-demo-credits", "S20-product"]
-
+gate_checks = ["S20-project", "S20-baseline", "S20-charter", "S20-contract", "S20-review", "S20-waivers", "S20-pi-cadence", "S20-pi-plan", "S20-pi-objectives", "S20-lessons", "S20-wsjf", "S20-demo-credits", "S20-product"]
 [[check]]
 id = "S20-project"
 check = "project"
@@ -35,12 +34,6 @@ assert gates.get("charter")=="approved", gates
 '''
 
 [[check]]
-id = "S20-closure-outputs"
-check = "closure_outputs"
-severity = "P0"
-description = "the declared closure outputs are declared and published"
-
-[[check]]
 id = "S20-contract"
 check = "contract"
 severity = "P0"
@@ -51,12 +44,6 @@ id = "S20-review"
 check = "review"
 severity = "P0"
 description = "the Phase-G review cites a published standing delegation"
-
-[[check]]
-id = "S20-closure-gate"
-check = "closure_gate"
-severity = "P0"
-description = "the closure gate was decided by an approver other than its requester"
 
 [[check]]
 id = "S20-waivers"

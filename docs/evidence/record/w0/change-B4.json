@@ -1,0 +1,7 @@
+{
+ "snapshot_sha": "fe36ca35c3b9d444ba7e15822a6d033524b5e75b",
+ "benefit": "B4",
+ "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+ "baseline_id": "01a1ff3e-51c4-75b1-9db1-a2f729dd10b8",
+ "reason": "B4's baseline is the outside-contribution count from the merged-PR authors; this change records that reading with the measurement row that proves it. No value changes."
+}

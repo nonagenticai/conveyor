@@ -2,8 +2,7 @@
 key = "S21"
 name = "Message construction"
 gate = "S21 is accepted when a step whose recipe requires `procedure` and whose run has none fails by name before a model call, the same recipe and the same facts compile byte-identically, changing the card changes the hash while changing an unrelated tenant's card does not, an over-budget section refuses with the measured size and never truncates, and the prompt audit can name the compiled text it audited by `(prompt_ref, prompt_sha256)`."
-gate_checks = ["S21-project", "S21-baseline", "S21-charter", "S21-closure-outputs", "S21-contract", "S21-review", "S21-closure-gate", "S21-waivers", "S21-pi-cadence", "S21-pi-plan", "S21-pi-objectives", "S21-lessons", "S21-wsjf", "S21-demo-credits", "S21-product"]
-
+gate_checks = ["S21-project", "S21-baseline", "S21-charter", "S21-contract", "S21-review", "S21-waivers", "S21-pi-cadence", "S21-pi-plan", "S21-pi-objectives", "S21-lessons", "S21-wsjf", "S21-demo-credits", "S21-product"]
 [[check]]
 id = "S21-project"
 check = "project"
@@ -35,12 +34,6 @@ assert gates.get("charter")=="approved", gates
 '''
 
 [[check]]
-id = "S21-closure-outputs"
-check = "closure_outputs"
-severity = "P0"
-description = "the declared closure outputs are declared and published"
-
-[[check]]
 id = "S21-contract"
 check = "contract"
 severity = "P0"
@@ -51,12 +44,6 @@ id = "S21-review"
 check = "review"
 severity = "P0"
 description = "the Phase-G review cites a published standing delegation"
-
-[[check]]
-id = "S21-closure-gate"
-check = "closure_gate"
-severity = "P0"
-description = "the closure gate was decided by an approver other than its requester"
 
 [[check]]
 id = "S21-waivers"
