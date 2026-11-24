@@ -325,6 +325,11 @@
   },
   {
    "id": "v1-p75-6",
+   "resolved_by": {
+    "commit": "fbf2405fbd913947ad0fee96060eb6a3785cfcb4",
+    "test": "crates/actions/tests/tool_destinations.rs::billing_summary_is_the_ledger_figure; crates/actions/tests/metrics.rs::an_unpriced_period_refuses_an_exact_reconciliation",
+    "evidence": "cargo-guard test -p conveyor-actions --test metrics --test tool_destinations: 20 passed on ce0ef5e7 (rebased here as fbf2405f, same content); the summary counts the unpriced call and reconcile refuses 422 unpriced_calls"
+   },
    "area": "\u00a77.5",
    "standard": "SPEC",
    "spec": "\u00a77.5",
@@ -2795,6 +2800,11 @@
   },
   {
    "id": "v1-w4b-6",
+   "resolved_by": {
+    "commit": "fbf2405fbd913947ad0fee96060eb6a3785cfcb4",
+    "test": "crates/actions/tests/metrics.rs::reconciliation_is_exact_or_opens_an_incident",
+    "evidence": "cargo-guard test -p conveyor-actions --test metrics: 13 passed on ce0ef5e7 (rebased here as fbf2405f, same content); metrics.reconciliation returns the recorded periods with their recomputed verdict, incident link and trend"
+   },
    "area": "\u00a714/R1",
    "standard": "SPEC",
    "spec": "P10, \u00a77.5, T11",
