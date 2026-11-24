@@ -681,6 +681,34 @@ const REGISTER_COLUMNS: &str = "id, project_id, programme_id, kind, code, title,
                                 baseline_ref, review_at, response, meta, version, created_at, \
                                 updated_at";
 
+/// The declared §5.5 link document with every array empty: the column's default, and the value
+/// an omitted `links` stores.
+pub fn empty_register_links() -> Value {
+    serde_json::json!({ "cards": [], "requirements": [], "decisions": [] })
+}
+
+/// The document the register writers persist (SPEC_V2 §5.5). A legacy bare array is the old
+/// `[]` default or the benefit citation; its entries move under `requirements`, exactly as 0098
+/// normalises stored rows, and each entry keeps its own `kind`. Every other non-conforming
+/// value becomes the empty document: an internal caller has no client to refuse, and the
+/// column's CHECK would otherwise fail the whole transaction.
+fn register_links_document(links: &Value) -> Value {
+    let Some(map) = links.as_object() else {
+        let mut document = empty_register_links();
+        if let Some(items) = links.as_array() {
+            document["requirements"] = Value::Array(items.clone());
+        }
+        return document;
+    };
+    let mut document = empty_register_links();
+    for key in ["cards", "requirements", "decisions"] {
+        if let Some(items) = map.get(key).and_then(Value::as_array) {
+            document[key] = Value::Array(items.clone());
+        }
+    }
+    document
+}
+
 /// A new register row.
 #[derive(Clone, Debug, Default)]
 pub struct NewRegisterItem {
@@ -752,6 +780,7 @@ pub async fn insert_register_tx(
     if new.kind == "change" {
         validate_change(new.meta.get("impact"), new.baseline_ref)?;
     }
+    let links = register_links_document(&new.links);
     let sql = format!(
         "INSERT INTO project_register_item
             (tenant_id, project_id, programme_id, kind, code, title, body, owner_job_id, status,
@@ -772,7 +801,7 @@ pub async fn insert_register_tx(
         .bind(&new.severity)
         .bind(&new.probability)
         .bind(new.impact)
-        .bind(&new.links)
+        .bind(&links)
         .bind(new.baseline_ref)
         .bind(new.review_at)
         .bind(&new.response)
@@ -888,6 +917,7 @@ pub async fn update_register_tx(
     {
         validate_change(meta.get("impact"), current.baseline_ref)?;
     }
+    let links = links.map(register_links_document);
     let sql = format!(
         "UPDATE project_register_item SET
             programme_id = coalesce($4, programme_id), status = coalesce($5, status),
@@ -913,7 +943,7 @@ pub async fn update_register_tx(
         .bind(probability)
         .bind(owner_job_id)
         .bind(impact)
-        .bind(links)
+        .bind(links.as_ref())
         .bind(review_at)
         .bind(response)
         .bind(meta)
@@ -2400,7 +2430,8 @@ pub async fn approved_change_for_baseline_tx(
 }
 
 /// Append the profile to the change row's links, so the citation reads from both sides. The
-/// `NOT links @>` guard makes a repeated update idempotent; the row's version moves with it.
+/// entry lives under the declared `requirements` array (§5.5); each entry keeps its `kind`, and
+/// the `@>` guard makes a repeated update idempotent. The row's version moves with it.
 async fn cite_benefit_on_change_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -2410,8 +2441,14 @@ async fn cite_benefit_on_change_tx(
     let link = serde_json::json!([{ "kind": "benefit", "id": benefit_id.to_string() }]);
     sqlx::query(
         "UPDATE project_register_item
-            SET links = links || $3::jsonb, version = version + 1, updated_at = now()
-          WHERE tenant_id = $1 AND id = $2 AND NOT (links @> $3::jsonb)",
+            SET links = jsonb_set(
+                    links,
+                    '{requirements}',
+                    coalesce(links->'requirements', '[]'::jsonb) || $3::jsonb,
+                    true),
+                version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2
+            AND NOT (coalesce(links->'requirements', '[]'::jsonb) @> $3::jsonb)",
     )
     .bind(tenant.as_uuid())
     .bind(change_id)

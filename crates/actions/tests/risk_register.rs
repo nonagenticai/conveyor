@@ -123,7 +123,11 @@ async fn create_risk(
         "impact": 4,
         "owner_job_id": owner,
         "response": "Weekly vendor checkpoint and a fallback supplier",
-        "links": [{"kind": "objective", "ref": "reduce cycle time"}]
+        "links": {
+            "cards": [],
+            "requirements": [{"kind": "objective", "ref": "reduce cycle time"}],
+            "decisions": []
+        }
     });
     if review {
         input["review_at"] = json!("2026-12-01");
@@ -155,7 +159,7 @@ async fn a_programme_risk_has_no_project() {
         "{body}"
     );
     assert!(
-        risk["links"]
+        risk["links"]["requirements"]
             .as_array()
             .is_some_and(|links| !links.is_empty()),
         "a risk keeps its links: {body}"
@@ -233,7 +237,11 @@ async fn a_register_row_has_exactly_one_parent() {
                 "impact": 5,
                 "owner_job_id": owner,
                 "review_at": "2026-12-01",
-                "links": [{"kind": "objective", "ref": "x"}]
+                "links": {
+                    "cards": [],
+                    "requirements": [{"kind": "objective", "ref": "x"}],
+                    "decisions": []
+                }
             }),
             None,
             None,
@@ -296,7 +304,7 @@ async fn a_risk_update_keeps_the_risk_complete() {
         "INSERT INTO project_register_item
             (tenant_id, programme_id, kind, title, probability, impact, owner_job_id, links)
          VALUES ($1, $2::uuid, 'risk', 'Legacy incomplete risk', 'low', 1, $3::uuid,
-                 '[{\"kind\":\"objective\",\"ref\":\"y\"}]'::jsonb)
+                 '{\"cards\": [], \"requirements\": [{\"kind\": \"objective\", \"ref\": \"y\"}], \"decisions\": []}'::jsonb)
          RETURNING id",
     )
     .bind(seeded.tenant_id)
@@ -411,7 +419,11 @@ async fn a_risk_update_corrects_probability_owner_and_links() {
                 "id": risk,
                 "probability": "high",
                 "owner_job_id": corrected_owner,
-                "links": [{"kind": "objective", "ref": "corrected link"}],
+                "links": {
+                    "cards": [],
+                    "requirements": [{"kind": "objective", "ref": "corrected link"}],
+                    "decisions": []
+                },
             }),
             Some("\"1\""),
             None,
@@ -426,7 +438,9 @@ async fn a_risk_update_corrects_probability_owner_and_links() {
         json!(corrected_owner.to_string()),
         "{body}"
     );
-    let links = corrected["links"].as_array().expect("links stay an array");
+    let links = corrected["links"]["requirements"]
+        .as_array()
+        .expect("links keep the declared requirements array");
     assert_eq!(links.len(), 1, "{body}");
     assert_eq!(links[0]["ref"], "corrected link", "{body}");
 
@@ -459,7 +473,7 @@ async fn a_risk_update_that_empties_its_links_is_refused() {
         .invoke(
             "registers.update",
             TOKEN,
-            json!({"id": risk, "links": []}),
+            json!({"id": risk, "links": {"cards": [], "requirements": [], "decisions": []}}),
             Some("\"1\""),
             None,
             None,
@@ -482,7 +496,7 @@ async fn a_risk_update_that_empties_its_links_is_refused() {
         .await;
     assert_eq!(status, 200, "{read}");
     assert!(
-        output(&read)["links"]
+        output(&read)["links"]["requirements"]
             .as_array()
             .is_some_and(|links| !links.is_empty()),
         "a refused update must not write: {read}"
