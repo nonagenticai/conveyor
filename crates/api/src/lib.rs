@@ -425,9 +425,11 @@ mod tests {
         // #655 (T17b) adds one internal read (`authoring.intakes`): 564 -> 565.
         // S21 step 10 (#656) adds `ladder.case`, `decision_option_sets.get|set` and
         // `ladder.precheck`: 565 -> 569.
+        // S21 step 11 (#697) adds `organisation_layers.get|set` for the release knowledge
+        // layers: 569 -> 571.
         assert_eq!(
             registry.len(),
-            569,
+            571,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \

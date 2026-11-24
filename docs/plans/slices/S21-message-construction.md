@@ -821,9 +821,10 @@ defects; ADR 0011:77 deferred the first as "a policy choice", and the owner has 
 `park`), validated at authoring (`422 invalid_policy_meta`). The executor's `Gate` carries the
 recorded `decision_id` it already extracts (`internal_agent.rs:842`) and the policy's choice; the
 `(None, None)` arm calls `crate::ladder::apply_draft_tx` in the finish transaction with the service
-ctx, then `finish_succeeded`. A cardless run attaches nothing and records `apply_skipped: no_card`;
-an apply that refuses fails the run `draft_apply_invalid` rather than leaving a half-applied draft.
-`park` is exactly today's behaviour.
+ctx, then `finish_succeeded`. An `internal_agent` run is always carded — the dispatcher refuses a
+cardless one `capability_not_ready` before the executor — and the executor's `apply_skipped:
+no_card` branch is defence in depth. An apply that refuses fails the run `draft_apply_invalid`
+rather than leaving a half-applied draft. `park` is exactly today's behaviour.
 
 **P2 — no model call without compiled text and a hash.** An active `internal_agent` must name a
 `prompt_ref` that resolves to an active prompt in the tenant: the domain's `validate_agent_config`,

@@ -62,13 +62,41 @@ async fn seed_executor_with(
         .iter()
         .map(|name| (*name).to_owned())
         .collect();
+    // SPEC_V2 §7.7: an active executor must name a resolvable prompt, so the fixture carries one.
+    // It is a workflow node, not a process step, so `agent@1`'s required process section would
+    // refuse; one required `system` section compiles anywhere.
+    sqlx::query(
+        "INSERT INTO prompt (tenant_id, key, version, status, title)
+         VALUES ($1, 'resolved_exec', 1, 'active', 'Resolved executor prompt')",
+    )
+    .bind(seeded.tenant.as_uuid())
+    .execute(&mut *tx)
+    .await
+    .expect("insert prompt");
+    let (prompt_id,): (Uuid,) = sqlx::query_as(
+        "SELECT id FROM prompt WHERE tenant_id = $1 AND key = 'resolved_exec' AND version = 1",
+    )
+    .bind(seeded.tenant.as_uuid())
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prompt id");
+    sqlx::query(
+        "INSERT INTO prompt_section
+             (tenant_id, prompt_id, position, source_kind, required, template)
+         VALUES ($1, $2, 1, 'system', true, 'You are a resolved test executor.')",
+    )
+    .bind(seeded.tenant.as_uuid())
+    .bind(prompt_id)
+    .execute(&mut *tx)
+    .await
+    .expect("insert prompt section");
     let (agent_id,): (Uuid,) = sqlx::query_as(
         // A `process_agent` must name the process it runs (0035's CHECK); this fixture is a
         // generic executor, so it declares the tool-agent role.
         "INSERT INTO capability_agent
-             (tenant_id, capability_id, key, role, status, model_ref, allowed_actions,
+             (tenant_id, capability_id, key, role, status, model_ref, prompt_ref, allowed_actions,
               max_iterations, timeout_secs)
-         VALUES ($1, $2, 'agent', 'tool_agent', 'active', 'resolved-model', $3, 3, 60)
+         VALUES ($1, $2, 'agent', 'tool_agent', 'active', 'resolved-model', 'resolved_exec@1', $3, 3, 60)
          RETURNING id",
     )
     .bind(seeded.tenant.as_uuid())
@@ -876,5 +904,34 @@ async fn a_bound_run_without_tools_call_gets_no_broker_tool() {
         names,
         vec!["workflows.list"],
         "a binding without tools.call does not widen the agent's surface"
+    );
+}
+
+/// P2.4 (S21 step 11, issue #697): an active executor with no prompt cannot buy a call. The row
+/// is the pre-guard shape — written before the create/activate refusal existed.
+#[tokio::test]
+async fn a_run_with_no_compiled_prompt_makes_no_call() {
+    let (pg, seeded, running) = fixture().await;
+    let _router = ROUTER.lock().await;
+    let (base, models, _bodies) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
+    let (_capability, agent) = seed_executor(&pg, &seeded).await;
+    sqlx::query("UPDATE capability_agent SET prompt_ref = NULL WHERE tenant_id = $1 AND id = $2")
+        .bind(seeded.tenant.as_uuid())
+        .bind(agent)
+        .execute(&pg.super_pool)
+        .await
+        .expect("clear the prompt");
+    let workflow = published_agent_workflow(&running).await;
+    let project = project(&running).await;
+    let run = start_workflow_run(&running, &project, &workflow, Some(agent)).await;
+
+    drive(&pg, &seeded, &run).await;
+    assert_eq!(run_status(&pg, &seeded, &run).await, "failed");
+    let error = step_error(&pg, &seeded, &run).await.unwrap_or_default();
+    assert!(error.contains("capability_not_ready"), "{error}");
+    assert!(
+        models.lock().expect("models").is_empty(),
+        "zero model calls without compiled text"
     );
 }

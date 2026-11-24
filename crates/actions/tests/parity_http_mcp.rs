@@ -3798,6 +3798,21 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample
         },
         {
+            // S21 step 11 (#697): the release knowledge layers are authorable and readable.
+            let mut sample = plain("organisation_layers.set", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "level": "industry",
+                    "industry_id": ctx.industry_id,
+                    "kind": "parity_style",
+                    "value": "plain",
+                    "required": false
+                })
+            });
+            sample
+        },
+        plain("organisation_layers.list", json!({}), None),
+        {
             let mut sample = plain("job_bindings.list", json!({}), None);
             sample.input = Box::new(|ctx: &Ctx| json!({"job_id": ctx.org_job_id}));
             sample

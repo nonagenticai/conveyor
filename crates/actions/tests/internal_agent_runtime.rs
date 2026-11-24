@@ -1916,3 +1916,183 @@ async fn the_judge_state_carries_the_release_request() {
         "the judge sees the charter: {state}"
     );
 }
+
+/// Flip the seeded `gate.precheck` policy's `on_accept` declaration.
+async fn set_on_accept(pg: &support::Pg, seeded: &support::Seeded, value: &str) {
+    sqlx::query(
+        "UPDATE decision_policy
+            SET meta = meta || jsonb_build_object('on_accept', $2)
+          WHERE tenant_id = $1 AND kind = 'gate.precheck'",
+    )
+    .bind(seeded.tenant.as_uuid())
+    .bind(value)
+    .execute(&pg.super_pool)
+    .await
+    .expect("on_accept");
+}
+
+/// The draft one run's step produced.
+async fn draft_of_run(pg: &support::Pg, tenant: TenantId, run: Uuid) -> Uuid {
+    let draft: String = scalar(
+        pg,
+        tenant,
+        "SELECT output->>'draft_document_id' FROM run_step
+          WHERE tenant_id = $1 AND run_id = $2 AND position = 1 AND attempt = 1",
+        run,
+    )
+    .await;
+    Uuid::parse_str(&draft).expect("a draft id")
+}
+
+/// Build and execute one bound run under the seeded policy; return `(run, card)`.
+async fn execute_bound_run(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    running: &support::Running,
+    key: &str,
+) -> (Uuid, String) {
+    let (capability, agent) = seed_agent(pg, seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        pg,
+        seeded,
+        key,
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release"}),
+    )
+    .await;
+    let binding = bind(pg, seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(running).await;
+    let card = create_card(running, &board, &lane).await;
+    let run = start_run(running, &card, binding).await;
+    execute(pg, seeded, run).await;
+    (run, card)
+}
+
+#[tokio::test]
+async fn an_accepted_draft_is_applied_when_the_policy_says_apply() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    let (laya, _hits) = stub_laya(Some(0.9)).await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+    seal_laya_token(&pg, &seeded).await;
+    seed_policy(&pg, &seeded, 0.5, "closed", "handover").await;
+    set_on_accept(&pg, &seeded, "apply").await;
+
+    let (run, card) = execute_bound_run(&pg, &seeded, &running, "apply_job").await;
+
+    let (status, class) = run_state(&pg, seeded.tenant, run).await;
+    assert_eq!(status, "succeeded", "the accepted gate finishes the run");
+    assert_eq!(class, None);
+    let draft = draft_of_run(&pg, seeded.tenant, run).await;
+    assert_eq!(
+        document_card(&pg, seeded.tenant, draft).await,
+        Some(Uuid::parse_str(&card).expect("card id")),
+        "on_accept=apply attaches the draft to its card"
+    );
+    let decisions: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM decision WHERE tenant_id = $1 AND kind = 'gate.precheck' \
+         AND card_id = (SELECT card_id FROM run WHERE tenant_id = $1 AND id = $2)",
+        run,
+    )
+    .await;
+    assert_eq!(decisions, 1, "exactly one L1 decision");
+    let calls: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        run,
+    )
+    .await;
+    let hashed: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2 \
+         AND prompt_sha256 ~ '^[0-9a-f]{64}$'",
+        run,
+    )
+    .await;
+    assert_eq!(calls, 1, "the model was called once");
+    assert_eq!(hashed, calls, "every call carries a 64-hex prompt hash");
+}
+
+#[tokio::test]
+async fn an_accepted_draft_parks_by_default() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    let (laya, _hits) = stub_laya(Some(0.9)).await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+    seal_laya_token(&pg, &seeded).await;
+    seed_policy(&pg, &seeded, 0.5, "closed", "handover").await;
+
+    let (run, _card) = execute_bound_run(&pg, &seeded, &running, "park_job").await;
+
+    let (status, class) = run_state(&pg, seeded.tenant, run).await;
+    assert_eq!(
+        status, "succeeded",
+        "a silent policy keeps today's behaviour"
+    );
+    assert_eq!(class, None);
+    let draft = draft_of_run(&pg, seeded.tenant, run).await;
+    assert_eq!(
+        document_card(&pg, seeded.tenant, draft).await,
+        None,
+        "park leaves the draft unattached"
+    );
+}
+
+#[tokio::test]
+async fn a_cardless_internal_agent_run_is_refused_before_any_call() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    let (laya, hits) = stub_laya(Some(0.9)).await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+    seal_laya_token(&pg, &seeded).await;
+    seed_policy(&pg, &seeded, 0.5, "closed", "handover").await;
+    set_on_accept(&pg, &seeded, "apply").await;
+
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "cardless_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let run = start_run(&running, &card, binding).await;
+    // The defensive shape: a run with no card (runs.create always names one).
+    sqlx::query("UPDATE run SET card_id = NULL WHERE tenant_id = $1 AND id = $2")
+        .bind(seeded.tenant.as_uuid())
+        .bind(run)
+        .execute(&pg.super_pool)
+        .await
+        .expect("cardless");
+    execute(&pg, &seeded, run).await;
+
+    let (status, class) = run_state(&pg, seeded.tenant, run).await;
+    assert_eq!(
+        status, "failed",
+        "an internal_agent run must execute on a card"
+    );
+    assert_eq!(class.as_deref(), Some("capability_not_ready"));
+    let calls: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(calls, 0, "the refusal precedes any model call");
+    assert_eq!(*hits.lock().expect("hits"), 0, "and any laya call");
+}

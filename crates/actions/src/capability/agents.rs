@@ -61,6 +61,7 @@ async fn capability_agents_create(
     validate_agent_config(&AgentConfig {
         model_ref: &input.model_ref,
         prompt_ref: input.prompt_ref.as_deref(),
+        active: status.as_str() == "active",
         allowed_actions: &allowed_actions,
         max_iterations,
         timeout_secs,
@@ -155,6 +156,7 @@ async fn capability_agents_update(
     validate_agent_config(&AgentConfig {
         model_ref: &model_ref,
         prompt_ref: prompt_ref.as_deref(),
+        active: next_status.as_str() == "active",
         allowed_actions: &allowed_actions,
         max_iterations,
         timeout_secs,

@@ -427,6 +427,26 @@ fn organisation_error(error: OrganisationStoreError, action: &str) -> ActionErro
             "binding_kind_mismatch",
             format!("the binding names {binding:?} but the release declares {release:?}"),
         ),
+        OrganisationStoreError::ReleaseNotReady { kind, department } => ActionError::new(
+            409,
+            "release_not_ready",
+            format!(
+                "the required knowledge kind {kind:?} has no value for department {department:?}"
+            ),
+        ),
+        OrganisationStoreError::DepartmentConflict { kind, departments } => ActionError::new(
+            422,
+            "department_conflict",
+            format!(
+                "{} disagree on knowledge kind {kind:?}; a job-layer row must resolve it",
+                departments.join(", ")
+            ),
+        ),
+        OrganisationStoreError::UnknownLayerLevel(level) => invalid(
+            "level",
+            "invalid_layer",
+            format!("{level:?} is not a knowledge-layer level"),
+        ),
         OrganisationStoreError::Database(error) => store_error(error, action),
     }
 }
@@ -965,4 +985,212 @@ async fn job_bindings_list(
         .await
         .map_err(|error| store_error(error, "job_bindings.list"))?;
     Ok(rows.iter().map(binding_view).collect())
+}
+
+// ── knowledge layers (SPEC_V2 §4.1) ──────────────────────────────────────────────────────
+
+/// `organisation_layers.set`'s input: one release knowledge layer by level and scope.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LayerSetIn {
+    /// `base | industry | department_archetype | department | job`.
+    pub level: String,
+    /// The industry scope, for `industry`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub industry_id: Option<Uuid>,
+    /// The department scope, for `department_archetype` and `department`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub department_id: Option<Uuid>,
+    /// The job scope, for `job`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_id: Option<Uuid>,
+    /// The knowledge kind.
+    pub kind: String,
+    /// The value this layer sets; omitted when the row only declares the kind required.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value: Option<Value>,
+    /// Whether the kind is required from this layer downward.
+    #[serde(default)]
+    pub required: bool,
+}
+
+/// `organisation_layers.list`'s input.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct LayerListIn {
+    /// Only this level.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub level: Option<String>,
+    /// Only rows scoped to this industry.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub industry_id: Option<Uuid>,
+    /// Only rows scoped to this department.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub department_id: Option<Uuid>,
+    /// Only rows scoped to this job.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_id: Option<Uuid>,
+}
+
+/// One knowledge-layer row.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LayerOut {
+    /// The row id.
+    pub id: String,
+    /// `base | industry | department_archetype | department | job`.
+    pub level: String,
+    /// The industry scope.
+    pub industry_id: Option<String>,
+    /// The department scope.
+    pub department_id: Option<String>,
+    /// The job scope.
+    pub job_id: Option<String>,
+    /// The knowledge kind.
+    pub kind: String,
+    /// The value, when the row sets one.
+    pub value: Option<Value>,
+    /// Whether the layer requires the kind.
+    pub required: bool,
+    /// The row's bookkeeping version.
+    pub version: i64,
+    /// Creation time.
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    /// Last write.
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+fn layer_view(row: &store::organisation::LayerRow) -> LayerOut {
+    LayerOut {
+        id: row.id.to_string(),
+        level: row.level.clone(),
+        industry_id: row.industry_id.map(|id| id.to_string()),
+        department_id: row.department_id.map(|id| id.to_string()),
+        job_id: row.job_id.map(|id| id.to_string()),
+        kind: row.kind.clone(),
+        value: row.value.clone(),
+        required: row.required,
+        version: row.version,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+    }
+}
+
+/// The kind grammar the table's CHECK enforces, refused here as a typed `422`.
+fn valid_layer_kind(kind: &str) -> bool {
+    let mut bytes = kind.bytes();
+    match bytes.next() {
+        Some(first) if first.is_ascii_lowercase() => {}
+        _ => return false,
+    }
+    kind.len() <= 64
+        && bytes.all(|byte| {
+            byte.is_ascii_lowercase() || byte.is_ascii_digit() || matches!(byte, b'_' | b'.' | b'-')
+        })
+}
+
+/// Author one release knowledge layer; the release compiler reads them on publish.
+#[crate::action(
+    name = "organisation_layers.set",
+    version = 1,
+    kind = "internal",
+    scopes = ["organisation:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn organisation_layers_set(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: LayerSetIn,
+) -> Result<LayerOut, ActionError> {
+    let level = input.level.trim();
+    if !store::organisation::LAYER_LEVELS.contains(&level) {
+        return Err(invalid(
+            "level",
+            "invalid_layer",
+            "level must be base, industry, department_archetype, department or job",
+        ));
+    }
+    let scope_ok = match level {
+        "base" => {
+            input.industry_id.is_none() && input.department_id.is_none() && input.job_id.is_none()
+        }
+        "industry" => {
+            input.industry_id.is_some() && input.department_id.is_none() && input.job_id.is_none()
+        }
+        "department_archetype" | "department" => {
+            input.industry_id.is_none() && input.department_id.is_some() && input.job_id.is_none()
+        }
+        "job" => {
+            input.industry_id.is_none() && input.department_id.is_none() && input.job_id.is_some()
+        }
+        _ => false,
+    };
+    if !scope_ok {
+        return Err(invalid(
+            "level",
+            "invalid_layer_scope",
+            "the scope id must match the level, and no other scope may be set",
+        ));
+    }
+    if !valid_layer_kind(input.kind.trim()) {
+        return Err(invalid(
+            "kind",
+            "invalid_value",
+            "a kind is lower-case ASCII letters, digits, underscore, dot or dash, starting with a letter",
+        ));
+    }
+    if input.value.is_none() && !input.required {
+        return Err(invalid(
+            "value",
+            "empty_layer",
+            "a layer must set a value or require the kind",
+        ));
+    }
+    let row = store::organisation::set_layer_tx(
+        &mut *tx,
+        ctx.tenant,
+        &store::organisation::LayerSet {
+            level: level.to_owned(),
+            industry_id: input.industry_id,
+            department_id: input.department_id,
+            job_id: input.job_id,
+            kind: input.kind.trim().to_owned(),
+            value: input.value,
+            required: input.required,
+        },
+    )
+    .await
+    .map_err(|error| organisation_error(error, "organisation_layers.set"))?;
+    Ok(layer_view(&row))
+}
+
+/// The tenant's release knowledge layers, narrowed by level and scope.
+#[crate::action(
+    name = "organisation_layers.list",
+    version = 1,
+    kind = "internal",
+    scopes = ["organisation:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn organisation_layers_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: LayerListIn,
+) -> Result<Vec<LayerOut>, ActionError> {
+    let rows = store::organisation::layers_list_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.level.as_deref(),
+        input.industry_id,
+        input.department_id,
+        input.job_id,
+    )
+    .await
+    .map_err(|error| store_error(error, "organisation_layers.list"))?;
+    Ok(rows.iter().map(layer_view).collect())
 }

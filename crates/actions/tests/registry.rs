@@ -132,7 +132,7 @@ use serde_json::{Value, json};
 /// `authoring.intakes` → **565**. **S21 step 10 (#656) adds 4**: `ladder.case` and
 /// `decision_option_sets.get|set` (internal) and `ladder.precheck` (external) — 565 → **569**,
 /// internal 547 → 550, external 18 → 19.
-const EXPECTED: [&str; 569] = [
+const EXPECTED: [&str; 571] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -500,6 +500,8 @@ const EXPECTED: [&str; 569] = [
     "ops.rollback",
     "ops.scale",
     "ops.triage",
+    "organisation_layers.list",
+    "organisation_layers.set",
     "pm.charter",
     "pm.close",
     "pm.get",

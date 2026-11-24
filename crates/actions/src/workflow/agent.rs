@@ -390,6 +390,17 @@ async fn resolve_bound(
             .map(str::to_owned),
         None => record.prompt_ref.clone(),
     };
+    // SPEC_V2 §7.7: a model call exists only over compiled text. An agent with no prompt has no
+    // compiler input, so the run refuses here — before any inference and before the loop starts.
+    if effective_prompt.is_none() {
+        return Err(ActionError::new(
+            409,
+            "capability_not_ready",
+            format!(
+                "capability_agent {agent_id} names no prompt_ref; a model call needs compiled text"
+            ),
+        ));
+    }
 
     // How the row's configuration is defended: a step may narrow it, never substitute it.
     if let Some(model) = node_input.get("model").and_then(Value::as_str)

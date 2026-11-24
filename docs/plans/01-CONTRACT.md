@@ -1105,9 +1105,10 @@ succeeds, the draft stays unattached). `decision_policies.create|update` accept 
 and refuse anything else `422 invalid_policy_meta` before any write. The application is
 `ladder::apply_draft_tx` — the one gate `ladder.apply_draft` and `run.resume` also call — invoked by
 the executor inside its finish transaction with the recorded L1 decision; it never writes a
-decision, re-generates or calls the model again. A cardless accepted run records
-`apply_skipped: no_card` and attaches nothing. A declared apply that the gate refuses finishes the
-run `failed` with `draft_apply_invalid`, never a half-applied draft.
+decision, re-generates or calls the model again. An `internal_agent` run is always carded — the
+dispatcher refuses a cardless one `capability_not_ready` before the executor — and the executor's
+`apply_skipped: no_card` branch is defence in depth. A declared apply that the gate refuses
+finishes the run `failed` with `draft_apply_invalid`, never a half-applied draft.
 
 **No model call without compiled text and a 64-hex hash.** An `internal_agent` that is `active`
 must name a `prompt_ref` resolving to an active prompt in the tenant. `validate_agent_config`

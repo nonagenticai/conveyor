@@ -94,6 +94,13 @@ pub(crate) fn parse_status(raw: &str) -> Result<CapabilityStatus, ActionError> {
 
 /// A domain refusal is the caller's input, never a `500`.
 pub(crate) fn config_error(error: CapabilityError) -> ActionError {
+    if matches!(&error, CapabilityError::PromptRequired) {
+        return invalid(
+            "prompt_ref",
+            "prompt_ref_required",
+            "an active internal_agent must name a prompt_ref (SPEC_V2 §7.7)",
+        );
+    }
     let field = match &error {
         CapabilityError::BlankModelRef => "model_ref",
         CapabilityError::IterationsOutOfRange(_) => "max_iterations",
