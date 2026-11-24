@@ -2604,6 +2604,64 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             .await;
             ctx.push(sample.name, kata);
         }
+        // T12 (#88): the kata's last three Gets are recorded after the person's adoption.
+        "kata.standardise" => {
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "adopted",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("solution", json!({"candidate_ref": "process:parity:v2"})),
+                ],
+                None,
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.sustain" => {
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "adopted",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("solution", json!({"candidate_ref": "process:parity:v2"})),
+                    (
+                        "standardisation",
+                        json!({"standard_ref": "process:parity:v2"}),
+                    ),
+                ],
+                None,
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.stretch" => {
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "adopted",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("solution", json!({"candidate_ref": "process:parity:v2"})),
+                    (
+                        "standardisation",
+                        json!({"standard_ref": "process:parity:v2"}),
+                    ),
+                    (
+                        "sustainability",
+                        json!({"monitoring": "the eval each cycle"}),
+                    ),
+                ],
+                None,
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
         // T8 (#79): a proposal needs TWO independent objects, so each round gets a fresh failed
         // run beside the stable anchor card; review/promote get a lesson already at the stage
         // the action requires.
@@ -3848,6 +3906,42 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             let mut sample = plain("kata.adopt", json!({}), None);
             sample.input = Box::new(|_ctx: &Ctx| json!({"kata_id": Uuid::nil(), "note": "parity"}));
             expecting(sample, 404)
+        },
+        // ── T12 (#88): the last three Gets ───────────────────────────────────────────────
+        {
+            let mut sample = plain("kata.standardise", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.standardise"),
+                    "standard_ref": "process:parity:v2",
+                    "description": "parity standardisation",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.sustain", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.sustain"),
+                    "monitoring": "the held-out eval each cadence cycle",
+                    "regression_guard": "the eval regression reopens the kata",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.stretch", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.stretch"),
+                    "targets": ["delivery", "operations"],
+                })
+            });
+            expecting(sample, 200)
         },
         // ── T8: organisational memory (#79) ──────────────────────────────────────────────
         // The proposal names the stable anchor card plus a fresh failed run each round: two

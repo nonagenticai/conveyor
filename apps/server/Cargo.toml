@@ -50,5 +50,8 @@ uuid = { workspace = true }
 
 [dev-dependencies]
 tower = { workspace = true }
+# T12's acceptance proves the pre-call budget refusal at the inference router's admission
+# gate — the only `429 budget_exceeded` on main — so the test drives that real gate.
+conveyor-inference-router = { path = "../inference-router" }
 # `documents_purge` hashes the seeded bytes so the row and the object agree — `sha2` is a
 # normal dependency now (the sandbox Job name's truncation hash), so the test reuses it.
