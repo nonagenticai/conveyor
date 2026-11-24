@@ -1,0 +1,54 @@
+{
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "wbs": [
+  {
+   "kind": "deliverable",
+   "title": "SOP intake as a governed asset: procedures.ingest_sop produces capability and job drafts",
+   "business_value": 9,
+   "time_criticality": 8,
+   "risk_reduction": 6,
+   "job_size": 3
+  },
+  {
+   "kind": "deliverable",
+   "title": "RDF/OWL/Turtle imported as a strata knowledge pack bound by knowledge_pack_ref",
+   "business_value": 8,
+   "time_criticality": 7,
+   "risk_reduction": 5,
+   "job_size": 2
+  },
+  {
+   "kind": "deliverable",
+   "title": "BPMN, Visio and draw.io converted into PDDL procedure drafts",
+   "business_value": 9,
+   "time_criticality": 8,
+   "risk_reduction": 6,
+   "job_size": 3
+  },
+  {
+   "kind": "deliverable",
+   "title": "Source review and human publication gates: the drafting job cannot publish its own procedure",
+   "business_value": 9,
+   "time_criticality": 7,
+   "risk_reduction": 7,
+   "job_size": 2
+  },
+  {
+   "kind": "deliverable",
+   "title": "Re-ingest versioning keeps the published row's source and pack",
+   "business_value": 8,
+   "time_criticality": 6,
+   "risk_reduction": 6,
+   "job_size": 2
+  },
+  {
+   "kind": "deliverable",
+   "title": "A bound job runs the PDDL steps; an unreviewed source never binds",
+   "business_value": 8,
+   "time_criticality": 7,
+   "risk_reduction": 6,
+   "job_size": 2
+  }
+ ],
+ "baseline_kind": "scope"
+}

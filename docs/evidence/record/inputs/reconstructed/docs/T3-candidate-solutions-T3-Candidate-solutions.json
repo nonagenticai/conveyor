@@ -1,0 +1,8 @@
+{
+ "title": "T3 \u2014 Candidate solutions",
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "category": "candidate-solutions",
+ "body": "# T3 \u2014 Candidate solutions\n\n## Candidates\n\n1. A new PM engine with its own state machine.\n2. The spine primitives composed by a PM job (chosen).\n3. A procedure-driven PM run over the bus.\n\n## Criteria\n\nDual control must be structural; the record must be the same rows every other surface reads; the\napproach must not fork the action registry; a baseline change must be a first-class change row.\n\n## Options rejected\n\nCandidate 1 duplicates the approval and baseline primitives and would fork the record. Candidate 3\nmakes the PM's gates depend on a run's completion; the gates must hold outside any run. Candidate 2\ncomposes `charter`, `projects.baseline`, `changes.request`, `close_request` and `close`, which are\nthe programme's own primitives.\n",
+ "publishable": true,
+ "unit": "T3"
+}

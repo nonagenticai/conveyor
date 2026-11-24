@@ -1,0 +1,8 @@
+{
+ "title": "T3 \u2014 Benefits diagram",
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "category": "benefits-diagram",
+ "body": "# T3 \u2014 Benefits diagram\n\n## Goals and outcomes\n\nThe PM path's goal is an auditable request-to-closure loop; the outcome is that no gate, baseline\nor acceptance in the programme moves without a recorded, distinct decision.\n\n## Measures\n\n- Every gate carries a `rule` decision under a published delegation (measured by the approval\n  ledger).\n- A baseline mutation after the frozen baseline cites an approved change (measured by the change\n  rows).\n- Closure resolves against the baseline (measured by the closure gate's evidence).\n\n## Benefits and sub-benefits\n\nThe programme benefits served: B1 (auditable decisions) directly; B6 (the coverage the record\ngives) and B7 (through fewer rework loops) indirectly. The sub-benefits are the five accepted T3\ndeliverables.\n",
+ "publishable": true,
+ "unit": "T3"
+}

@@ -1,0 +1,8 @@
+{
+ "title": "T16 \u2014 Project Brief",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "category": "project-brief",
+ "body": "# Project brief\n\n## Outcome\n\nThe conveyor ingests SOPs, RDF/OWL ontologies and BPMN/Visio/draw.io documents into governed procedure drafts\nthat a person publishes, and a bound job executes the PDDL steps.\n\n## Boundary\n\nNot in scope: the procedure catalogue UI (T18) and the process engine (S13).\n\n## Reuse sources\n\nThe action spine's governed assets and documents, the capability/job families, the process executor (S13), and\nthe D53 decision (knowledge pack, no RDF store at runtime).\n\n## Inception units\n\nThe ingestion actions (`procedures.ingest_*`), the review/publish gates, and the re-ingest versioning path.\n\n## Dependencies\n\nT2 (plan spine), T13 (governed assets), P0 (programme definition); S13 for execution.\n\n## Acceptance\n\nSPEC_V2 \u00a712 T16, proven by 25/25 named tests at lane head `46fc49e2`; manifest `acceptance/programme/T16.toml`.\n\n## Capabilities\n\nA team can turn its written procedures into executable, versioned procedures without hand-authoring the\naction space.\n\n## Plan\n\nDelivered in tranche 4; the PI plan for tranche 4 carries the objectives and capacity.\n\n## Risks\n\nThe systemic-improvement loop (T5) and the operations path (T7) are the coupled slices; the human gate and the\nknowledge-pack decision are the mitigations.\n",
+ "publishable": true,
+ "unit": "T16"
+}

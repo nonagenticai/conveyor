@@ -1,0 +1,8 @@
+{
+ "title": "T7 \u2014 Project Brief",
+ "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+ "category": "project-brief",
+ "body": "# Project brief\n\n## Outcome\n\nThe conveyor operates the estate: an incident is opened, triaged, mitigated by an approved write,\nresolved with a postmortem; a destructive call without the tenant's approvals is refused.\n\n## Boundary\n\nNot in scope: the process engine (S13) and the procedure catalogue (T18); the k8s API is reached\nonly through a registered host and read-only actions for reads.\n\n## Reuse sources\n\nThe action spine's approvals and governed assets, the cards/board surfaces, T4's contracts, and\nT5's systemic-improvement loop.\n\n## Inception units\n\nThe ops actions (`ops.incident`, triage, the write verbs), the approval policy, and the host\nregistry.\n\n## Dependencies\n\nT2 and T4; T5 for the systemic loop; the cluster live proof is deploy-bound.\n\n## Acceptance\n\nSPEC_V2 \u00a712 T7, proven by the executed suite and `acceptance/programme/T7.toml`.\n\n## Capabilities\n\nAn operator can run an incident through the product's own actions, with the tenant's policy as\nthe only path to a destructive write.\n\n## Plan\n\nDelivered in tranche 5; the tranche-5 PI plan carries the objectives and capacity.\n\n## Risks\n\nThe live proof needs the deployed operator CLI; a host must be registered before a live read; the\nsystemic loop's kata is T5's.\n",
+ "publishable": true,
+ "unit": "T7"
+}

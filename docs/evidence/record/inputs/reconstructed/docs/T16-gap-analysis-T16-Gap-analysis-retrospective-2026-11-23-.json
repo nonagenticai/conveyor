@@ -1,0 +1,8 @@
+{
+ "title": "T16 \u2014 Gap analysis (retrospective, 2026-11-23)",
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "category": "gap-analysis",
+ "body": "# T16 \u2014 Gap analysis (retrospective, 2026-11-23)\n\n## Baseline\n\nBefore T16: procedure knowledge lived in documents; there was no typed, versioned ingestion, no\nhuman publication gate on the drafting job, and no bound PDDL execution from an ingested source.\n\n## Target\n\nA SOP, an OWL/Turtle file or a BPMN/Visio/draw.io diagram becomes a typed draft through the product's\nown actions; a human gate publishes it; a re-ingest versions it while the published row stays stable;\na bound job runs its PDDL steps; an unreviewed source never binds.\n\n## Gaps and work packages\n\n| Gap | Work package (accepted) |\n|---|---|\n| SOP sources not ingested | 1 \u2014 SOP intake as a governed asset |\n| RDF/OWL not bound to procedures | 2 \u2014 knowledge pack bound by `knowledge_pack_ref` |\n| Process documents not converted | 3 \u2014 BPMN, Visio and draw.io to PDDL drafts |\n| Drafting could publish | 4 \u2014 source review and human publication gates |\n| Re-ingest forked the row | 5 \u2014 re-ingest versioning |\n| Unreviewed sources could bind | 6 \u2014 bound job runs the PDDL steps |\n\nResidual gap: live-cluster fault injection is T7's live proof, recorded separately; T16's gate is\nthe executed test set, not a probe.\n",
+ "publishable": true,
+ "unit": "T16"
+}

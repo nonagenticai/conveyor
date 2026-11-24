@@ -1,0 +1,8 @@
+{
+ "title": "Delivery Contract \u2014 Action registry \u2014 derive, manifest, OpenAPI, MCP, invocation, external ingest",
+ "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+ "category": "delivery-contract",
+ "body": "# Delivery Contract \u2014 Action registry \u2014 derive, manifest, OpenAPI, MCP, invocation, external ingest\n\n## Commitments\n\nThe record the section derives from, or an explicit absence.\n\n_Explicit absence \u2014 the contract's commitment list: a commitments field on the delivery contract body._\n\n## Compliance method\n\nThe record the section derives from, or an explicit absence.\n\n_Explicit absence \u2014 the contract's compliance method: a compliance field on the delivery contract body._\n\n## Approval\n\nThe record the section derives from, or an explicit absence.\n\n```json\n{\n  \"category\": \"delivery-contract\",\n  \"count\": 1,\n  \"rows\": [\n    {\n      \"approved_at\": \"2026-11-22T22:06:56.441983+00:00\",\n      \"approved_by\": \"01a1e8a7-8b23-76a9-9114-aafb95f7a545\",\n      \"id\": \"01a2054c-4d13-7f17-a5e6-eaeb5d8778c6\",\n      \"kind\": \"contract_approval\",\n      \"requested_by\": \"01a1efd4-c3e5-7b74-b32b-1b15683a8c4e\",\n      \"status\": \"approved\",\n      \"title\": \"approval 01a2054c-4d13-7f17-a5e6-eaeb5d8778c6 \\u2014 approved\"\n    }\n  ],\n  \"source\": \"computed:contract_approval\"\n}\n```\n",
+ "publishable": true,
+ "unit": "artefact:S04:delivery-contract:02141cb6c5fd097f"
+}

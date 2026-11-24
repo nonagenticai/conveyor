@@ -1,0 +1,8 @@
+{
+ "title": "T3 \u2014 Project context diagram",
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "category": "project-context-diagram",
+ "body": "# T3 \u2014 Project context diagram\n\n## Context\n\nThe PM job sits between the sponsor (programme owner), the approver job and the projects it runs:\nit consumes the spine's primitives and writes the project's own rows.\n\n## Affected organisation\n\nThe programme manager, the approver and the architect; the PM job is the only requester of the\ngates it runs.\n\n## Affected systems\n\nThe action registry, the approval ledger, the spine store's baseline and change tables, the\ndocument store (for the outputs) and the snapshot projection \u2014 all reused unchanged.\n",
+ "publishable": true,
+ "unit": "T3"
+}
