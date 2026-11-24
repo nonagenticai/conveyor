@@ -14,9 +14,9 @@
     "new": "neither the route nor an ancestor exists"
   },
   "counts": {
-    "exists": 58,
+    "exists": 59,
     "extend": 7,
-    "new": 4
+    "new": 3
   },
   "rows": [
     {
@@ -612,9 +612,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "memory",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: lessons.* absent"
+        "actions: lessons.* found (lessons.promote, lessons.propose, lessons.review)"
       ]
     },
     {
