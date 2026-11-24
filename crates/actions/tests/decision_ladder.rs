@@ -1691,11 +1691,12 @@ async fn a_laya_decision_derives_its_fields_latency_and_provenance_from_the_resp
     assert_eq!(laya_rows(&pg, &seeded).await, 1);
 }
 
-/// A laya outage — no token, a refused call or an unreadable answer — is `gate_unavailable`
-/// and writes no decision. The policy's fail behaviour is carried in the refusal; it is never
-/// silently a pass.
+/// A closed safety gate's laya outage applies `refused` and records the outage as an
+/// `unavailable` decision. The refusal is 503 `gate_unavailable`; the outcome survives the
+/// handler transaction's rollback in a decision row, never as a silent pass (§7.2,
+/// finding v1-w1c-5).
 #[tokio::test(flavor = "multi_thread")]
-async fn a_laya_outage_is_gate_unavailable_and_writes_nothing() {
+async fn a_closed_laya_outage_records_a_refused_unavailable_decision() {
     let (pg, running, seeded) = fixture().await;
     create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
     let laya_config_id = create_laya_config(&running).await;
@@ -1717,30 +1718,162 @@ async fn a_laya_outage_is_gate_unavailable_and_writes_nothing() {
         "{refused}"
     );
 
-    // An open routing gate carries its configured action instead of refusing.
-    let open_kind = "gate.precheck.open";
-    create_policy(&running, open_kind, Some(GATE), 0.8, "open", "handover").await;
-    let (status, prepared) = prepare(&running, open_kind, Some(&laya_config_id)).await;
+    let (rung, outcome, answer, policy_version, laya_config_version, meta): (
+        String,
+        String,
+        String,
+        Option<i64>,
+        Option<i64>,
+        Value,
+    ) = sqlx::query_as(
+        "SELECT rung, outcome, answer, policy_version, laya_config_version, meta
+           FROM decision WHERE tenant_id = $1 AND kind = $2",
+    )
+    .bind(seeded.tenant.as_uuid())
+    .bind(KIND)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the outage decision");
+    assert_eq!(rung, "rule", "the fail policy is the rule that decided");
+    assert_eq!(outcome, "refused", "a closed policy refuses");
+    assert_eq!(answer, "unavailable");
+    assert_eq!(meta["decision"], "unavailable", "{meta}");
+    assert_eq!(meta["fail_policy"], "closed", "{meta}");
+    assert_eq!(meta["action"], "block", "{meta}");
+    assert!(
+        meta.get("note").is_none(),
+        "a closed outage records no note"
+    );
+    assert!(policy_version.is_some(), "the row pins the policy version");
+    assert!(
+        laya_config_version.is_some(),
+        "the row pins the laya config version"
+    );
+    assert_eq!(
+        laya_rows(&pg, &seeded).await,
+        0,
+        "the outage faked an L1 row"
+    );
+}
+
+/// An open routing gate's laya outage applies its configured action: with `annotate` the
+/// outcome is `accepted` and the decision records the note an operator audits. The refusal is
+/// still 503 `gate_unavailable`, never a silent pass (§7.2, finding v1-w1c-5).
+#[tokio::test(flavor = "multi_thread")]
+async fn an_open_laya_outage_records_its_action_and_annotate_note() {
+    let (pg, running, seeded) = fixture().await;
+    create_policy(&running, KIND, Some(GATE), 0.8, "open", "annotate").await;
+    let laya_config_id = create_laya_config(&running).await;
+    // Deliberately no `laya.token`: the classify call answers 503.
+
+    let (status, prepared) = prepare(&running, KIND, Some(&laya_config_id)).await;
     assert_eq!(status, 200, "{prepared}");
     let request = output(&prepared)["request"].clone();
     let (status, classified) = classify(&running, request, "key-open-outage").await;
     assert_eq!(status, 503, "{classified}");
-    let (status, open) = evaluate(
-        &running,
-        open_kind,
-        Some(&laya_config_id),
-        "key-open-outage",
-    )
-    .await;
+    let (status, open) = evaluate(&running, KIND, Some(&laya_config_id), "key-open-outage").await;
     assert_eq!(status, 503, "{open}");
     assert_eq!(output(&open)["type"], "gate_unavailable", "{open}");
     assert!(
         output(&open)["detail"]
             .as_str()
             .unwrap_or_default()
-            .contains("fail_policy=open outcome=escalated"),
+            .contains("fail_policy=open outcome=accepted"),
         "{open}"
     );
 
-    assert_eq!(laya_rows(&pg, &seeded).await, 0, "an outage wrote a row");
+    let (rung, outcome, answer, meta): (String, String, String, Value) = sqlx::query_as(
+        "SELECT rung, outcome, answer, meta
+           FROM decision WHERE tenant_id = $1 AND kind = $2",
+    )
+    .bind(seeded.tenant.as_uuid())
+    .bind(KIND)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the outage decision");
+    assert_eq!(rung, "rule", "the fail policy is the rule that decided");
+    assert_eq!(outcome, "accepted", "an open annotate policy proceeds");
+    assert_eq!(answer, "unavailable");
+    assert_eq!(meta["decision"], "unavailable", "{meta}");
+    assert_eq!(meta["fail_policy"], "open", "{meta}");
+    assert_eq!(meta["action"], "annotate", "{meta}");
+    let note = meta["note"].as_str().expect("the annotate note");
+    assert!(note.contains("laya unavailable"), "{note}");
+    assert_eq!(
+        laya_rows(&pg, &seeded).await,
+        0,
+        "the outage faked an L1 row"
+    );
+}
+
+// ── the seam's budget (SPEC_V2 §10.2, finding v1-p102-1) ────────────────────────────────
+
+/// §10.2 fixes the conveyor→laya seam at a 1500 ms default: a config that names no timeout
+/// stores that default, never the old 30 s.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_laya_config_defaults_to_fifteen_hundred_ms() {
+    let (_pg, running, _seeded) = fixture().await;
+    let (status, created) = running
+        .invoke(
+            "laya_configs.create",
+            "dev:alice",
+            json!({"model_ref": "jev-latest"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    assert_eq!(
+        output(&created)["timeout_ms"],
+        1500,
+        "the seam's measured default is 1500 ms (SPEC_V2 §10.2)"
+    );
+}
+
+/// A configured budget above the seam's hard budget is refused as a field failure — never
+/// silently clamped — and the hard budget itself is accepted and usable by `ladder.prepare`.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_laya_config_timeout_is_capped_at_the_hard_budget() {
+    let (_pg, running, _seeded) = fixture().await;
+    let (status, refused) = running
+        .invoke(
+            "laya_configs.create",
+            "dev:alice",
+            json!({"model_ref": "jev-latest", "timeout_ms": 3001}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(
+        output(&refused)["type"],
+        "timeout_above_budget",
+        "{refused}"
+    );
+    assert_eq!(refused["errors"][0]["field"], "timeout_ms", "{refused}");
+    assert_eq!(
+        refused["errors"][0]["code"], "timeout_above_budget",
+        "{refused}"
+    );
+
+    let (status, accepted) = running
+        .invoke(
+            "laya_configs.create",
+            "dev:alice",
+            json!({"model_ref": "jev-latest", "timeout_ms": 3000}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{accepted}");
+    assert_eq!(output(&accepted)["timeout_ms"], 3000, "{accepted}");
+    let config_id = id_of(output(&accepted), "id");
+    let (status, prepared) = prepare(&running, KIND, Some(&config_id)).await;
+    assert_eq!(
+        status, 200,
+        "the hard budget is a usable seam budget: {prepared}"
+    );
 }
