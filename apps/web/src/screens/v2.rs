@@ -268,11 +268,6 @@ pub fn PlanGate() -> impl IntoView {
 }
 
 #[component]
-pub fn ToolsGate() -> impl IntoView {
-    view! { <DestinationGate title="Tools" slice="T13 · T14 · T15"/> }
-}
-
-#[component]
 pub fn AdmGate() -> impl IntoView {
     view! { <DestinationGate title="Architecture capability" slice="T9"/> }
 }

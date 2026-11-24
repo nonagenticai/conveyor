@@ -47,8 +47,9 @@ use crate::screens::runs::RunQueue;
 use crate::screens::search::SearchScreen;
 use crate::screens::sign_in::SignIn;
 use crate::screens::today::Today;
+use crate::screens::tools::Tools;
 use crate::screens::usage::Usage;
-use crate::screens::v2::{AdmGate, KnowledgeGate, PortfolioScreen, ProgrammeScreen, ToolsGate};
+use crate::screens::v2::{AdmGate, KnowledgeGate, PortfolioScreen, ProgrammeScreen};
 use crate::screens::validation::ValidationScreen;
 use crate::state::AppCtx;
 
@@ -200,7 +201,7 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/improve") view=Improve/>
                             <Route path=path!("/operations") view=Operations/>
                             <Route path=path!("/metering") view=Metering/>
-                            <Route path=path!("/tools") view=ToolsGate/>
+                            <Route path=path!("/tools") view=Tools/>
                             <Route path=path!("/design/adm") view=AdmGate/>
                             <Route path=path!("/knowledge") view=KnowledgeGate/>
                         </Routes>

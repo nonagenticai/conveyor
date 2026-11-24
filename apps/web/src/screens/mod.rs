@@ -35,6 +35,7 @@ pub mod runs;
 pub mod search;
 pub mod sign_in;
 pub mod today;
+pub mod tools;
 pub mod usage;
 pub mod v2;
 pub mod v2_data;
