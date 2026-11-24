@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F — Decision-forum governance (follow-on) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F-meeting-bindings.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f--decision-forum-governance-follow-on">T19F — Decision-forum governance (follow-on)</h1>
+<p>Programme project: T19F · plan issue #682 · implementation #683 · proof #684</p>
+<p><strong>Gate:</strong> a policy change is authored through the tenant's authoring route and published as a new immutable <code>meeting_type</code> version while an in-flight meeting keeps its pinned version; a board subject decision is taken in a board sitting, with one <code>approval_decision</code> row per qualifying seat carrying <code>via='meeting'</code>; a cadence row names its meeting type and materialises exactly one meeting; the direct <code>architecture.board_decide</code> path is unchanged; the T19F project is a live programme row with its MSP/TOGAF/SAFe artefact set and a closure review that defers closure to the tranche-6 review.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>T19 made the meeting the decision forum, but left two seams open. A forum's policy could only be created implicitly by a schedule and never changed: the engine answers a policy change with "a policy change is a new version through the governance route", and that route did not exist. The T9 <code>governance_body</code> and T10 <code>programme_cadence</code> only resolved a meeting by convention — a body's key doubled as its standing type, and a cadence slot was passed by hand — so the board's decisions and the cadence's sittings were not bound to the forum records they belong to.</p>
+<p>T19F closes both seams without rebuilding either consumer. It adds the versioned authoring route through T17, an explicit meeting-type binding on the body and the cadence row, a board-sitting entry that uses T19's own outcome arithmetic, and a cadence materialisation that is idempotent.</p>
+<h2 id="2-starting-state-measured-at-main2debb226-2026-11-24">2. Starting state (measured at <code>main@2debb226</code>, 2026-11-24)</h2>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>State</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Policy versioning</td>
+<td>PARTIAL</td>
+<td><code>migrations/0065_meetings.sql</code>: <code>meeting_type</code> is versioned and immutable; <code>crates/store/src/meetings.rs:schedule_tx</code> creates v1 and refuses a change ("a policy change is a new version through the governance route")</td>
+</tr>
+<tr>
+<td>Policy authoring route</td>
+<td>ABSENT</td>
+<td><code>git grep -n 'name = "meetings.type' origin/main -- crates</code> → 0; <code>authoring.publish</code> writes no <code>meeting_type</code> row</td>
+</tr>
+<tr>
+<td>Board binding</td>
+<td>ABSENT</td>
+<td><code>migrations/0054_architecture.sql</code> <code>governance_body</code> has no meeting-type column; <code>crates/store/src/architecture.rs:decide_board_tx</code> writes one approval row directly</td>
+</tr>
+<tr>
+<td>Cadence binding</td>
+<td>ABSENT</td>
+<td><code>migrations/0044_plan_spine.sql</code> <code>programme_cadence</code> has only <code>meta</code>; no action materialises a meeting from a cadence row</td>
+</tr>
+<tr>
+<td>Meeting arithmetic</td>
+<td>DONE, reused</td>
+<td><code>crates/store/src/meetings.rs:close_item_tx</code>; D4's 26-scenario evidence in <code>docs/plans/T19/evidence.md</code></td>
+</tr>
+<tr>
+<td>Authoring route (T17)</td>
+<td>DONE, reused</td>
+<td><code>authoring.intake/draft/review/publish/assets</code>; <code>kind='policy'</code>; one published row per <code>(tenant, kind, key)</code></td>
+</tr>
+<tr>
+<td>Mock UI / real app</td>
+<td>PARTIAL</td>
+<td><code>docs/design/v2.js</code> <code>meetingsPage</code>; <code>apps/web/src/screens/meetings.rs</code>; no policy/sitting/cadence panel</td>
+</tr>
+<tr>
+<td>Programme row</td>
+<td>ABSENT</td>
+<td>no <code>T19F</code> in <code>seed/programme.json</code>, coverage or the programme doc</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — the versioned <code>meeting_type</code> authoring route through T17; <code>meetings.type_list/get</code>; the explicit meeting-type binding on <code>governance_body</code> and <code>programme_cadence</code>; the board-sitting open and decide actions; the cadence materialisation; the mock-UI and real-app panels; the T19F plan, MSP/TOGAF/SAFe artefact set, programme registration and live proof.</p>
+<p><strong>OUT</strong> — a second decision store; a chat/AV/transcript store; a rebuild of T9's board, T10's cadence or the approval primitive; a change to the direct <code>board_decide</code> path; the T18 shell/nav; the homepage mirror; the tranche 2→4 authorisation chain and #526's ledger; programmatic LLM selection of agenda items, positions or attendance.</p>
+<h2 id="4-the-model">4. The model</h2>
+<h3 id="41-policy-authoring-is-a-versioned-release-not-an-edit">4.1 Policy authoring is a versioned release, not an edit</h3>
+<p><code>meeting_type</code> rows stay immutable. A change is a new authoring asset of <code>kind='policy'</code> whose payload carries the policy, reviewed by a human through <code>authoring.review</code> (an approved <code>approval_id</code>) and published by <code>authoring.publish</code>. Publication writes the next <code>max(version)+1</code> row for the policy key in the same transaction and records the output link on the asset. The authoring asset key and the meeting-type key are different: a new version needs a new asset key carrying the same <code>meeting_type_key</code>, because T17 keeps one published row per <code>(tenant, kind, key)</code>. A meeting pins <code>meeting_type_id</code> and <code>meeting_type_version</code> at schedule time; it never follows a later version.</p>
+<h3 id="42-the-board-sits-through-the-meeting-arithmetic">4.2 The board sits through the meeting arithmetic</h3>
+<p><code>governance_body.meeting_type_key</code> names the body's standing type explicitly (defaulting to the body key for existing rows). <code>architecture.board_sit_open</code> validates the body and the subject, opens the board approval and creates or reuses the live sitting with the body's type, then adds the approval as the deciding agenda item. Seats record positions; <code>architecture.board_sit_decide</code> calls T19's <code>close_item_tx</code>, so the quorum, the required departments, the meeting rule, the linked approval's stricter policy, P4 exclusion and the <code>via='meeting'</code> decision rows all come from the one arithmetic T19 already proves. A quorum miss defers <code>inquorate</code>; it is not an error. The direct <code>architecture.board_decide</code> writes its approval row as before; the sitting is the bound path.</p>
+<h3 id="43-a-cadence-row-materialises-its-own-meeting">4.3 A cadence row materialises its own meeting</h3>
+<p><code>programme_cadence.meeting_type_key</code> names the forum type for PI planning, the demo, the retro or a refinement. <code>cadences.materialise</code> resolves the latest non-retired version, schedules the meeting with the slot, and returns the existing non-cancelled instance on a repeat. A partial unique index on <code>(tenant_id, cadence_slot)</code> for non-cancelled meetings makes "one cadence row, one meeting" the database's promise; a cancelled instance may be replaced.</p>
+<h3 id="44-what-does-not-change">4.4 What does not change</h3>
+<p>The direct board path, the approval primitive, T19's outcome arithmetic, the meeting DoD, the minutes gate, the metering roll-up and the never-decided retirement flag are untouched. The tenancy, RLS and audit rules are the existing rows'.</p>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<h3 id="p1--the-policy-authoring-route">P1 — The policy authoring route</h3>
+<p>Migration <code>0068_meeting_bindings.sql</code>; the <code>authoring.publish</code> hook; <code>meetings.type_list/get</code>.</p>
+<ul>
+<li>Given a live meeting pinned to a policy's v1, when a reviewed <code>kind=policy</code> asset for the same key is published, then a v2 row exists and the meeting still resolves v1. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_authoring policy_publish_versions_meeting_type</code></li>
+<li>Given an unreviewed policy asset, when it is published, then the publish is refused. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_authoring policy_publish_requires_review</code></li>
+<li>Given an already-published asset key, when another version is drafted under it, then the route refuses and a new asset key is required. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_authoring a_reused_asset_key_is_refused</code></li>
+<li>Given the reads, when list/get run by key, version or status, then the versions return in order. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_authoring type_list_and_get_read_versions</code></li>
+</ul>
+<h3 id="p2--the-board-sitting-binding">P2 — The board-sitting binding</h3>
+<p><code>governance_body.meeting_type_key</code>; the <code>board_open</code> input; <code>architecture.board_sit_open/decide</code>.</p>
+<ul>
+<li>Given a body with a bound type and a subject, when the sitting opens, the seats record positions and the chair decides, then per-seat <code>approval_decision</code> rows exist with <code>via='meeting'</code> and the approval status matches the derived rule. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_binding board_sitting_uses_close_item</code></li>
+<li>Given a body with no bound type, when a sitting is opened, then it is refused <code>422</code>. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_binding a_body_without_a_type_refuses_a_sitting</code></li>
+<li>Given a missing required department, when the chair decides, then the item defers <code>inquorate</code>. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_binding a_quorum_miss_defers_inquorate</code></li>
+<li>Given a body without a sitting, when <code>board_decide</code> is called, then the direct path still records. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_binding the_direct_board_decide_path_still_works</code></li>
+</ul>
+<h3 id="p3--the-cadence-materialisation">P3 — The cadence materialisation</h3>
+<p><code>programme_cadence.meeting_type_key</code>; the one-instance index; <code>cadences.materialise</code>.</p>
+<ul>
+<li>Given a cadence row with a type, when materialise is called twice, then one non-cancelled meeting exists with the bound type and the slot. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_binding cadence_materialise_is_idempotent</code></li>
+<li>Given a cadence without a type, when materialise runs, then it is refused <code>422 cadence_type_missing</code>. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_binding a_cadence_without_a_type_is_refused</code></li>
+<li>Given a materialised meeting, when the agenda is read, then the <code>cadence</code> item resolves the slot. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_binding the_cadence_item_resolves</code></li>
+</ul>
+<h3 id="p4--the-surfaces">P4 — The surfaces</h3>
+<p>The mock UI's Meetings page carries the policy, sitting and cadence panels; the real app's Meetings screen shows the pinned type/version and the policy list; the Playwright spec covers the states.</p>
+<ul>
+<li>Given the mock pack, when <code>check-v2.cjs</code> runs, then the Meetings page carries the panels. <code>Verify:</code> <code>node docs/design/scripts/check-v2.cjs</code></li>
+<li>Given the real app, when the Meetings destination renders, then the new surfaces show empty, happy and one refusal state. <code>Verify:</code> <code>npx playwright test apps/web/e2e/meetings.spec.ts</code></li>
+</ul>
+<h3 id="p5--the-programme-record-and-the-live-proof">P5 — The programme record and the live proof</h3>
+<p>The T19F project row, the MSP/TOGAF/SAFe artefact set, the design-pack registration, the live governance chain, the live gate and the strict programme publish.</p>
+<ul>
+<li>Given the seeded tenant, when <code>migrate --seed</code> and <code>programmes.refresh</code> run, then T19F, its board and the B7 link are live rows. <code>Verify:</code> the read-back under <code>docs/evidence/t19f/</code></li>
+<li>Given the deployed engine, when the chain and gate checks run, then the seven artefacts are approved, the contracts live, the policy/sitting/cadence proofs pass. <code>Verify:</code> <code>python3 scripts/governance-chain.py --project T19F --check</code> and <code>python3 scripts/t19f-live-gate-check.py --check</code></li>
+<li>Given the live snapshot, when the strict publish runs, then no new T19F P0/P1 exists and the pack carries T19F. <code>Verify:</code> <code>CONFORMANCE_STRICT=1 docs/design/scripts/publish-data.sh</code></li>
+</ul>
+<h2 id="6-data-model">6. Data model</h2>
+<p><code>migrations/0068_meeting_bindings.sql</code>, additive only:</p>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>authoring_asset</code></td>
+<td><code>published_meeting_type_id uuid NULL REFERENCES meeting_type(id)</code>, <code>CHECK (published_meeting_type_id IS NULL OR kind = 'policy')</code>, partial unique index on the column</td>
+</tr>
+<tr>
+<td><code>governance_body</code></td>
+<td><code>meeting_type_key text NULL</code>, <code>CHECK (IS NULL OR btrim(...) &lt;&gt; '')</code></td>
+</tr>
+<tr>
+<td><code>programme_cadence</code></td>
+<td><code>meeting_type_key text NULL</code>, same blank check</td>
+</tr>
+<tr>
+<td><code>meeting</code></td>
+<td><code>CREATE UNIQUE INDEX uq_meeting_cadence_instance ON meeting (tenant_id, cadence_slot) WHERE cadence_slot IS NOT NULL AND status &lt;&gt; 'cancelled'</code></td>
+</tr>
+</tbody>
+</table>
+<p>No new table. No FK on a versioned key: the actions resolve the latest non-retired version.</p>
+<h2 id="7-actions-and-events">7. Actions and events</h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Effect</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>meetings.type_list</code></td>
+<td>read</td>
+<td>key/status filter, version desc</td>
+</tr>
+<tr>
+<td><code>meetings.type_get</code></td>
+<td>read</td>
+<td>id, or key + optional version</td>
+</tr>
+<tr>
+<td><code>architecture.board_sit_open</code></td>
+<td>write</td>
+<td>approval + sitting + agenda item, idempotent</td>
+</tr>
+<tr>
+<td><code>architecture.board_sit_decide</code></td>
+<td>write</td>
+<td>calls <code>close_item_tx</code>; returns the item outcome and approval id</td>
+</tr>
+<tr>
+<td><code>cadences.materialise</code></td>
+<td>write</td>
+<td>idempotent per cadence slot</td>
+</tr>
+<tr>
+<td><code>authoring.publish</code></td>
+<td>write (changed)</td>
+<td>a <code>kind=policy</code> payload writes the next <code>meeting_type</code> version</td>
+</tr>
+</tbody>
+</table>
+<p>Events: <code>meeting_type.published</code> on the authoring publish. The meeting events stay T19's.</p>
+<h2 id="8-the-programme">8. The programme</h2>
+<ul>
+<li><strong>MSP</strong> — <code>docs/plans/T19F/msp-profile.md</code>: the B7 realisation increment ("Deliberated cross-department decisions"), the benefit map link, the risk, the stakeholders and the tranche-6 evidence. No new benefit profile; B7's measured baseline is read, never overwritten.</li>
+<li><strong>TOGAF</strong> — <code>docs/plans/T19F/architecture-design.md</code>: the PSA set (principles, requirements R1–R8, stakeholders, drivers/goals, solution concept) and the HLD set (business, data, application and technology views, migration), the seven mandatory artefact types and their links, closing with the Statement of Architecture Work and the compliance approach.</li>
+<li><strong>SAFe</strong> — <code>docs/plans/T19F/safe-epic.md</code>: the epic hypothesis, features F1–F4, enablers E1–E3, WSJF inputs and the PI objectives.</li>
+<li><code>docs/plans/T19F/artifact-register.md</code> is the typed catalogue. The programme doc's "decision forums" subsection names this slice's follow-on and the tranche-6 placement.</li>
+</ul>
+<h2 id="9-dependencies">9. Dependencies</h2>
+<table>
+<thead>
+<tr>
+<th>Relation</th>
+<th>Issue</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>blocked-by</td>
+<td>#682</td>
+<td>this plan and its artefacts</td>
+</tr>
+<tr>
+<td>related</td>
+<td>#606, #650</td>
+<td>T19 implementation and close-out; the feature and its declared follow-ups</td>
+</tr>
+<tr>
+<td>related</td>
+<td>#655</td>
+<td><code>authoring.intakes</code>; file-adjacent, no ordering</td>
+</tr>
+<tr>
+<td>related</td>
+<td>#565, #566</td>
+<td>the T18 real UI; the Meetings screen is screen-local</td>
+</tr>
+<tr>
+<td>related</td>
+<td>#526</td>
+<td>the tranche 2→4 retrospective chain; T19F stays active</td>
+</tr>
+</tbody>
+</table>
+<p>T19 and T17 are built; their dependency is provenance, not a frozen construction order. T19F is a follow-on at tranche 6 by the coverage graph.</p>
+<h2 id="10-acceptance-and-definition-of-done">10. Acceptance and definition of done</h2>
+<p>Every P-scenario passes at the PR head with a row in <code>docs/plans/T19F/evidence.md</code>; the repo gate is green at the exact head (<code>preflight.yml</code> for the compile verdict, the PR's <code>ci-public</code>); the migration ledger reaches 68; the action registry, parity and OpenAPI lock agree; the coverage and design-pack checks pass; one PR per issue; the live gate runs on the deployed engine; the strict publish is green with no new T19F finding. T19F remains <code>active</code>; the closure review records acceptance met and defers closure to the tranche-6 review.</p>
+<h2 id="11-not-claimed">11. Not claimed</h2>
+<p>No chat or transcript store, no AV integration, no calendar dependency, no second decision store, no LLM that selects, decides or marks attendance, no rebuild of T9's board or T10's cadence, no change to the direct board path, no T18 shell work.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T19F-meeting-bindings.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -146,8 +146,8 @@ use serde_json::{Value, json};
 /// #656 `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` are retired
 /// with their handlers, so they do not appear here. T11's `metrics.reconciliation` read adds
 /// one internal action and T11's billing shim adds one external read (`billing.rollup`):
-/// **605: 585 internal, 20 external**.
-const EXPECTED: [&str; 605] = [
+/// **610: 585 internal, 25 external**.
+const EXPECTED: [&str; 610] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -434,6 +434,12 @@ const EXPECTED: [&str; 605] = [
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
+    // T14 (#561): the Lean prover's three read actions.
+    "lean4.check",
+    "lean4.elaborate",
+    "lean4.prove",
+    // T8 (#79): the organisational-memory lifecycle — propose with independent evidence,
+    // a person's review, and promotion to a governed-asset source draft.
     "lessons.promote",
     "lessons.propose",
     "lessons.review",
@@ -734,6 +740,9 @@ const EXPECTED: [&str; 605] = [
     "webhooks.delete",
     "webhooks.test",
     "webhooks.update",
+    // T14 (#561): the webscraper's two read actions.
+    "webscraper.scrape_bulk",
+    "webscraper.scrape_url",
     "workers.list",
     "workflow_runs.cancel",
     "workflow_runs.get",
@@ -854,8 +863,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` with their handlers.
     // T11's `metrics.reconciliation` read adds one internal action.
     // T11's billing shim adds one external read (`billing.rollup`).
-    // Final: 585 internal + 20 external = 605.
-    assert_eq!((internal, external), (585, 20));
+    // Final: 585 internal + 25 external = 610.
+    assert_eq!((internal, external), (585, 25));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

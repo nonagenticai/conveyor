@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "2c944b95a7cd14b570996d8a6997766ddf3d1dfef0ad44eac867a258a557581e",
-      "bytes": 196503,
+      "sha256": "56d237d16db41a74c8c7474d28a3ac1a9ba9c6875a3e904d826003010ac80ab2",
+      "bytes": 197298,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -204,8 +204,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
       "section": "Design",
-      "sha256": "b534cd0891d6cdf0923586016878c357274a5a80e4c5f0708e2bc3f66b5f1b91",
-      "bytes": 18121,
+      "sha256": "a5ce762378364acf2866183f5ee384e2f20417f48f90958cda2bacfa831cb7df",
+      "bytes": 18895,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md"
     },
     {
@@ -942,8 +942,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "b8a0a1edadb3622f7e7e38653cb1765ae3462036963ad051f0ffdcc917a814e6",
-      "bytes": 259149,
+      "sha256": "36eca2e9475876120ccc695318ed827ef80c34130b3c3abe2a0e17edf9a61dba",
+      "bytes": 260000,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -1170,6 +1170,69 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "c4cd154bc3d1047bdb8bcfb9aec7f62d96580fcdb99b046305b76ed070a2763b",
       "bytes": 5420,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/safe-epic.md"
+    },
+    {
+      "title": "T19F — Decision-forum governance (follow-on)",
+      "path": "docs/plans/T19F-meeting-bindings.html",
+      "source": "docs/plans/T19F-meeting-bindings.md",
+      "section": "Plans",
+      "sha256": "b55d45b97942b6e8e99c48c3ec83d10cd7a978ada2ea1c2915ee60f3750a11eb",
+      "bytes": 14656,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F-meeting-bindings.md"
+    },
+    {
+      "title": "T19F — Architecture design (PSA + HLD)",
+      "path": "docs/plans/T19F/architecture-design.html",
+      "source": "docs/plans/T19F/architecture-design.md",
+      "section": "Plans",
+      "sha256": "56e9beb0b754d87260d1e61e8611f6344343c844f862b1dbfbb316f95cb035fe",
+      "bytes": 6276,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/architecture-design.md"
+    },
+    {
+      "title": "T19F — Artefact register",
+      "path": "docs/plans/T19F/artifact-register.html",
+      "source": "docs/plans/T19F/artifact-register.md",
+      "section": "Plans",
+      "sha256": "0da8389f33a51f2ab6b2c78032cac8fe6841a4717c4e38172882a92f5b35ebdd",
+      "bytes": 4256,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/artifact-register.md"
+    },
+    {
+      "title": "T19F — Inception analysis",
+      "path": "docs/plans/T19F/inception-analysis.html",
+      "source": "docs/plans/T19F/inception-analysis.md",
+      "section": "Plans",
+      "sha256": "d8411fc4348cd72f7ff0b296713cb37c9f263376c6c91198ec41ad1d694ed76d",
+      "bytes": 5821,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/inception-analysis.md"
+    },
+    {
+      "title": "T19F — MSP profile",
+      "path": "docs/plans/T19F/msp-profile.html",
+      "source": "docs/plans/T19F/msp-profile.md",
+      "section": "Plans",
+      "sha256": "8155ee18056e6ea7d037c8b12e274bcc2d01d32d5cd1d3687cbf6cb221f40816",
+      "bytes": 2961,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/msp-profile.md"
+    },
+    {
+      "title": "T19F — Decision-forum governance: project brief",
+      "path": "docs/plans/T19F/project-brief.html",
+      "source": "docs/plans/T19F/project-brief.md",
+      "section": "Plans",
+      "sha256": "320d632de45aa02035273e0e5c8363e2d448cba9211c65408f18e99be7e4dca6",
+      "bytes": 4039,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/project-brief.md"
+    },
+    {
+      "title": "T19F — SAFe epic",
+      "path": "docs/plans/T19F/safe-epic.html",
+      "source": "docs/plans/T19F/safe-epic.md",
+      "section": "Plans",
+      "sha256": "6e87daefcbd4af476cabaf74e96a16e19f4762ac5b526ba9f338009c9d961bac",
+      "bytes": 2699,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/safe-epic.md"
     },
     {
       "title": "T9 — TOGAF ADM capability",

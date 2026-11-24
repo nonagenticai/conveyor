@@ -962,7 +962,7 @@ closes one Board agenda item and adds no decision path (the `dev.*` composition 
 A delivery project cannot pass its design gate without the contract that governs it; the phase-G review is per
 delivery project, and its compliance level and waivers attach to that delivery's evidence. The conveyor's own
 buildout runs under this capability: P0 is the Preliminary-phase and programme-definition project, and the delivery
-slices T1–T19 each sit under the contract that governs them.
+slices T1–T19 (with the T19F follow-on) each sit under the contract that governs them.
 
 Scope note: this is a **tailored ADM profile** for software delivery, not a claim of TOGAF certification or full
 conformance. The standard's full catalogue is the reference; the tenant's `adm_profile` names the mandatory set per
@@ -1738,6 +1738,7 @@ slice integrates and when the repo merges. V2 slices build on V1's S-slices and 
 | **T17** | **Tenant asset authoring** — chat + document intake producing drafts of every tenant asset (organisation, jobs, procedures, packs, policies, templates, tool requests), the review queue, publication | a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant |
 | **T18** | **The real V2 UI** — every V2 destination is a route in `apps/web` with its screen module, read/write contract, honest states and a Playwright spec; the shell and navigation; the L1–L4 delivery view; the design pack remains the public programme site and the reviewed reference | a signed-in tenant drives portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports `exists` only from a real route + spec; no production screen renders a fixture |
 | **T19** | **Decision forums (meetings)** — `meeting_type` policy, `meeting`, agenda items resolving approvals, attendance and positions, quorum and the three decision rules, the closed outcome set, commitments as dependencies or cards, minutes as a governed asset, human seats with live and asynchronous participation | a three-department board meeting decides its agenda items by recorded majority with a recorded dissent; an item missing a required department is deferred `inquorate` and cannot be decided; a meeting cannot lower a linked approval's dual control or waive its evidence; the owner decides one item in the web meeting room and another asynchronously from the agent front end over MCP, both recorded `via='meeting'`; minutes publish behind the chair's gate and every action becomes a card; a forum with no decision over a cycle is flagged |
+| **T19F** | **Decision-forum governance (follow-on)** — the `meeting_type` authoring route through the tenant's authoring pipeline, and the explicit T9 board / T10 cadence binding to forum types | a reviewed policy asset publishes a new immutable `meeting_type` version while an in-flight meeting keeps its pinned version; a board subject decision is taken in a sitting whose qualifying seats each write one `approval_decision` with `via='meeting'`; a cadence row names its type and materialises exactly one meeting; the direct board path is unchanged |
 
 Dependencies: T0 → T1 → T2 → T3; T4 after T3; T5 after T2 and V1's S16–S20; T6 after T5 **and T13**; T7 after T2/T4
 **and T13**; T9/T10 after T1/T3; T8 after T5; T11 continuous; T12 after all; T13 after T2; T14 after T13; T15 after
@@ -1746,7 +1747,8 @@ T13 and T6; T16 after T2 and T13; T17 after T16 and T3. T9 and T10 may run in pa
 T11, T13, T16, T17), and T18 closes after T12. **T19** starts after T1, T2 and T3; it tests with a `job_binding` or
 `app_user` convener, and the `governance_body` convener is testable because T9 is built (measured 2026-11-23). T9 and
 T10 are already built; their board and cadence binding to T19's meeting types is a follow-up integration unit, not a
-rebuild.
+rebuild. **T19F** is that follow-up (measured 2026-11-24): it starts after T19 and T17, both built, and adds the
+reviewed policy route and the explicit board/cadence binding while leaving the direct board path unchanged.
 
 **The first three months of work are T0–T3 plus T13.** They install the organisation spine and the tool spine;
 everything else is a job that uses them. T16 follows the tool spine and is the first authoring feature built on it;

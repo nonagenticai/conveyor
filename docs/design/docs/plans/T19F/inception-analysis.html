@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F — Inception analysis · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/inception-analysis.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f--inception-analysis">T19F — Inception analysis</h1>
+<h2 id="question">Question</h2>
+<p>T19's closure review names two open items: the <code>meeting_type</code> authoring route and the T9 board / T10 cadence binding. What is the smallest implementation that closes them through the platform's existing routes, and what does it cost?</p>
+<h2 id="measured-starting-point">Measured starting point</h2>
+<p><code>main@2debb226</code>, 2026-11-24:</p>
+<table>
+<thead>
+<tr>
+<th>Seam</th>
+<th>Measurement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The policy has versions but no writer</td>
+<td><code>meeting_type</code> is versioned and immutable (<code>migrations/0065_meetings.sql</code>); <code>crates/store/src/meetings.rs:schedule_tx</code> creates v1 only and refuses an existing key with "a policy change is a new version through the governance route"</td>
+</tr>
+<tr>
+<td>The authoring route exists</td>
+<td><code>authoring.intake/draft/review/publish/assets</code>; <code>migrations/0064_authoring.sql</code> admits <code>kind='policy'</code>; <code>authoring.review</code> requires an approved <code>approval_id</code>; one published row per <code>(tenant, kind, key)</code></td>
+</tr>
+<tr>
+<td>The board has no type</td>
+<td><code>governance_body</code> (<code>migrations/0054</code>) has no meeting-type column; <code>architecture.board_open</code> and <code>board_decide</code> (<code>crates/actions/src/architecture.rs</code>) call <code>decide_board_tx</code>, which writes one approval row directly</td>
+</tr>
+<tr>
+<td>The cadence has no type</td>
+<td><code>programme_cadence</code> (<code>migrations/0044</code>) has <code>meta</code> only; <code>cadences.create/update</code> (<code>crates/actions/src/spine/mod.rs</code>) do not name a meeting type; <code>meetings.schedule</code> accepts a <code>cadence_slot</code> but nothing materialises it</td>
+</tr>
+<tr>
+<td>The arithmetic exists</td>
+<td><code>crates/store/src/meetings.rs:close_item_tx</code>; T19's D4 evidence has 26 scenarios</td>
+</tr>
+<tr>
+<td>The surfaces have no policy view</td>
+<td><code>docs/design/v2.js:meetingsPage</code>; <code>apps/web/src/screens/meetings.rs</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="options">Options</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Shape</th>
+<th>Assessment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A. Dedicated <code>meetings.types_*</code> CRUD</td>
+<td>new actions with their own approval</td>
+<td>duplicates T17's review/publication pipeline; a second authoring route to maintain</td>
+</tr>
+<tr>
+<td>B. T17 authoring route</td>
+<td><code>authoring.draft(kind=policy)</code> → human review approval → <code>authoring.publish</code> writes the next <code>meeting_type</code> version</td>
+<td>reuses the platform's prescribed tenant-asset route; one publish hook; the asset key and the type key stay distinct</td>
+</tr>
+<tr>
+<td>C. Seed/config only</td>
+<td>edit the seed and redeploy for a policy change</td>
+<td>no runtime route; a tenant cannot change its own policy</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Decision: B.</strong> The policy is a tenant policy; T17 is the tenant's authoring route. The hook is a single additive call inside <code>asset_publish_tx</code>, with the existing review approval as the governance gate. Option A would create a second policy store; option C leaves the clause in the schedule's refusal with no way out.</p>
+<h2 id="binding-options">Binding options</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Shape</th>
+<th>Assessment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A. Link only</td>
+<td>store the type key on the body and cadence row; decisions/materialisation stay manual</td>
+<td>the keys are visible but the board still writes one direct approval; the cadence still needs a hand-made schedule</td>
+</tr>
+<tr>
+<td>B. Sittings and slots</td>
+<td>a board sitting opens the approval + meeting + agenda item and decides through <code>close_item_tx</code>; a cadence row materialises its meeting</td>
+<td>the board's decision carries the deliberation T19 built; one class of arithmetic</td>
+</tr>
+<tr>
+<td>C. Rebuild T9/T10</td>
+<td>replace the board/cadence aggregates with meeting calls</td>
+<td>a rebuild the spec explicitly forbids</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Decision: B</strong>, with the direct <code>architecture.board_decide</code> path unchanged. The sitting is an additional entry, not a replacement; a body without a type keeps the direct path.</p>
+<h2 id="affected-units">Affected units</h2>
+<ul>
+<li><code>crates/store/src/meetings.rs</code> — the version writer, the sitting helper, the cadence materialiser.</li>
+<li><code>crates/store/src/authoring.rs</code> — the publish hook.</li>
+<li><code>crates/store/src/architecture.rs</code> — <code>insert_board_approval_tx</code> extracted from <code>decide_board_tx</code>.</li>
+<li><code>crates/store/src/spine.rs</code> — the cadence key and the derived meeting.</li>
+<li><code>crates/actions/src/{meetings,authoring,architecture,spine}</code> — the five actions and the changed input.</li>
+<li><code>crates/api/tests/meetings_authoring.rs</code>, <code>meetings_binding.rs</code> — the new scenarios.</li>
+<li><code>docs/design/v2.js</code>, <code>apps/web/src/screens/meetings.rs</code>, <code>apps/web/e2e/meetings.spec.ts</code> — the surfaces.</li>
+<li>The programme record — the T19F plan, artefacts, seed, coverage and design pack.</li>
+</ul>
+<h2 id="assumptions">Assumptions</h2>
+<ul>
+<li>T17's authoring route is stable while #655 lands its read action; the hook is additive.</li>
+<li>A governance body has at most one standing type at a time; the explicit key replaces the key-coincidence convention.</li>
+<li>A cadence row is one forum instance per slot; a cancelled meeting may be replaced.</li>
+<li>T19F is delivered at tranche 6 by the coverage graph (T19 is tranche 4, T17 tranche 5).</li>
+</ul>
+<h2 id="risks">Risks</h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Likelihood</th>
+<th>Impact</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T17 file collision</td>
+<td>medium</td>
+<td>merge conflict</td>
+<td>rebase before the PR; the hook does not change signatures</td>
+</tr>
+<tr>
+<td>A policy version is published without evidence</td>
+<td>low</td>
+<td>governance defect</td>
+<td><code>authoring.review</code> requires an approved approval row; the plan tests the refusal</td>
+</tr>
+<tr>
+<td>A board sitting bypasses the direct policy</td>
+<td>low</td>
+<td>dual control lowered</td>
+<td><code>close_item_tx</code> is the only writer; the stricter approval policy wins</td>
+</tr>
+<tr>
+<td>A cadence slot gets a second meeting</td>
+<td>medium</td>
+<td>duplicate deliberation</td>
+<td>the partial unique index; the action is idempotent</td>
+</tr>
+<tr>
+<td>T19F closure manufactures a P0</td>
+<td>high if closed</td>
+<td>strict gate red</td>
+<td>T19F stays active; the closure review defers to the tranche-6 review</td>
+</tr>
+</tbody>
+</table>
+<h2 id="recommendation">Recommendation</h2>
+<p>Deliver T19F in the split the delivery contract writes: the plan and artefacts (#682), the implementation (#683) and the deployment-gated proof (#684). The live proof waits for the rollout that carries migration 0068; it is recorded as acceptance-blocked, never waived.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T19F/inception-analysis.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

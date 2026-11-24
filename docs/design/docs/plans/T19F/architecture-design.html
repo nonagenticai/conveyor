@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F — Architecture design (PSA + HLD) · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/architecture-design.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f--architecture-design-psa--hld">T19F — Architecture design (PSA + HLD)</h1>
+<p>The design follows T9's tailored ADM profile and the artefact standard in <code>docs/plans/T9-architecture-capability.md</code>. Each artefact carries the standard's common metadata and is linked with <code>derivation | realization | reuse | dependency</code>.</p>
+<h2 id="psa--preliminary-a">PSA — Preliminary, A</h2>
+<h3 id="principles">Principles</h3>
+<table>
+<thead>
+<tr>
+<th>Id</th>
+<th>Principle</th>
+<th>Application</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td>One decision store</td>
+<td>a policy version is still a <code>meeting_type</code> row; a sitting decision is still an <code>approval_decision</code> row</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>Rows are the record</td>
+<td>the authored policy, the approval, the positions and the minutes are rows; no transcript is evidence</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>The consumer names its binding</td>
+<td>the body and the cadence row name their meeting type explicitly; no key coincidence</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>Stricter policy wins</td>
+<td>the linked approval's dual control, evidence and conflict rules outrank the meeting's rule</td>
+</tr>
+</tbody>
+</table>
+<h3 id="requirements">Requirements</h3>
+<table>
+<thead>
+<tr>
+<th>Id</th>
+<th>Requirement</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>A policy change publishes a new immutable version</td>
+<td>§6.8 "versioned (P11)"; T19 closure review</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>A policy change passes a human review gate</td>
+<td>T17 <code>authoring.review</code></td>
+</tr>
+<tr>
+<td>R3</td>
+<td>An in-flight meeting keeps its pinned version</td>
+<td>§6.8; <code>meeting.meeting_type_id/version</code></td>
+</tr>
+<tr>
+<td>R4</td>
+<td>A board subject decision can be taken in a sitting</td>
+<td>§6.8; SPEC §12 T19F</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>A sitting writes one <code>approval_decision</code> per qualifying seat with <code>via='meeting'</code></td>
+<td>§6.8; T19 D4</td>
+</tr>
+<tr>
+<td>R6</td>
+<td>A cadence row names its meeting type and materialises one meeting</td>
+<td>§6.8; SPEC §12 T19F</td>
+</tr>
+<tr>
+<td>R7</td>
+<td>The direct board path is unchanged</td>
+<td>T9; the scope boundary</td>
+</tr>
+<tr>
+<td>R8</td>
+<td>The policy and cadence bindings are tenant-scoped and RLS-guarded</td>
+<td>P11; the existing tables</td>
+</tr>
+</tbody>
+</table>
+<h3 id="stakeholders">Stakeholders</h3>
+<table>
+<thead>
+<tr>
+<th>Stakeholder</th>
+<th>Concern</th>
+<th>Engagement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SRO / sponsoring group</td>
+<td>the board's decisions are deliberated and evidenced</td>
+<td>tranche review; the programme board</td>
+</tr>
+<tr>
+<td>Programme manager</td>
+<td>the tranche-6 evidence and B7</td>
+<td>the meeting record</td>
+</tr>
+<tr>
+<td>Architecture Board</td>
+<td>the sitting path, contracts and artefacts</td>
+<td>the sitting; the phase-G review</td>
+</tr>
+<tr>
+<td>BCM</td>
+<td>B7's measurement</td>
+<td>the benefit profile and the review</td>
+</tr>
+<tr>
+<td>Department heads</td>
+<td>seats are invited and counted</td>
+<td>the attendance rows</td>
+</tr>
+<tr>
+<td>Delivery teams</td>
+<td>no change to the direct paths</td>
+<td>the release note</td>
+</tr>
+</tbody>
+</table>
+<h3 id="drivers-goals-and-objectives">Drivers, goals and objectives</h3>
+<table>
+<thead>
+<tr>
+<th>Driver</th>
+<th>Goal</th>
+<th>Objective</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A policy change today has no route</td>
+<td>a governed policy lifecycle</td>
+<td>a reviewed asset publishes a version; the schedule refuses an inline change</td>
+</tr>
+<tr>
+<td>The board's deliberation is not recorded as a meeting</td>
+<td>a seated board decision</td>
+<td>a sitting produces <code>via='meeting'</code> rows</td>
+</tr>
+<tr>
+<td>A cadence slot is scheduled by hand</td>
+<td>a cadence-driven forum</td>
+<td>the row materialises its meeting once</td>
+</tr>
+</tbody>
+</table>
+<h3 id="solution-concept">Solution concept</h3>
+<p>The authoring asset is the draft; the published asset is the release note; <code>meeting_type</code> is the runtime policy. The board sitting is an approval plus a meeting plus an agenda item, decided by T19's arithmetic. The cadence materialisation is a schedule with a slot and an idempotent key. Nothing else is added.</p>
+<h2 id="hld--bd">HLD — B–D</h2>
+<h3 id="business-capability-map">Business capability map</h3>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Realisation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B1 Governed tenant assets</td>
+<td>T17's authoring route, extended with the <code>policy</code> payload</td>
+</tr>
+<tr>
+<td>B2 Deliberated decisions</td>
+<td>T19's meeting, reused by the board sitting</td>
+</tr>
+<tr>
+<td>B3 Cadence-driven forums</td>
+<td>T10's cadence row, binding to a meeting type</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-entity-catalog">Data entity catalog</h3>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>meeting_type</code></td>
+<td>no schema change; the writer and the reads are new</td>
+</tr>
+<tr>
+<td><code>meeting</code></td>
+<td>no column; the cadence-slot partial unique index is new</td>
+</tr>
+<tr>
+<td><code>governance_body</code></td>
+<td><code>meeting_type_key</code></td>
+</tr>
+<tr>
+<td><code>programme_cadence</code></td>
+<td><code>meeting_type_key</code></td>
+</tr>
+<tr>
+<td><code>authoring_asset</code></td>
+<td><code>published_meeting_type_id</code></td>
+</tr>
+<tr>
+<td><code>approval</code>, <code>approval_decision</code>, <code>meeting_agenda_item</code>, <code>meeting_attendance</code>, <code>meeting_position</code></td>
+<td>reused unchanged</td>
+</tr>
+</tbody>
+</table>
+<h3 id="application-view">Application view</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/store/src/authoring.rs</code></td>
+<td>publish hook: validate the policy payload, write the next version, link the asset</td>
+</tr>
+<tr>
+<td><code>crates/store/src/meetings.rs</code></td>
+<td>version writer, sitting open, sit decide, cadence materialise</td>
+</tr>
+<tr>
+<td><code>crates/store/src/architecture.rs</code></td>
+<td>extract the board approval insert; set the body's key</td>
+</tr>
+<tr>
+<td><code>crates/store/src/spine.rs</code></td>
+<td>cadence key in create/update/list; the derived meeting</td>
+</tr>
+<tr>
+<td><code>crates/actions/src/*</code></td>
+<td>five new actions and the changed cadence inputs</td>
+</tr>
+<tr>
+<td><code>docs/design/v2.js</code>, <code>apps/web</code></td>
+<td>the policy, sitting and cadence surfaces</td>
+</tr>
+</tbody>
+</table>
+<h3 id="technology-standards">Technology standards</h3>
+<table>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rust + sqlx, AdditiveForward migrations</td>
+<td>migration 0068</td>
+</tr>
+<tr>
+<td>One ActionSpec per action</td>
+<td>HTTP + MCP + OpenAPI + generated client</td>
+</tr>
+<tr>
+<td>RLS and tenant scoping</td>
+<td>every altered table keeps <code>ENABLE</code>+<code>FORCE ROW LEVEL SECURITY</code></td>
+</tr>
+<tr>
+<td>Deterministic generators</td>
+<td>seed, coverage and docs are regenerated, never hand-edited</td>
+</tr>
+</tbody>
+</table>
+<h3 id="migration">Migration</h3>
+<p>Tranche 6: the migration, the actions, the tests and the surfaces land in #683; the live chain and the live gate run in #684 on the deployed engine. No backfill: the bindings are nullable and the direct paths keep working for rows without a key.</p>
+<h2 id="links">Links</h2>
+<table>
+<thead>
+<tr>
+<th>From</th>
+<th>Kind</th>
+<th>To</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Requirements catalog</td>
+<td>derivation</td>
+<td>Solution concept</td>
+</tr>
+<tr>
+<td>Drivers/goals</td>
+<td>derivation</td>
+<td>Requirements catalog</td>
+</tr>
+<tr>
+<td>Stakeholder map</td>
+<td>dependency</td>
+<td>Solution concept</td>
+</tr>
+<tr>
+<td>Business capability map</td>
+<td>realization</td>
+<td>Application view</td>
+</tr>
+<tr>
+<td>Data entity catalog</td>
+<td>realization</td>
+<td>Application view</td>
+</tr>
+<tr>
+<td>Technology standards</td>
+<td>realization</td>
+<td>Application view</td>
+</tr>
+</tbody>
+</table>
+<h2 id="statement-of-architecture-work-and-compliance">Statement of Architecture Work and compliance</h2>
+<p>The SoAW for T19F is requested, board-decided and approved in the live governance chain (<code>scripts/governance-chain.py --project T19F</code>), followed by a phase-F delivery contract. Two Phase-G compliance reviews record the level and the follow-ups. The review checks: every policy version is published through the authoring gate; every sitting decision is a <code>via='meeting'</code> decision row; every materialised cadence has one non-cancelled meeting; the direct board path is unchanged.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T19F/architecture-design.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

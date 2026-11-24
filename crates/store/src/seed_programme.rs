@@ -35,7 +35,7 @@ use crate::tenants;
 /// The checked-in programme document.
 pub const PROGRAMME_EXPORT: &str = include_str!("../../../seed/programme.json");
 
-/// The buildout's own MSP definition: the six benefit profiles, their map, the fourteen tranches
+/// The buildout's own MSP definition: the seven benefit profiles, their map, the fourteen tranches
 /// and every project's ADM phase/plateau (`scripts/check-programme-definition.py` validates it).
 pub const PROGRAMME_DEFINITION_EXPORT: &str =
     include_str!("../../../seed/programme-definition.json");

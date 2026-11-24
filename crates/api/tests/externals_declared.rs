@@ -214,7 +214,7 @@ fn every_external_action_declares_its_services_path_prefix() {
     // are internal reads now, so no external path reaches those services. SPEC §12 T11's
     // reconciliation re-adds billing as a **Rust shim** destination (`billing_shim`), never the
     // Python billing service directly (owner decision 2026-11-24).
-    const PREFIXES: [(&str, &str); 10] = [
+    const PREFIXES: [(&str, &str); 12] = [
         ("fixtures", ""),
         ("image_gen", ""),
         ("coding", "/api"),
@@ -227,7 +227,10 @@ fn every_external_action_declares_its_services_path_prefix() {
         // (apps/scientific/src/router/mod.rs).
         ("scientific", "/api"),
         // SPEC §12 T11: the shim serves POST /api/usage/rollup (apps/billing-shim).
-        ("billing_shim", "/api"),
+        ("billing_shim", "/api"), // #561: the scraper mounts /api/scrape/* (apps/research/src/router.rs) and the Lean
+        // prover mounts /api/check|elaborate|prove (apps/lean4-prover/src/routes.rs).
+        ("webscraper", "/api"),
+        ("lean4", "/api"),
     ];
 
     let mut seen: BTreeSet<&str> = BTreeSet::new();
