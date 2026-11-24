@@ -383,6 +383,7 @@
     "pm.get",
     "pm.plan",
     "pm.route_gate",
+    "pm.status",
     "portfolio.in_flight",
     "principles.create",
     "principles.dismiss_conflict",
