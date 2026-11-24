@@ -1,12 +1,12 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `97100b6e18474ccd26ef2e6ff82a0d94500926cd` generated `2026-11-24T08:29:31.004848+00:00` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.QtVPK1x8to/data`.
+Snapshot: `fd652720002ea5886a274557f6d2fb0714f66069` generated `2026-11-24T09:41:16.641438+00:00` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.yOiw3zfMzd/data`.
 
 | Severity | Count |
 |---|---:|
 | P0 | 26 |
-| P1 | 143 |
-| P2 | 35 |
+| P1 | 140 |
+| P2 | 39 |
 | P3 | 0 |
 
 ## P0 and P1
@@ -45,9 +45,7 @@ Snapshot: `97100b6e18474ccd26ef2e6ff82a0d94500926cd` generated `2026-11-24T08:29
 | `benefit_baseline_placeholder` | `B4` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
 | `benefit_baseline_placeholder` | `B5` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
 | `benefit_baseline_placeholder` | `B6` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
-| `benefit_baseline_placeholder` | `B7` | P1 | baseline is a placeholder: 'not measured - no meeting rows exist before T19; the current record is the approval row only' |
 | `benefit_profile_incomplete` | `B1` | P1 | missing operational_area |
-| `benefit_profile_incomplete` | `B7` | P1 | missing owner |
 | `closed_without_closure_review` | `S05` | P1 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `S06b` | P1 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `S06c` | P1 | project is closed but its closure review is not published |
@@ -97,7 +95,6 @@ Snapshot: `97100b6e18474ccd26ef2e6ff82a0d94500926cd` generated `2026-11-24T08:29
 | `contract_missing` | `T16` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T17` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T18` | P1 | delivery project has no live architecture contract |
-| `contract_missing` | `T19` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T3` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T5` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T6` | P1 | delivery project has no live architecture contract |
@@ -136,7 +133,6 @@ Snapshot: `97100b6e18474ccd26ef2e6ff82a0d94500926cd` generated `2026-11-24T08:29
 | `mandatory_artefacts` | `T16` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `T17` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `T18` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
-| `mandatory_artefacts` | `T19` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `T2` | P1 | missing approved artefacts: solution_concept |
 | `mandatory_artefacts` | `T3` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `T5` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
@@ -155,6 +151,7 @@ Snapshot: `97100b6e18474ccd26ef2e6ff82a0d94500926cd` generated `2026-11-24T08:29
 | `project_in_unauthorised_tranche` | `T5` | P1 | project is active in tranche 10 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T6` | P1 | project is active in tranche 11 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T8` | P1 | project is active in tranche 11 whose state is 'planned' |
+| `seed_live_drift` | `T5` | P1 | seed status 'closed' != live status 'active' |
 | `unpublished_declared_output` | `S04` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S05` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S06` | P1 | declared outputs are not published: project-brief |
@@ -217,7 +214,7 @@ Snapshot: `97100b6e18474ccd26ef2e6ff82a0d94500926cd` generated `2026-11-24T08:29
 | S18 | closed | 9 | 1 | 4 | 0 | 0 |
 | S19 | active | 8 | 0 | 3 | 1 | 0 |
 | S20 | closed | 9 | 1 | 4 | 0 | 0 |
-| S21 | closed | 9 | 1 | 4 | 0 | 0 |
+| S21 | closed | 9 | 1 | 4 | 1 | 0 |
 | SPEC-V2 | closed | 0 | 0 | 1 | 0 | 0 |
 | T0 | closed | 0 | 0 | 1 | 0 | 0 |
 | T1 | closed | 1 | 0 | 2 | 2 | 0 |
@@ -230,11 +227,11 @@ Snapshot: `97100b6e18474ccd26ef2e6ff82a0d94500926cd` generated `2026-11-24T08:29
 | T16 | closed | 4 | 2 | 3 | 0 | 0 |
 | T17 | active | 5 | 0 | 3 | 1 | 0 |
 | T18 | active | 4 | 0 | 4 | 1 | 0 |
-| T19 | closed | 4 | 1 | 2 | 0 | 0 |
+| T19 | closed | 4 | 1 | 0 | 3 | 0 |
 | T2 | closed | 2 | 0 | 2 | 2 | 0 |
 | T3 | closed | 3 | 1 | 3 | 0 | 0 |
 | T4 | closed | 4 | 2 | 1 | 2 | 0 |
-| T5 | active | 10 | 0 | 3 | 1 | 0 |
+| T5 | active | 10 | 0 | 4 | 1 | 0 |
 | T6 | active | 11 | 0 | 3 | 1 | 0 |
 | T7 | closed | 5 | 2 | 3 | 0 | 0 |
 | T8 | active | 11 | 0 | 4 | 1 | 0 |

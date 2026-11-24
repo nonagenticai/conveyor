@@ -1,8 +1,38 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-24T08:29:31.004848+00:00",
+  "generated_at": "2026-11-24T09:41:16.641438+00:00",
   "issue_registry": {
     "issues": [
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 661,
+        "state": "OPEN",
+        "title": "fix: the router flushes SSE headers before the upstream's first chunk",
+        "updatedAt": "2026-11-24T09:26:34Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/661"
+      },
+      {
+        "labels": [
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 660,
+        "state": "OPEN",
+        "title": "conveyor-buildout — the SPEC_V2 programme",
+        "updatedAt": "2026-11-24T09:00:52Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/660"
+      },
       {
         "labels": [
           {
@@ -21,7 +51,7 @@
         "number": 656,
         "state": "OPEN",
         "title": "add: the L1 laya gate — the ladder builds the case, the engine makes the call, the decision cites it",
-        "updatedAt": "2026-11-24T08:22:43Z",
+        "updatedAt": "2026-11-24T09:18:58Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/656"
       },
       {
@@ -31,8 +61,8 @@
             "name": "unit"
           },
           {
-            "color": "D93F0B",
-            "name": "status:blocked"
+            "color": "0E8A16",
+            "name": "status:ready"
           },
           {
             "color": "6E7781",
@@ -46,7 +76,7 @@
         "number": 655,
         "state": "OPEN",
         "title": "add: the authoring intake queue read (authoring.intakes)",
-        "updatedAt": "2026-11-24T08:20:08Z",
+        "updatedAt": "2026-11-24T09:26:37Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/655"
       },
       {
@@ -65,9 +95,9 @@
           }
         ],
         "number": 653,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "data: T5 measures built — register the kata's tables, actions and module",
-        "updatedAt": "2026-11-24T08:27:49Z",
+        "updatedAt": "2026-11-24T09:00:44Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/653"
       },
       {
@@ -92,7 +122,7 @@
         "number": 650,
         "state": "OPEN",
         "title": "T19 close-out: the live gate, the closure review and the published programme record",
-        "updatedAt": "2026-11-24T07:40:42Z",
+        "updatedAt": "2026-11-24T08:57:48Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/650"
       },
       {
@@ -215,9 +245,9 @@
           }
         ],
         "number": 629,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "T18-3b: the Authoring destination live over T17's authoring.* actions",
-        "updatedAt": "2026-11-24T08:20:38Z",
+        "updatedAt": "2026-11-24T09:27:30Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/629"
       },
       {
@@ -1069,7 +1099,7 @@
         "number": 526,
         "state": "OPEN",
         "title": "#526 programme: the retrospective rework — tranche 0, all remaining tranches, benefits and the viability gate (U5a–U5h, U6, U7)",
-        "updatedAt": "2026-11-24T08:01:42Z",
+        "updatedAt": "2026-11-24T09:20:28Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/526"
       },
       {
@@ -4640,7 +4670,7 @@
         "number": 80,
         "state": "OPEN",
         "title": "T6 — Development project",
-        "updatedAt": "2026-11-24T08:04:54Z",
+        "updatedAt": "2026-11-24T09:28:57Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/80"
       },
       {

@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19 artefact link — drivergoalobjective derivation requirementscatalog · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-links.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19-artefact-link--driver_goal_objective-derivation-requirements_catalog">T19 artefact link — driver_goal_objective derivation requirements_catalog</h1>
+<p>Action <code>architecture.artifacts_link</code> from 01a20cde-0f97-7f74-afd8-7cd74e0990e3 to 01a20cde-371c-7d85-ae2d-780453958bef, kind <code>derivation</code> (docs/plans/T19/architecture-design.md §5).</p>
+<pre><code>== write: architecture.artifacts_link ==
+{
+  &quot;from_artifact_id&quot;: &quot;01a20cde-0f97-7f74-afd8-7cd74e0990e3&quot;,
+  &quot;id&quot;: &quot;01a20cdf-cacf-744d-9147-64e4091a3a47&quot;,
+  &quot;kind&quot;: &quot;derivation&quot;,
+  &quot;to_artifact_id&quot;: &quot;01a20cde-371c-7d85-ae2d-780453958bef&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: architecture.artifacts_links ==
+{
+  &quot;items&quot;: [
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cde-0f97-7f74-afd8-7cd74e0990e3&quot;,
+      &quot;id&quot;: &quot;01a20cdf-cacf-744d-9147-64e4091a3a47&quot;,
+      &quot;kind&quot;: &quot;derivation&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-371c-7d85-ae2d-780453958bef&quot;,
+      &quot;version&quot;: 1
+    }
+  ]
+}</code></pre>
+<pre><code>== write: architecture.artifacts_link ==
+{
+  &quot;from_artifact_id&quot;: &quot;01a20cde-371c-7d85-ae2d-780453958bef&quot;,
+  &quot;id&quot;: &quot;01a20cdf-de08-7ce2-8d47-1dd19702d147&quot;,
+  &quot;kind&quot;: &quot;derivation&quot;,
+  &quot;to_artifact_id&quot;: &quot;01a20cde-5f86-7720-9a16-36a964ef255d&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: architecture.artifacts_links ==
+{
+  &quot;items&quot;: [
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cde-0f97-7f74-afd8-7cd74e0990e3&quot;,
+      &quot;id&quot;: &quot;01a20cdf-cacf-744d-9147-64e4091a3a47&quot;,
+      &quot;kind&quot;: &quot;derivation&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-371c-7d85-ae2d-780453958bef&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cde-371c-7d85-ae2d-780453958bef&quot;,
+      &quot;id&quot;: &quot;01a20cdf-de08-7ce2-8d47-1dd19702d147&quot;,
+      &quot;kind&quot;: &quot;derivation&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-5f86-7720-9a16-36a964ef255d&quot;,
+      &quot;version&quot;: 1
+    }
+  ]
+}</code></pre>
+<pre><code>== write: architecture.artifacts_link ==
+{
+  &quot;from_artifact_id&quot;: &quot;01a20cde-5f86-7720-9a16-36a964ef255d&quot;,
+  &quot;id&quot;: &quot;01a20cdf-f295-76b4-b9eb-1465f0484504&quot;,
+  &quot;kind&quot;: &quot;realization&quot;,
+  &quot;to_artifact_id&quot;: &quot;01a20cde-adbf-7626-9b2b-58faf7164755&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: architecture.artifacts_links ==
+{
+  &quot;items&quot;: [
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cde-371c-7d85-ae2d-780453958bef&quot;,
+      &quot;id&quot;: &quot;01a20cdf-de08-7ce2-8d47-1dd19702d147&quot;,
+      &quot;kind&quot;: &quot;derivation&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-5f86-7720-9a16-36a964ef255d&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cde-5f86-7720-9a16-36a964ef255d&quot;,
+      &quot;id&quot;: &quot;01a20cdf-f295-76b4-b9eb-1465f0484504&quot;,
+      &quot;kind&quot;: &quot;realization&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-adbf-7626-9b2b-58faf7164755&quot;,
+      &quot;version&quot;: 1
+    }
+  ]
+}</code></pre>
+<pre><code>== write: architecture.artifacts_link ==
+{
+  &quot;from_artifact_id&quot;: &quot;01a20cde-5f86-7720-9a16-36a964ef255d&quot;,
+  &quot;id&quot;: &quot;01a20ce0-0567-7c74-be0f-7eb958c4b0f5&quot;,
+  &quot;kind&quot;: &quot;realization&quot;,
+  &quot;to_artifact_id&quot;: &quot;01a20cde-86d7-7257-a45e-b4731ab423a4&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: architecture.artifacts_links ==
+{
+  &quot;items&quot;: [
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cde-371c-7d85-ae2d-780453958bef&quot;,
+      &quot;id&quot;: &quot;01a20cdf-de08-7ce2-8d47-1dd19702d147&quot;,
+      &quot;kind&quot;: &quot;derivation&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-5f86-7720-9a16-36a964ef255d&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cde-5f86-7720-9a16-36a964ef255d&quot;,
+      &quot;id&quot;: &quot;01a20cdf-f295-76b4-b9eb-1465f0484504&quot;,
+      &quot;kind&quot;: &quot;realization&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-adbf-7626-9b2b-58faf7164755&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cde-5f86-7720-9a16-36a964ef255d&quot;,
+      &quot;id&quot;: &quot;01a20ce0-0567-7c74-be0f-7eb958c4b0f5&quot;,
+      &quot;kind&quot;: &quot;realization&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-86d7-7257-a45e-b4731ab423a4&quot;,
+      &quot;version&quot;: 1
+    }
+  ]
+}</code></pre>
+<pre><code>== write: architecture.artifacts_link ==
+{
+  &quot;from_artifact_id&quot;: &quot;01a20cdd-e71f-7d06-8ca5-701ff6b7d69e&quot;,
+  &quot;id&quot;: &quot;01a20ce0-1850-7c77-ab61-acf6c28b9f9c&quot;,
+  &quot;kind&quot;: &quot;dependency&quot;,
+  &quot;to_artifact_id&quot;: &quot;01a20cde-86d7-7257-a45e-b4731ab423a4&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: architecture.artifacts_links ==
+{
+  &quot;items&quot;: [
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cdd-e71f-7d06-8ca5-701ff6b7d69e&quot;,
+      &quot;id&quot;: &quot;01a20ce0-1850-7c77-ab61-acf6c28b9f9c&quot;,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-86d7-7257-a45e-b4731ab423a4&quot;,
+      &quot;version&quot;: 1
+    }
+  ]
+}</code></pre>
+<pre><code>== write: architecture.artifacts_link ==
+{
+  &quot;from_artifact_id&quot;: &quot;01a20cde-86d7-7257-a45e-b4731ab423a4&quot;,
+  &quot;id&quot;: &quot;01a20ce0-2bcc-734b-a713-c5e0fefa98b8&quot;,
+  &quot;kind&quot;: &quot;realization&quot;,
+  &quot;to_artifact_id&quot;: &quot;01a20cde-d6bd-7cfe-88ad-42a1e6db30a7&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: architecture.artifacts_links ==
+{
+  &quot;items&quot;: [
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cdd-e71f-7d06-8ca5-701ff6b7d69e&quot;,
+      &quot;id&quot;: &quot;01a20ce0-1850-7c77-ab61-acf6c28b9f9c&quot;,
+      &quot;kind&quot;: &quot;dependency&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-86d7-7257-a45e-b4731ab423a4&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cde-5f86-7720-9a16-36a964ef255d&quot;,
+      &quot;id&quot;: &quot;01a20ce0-0567-7c74-be0f-7eb958c4b0f5&quot;,
+      &quot;kind&quot;: &quot;realization&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-86d7-7257-a45e-b4731ab423a4&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cde-86d7-7257-a45e-b4731ab423a4&quot;,
+      &quot;id&quot;: &quot;01a20ce0-2bcc-734b-a713-c5e0fefa98b8&quot;,
+      &quot;kind&quot;: &quot;realization&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-d6bd-7cfe-88ad-42a1e6db30a7&quot;,
+      &quot;version&quot;: 1
+    }
+  ]
+}</code></pre>
+<pre><code>== write: architecture.artifacts_link ==
+{
+  &quot;from_artifact_id&quot;: &quot;01a20cde-adbf-7626-9b2b-58faf7164755&quot;,
+  &quot;id&quot;: &quot;01a20ce0-3ebe-76bb-a6da-63d71cacf574&quot;,
+  &quot;kind&quot;: &quot;realization&quot;,
+  &quot;to_artifact_id&quot;: &quot;01a20cde-d6bd-7cfe-88ad-42a1e6db30a7&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: architecture.artifacts_links ==
+{
+  &quot;items&quot;: [
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cde-5f86-7720-9a16-36a964ef255d&quot;,
+      &quot;id&quot;: &quot;01a20cdf-f295-76b4-b9eb-1465f0484504&quot;,
+      &quot;kind&quot;: &quot;realization&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-adbf-7626-9b2b-58faf7164755&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;from_artifact_id&quot;: &quot;01a20cde-adbf-7626-9b2b-58faf7164755&quot;,
+      &quot;id&quot;: &quot;01a20ce0-3ebe-76bb-a6da-63d71cacf574&quot;,
+      &quot;kind&quot;: &quot;realization&quot;,
+      &quot;to_artifact_id&quot;: &quot;01a20cde-d6bd-7cfe-88ad-42a1e6db30a7&quot;,
+      &quot;version&quot;: 1
+    }
+  ]
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19/gov/artifact-links.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

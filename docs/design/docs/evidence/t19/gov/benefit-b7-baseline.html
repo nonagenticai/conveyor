@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>B7 — the measured baseline · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/benefit-b7-baseline.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="b7--the-measured-baseline">B7 — the measured baseline</h1>
+<p>Action <code>benefits.update</code> for benefit profile 01a20c80-c0c3-7788-9cc2-bb18a102a2f7 (B7), setting the pre-T19 baseline to a measurement record: zero deliberated cross-department decision rows existed before T19 (docs/plans/T19/inception-analysis.md). The act is delegated by the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3.</p>
+<pre><code>== write: benefits.update ==
+{
+  &quot;baseline&quot;: {
+    &quot;measured_at&quot;: &quot;2026-11-24&quot;,
+    &quot;method&quot;: &quot;count of meeting rows with a closed deciding agenda item before T19; the pre-T19 record holds approval rows only (docs/plans/T19/inception-analysis.md)&quot;,
+    &quot;unit&quot;: &quot;deliberated cross-department decision rows before T19&quot;,
+    &quot;value&quot;: 0
+  },
+  &quot;benefit_owner_job_id&quot;: &quot;01a1db6b-4f17-7e76-838d-590d71578ad1&quot;,
+  &quot;capabilities&quot;: [],
+  &quot;category&quot;: &quot;programme benefit&quot;,
+  &quot;change_ref&quot;: null,
+  &quot;cost&quot;: {},
+  &quot;description&quot;: &quot;Deliberated cross-department decisions&quot;,
+  &quot;financial_value&quot;: &quot;&quot;,
+  &quot;id&quot;: &quot;01a20c80-c0c3-7788-9cc2-bb18a102a2f7&quot;,
+  &quot;kpis&quot;: [],
+  &quot;measurement_method&quot;: &quot;Read-time aggregates over meeting, meeting_agenda_item, meeting_attendance, meeting_position, approval_decision and project_dependency; a metric reads rows and writes nothing.&quot;,
+  &quot;objectives&quot;: [],
+  &quot;observable_outcome&quot;: &quot;&quot;,
+  &quot;operational_area&quot;: &quot;BCM&quot;,
+  &quot;owner_job_id&quot;: &quot;01a1db6b-4f17-7e76-838d-590d71578ad1&quot;,
+  &quot;preconditions&quot;: [],
+  &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+  &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+  &quot;reference&quot;: &quot;B7&quot;,
+  &quot;retired_reason&quot;: &quot;&quot;,
+  &quot;risks&quot;: [],
+  &quot;status&quot;: &quot;draft&quot;,
+  &quot;target&quot;: &quot;every tranche-4 cross-department decision has a meeting record with a position per required department; quorum-miss and commitment slippage are reported at the review&quot;,
+  &quot;version&quot;: 2
+}
+== read-back: benefits.get ==
+{
+  &quot;baseline&quot;: {
+    &quot;measured_at&quot;: &quot;2026-11-24&quot;,
+    &quot;method&quot;: &quot;count of meeting rows with a closed deciding agenda item before T19; the pre-T19 record holds approval rows only (docs/plans/T19/inception-analysis.md)&quot;,
+    &quot;unit&quot;: &quot;deliberated cross-department decision rows before T19&quot;,
+    &quot;value&quot;: 0
+  },
+  &quot;benefit_owner_job_id&quot;: &quot;01a1db6b-4f17-7e76-838d-590d71578ad1&quot;,
+  &quot;capabilities&quot;: [],
+  &quot;category&quot;: &quot;programme benefit&quot;,
+  &quot;change_ref&quot;: null,
+  &quot;cost&quot;: {},
+  &quot;description&quot;: &quot;Deliberated cross-department decisions&quot;,
+  &quot;financial_value&quot;: &quot;&quot;,
+  &quot;id&quot;: &quot;01a20c80-c0c3-7788-9cc2-bb18a102a2f7&quot;,
+  &quot;kpis&quot;: [],
+  &quot;measurement_method&quot;: &quot;Read-time aggregates over meeting, meeting_agenda_item, meeting_attendance, meeting_position, approval_decision and project_dependency; a metric reads rows and writes nothing.&quot;,
+  &quot;objectives&quot;: [],
+  &quot;observable_outcome&quot;: &quot;&quot;,
+  &quot;operational_area&quot;: &quot;BCM&quot;,
+  &quot;owner_job_id&quot;: &quot;01a1db6b-4f17-7e76-838d-590d71578ad1&quot;,
+  &quot;preconditions&quot;: [],
+  &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+  &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+  &quot;reference&quot;: &quot;B7&quot;,
+  &quot;retired_reason&quot;: &quot;&quot;,
+  &quot;risks&quot;: [],
+  &quot;status&quot;: &quot;draft&quot;,
+  &quot;target&quot;: &quot;every tranche-4 cross-department decision has a meeting record with a position per required department; quorum-miss and commitment slippage are reported at the review&quot;,
+  &quot;version&quot;: 2
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19/gov/benefit-b7-baseline.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

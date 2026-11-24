@@ -11,9 +11,9 @@
       "sha256": "af821f73b2a20f8edb2d3fc98949348eaac2a59ab472767b9756c916b0401c6a"
     },
     {
-      "bytes": 196027,
+      "bytes": 196052,
       "path": "docs/SPEC_V2.md",
-      "sha256": "53e9f4d033bfa9fa6d05677494a24a983dd660be05741ffac33edc74e6d30f5d"
+      "sha256": "571e2a241be13dcc686a4e2863b66282d0c6cd67bd4519a08f5262470b21993e"
     },
     {
       "bytes": 11057,
@@ -91,9 +91,9 @@
       "sha256": "0f0238e5905c39957db243d6750fff728ff64207d1fda8c05ceaf21c75d6b154"
     },
     {
-      "bytes": 16781,
+      "bytes": 18121,
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.md",
-      "sha256": "b2bea63b00832621fc26d0067a41f1e53e2aaeb860f6136a9a637bc8e563dd18"
+      "sha256": "b534cd0891d6cdf0923586016878c357274a5a80e4c5f0708e2bc3f66b5f1b91"
     },
     {
       "bytes": 25352,
@@ -104,6 +104,11 @@
       "bytes": 80862,
       "path": "docs/design/STUDIO-SPEC.md",
       "sha256": "bceb5d63a826ae0e2401707e4175cada58740f922fec7c073ff29caf7524b992"
+    },
+    {
+      "bytes": 24094,
+      "path": "docs/design/data/conformance.md",
+      "sha256": "49244f966190aea42896193e78b263838ed098f6d98a302e3bd557dd4fd71bcb"
     },
     {
       "bytes": 10909,
@@ -291,9 +296,9 @@
       "sha256": "6c5b53d667640bb8531b7dbd336742d364518e2c7b7733de9f4971c1148e8307"
     },
     {
-      "bytes": 23313,
+      "bytes": 24579,
       "path": "docs/evidence/conformance-gap-register.md",
-      "sha256": "4cfd81a55cf9466384497cf43c8caf00e354a15a70fa0f28a1797c47a5a21870"
+      "sha256": "66e6787db96030c6f14dd6bdb1d05ae19c42a1590282abea9645656336330267"
     },
     {
       "bytes": 33072,
@@ -341,6 +346,141 @@
       "sha256": "077ef6e3f3ba3fad737cc65bb288092663d58dc22e7d70192af9b5f21638afed"
     },
     {
+      "bytes": 2030,
+      "path": "docs/evidence/t19/gov/approve-business_capability_map.md",
+      "sha256": "7fd4c2de463fde87e329b973e5f2fe82643b269a6da2c68903d6aa85d0ec44c6"
+    },
+    {
+      "bytes": 2062,
+      "path": "docs/evidence/t19/gov/approve-data_entity_catalog.md",
+      "sha256": "88005bbb23aecebff413297fe780a6ea04bc52bd796363e48f8d9d95a5437f90"
+    },
+    {
+      "bytes": 2016,
+      "path": "docs/evidence/t19/gov/approve-driver_goal_objective.md",
+      "sha256": "93baae4f132c8d6cb4d39c697e758b117056b69ecf961d19bc825852da48148d"
+    },
+    {
+      "bytes": 2083,
+      "path": "docs/evidence/t19/gov/approve-requirements_catalog.md",
+      "sha256": "a8aacbfe8fdff979f1ce714483853900e4a204dce0500327479e929be298c1f8"
+    },
+    {
+      "bytes": 1989,
+      "path": "docs/evidence/t19/gov/approve-solution_concept.md",
+      "sha256": "16c8a62e9f5171e7c9e4fd24ad0bcc7b5c6272deceba3fba09f979ac6dddd96d"
+    },
+    {
+      "bytes": 2066,
+      "path": "docs/evidence/t19/gov/approve-stakeholder_map.md",
+      "sha256": "a8d5285a5545c3b8e1a491a9cfc06ff523e7aa775ddcffbdc6a12dc886e56def"
+    },
+    {
+      "bytes": 2003,
+      "path": "docs/evidence/t19/gov/approve-technology_standards.md",
+      "sha256": "c3982a09c3ce22886af7fb006f5f18f859859bded32a7199abaab0149d826951"
+    },
+    {
+      "bytes": 1913,
+      "path": "docs/evidence/t19/gov/artifact-business_capability_map.md",
+      "sha256": "527f326d18fd4154f02c4b12692ccf8c25d46935df36b966d44c5f974c3e7cc6"
+    },
+    {
+      "bytes": 1941,
+      "path": "docs/evidence/t19/gov/artifact-data_entity_catalog.md",
+      "sha256": "5a3fbf01c6bba568513d3679ff90551a6eefa985a1dc4c67015743ceef85690a"
+    },
+    {
+      "bytes": 8889,
+      "path": "docs/evidence/t19/gov/artifact-document-compose.md",
+      "sha256": "6f2f04321ff2e1ac84bfe3ce7d97eeffdeeb13f2a4646d28ecbbe2444e9e462a"
+    },
+    {
+      "bytes": 9022,
+      "path": "docs/evidence/t19/gov/artifact-document-publish.md",
+      "sha256": "543005b025ce8caf75341cc381a94a97de7744e1c2948c36330547b6b23d4e67"
+    },
+    {
+      "bytes": 8966,
+      "path": "docs/evidence/t19/gov/artifact-document-update.md",
+      "sha256": "d164208672b99dae79b15cda592f267f3f2427cddbd15e5e64ac1549b71c8df1"
+    },
+    {
+      "bytes": 1897,
+      "path": "docs/evidence/t19/gov/artifact-driver_goal_objective.md",
+      "sha256": "e9c8fb004eda844b0e6faf3e653cdaf0eaf2f9033da3439935d22e8e819bc5f0"
+    },
+    {
+      "bytes": 5965,
+      "path": "docs/evidence/t19/gov/artifact-links.md",
+      "sha256": "697222d4d84cad812dedb2541adb094ca01fc67982b6bf5d61e5eaaf467ed605"
+    },
+    {
+      "bytes": 1963,
+      "path": "docs/evidence/t19/gov/artifact-requirements_catalog.md",
+      "sha256": "0f09d05d2d74e3a9b734008d189ed0824902610f01f31e5c3f79e3145c7f2bfc"
+    },
+    {
+      "bytes": 1865,
+      "path": "docs/evidence/t19/gov/artifact-solution_concept.md",
+      "sha256": "ff30fa53c52b33dc7286194c3b493406fee8f81b0389d20f7c69698739f27a5d"
+    },
+    {
+      "bytes": 1940,
+      "path": "docs/evidence/t19/gov/artifact-stakeholder_map.md",
+      "sha256": "7708bcc10eb26ecec9e5a7963bcb3d635c2d53363b57aa8394f888775f637e24"
+    },
+    {
+      "bytes": 1883,
+      "path": "docs/evidence/t19/gov/artifact-technology_standards.md",
+      "sha256": "572d19c7eddaf01227125dfe305198b20469bf7b2a8b56b7d744b36af672687c"
+    },
+    {
+      "bytes": 3174,
+      "path": "docs/evidence/t19/gov/benefit-b7-baseline.md",
+      "sha256": "8ee36b8bd3312e7b5b94f5152e0c351a4f092476db4dd1eeb4286c4d7f6f838d"
+    },
+    {
+      "bytes": 3198,
+      "path": "docs/evidence/t19/gov/compliance-review-delivery.md",
+      "sha256": "cb339730018c2a706dfaf9dd6093139dc6016ea9680f05b995c946b69f49398d"
+    },
+    {
+      "bytes": 3197,
+      "path": "docs/evidence/t19/gov/compliance-review-soaw.md",
+      "sha256": "e6f066eee9929ccd767fbdf9fb39426a5a549ade6241e8d6b9d085d7f1a087ea"
+    },
+    {
+      "bytes": 3451,
+      "path": "docs/evidence/t19/gov/contract-approve.md",
+      "sha256": "369a9cd13f9bbc086624102fc4ffa6ddfc367c18ba84e255f57927d8e3364144"
+    },
+    {
+      "bytes": 1759,
+      "path": "docs/evidence/t19/gov/contract-board-decision.md",
+      "sha256": "d8514ebdf40156d5f87c78cec84e6f0b933f8a8536e2d9ab42e9fcf53ad6b253"
+    },
+    {
+      "bytes": 3213,
+      "path": "docs/evidence/t19/gov/contract-request.md",
+      "sha256": "a5dc3f5faa5c18ed30ca3bd212da7d3d827b6d62df3500f71a1a43ba1c85a9ce"
+    },
+    {
+      "bytes": 3501,
+      "path": "docs/evidence/t19/gov/delivery-contract-approve.md",
+      "sha256": "10e41d0df321c6792b76ad2a4ddc88a6b40491cad5602bd287a4599912441706"
+    },
+    {
+      "bytes": 1676,
+      "path": "docs/evidence/t19/gov/delivery-contract-board-decision.md",
+      "sha256": "9acdf5bda93125e39b37a437c3057254392ae9e861216fc102f5febf17171a5e"
+    },
+    {
+      "bytes": 3268,
+      "path": "docs/evidence/t19/gov/delivery-contract-request.md",
+      "sha256": "935a5f9bda3536b30d38d99d8569aead712868287252699fc6e25a096ee63d68"
+    },
+    {
       "bytes": 931,
       "path": "docs/evidence/t19/live-write-evidence.md",
       "sha256": "b3b6ff1653e1ba823045a13b384f4a642dc41512d212d839ff0c4d4942f7efb2"
@@ -351,9 +491,9 @@
       "sha256": "ddac071a949b01161f9bb16d0a38c5749705b774a6b2935b6ef7caf52ad3cc2d"
     },
     {
-      "bytes": 14742,
+      "bytes": 14781,
       "path": "docs/evidence/v2-coverage.md",
-      "sha256": "79d1dc773f8cd949c366bf3b71b69be3299ad27e85b58ba930c04231f4c482e1"
+      "sha256": "322feda4904b2d2ec1a45ad7414ef95b19496907c69989b86a928c9eb35e5b81"
     },
     {
       "bytes": 257438,
@@ -446,19 +586,19 @@
       "sha256": "730266ca5fa0006d7f9059267ba4c6e1bc8e381ffb018e511d888c5f0ebd0371"
     },
     {
-      "bytes": 3855,
+      "bytes": 5995,
       "path": "docs/plans/T19/artifact-register.md",
-      "sha256": "64449b597c0895220a1b6bfd97ca18a28ea0995d3aa5a70188ace2cf2dcd6172"
+      "sha256": "44a1f02c2fc887a787a2b50033e7775ae2aec73b28878b1da4452d04208bfd02"
     },
     {
-      "bytes": 4339,
+      "bytes": 6122,
       "path": "docs/plans/T19/closure-review.md",
-      "sha256": "3547669389ef7b12c30c0ea5c9e472fbe778f25fdce0d4ccafb5c8da3e2096b7"
+      "sha256": "d7fe5b981be971797a2768ed5ba67c390ae52edc4afc293d4429ee741abede8d"
     },
     {
-      "bytes": 9164,
+      "bytes": 12563,
       "path": "docs/plans/T19/evidence.md",
-      "sha256": "f752b33890b84a5172cbe0ce5e0329c95fc9aea3af415fc611246032d2c02057"
+      "sha256": "aeb7d5ed9e5b54fcf67288a57e0d8b4aa66c0f343351bdb97b90e99c142ce6a6"
     },
     {
       "bytes": 6378,
@@ -711,6 +851,6 @@
       "sha256": "1974a35c3c44801056a6fe2adb35991cf861d5b97ef37f449010901fcc7e79f5"
     }
   ],
-  "generated_at": "2026-11-24T08:29:31.004848+00:00",
+  "generated_at": "2026-11-24T09:41:16.641438+00:00",
   "schema": "design-snapshot/v1"
 }

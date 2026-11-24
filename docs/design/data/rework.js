@@ -1,6 +1,6 @@
 window.CONVEYOR_REWORK = {
-  "generated_at": "2026-11-24T08:29:31.004848+00:00",
-  "git_sha": "97100b6e18474ccd26ef2e6ff82a0d94500926cd",
+  "generated_at": "2026-11-24T09:40:58.688521+00:00",
+  "git_sha": "fd652720002ea5886a274557f6d2fb0714f66069",
   "packages": [
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T16",
@@ -2353,7 +2353,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 7,
+        "entries": 6,
         "owners": [
           "programme owner"
         ]
@@ -2381,8 +2381,7 @@ window.CONVEYOR_REWORK = {
             "B3",
             "B4",
             "B5",
-            "B6",
-            "B7"
+            "B6"
           ]
         }
       ],
@@ -2394,7 +2393,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 7,
+      "subject_count": 6,
       "subjects": [
         {
           "detail": "baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)'",
@@ -2455,16 +2454,6 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "B6"
-        },
-        {
-          "detail": "baseline is a placeholder: 'not measured - no meeting rows exist before T19; the current record is the approval row only'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "B7"
         }
       ],
       "title": "Measure the benefit baselines"
@@ -2476,7 +2465,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 2,
+        "entries": 1,
         "owners": [
           "programme owner"
         ]
@@ -2499,8 +2488,7 @@ window.CONVEYOR_REWORK = {
           "rule": "benefit_profile_incomplete",
           "source": "snapshot",
           "subjects": [
-            "B1",
-            "B7"
+            "B1"
           ]
         }
       ],
@@ -2512,7 +2500,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 2,
+      "subject_count": 1,
       "subjects": [
         {
           "detail": "missing operational_area",
@@ -2523,16 +2511,6 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "B1"
-        },
-        {
-          "detail": "missing owner",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "B7"
         }
       ],
       "title": "Complete the benefit profiles"
@@ -8569,6 +8547,85 @@ window.CONVEYOR_REWORK = {
       "title": "Demo and retro cadence rows enforce nothing: no evidence, no credit, no lessons"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check seed_live_drift:programme",
+      "apply_to": "PLATFORM",
+      "artefact": "seed_reconciliation",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 3,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The seeded project facts equal the live rows, or the drift is recorded and approved",
+          "met": false
+        },
+        {
+          "item": "The audit reports no seed_live_drift gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "seed_live_drift",
+          "source": "snapshot",
+          "subjects": [
+            "T5",
+            "S21",
+            "T19"
+          ]
+        }
+      ],
+      "key": "seed_live_drift:programme",
+      "owner_project": "PLATFORM",
+      "rule": "seed_live_drift",
+      "scope": "programme",
+      "severity": "P1",
+      "spec": "§5.3",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 3,
+      "subjects": [
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T5"
+        },
+        {
+          "detail": "seed status 'active' != live status 'closed'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P2",
+          "subject": "S21"
+        },
+        {
+          "detail": "seed status 'active' != live status 'closed'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        }
+      ],
+      "title": "Reconcile the seed with the live rows"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p101-1:T2",
       "apply_to": "PLATFORM",
       "artefact": "§10.1",
@@ -13838,7 +13895,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 4,
+        "entries": 3,
         "owners": [
           "programme owner"
         ]
@@ -13863,8 +13920,7 @@ window.CONVEYOR_REWORK = {
           "subjects": [
             "T14",
             "T16",
-            "T18",
-            "T19"
+            "T18"
           ]
         }
       ],
@@ -13876,7 +13932,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.1",
       "standard": "TOGAF",
       "status": "open",
-      "subject_count": 4,
+      "subject_count": 3,
       "subjects": [
         {
           "detail": "delivery project has no live architecture contract",
@@ -13907,16 +13963,6 @@ window.CONVEYOR_REWORK = {
           "reason": null,
           "severity": "P1",
           "subject": "T18"
-        },
-        {
-          "detail": "delivery project has no live architecture contract",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T19"
         }
       ],
       "title": "Put the project under an approved architecture contract"
@@ -14540,7 +14586,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 7,
+        "entries": 6,
         "owners": [
           "programme owner"
         ]
@@ -14568,8 +14614,7 @@ window.CONVEYOR_REWORK = {
             "S09",
             "T14",
             "T16",
-            "T18",
-            "T19"
+            "T18"
           ]
         }
       ],
@@ -14581,7 +14626,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.1",
       "standard": "TOGAF",
       "status": "open",
-      "subject_count": 7,
+      "subject_count": 6,
       "subjects": [
         {
           "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
@@ -14642,16 +14687,6 @@ window.CONVEYOR_REWORK = {
           "reason": null,
           "severity": "P1",
           "subject": "T18"
-        },
-        {
-          "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T19"
         }
       ],
       "title": "Complete the mandatory phase artefact sets"
@@ -16251,6 +16286,139 @@ window.CONVEYOR_REWORK = {
       "title": "TOGAF artefact absent: phase-e"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-t19-e:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-e",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-e-t19-e",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t19-e",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t19-e",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-e-t19-e",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-e-t19-e:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-e-t19-e",
+      "scope": "T19",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-e artefact for T19 — E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-e-t19-e",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t19-e",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t19-e",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-e-t19-e",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-t4-e:T4",
       "apply_to": "PLATFORM",
       "artefact": "phase-e",
@@ -17448,6 +17616,139 @@ window.CONVEYOR_REWORK = {
       "title": "TOGAF artefact absent: phase-g"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-t19-g:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-g",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-g-t19-g",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t19-g",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t19-g",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-g-t19-g",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-g-t19-g:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-g-t19-g",
+      "scope": "T19",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-g artefact for T19 — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-g-t19-g",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t19-g",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t19-g",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-g-t19-g",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-t4-g:T4",
       "apply_to": "PLATFORM",
       "artefact": "phase-g",
@@ -18640,6 +18941,139 @@ window.CONVEYOR_REWORK = {
           "reason": null,
           "severity": "P1",
           "subject": "T13"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-h"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-t19-h:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-h",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-h-t19-h",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t19-h",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t19-h",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-h-t19-h",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-h-t19-h:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-h-t19-h",
+      "scope": "T19",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-h artefact for T19 — H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-h-t19-h",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t19-h",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t19-h",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-h-t19-h",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T19"
         }
       ],
       "title": "TOGAF artefact absent: phase-h"
@@ -25425,336 +25859,6 @@ window.CONVEYOR_REWORK = {
       "title": "Correct a claim that a stored value is derived when it is not"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T12",
-      "apply_to": "T12",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T12"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T12",
-      "owner_project": "T12",
-      "rule": "status_source_drift",
-      "scope": "T12",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T12"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T15",
-      "apply_to": "T15",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T15"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T15",
-      "owner_project": "T15",
-      "rule": "status_source_drift",
-      "scope": "T15",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T15"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T17",
-      "apply_to": "T17",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T17"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T17",
-      "owner_project": "T17",
-      "rule": "status_source_drift",
-      "scope": "T17",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T17"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T18",
-      "apply_to": "T18",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T18"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T18",
-      "owner_project": "T18",
-      "rule": "status_source_drift",
-      "scope": "T18",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T18"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T5",
-      "apply_to": "T5",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T5"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T5",
-      "owner_project": "T5",
-      "rule": "status_source_drift",
-      "scope": "T5",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T5"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T6",
-      "apply_to": "T6",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T6"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T6",
-      "owner_project": "T6",
-      "rule": "status_source_drift",
-      "scope": "T6",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T6"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p102-1:T2",
       "apply_to": "PLATFORM",
       "artefact": "§10.2",
@@ -28117,7 +28221,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "unprovable",
         "earliest_expires": null,
-        "entries": 14,
+        "entries": 16,
         "owners": []
       },
       "depends_on": [],
@@ -28146,6 +28250,8 @@ window.CONVEYOR_REWORK = {
             "T11",
             "T13",
             "T13",
+            "T19",
+            "T19",
             "T2",
             "T2",
             "T4",
@@ -28163,7 +28269,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.1",
       "standard": "TOGAF",
       "status": "suppressed",
-      "subject_count": 14,
+      "subject_count": 16,
       "subjects": [
         {
           "detail": "the snapshot does not carry the contract requester",
@@ -28244,6 +28350,26 @@ window.CONVEYOR_REWORK = {
           "reason": null,
           "severity": "P2",
           "subject": "T13"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
         },
         {
           "detail": "the snapshot does not carry the contract requester",
@@ -32899,129 +33025,6 @@ window.CONVEYOR_REWORK = {
       "title": "TOGAF artefact partial: architecture-artifact"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t19:T19",
-      "apply_to": "PLATFORM",
-      "artefact": "architecture-artifact",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-togaf-architecture-artifact-t19",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t19",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t19",
-              "section": "Document",
-              "snapshot": [
-                [
-                  "artefacts.json",
-                  "/documents",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-togaf-architecture-artifact-t19",
-          "source": "audit"
-        }
-      ],
-      "key": "std-togaf-architecture-artifact-t19:T19",
-      "owner_project": "T19",
-      "rule": "std-togaf-architecture-artifact-t19",
-      "scope": "T19",
-      "severity": "P2",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The architecture-artifact artefact for SPEC_V2 slice T19 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-t19",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-t19",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-t19",
-                  "section": "Document",
-                  "snapshot": [
-                    [
-                      "artefacts.json",
-                      "/documents",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-togaf-architecture-artifact-t19",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T19"
-        }
-      ],
-      "title": "TOGAF artefact partial: architecture-artifact"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t1:T1",
       "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
@@ -34762,6 +34765,81 @@ window.CONVEYOR_REWORK = {
       "title": "TOGAF artefact partial: compliance-review"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-t19:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-t19",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-t19",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-t19:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-compliance-review-t19",
+      "scope": "T19",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for SPEC_V2 slice T19 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-t19",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-t19",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-t1:T1",
       "apply_to": "PLATFORM",
       "artefact": "compliance-review",
@@ -36032,6 +36110,81 @@ window.CONVEYOR_REWORK = {
           "reason": null,
           "severity": "P2",
           "subject": "T13"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-t19-b:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-t19-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-t19-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-t19-b:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-b-t19-b",
+      "scope": "T19",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for T19 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-t19-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-t19-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
         }
       ],
       "title": "TOGAF artefact partial: phase-b"
@@ -37312,6 +37465,81 @@ window.CONVEYOR_REWORK = {
       "title": "TOGAF artefact partial: phase-c"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-t19-c:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-t19-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-t19-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-t19-c:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-c-t19-c",
+      "scope": "T19",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for T19 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-t19-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-t19-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-t2-c:T2",
       "apply_to": "PLATFORM",
       "artefact": "phase-c",
@@ -38582,6 +38810,81 @@ window.CONVEYOR_REWORK = {
           "reason": null,
           "severity": "P2",
           "subject": "T13"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-t19-d:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-t19-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-t19-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-t19-d:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-d-t19-d",
+      "scope": "T19",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for T19 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-t19-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-t19-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
         }
       ],
       "title": "TOGAF artefact partial: phase-d"
@@ -40338,6 +40641,115 @@ window.CONVEYOR_REWORK = {
       "title": "TOGAF artefact partial: phase-f"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t19-f:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-t19-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-t19-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-t19-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-t19-f:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-f-t19-f",
+      "scope": "T19",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for T19 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-t19-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-t19-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-t19-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t2-f:T2",
       "apply_to": "PLATFORM",
       "artefact": "phase-f",
@@ -40843,9 +41255,9 @@ window.CONVEYOR_REWORK = {
   "scorecard": {
     "MSP": {
       "findings": 8,
-      "gaps": 115,
+      "gaps": 113,
       "p0": 25,
-      "p1": 85,
+      "p1": 83,
       "p2": 5,
       "packages": 74,
       "rules": 12,
@@ -40879,11 +41291,11 @@ window.CONVEYOR_REWORK = {
     },
     "SPEC": {
       "findings": 86,
-      "gaps": 22,
+      "gaps": 19,
       "p0": 0,
-      "p1": 0,
-      "p2": 22,
-      "packages": 103,
+      "p1": 1,
+      "p2": 18,
+      "packages": 98,
       "rules": 8,
       "rules_clean": 4,
       "rules_with_gaps": 4,
@@ -40893,38 +41305,38 @@ window.CONVEYOR_REWORK = {
       "findings": 12,
       "gaps": 73,
       "p0": 1,
-      "p1": 58,
-      "p2": 14,
-      "packages": 203,
+      "p1": 56,
+      "p2": 16,
+      "packages": 210,
       "rules": 9,
       "rules_clean": 5,
       "rules_with_gaps": 4,
       "suppressed": 0
     }
   },
-  "snapshot": "docs/design/data",
+  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.yOiw3zfMzd/data",
   "summary": {
     "by_severity": {
       "P0": 26,
-      "P1": 185,
-      "P2": 216
+      "P1": 189,
+      "P2": 214
     },
     "by_standard": {
       "MSP": 74,
       "PMP": 34,
       "SAFe": 13,
-      "SPEC": 103,
-      "TOGAF": 203
+      "SPEC": 98,
+      "TOGAF": 210
     },
     "by_status": {
-      "open": 425,
+      "open": 427,
       "suppressed": 2
     },
     "duplicates": 0,
-    "open": 425,
-    "packages": 427,
+    "open": 427,
+    "packages": 429,
     "resolved": 14,
-    "subjects": 540,
+    "subjects": 542,
     "suppressed": 2
   }
 };

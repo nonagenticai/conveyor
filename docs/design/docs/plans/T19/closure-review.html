@@ -72,7 +72,7 @@
 </tr>
 <tr>
 <td><strong>The live gate</strong>: the owner decides one item in the web room and one over MCP, both <code>via='meeting'</code></td>
-<td><code>scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed</code> — 15/15 rows pass on deployed <code>a8f67c3e</code></td>
+<td><code>scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed</code> — 15/15 rows pass on deployed <code>a8f67c3e</code>, and again on the current <code>7e617673</code></td>
 <td>pass</td>
 </tr>
 <tr>
@@ -85,6 +85,36 @@
 <td>project <code>T19</code> on its board; benefit B7; <code>migrate --seed --tenant nonagentic</code> read-back</td>
 <td>pass</td>
 </tr>
+<tr>
+<td>T19's seven mandatory TOGAF artefacts are approved rows</td>
+<td><code>scripts/t19-governance-chain.py --check</code> — 7/7 approved against T19</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>T19 has a live architecture contract, requester ≠ approver</td>
+<td>Statement of Architecture Work <code>01a20ce0-5183-776c-84bd-327f2301b19b</code>, board decision <code>01a20ce0-644d-7340-a696-1af10fa8c61e</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>T19 has a live phase-F delivery contract</td>
+<td><code>01a20cea-91bb-77f4-a880-044c90bb5f0e</code>, board decision <code>01a20cea-a68f-7e08-8d0c-399759ef16e0</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Each live contract has a Phase-G compliance review</td>
+<td><code>architecture.reviews_record</code> × 2, level <code>conformant</code>, follow-ups named; the audit's <code>compliance_review_missing</code> clears</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B7 has a measurement baseline and an owner</td>
+<td>baseline <code>{value: 0, …}</code>; benefit owner = programme-manager job</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>The TOGAF <code>architecture-artifact</code> standard is evidenced, not partial</td>
+<td>published output <code>01a20ce4-73e4-7009-9ec7-eb2265e9e84e</code> with Metadata / Entries / Links / Document</td>
+<td>pass</td>
+</tr>
 </tbody>
 </table>
 <h2 id="evidence">Evidence</h2>
@@ -93,6 +123,7 @@
 <li>Live gate: <code>docs/plans/T19/evidence.md</code> § "The live gate"; raw read-backs in <code>docs/evidence/t19/</code> (<code>live-gate.json</code>, <code>live-gate-check.txt</code>, <code>meeting-schedule.json</code>, <code>minutes-publish.json</code>, <code>meeting-close.json</code>, <code>refresh-readback.json</code>, <code>seed-readback.txt</code>). The human seat was exercised by the tenant admin identity <code>FR Test</code>, supplied by the owner; the record names that identity, not the owner's personal account.</li>
 <li>Deployment fixes the gate required, both merged in <code>gitops-production</code>: #5429 (the public MCP host was not in <code>CONVEYOR_MCP_ALLOWED_HOSTS</code>, so every handshake was <code>403 Host header is not allowed</code>) and #5432 (the MCP session lives in one pod; a DestinationRule now pins it on <code>mcp-session-id</code>, and the probe went from 6/8 failures to 8/8 served).</li>
 <li>Programme: <code>migrate --seed --tenant nonagentic</code> created the catalogue's <code>meeting</code> card type and T19 with its board; <code>programmes.refresh</code> then reported created=0, updated=0, skipped=51. The published snapshot is regenerated in the same unit.</li>
+<li>Conformance chain (deployed <code>7e617673</code>): the seven mandatory TOGAF artefacts and their links, the live Statement of Architecture Work and the published <code>architecture-artifact</code> output are recorded in <code>docs/plans/T19/evidence.md</code> § "The T19 conformance chain" with per-act read-backs under <code>docs/evidence/t19/gov/</code>. The approvals were performed by the tenant's <code>conveyor-approver</code> seat under the published standing delegation <code>01a1fb9f-ac2d-732d-b274-1079be3dd2b3</code>; they are not claimed as the owner's personal decisions.</li>
 </ul>
 <h2 id="open-items">Open items</h2>
 <table>
@@ -115,9 +146,9 @@
 <td>the plan's declared follow-up integration unit</td>
 </tr>
 <tr>
-<td>T19's wider MSP chain (charter, approved baseline, WBS/WSJF, SoAW + delivery contract, Phase-G review, demo credit)</td>
+<td>Tranche 4 authorisation: T19 is closed while tranche 4 is <code>planned</code> (audit P0 <code>project_in_unauthorised_tranche</code>)</td>
 <td>the #526 programme-rework lane</td>
-<td>recorded there under its own verdict; this closure does not claim it</td>
+<td>the retrospective tranche 2→4 review chain; this unit does not backfill reviews whose exit criteria other projects have not met</td>
 </tr>
 <tr>
 <td>The homepage mirror of the design pack</td>
@@ -132,7 +163,7 @@
 </tbody>
 </table>
 <h2 id="decision">Decision</h2>
-<p>Close. T19's D1–D8 acceptance and its live gate are met on the evidence above, the meeting closed on its own DoD, and the project is a live programme row with benefit B7. The open items are named follow-ups with owners; the wider MSP chain is the #526 lane's record, not a condition of this closure.</p>
+<p>Close. T19's D1–D8 acceptance, its live gate on the deployment now running, and its own TOGAF chain (seven approved artefacts, links, live contract, B7 measurement, published architecture-artifact) are met on the evidence above; the meeting closed on its own DoD and the project is a live programme row with benefit B7. The remaining open items are named follow-ups with owners; the tranche-4 authorisation is the #526 lane's retrospective chain, not a condition of this closure.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/plans/T19/closure-review.md</code> at build time.</span>

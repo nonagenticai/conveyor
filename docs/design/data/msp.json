@@ -291,8 +291,13 @@
       "version": 1
     },
     {
-      "baseline": "not measured - no meeting rows exist before T19; the current record is the approval row only",
-      "benefit_owner_job_id": null,
+      "baseline": {
+        "measured_at": "2026-11-24",
+        "method": "count of meeting rows with a closed deciding agenda item before T19; the pre-T19 record holds approval rows only (docs/plans/T19/inception-analysis.md)",
+        "unit": "deliberated cross-department decision rows before T19",
+        "value": 0
+      },
+      "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
       "capabilities": [],
       "category": "programme benefit",
       "cost": {},
@@ -305,7 +310,7 @@
       "objectives": [],
       "observable_outcome": "",
       "operational_area": "BCM",
-      "owner_job_id": null,
+      "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
       "preconditions": [],
       "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
@@ -314,8 +319,8 @@
       "risks": [],
       "status": "draft",
       "target": "every tranche-4 cross-department decision has a meeting record with a position per required department; quorum-miss and commitment slippage are reported at the review",
-      "updated_at": "2026-11-24T07:41:22.15583+00:00",
-      "version": 1
+      "updated_at": "2026-11-24T09:30:20.62579+00:00",
+      "version": 2
     }
   ],
   "benefit_realisation": [
@@ -417,9 +422,9 @@
     },
     {
       "baseline": {
-        "measured_at": null,
-        "placeholder": true,
-        "value": null
+        "measured_at": "2026-11-24",
+        "placeholder": false,
+        "value": 0.0
       },
       "delta": null,
       "latest_post": null,
@@ -427,7 +432,7 @@
       "owner_role": "BCM",
       "project": "T19",
       "reference": "B7",
-      "state": "unbaselined",
+      "state": "baselined",
       "target": "every tranche-4 cross-department decision has a meeting record with a position per required department; quorum-miss and commitment slippage are reported at the review",
       "transitions": []
     }
@@ -1738,7 +1743,7 @@
     "unknown_targets": [],
     "untyped": 163
   },
-  "generated_at": "2026-11-24T08:29:31.004848+00:00",
+  "generated_at": "2026-11-24T09:41:16.641438+00:00",
   "programme_baselines": [
     {
       "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",

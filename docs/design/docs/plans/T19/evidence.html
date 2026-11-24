@@ -280,6 +280,56 @@
 </tbody>
 </table>
 <p>The gate found and closed two deployment defects, both in <code>gitops-production</code>: <code>CONVEYOR_MCP_ALLOWED_HOSTS</code> was unset, so rmcp's localhost-only allowlist answered every public handshake <code>403 Host header is not allowed</code> (#5429); and the MCP session lives in one pod's memory while the two-replica Service round-robins, so 6 of 8 post-initialize calls 404'd until a DestinationRule pinned the session on <code>mcp-session-id</code> (#5432). After the rollout, the same probe served 8 of 8.</p>
+<p><strong>Re-run on the current deployment.</strong> The check was run again on <code>7e617673</code> (the T5 release, which carries T19 unchanged): all 15 assertions passed, with the same approver <code>01a1cf1e-09dd-7580-99cc-de395f3e86cc</code> on both decision rows. The gate is therefore evidenced on the deployment that is running now, not only on the one it was first taken on.</p>
+<h3 id="the-t19-conformance-chain--deployed-7e617673-tenant-nonagentic-2026-11-24">The T19 conformance chain — deployed <code>7e617673</code>, tenant <code>nonagentic</code>, 2026-11-24</h3>
+<p>The conformance audit named four T19-owned gaps. Three are closed here through the engine's own action surface, under the published standing delegation <code>01a1fb9f-ac2d-732d-b274-1079be3dd2b3</code>; the fourth is the programme's tranche chain (see Gap).</p>
+<table>
+<thead>
+<tr>
+<th>Gap</th>
+<th>Act</th>
+<th>Read-back</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>seven mandatory TOGAF artefacts</td>
+<td><code>architecture.artifacts_create</code> + <code>artifacts_approve</code> on each of <code>requirements_catalog</code>, <code>stakeholder_map</code>, <code>driver_goal_objective</code>, <code>solution_concept</code>, <code>business_capability_map</code>, <code>data_entity_catalog</code>, <code>technology_standards</code></td>
+<td>seven <code>approved</code> rows for T19, entries from <code>docs/plans/T19/architecture-design.md</code></td>
+</tr>
+<tr>
+<td>artefact links</td>
+<td><code>architecture.artifacts_link</code> × 7 (derivation / realization / dependency, §5 of the design)</td>
+<td>seven edges among the T19 artefacts</td>
+</tr>
+<tr>
+<td>the live architecture contract</td>
+<td><code>architecture.contracts_request</code> → <code>architecture.board_decide</code> (Architecture Board, citing the delegation) → <code>architecture.contracts_approve</code> (approver distinct from requester)</td>
+<td><code>statement_of_architecture_work</code> <code>01a20ce0-5183-776c-84bd-327f2301b19b</code> is <code>live</code>, <code>approved_at</code> set, board decision <code>01a20ce0-644d-7340-a696-1af10fa8c61e</code></td>
+</tr>
+<tr>
+<td>the phase-F delivery contract</td>
+<td>the same request → board decision → approval flow, <code>kind=delivery_contract</code>, phase <code>f</code></td>
+<td><code>01a20cea-91bb-77f4-a880-044c90bb5f0e</code> is <code>live</code>, board decision <code>01a20cea-a68f-7e08-8d0c-399759ef16e0</code></td>
+</tr>
+<tr>
+<td>the Phase-G compliance reviews</td>
+<td><code>architecture.reviews_record</code> × 2 (one per live contract), level <code>conformant</code>, recorded by <code>conveyor-approver</code> under the delegation</td>
+<td>both reviews carry the delegation ref and the named follow-ups; the audit's <code>compliance_review_missing</code> clears</td>
+</tr>
+<tr>
+<td>B7's baseline and owner</td>
+<td><code>benefits.update</code></td>
+<td>baseline <code>{value: 0, unit, measured_at, method}</code> (zero deliberated decision rows before T19) and the programme-manager benefit owner</td>
+</tr>
+<tr>
+<td>the <code>architecture-artifact</code> standard</td>
+<td><code>documents.compose</code> + <code>documents.publish</code></td>
+<td>output <code>01a20ce4-73e4-7009-9ec7-eb2265e9e84e</code> is published; its page carries Metadata / Entries / Links / Document</td>
+</tr>
+</tbody>
+</table>
+<p><code>python3 scripts/t19-governance-chain.py --check</code> reads every row back through the deployed read actions and passes all 16 assertions. The approvals were performed by the tenant's <code>conveyor-approver</code> seat under the standing delegation, not by the owner personally; the contract's requester is the operator's default actor, so the requester is never its approver. Each act's write and read-back is under <code>docs/evidence/t19/gov/</code>.</p>
 <h2 id="verification">Verification</h2>
 <pre class="bash"><code>cargo test -p conveyor-api --test meetings_policy
 cargo test -p conveyor-api --test meetings_agenda
@@ -293,7 +343,8 @@ cargo test -p conveyor-actions --test registry
 cargo test -p conveyor-actions --test parity_http_mcp
 cargo test -p conveyor-store migrate
 npx playwright test apps/web/e2e/meetings.spec.ts
-python3 scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed</code></pre>
+python3 scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json --seed
+python3 scripts/t19-governance-chain.py --check</code></pre>
 <p>The Rust suites were run through <code>~/.claude/scripts/cargo-guard.py</code> on m4 (the estate's sanctioned interactive route); the compile/lint verdict is the branch's GitHub-hosted <code>preflight.yml</code>, and the PR's CI is the merge gate. The Playwright suite runs in <code>web.yml</code>, which is the first local-capable run of the real app (no <code>cargo-leptos</code> is installed on m4, and installing it would compile locally).</p>
 <h2 id="links">Links</h2>
 <ul>
@@ -304,10 +355,12 @@ python3 scripts/t19-live-gate-check.py --state docs/evidence/t19/live-gate.json 
 <li>Architecture: <code>docs/plans/T19/architecture-design.md</code>; MSP: <code>docs/plans/T19/msp-profile.md</code>; SAFe: <code>docs/plans/T19/safe-epic.md</code></li>
 <li>Console: <code>apps/web/src/screens/meetings.rs</code>; design reference: <code>docs/design/v2.js</code> <code>meetings</code></li>
 <li>Live gate state and read-backs: <code>docs/evidence/t19/</code>; checker: <code>scripts/t19-live-gate-check.py</code></li>
+<li>Conformance chain: <code>scripts/t19-governance-chain.py</code>; per-act read-backs: <code>docs/evidence/t19/gov/</code></li>
+<li>Delegation: <code>docs/evidence/t19/gov/</code> names the standing delegation <code>01a1fb9f-ac2d-732d-b274-1079be3dd2b3</code></li>
 <li>Deployment fixes the gate required: gitops-production #5429 (MCP allowed hosts) and #5432 (MCP session affinity)</li>
 </ul>
 <h2 id="gap">Gap</h2>
-<p>None. The live gate is recorded above at the deployed revision. Two items remain declared follow-ups rather than gaps: the <code>meeting_type</code> authoring route (a policy change is a new version through the governance route) and the T9 board / T10 cadence binding to meeting types; both are recorded as open items with owners in <code>docs/plans/T19/closure-review.md</code>.</p>
+<p>None against T19's acceptance. The audit's one remaining T19-labelled finding is the <strong>P0 <code>project_in_unauthorised_tranche</code></strong>: T19 is closed while tranche 4 is <code>planned</code>, and tranche 4's entry needs the tranche 3 review — the programme's retrospective tranche chain, owned by #526. This unit does not backfill those reviews; the strict-gate disclosure in the PR and the closure review state it. Two declared follow-ups (the <code>meeting_type</code> authoring route and the T9 board / T10 cadence binding) stay open items with owners in <code>docs/plans/T19/closure-review.md</code>.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/plans/T19/evidence.md</code> at build time.</span>

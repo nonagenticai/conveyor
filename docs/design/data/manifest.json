@@ -2,92 +2,92 @@
   "feedback_url": "https://github.com/nonagenticai/conveyor/discussions",
   "files": [
     {
-      "bytes": 1737864,
+      "bytes": 1784990,
       "path": "architecture.json",
-      "records": 502,
-      "sha256": "563662b0433d6972ec0bceb476409fda3dbc0ba9d3f217b0e100edee0a83af78"
+      "records": 520,
+      "sha256": "2c7fa687b0104a280d97a0297f65843dd432890d54e538772fc529c8ec24e258"
     },
     {
-      "bytes": 133923,
+      "bytes": 134369,
       "path": "artefacts.json",
-      "records": 282,
-      "sha256": "c03aaa200704b2bd78f9faed37cf6114578e8caa8d6713689adcbf0da1d4541e"
+      "records": 283,
+      "sha256": "da1bf686bac5f74527b1bbc18283234f994be1f90d9405b14f18dc9a00f52021"
     },
     {
       "bytes": 1832913,
       "path": "config.json",
       "records": 2256,
-      "sha256": "f70dd23beeef1607ad8f15fb9266bab435a5d8cdeadb9f86e79b164142607162"
+      "sha256": "82cd38b61ca2a9f7283552e3562e3c555d0133bad2c4dbb2d9315b79ef6e3a78"
     },
     {
-      "bytes": 24664,
+      "bytes": 29831,
       "path": "evidence.json",
-      "records": 142,
-      "sha256": "590711a49b6780c3871ce96ed16795afdd30f11ca648670800d89f98a0bfe736"
+      "records": 170,
+      "sha256": "df989bcdc2c7e5ab0107c94218151325952ea1ed39c4f102234fb3a4bc9a091e"
     },
     {
       "bytes": 107,
       "path": "feedback.json",
       "records": 0,
-      "sha256": "78b421a4d772dd71e67b2dcbdf7bd28fe86a21bba1a1199f673616c16355dded"
+      "sha256": "f6cef59d2e38267bd39524de16fae2d6986901f642b3eec9fe482819e6c2ee4c"
     },
     {
       "bytes": 4205,
       "path": "measure.json",
       "records": 0,
-      "sha256": "3fc26bf6fa46cecec46d312e2968416e02c834b6682bbd6c503de2374f1e6c70"
+      "sha256": "7434148eb4a1c569bba9c08f5ad9226c8a27bf26610d376450667005b38cbc02"
     },
     {
-      "bytes": 453786,
+      "bytes": 454077,
       "path": "msp.json",
       "records": 173,
-      "sha256": "fb0313cca9627e60d064eab3bc06da5194e7d94a766daf0e04eab225c30bda92"
+      "sha256": "7e5e07a26eb1fcecf4dfb00b0871ab0db809508262f5ff090b0461e93aef2924"
     },
     {
       "bytes": 1028,
       "path": "ops.json",
       "records": 1,
-      "sha256": "b7ce37362820360f7e7532abd51e5203e2f8c0b7daced7d15421d034b8e48feb"
+      "sha256": "c9e4bc3d934d4ed6fb540498190654ca73c2262979d8e990d11b4eb80ed1d4af"
     },
     {
       "bytes": 16709,
       "path": "organisation.json",
       "records": 34,
-      "sha256": "03d390295df385bd8194c057911cb027d39feef181faffd4b41c5969d0d4313f"
+      "sha256": "8a388215d99460e42942e82112bfb898859e5c6bb8036ea7d005087a96c5ce1b"
     },
     {
-      "bytes": 234569,
+      "bytes": 235407,
       "path": "programme.json",
       "records": 53,
-      "sha256": "61b15facd73ee8f6df77317e7809a07de7f1ddd844e5e8e2e615bfd92a988077"
+      "sha256": "445fd7f8697c8b770ef4b66adbbd6bee26c76838f3f14432ed290878f967bb21"
     },
     {
-      "bytes": 1386047,
+      "bytes": 1396081,
       "path": "rework.json",
-      "records": 427,
-      "sha256": "0898433de3a7be4385f4c701d596455c893ab854ea86e0256349ba5fcc79d992"
+      "records": 429,
+      "sha256": "33ba4b123c888603a26e58eb6cf3684188b22b7e0709a10c25878ec78c476284"
     },
     {
       "bytes": 223,
       "path": "secrets.json",
       "records": 0,
-      "sha256": "02f4d820a866ea55b1efa567db821cc0e525f4a71def448369d70a4d7b05336a"
+      "sha256": "5d1b2b847d5519489cac49f2277133ed9fa451a1018bd080c50779b7d967aafb"
     },
     {
-      "bytes": 5063929,
+      "bytes": 5093424,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "424f3ac5a52e1dca73d1162b9d7e79803a3ee76e40cd94389a7b246ebc48511c"
+      "sha256": "4e9ec460bd9004765b4b973223d1411810e679313128441c716174f039b84360"
     },
     {
       "bytes": 1215102,
       "path": "work.json",
       "records": 2180,
-      "sha256": "d27f4fcc7e1cfb2599cd6c11f18218bb05d7b9469d411b36817333cbb6fc5b15"
+      "sha256": "56fd0fcc2059d27fd55738ae53c329f0aad26b145c3c264e6984c720ac2cc424"
     }
   ],
-  "generated_at": "2026-11-24T08:29:31.004848+00:00",
-  "git_sha": "97100b6e18474ccd26ef2e6ff82a0d94500926cd",
+  "generated_at": "2026-11-24T09:41:16.641438+00:00",
+  "git_sha": "fd652720002ea5886a274557f6d2fb0714f66069",
   "migration": {
     "description": "development project",
     "version": 68

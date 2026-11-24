@@ -2927,9 +2927,21 @@
       "title": "T19 — Decision forums: closure review",
       "unit": "T19",
       "updated_at": "2026-11-24T08:24:37.036804+00:00"
+    },
+    {
+      "card_id": null,
+      "category": "architecture-artifact",
+      "created_at": "2026-11-24T09:30:28.081869+00:00",
+      "id": "01a20ce4-73e4-7009-9ec7-eb2265e9e84e",
+      "kind": "document",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "publishable": true,
+      "title": "T19 — Architecture artifact (the typed TOGAF set)",
+      "unit": "T19",
+      "updated_at": "2026-11-24T09:31:58.766037+00:00"
     }
   ],
-  "generated_at": "2026-11-24T08:29:31.004848+00:00",
+  "generated_at": "2026-11-24T09:41:16.641438+00:00",
   "governed_assets": [
     {
       "confidence": null,
