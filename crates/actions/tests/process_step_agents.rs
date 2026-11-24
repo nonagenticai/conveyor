@@ -204,7 +204,12 @@ async fn published_and_started(
         .invoke(
             "process_runs.start",
             TOKEN,
-            json!({"card_id": card, "process_key": PROCESS_KEY, "inputs": {}}),
+            // The agent steps call a model; a capturing run needs its declared ceiling (§7.5).
+            json!({
+                "card_id": card,
+                "process_key": PROCESS_KEY,
+                "inputs": {"limits": {"cost_budget_usd": 1.0}}
+            }),
             None,
             None,
             None,
