@@ -1360,13 +1360,20 @@ async fn complete_development(h: &Harness, d: &Development) -> Value {
             "prior_digest": d.prior_digest,
             "method": "kubectl rollout undo",
             "tested": true,
+            "backward_compatible": true,
             "evidence": ["rehearsal on the staging deployment"],
         }),
     )
     .await;
     let deploy = development_gate(h, "development_projects.deploy_gate", id).await;
     decide(h, &id_of(&deploy, "approval_id")).await;
-    record_step(h, id, "deploy", json!({"digest": d.digest})).await;
+    record_step(
+        h,
+        id,
+        "deploy",
+        json!({"digest": d.digest, "migration_generation": 70}),
+    )
+    .await;
     record_step(
         h,
         id,
@@ -1387,6 +1394,7 @@ async fn complete_development(h: &Harness, d: &Development) -> Value {
             "development_project_id": id,
             "deployed_digest": d.digest,
             "restored_digest": d.prior_digest,
+            "migration_generation": 70,
             "health_status": 200,
             "evidence": ["rollout status observed at the restored digest"],
         }),
@@ -1449,6 +1457,7 @@ async fn development_project_deploy_and_live_verify() {
             "prior_digest": d.prior_digest,
             "method": "kubectl rollout undo",
             "tested": true,
+            "backward_compatible": true,
             "evidence": ["rehearsal on the staging deployment"],
         }),
     )
@@ -1456,7 +1465,13 @@ async fn development_project_deploy_and_live_verify() {
 
     let deploy = development_gate(&h, "development_projects.deploy_gate", id).await;
     decide(&h, &id_of(&deploy, "approval_id")).await;
-    record_step(&h, id, "deploy", json!({"digest": d.digest})).await;
+    record_step(
+        &h,
+        id,
+        "deploy",
+        json!({"digest": d.digest, "migration_generation": 70}),
+    )
+    .await;
     record_step(
         &h,
         id,
@@ -1478,6 +1493,7 @@ async fn development_project_deploy_and_live_verify() {
             "development_project_id": id,
             "deployed_digest": d.digest,
             "restored_digest": d.prior_digest,
+            "migration_generation": 70,
             "health_status": 200,
             "evidence": ["rollout status observed at the restored digest"],
         }),
