@@ -222,8 +222,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/data/conformance.html",
       "source": "docs/design/data/conformance.md",
       "section": "Design",
-      "sha256": "6679e33aa06451668e2c1882e14af92e616d674c190aa9e1ac096c7e7d0fccfb",
-      "bytes": 24244,
+      "sha256": "0b90fd258c3d8161d8c4f55b0a6aef78f286605c785bdf648a013c18e6be6163",
+      "bytes": 24325,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
     {
