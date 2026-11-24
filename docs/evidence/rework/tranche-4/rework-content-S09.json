@@ -1,0 +1,855 @@
+{
+ "charter": "# Charter — S09 Documents and integrations (retrospective, 2026-11-24)\n\n- **Project:** S09 'Documents, repositories, secrets, workers UI, reports/metrics, billing display', track v1, ADM phase G, delivery plateau, tranche 4, project `01a1d039-0d2d-71f1-a403-c9abe52c1888`, plan `docs/plans/slices/S09-documents-integrations.md`. At the rework snapshot the project row is `status: closed` (version 10, updated 2026-11-24T07:41:22Z) with `meta.measured_status: built`, `meta.plan_status: planned`, `meta.viability: rework`, `meta.tranche: 4` and nine linked issues recorded closed.\n- **Mandate:** deliver the document, repository, secret and read-only display boundary of the delivery track — four tables, the `integrations` module, 26 of the front matter's 27 actions, nine event types, bytes in MinIO behind an authorized stream, write-only secrets, repositories as references, and nine adjacent services reached only as declared actions with timeout and breaker — so that no worker manager, billing engine or KAG is absorbed. This retrospective is authored under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Scope:** the four tables `document`, `repository`, `project_repository` and `secret` in `migrations/0013_documents.sql`; the object store and secret envelope; documents, repositories, secrets, reports, workers, billing and coding-job actions; the read-only workers, billing and observability displays; and the strata handoff. Out of scope: billing logic and metering writes, worker scheduling, artifact objects, code analysis, licence issuance, ingestion and embeddings as services, screens (S12) and `project_request.repository_url` (S07).\n- **Expected outputs:** `project-brief`, `evidence`. The evidence page `01a1e687-7682-753d-b60e-1f00243b13a3` is published (2026-11-16T22:43:22Z); the project brief is published by this rework.\n- **Tranche and governance:** tranche 4 (`01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce`) is authorised at 2026-11-24T17:04:34Z by the tranche-3 review `01a20e84-325b-7fef-8f40-50b5e53550e9`; the tranche-4 PI plan records the WSJF inputs 10/8/10/5 for this slice.\n- **What this retrospective does NOT attest:** it does not attest contemporaneous intent or a contemporaneous Phase A–D set; it does not attest a run of the plan §7 gate properties a–g, because the snapshot records none; it does not attest the deployed MinIO leg (credentials and bucket policy), the live strata_ingest path behind the unregistered `documents.ingest`, or the acceptance of the nine linked issues; and it does not re-close the project, so no closure or closure review is authored here."
+ ,
+ "soaw": {
+  "title": "Statement of Architecture Work — S09 Documents and integrations (retrospective, 2026-11-24)",
+  "body": {
+   "assignment": "Rework the V1 slice S09 (SPEC §8 S9) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A–D artefacts, this charter, this Statement of Architecture Work and the delivery contract, take the scope baseline with one WBS deliverable, record a retrospective Phase-G review at level consistent, and publish the expected outputs project-brief and evidence. The project stays active: this rework re-closes nothing and carries no closure keys.",
+   "scope": "the four tables document, repository, project_repository and secret in migrations/0013_documents.sql; the integrations module (object_store, external, breaker, ingest); documents.create/get/list/download/update/delete/report, 26 of the front matter's 27 actions in all; the nine event types; MinIO bucket conveyor-documents with key t/<tenant>/<document>/<version>; the KEK/HKDF/XChaCha20-Poly1305 secret envelope; repositories as references; the read-only workers, billing and observability displays; report queries over local tables; and the strata handoff. Out of scope: billing logic and metering writes, worker scheduling, artifact objects, code analysis, licence issuance, ingestion and embeddings as services, screens (S12) and project_request.repository_url (S07).",
+   "responsibilities": "The programme architect (conveyor-e2e) owns the slice plan and this retrospective set; the Architecture Board (conveyor-architecture-board) approves the Phase A–D artefacts and the delivery contract; the approver (conveyor-approver) decides the Phase-G level; the S03 team supplies tenancy, trace_link and revision, and the S04 team supplies the action registry with its OpenAPI and MCP projection. Operators own the KEK source in the pod environment and the MinIO bucket policy.",
+   "acceptance_criteria": "The plan §7 gate: (a) round-trip — a 1 MiB upload, list and download with sha256 equal to content_hash, then delete yields GET 404 and object_store::head NotFound, asserted in documents_roundtrip; (b) cap — 10,485,760 bytes accepted and one byte more refused 413 application/problem+json with a stable type in documents_limits; (c) secret — rotate to version 2 and GET returns no plaintext, value key or ciphertext in secrets_never_revealed; (d) workers — the page renders live rows and a stopped service yields a banner with the breaker open after five failures; (e) reports — every number equals its SQL count on the same snapshot in reports_match_sql; (f) externals — GET /api/actions carries timeout_ms on every external and zero reqwest:: outside the executor in externals_declared; (g) billing — no write action and no metering event in the manifest. The same instrument also requires migration 0013 applied twice as a no-op, FORCE RLS on all four tables, and the nine declared event types. The snapshot records no run of these properties.",
+   "contract": "This Statement establishes the delivery contract against acceptance/programme/S09.toml, whose gate text names the seven properties above. Compliance is assessed clause by clause at the 2026-11-24 retrospective snapshot; the project's published evidence page is 01a1e687-7682-753d-b60e-1f00243b13a3 and its pre-rework audit pack is docs/evidence/rework/S09.json, which records verdict red on the missing baseline, charter, contract, Phase-G review and closure outputs. The rework supplies the lifecycle record but does not re-close; the remaining verification limits are carried in the review and the evidence output rather than converted into a pass."
+  }
+ },
+ "artifacts": [
+  {
+   "title": "Stakeholder Map — S09 Documents and integrations (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "matrix",
+   "purpose": "Who is affected by the document, repository, secret and read-only display boundary, what each needs, and how the rework engages them.",
+   "scope": "the four tables, the integrations module, the byte route, the secret envelope, the read-only displays, the strata and coding externals, and the tranche-4 governance around them.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group",
+     "the SRO",
+     "the S03 and S04 delivery teams",
+     "the S12 UI team",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "Sponsoring group",
+     "axis_b": "tranche-4 authorisation and the retrospective disposition",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "decide"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "SRO",
+     "axis_b": "accountable for the boundary and the tranche's outcome",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "accountable"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Programme architect (conveyor-e2e)",
+     "axis_b": "owns the slice plan, the Phase A–D set and the object-store and secret design",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "responsible"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Architecture Board",
+     "axis_b": "approves the Phase A–D set and the delivery contract",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "approve"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "S03 delivery team",
+     "axis_b": "supplies tenant, trace_link, revision and the tenancy convention",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "S04 delivery team",
+     "axis_b": "supplies the ActionSpec registry, the served OpenAPI and the MCP projection",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "S12 UI team",
+     "axis_b": "receives the declared admin surface: actions, jobs, audit, licences, workers and billing reads",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "inform"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Strata and coding service owners",
+     "axis_b": "are reached as declared externals; the conveyor never absorbs their stores or schedules",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Operators and tenants",
+     "axis_b": "hold the KEK, the MinIO bucket policy and the tenant isolation of bytes and secrets",
+     "value": {
+      "influence": "low",
+      "interest": "high",
+      "engagement": "inform"
+     },
+     "position": 9
+    }
+   ],
+   "body": "# Stakeholder Map — S09 Documents and integrations (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine rows on the influence, interest and engagement axes: the sponsoring group decides the tranche and the retrospective disposition, the SRO is accountable, the programme architect is responsible, the Architecture Board approves the Phase A–D set, S03 and S04 supply tenancy and the action registry, S12 receives the declared admin surface, the strata and coding owners are consulted as external targets, and operators and tenants are informed on byte and secret custody.\n\n## Links\n\nDerives from docs/plans/slices/S09-documents-integrations.md sections 1 to 5 and 9; realizes the Phase A stakeholder view for the document, repository, secret and display boundary; reuses the programme roles already recorded in the conveyor buildout programme and the tranche-4 authorisation 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. The project's only contemporaneous publication is the evidence page 01a1e687-7682-753d-b60e-1f00243b13a3, published 2026-11-16; this Phase A matrix is authored by the 2026-11-24 retrospective rework and does not attest delivery-time engagement."
+  },
+  {
+   "title": "Driver/Goal/Objective Catalog — S09 Documents and integrations (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "The drivers behind the boundary, the goal each serves and the objective the plan installs.",
+   "scope": "bytes in an object store, write-only secrets, declared actions only, the internal ingest action, references not clones, live report queries, read-only displays and the x-secret projection.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the SRO",
+     "the S03 and S04 delivery teams",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "D1 Bytes stored in Postgres TOAST every row and every dump",
+     "axis_b": "G1 Bytes live in MinIO behind one authorized stream",
+     "value": {
+      "objective": "object_store writes bucket conveyor-documents at key t/<tenant>/<document>/<version>; every byte streams through /api/documents/{id}/content authenticated against tenant_id and membership; no presigned URL exists (plan 5.2, decision 1)."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "D2 A secret returned once for convenience is the whole leak",
+     "axis_b": "G2 Secrets are write-only and never revealed",
+     "value": {
+      "objective": "create and rotate take value marked x-secret; get and list return id, name, scope, key_id, version and created_at only; there is no reveal action and OpenAPI examples are stripped for marked fields (plan 5.4, traps 2 and 3)."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "D3 One direct read of a neighbour's database owns its schema and its outages",
+      "axis_b": "G3 Every adjacent service is a declared action",
+     "value": {
+      "objective": "a call absent from action_registry does not exist; action_registry.service names the backing service; reads carry a 5 s timeout and writes 30 s; the breaker is process-local and opens after five failures in 30 s (plan 5.1, decision 7)."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "D4 Ingestion could become a second local pipeline",
+     "axis_b": "G4 documents.ingest is an internal action over the strata service",
+     "value": {
+      "objective": "documents.ingest is registered once as kind internal and pushes multipart to strata_ingest POST /api/ingest/jobs with the tenant token sealed as strata_ingest.token; the returned jobs[0].job_id is stored in document.external_ref (plan 5.6, decision 10)."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "D5 Cloning repositories would make the conveyor a git host",
+     "axis_b": "G5 Repositories are references",
+     "value": {
+      "objective": "repository holds provider, url, default_branch, installation_ref and credential_secret_id; project_repository is the join with role; coding work is coding_jobs.create with repository_url and ref returning run.external_ref; no git crate may appear in the dependency tree (plan 5.3, decision 6)."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "D6 Rolled-up metrics drift from the operational tables",
+     "axis_b": "G6 Every report number is a live query",
+     "value": {
+      "objective": "reports are document rows of kind report carrying meta.params and meta.generated_at; each number is computed on demand from event, card, list, run, approval, approval_decision and delivery; project_metrics stays dropped (plan 5.5, decision 8)."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "D7 Worker scheduling and billing logic are other systems' authority",
+     "axis_b": "G7 Workers, billing and observability are read-only displays",
+     "value": {
+      "objective": "the workers page renders the external answer with no writes and no local table; billing.summary reads inference_call and tool_call and billing display adds app_licence as of checked_at with no arithmetic, metering write or budget mutation (plan 5.5, decision 9)."
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "D8 A marked secret leaking into a published OpenAPI example",
+     "axis_b": "G8 The served spec strips marked examples and asserts",
+     "value": {
+      "objective": "utoipa and the MCP projection carry x-secret on the value field and publish no default or example for it; the served-spec lock is regenerated only through the binary's --print-openapi --write-lock and checked by --check-lock (build step 8, trap 3)."
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "D9 A delete that drops the row and leaves the object",
+     "axis_b": "G9 Tombstone first, purge guarded by status",
+     "value": {
+      "objective": "documents.delete sets status deleted and enqueues document.purge; the purge checks status == deleted before removing bytes and clear_object_tx refuses a non-deleted row, so orphaned bytes and pointerless documents are both refused (plan 5.2, trap 0b)."
+     },
+     "position": 9
+    }
+   ],
+   "body": "# Driver/Goal/Objective Catalog — S09 Documents and integrations (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine driver, goal and objective rows: bytes out of Postgres into MinIO, secrets that never answer in plaintext, adjacent services reachable only as declared actions, an internal ingest action over the strata service, repositories as references, live report queries, read-only worker and billing displays, the x-secret projection and the guarded purge.\n\n## Links\n\nDerives from the slice plan sections 1, 3, 5, 8 and the ten decisions closed in section 9; realizes the Phase A driver view; reuses the S03 tenancy and trace_link and the S04 action registry and served spec.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. The plan records that Part A and Part B were built on 2026-11-08; the pre-rework audit pack docs/evidence/rework/S09.json still records verdict red because the governance record and gate run were absent, and this catalogue records the intent rather than claiming the gate passed."
+  },
+  {
+   "title": "Requirements Catalog — S09 Documents and integrations (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "The requirements the S09 gate and its schema must satisfy, each with an executable proof.",
+   "scope": "the seven gate properties, the four tables, the 26 registered actions, the nine events, the secret envelope and the read-only displays.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the SRO",
+     "the S03 and S04 delivery teams",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "R1 Property (a) round-trip",
+     "axis_b": "A 1 MiB document keeps its bytes, hash and deletion",
+     "value": {
+      "priority": "must",
+      "acceptance": "upload 1 MiB, list and download: sha256 equals content_hash; delete yields GET 404 and object_store::head returns NotFound; documents_roundtrip asserts it and mc stat is only the manual cross-check (plan 7)."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "R2 Property (b) cap",
+     "axis_b": "10 MiB is the boundary and one byte more is refused",
+     "value": {
+      "priority": "must",
+      "acceptance": "10,485,760 bytes accepted, 10,485,761 refused 413 application/problem+json with a stable type; documents_limits; the router's 16 MiB layer is an envelope and the action's cap remains the check (plan 7, trap 0)."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "R3 Property (c) secret",
+     "axis_b": "Rotation returns no plaintext",
+     "value": {
+      "priority": "must",
+      "acceptance": "rotate to version 2; GET has no plaintext, no value key and no ciphertext; secrets_never_revealed; the envelope is HKDF-SHA256 per tenant with XChaCha20-Poly1305 and key_id kek:v1 (plan 5.4, 7)."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "R4 Property (d) workers",
+     "axis_b": "The workers display is live and read-only",
+     "value": {
+      "priority": "must",
+      "acceptance": "the page renders live rows; a stopped service yields last-known values plus a banner and the breaker opens after five failures; externals_declared proves the declaration and the absence of writes (plan 7)."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "R5 Property (e) reports",
+     "axis_b": "Every report number equals its SQL count",
+     "value": {
+      "priority": "must",
+      "acceptance": "each number in the report document equals its SQL count on the same snapshot; reports_match_sql; the five sources are event, card join list, run, approval, approval_decision and delivery (plan 5.5, 7)."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "R6 Property (f) externals",
+     "axis_b": "Every external declares its timeout and only the executor calls out",
+     "value": {
+      "priority": "must",
+      "acceptance": "GET /api/actions shows timeout_ms on every external and zero reqwest:: usages outside the executor; externals_declared plus the registry and parity_http_mcp wire-shape tests (plan 7)."
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "R7 Property (g) billing",
+     "axis_b": "Billing is display only",
+     "value": {
+      "priority": "must",
+      "acceptance": "no write action and no metering event in the manifest; billing.summary reads inference_call and tool_call; the display adds app_licence status, expires_at and checked_at with no arithmetic (plan 5.5, 7)."
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "R8 Four tables and tenancy",
+     "axis_b": "0013 owns the schema with FORCE RLS",
+     "value": {
+      "priority": "must",
+      "acceptance": "migrations/0013_documents.sql creates document, repository, project_repository and secret with their foreign keys, indexes and FORCE ROW LEVEL SECURITY; the server binary applies migration 0013 twice and the second run is a no-op (plan 6 step 2)."
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "R9 27 declared actions, 26 registered",
+     "axis_b": "The one gap is named, not hidden",
+     "value": {
+      "priority": "must",
+      "acceptance": "the front matter lists 27 actions; 26 are registered through the S04 registry; documents.ingest is the single unregistered action because it needs a live strata_ingest target, and it is recorded as a follow-up with a live target rather than as proven code (plan 6)."
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "R10 Nine event types",
+     "axis_b": "Every mutation writes its outbox row in its transaction",
+     "value": {
+      "priority": "must",
+      "acceptance": "document.created/updated/deleted/ingested, repository.created/linked and secret.created/rotated/deleted are written one per mutation in the same transaction with the payload keys of plan 5.7; no event is emitted by a read path."
+     },
+     "position": 10
+    }
+   ],
+   "body": "# Requirements Catalog — S09 Documents and integrations (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen requirements: the seven gate properties (round-trip, cap, secret, workers, reports, externals, billing), the four tables with FORCE RLS, the 27 declared actions of which 26 are registered, and the nine event types. Each row names its executable proof in the plan's gate or its test targets.\n\n## Links\n\nDerives from SPEC section 8 S9 and the slice plan sections 5, 6, 7 and 8; realizes the Phase A requirements view; reuses the S03 schema conventions and the S04 registry with its OpenAPI and MCP projection. The acceptance instrument is acceptance/programme/S09.toml.\n\n## Document\n\nThe artefact sits under the slice plan. The snapshot contains no run of properties a to g and no evidence that the deployed MinIO leg or the live strata_ingest call was exercised; the catalogue therefore states the required proof without claiming it was observed."
+  },
+  {
+   "title": "Solution Concept Diagram — S09 Documents and integrations (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "diagram",
+   "purpose": "The components, stores and edges that carry documents, repositories, secrets, reports and the external boundary.",
+   "scope": "migration 0013, the store and API modules, the integrations module, MinIO, the secret envelope and the declared external targets.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the SRO",
+     "the S03 and S04 delivery teams",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "migrations/0013_documents.sql",
+     "axis_b": "the four-table schema",
+     "value": {
+      "kind": "component",
+      "note": "document, repository, project_repository and secret with foreign keys, indexes, ENABLE and FORCE RLS; the server binary applies it and the second run is a no-op"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "crates/store/src/{document,repository,secret}.rs",
+     "axis_b": "the store modules",
+     "value": {
+      "kind": "component",
+      "note": "tenant-first transaction functions; the secret envelope lives here and is tested by secret_envelope"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "crates/api/src/{documents,repositories,secrets,reports,workers,billing}.rs",
+     "axis_b": "the served surfaces",
+     "value": {
+      "kind": "component",
+      "note": "read routes and the byte route; report queries; read-only worker and billing displays; unversioned /api/<resource> paths"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "crates/actions/src/integrations/{object_store,external,breaker,ingest}.rs",
+     "axis_b": "the integrations module",
+     "value": {
+      "kind": "component",
+      "note": "object_store put/get/delete/stat; the external executor with timeout and a process-local breaker; documents.ingest"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "MinIO at minio.example.com:8389",
+     "axis_b": "the bytes backend",
+     "value": {
+      "kind": "component",
+      "note": "bucket conveyor-documents, key t/<tenant>/<document>/<version>; service-level credentials; the conveyor is sole authorizer"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "strata_ingest",
+     "axis_b": "the ingest target",
+     "value": {
+      "kind": "component",
+      "note": "POST /api/ingest/jobs multipart; Bearer token is the tenant; 202 jobs[0].job_id; the target is not reachable from a local gate"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "declared external actions",
+     "axis_b": "inference-router, licenses, coding-*, strata_rag, observability",
+     "value": {
+      "kind": "component",
+      "note": "each is a registry row with a timeout and a breaker; a call not in action_registry does not exist"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "document row",
+     "axis_b": "object key",
+     "value": {
+      "kind": "edge",
+      "note": "content_hash is SHA-256 computed while streaming and re-verified on download; content_type and size_bytes live in meta, not in new columns"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "/api/documents/{id}/content",
+     "axis_b": "MinIO stream",
+     "value": {
+      "kind": "edge",
+      "note": "the only byte path; authenticated against tenant_id and membership; attachment disposition and nosniff; no presigned URL"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "KEK in the pod environment",
+     "axis_b": "secret row",
+     "value": {
+      "kind": "edge",
+      "note": "HKDF-SHA256 with salt tenant_id yields the per-tenant key; values are sealed XChaCha20-Poly1305; key_id kek:v1; rotation replaces the ciphertext and bumps version"
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "ArtifactRef {document_id, role}",
+     "axis_b": "trace_link",
+     "value": {
+      "kind": "edge",
+      "note": "a domain value, never a table; queryable as a trace_link row from_type document kind traces with role in document.meta.role"
+     },
+     "position": 11
+    },
+    {
+     "axis_a": "document.purge job",
+     "axis_b": "object_store delete",
+     "value": {
+      "kind": "edge",
+      "note": "runs only after documents.delete sets status deleted; the purge re-checks the tombstone before removing bytes"
+     },
+     "position": 12
+    },
+    {
+     "axis_a": "event row",
+     "axis_b": "the nine event types",
+     "value": {
+      "kind": "edge",
+      "note": "one outbox row per mutation in its transaction; document.ingested carries id and external_ref"
+     },
+     "position": 13
+    },
+    {
+     "axis_a": "S03 and S04 primitives",
+     "axis_b": "S09",
+     "value": {
+      "kind": "edge",
+      "note": "S03 supplies tenant, trace_link and revision; S04 supplies the ActionSpec derive, registry, OpenAPI and MCP projection; S09 adds no second write path"
+     },
+     "position": 14
+    }
+   ],
+   "body": "# Solution Concept Diagram — S09 Documents and integrations (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nFourteen rows: seven components (migration 0013, the store modules, the served surfaces, the integrations module, MinIO, strata_ingest and the declared externals) and seven edges (row to object key, the authorized byte stream, the KEK to secret row, ArtifactRef to trace_link, the guarded purge, the outbox row and the S03/S04 primitives).\n\n## Links\n\nDerives from the slice plan sections 5.1 to 5.7 and the build order in section 6; realizes the Phase A solution concept; reuses the S03 schema and the S04 registry. The strata_rag base-URL contract and the /query versus /api/query discrepancy remain stated risks rather than silent assumptions.\n\n## Document\n\nThe artefact sits under the slice plan. Its executable counterparts are documents_roundtrip, documents_limits, secrets_never_revealed, externals_declared, reports_match_sql, repositories_crud and the served-spec lock; the plan gate in section 7 is its acceptance."
+  },
+  {
+   "title": "Business Capability Map — S09 Documents and integrations (Phase B)",
+   "phase_code": "b",
+   "plateau": "hld",
+   "artifact_kind": "diagram",
+   "purpose": "The capabilities the slice declares and how far each is evidenced at the rework snapshot.",
+   "scope": "documents, repositories, secrets, coding jobs, external declarations, workers, billing, reports and the strata ingest handoff.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group",
+     "the SRO",
+     "the S12 UI team",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "Document lifecycle",
+     "axis_b": "create, get, list, download, update, delete and report",
+     "value": {
+      "maturity": "the plan records Part A and Part B built on 2026-11-08; no gate run is evidenced at the snapshot",
+      "evidence": "project meta.measured_status built; plan 5.2 and 6; published evidence page 01a1e687-7682-753d-b60e-1f00243b13a3"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Bytes backend",
+     "axis_b": "MinIO object_store with one authorized stream",
+     "value": {
+      "maturity": "declared and built per the plan; the deployed MinIO credentials and bucket policy remain unproven",
+      "evidence": "plan 5.2 and open question 0; scripts/prove-s3.sh proves the wire only"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Repository references",
+     "axis_b": "repository and project_repository without clones",
+     "value": {
+      "maturity": "declared in the plan; the repositories_crud test and the no-git-crate assertion are named",
+      "evidence": "plan 5.3 and build step 9"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Write-only secrets",
+     "axis_b": "the KEK envelope, rotation and no reveal",
+     "value": {
+      "maturity": "declared and built per the plan; no run of secrets_never_revealed is recorded",
+      "evidence": "plan 5.4 and 7 property c"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Coding job dispatch",
+     "axis_b": "coding_jobs.create and get through run.external_ref",
+     "value": {
+      "maturity": "declared in the plan and covered by the externals declaration and registry shape tests",
+      "evidence": "plan 5.3, 6 step 11 and the gate note on the target names"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "External service boundary",
+     "axis_b": "nine externals as declared actions with timeout and breaker",
+     "value": {
+      "maturity": "declared; externals_declared is the named proof and no recorded run exists",
+      "evidence": "plan 5.1 and 7 property f"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Worker and provider display",
+     "axis_b": "read-only rows from the durable queue and host registry",
+     "value": {
+      "maturity": "declared; the stopped-service banner and breaker behaviour are named but unrecorded",
+      "evidence": "plan 5.5 and 7 property d"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Billing display",
+     "axis_b": "billing.summary and app_licence as of checked_at",
+     "value": {
+      "maturity": "declared; no write action and no metering event is the named proof",
+      "evidence": "plan 5.5 and 7 property g"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Live report queries",
+     "axis_b": "five report numbers over local tables",
+     "value": {
+      "maturity": "declared; reports_match_sql is the named proof and project_metrics remains dropped",
+      "evidence": "plan 5.5 and 7 property e"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "Strata ingest handoff",
+     "axis_b": "documents.ingest to strata_ingest",
+     "value": {
+      "maturity": "not registered; the plan records 26 of 27 actions built and this one blocked on a live target",
+      "evidence": "plan 5.6 and 6; open question 4 resolved only as a contract"
+     },
+     "position": 10
+    }
+   ],
+   "body": "# Business Capability Map — S09 Documents and integrations (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen capabilities: document lifecycle, the MinIO bytes backend, repository references, write-only secrets, coding job dispatch, the external service boundary, worker and provider display, billing display, live report queries and the strata ingest handoff. Each carries the plan's own statement of maturity rather than an inferred pass.\n\n## Links\n\nDerives from the Phase A solution concept and the slice plan sections 5 to 8; realizes the Phase B capability view over SPEC section 8 S9; reuses the S03 tenancy and trace_link and the S04 registry. The plan's build order is the maturity record for Part A and Part B.\n\n## Document\nThe artefact sits under the slice plan. The snapshot records no Phase-G review and no run of properties a to g, so the map distinguishes what the plan says was built from what the record proves; the strata ingest capability is the one openly unregistered action."
+  },
+  {
+   "title": "Data Entity/Data Component Catalog — S09 Documents and integrations (Phase C)",
+   "phase_code": "c",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "The entities the slice adds, each with its owner and its one invariant.",
+   "scope": "the four tables, the ArtifactRef value, the object key, the purge job, the event row and the external references.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the S03 and S04 delivery teams",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "document",
+     "axis_b": "the document row and tombstone",
+     "value": {
+      "owner": "domain",
+      "table": "document",
+      "note": "kind, status, content_hash and external_ref; content_type and size_bytes in meta; delete sets status deleted and never drops the row"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "repository",
+     "axis_b": "the repository reference",
+     "value": {
+      "owner": "domain",
+      "table": "repository",
+      "note": "provider, url, default_branch, installation_ref and credential_secret_id pointing at secret; the conveyor clones nothing"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "project_repository",
+     "axis_b": "the project join",
+     "value": {
+      "owner": "domain",
+      "table": "project_repository",
+      "note": "the join of project and repository with role; link and unlink are the only mutations"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "secret",
+     "axis_b": "the sealed value",
+     "value": {
+      "owner": "domain",
+      "table": "secret",
+      "note": "ciphertext is nonce plus ct plus tag; key_id kek:v1; uq(tenant,name) forbids history; version increments on rotation and the old ciphertext does not survive"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "ArtifactRef",
+     "axis_b": "the attachment value",
+     "value": {
+      "owner": "domain",
+      "component": "domain value plus trace_link row",
+      "note": "document_id and role; queryable as from_type document and kind traces with role in document.meta.role; a role-indexed join table would be a contract-change request"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "object key",
+     "axis_b": "the MinIO address",
+     "value": {
+      "owner": "store",
+      "component": "bucket conveyor-documents",
+      "note": "t/<tenant>/<document>/<version>; service-level credentials; no presigned URL and no second authorizer"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "document.purge",
+     "axis_b": "the purge job",
+     "value": {
+      "owner": "store",
+      "component": "job kind document.purge",
+      "note": "removes the object only for a row whose status is deleted; clear_object_tx refuses any other state"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "event row",
+     "axis_b": "the outbox",
+     "value": {
+      "owner": "store",
+      "component": "event row written in-tx",
+      "note": "nine types with the payload keys of plan 5.7; document.ingested carries id and external_ref; one row per mutation"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "run.external_ref",
+     "axis_b": "the coding job reference",
+     "value": {
+      "owner": "domain",
+      "column": "run.external_ref",
+      "note": "written in the run transition when coding_jobs.create returns; coding_jobs.get polls by that reference"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "app_licence",
+     "axis_b": "the licence read model",
+     "value": {
+      "owner": "read-model",
+      "table": "app_licence",
+      "note": "status, expires_at and checked_at feed the billing display as of checked_at; no licence row is written by S09"
+     },
+     "position": 10
+    },
+    {
+     "axis_a": "strata_ingest.token",
+     "axis_b": "the sealed per-tenant token",
+     "value": {
+      "owner": "store",
+      "component": "secret row",
+      "note": "opened per call; a tenant without one is 422 ingest_not_configured before a byte is read; there is no plaintext env and no shared token"
+     },
+     "position": 11
+    },
+    {
+     "axis_a": "inference_call and tool_call",
+     "axis_b": "the billing sources",
+     "value": {
+      "owner": "read-model",
+      "tables": "inference_call, tool_call",
+      "note": "billing.summary reads these; S09 writes neither and mutates no budget"
+     },
+     "position": 12
+    }
+   ],
+   "body": "# Data Entity/Data Component Catalog — S09 Documents and integrations (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTwelve rows: the four tables document, repository, project_repository and secret, the ArtifactRef value, the MinIO object key, the purge job, the event outbox, run.external_ref, the app_licence read model, the sealed strata token and the billing source tables. Each names its owner and the one invariant that keeps the boundary intact.\n\n## Links\n\nDerives from 02-DATA-ARCHITECTURE section 2.10 and the slice plan sections 5.2 to 5.7; realizes the Phase C data view; reuses the S03 tenant, trace_link and revision and the S02 event and job primitives. The four-table cap is the plan's own rule.\n\n## Document\n\nThe artefact sits under the slice plan and migrations/0013_documents.sql. The snapshot records the migration's existence through the plan but no applied run or catalog read; the entity set is the designed record, and the plan section 7 gate is its verification."
+  },
+  {
+   "title": "Technology Standards Catalog — S09 Documents and integrations (Phase D)",
+   "phase_code": "d",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "The standards the slice fixes for its schema, storage, secrets, externals, reports and verification.",
+   "scope": "Postgres and RLS, the action-only write path, MinIO, the secret envelope, x-secret, timeout and breaker, live queries, non-absorption and the verification route.",
+   "stakeholders": {
+    "owner": "programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the S03 and S04 delivery teams",
+     "operators and tenants"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "PostgreSQL",
+     "axis_b": "the repository standard with FORCE row-level security",
+     "value": {
+      "usage": "every S09 table carries tenant_id and ENABLE plus FORCE ROW LEVEL SECURITY with the tenant policy; migration 0013 is applied by the server binary so the runtime grants are re-applied, and a second run is a no-op (plan 6 step 2)"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "Write path",
+     "axis_b": "actions only, unversioned routes",
+     "value": {
+      "usage": "every write is a registered action served at POST /api/actions/{name}/invocations; read routes are unversioned /api/<resource>; a call absent from action_registry does not exist (plan 5.1)"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Object storage",
+     "axis_b": "MinIO through object_store, never local disk or artifacts",
+     "value": {
+      "usage": "bucket conveyor-documents, key t/<tenant>/<document>/<version>; local disk rejected because bytes die with the pod; artifacts rejected because it is a second authorizer; no presigned URL (plan 5.2)"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Secret envelope",
+     "axis_b": "HKDF-SHA256 and XChaCha20-Poly1305",
+     "value": {
+      "usage": "32-byte KEK from CONVEYOR_SECRET_KEK in the pod environment only; per-tenant key HKDF(KEK, salt tenant_id); ciphertext nonce plus ct plus tag; key_id kek:v1; rotation bumps version and discards the old ciphertext (plan 5.4)"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Secret projection",
+     "axis_b": "x-secret in OpenAPI and MCP",
+     "value": {
+      "usage": "value is marked x-secret on create and rotate; the served spec carries no default or example for it; the lock is written only by --print-openapi --write-lock and checked by --check-lock (build step 8, trap 3)"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "External calls",
+     "axis_b": "declared action, timeout and process-local breaker",
+     "value": {
+      "usage": "5 s read timeout and 30 s write; the breaker opens after five failures in 30 s; reqwest:: appears only inside the executor; every external row names action_registry.service (plan 5.1)"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "Reports",
+     "axis_b": "live SQL, no rollup table",
+     "value": {
+      "usage": "each number is a query on event, card, list, run, approval, approval_decision or delivery; reports are document rows of kind report with meta.params and meta.generated_at; project_metrics stays dropped (plan 5.5)"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Non-absorption",
+     "axis_b": "no worker manager, billing engine or KAG",
+     "value": {
+      "usage": "workers, billing and observability are read-only displays; billing writes and metering events are absent from the manifest; KAG is archived and has no client, asset_bindings or card_asset_binding (plan 5.1, 5.5)"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "Content handling",
+     "axis_b": "sniff, allowlist and attachment disposition",
+     "value": {
+      "usage": "the allowlist is pdf, text/plain, text/markdown, text/csv, json, png, jpeg and svg; magic bytes must match the declared type; application/octet-stream is refused; bytes are served as attachment with nosniff (plan 5.2, trap 6)"
+     },
+     "position": 9
+    },
+    {
+     "axis_a": "Verification",
+     "axis_b": "the plan gate on the hosted preflight for the compile verdict",
+     "value": {
+      "usage": "the gate runs fmt, clippy, the served-spec lock, migrate twice, and the named test targets; the compile and test verdict comes from the repository's GitHub-hosted preflight, and port 8000 is never used (plan 7)"
+     },
+     "position": 10
+    }
+   ],
+   "body": "# Technology Standards Catalog — S09 Documents and integrations (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen standards: the repository's Postgres and FORCE RLS convention, the action-only unversioned write path, MinIO object storage, the HKDF and XChaCha20-Poly1305 envelope, the x-secret projection, external timeout and breaker, live report queries, non-absorption, content sniffing and the verification route.\n\n## Links\n\nDerives from the slice plan sections 5, 7 and 8 and the repository's delivery rules; realizes the Phase D standards view; reuses the S03 tenancy convention, the S04 registry and the S02 outbox. The standards are the constraints the gate and the named tests exercise.\n\n## Document\n\nThe artefact sits under the slice plan. Its executable counterparts are migration 0013, the integrations module, the served-spec lock and the test targets named in the plan gate; the snapshot records the design and the plan's build claims, not a recorded gate run."
+  }
+ ],
+ "delivery_contract": {
+  "title": "Delivery contract — S09 Documents and integrations (retrospective, 2026-11-24)",
+  "body": {
+   "compliance": "S09 is assessed clause by clause against acceptance/programme/S09.toml and the plan section 7 gate. The seven properties are: (a) round-trip — a 1 MiB upload, list and download with sha256 equal to content_hash, delete yielding 404 and object_store::head NotFound; (b) cap — 10,485,760 bytes accepted and 10,485,761 refused 413; (c) secret — rotation to version 2 with no plaintext, value key or ciphertext in the response; (d) workers — live rows plus a stopped-service banner and the breaker open after five failures; (e) reports — every number equal to its SQL count on the same snapshot; (f) externals — timeout_ms on every external and zero reqwest:: outside the executor; (g) billing — no write action and no metering event. The instrument also requires migration 0013 twice, FORCE RLS on the four tables, 26 of 27 actions registered and the nine event types. The snapshot records no run of these properties; this rework supplies the lifecycle record and records the gap.",
+   "acceptance": "The live record at the 2026-11-24 rework snapshot: project 01a1d039-0d2d-71f1-a403-c9abe52c1888, key S09, status closed, version 10, updated 2026-11-24T07:41:22Z; meta adm_phase G, plateau delivery, track v1, tranche 4, viability rework, measured_status built, plan_status planned; nine linked issues recorded closed; the evidence page 01a1e687-7682-753d-b60e-1f00243b13a3 published 2026-11-16T22:43:22Z; tranche 4 authorised 2026-11-24T17:04:34Z by review 01a20e84-325b-7fef-8f40-50b5e53550e9. The project brief was missing before this rework and is published with it.",
+   "approval": "The Phase A–D artefacts and this contract are approved by the Architecture Board (conveyor-architecture-board); the Phase-G level is decided by the approver (conveyor-approver) under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Because this retrospective does not re-close the project, no closure gate is requested and no closure or closure review is authored; any future close must be decided by an approver other than the requester against the P0 checks of the acceptance manifest.",
+   "instrument": "acceptance/programme/S09.toml is the manifest; docs/evidence/rework/S09.json is the pre-rework audit pack and records verdict red on the missing baseline, charter, delivery contract, Phase-G review and closure outputs; docs/plans/slices/S09-documents-integrations.md is the plan of record.",
+   "retrospective": true,
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+  }
+ },
+ "wbs_deliverable": {
+  "title": "The S09 boundary — documents, repositories, secrets, declared externals and read-only displays",
+  "business_value": 10,
+  "time_criticality": 8,
+  "risk_reduction": 10,
+  "job_size": 5
+ },
+ "review": {
+  "level": "consistent",
+  "findings": "This retrospective Phase-G review records level consistent for S09 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The snapshot carries no earlier review rows for S09 at all: reviews is empty, so there is no prior Phase-G or compliance review to supersede, and the only governance review touching the slice is the tranche-3 review 01a20e84-325b-7fef-8f40-50b5e53550e9 that authorised tranche 4 at 2026-11-24T17:04:34Z. The pre-rework audit pack docs/evidence/rework/S09.json records verdict red: no project baseline, no charter, no live board-approved delivery contract, no Phase-G review, no closure outputs and no closure gate, while the project is closed (version 10, updated 2026-11-24T07:41:22Z) with meta.measured_status built and plan_status planned. This rework supplies the missing lifecycle record — charter, Statement of Architecture Work, delivery contract, the seven Phase A–D artefacts, this review, the project brief and the evidence output — and leaves the project un-closed. Remaining limits are explicit: the snapshot records no run of the plan section 7 properties a to g; the deployed MinIO credentials and bucket policy, and the live strata_ingest path, are unproven; documents.ingest is the one unregistered action of 27 and is a follow-up with a live target; the plan frontmatter still reads planned while the measured status is built; the nine linked issues are recorded closed but their acceptance is not re-verified here; and the strata_rag path contract (/query versus /api/query) remains a stated risk. The level is consistent rather than compliant because the governance record is now complete but the functional gate is not evidenced; a non-conformant verdict would require a waiver the programme forbids.",
+  "evidence": {
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+   "acceptance_manifest": "acceptance/programme/S09.toml",
+   "audit_pack": "docs/evidence/rework/S09.json",
+   "published_evidence": "01a1e687-7682-753d-b60e-1f00243b13a3"
+  }
+ },
+ "project_brief_output": "# Project brief — S09 Documents and integrations (retrospective, 2026-11-24)\n\n## Outcome\n\nS09 delivers the delivery track's document, repository, secret and read-only display boundary: four tables (document, repository, project_repository and secret), the integrations module, 26 of the front matter's 27 actions, nine event types, bytes in MinIO behind an authorized stream, write-only secrets and repositories as references. The record claims the slice built on 2026-11-08; the functional gate is not evidenced at the snapshot, and this rework records that distinction instead of claiming a pass.\n\n## Boundary\n\nOut of scope and never absorbed: billing logic and metering writes (billing_service), worker scheduling (worker_management), artifact objects, code analysis (coding-*), licence issuance (licenses), ingestion and embeddings as services (strata_ingest and strata_rag), screens (S12) and project_request.repository_url (S07). The slice also refuses bytes in Postgres, local disk, presigned URLs, a reveal endpoint, repository clones, a rollup metrics table and a direct read of any neighbour's database.\n\n## Reuse sources\n\n- SPEC sections 2, 3 D12/D14, 5.2, 5.5 and 8 S9 for the nine-service list and the boundary.\n- 01-CONTRACT sections 6, 9 and 14 for external-action fields, timeout and breaker, and tenant from membership.\n- 02-DATA-ARCHITECTURE sections 2.10, 5 and 8 for the four tables' DDL and the meta read-whole rule.\n- 02-source-map/20-fr account, admin, operate, settings and integrations for the repository registry, secret store and display shapes; kag.ts, licensing, pricing, billing sync and project-requests are not carried.\n- 02-source-map/30 section 4 for artifacts and observability as external nodes only.\n\n## Inception units\n\nThe project row records meta.measured_status built, meta.plan_status planned, meta.viability rework, meta.tranche 4 and nine linked issues (156, 168, 183, 195, 231, 245, 571, 577 and 579), all recorded closed in the snapshot. The only contemporaneous publication is the evidence page 01a1e687-7682-753d-b60e-1f00243b13a3 (2026-11-16T22:43:22Z); no project brief or Phase A–D set existed before this rework, and the plan's section 9 decisions are the design record.\n\n## Dependencies\n\n- blocked-by: S03 — tenant, trace_link, revision and the tenancy convention for the four new tables.\n- blocked-by: S04 — the ActionSpec derive, action_registry, POST /api/actions/{name}/invocations and the OpenAPI and MCP projection.\n- blocked-by: S02 — event, job, audit_event and the outbox that carries the nine S09 event types.\n- blocked-by: the operators' MinIO endpoint and bucket policy for the deployed leg, and a live strata_ingest target for documents.ingest.\n- blocks: S12's declared admin surface (actions, jobs, audit, licences, workers and billing reads) and S15's separation of retrieval.query from knowledge.query.\n\n## Acceptance\n\nThe gate is the plan section 7 feature list: a 1 MiB round-trip whose sha256 equals content_hash with the object key gone after delete; a 10 MiB upload refused 413; secrets never returning plaintext; the workers page rendering live rows; every report number equal to its SQL count; timeout_ms on every external; and billing with no write action and no metering event. The instrument also requires migration 0013 twice, FORCE RLS, 26 of 27 actions and the nine events. The manifest is acceptance/programme/S09.toml; the snapshot records no run.\n\n## Capabilities\n\nThe declared capabilities are document lifecycle, the MinIO bytes backend, repository references, write-only secrets, coding job dispatch, the external service boundary, worker and provider display, billing display, live report queries and the strata ingest handoff. At the snapshot the plan claims Part A and Part B built; the deployed MinIO leg, the live strata path and every gate property remain unevidenced, and documents.ingest is the one action not registered.\n\n## Plan\n\nHeld to docs/plans/slices/S09-documents-integrations.md, whose frontmatter still reads status planned while the project meta says measured_status built. The project closed at version 10 (updated 2026-11-24T07:41:22Z); tranche 4 was authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a20e84-325b-7fef-8f40-50b5e53550e9, and the PI plan records the WSJF inputs 10/8/10/5. This rework publishes the missing lifecycle set and does not re-close the project.\n",
+ "evidence_output": "# Evidence — S09 Documents and integrations (retrospective, 2026-11-24)\n\n## Claim\n\nS09 is the delivery track's document, repository, secret and read-only display boundary: four tables, 26 of 27 actions, nine events, MinIO bytes behind one authorized stream and write-only secrets. The record claims it built, but at the 2026-11-24 snapshot the project is closed with no baseline, charter, delivery contract or Phase-G review in the record and no run of the gate properties; this rework reconstructs the lifecycle set and publishes the project brief and this evidence page without re-closing the project.\n\n## Evidence\n\n- **Project row:** 01a1d039-0d2d-71f1-a403-c9abe52c1888, key S09, status closed, version 10, created 2026-11-12T14:46:02Z, updated 2026-11-24T07:41:22Z; meta adm_phase G, plateau delivery, track v1, tranche 4, viability rework, measured_status built, plan_status planned, depends_on S03 and S04, expected_outputs project-brief and evidence, closure_outputs empty.\n- **Linked issues:** 156, 168, 183, 195, 231, 245, 571, 577 and 579, all recorded closed in the snapshot.\n- **Tranche:** tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce) authorised 2026-11-24T17:04:34Z by the tranche-3 review 01a20e84-325b-7fef-8f40-50b5e53550e9.\n- **Publication:** the project's only contemporaneous document is the evidence page 01a1e687-7682-753d-b60e-1f00243b13a3, published 2026-11-16T22:43:22Z.\n- **Plan content:** migrations/0013_documents.sql for the four tables; the integrations module; 27 declared actions of which 26 are registered; nine event types; the seven gate properties a to g in section 7.\n- **Pre-rework audit:** docs/evidence/rework/S09.json records verdict red with failures for the baseline, charter, delivery contract, Phase-G review and closure outputs.\n\n## Verification\n\nAn independent reader can repeat the record checks through acceptance/programme/S09.toml and the plan section 7 gate: bring up Postgres and an ephemeral MinIO container, apply migration 0013 twice through the server binary, run the named test targets documents_roundtrip, documents_limits, documents_ingest, secrets_never_revealed, externals_declared, reports_match_sql, repositories_crud and s07_requests, and check the served-spec lock with --check-lock. The deployed MinIO leg needs the operator's endpoint, credentials and bucket policy; the live strata_ingest call needs a reachable target and a sealed per-tenant token. The compile and test verdict comes from the repository's GitHub-hosted preflight. This rework's write is checked by scripts/rework-content-check.py before scripts/rework-project.py runs it.\n\n## Links\n\n- Plan: docs/plans/slices/S09-documents-integrations.md\n- Acceptance instrument: acceptance/programme/S09.toml\n- Project: 01a1d039-0d2d-71f1-a403-c9abe52c1888\n- Tranche 4: 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; authorising review: 01a20e84-325b-7fef-8f40-50b5e53550e9\n- Published evidence page: 01a1e687-7682-753d-b60e-1f00243b13a3\n- Standing delegation: 01a1ff1f-e4ba-72dc-9c1a-13049933cf14\n- Audit pack: docs/evidence/rework/S09.json\n\n## Gap\n\n- No recorded run of the seven gate properties: round-trip, cap, secret, workers, reports, externals and billing are defined in plan section 7 but not evidenced in the snapshot.\n- No contemporaneous charter, Statement of Architecture Work, delivery contract, Phase A–D set or Phase-G review existed; this set is retrospective and does not attest contemporaneous intent.\n- No project baseline exists in the record, and the closure outputs are empty, so the closed row has no governed close behind it.\n- documents.ingest is the one declared action of 27 not registered, because it needs a live strata_ingest target.\n- The deployed MinIO leg and its bucket policy are unproven; only the S3 wire was proven locally.\n- The plan frontmatter reads planned while the meta says measured_status built; the two are not reconciled.\n- The nine linked issues are recorded closed but their acceptance is not re-verified here, and the strata_rag /query versus /api/query path contract remains a stated risk.\n"
+}

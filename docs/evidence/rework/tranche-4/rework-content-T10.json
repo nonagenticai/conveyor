@@ -1,0 +1,679 @@
+{
+  "charter": "# Charter — T10 SAFe cadence and MSP tranches (retrospective)\n\nProject 01a1d039-0d36-70c1-a5e8-f50956c5e3f9 is the conveyor's T10 slice, \"SAFe cadence and MSP tranches\", specified in docs/SPEC_V2.md §12 and elaborated in §8.2 (SAFe as the programme cadence) and §8.3 (MSP as the programme definition and benefits realization). It belongs to tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce), depends on T1 (the plan spine), T3 (the PM job) and the P0 programme record set, and its register row is closed at version 15, created 2026-11-12T14:46:02Z and updated 2026-11-24T17:04:34Z. Its two linked issues, #82 \"T10 — SAFe cadence and MSP tranches\" and #502 \"benefits: a realized status needs a measured transition\", are both closed.\n\nMandate. T10 exists so that planning is arithmetic rather than opinion and so that a programme's tranche and benefit records refuse to pass on free text: WSJF is computed from the four typed inputs and never stored; an approved PI plan materialises the backlog into cards within WIP; a deliverable cannot demo without typed evidence; a retro cannot close while a finding lacks a lesson; an end-of-tranche review must cite baselines, benefit status and risk evidence; and a benefit transition cannot report realization without a measured baseline. The gate text is the one the project row and acceptance/programme/T10.toml carry.\n\nScope. The slice owns the SAFe cadence machinery (PI planning, system demo, inspect and adapt, backlog refinement), the WSJF arithmetic, the MSP tranche rows and their reviews, and the benefit transition record. It reuses T1's wbs_node, project_baseline, project_register_item and shared_config rather than duplicating them. It does not own the decision ladder (T2), metrics and metering (T11), the one-organisation-loop acceptance (T12), or the meeting types (T19), whose binding to the board and cadence is a follow-up integration unit per §12.\n\nThis retrospective is executed under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, as the tranche-4 rework requested by #526. It publishes the seven mandatory Phase A–D artefacts with authored bodies, the Statement of Architecture Work, the delivery contract, the project's one accepted WBS deliverable and a Phase-G compliance review, and records the project's expected outputs, project-brief and evidence. It publishes no closure and no closure review: the register status remains closed, and this pass records the lifecycle rather than re-deciding closure.\n\nWhat this retrospective does NOT attest. It does not attest that the §12 gate was run or passed contemporaneously, and it did not re-run the named test suites (their names are carried from the project's recorded artefact entries). It does not attest a tranche-4 exit review: the tranche row is declared authorised, but tranche reconciliation records authorised:false with the flags review_missing and projects_closed_before_authorisation, and the exit criteria — every tranche-4 project accepted with published evidence, and a recorded continue, pause or stop — are not met. It does not attest that the eight recorded findings v1-p82-5, v1-p82-6 and v1-p83-1 to v1-p83-6 are closed. It does not attest a realized programme benefit: the seven benefit profiles are baselined, but benefit_transitions is empty and no post-transition measurement is recorded. It does not attest an approved tranche-4 PI plan: the PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 is awaiting approval even though the PI plan and PI objectives documents 01a20e7e-6cac-767e-b385-a5b732341aee and 01a20e7e-6dc5-7314-b03d-009f0abea659 are published. Finally, the WSJF inputs 10/13/10/8 recorded by the tranche-4 refinement cadence 01a202a2-2705-7392-a2d1-03ca2b3a174e are the planning record; the approved scope baseline 01a20289-7be3-7e47-afe0-f6b1f82f1892 froze the deliverable at 8/7/8/8, and this pass records the refinement rather than re-measuring the baseline.",
+  "soaw": {
+    "title": "Statement of Architecture Work — T10 SAFe cadence and MSP tranches (retrospective, U5a)",
+    "body": {
+      "assignment": "Rework the V2 slice T10 (docs/SPEC_V2.md §8.2, §8.3 and §12; issues #82 and #502) by the reconstituted TOGAF/MSP lifecycle. Produce and publish the seven mandatory Phase A–D artefacts with authored bodies, the charter, this Statement of Architecture Work and the delivery contract; record the project's one WBS deliverable at the tranche-4 refinement's WSJF inputs; take the Phase-G compliance review against the §12 gate; and publish the project's expected outputs, project-brief and evidence. The project's register status is closed at version 15; this pass records the lifecycle retrospectively and publishes no closure and no closure review.",
+      "scope": "In scope: the programme_cadence state machine and its PI, demo, retro and refinement kinds; WSJF computed from four typed inputs and never stored; WIP-bounded materialisation behind an approved PI plan, with pending and rejected plans materialising nothing; the demo credit and its typed evidence; the retro lesson rule; the programme_tranche and programme_tranche_review record; and the benefit_transition baseline gate. Out of scope: the T2 decision ladder, the T1 plan-spine baseline contract, the T4 coach card except the retro card, T11 metrics and metering, T12's one-organisation-loop acceptance, and T19's meeting types.",
+      "responsibilities": "The programme architect (conveyor-e2e) owns the slice and authored this retrospective. conveyor-approver is the approver of the Statement of Architecture Work, the delivery contract and the Phase-G review. The Architecture Board (conveyor-architecture-board) reviews the seven A–D artefacts. The SRO and BCM are accountable for the tranche exit and for benefit ownership, with benefit ownership still a free-text role rather than a job key. The ART and board operator run the PI and accept the materialised cards and the demo; product owners own the backlog and its refinement; project managers supply the accepted evidence the demo credit reads.",
+      "acceptance_criteria": "The SPEC_V2 §12 T10 gate is assessed clause by clause. The Phase-G verdict this pass records is consistent: the lifecycle set and the contract evidence exist, but clause 4 is unproved and clause 1 is partial, so the record does not support compliant or higher. Clause 1, PI planning materialises cards from the backlog by WSJF within WIP, is proved for a project backlog by crates/store/tests/programme_cadence.rs::wsjf_is_computed_not_stored (line 179) and ::materialisation_respects_wip_slots (line 215), with crates/actions/tests/pi_plan_approval.rs::an_approved_plan_materialises_exactly_once (line 297) and apps/server/tests/cadence_jobs.rs::pi_tick_is_idempotent (line 153); it is not proved for the programme's standing backlog, which v1-p82-5 records as pinned to one project_id. Clause 2, a deliverable without evidence cannot demo, is proved by crates/store/tests/demo_gate.rs::a_credit_needs_typed_evidence (line 94) with crates/actions/tests/demo_credit.rs (lines 154 and 168). Clause 3, retro produces lessons, is proved by crates/store/tests/retro.rs::retro_cannot_close_without_lessons (line 190) and ::every_finding_becomes_a_lesson (line 156), with the evidence-free lesson gap v1-p82-6. Clause 4, an end-of-tranche review without baselines, benefit status or risk evidence is refused, has a named passing test, crates/store/tests/tranche_review.rs::a_review_without_evidence_is_refused (line 208), but is unproved at HEAD because v1-p83-1 shows free-text placeholders satisfy the three keys and the seed authorises a tranche with no review, and v1-p83-4 shows baseline_ref is nullable and an unapproved baseline satisfies the existence check. Clause 5, a transition that never measured its baseline cannot report the benefit realized, is proved by crates/store/tests/benefit_transition.rs::a_missing_baseline_cannot_claim_realization (line 194) and ::a_measured_baseline_enables_realization (line 161), with the untyped value gap v1-p83-2 and the free-text ownership gap v1-p83-3. The findings are carried open; the acceptance instrument is acceptance/programme/T10.toml.",
+      "contract": "The delivery contract 'Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a)' (01a20289-2b08-7ea3-96f6-b2ac928a7be4) is live and is the Phase-F obligation this Statement authorises. It binds the project to acceptance/programme/T10.toml, the tranche-4 capacity and WIP limits, the named test evidence, the published PI plan and PI objectives, and the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Its review 01a2028a-3c4e-7a50-8ee9-d59ad0f11396 records level compliant, as does this Statement's prior review 01a20e7e-7e2f-70df-9e17-4884d8b188d0; those are the contract reviews, not the new verdict. The Phase-G verdict this pass records is consistent, and the remaining limits are the findings of that review.",
+      "retrospective": true
+    }
+  },
+  "artifacts": [
+    {
+      "title": "Stakeholder Map — T10 SAFe cadence and MSP tranches (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "matrix",
+      "purpose": "Who decides, runs and is served by the SAFe cadence and MSP tranche machinery, and how the retrospective engages each.",
+      "scope": "the §12 T10 gate, the §8.2 cadence and the §8.3 tranche and benefit record, and the tranche-4 governance around T10.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO and BCM",
+          "the ART and board operator",
+          "product owners and project managers",
+          "delivery teams",
+          "PMO and audit"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Sponsoring group",
+          "axis_b": "tranche-4 authorisation, the tranche exit and the benefit decision",
+          "value": {"influence": "high", "interest": "high", "engagement": "decide"},
+          "position": 1
+        },
+        {
+          "axis_a": "SRO / BCM",
+          "axis_b": "accountable for the tranche exit and for benefit ownership resolving to a job",
+          "value": {"influence": "high", "interest": "high", "engagement": "accountable"},
+          "position": 2
+        },
+        {
+          "axis_a": "Architecture Board",
+          "axis_b": "conformance of the seven A–D artefacts, the charter and the delivery contract",
+          "value": {"influence": "high", "interest": "high", "engagement": "approve"},
+          "position": 3
+        },
+        {
+          "axis_a": "ART and board operator",
+          "axis_b": "runs the PI, accepts the materialised cards and the demo",
+          "value": {"influence": "high", "interest": "high", "engagement": "consult"},
+          "position": 4
+        },
+        {
+          "axis_a": "Product owner",
+          "axis_b": "owns the backlog and its refinement; needs the WSJF inputs and stale-row flags",
+          "value": {"influence": "high", "interest": "high", "engagement": "consult"},
+          "position": 5
+        },
+        {
+          "axis_a": "Project managers",
+          "axis_b": "deliver the WBS deliverables whose accepted evidence earns the demo credit",
+          "value": {"influence": "high", "interest": "high", "engagement": "consult"},
+          "position": 6
+        },
+        {
+          "axis_a": "Benefit owner (BCM job)",
+          "axis_b": "owns the benefit; the snapshot records free-text role strings rather than job keys (v1-p83-3)",
+          "value": {"influence": "high", "interest": "high", "engagement": "consult"},
+          "position": 7
+        },
+        {
+          "axis_a": "Delivery teams",
+          "axis_b": "receive the materialised cards and supply the demo evidence",
+          "value": {"influence": "medium", "interest": "high", "engagement": "inform"},
+          "position": 8
+        },
+        {
+          "axis_a": "PMO and audit",
+          "axis_b": "reads the tranche review, the baselines, the benefit status and the risk register",
+          "value": {"influence": "high", "interest": "medium", "engagement": "consult"},
+          "position": 9
+        }
+      ],
+      "body": "## Metadata\n\nType matrix; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d36-70c1-a5e8-f50956c5e3f9; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine stakeholders on the influence/interest/engagement axes. The sponsoring group decides the tranche exit and the benefit decision. The SRO and BCM are accountable, although benefit ownership remains a free-text role string rather than a job key, which v1-p83-3 records. The Architecture Board approves the seven A–D artefacts, the charter and the delivery contract. The ART and board operator run the PI and accept the materialised cards and the demo; product owners own the backlog and its refinement flags; project managers supply the accepted evidence the demo credit reads; delivery teams receive the materialised cards; and PMO and audit read the tranche review, baselines, benefit status and risk register.\n\n## Links\n\nDerives from docs/SPEC_V2.md §8.2 (SAFe as the programme cadence), §8.3 (MSP as the programme definition and benefits realization) and §12 (T10). Reuses the programme roles already recorded in the conveyor buildout programme and the seven A–D artefact set of project T10. The tranche-4 PI plan 01a20e7e-6cac-767e-b385-a5b732341aee names the ART and the ten-project capacity the cadence serves.\n\n## Document\n\nThe stakeholder view sits under the project's architecture set and the tranche-4 governance record. The engagement values describe the role each stakeholder holds in the cadence and tranche machinery at the 2026-11-24 snapshot; they do not assert that every engagement has occurred."
+    },
+    {
+      "title": "Driver/Goal/Objective Catalog — T10 SAFe cadence and MSP tranches (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "The drivers that make planning and tranche governance untrustworthy, and the goals that answer each.",
+      "scope": "the ten driver-goal pairs behind the cadence, demo, retro, tranche and benefit rules.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "the ART and board operator",
+          "product owners",
+          "project managers",
+          "the SRO and BCM"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "D1 Plans are ordered by opinion",
+          "axis_b": "G1 WSJF is computed from four typed inputs and never stored",
+          "value": {"objective": "cards materialise in computed-score order and no score column exists", "detail": "crates/store/tests/programme_cadence.rs::wsjf_is_computed_not_stored (line 179) drafts low/high/mid in the order high, mid, low and asserts no wsjf column on wbs_node."},
+          "position": 1
+        },
+        {
+          "axis_a": "D2 A PI materialises past capacity",
+          "axis_b": "G2 Materialisation respects WIP",
+          "value": {"objective": "at most wip_limit minus live drafts are created and the rest of the backlog is untouched", "detail": "programme_cadence.rs::materialisation_respects_wip_slots (line 215) with pi_plan_approval.rs::an_approved_plan_still_respects_the_wip_limit (line 338)."},
+          "position": 2
+        },
+        {
+          "axis_a": "D3 A zero divisor reaches the score",
+          "axis_b": "G3 A zero job size is refused",
+          "value": {"objective": "the domain returns JobSizeNotPositive and the schema refuses the row", "detail": "programme_cadence.rs::a_zero_job_size_is_refused (line 249)."},
+          "position": 3
+        },
+        {
+          "axis_a": "D4 The backlog carries unscored and aged rows",
+          "axis_b": "G4 Backlog refinement flags them and clears the flag on rescore",
+          "value": {"objective": "every open deliverable is revalidated; zero-input and aged rows are flagged with a reason", "detail": "crates/store/tests/refinement.rs::refinement_flags_unscored_and_aged_rows (line 114) and ::a_row_that_scores_again_loses_its_flag (line 152)."},
+          "position": 4
+        },
+        {
+          "axis_a": "D5 A PI materialises before its plan is approved",
+          "axis_b": "G5 An approved plan gates materialisation",
+          "value": {"objective": "pending and rejected plans materialise nothing; an approved plan materialises exactly once", "detail": "crates/actions/tests/pi_plan_approval.rs::a_pending_plan_materialises_nothing (line 249), ::a_rejected_plan_materialises_nothing (line 274), ::an_approved_plan_materialises_exactly_once (line 297) and ::a_service_decision_cannot_approve_a_plan (line 363)."},
+          "position": 5
+        },
+        {
+          "axis_a": "D6 A repeated tick duplicates cards",
+          "axis_b": "G6 The cadence tick is idempotent",
+          "value": {"objective": "a second tick creates nothing and the cadence records its materialised pass", "detail": "apps/server/tests/cadence_jobs.rs::pi_tick_is_idempotent (line 153)."},
+          "position": 6
+        },
+        {
+          "axis_a": "D7 A deliverable demos with no evidence",
+          "axis_b": "G7 The demo credit needs typed evidence",
+          "value": {"objective": "open deliverables, empty arrays and blank strings are refused; a typed path credits", "detail": "crates/store/tests/demo_gate.rs::a_credit_needs_typed_evidence (line 94) with crates/actions/tests/demo_credit.rs::a_credit_needs_a_demo_cadence (line 154) and ::a_credit_needs_an_accepted_deliverable (line 168)."},
+          "position": 7
+        },
+        {
+          "axis_a": "D8 A retro closes with findings untaught",
+          "axis_b": "G8 Every retro finding becomes a lesson",
+          "value": {"objective": "the retro cannot close while a finding lacks a lesson", "detail": "crates/store/tests/retro.rs::retro_cannot_close_without_lessons (line 190) and ::every_finding_becomes_a_lesson (line 156)."},
+          "position": 8
+        },
+        {
+          "axis_a": "D9 A tranche review passes on free text",
+          "axis_b": "G9 The review cites baseline, benefit-status and risk evidence",
+          "value": {"objective": "OPEN — v1-p83-1 and v1-p83-4", "detail": "tranche_review.rs::a_review_without_evidence_is_refused (line 208) refuses missing keys, but any non-null non-empty value, including the string none, satisfies the check; seeded tranches carry no authorisation review; and programme_tranche.baseline_ref is nullable with only an existence check."},
+          "position": 9
+        },
+        {
+          "axis_a": "D10 A benefit is realized with no typed measurement",
+          "axis_b": "G10 A realized benefit cites a measured baseline and post value",
+          "value": {"objective": "OPEN IN PART — v1-p83-2 and v1-p83-3", "detail": "benefit_transition.rs::a_missing_baseline_cannot_claim_realization (line 194) refuses no-baseline realization and ::a_measured_baseline_enables_realization (line 161) proves the baseline path, but benefit_transition stores timestamps plus free-form evidence with no typed baseline/post values, and benefit ownership is a free-text role string rather than a job key."},
+          "position": 10
+        }
+      ],
+      "body": "## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d36-70c1-a5e8-f50956c5e3f9; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen driver-goal pairs. D1–D3 cover the WSJF arithmetic and its refusals: no stored score, a WIP bound on materialisation, and a positive job size. D4 is backlog refinement, which flags stale or unscored rows and clears the flag when a row scores again. D5–D6 are the approved-plan gate and the idempotent cadence tick. D7 is the demo evidence gate; D8 is the retro lesson rule; D9 is the tranche review evidence, open on v1-p83-1 and v1-p83-4; and D10 is benefit realization, open in part on v1-p83-2 and v1-p83-3. Each pair names the test functions that record the goal, taken from the project's artefact entries rather than re-executed by this pass.\n\n## Links\n\nDerives from the SPEC_V2 §12 T10 gate and acceptance/programme/T10.toml. Realizes the Phase A driver-goal view over the programme cadence and tranche machinery; reuses the T1 plan-spine vocabulary (wbs_node, project_baseline, programme_tranche) rather than introducing a second planning store.\n\n## Document\n\nThe catalog records the intent the slice answers. Two of its ten goals are open at the snapshot: the tranche review accepts placeholders and the benefit transition compares no typed value pair. The catalog states that rather than claiming conformance."
+    },
+    {
+      "title": "Requirements Catalog — T10 SAFe cadence and MSP tranches (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "catalog",
+      "purpose": "The testable requirements the slice must satisfy, clause by clause against the §12 gate and the acceptance manifest.",
+      "scope": "R1–R10: the five gate clauses, PI plan approval, cadence and refinement rows, typed WSJF inputs, demo credits and MSP ownership and closure.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "conveyor-approver",
+          "the ART and board operator",
+          "product owners and project managers",
+          "PMO and audit"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "R1 gate clause 1",
+          "axis_b": "PI planning materialises cards from the backlog by WSJF within WIP",
+          "value": {"acceptance": "programme_cadence.rs::wsjf_is_computed_not_stored (line 179) and ::materialisation_respects_wip_slots (line 215), with cadence_jobs.rs::pi_tick_is_idempotent (line 153), prove a project backlog. NOT PROVED for the programme's standing backlog — v1-p82-5 pins the query to one project_id.", "priority": "must"},
+          "position": 1
+        },
+        {
+          "axis_a": "R2 gate clause 2",
+          "axis_b": "A deliverable without evidence cannot demo",
+          "value": {"acceptance": "demo_gate.rs::a_credit_needs_typed_evidence (line 94) refuses an open deliverable, an empty evidence array and a blank string; demo_credit.rs (lines 154 and 168) refuses a missing cadence and an unaccepted deliverable.", "priority": "must"},
+          "position": 2
+        },
+        {
+          "axis_a": "R3 gate clause 3",
+          "axis_b": "Retro produces lessons",
+          "value": {"acceptance": "retro.rs::every_finding_becomes_a_lesson (line 156) and ::retro_cannot_close_without_lessons (line 190). GAP — v1-p82-6: a lesson needs no evidence and a systemic retro finding emits no kata candidate.", "priority": "must"},
+          "position": 3
+        },
+        {
+          "axis_a": "R4 gate clause 4",
+          "axis_b": "An end-of-tranche review with no baselines, benefit status or risk evidence is refused",
+          "value": {"acceptance": "UNPROVED — tranche_review.rs::a_review_without_evidence_is_refused (line 208) refuses missing keys, but v1-p83-1 shows free-text placeholders satisfy the check and the seed authorises tranches with no review; v1-p83-4 shows baseline_ref is nullable and an unapproved baseline satisfies the existence check.", "priority": "must"},
+          "position": 4
+        },
+        {
+          "axis_a": "R5 gate clause 5",
+          "axis_b": "A transition that never measured its baseline cannot report the benefit realized",
+          "value": {"acceptance": "benefit_transition.rs::a_missing_baseline_cannot_claim_realization (line 194) refuses a post-only patch; ::a_measured_baseline_enables_realization (line 161) proves the measured path. GAP — v1-p83-2: the claim compares no typed values.", "priority": "must"},
+          "position": 5
+        },
+        {
+          "axis_a": "R6 PI plan approval",
+          "axis_b": "An approved plan gates materialisation and still respects WIP",
+          "value": {"acceptance": "pi_plan_approval.rs::a_pending_plan_materialises_nothing (line 249), ::a_rejected_plan_materialises_nothing (line 274), ::an_approved_plan_materialises_exactly_once (line 297), ::an_approved_plan_still_respects_the_wip_limit (line 338) and ::a_service_decision_cannot_approve_a_plan (line 363).", "priority": "must"},
+          "position": 6
+        },
+        {
+          "axis_a": "R7 cadence and refinement rows",
+          "axis_b": "The PI has a cadence row and a backlog-refinement row",
+          "value": {"acceptance": "programme_cadence.rs proves the cadence state machine (::an_illegal_cadence_jump_is_refused, line 302; ::the_cadence_states_move_only_along_the_table, line 386); refinement.rs lines 114 and 152 prove the refinement pass and its flags.", "priority": "must"},
+          "position": 7
+        },
+        {
+          "axis_a": "R8 typed WSJF inputs",
+          "axis_b": "Every WBS deliverable carries the four typed inputs and a positive job size",
+          "value": {"acceptance": "programme_cadence.rs::wsjf_is_computed_not_stored (line 179) and ::a_zero_job_size_is_refused (line 249); the manifest check T10-wsjf reads the same four columns.", "priority": "must"},
+          "position": 8
+        },
+        {
+          "axis_a": "R9 demo credit evidence",
+          "axis_b": "Every accepted deliverable has a credit carrying its typed evidence",
+          "value": {"acceptance": "demo_gate.rs::a_credit_needs_typed_evidence (line 94) stores the typed refs and returns them; the manifest check T10-demo-credits reads the credit.", "priority": "must"},
+          "position": 9
+        },
+        {
+          "axis_a": "R10 MSP ownership, baselines and closure",
+          "axis_b": "Benefit and programme ownership resolve to jobs and closure requires the approved review and realization plan",
+          "value": {"acceptance": "OPEN — v1-p83-3 (free-text owners), v1-p83-5 (programmes.update closes without a review or plan) and v1-p83-6 (closure requires only the scope baseline; schedule, cost and registers are not gated).", "priority": "must"},
+          "position": 10
+        }
+      ],
+      "body": "## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d36-70c1-a5e8-f50956c5e3f9; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen requirements. R1–R5 are the SPEC_V2 §12 gate clauses; R6–R9 are the manifest's PI approval, cadence and refinement, typed-WSJF and demo-credit checks; R10 is MSP ownership, baseline and closure. R1 is proved for a project backlog but not the programme's standing backlog (v1-p82-5). R4 is unproved because the review evidence check is presence-only (v1-p83-1) and the baseline is not gated (v1-p83-4). R3 carries the evidence-free lesson gap (v1-p82-6); R5 carries the untyped measurement gap (v1-p83-2); R10 is open on ownership, closure bypass and closure scope (v1-p83-3, v1-p83-5, v1-p83-6). Every acceptance names the test that records it, not a test this retrospective re-ran.\n\n## Links\n\nDerives from the §12 gate and acceptance/programme/T10.toml, the manifest that enumerates T10-project, T10-baseline, T10-charter, T10-closure-outputs, T10-contract, T10-review, T10-closure-gate, T10-waivers, T10-pi-cadence, T10-pi-plan, T10-pi-objectives, T10-wsjf, T10-demo-credits, T10-lessons, T10-product, T10-artefact-standard and T10-rework. Realizes the Phase A requirement view over the cadence and tranche machinery; reuses the T1 plan spine and the S05 card table.\n\n## Document\n\nThe catalog is the requirements record the delivery contract binds. It is deliberately split between the seven requirements that are proved by a named test and the three that are open on recorded findings; the split is the honest state at the snapshot, not a plan to weaken the gate."
+    },
+    {
+      "title": "Solution Concept Diagram — T10 SAFe cadence and MSP tranches (Phase A)",
+      "phase_code": "a",
+      "plateau": "psa",
+      "artifact_kind": "diagram",
+      "purpose": "The components and flows that bind the SAFe cadence, the MSP tranche review and the benefit transition into one concept.",
+      "scope": "ten components and five flows from the approved PI plan through cards, demo credits, retro lessons, tranche reviews and measured benefit transitions.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the ART and board operator",
+          "product owners",
+          "project managers",
+          "the SRO and BCM",
+          "PMO and audit"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "programme_cadence",
+          "axis_b": "the PI row",
+          "value": {"kind": "component", "note": "state machine over the cadence table; a materialised pass records the PI; the server job cadence::tick advances it."},
+          "position": 1
+        },
+        {
+          "axis_a": "wbs_node",
+          "axis_b": "the backlog deliverable",
+          "value": {"kind": "component", "note": "kind deliverable, the four WSJF inputs, card_id once drafted, and meta.refinement flags on stale or unscored rows."},
+          "position": 2
+        },
+        {
+          "axis_a": "approval",
+          "axis_b": "the PI-plan gate",
+          "value": {"kind": "component", "note": "pending and rejected plans materialise nothing; a service principal cannot decide the plan; the materialise step runs only on approval."},
+          "position": 3
+        },
+        {
+          "axis_a": "card",
+          "axis_b": "the materialised draft",
+          "value": {"kind": "component", "note": "one card per drafted wbs_node, in computed-score order, bounded by the WIP slots."},
+          "position": 4
+        },
+        {
+          "axis_a": "programme_demo_credit",
+          "axis_b": "the demo evidence",
+          "value": {"kind": "component", "note": "an accepted deliverable is credited with a typed evidence array; empty and blank evidence is refused."},
+          "position": 5
+        },
+        {
+          "axis_a": "retro card and lesson",
+          "axis_b": "the inspect-and-adapt pair",
+          "value": {"kind": "component", "note": "the retro card carries meta.cadence_id and meta.retro_closed; every finding must become a lesson before close."},
+          "position": 6
+        },
+        {
+          "axis_a": "programme_tranche",
+          "axis_b": "the MSP tranche",
+          "value": {"kind": "component", "note": "state plus authorisation_review_id and baseline_ref; the snapshot's tranche 4 is declared authorised while reconciliation reports authorised:false (v1-p83-1, v1-p83-4)."},
+          "position": 7
+        },
+        {
+          "axis_a": "programme_tranche_review",
+          "axis_b": "the end-of-tranche review",
+          "value": {"kind": "component", "note": "one continue/pause/stop review per tranche with an evidence body; the key check is presence-only (v1-p83-1)."},
+          "position": 8
+        },
+        {
+          "axis_a": "benefit_transition",
+          "axis_b": "the realisation record",
+          "value": {"kind": "component", "note": "baseline_measured_at, post_measured_at and free-form evidence; a realized status needs both timestamps and non-empty evidence, but no typed value pair (v1-p83-2)."},
+          "position": 9
+        },
+        {
+          "axis_a": "materialise / demo / retro / review / realise edges",
+          "axis_b": "the five flows",
+          "value": {"kind": "edge", "note": "approved cadence to wbs_node to card; accepted deliverable to demo credit; retro card to lesson; tranche review to next tranche to project start; measured benefit baseline to transition to realized. programmes.update is a bypass edge to closed (v1-p83-5)."},
+          "position": 10
+        }
+      ],
+      "body": "## Metadata\n\nType diagram; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d36-70c1-a5e8-f50956c5e3f9; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen nodes and flows. The approved PI plan is the gate on materialisation: programme_cadence drives cadence::tick, a wbs_node carries the four typed WSJF inputs, and a card is drafted per deliverable within the WIP slots. An accepted deliverable earns a programme_demo_credit only with a typed evidence array. A retro card must teach every finding as a lesson before it closes. The MSP unit is programme_tranche with programme_tranche_review as its continue, pause or stop gate, and benefit_transition records a measured baseline before a realized status. Two defects are drawn rather than hidden: the tranche-review key check is presence-only (v1-p83-1) and programmes.update is a bypass edge to closed (v1-p83-5).\n\n## Links\n\nDerives from the Phase A requirements catalog and the §8.2 and §8.3 concept in docs/SPEC_V2.md. Realizes the solution view over the T1 plan-spine tables and the S05 card table; it adds no second plan store, no second card store and no stored WSJF score. The cadence rows for tranche 4 are 01a202a1-dbb9-7e49-b64a-cf97c3fab095 (PI), 01a202a1-f4ee-7acc-8e57-50ac6f0417fd (demo), 01a202a2-0e3f-75be-9f2b-c572ddcdfce9 (retro) and 01a202a2-2705-7392-a2d1-03ca2b3a174e (refinement).\n\n## Document\n\nThe diagram is the concept the seven A–D artefacts describe from their own viewpoints. The open edges are recorded as findings, not omitted: a reader can see exactly where the gate is proved and where the record still relies on presence-only checks."
+    },
+    {
+      "title": "Business Capability Map — T10 SAFe cadence and MSP tranches (Phase B)",
+      "phase_code": "b",
+      "plateau": "hld",
+      "artifact_kind": "diagram",
+      "purpose": "The capabilities the slice declares and their honest maturity at the 2026-11-24 snapshot.",
+      "scope": "ten capabilities across the cadence, demo, retro, tranche and benefit functions; seven live and three partial on recorded findings.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the sponsoring group",
+          "the SRO and BCM",
+          "the ART and board operator",
+          "product owners and project managers",
+          "PMO and audit"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "Computed WSJF",
+          "axis_b": "the score is arithmetic over four typed inputs",
+          "value": {"evidence": "programme_cadence.rs::wsjf_is_computed_not_stored (line 179); no score column on wbs_node", "maturity": "live"},
+          "position": 1
+        },
+        {
+          "axis_a": "WIP-bounded materialisation",
+          "axis_b": "the PI drafts only what the active lane can hold",
+          "value": {"evidence": "programme_cadence.rs::materialisation_respects_wip_slots (line 215)", "maturity": "live"},
+          "position": 2
+        },
+        {
+          "axis_a": "Approved-plan-only materialisation",
+          "axis_b": "a pending or rejected plan drafts nothing",
+          "value": {"evidence": "pi_plan_approval.rs lines 249, 274, 297, 338 and 363", "maturity": "live"},
+          "position": 3
+        },
+        {
+          "axis_a": "Idempotent PI tick",
+          "axis_b": "a second tick creates no duplicate",
+          "value": {"evidence": "apps/server/tests/cadence_jobs.rs::pi_tick_is_idempotent (line 153)", "maturity": "live"},
+          "position": 4
+        },
+        {
+          "axis_a": "Backlog refinement",
+          "axis_b": "unscored and aged rows are flagged and rescored rows clear",
+          "value": {"evidence": "refinement.rs lines 114 and 152", "maturity": "live"},
+          "position": 5
+        },
+        {
+          "axis_a": "Demo evidence gate",
+          "axis_b": "a deliverable without typed evidence cannot demo",
+          "value": {"evidence": "demo_gate.rs::a_credit_needs_typed_evidence (line 94); demo_credit.rs lines 154 and 168", "maturity": "live"},
+          "position": 6
+        },
+        {
+          "axis_a": "Retro lessons",
+          "axis_b": "a retro cannot close with an untaught finding",
+          "value": {"evidence": "retro.rs::retro_cannot_close_without_lessons (line 190) and ::every_finding_becomes_a_lesson (line 156)", "maturity": "live"},
+          "position": 7
+        },
+        {
+          "axis_a": "Tranche review evidence",
+          "axis_b": "a review carries baselines, benefit status and risk evidence",
+          "value": {"evidence": "tranche_review.rs::a_review_without_evidence_is_refused (line 208) refuses missing keys; free-text placeholders pass (v1-p83-1) and the baseline is not gated (v1-p83-4)", "maturity": "partial"},
+          "position": 8
+        },
+        {
+          "axis_a": "Benefit realisation",
+          "axis_b": "a realized benefit has a measured baseline",
+          "value": {"evidence": "benefit_transition.rs lines 161 and 194 prove the baseline gate; no typed baseline/post value pair (v1-p83-2) and free-text ownership (v1-p83-3)", "maturity": "partial"},
+          "position": 9
+        },
+        {
+          "axis_a": "MSP programme governance",
+          "axis_b": "tranche authorisation, programme-wide planning and closure are earned",
+          "value": {"evidence": "v1-p83-1 (seeded authorisation), v1-p83-5 (closure bypass), v1-p83-6 (PMP closure scope), v1-p82-5 (single-project backlog) and v1-p82-6 (evidence-free lessons)", "maturity": "partial"},
+          "position": 10
+        }
+      ],
+      "body": "## Metadata\n\nType diagram; phase B; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d36-70c1-a5e8-f50956c5e3f9; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen capabilities; seven live and three partial. Live: computed WSJF, WIP-bounded materialisation, approved-plan-only materialisation, the idempotent PI tick, backlog refinement, the demo evidence gate and retro lessons. Partial: tranche review evidence, because the check is presence-only and the baseline is not gated (v1-p83-1, v1-p83-4); benefit realisation, because the transition stores no typed baseline and post value pair and ownership is free text (v1-p83-2, v1-p83-3); and MSP programme governance, because the programme backlog is pinned to one project, lessons need no evidence, closure bypasses the review and closure reads only the scope baseline (v1-p82-5, v1-p82-6, v1-p83-5, v1-p83-6).\n\n## Links\n\nDerives from the Phase A solution concept and the §12 gate. Realizes the Phase B capability view over SPEC_V2 §8.2 and §8.3; reuses the T1 plan-spine tables and the S05 card table. The maturity column is the state at the 2026-11-24 snapshot, not a claim that the end-of-tranche review ran.\n\n## Document\n\nThe map is the delivery view of the slice: it says which capabilities a demo could actually show and which still rest on a record-only check. The three partial capabilities are the ones the eight findings attach to."
+    },
+    {
+      "title": "Data Entity/Data Component Catalog — T10 SAFe cadence and MSP tranches (Phase C)",
+      "phase_code": "c",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "The persisted records the slice owns or reads, with their owners and the constraints each carries.",
+      "scope": "ten tables or table groups spanning the cadence, the plan spine, the board, the demo credit, lessons, tranche review and benefit transition.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the ART and board operator",
+          "product owners",
+          "project managers",
+          "the SRO and BCM",
+          "PMO and audit"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "programme_cadence",
+          "axis_b": "the PI",
+          "value": {"table": "programme_cadence", "owner": "cadence", "note": "the state machine and the materialised pass; cadence::tick is idempotent and sets state = materialised."},
+          "position": 1
+        },
+        {
+          "axis_a": "wbs_node",
+          "axis_b": "the backlog deliverable",
+          "value": {"table": "wbs_node", "owner": "plan spine", "note": "kind deliverable; the four WSJF inputs with a positive job_size; card_id once drafted; meta.refinement flags stale rows."},
+          "position": 2
+        },
+        {
+          "axis_a": "approval",
+          "axis_b": "the PI-plan gate",
+          "value": {"table": "approval", "owner": "control", "note": "the plan request and its approve decision; a service principal cannot decide it (pi_plan_approval.rs:363)."},
+          "position": 3
+        },
+        {
+          "axis_a": "card",
+          "axis_b": "the materialised and retro card",
+          "value": {"table": "card", "owner": "board", "note": "one card per drafted deliverable; the retro card carries meta.cadence_id and meta.retro_closed."},
+          "position": 4
+        },
+        {
+          "axis_a": "programme_demo_credit",
+          "axis_b": "the demo evidence",
+          "value": {"table": "programme_demo_credit", "owner": "cadence", "note": "one credit per accepted deliverable per demo cadence, carrying a non-empty array of typed evidence refs."},
+          "position": 5
+        },
+        {
+          "axis_a": "lesson",
+          "axis_b": "the retro lesson",
+          "value": {"table": "lesson", "owner": "memory", "note": "every retro finding must name a lesson before the retro closes; the row accepts an empty evidence array today (v1-p82-6)."},
+          "position": 6
+        },
+        {
+          "axis_a": "programme_tranche",
+          "axis_b": "the MSP tranche",
+          "value": {"table": "programme_tranche", "owner": "programme", "note": "state, authorisation_review_id and baseline_ref; the snapshot's tranche 4 is declared authorised while reconciliation reports authorised:false (v1-p83-1, v1-p83-4)."},
+          "position": 7
+        },
+        {
+          "axis_a": "programme_tranche_review",
+          "axis_b": "the end-of-tranche review",
+          "value": {"table": "programme_tranche_review", "owner": "programme", "note": "one continue/pause/stop review per tranche; the evidence body is free text keyed baselines, benefit_status and risk_register (v1-p83-1)."},
+          "position": 8
+        },
+        {
+          "axis_a": "benefit_transition",
+          "axis_b": "the realisation record",
+          "value": {"table": "benefit_transition", "owner": "benefits", "note": "baseline_measured_at, post_measured_at and an evidence body; realized needs both timestamps and non-empty evidence, but no typed baseline/post values (v1-p83-2)."},
+          "position": 9
+        },
+        {
+          "axis_a": "programme_baseline and programme",
+          "axis_b": "the governance rows",
+          "value": {"table": "programme_baseline, programme", "owner": "programme", "note": "baselines carry a kind and approved_by; programme.status is writable through programmes.update without a review (v1-p83-5); closure reads only the scope baseline (v1-p83-6)."},
+          "position": 10
+        }
+      ],
+      "body": "## Metadata\n\nType catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d36-70c1-a5e8-f50956c5e3f9; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen persisted records. programme_cadence is the PI, demo, retro and refinement state machine; wbs_node carries the backlog deliverable and its four typed WSJF inputs; approval is the PI-plan gate; card holds the materialised draft and the retro card; programme_demo_credit is the typed demo evidence; lesson is the retro lesson; programme_tranche and programme_tranche_review are the MSP unit and its review; benefit_transition is the realisation record; and programme_baseline and programme are the governance rows. The cadence and tranche tables ship in migrations/0056_cadence_tranche.sql, per the recorded artefact entry; the suites run against real PostgreSQL 18.\n\n## Links\n\nDerives from the Phase B capability map and the data model in docs/SPEC_V2.md §8.2–§8.3. Reuses the T1 plan spine (wbs_node, project_baseline, project_register_item) and the S05 card table rather than creating a second plan or board store. The benefit rows follow the MSP six field groups described in §8.3.\n\n## Document\n\nThe catalog is the data view of the slice. The note on each row names the recorded defect that matters to that row: presence-only tranche evidence, nullable baseline_ref, untyped benefit values, free-text ownership, the closure bypass and closure scope limited to the scope baseline."
+    },
+    {
+      "title": "Technology Standards Catalog — T10 SAFe cadence and MSP tranches (Phase D)",
+      "phase_code": "d",
+      "plateau": "hld",
+      "artifact_kind": "catalog",
+      "purpose": "The technologies and standards the slice is built on, and where each one is exercised.",
+      "scope": "PostgreSQL 18, the Rust workspace, computed WSJF, the cadence state machine, PI approval, typed evidence, retro closure, tranche evidence, benefit measurement and the preflight verification route.",
+      "stakeholders": {
+        "owner": "the programme architect (conveyor-e2e)",
+        "reviewer": "the Architecture Board (conveyor-architecture-board)",
+        "consumers": [
+          "the ART and board operator",
+          "conveyor-approver",
+          "the delivery teams",
+          "PMO and audit"
+        ]
+      },
+      "entries": [
+        {
+          "axis_a": "PostgreSQL",
+          "axis_b": "one cadence/tranche migration and real-Postgres tests",
+          "value": {"usage": "migrations/0056_cadence_tranche.sql ships the cadence and tranche tables; the suites run against real PostgreSQL 18."},
+          "position": 1
+        },
+        {
+          "axis_a": "Rust workspace",
+          "axis_b": "edition 2024",
+          "value": {"usage": "the store spine, the cadence job and the test suites compile under the workspace's Rust standard."},
+          "position": 2
+        },
+        {
+          "axis_a": "WSJF arithmetic",
+          "axis_b": "computed in the domain, never stored",
+          "value": {"usage": "the four inputs are columns; the score is arithmetic; a zero job_size is JobSizeNotPositive and is refused by the schema (programme_cadence lines 179 and 249)."},
+          "position": 3
+        },
+        {
+          "axis_a": "Cadence state machine",
+          "axis_b": "states move only along the table",
+          "value": {"usage": "an_illegal_cadence_jump_is_refused (line 302) and the_cadence_states_move_only_along_the_table (line 386)."},
+          "position": 4
+        },
+        {
+          "axis_a": "PI-plan approval",
+          "axis_b": "an approval is the materialisation gate",
+          "value": {"usage": "pi_plan_approval.rs lines 249, 274, 297, 338 and 363; the cadence job cadence::tick materialises only an approved plan."},
+          "position": 5
+        },
+        {
+          "axis_a": "Typed evidence",
+          "axis_b": "arrays of typed refs, not free text",
+          "value": {"usage": "the demo credit refuses empty arrays and blank strings (demo_gate.rs:94)."},
+          "position": 6
+        },
+        {
+          "axis_a": "Retro closure",
+          "axis_b": "a finding without a lesson blocks the close",
+          "value": {"usage": "retro.rs::retro_cannot_close_without_lessons (line 190)."},
+          "position": 7
+        },
+        {
+          "axis_a": "Tranche review evidence",
+          "axis_b": "the review cites baselines, benefit status and risk evidence",
+          "value": {"usage": "NOT MET — v1-p83-1: the three evidence keys accept any non-null non-empty value, including the string none, and the seed authorises tranches with no review; v1-p83-4: baseline_ref is nullable and an unapproved baseline satisfies the existence check."},
+          "position": 8
+        },
+        {
+          "axis_a": "Benefit measurement",
+          "axis_b": "a realized benefit has a measured baseline and a comparable post value",
+          "value": {"usage": "PARTIAL — benefit_transition.rs:194 refuses a missing baseline and :161 proves the measured path; v1-p83-2: the row stores timestamps plus free-form evidence, not a typed baseline/post value pair, and v1-p83-3 leaves ownership as a free-text role."},
+          "position": 9
+        },
+        {
+          "axis_a": "Verification and governance",
+          "axis_b": "named tests, the preflight and the earned tranche",
+          "value": {"usage": "the gate evidence is the named functions across the eight suites; this retrospective confirmed their names in the project record and did not re-run them. NOT MET — v1-p82-5 (single-project backlog), v1-p82-6 (evidence-free lessons), v1-p83-5 (programmes.update closure bypass) and v1-p83-6 (PMP closure reads only the scope baseline). The compile and test verdict is preflight.yml; the local gate is fmt plus cargo metadata (docs/plans/03-DELIVERY.md)."},
+          "position": 10
+        }
+      ],
+      "body": "## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d36-70c1-a5e8-f50956c5e3f9; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen standards. PostgreSQL 18 carries the cadence, tranche, demo, lesson and benefit tables in migrations/0056_cadence_tranche.sql; the Rust workspace is the implementation standard. WSJF is computed in the domain and never stored; the cadence state machine moves only along its table; the PI plan approval is the materialisation gate; demo evidence is an array of typed refs; retro closure requires a lesson per finding. Three standards are recorded as not met or partial: the tranche-review evidence check, the benefit-measurement value pair, and the programme governance rules around ownership, closure bypass and closure scope.\n\n## Links\n\nDerives from the Phase C data catalog and the repository's technology base. Reuses the workspace's PostgreSQL 18 and Rust standards and the delivery policy in docs/plans/03-DELIVERY.md. The compile and test verdict comes from the GitHub-hosted preflight.yml, never from local Rust compilation.\n\n## Document\n\nThe catalog is the technology view of the slice. It distinguishes a standard that is implemented and proved by a named test from a standard whose row exists but whose check is too weak; the latter are recorded with their finding codes rather than presented as met."
+    }
+  ],
+  "delivery_contract": {
+    "title": "Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a)",
+    "body": {
+      "capacity": "The tranche-4 PI plan (cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095, state awaiting_approval) scopes ten projects — T9, T10, T4, T14, T16, S05, S07, S09, T19 and T18 — with build_concurrency 1, live_record_writer 1, read_agents_max 6, and WIP limits of 2 open batches and 1 open card per writer. The refinement cadence 01a202a2-2705-7392-a2d1-03ca2b3a174e reorders T9 and T10 first by an ART decision over the computed WSJF score, and records T10 at business value 10, time criticality 13, risk reduction 10 and job size 8, with 22 open packages (0 P0, 3 P1, 19 P2).",
+      "acceptance": "The contract binds T10 to the SPEC_V2 §12 gate and to acceptance/programme/T10.toml: the project is closed; the scope baseline is approved; a charter asset exists and its charter gate is approved; the declared closure outputs are published; a live board-approved delivery contract exists; a Phase-G review cites the standing delegation; the closure gate is decided by an approver other than its requester; no active waiver is expired or owned by its reviewer; the PI has a cadence row and a refinement row; the PI plan and PI objectives are published; every deliverable carries the four typed WSJF inputs; every accepted deliverable has a demo credit carrying its evidence; at least one retro lesson exists (P1); no open P0 product finding remains; every mandatory standard artefact is evidenced (P1); and no unresolved P0/P1 rework package remains. The PI plan, PI objectives, cadence and demo-credit checks are supported by the published documents and the recorded credit; T10-lessons is P1 and no lesson in the snapshot names T10.",
+      "evidence": "The evidence is typed: the named test functions in crates/store/tests/programme_cadence.rs, refinement.rs, demo_gate.rs, retro.rs, tranche_review.rs and benefit_transition.rs; crates/actions/tests/pi_plan_approval.rs and demo_credit.rs; and apps/server/tests/cadence_jobs.rs. The published documents are the PI plan 01a20e7e-6cac-767e-b385-a5b732341aee, the PI objectives 01a20e7e-6dc5-7314-b03d-009f0abea659 and the SAFe cadence output 01a20e7e-7b8f-7011-bdb5-a9897712ac1b. The accepted deliverable 01a20289-78c8-70b5-98ce-784f39be9408 carries the demo credit 01a202a2-01a5-7669-987b-ebd8230e63d8, whose evidence is acceptance/programme/T10.toml, docs/evidence/rework/T10.json and docs/evidence/rework/T10/acts.md. The approved scope baseline 01a20289-7be3-7e47-afe0-f6b1f82f1892 freezes the register item U3-EXC-T10 (01a1fbad-6dd5-75d9-83dc-c490d72c7375), the accepted P0 retrospective exception for the out-of-sequence closure.",
+      "delegation": "Executed under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce, version 2, state authorised) was authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a20e84-325b-7fef-8f40-50b5e53550e9 with decision continue. The tranche's own exit review is absent: tranche reconciliation records authorised:false with the flags review_missing and projects_closed_before_authorisation.",
+      "compliance": "The Phase-G verdict this pass records is consistent: the seven A–D artefacts, the Statement of Architecture Work, the delivery contract, the WBS deliverable and the published outputs exist and are reviewed, so the record is consistent with the gate, but clause 4 is unproved and clause 1 is partial. It is not compliant, conformant or fully_conformant: v1-p82-5, v1-p82-6 and v1-p83-1 to v1-p83-6 remain open and are carried as findings.",
+      "manifest": "acceptance/programme/T10.toml",
+      "retrospective": true
+    }
+  },
+  "wbs_deliverable": {
+    "title": "SAFe cadence and MSP tranches — WSJF materialisation, demo evidence, retro lessons, tranche review and benefit realisation",
+    "business_value": 10,
+    "time_criticality": 13,
+    "risk_reduction": 10,
+    "job_size": 8
+  },
+  "review": {
+    "level": "consistent",
+    "findings": [
+      {
+        "code": "v1-p82-5",
+        "severity": "P2",
+        "finding": "The PI materialisation query is pinned to one project_id, so the programme's standing backlog is not planned by WSJF. The project-backlog clause of the gate is proved; the programme-wide claim is not."
+      },
+      {
+        "code": "v1-p82-6",
+        "severity": "P2",
+        "finding": "A retro lesson needs no evidence and a systemic retro finding emits no kata candidate. The retro lesson rule is enforced, but the lesson record itself is weak, and no lesson in the snapshot names T10."
+      },
+      {
+        "code": "v1-p83-1",
+        "severity": "P1",
+        "finding": "The tranche-review evidence check is presence-only: the three evidence keys accept any non-null non-empty value, including the string none, and the seed authorises a tranche with no review. The tranche-4 row is declared authorised while reconciliation reports authorised:false."
+      },
+      {
+        "code": "v1-p83-2",
+        "severity": "P1",
+        "finding": "benefit_transition stores timestamps and free-form evidence rather than a typed baseline and post value pair, so a realized status compares no measured values."
+      },
+      {
+        "code": "v1-p83-3",
+        "severity": "P1",
+        "finding": "Benefit ownership is a free-text role string rather than a job key, so accountability does not resolve to a row in the job catalogue."
+      },
+      {
+        "code": "v1-p83-4",
+        "severity": "P1",
+        "finding": "programme_tranche.baseline_ref is nullable and an unapproved baseline satisfies the existence check, so the end-of-tranche baseline clause is not proved by the record alone."
+      },
+      {
+        "code": "v1-p83-5",
+        "severity": "P2",
+        "finding": "programme status is writable through programmes.update without a review or a realization plan, which is a bypass edge to closed."
+      },
+      {
+        "code": "v1-p83-6",
+        "severity": "P2",
+        "finding": "Programme closure reads only the scope baseline; schedule, cost and register baselines are not gated."
+      },
+      {
+        "code": "prior-review",
+        "severity": "record",
+        "finding": "The two prior contract reviews 01a20e7e-7e2f-70df-9e17-4884d8b188d0 and 01a2028a-3c4e-7a50-8ee9-d59ad0f11396 recorded level compliant against the Statement of Architecture Work and the delivery contract. This retrospective's Phase-G verdict is consistent, not compliant or higher, because clause 4 is unproved (v1-p83-1, v1-p83-4), clause 1 is partial (v1-p82-5), and the tranche-4 exit review is absent."
+      },
+      {
+        "code": "tranche-4-exit",
+        "severity": "P0-gap",
+        "finding": "The tranche-4 exit review has not been taken. Tranche reconciliation records authorised:false with review_missing and projects_closed_before_authorisation, and the exit criteria — every tranche-4 project accepted with published evidence and a recorded continue, pause or stop — are unmet."
+      }
+    ],
+    "evidence": {
+      "acceptance_manifest": "acceptance/programme/T10.toml",
+      "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "contracts": {
+        "statement_of_architecture_work": "01a20287-696c-76a4-a2db-28c6092b5813",
+        "delivery_contract": "01a20289-2b08-7ea3-96f6-b2ac928a7be4"
+      },
+      "scope_baseline": "01a20289-7be3-7e47-afe0-f6b1f82f1892",
+      "prior_reviews": ["01a20e7e-7e2f-70df-9e17-4884d8b188d0", "01a2028a-3c4e-7a50-8ee9-d59ad0f11396"],
+      "tranche": "01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce",
+      "authorising_review": "01a20e84-325b-7fef-8f40-50b5e53550e9",
+      "published": {
+        "pi_plan": "01a20e7e-6cac-767e-b385-a5b732341aee",
+        "pi_objectives": "01a20e7e-6dc5-7314-b03d-009f0abea659",
+        "safe_cadence": "01a20e7e-7b8f-7011-bdb5-a9897712ac1b"
+      },
+      "wbs_deliverable": "01a20289-78c8-70b5-98ce-784f39be9408",
+      "demo_credit": "01a202a2-01a5-7669-987b-ebd8230e63d8"
+    }
+  },
+  "project_brief_output": "# Project brief — T10 SAFe cadence and MSP tranches (retrospective, 2026-11-24)\n\n## Outcome\n\nT10 is the conveyor's SAFe cadence and MSP tranche slice: PI planning that materialises cards from the backlog by computed WSJF within WIP, a system demo that cannot credit a deliverable without typed evidence, an inspect-and-adapt cycle that cannot close with an untaught finding, an end-of-tranche review that must cite baselines, benefit status and risk evidence, and a benefit transition that cannot report realization without a measured baseline. The register records the project as built and closed at version 15, created 2026-11-12T14:46:02Z and updated 2026-11-24T17:04:34Z, with meta adm_phase G, plateau capability, track v2, tranche 4, viability rework, measured_status built, plan_status draft, expected outputs project-brief and evidence, and both linked issues #82 and #502 closed. This retrospective reconstructs the lifecycle record — charter, seven Phase A–D artefacts, Statement of Architecture Work, delivery contract, WBS deliverable and Phase-G review — around that closure; it does not claim a contemporaneous gate run.\n\n## Boundary\n\nOut of scope: the decision ladder (T2), the plan-spine baseline contract (T1), the coach card (T4) except the retro card, metrics and metering (T11), the one-organisation-loop acceptance (T12), and T19's meeting types, whose binding to the board and cadence §12 records as a follow-up integration unit. T10 must not create a second plan store, a second card store or a stored WSJF score; it reuses T1's wbs_node, project_baseline and shared_config, and S05's card table. Benefit realization happens only through a measured benefit_transition, never through a free-text status.\n\n## Reuse sources\n\n- docs/SPEC_V2.md §8.2 (SAFe as the programme cadence) and §8.3 (MSP as the programme definition and benefits realization); §12 T10 row for the gate.\n- T1 plan spine: wbs_node, project_baseline, project_register_item, project_dependency, shared_config and cadence; programme_tranche, benefit_profile and benefit_link per §12 T1.\n- T3 PM job: charter, WBS, baseline, staffing, gate routing and closure per §12 T3, and the P0 programme record set.\n- The tranche-4 PI plan 01a20e7e-6cac-767e-b385-a5b732341aee, PI objectives 01a20e7e-6dc5-7314-b03d-009f0abea659 and SAFe cadence output 01a20e7e-7b8f-7011-bdb5-a9897712ac1b.\n- The project's recorded artefact entries, which carry the named test functions; acceptance/programme/T10.toml; and the existing live contracts 01a20287-696c-76a4-a2db-28c6092b5813 and 01a20289-2b08-7ea3-96f6-b2ac928a7be4.\n\n## Inception units\n\nThe inception record is the tranche-4 PI plan and its refinement, not a separate analysis document. The refinement cadence 01a202a2-2705-7392-a2d1-03ca2b3a174e records T10 at 22 open packages (0 P0, 3 P1, 19 P2) and reorders T9 and T10 first by an ART decision over the computed WSJF score. The project has one accepted WBS deliverable, 01a20289-78c8-70b5-98ce-784f39be9408, whose demo credit 01a202a2-01a5-7669-987b-ebd8230e63d8 carries acceptance/programme/T10.toml, docs/evidence/rework/T10.json and docs/evidence/rework/T10/acts.md. Issues #82 and #502 are closed; no contemporaneous charter, Statement of Architecture Work, delivery contract, Phase A–D artefact body or Phase-G review existed before the retrospective passes.\n\n## Dependencies\n\n- blocked-by: T1 — the plan spine, whose wbs_node, project_baseline, project_register_item and shared_config T10 reads and never duplicates.\n- blocked-by: T3 — the PM job that owns charter, WBS, baseline, gate routing and closure.\n- blocked-by: P0 — the programme record set; the accepted P0 exception U3-EXC-T10 (01a1fbad-6dd5-75d9-83dc-c490d72c7375) records the out-of-sequence closure.\n- blocked-by: tranche 4 (01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce, version 2, state authorised), authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a20e84-325b-7fef-8f40-50b5e53550e9 with decision continue.\n- blocks: T12's one-organisation-loop acceptance, which consumes a baselined and measured benefit; T18's programme destination; and §12's follow-up integration of the cadence with T19's meeting types.\n\n## Acceptance\n\nThe acceptance instrument is acceptance/programme/T10.toml, whose P0 checks are T10-project, T10-baseline, T10-charter, T10-closure-outputs, T10-contract, T10-review, T10-closure-gate, T10-waivers, T10-pi-cadence, T10-pi-plan, T10-pi-objectives, T10-wsjf, T10-demo-credits, T10-product and T10-rework, with T10-lessons and T10-artefact-standard at P1. The gate itself is the SPEC_V2 §12 T10 text. Clause 1 is proved for a project backlog by programme_cadence.rs::wsjf_is_computed_not_stored and ::materialisation_respects_wip_slots with cadence_jobs.rs::pi_tick_is_idempotent, but not for the programme's standing backlog (v1-p82-5). Clause 2 is proved by demo_gate.rs::a_credit_needs_typed_evidence. Clause 3 is proved by retro.rs::retro_cannot_close_without_lessons and ::every_finding_becomes_a_lesson, with v1-p82-6. Clause 4 is unproved because the tranche-review check is presence-only (v1-p83-1) and the baseline is not gated (v1-p83-4). Clause 5 is proved by benefit_transition.rs::a_missing_baseline_cannot_claim_realization with the untyped-value gap v1-p83-2. The Phase-G review this pack records is consistent: the lifecycle set exists and the prior contract reviews recorded compliant, but clause 4 is unproved and clause 1 is partial, so the record does not support compliant or higher.\n\n## Capabilities\n\nComputed WSJF; WIP-bounded materialisation; approved-plan-only materialisation; idempotent PI tick; backlog refinement; the demo evidence gate; and retro lessons are live. Tranche review evidence is partial: the review refuses missing keys but accepts free-text placeholders and does not gate the baseline. Benefit realisation is partial: the baseline gate is proved but the transition stores no typed baseline and post value pair, and ownership is free text. MSP programme governance is partial: the programme backlog is pinned to one project, lessons need no evidence, closure bypasses the review, and closure reads only the scope baseline. The WBS deliverable is accepted; the demo credit and PI documents exist; the eight findings and the absent tranche-4 exit review are the open record.\n\n## Plan\n\nHeld to docs/SPEC_V2.md §12 (T10) and the §8.2–§8.3 design; the plan frontmatter is draft while the project meta records measured_status built. Tranche 4 is declared authorised, but reconciliation records authorised:false with review_missing and projects_closed_before_authorisation, so the tranche-4 exit criteria are unmet and its review is absent. The tranche-4 cadences are PI 01a202a1-dbb9-7e49-b64a-cf97c3fab095 (awaiting_approval), demo 01a202a1-f4ee-7acc-8e57-50ac6f0417fd (materialised), retro 01a202a2-0e3f-75be-9f2b-c572ddcdfce9 (planned) and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e (planned). The approved scope baseline 01a20289-7be3-7e47-afe0-f6b1f82f1892 froze the deliverable at 8/7/8/8; the refinement records 10/13/10/8, and this rework's deliverable carries the refined inputs. This pass publishes the lifecycle set and does not close the project.",
+  "evidence_output": "# Evidence — T10 SAFe cadence and MSP tranches (retrospective, 2026-11-24)\n\n## Claim\n\nT10 is the conveyor's SAFe cadence and MSP tranche slice in tranche 4, and the register records it built and closed at version 15. At the 2026-11-24 snapshot the project has no contemporaneous charter, Statement of Architecture Work, delivery contract, Phase A–D artefact bodies or Phase-G review, the tranche-4 exit review has not been taken, and no benefit transition has been measured. This retrospective reconstructs the lifecycle record with authored artefacts, a charter, a Statement of Architecture Work, a delivery contract, a Phase-G review and the project's expected outputs, and it does not claim that the SPEC_V2 §12 gate was run or passed contemporaneously.\n\n## Evidence\n\n- **Project row:** 01a1d039-0d36-70c1-a5e8-f50956c5e3f9, key T10, status closed, version 15, created 2026-11-12T14:46:02Z, updated 2026-11-24T17:04:34Z; meta adm_phase G, plateau capability, track v2, tranche 4, viability rework, measured_status built, plan_status draft, issues [82, 502], expected_outputs [project-brief, evidence], closure_outputs [closure-review], reopen_decision_ref 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n- **Issues:** #82 \"T10 — SAFe cadence and MSP tranches\" and #502 \"benefits: a realized status needs a measured transition\" are both closed.\n- **Tranche:** tranche 4 is 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce, version 2, state authorised, created 2026-11-17T14:19:56Z and authorised 2026-11-24T17:04:34Z by the tranche-3 review 01a20e84-325b-7fef-8f40-50b5e53550e9 (decision continue). Tranche reconciliation records authorised:false with the flags review_missing and projects_closed_before_authorisation and no review; the tranche-4 exit criteria are unmet.\n- **Contracts:** the Statement of Architecture Work 01a20287-696c-76a4-a2db-28c6092b5813 is live, reviewed compliant at 01a20e7e-7e2f-70df-9e17-4884d8b188d0; the delivery contract 01a20289-2b08-7ea3-96f6-b2ac928a7be4 is live, reviewed compliant at 01a2028a-3c4e-7a50-8ee9-d59ad0f11396. Both reviewers are conveyor-approver.\n- **Baseline:** scope baseline 01a20289-7be3-7e47-afe0-f6b1f82f1892, approved 2026-11-22T09:14:52Z by conveyor-approver; its frozen register carries the accepted P0 exception U3-EXC-T10 (01a1fbad-6dd5-75d9-83dc-c490d72c7375) for the out-of-sequence closure; its frozen WBS row is the deliverable 01a20289-78c8-70b5-98ce-784f39be9408 at 8/7/8/8.\n- **WBS deliverable and demo:** the deliverable 01a20289-78c8-70b5-98ce-784f39be9408 is accepted with evidence acceptance/programme/T10.toml, docs/evidence/rework/T10.json and docs/evidence/rework/T10/acts.md; the demo credit 01a202a2-01a5-7669-987b-ebd8230e63d8 carries the same three refs and was credited 2026-11-22T09:41:40Z. The tranche-4 refinement records the WSJF inputs 10/13/10/8.\n- **Cadence:** PI 01a202a1-dbb9-7e49-b64a-cf97c3fab095 (awaiting_approval, ten-project scope), demo 01a202a1-f4ee-7acc-8e57-50ac6f0417fd (materialised), retro 01a202a2-0e3f-75be-9f2b-c572ddcdfce9 (planned) and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e (planned).\n- **Published documents:** PI plan 01a20e7e-6cac-767e-b385-a5b732341aee, PI objectives 01a20e7e-6dc5-7314-b03d-009f0abea659, SAFe cadence 01a20e7e-7b8f-7011-bdb5-a9897712ac1b, architecture artefact index 01a20e7e-4043-75e9-8aec-c26dc07b9c0c, benefits diagram 01a20e7e-40bc-73ce-b339-0df4f485f42e, candidate solutions 01a20e7e-4132-7701-811f-4c4421289a69, change control 01a20e7e-41a8-7170-8262-848562df4976, gap analysis 01a20e7e-421d-7625-b796-f77328226502, project context diagram 01a20e7e-4291-7146-af41-c429d97bd36e, project registers 01a20e7e-4305-7482-9cc4-94865c21f7ab, project WBS 01a20e7e-4379-70a2-acc0-d40eb98ca051, Statement of Architecture Work output 01a20e7e-43f0-7714-9499-1806f96d622d, compliance review 01a20e7d-fc13-769f-80e9-edd43ef40b79, delivery contract output 01a20e7d-fe4d-76c8-8df9-e1345d6407f3, project baseline output 01a20e7e-02c0-7552-bb0b-a77f2c93440a, project brief 01a20289-9f4e-758d-9ee1-b5410a93d5a1 and evidence page 01a1f2ca-1e66-77dc-a80a-73a424e4f47a.\n- **Gap in the record:** the eight findings v1-p82-5, v1-p82-6 and v1-p83-1 to v1-p83-6 remain open; the tranche-4 exit review is absent; the PI cadence awaits approval; no lesson names T10; and benefit_transitions is empty.\n\n## Verification\n\nAn independent reader can repeat the record checks through acceptance/programme/T10.toml and the named test suites: crates/store/tests/programme_cadence.rs, refinement.rs, demo_gate.rs, retro.rs, tranche_review.rs and benefit_transition.rs; crates/actions/tests/pi_plan_approval.rs and demo_credit.rs; and apps/server/tests/cadence_jobs.rs. The local gate is cargo fmt --all -- --check plus cargo metadata --locked --format-version 1 (docs/plans/03-DELIVERY.md); the compile and test verdict comes from the repository's GitHub-hosted preflight.yml, not from local Rust compilation. This retrospective carried the test names from the project's recorded artefact entries and did not re-run them. The rework's write is checked by scripts/rework-content-check.py before scripts/rework-project.py runs it.\n\n## Links\n\n- Plan: docs/SPEC_V2.md §12 (T10), §8.2 and §8.3\n- Acceptance instrument: acceptance/programme/T10.toml\n- Project: 01a1d039-0d36-70c1-a5e8-f50956c5e3f9\n- Tranche 4: 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; authorising review: 01a20e84-325b-7fef-8f40-50b5e53550e9\n- Statement of Architecture Work: 01a20287-696c-76a4-a2db-28c6092b5813; delivery contract: 01a20289-2b08-7ea3-96f6-b2ac928a7be4\n- Scope baseline: 01a20289-7be3-7e47-afe0-f6b1f82f1892; accepted exception U3-EXC-T10: 01a1fbad-6dd5-75d9-83dc-c490d72c7375\n- WBS deliverable: 01a20289-78c8-70b5-98ce-784f39be9408; demo credit: 01a202a2-01a5-7669-987b-ebd8230e63d8\n- PI plan: 01a20e7e-6cac-767e-b385-a5b732341aee; PI objectives: 01a20e7e-6dc5-7314-b03d-009f0abea659; SAFe cadence: 01a20e7e-7b8f-7011-bdb5-a9897712ac1b\n- Cadences: PI 01a202a1-dbb9-7e49-b64a-cf97c3fab095; demo 01a202a1-f4ee-7acc-8e57-50ac6f0417fd; retro 01a202a2-0e3f-75be-9f2b-c572ddcdfce9; refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e\n- Standing delegation: 01a1ff1f-e4ba-72dc-9c1a-13049933cf14\n\n## Gap\n\n- The tranche-4 exit review is absent; reconciliation records authorised:false with review_missing and projects_closed_before_authorisation; the exit criteria are unmet.\n- The PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 is awaiting approval even though the PI plan and PI objectives are published; no approved-plan materialisation is recorded.\n- The eight findings v1-p82-5, v1-p82-6 and v1-p83-1 to v1-p83-6 are open: the programme backlog is pinned to one project, lessons need no evidence, tranche evidence is presence-only, the baseline is not gated, benefit values are untyped, ownership is free text, programme closure bypasses the review, and closure reads only the scope baseline.\n- The WSJF inputs are inconsistent across records: the approved scope baseline froze 8/7/8/8, the refinement records 10/13/10/8, and the accepted deliverable row still holds 8/7/8/8 at the snapshot. This pack records the refined inputs and does not re-measure the baseline.\n- No lesson in the snapshot names T10, and the tranche-4 retro cadence is planned rather than materialised.\n- benefit_transitions is empty; the seven benefit profiles are baselined but no post-transition measurement is recorded, so no benefit can claim realization.\n- No contemporaneous charter, Statement of Architecture Work, delivery contract, Phase A–D artefact body or Phase-G review existed; this set is retrospective and does not attest contemporaneous intent or gate execution. Two earlier closure-review pages exist (01a1f2ca-31ea-7341-a725-4c4492c7d3f7 and 01a20e7d-dfc2-74c9-a17e-af521ed606e6), but this pack publishes no closure and no closure review."
+}
