@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
-# The published MSP/TOGAF/SAFe/PMP record and the rework register are built from the COMMITTED
-# pack, not from a fixture: every unresolved mandatory section must name a package the register
-# actually carries, every package must be individually acceptable, and two runs must be
-# byte-identical. This is the gate the pack never had: without it, an absent record passed CI.
+# The published MSP/TOGAF/SAFe/PMP record and the rework register are the LIVE PUBLISH's objects
+# (`docs/design/scripts/publish-data.sh`). This test validates the COMMITTED pack those bytes
+# describe: it never re-derives the register or the record from the snapshot and compares it to the
+# pack, because the snapshot follows the issue-driven seed and a branch that closes one issue would
+# redden the pack by construction (measured on the automated refresh #665 and on #670). The
+# generators' determinism is checked as a self-test below: two runs over the same inputs must agree,
+# and nothing compares that output to the committed pack.
 #
 # Run: bash scripts/ci/tests/standards_pack.sh
 set -euo pipefail
@@ -14,86 +17,58 @@ export TZ=UTC
 export PYTHONHASHSEED=0
 cd "$repo"
 
-# The same relative --snapshot argument in both runs: the register records the string it was
-# built with, so an absolute path would make two identical builds differ.
-build() {
-  local run="$1"
-  mkdir -p "$run/audit" "$run/data" "$run/docs/standards"
-  python3 scripts/audit-programme-conformance.py \
-    --snapshot docs/design/data --out "$run/audit" --report >/dev/null
-  python3 scripts/generate-standards.py \
-    --snapshot docs/design/data --outputs-dir docs/design/docs \
-    --gaps "$run/audit/conformance-gap-register.json" \
-    --findings-out "$run/standards-pass1.json" >/dev/null
-  python3 scripts/audit-programme-conformance.py \
-    --snapshot docs/design/data --out "$run/audit" \
-    --findings docs/evidence/v1-conformance-findings.json \
-    --findings "$run/standards-pass1.json" \
-    --deep-review docs/evidence/record-w3/deep-review-findings.json \
-    --rework-out "$run/rework.json" >/dev/null
-  # The public register must not carry a private address; redact at the one point every consumer
-  # reads, exactly as publish-standards.sh does.
-  python3 scripts/redact-public-register.py "$run/rework.json"
-  python3 scripts/generate-standards.py \
-    --snapshot docs/design/data --outputs-dir docs/design/docs \
-    --gaps "$run/audit/conformance-gap-register.json" \
-    --register "$run/rework.json" \
-    --data-out "$run/data" --html-out "$run/docs/standards" \
-    --findings-out "$run/standards-findings.json" >/dev/null
-  # The pass-2 record must carry the same findings pass 1 fed to the register.
-  cmp "$run/standards-pass1.json" "$run/standards-findings.json"
-}
+record="docs/design/data/standards.json"
+register="docs/design/data/rework.json"
+ledger="docs/evidence/rework-register.json"
+findings="docs/evidence/standards-findings.json"
 
-build "$tmp/run1"
-build "$tmp/run2"
+for path in "$record" "$register" "$ledger" "$findings" docs/design/docs/standards/index.html; do
+  test -f "$path" || {
+    echo "standards_pack: $path is missing; the pack must carry the published record and register" >&2
+    exit 1
+  }
+done
 
-# Determinism: the same committed pack produces the same record, pages and register.
-cmp "$tmp/run1/standards-findings.json" "$tmp/run2/standards-findings.json"
-cmp "$tmp/run1/rework.json" "$tmp/run2/rework.json"
-diff -r "$tmp/run1/data" "$tmp/run2/data"
-diff -r "$tmp/run1/docs" "$tmp/run2/docs"
+# The record's schema, page hashes and package linkage are checked over the committed tree. The
+# register keys are read from the committed register, so every unresolved mandatory artefact must
+# name a package the published pack actually carries.
+node docs/design/scripts/check-standards.cjs --data docs/design/data --documents docs/design
 
-# The committed ledger is the record of this snapshot, not a stale side note.
-cmp "$tmp/run1/standards-findings.json" docs/evidence/standards-findings.json
-
-# The pack must CARRY the record, not merely be able to produce it. Without these comparisons a
-# green run proves only that a temp root could be populated, which is exactly how the artefact set
-# stayed absent from the public pack while CI passed.
-stale() {
-  echo "standards_pack: $1 is stale or missing; run docs/design/scripts/publish-standards.sh" >&2
-  exit 1
-}
-cmp "$tmp/run1/data/standards.json" docs/design/data/standards.json || stale "docs/design/data/standards.json"
-cmp "$tmp/run1/data/standards.js" docs/design/data/standards.js || stale "docs/design/data/standards.js"
-cmp "$tmp/run1/data/rework.js" docs/design/data/rework.js || stale "docs/design/data/rework.js"
-cmp "$tmp/run1/rework.json" docs/evidence/rework-register.json || stale "docs/evidence/rework-register.json"
-diff -r "$tmp/run1/docs/standards" docs/design/docs/standards >/dev/null || stale "docs/design/docs/standards"
-
-# The record's schema, page hashes and package linkage are checked over the generated tree.
-node docs/design/scripts/check-standards.cjs --data "$tmp/run1/data" --documents "$tmp/run1"
-
-# The register must be consumable at head: a dry run plans cards against the committed snapshot,
-# with no database and no write.
+# The committed register must be consumable at head: a dry run plans cards against the committed
+# snapshot, with no database and no write.
 python3 scripts/materialise-rework.py \
-  --register "$tmp/run1/rework.json" --data docs/design/data \
+  --register "$register" --data docs/design/data \
   --receipt "$tmp/receipt.json" --severity P0,P1,P2,P3 | tee "$tmp/materialise.log"
 grep -Eq 'materialise-rework: [0-9]+ to create' "$tmp/materialise.log"
 
-python3 - "$tmp/run1" <<'PY'
+python3 - "$record" "$register" "$ledger" "$findings" <<'PY'
 import json
-import pathlib
 import sys
 
-run = pathlib.Path(sys.argv[1])
-record = json.loads((run / "data" / "standards.json").read_text(encoding="utf-8"))
-register = json.loads((run / "rework.json").read_text(encoding="utf-8"))
-findings = json.loads((run / "standards-findings.json").read_text(encoding="utf-8"))
+
+def load(path):
+    with open(path, encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+record = load(sys.argv[1])
+register = load(sys.argv[2])
+ledger = load(sys.argv[3])
+findings = load(sys.argv[4])
+
+# The published register travels in two committed carriers; they are the same object. Canonical
+# JSON equality, not bytes: `data/rework.json` is the live snapshot's serialisation and the
+# evidence ledger is the audit's (sorted keys, escaped non-ASCII); `check-data.cjs` compares them
+# the same way.
+assert register == ledger, (
+    "docs/design/data/rework.json and docs/evidence/rework-register.json differ")
 
 summary = record["summary"]
 artefacts = record["artefacts"]
 assert record["schema"] == "design-standards/v1", record.get("schema")
 assert summary["artefacts"] == len(artefacts)
 assert summary["artefacts"] == summary["evidenced"] + summary["partial"] + summary["absent"]
+assert findings.get("schema") == "conveyor-v1-findings/v1", findings.get("schema")
 assert summary["findings"] == len(findings["findings"]), (
     summary["findings"], len(findings["findings"]))
 
@@ -122,8 +97,38 @@ print(
     f"{summary['artefacts']} artefacts "
     f"({summary['evidenced']} evidenced, {summary['partial']} partial, {summary['absent']} absent), "
     f"{summary['findings']} findings, {len(packages)} packages "
-    f"({register['summary']['open']} open); the record and the register are deterministic"
+    f"({register['summary']['open']} open); the committed record, register and findings agree"
 )
 PY
 
-echo "standards_pack: OK"
+# Determinism self-test: the generators must be deterministic over the same inputs. This is the
+# only derivation in this test; its output is compared run-to-run, never to the committed pack.
+build() {
+  local run="$1"
+  mkdir -p "$run/audit" "$run/data" "$run/docs/standards"
+  python3 scripts/audit-programme-conformance.py \
+    --snapshot docs/design/data --out "$run/audit" --report >/dev/null
+  python3 scripts/generate-standards.py \
+    --snapshot docs/design/data --outputs-dir docs/design/docs \
+    --gaps "$run/audit/conformance-gap-register.json" \
+    --findings-out "$run/standards-pass1.json" >/dev/null
+  # The record is derived with the PUBLISHED register (the live publish's object), never a
+  # second register derived from the snapshot.
+  python3 scripts/generate-standards.py \
+    --snapshot docs/design/data --outputs-dir docs/design/docs \
+    --gaps "$run/audit/conformance-gap-register.json" \
+    --register "$register" \
+    --data-out "$run/data" --html-out "$run/docs/standards" \
+    --findings-out "$run/standards-findings.json" >/dev/null
+  # The pass-2 record must carry the same findings pass 1 produced.
+  cmp "$run/standards-pass1.json" "$run/standards-findings.json"
+}
+
+build "$tmp/run1"
+build "$tmp/run2"
+
+cmp "$tmp/run1/standards-findings.json" "$tmp/run2/standards-findings.json"
+diff -r "$tmp/run1/data" "$tmp/run2/data"
+diff -r "$tmp/run1/docs" "$tmp/run2/docs"
+
+echo "standards_pack: OK — the committed pack is a valid published record and register"

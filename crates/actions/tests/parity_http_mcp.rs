@@ -4656,6 +4656,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                     "development_project_id": ctx.pop("development_projects.rollback"),
                     "deployed_digest": "sha256:parity-deployed",
                     "restored_digest": "sha256:parity-restored",
+                    "migration_generation": 70,
                     "health_status": 200,
                     "evidence": ["parity rollback evidence"],
                 })

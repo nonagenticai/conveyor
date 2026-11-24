@@ -728,354 +728,55 @@
       }
     },
     {
-      "approval_id": "01a2079d-4c9f-7c11-86b4-ba0b23c45aa3",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:39.229888+00:00",
-      "decided_by_kind": "rule",
+      "approval_id": "01a20c89-5d47-754f-a183-b5074804c7d3",
+      "approver_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "approver_name": "FR Test",
+      "created_at": "2026-11-24T07:55:12.305673+00:00",
+      "decided_by_kind": "human",
       "decision": "approve",
-      "id": "01a2079d-4d84-7932-865a-d5050ca17caa",
+      "id": "01a20c8d-3c4f-71a0-bef1-e46ddf3fefef",
       "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+        "channel": "web",
+        "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+        "surface": "meeting"
       }
     },
     {
-      "approval_id": "01a2079d-50b7-7cb6-b436-a9195cb23b67",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:40.279002+00:00",
-      "decided_by_kind": "rule",
+      "approval_id": "01a20c8c-1428-79d4-a64e-fdeaa033a182",
+      "approver_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "approver_name": "FR Test",
+      "created_at": "2026-11-24T08:09:21.819118+00:00",
+      "decided_by_kind": "human",
       "decision": "approve",
-      "id": "01a2079d-519d-7f27-8e5a-ac4aba5a131a",
+      "id": "01a20c9a-32bc-7e42-9a9d-2f92941328be",
       "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+        "channel": "web"
       }
     },
     {
-      "approval_id": "01a2079d-5499-7672-b84c-84780d501814",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:41.272275+00:00",
-      "decided_by_kind": "rule",
+      "approval_id": "01a20c89-bc7e-791c-b9cf-381d0b352562",
+      "approver_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "approver_name": "FR Test",
+      "created_at": "2026-11-24T08:19:08.868783+00:00",
+      "decided_by_kind": "human",
       "decision": "approve",
-      "id": "01a2079d-557f-7133-84c4-cf36eb7e310f",
+      "id": "01a20ca3-27f4-7165-a643-1046af3671cd",
       "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+        "channel": "mcp",
+        "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+        "surface": "meeting"
       }
     },
     {
-      "approval_id": "01a2079d-5756-77e4-8647-75713550b8c7",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:41.971711+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-583b-71ec-9195-039af6449f90",
+      "approval_id": "01a20c87-0fd0-7a68-be24-c1e0f5be9f77",
+      "approver_id": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "approver_name": "conveyor-e2e",
+      "created_at": "2026-11-24T08:22:27.516211+00:00",
+      "decided_by_kind": "service",
+      "decision": "reject",
+      "id": "01a20ca6-3128-75a7-b942-c2fce17891e0",
       "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a2079d-5a11-794f-a55e-93fbed0bac8c",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:42.672836+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-5af8-7086-921d-08d52b5bca77",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a2079d-604d-7bc4-b7fd-7e181ddc3eac",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:44.265257+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-612f-7c18-b4ff-f67101a2e109",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a2079d-61ad-734b-b8c1-112b3be73d38",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:44.619963+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-6292-7f43-ba50-cda61b6368b6",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a2079d-6315-7063-9ee1-819e7eea3001",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:44.86696+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-638a-761f-b603-dd695a40e5be",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a2079d-642c-7afb-935e-5a46d89e6c33",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:45.25673+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-6510-70d8-ab91-8d704cde01d1",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a2079d-6593-7583-8190-41430f3ff921",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:45.622985+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-667d-7fd2-bb02-4c8a78391240",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a2079d-6a61-7685-9058-766a73fda912",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:46.84821+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-6b47-7498-b632-cfffdee94ea1",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a2079d-6d28-7dc1-959f-c7f2b906e2b3",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:47.504257+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-6dd7-7063-8e6b-3799449b7400",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a2079d-6e59-7d2a-bb83-4e872c53ca81",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:47.752488+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-6ece-7e4f-a2b5-12280436f888",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a2079d-6f51-7423-b210-cc0e01bed255",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:48.106939+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-7031-7b30-974b-d2ca817ef8e9",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
-      }
-    },
-    {
-      "approval_id": "01a2079d-70b3-7a52-ac9c-37e154baa3a5",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:48.408141+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-715f-712e-be8b-17eba5f3f172",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
-      }
-    },
-    {
-      "approval_id": "01a2079d-71e0-7706-b483-099a81ae6008",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:48.657652+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-725b-7e9e-972b-fb3bea590d9e",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
-      }
-    },
-    {
-      "approval_id": "01a2079d-72de-738c-a343-626b9cd18b8b",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:49.020041+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-73c3-7d7e-9793-691c0f6e15c2",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
-      }
-    },
-    {
-      "approval_id": "01a2079d-7449-782c-83dc-c527eaff4fa6",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:49.338181+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-7501-7053-a0c9-7e29ded21c79",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
-      }
-    },
-    {
-      "approval_id": "01a2079d-7582-75a6-a036-52d95342b1a4",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:54:49.588509+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a2079d-75fb-7dd7-9633-77fcf9c67e76",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
-      }
-    },
-    {
-      "approval_id": "01a207a0-00ea-77e5-833c-b971dd4392e5",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:57:36.343792+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a207a0-015e-7f3c-a9bd-6373e2a6516e",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a207a0-0292-7fbd-bb7c-329bacc072ab",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:57:36.767399+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a207a0-0305-7cb5-aeee-62325ab2d57e",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a207a0-0439-7354-ae1b-10f6f47c9e79",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:57:37.192452+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a207a0-04ae-7b15-af8f-c9d578d6f309",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a207a0-05e5-726a-a6f2-7870f0bfcd3d",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:57:37.617555+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a207a0-0658-7b60-abde-1bcfd1201dbd",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a207a0-078a-73ad-adc8-098a632f2e4e",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:57:38.040498+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a207a0-07ff-7296-ad26-0a3e342b259e",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a207a0-092e-74ce-ad33-fbf81078d7e1",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:57:38.457198+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a207a0-099f-7dbc-9fd6-557cbfce6530",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a207a0-0ad0-730d-9594-9ce1f05792ad",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:57:38.879051+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a207a0-0b45-7d75-b06f-c7d5c72096ab",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
-      }
-    },
-    {
-      "approval_id": "01a207a0-0c77-790c-bb68-93f7aedff6b0",
-      "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "approver_name": "conveyor-approver",
-      "created_at": "2026-11-23T08:57:39.302021+00:00",
-      "decided_by_kind": "rule",
-      "decision": "approve",
-      "id": "01a207a0-0cec-7a4a-aec5-7b1297212562",
-      "via": {
-        "channel": "internal",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+        "channel": "internal"
       }
     }
   ],
@@ -1087,10 +788,6 @@
       "gate": "ops.mitigate",
       "id": "01a1f7fc-d2ec-7137-b28e-12217dd7618d",
       "kind": "ops",
-      "meta": {
-        "description": "Restart the injected workload after the crash-loop runbook selected it",
-        "target": "incident/01a1f7fc-a653-7545-8fc3-0a5157569a12/nonagentic-ops/deployment/ops-proof/restart"
-      },
       "project_id": null,
       "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
       "required_decisions": 1,
@@ -1106,10 +803,6 @@
       "gate": "charter",
       "id": "01a1fbb1-43b4-7c55-ae77-493c426731fa",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a1fbb1-430f-78ff-a9ae-956f7759a67d",
-        "description": "Approve the charter for P0"
-      },
       "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1125,10 +818,6 @@
       "gate": "baseline",
       "id": "01a1fbb1-b0c6-7348-8f86-2b3c4b4c620a",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1139,66 +828,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-21T11:16:30.333744+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
-        },
-        "subject_id": "01a1fdd2-5041-7f80-8032-3305751d498c",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T11:16:30.333744+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-21T11:19:03.387858+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1fdd4-cac3-7767-9b0f-4c15d064d6f6",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
-        },
-        "subject_id": "01a1fdd4-ab0f-7802-b7a7-2541a2902e6b",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T11:19:03.387858+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-21T11:20:03.655377+00:00",
       "expires_at": null,
       "gate": "closure",
       "id": "01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a1fdd5-b6e0-7d7e-818f-9b46cd7b5bfe",
-        "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
-        "description": "U5a rework complete",
-        "evidence": {
-          "manifest": "acceptance/programme/P0.toml",
-          "snapshot_sha": "5dfd3fa0"
-        }
-      },
       "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1214,10 +848,6 @@
       "gate": "charter",
       "id": "01a1fdd8-a348-7c44-a08c-1ba2f29162b9",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a1fdd8-a2b1-708d-b8cf-39e4e2177592",
-        "description": "Approve the charter for PLATFORM"
-      },
       "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1233,10 +863,6 @@
       "gate": "baseline",
       "id": "01a1fdd8-d052-7532-8e66-944a4db595ab",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1252,10 +878,6 @@
       "gate": "charter",
       "id": "01a1ff2e-16ac-7c92-b0a6-0cc3385a57a7",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a1ff2e-1618-7ff9-8ca7-839f7197ce33",
-        "description": "Approve the charter for S01"
-      },
       "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1266,65 +888,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-21T17:38:03.528727+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/S01.toml",
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        },
-        "subject_id": "01a1ff2e-7974-74cd-be6d-377e3c0071a4",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T17:38:03.528727+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-21T17:39:40.95611+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff31-4403-7988-a64b-796300ce7102",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/S01.toml",
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        },
-        "subject_id": "01a1ff31-30fe-7003-8d62-59278699d128",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T17:39:40.95611+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-21T17:39:52.695711+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a1ff31-7348-7c52-b06f-e57cf09796e9",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a1ff31-72ec-766e-8ad3-227d927f64ab",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1340,16 +908,6 @@
       "gate": "closure",
       "id": "01a1ff34-00a1-75eb-9022-02be586d0bb3",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a1ff34-0014-7020-b4fe-ff513a4dd938",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close S01",
-        "evidence": {
-          "manifest": "acceptance/programme/S01.toml",
-          "retrospective": true,
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        }
-      },
       "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1365,10 +923,6 @@
       "gate": "charter",
       "id": "01a1ff37-8bae-7976-bf95-98ccac0c7735",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a1ff37-8b1a-7821-84c1-a598eadedccb",
-        "description": "Approve the charter for S00"
-      },
       "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1379,65 +933,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-21T17:46:59.884642+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/S00.toml",
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        },
-        "subject_id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T17:46:59.884642+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-21T17:48:33.244929+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff39-637a-7a73-b91f-f95a02e804da",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/S00.toml",
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        },
-        "subject_id": "01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T17:48:33.244929+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-21T17:48:43.761438+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a1ff39-8dc8-78db-bb58-2d18f93d0b35",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a1ff39-8d6e-7270-b2ba-9d235eb28b83",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1453,16 +953,6 @@
       "gate": "closure",
       "id": "01a1ff3b-1a6d-7952-be39-4a4f470ad5c3",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a1ff3b-19e4-7cc4-b08a-b367e42c4bf2",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close S00",
-        "evidence": {
-          "manifest": "acceptance/programme/S00.toml",
-          "retrospective": true,
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        }
-      },
       "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1478,10 +968,6 @@
       "gate": "charter",
       "id": "01a1ff3c-3804-71e8-bb10-4618621cb4c6",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a1ff3c-3774-7209-b1b0-effd34d1a368",
-        "description": "Approve the charter for DESIGN-PUBLISH"
-      },
       "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1492,65 +978,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-21T17:52:01.067648+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        },
-        "subject_id": "01a1ff3c-7aad-7dda-820e-1c7d85fe70a8",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T17:52:01.067648+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-21T17:53:45.459028+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff3e-26d6-7491-b341-73c0ffa3a683",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        },
-        "subject_id": "01a1ff3e-0f21-7e12-888d-1a54e7a90c9d",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T17:53:45.459028+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-21T17:53:56.128695+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a1ff3e-5250-70a7-bdd4-c16e15c3a99a",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a1ff3e-51c4-75b1-9db1-a2f729dd10b8",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1566,16 +998,6 @@
       "gate": "closure",
       "id": "01a1ff3f-cc40-7000-bce5-85f41c4c0b13",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a1ff3f-cba8-7809-9d2d-6609f579b191",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close DESIGN-PUBLISH",
-        "evidence": {
-          "manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
-          "retrospective": true,
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        }
-      },
       "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1591,10 +1013,6 @@
       "gate": "charter",
       "id": "01a1ff40-c4d6-71ed-8a42-171bcab5aa5e",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a1ff40-c439-7814-a804-9583b4ba4c2f",
-        "description": "Approve the charter for SPEC-V2"
-      },
       "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1605,65 +1023,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-21T17:57:03.540609+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/SPEC-V2.toml",
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        },
-        "subject_id": "01a1ff41-19f9-77bb-aa4a-f416f0d758e3",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T17:57:03.540609+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-21T17:58:34.815721+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff42-9127-7cad-b611-c1ebf1006b0a",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/SPEC-V2.toml",
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        },
-        "subject_id": "01a1ff42-7bd0-7d9e-883a-1059368cd356",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T17:58:34.815721+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-21T17:58:45.10455+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a1ff42-bac3-73c0-a04d-d3c13e99dfb1",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a1ff42-ba64-7670-b694-99bb4b1354e5",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1679,16 +1043,6 @@
       "gate": "closure",
       "id": "01a1ff44-4454-72c4-803f-78cbc73dfbe0",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a1ff44-43bd-763d-ad9e-c239953f070a",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close SPEC-V2",
-        "evidence": {
-          "manifest": "acceptance/programme/SPEC-V2.toml",
-          "retrospective": true,
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        }
-      },
       "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1704,10 +1058,6 @@
       "gate": "charter",
       "id": "01a1ff45-7691-7359-a888-763344d97f67",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a1ff45-7606-7900-b1d8-b7a1af787d7b",
-        "description": "Approve the charter for T0"
-      },
       "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1718,65 +1068,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-21T18:02:05.199709+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T0.toml",
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        },
-        "subject_id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T18:02:05.199709+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-21T18:03:34.751948+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff47-24cb-7ffb-87a0-3097d55adb64",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T0.toml",
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        },
-        "subject_id": "01a1ff47-1159-707b-a737-582f894cc956",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T18:03:34.751948+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-21T18:03:45.609503+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a1ff47-50a2-719f-9d61-71fcf97f5f08",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a1ff47-5043-73f7-b18d-2fc03832c96a",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1792,16 +1088,6 @@
       "gate": "closure",
       "id": "01a1ff48-c258-72af-9643-1c830af6b92f",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a1ff48-c1ce-79b4-8a92-10b8ab63f412",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close T0",
-        "evidence": {
-          "manifest": "acceptance/programme/T0.toml",
-          "retrospective": true,
-          "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
-        }
-      },
       "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1817,10 +1103,6 @@
       "gate": "charter",
       "id": "01a1ff83-f0c8-7113-bb51-101be2b0f7ea",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a1ff83-f031-7b6b-90a8-d41527bcf37f",
-        "description": "Approve the charter for S02"
-      },
       "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1831,65 +1113,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-21T19:10:25.503968+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/S02.toml",
-          "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
-        },
-        "subject_id": "01a1ff84-4425-75d9-8772-08e09cf71069",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T19:10:25.503968+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-21T19:12:02.10345+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff85-d11f-7c2a-8716-73985ceb94e7",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/S02.toml",
-          "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
-        },
-        "subject_id": "01a1ff85-bda3-7671-a5b1-42eae3b0e6ee",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T19:12:02.10345+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-21T19:12:12.47338+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a1ff85-fb0a-7e74-b5c5-cf27a530f0a8",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a1ff85-faae-7c2e-b897-fe957985ca78",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1905,16 +1133,6 @@
       "gate": "closure",
       "id": "01a1ff87-d283-7952-b2e1-7512a8ad7864",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a1ff87-d1f0-7149-b67a-96a8aba79c28",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close S02",
-        "evidence": {
-          "manifest": "acceptance/programme/S02.toml",
-          "retrospective": true,
-          "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
-        }
-      },
       "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1930,10 +1148,6 @@
       "gate": "charter",
       "id": "01a1ff88-c067-79d4-b056-5b6c12861371",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a1ff88-bfd5-7a31-8fdd-4c0dee71f0e8",
-        "description": "Approve the charter for T1"
-      },
       "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -1944,65 +1158,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-21T19:15:36.714666+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T1.toml",
-          "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
-        },
-        "subject_id": "01a1ff89-02bd-7b6d-902e-ffa5902cc7f5",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T19:15:36.714666+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-21T19:17:11.072932+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff8a-880f-7d08-b322-9656f2c5355f",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T1.toml",
-          "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
-        },
-        "subject_id": "01a1ff8a-754f-70de-a63a-fa8d00596433",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T19:17:11.072932+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-21T19:17:22.31215+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a1ff8a-b550-7e62-a155-0a1f00699022",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a1ff8a-b4f0-7e6e-9cc7-4231076e1039",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2018,16 +1178,6 @@
       "gate": "closure",
       "id": "01a1ff8c-5646-741c-82c6-0665f98c3adb",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a1ff8c-55b1-7573-b390-392c4f9fa0e6",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close T1",
-        "evidence": {
-          "manifest": "acceptance/programme/T1.toml",
-          "retrospective": true,
-          "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
-        }
-      },
       "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2043,10 +1193,6 @@
       "gate": "charter",
       "id": "01a1ff8d-5f2a-765f-a457-414200b9f65c",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a1ff8d-5e7b-75df-bea5-932b15a1ae2a",
-        "description": "Approve the charter for T11"
-      },
       "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2057,65 +1203,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-21T19:20:39.144071+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T11.toml",
-          "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
-        },
-        "subject_id": "01a1ff8d-a0ad-7a91-b026-d9a2575daa3f",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T19:20:39.144071+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-21T19:22:11.15967+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a1ff8f-1c44-749c-ac12-c067de253ee7",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T11.toml",
-          "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
-        },
-        "subject_id": "01a1ff8f-08ee-7bc5-bb39-81304d03c4ef",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T19:22:11.15967+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-21T19:22:22.038135+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a1ff8f-482a-746a-bd48-67924668daf2",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a1ff8f-47cb-78cf-9db8-d98d863e7dd0",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2131,16 +1223,6 @@
       "gate": "closure",
       "id": "01a1ff90-fcdb-7ed1-bf51-54e24deb923d",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a1ff90-fc47-719b-83a8-2d4bd4dc6010",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close T11",
-        "evidence": {
-          "manifest": "acceptance/programme/T11.toml",
-          "retrospective": true,
-          "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
-        }
-      },
       "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2156,16 +1238,6 @@
       "gate": "closure",
       "id": "01a1ffa2-ba35-7c57-be77-105d7ca09f92",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a1ffa2-b99d-7daf-9ac9-40a1dc937935",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close T1",
-        "evidence": {
-          "manifest": "acceptance/programme/T1.toml",
-          "retrospective": true,
-          "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
-        }
-      },
       "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2181,16 +1253,6 @@
       "gate": "closure",
       "id": "01a1ffa4-4a14-7fd2-9cf2-08714286b017",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a1ffa4-4987-740d-a846-5f966971b6c2",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close T11",
-        "evidence": {
-          "manifest": "acceptance/programme/T11.toml",
-          "retrospective": true,
-          "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
-        }
-      },
       "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2206,16 +1268,6 @@
       "gate": "closure",
       "id": "01a1ffa6-62ce-747b-abac-c41e9679dde8",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a1ffa6-622f-754b-96d6-a285fc985e9b",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close S02",
-        "evidence": {
-          "manifest": "acceptance/programme/S02.toml",
-          "retrospective": true,
-          "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
-        }
-      },
       "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2231,10 +1283,6 @@
       "gate": "tranches.review",
       "id": "01a1ffa9-76b2-7956-98ba-c1d0be651017",
       "kind": "action",
-      "meta": {
-        "description": "End-of-tranche 1 review: continue on the reworked evidence and authorise tranche 2",
-        "target": "tranche/01a1e9e0-d787-7f5c-b5ed-15b05f3dc531/review"
-      },
       "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
       "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
       "required_decisions": 1,
@@ -2250,10 +1298,6 @@
       "gate": "charter",
       "id": "01a2005a-2c3a-7398-a907-cf482afe3f85",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a2005a-2ba4-74f8-b173-55b9a42c4969",
-        "description": "Approve the charter for T2"
-      },
       "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2264,65 +1308,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-21T23:04:23.679742+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a2005a-8c6e-708a-84df-ab16d175072e",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T2.toml",
-          "sha": "7ff27efd65146630e62d9c235458be789fb68c14"
-        },
-        "subject_id": "01a2005a-7886-7f2d-9b49-53d174544ee9",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T23:04:23.679742+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-21T23:06:10.327789+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a2005c-2d07-714c-ac78-ca04396b7878",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T2.toml",
-          "sha": "7ff27efd65146630e62d9c235458be789fb68c14"
-        },
-        "subject_id": "01a2005c-18e4-75a7-9c20-2d83728194e0",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T23:06:10.327789+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-21T23:06:21.585567+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a2005c-5ab0-79f9-84d9-c014517687e8",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a2005c-5a4f-7eb5-a004-ccb5545eb6fb",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2338,16 +1328,6 @@
       "gate": "closure",
       "id": "01a20060-baee-70c8-babc-9a959e21fb82",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a20060-ba59-732b-acba-942a607bac92",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close T2",
-        "evidence": {
-          "manifest": "acceptance/programme/T2.toml",
-          "retrospective": true,
-          "sha": "7ff27efd65146630e62d9c235458be789fb68c14"
-        }
-      },
       "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2363,10 +1343,6 @@
       "gate": "charter",
       "id": "01a20061-6a52-7da5-ba79-788ac48dc14f",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a20061-69b4-7e46-b687-6e4845e50baf",
-        "description": "Approve the charter for S03"
-      },
       "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2377,65 +1353,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-21T23:12:20.147214+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/S03.toml",
-          "sha": "7ff27efd65146630e62d9c235458be789fb68c14"
-        },
-        "subject_id": "01a20061-bd73-7a89-b08c-bd8b867eb061",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T23:12:20.147214+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-21T23:13:58.049456+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a20063-5009-7a66-aaa2-5f2876187e88",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/S03.toml",
-          "sha": "7ff27efd65146630e62d9c235458be789fb68c14"
-        },
-        "subject_id": "01a20063-3a7d-7e67-a437-2e0884f6c46a",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-21T23:13:58.049456+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-21T23:14:08.772733+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a20063-7b58-7840-b544-cdfc5b38232f",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a20063-7af8-727b-b092-24de3821d204",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2451,16 +1373,6 @@
       "gate": "closure",
       "id": "01a20073-737a-7574-954a-2d54d6be5af5",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a20073-72e6-7c7d-a824-994959b8e4e3",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close S03",
-        "evidence": {
-          "manifest": "acceptance/programme/S03.toml",
-          "retrospective": true,
-          "sha": "58b2fb3ac710ee8a69e04c6ba52eab9bd80ff5a0"
-        }
-      },
       "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2476,21 +1388,6 @@
       "gate": "tranche.resume",
       "id": "01a20095-d07b-737e-90e6-b235f3159cde",
       "kind": "gate",
-      "meta": {
-        "allowed_decisions": [
-          "approve",
-          "reject"
-        ],
-        "description": "Resume tranche 2 after its pause review: the exit criteria are met on a full-fidelity snapshot (S03 and T2 each green except the retro lesson, now recorded) and tranche 3 is authorised on the same evidence.",
-        "proposed_answer": "approve",
-        "resume": {
-          "note": "Resumed under the owner's published delegation (2026-11-22)",
-          "resume_approval_id": "01a20095-d07b-737e-90e6-b235f3159cde",
-          "resumed_at": "2026-11-22T07:19:14.063568+00:00",
-          "tranche_id": "01a1e9e0-e2ac-786b-ac48-3b8bcdf12188"
-        },
-        "target": "01a1e9e0-e2ac-786b-ac48-3b8bcdf12188"
-      },
       "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
       "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
       "required_decisions": 1,
@@ -2501,68 +1398,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-22T00:14:24.428141+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a2009a-a7fa-7a68-a539-32dc78e5a221",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T2.toml",
-          "sha": "e55b92e050555c6acd2eefa9272a3721657d7de5",
-          "why": "re-review of T2 at the fixed P0 v1-t2-1"
-        },
-        "subject_id": "01a2009a-7bce-7a8f-96fd-f5159286a09e",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-22T00:14:24.428141+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-22T06:49:18.788982+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a20204-34e9-7eea-87d1-5b8265816c62",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/PLATFORM.toml",
-          "record": "#526",
-          "retrospective": true,
-          "scope": "the programme capability's record, standards and gates"
-        },
-        "subject_id": "01a20203-883b-7231-b0d3-dee948cf90e4",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-22T06:49:18.788982+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-22T07:22:48.736236+00:00",
       "expires_at": null,
       "gate": "projects.close",
       "id": "01a20222-df0f-77b5-ad70-b53bcea5ecb9",
       "kind": "action",
-      "meta": {
-        "description": "Close S03 after the tranche-2 rework (#526)",
-        "target": "project/01a1d039-0d28-743b-86c7-0d0698ed69c1/close"
-      },
       "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2578,10 +1418,6 @@
       "gate": "projects.close",
       "id": "01a20223-29bf-734c-9b5f-2543c7f2abed",
       "kind": "action",
-      "meta": {
-        "description": "Close T2 after the tranche-2 rework (#526)",
-        "target": "project/01a1d039-0d33-7282-b7b0-6dde32c38ab1/close"
-      },
       "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2597,10 +1433,6 @@
       "gate": "projects.close",
       "id": "01a20230-46b3-7161-8b4d-0dfa7244375e",
       "kind": "action",
-      "meta": {
-        "description": "Close T1 after the tranche-1 rework (#526)",
-        "target": "project/01a1d039-0d32-7c81-8365-371217d16ef7/close"
-      },
       "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2616,16 +1448,6 @@
       "gate": "closure",
       "id": "01a20231-0d43-74ad-80ca-42088a1be984",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a20231-0913-70c8-b29f-ce8866e82885",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close T1 after the tranche-1 rework (#526)",
-        "evidence": {
-          "manifest": "acceptance/programme/T1.toml",
-          "p0_test": "92e6b223",
-          "record": "#526"
-        }
-      },
       "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2641,16 +1463,6 @@
       "gate": "closure",
       "id": "01a20231-bd2b-744e-b9f0-0daf9b21e25a",
       "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a20231-b8f0-70f4-b659-3286935939a9",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close T11 after the tranche-1 rework (#526)",
-        "evidence": {
-          "manifest": "acceptance/programme/T11.toml",
-          "p0_test": "8f1e5770",
-          "record": "#526"
-        }
-      },
       "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2666,10 +1478,6 @@
       "gate": "projects.close",
       "id": "01a20232-12d8-70ff-afc9-320a80c262d6",
       "kind": "action",
-      "meta": {
-        "description": "Close T11 after the tranche-1 rework (#526)",
-        "target": "project/01a1d039-0d36-782b-8b18-ff07a64dedbe/close"
-      },
       "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2680,41 +1488,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-22T07:53:35.984637+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a2023f-11ac-7fe6-bf6f-101ced8f4ba2",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T9.toml",
-          "record": "#526",
-          "subject": "the re-issued T9 Statement of Architecture Work"
-        },
-        "subject_id": "01a2023e-4e59-75ad-b2ab-fd7d014511d2",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-22T07:53:35.984637+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-22T08:17:59.090556+00:00",
       "expires_at": null,
       "gate": "charter",
       "id": "01a20255-6578-7a4d-b99b-81d6d03d8880",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a20255-63a6-71b3-9d8d-e7a13fcc3331",
-        "description": "Approve the charter for S04"
-      },
       "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2730,10 +1508,6 @@
       "gate": "baseline",
       "id": "01a20256-466e-7670-9a2b-5fad19bc3e08",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a20256-44d0-731d-b345-fffc5f3ac9e8",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2744,40 +1518,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-22T08:19:12.390358+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a20256-80ac-72f0-a310-d114488f1d7c",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/S04.toml",
-          "record": "#526"
-        },
-        "subject_id": "01a20256-6ede-7d70-aae8-5dbfe681a1b7",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-22T08:19:12.390358+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-22T08:47:51.804813+00:00",
       "expires_at": null,
       "gate": "charter",
       "id": "01a20270-c046-7214-8aca-d2c89b386bd0",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a20270-be7c-7f43-9505-4938a498126a",
-        "description": "Approve the charter for T13"
-      },
       "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2788,65 +1533,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-22T08:50:39.479287+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T13.toml",
-          "sha": "582e2dc67e5882eb63f40de67c129f8c2863c376"
-        },
-        "subject_id": "01a20271-2a37-7329-b159-28031ddcb966",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-22T08:50:39.479287+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-22T08:55:01.14104+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a20277-4be1-78c6-8516-728eb4d6068b",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T13.toml",
-          "sha": "582e2dc67e5882eb63f40de67c129f8c2863c376"
-        },
-        "subject_id": "01a20277-2d08-7c91-bce6-1a8326add30c",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-22T08:55:01.14104+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-22T08:55:18.027529+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a20277-92f1-7e49-9675-5bb2717081e8",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a20277-9131-7ee2-acad-7e40ffa8f947",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2862,10 +1553,6 @@
       "gate": "baseline",
       "id": "01a20279-8672-70c6-86b4-975cad387b8c",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a20279-854d-79f6-a751-a34d51be7589",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2881,10 +1568,6 @@
       "gate": "charter",
       "id": "01a2027e-53b5-76c1-8782-ea026cf4b0ee",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a2027e-517c-737f-9526-08d51122dc6c",
-        "description": "Approve the charter for T9"
-      },
       "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2895,40 +1578,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-22T09:04:47.771355+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a20280-3d7c-72fd-bb24-5fe966d512e2",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T9.toml",
-          "sha": "0a1cc4a0825026c1be31fcc202fb33667fc0109d"
-        },
-        "subject_id": "01a20280-25ea-759d-8f96-51980017b97e",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-22T09:04:47.771355+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-22T09:05:00.383623+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a20280-7305-7fe4-b40c-998a13c392fc",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a20280-71de-7b06-9086-ae0158bfd36f",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2944,10 +1598,6 @@
       "gate": "charter",
       "id": "01a20287-143c-70bb-96f6-108c33dd29bc",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a20287-1272-7a84-bab0-38826b02bcc8",
-        "description": "Approve the charter for T10"
-      },
       "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -2958,65 +1608,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-22T09:12:43.866105+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T10.toml",
-          "sha": "d8034b949bc2d27f60d83ff5a7a15b81ae246def"
-        },
-        "subject_id": "01a20287-696c-76a4-a2db-28c6092b5813",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-22T09:12:43.866105+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-22T09:14:39.414955+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a20289-44a3-7f2b-b741-b502fe86eef3",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T10.toml",
-          "sha": "d8034b949bc2d27f60d83ff5a7a15b81ae246def"
-        },
-        "subject_id": "01a20289-2b08-7ea3-96f6-b2ac928a7be4",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-22T09:14:39.414955+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-22T09:14:52.60631+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a20289-7d0e-7f76-87e9-f4ffd042a582",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a20289-7be3-7e47-afe0-f6b1f82f1892",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -3032,10 +1628,6 @@
       "gate": "charter",
       "id": "01a2028b-88c8-73af-a738-ede088c07761",
       "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a2028b-86d7-77c8-b0bf-525d70aa3834",
-        "description": "Approve the charter for T4"
-      },
       "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -3046,65 +1638,11 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-22T09:17:35.887621+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T4.toml",
-          "sha": "fc4ed551b7ad1a1c062781d6b820d0d700633c86"
-        },
-        "subject_id": "01a2028b-dde6-7ed4-9e47-6e582f2341d8",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-22T09:17:35.887621+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-22T09:19:27.962103+00:00",
-      "expires_at": null,
-      "gate": "architecture_board",
-      "id": "01a2028d-abf9-78fb-a9c6-eb06c4bdd634",
-      "kind": "architecture_board",
-      "meta": {
-        "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
-        "evidence": {
-          "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-          "manifest": "acceptance/programme/T4.toml",
-          "sha": "fc4ed551b7ad1a1c062781d6b820d0d700633c86"
-        },
-        "subject_id": "01a2028d-942b-759a-ad59-ab9c38629977",
-        "subject_kind": "contract"
-      },
-      "project_id": null,
-      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-22T09:19:27.962103+00:00",
-      "version": 1
-    },
-    {
-      "card_id": null,
       "created_at": "2026-11-22T09:19:40.844998+00:00",
       "expires_at": null,
       "gate": "baseline",
       "id": "01a2028d-e2ad-71fb-b3a9-656be39ce8ba",
       "kind": "pm",
-      "meta": {
-        "baseline_id": "01a2028d-e17b-793d-9ea2-fe4f7f8e2b72",
-        "description": "Approve the scope baseline"
-      },
       "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -3120,16 +1658,6 @@
       "gate": "change",
       "id": "01a202c2-eae1-76ac-8d64-6a548051cc27",
       "kind": "pm",
-      "meta": {
-        "change_id": "01a202c2-e964-7130-8d6e-cb922e2667cb",
-        "description": "Approve change 01a202c2-e964-7130-8d6e-cb922e2667cb",
-        "evidence": [
-          {
-            "id": "01a20279-854d-79f6-a751-a34d51be7589",
-            "kind": "baseline"
-          }
-        ]
-      },
       "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
@@ -3140,633 +1668,62 @@
     },
     {
       "card_id": null,
-      "created_at": "2026-11-23T08:54:38.998791+00:00",
+      "created_at": "2026-11-24T07:48:27.429958+00:00",
       "expires_at": null,
-      "gate": "change",
-      "id": "01a2079d-4c9f-7c11-86b4-ba0b23c45aa3",
-      "kind": "pm",
-      "meta": {
-        "change_id": "01a2079d-4c9d-7497-ab48-e811bbeaee61",
-        "description": "Approve change 01a2079d-4c9d-7497-ab48-e811bbeaee61",
-        "evidence": [
-          {
-            "id": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
-            "kind": "baseline"
-          }
-        ]
-      },
-      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
+      "gate": "t19_live_gate_web",
+      "id": "01a20c87-0fd0-7a68-be24-c1e0f5be9f77",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
       "required_decisions": 1,
       "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:39.229888+00:00",
+      "status": "rejected",
+      "updated_at": "2026-11-24T08:22:27.516211+00:00",
       "version": 2
     },
     {
       "card_id": null,
-      "created_at": "2026-11-23T08:54:40.046276+00:00",
+      "created_at": "2026-11-24T07:50:58.376814+00:00",
       "expires_at": null,
-      "gate": "change",
-      "id": "01a2079d-50b7-7cb6-b436-a9195cb23b67",
-      "kind": "pm",
-      "meta": {
-        "change_id": "01a2079d-50b5-73be-9684-a732c6d12133",
-        "description": "Approve change 01a2079d-50b5-73be-9684-a732c6d12133",
-        "evidence": [
-          {
-            "id": "01a20279-854d-79f6-a751-a34d51be7589",
-            "kind": "baseline"
-          }
-        ]
-      },
-      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:40.279002+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:41.040489+00:00",
-      "expires_at": null,
-      "gate": "change",
-      "id": "01a2079d-5499-7672-b84c-84780d501814",
-      "kind": "pm",
-      "meta": {
-        "change_id": "01a2079d-5496-7b1f-b0ca-d436d3cd5e6f",
-        "description": "Approve change 01a2079d-5496-7b1f-b0ca-d436d3cd5e6f",
-        "evidence": [
-          {
-            "id": "01a1ff3e-51c4-75b1-9db1-a2f729dd10b8",
-            "kind": "baseline"
-          }
-        ]
-      },
-      "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:41.272275+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:41.74148+00:00",
-      "expires_at": null,
-      "gate": "change",
-      "id": "01a2079d-5756-77e4-8647-75713550b8c7",
-      "kind": "pm",
-      "meta": {
-        "change_id": "01a2079d-5753-7be2-a544-1db1cd685ba8",
-        "description": "Approve change 01a2079d-5753-7be2-a544-1db1cd685ba8",
-        "evidence": [
-          {
-            "id": "01a1ff47-5043-73f7-b18d-2fc03832c96a",
-            "kind": "baseline"
-          }
-        ]
-      },
-      "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:41.971711+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:42.441087+00:00",
-      "expires_at": null,
-      "gate": "change",
-      "id": "01a2079d-5a11-794f-a55e-93fbed0bac8c",
-      "kind": "pm",
-      "meta": {
-        "change_id": "01a2079d-5a0e-7d59-94f0-00ea96cb650d",
-        "description": "Approve change 01a2079d-5a0e-7d59-94f0-00ea96cb650d",
-        "evidence": [
-          {
-            "id": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
-            "kind": "baseline"
-          }
-        ]
-      },
-      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:42.672836+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:44.037285+00:00",
-      "expires_at": null,
-      "gate": "change",
-      "id": "01a2079d-604d-7bc4-b7fd-7e181ddc3eac",
-      "kind": "pm",
-      "meta": {
-        "change_id": "01a2079d-604b-75e4-8089-f2af8b1111c2",
-        "description": "Approve change 01a2079d-604b-75e4-8089-f2af8b1111c2",
-        "evidence": [
-          {
-            "id": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
-            "kind": "baseline"
-          }
-        ]
-      },
-      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:44.265257+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:44.388884+00:00",
-      "expires_at": null,
-      "gate": "change",
-      "id": "01a2079d-61ad-734b-b8c1-112b3be73d38",
-      "kind": "pm",
-      "meta": {
-        "change_id": "01a2079d-61aa-7ff4-8ab4-691ee7e56f28",
-        "description": "Approve change 01a2079d-61aa-7ff4-8ab4-691ee7e56f28",
-        "evidence": [
-          {
-            "id": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
-            "kind": "baseline"
-          }
-        ]
-      },
-      "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:44.619963+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:44.744264+00:00",
-      "expires_at": null,
-      "gate": "charter",
-      "id": "01a2079d-6315-7063-9ee1-819e7eea3001",
-      "kind": "pm",
-      "meta": {
-        "charter_asset_id": "01a2079d-630f-7385-84f2-bae7d47b41a4",
-        "description": "Approve the charter for T3"
-      },
-      "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:44.86696+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:45.020869+00:00",
-      "expires_at": null,
-      "gate": "baseline",
-      "id": "01a2079d-642c-7afb-935e-5a46d89e6c33",
-      "kind": "pm",
-      "meta": {
-        "baseline_id": "01a2079d-642b-70f5-8d01-61dd5f4e90d5",
-        "description": "Approve the scope baseline"
-      },
-      "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:45.25673+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:45.385578+00:00",
-      "expires_at": null,
-      "gate": "change",
-      "id": "01a2079d-6593-7583-8190-41430f3ff921",
-      "kind": "pm",
-      "meta": {
-        "change_id": "01a2079d-6590-79ac-9515-8502677f35fd",
-        "description": "Approve change 01a2079d-6590-79ac-9515-8502677f35fd",
-        "evidence": [
-          {
-            "id": "01a2079d-642b-70f5-8d01-61dd5f4e90d5",
-            "kind": "baseline"
-          }
-        ]
-      },
-      "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:45.622985+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:46.616577+00:00",
-      "expires_at": null,
-      "gate": "change",
-      "id": "01a2079d-6a61-7685-9058-766a73fda912",
-      "kind": "pm",
-      "meta": {
-        "change_id": "01a2079d-6a5e-7bec-9ae2-2296c319df3f",
-        "description": "Approve change 01a2079d-6a5e-7bec-9ae2-2296c319df3f",
-        "evidence": [
-          {
-            "id": "01a20256-44d0-731d-b345-fffc5f3ac9e8",
-            "kind": "baseline"
-          }
-        ]
-      },
-      "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:46.84821+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:47.322941+00:00",
-      "expires_at": null,
-      "gate": "closure",
-      "id": "01a2079d-6d28-7dc1-959f-c7f2b906e2b3",
-      "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a2079d-6d24-7869-9280-66742cfa727a",
-        "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
-        "description": "Rework complete through tr3; closure decided on the manifest with the open items named.",
-        "evidence": {
-          "checks": {
-            "failed": [
-              "T13-closure-gate (this request)",
-              "gate (aggregate)"
-            ],
-            "passed": 14
-          },
-          "closure_review_document": "01a2051f-afd8-7749-9087-e99d1116edeb",
-          "manifest": "acceptance/programme/T13.toml",
-          "open_findings": [
-            "v1-w4a-6 (T15)",
-            "v1-p119-1 kata half (T5)",
-            "v1-u5a-tool-idempotency-publish-1 (P2)",
-            "v1-p118-2 (P2)"
-          ],
-          "review": "01a2027a-6502-72a6-9ef8-4c1582dbdf36",
-          "snapshot_manifest": "bb38b11e9bcc3d0fef9c8b3c389350ba1ef1e21a8786ede5ea15d0b4b38d483e"
-        }
-      },
-      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "gate": "t19_live_gate_web_v2",
+      "id": "01a20c89-5d47-754f-a183-b5074804c7d3",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
       "run_id": null,
       "status": "approved",
-      "updated_at": "2026-11-23T08:54:47.504257+00:00",
+      "updated_at": "2026-11-24T07:55:12.305673+00:00",
       "version": 2
     },
     {
       "card_id": null,
-      "created_at": "2026-11-23T08:54:47.636681+00:00",
+      "created_at": "2026-11-24T07:51:22.746435+00:00",
       "expires_at": null,
-      "gate": "projects.close",
-      "id": "01a2079d-6e59-7d2a-bb83-4e872c53ca81",
-      "kind": "action",
-      "meta": {
-        "description": "Close T13 after the retrospective rework",
-        "evidence": [
-          {
-            "id": "01a2079d-6d24-7869-9280-66742cfa727a",
-            "kind": "governed_asset"
-          }
-        ],
-        "proposed_input": {
-          "id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
-          "reason": "the retrospective rework of T13"
-        },
-        "target": "project/01a1d039-0d37-730f-8f8a-2f50e5a0933d/close"
-      },
-      "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+      "gate": "t19_live_gate_mcp",
+      "id": "01a20c89-bc7e-791c-b9cf-381d0b352562",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
       "run_id": null,
       "status": "approved",
-      "updated_at": "2026-11-23T08:54:47.752488+00:00",
+      "updated_at": "2026-11-24T08:19:08.868783+00:00",
       "version": 2
     },
     {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:47.878292+00:00",
+      "card_id": "01a20c8a-3370-7a8f-b903-faf5f7cff917",
+      "created_at": "2026-11-24T07:53:56.197132+00:00",
       "expires_at": null,
-      "gate": "change",
-      "id": "01a2079d-6f51-7423-b210-cc0e01bed255",
-      "kind": "pm",
-      "meta": {
-        "change_id": "01a2079d-6f4e-73e7-bf30-f1e81a999c9e",
-        "description": "Approve change 01a2079d-6f4e-73e7-bf30-f1e81a999c9e",
-        "evidence": [
-          {
-            "id": "01a20289-7be3-7e47-afe0-f6b1f82f1892",
-            "kind": "baseline"
-          }
-        ]
-      },
-      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "gate": "meeting_minutes",
+      "id": "01a20c8c-1428-79d4-a64e-fdeaa033a182",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
       "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "required_decisions": 1,
       "run_id": null,
       "status": "approved",
-      "updated_at": "2026-11-23T08:54:48.106939+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:48.231265+00:00",
-      "expires_at": null,
-      "gate": "closure",
-      "id": "01a2079d-70b3-7a52-ac9c-37e154baa3a5",
-      "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a2079d-70af-792b-8cc2-d868c5152e61",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close T10",
-        "evidence": {
-          "manifest": "acceptance/programme/T10.toml",
-          "retrospective": true
-        }
-      },
-      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
-      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:48.408141+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:48.539316+00:00",
-      "expires_at": null,
-      "gate": "projects.close",
-      "id": "01a2079d-71e0-7706-b483-099a81ae6008",
-      "kind": "action",
-      "meta": {
-        "description": "Close T10 after the retrospective rework",
-        "evidence": [
-          {
-            "id": "01a2079d-70af-792b-8cc2-d868c5152e61",
-            "kind": "governed_asset"
-          }
-        ],
-        "proposed_input": {
-          "id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
-          "reason": "the retrospective rework of T10"
-        },
-        "target": "project/01a1d039-0d36-70c1-a5e8-f50956c5e3f9/close"
-      },
-      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
-      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:48.657652+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:48.78902+00:00",
-      "expires_at": null,
-      "gate": "change",
-      "id": "01a2079d-72de-738c-a343-626b9cd18b8b",
-      "kind": "pm",
-      "meta": {
-        "change_id": "01a2079d-72db-7490-bac8-6734b9761496",
-        "description": "Approve change 01a2079d-72db-7490-bac8-6734b9761496",
-        "evidence": [
-          {
-            "id": "01a20280-71de-7b06-9086-ae0158bfd36f",
-            "kind": "baseline"
-          }
-        ]
-      },
-      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
-      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:49.020041+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:49.150185+00:00",
-      "expires_at": null,
-      "gate": "closure",
-      "id": "01a2079d-7449-782c-83dc-c527eaff4fa6",
-      "kind": "pm",
-      "meta": {
-        "closure_asset_id": "01a2079d-7445-7aa1-9b54-28081cd55121",
-        "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
-        "description": "Close T9",
-        "evidence": {
-          "manifest": "acceptance/programme/T9.toml",
-          "retrospective": true
-        }
-      },
-      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
-      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:49.338181+00:00",
-      "version": 2
-    },
-    {
-      "card_id": null,
-      "created_at": "2026-11-23T08:54:49.469325+00:00",
-      "expires_at": null,
-      "gate": "projects.close",
-      "id": "01a2079d-7582-75a6-a036-52d95342b1a4",
-      "kind": "action",
-      "meta": {
-        "description": "Close T9 after the retrospective rework",
-        "evidence": [
-          {
-            "id": "01a2079d-7445-7aa1-9b54-28081cd55121",
-            "kind": "governed_asset"
-          }
-        ],
-        "proposed_input": {
-          "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
-          "reason": "the retrospective rework of T9"
-        },
-        "target": "project/01a1d039-0d35-7bd1-945d-cea12c5dfd6d/close"
-      },
-      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
-      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:54:49.588509+00:00",
-      "version": 2
-    },
-    {
-      "card_id": "01a1ffea-6016-74b3-a32c-31e0e598c037",
-      "created_at": "2026-11-23T08:57:36.230273+00:00",
-      "expires_at": null,
-      "gate": "card_done",
-      "id": "01a207a0-00ea-77e5-833c-b971dd4392e5",
-      "kind": "card_dod",
-      "meta": {
-        "evidence_waiver": "the rework package pi_plan_missing:tranche-2 is a materialised view of its finding; the finding is resolved in docs/evidence/v1-conformance-findings.json and that resolution is the card's Definition of Done"
-      },
-      "project_id": null,
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:57:36.343792+00:00",
-      "version": 2
-    },
-    {
-      "card_id": "01a1ffea-79b1-79e3-bfef-b22726135492",
-      "created_at": "2026-11-23T08:57:36.654954+00:00",
-      "expires_at": null,
-      "gate": "card_done",
-      "id": "01a207a0-0292-7fbd-bb7c-329bacc072ab",
-      "kind": "card_dod",
-      "meta": {
-        "evidence_waiver": "the rework package v1-p82-1:T10 is a materialised view of its finding; the finding is resolved in docs/evidence/v1-conformance-findings.json and that resolution is the card's Definition of Done"
-      },
-      "project_id": null,
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:57:36.767399+00:00",
-      "version": 2
-    },
-    {
-      "card_id": "01a1ffea-48b5-7eb2-ab4f-eb59d2670fac",
-      "created_at": "2026-11-23T08:57:37.077236+00:00",
-      "expires_at": null,
-      "gate": "card_done",
-      "id": "01a207a0-0439-7354-ae1b-10f6f47c9e79",
-      "kind": "card_dod",
-      "meta": {
-        "evidence_waiver": "the rework package v1-w2b-2:T10 is a materialised view of its finding; the finding is resolved in docs/evidence/v1-conformance-findings.json and that resolution is the card's Definition of Done"
-      },
-      "project_id": null,
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:57:37.192452+00:00",
-      "version": 2
-    },
-    {
-      "card_id": "01a1ffeb-311e-708e-a994-83eb40fd3a69",
-      "created_at": "2026-11-23T08:57:37.505625+00:00",
-      "expires_at": null,
-      "gate": "card_done",
-      "id": "01a207a0-05e5-726a-a6f2-7870f0bfcd3d",
-      "kind": "card_dod",
-      "meta": {
-        "evidence_waiver": "the rework package v1-w4a-1:T13 is a materialised view of its finding; the finding is resolved in docs/evidence/v1-conformance-findings.json and that resolution is the card's Definition of Done"
-      },
-      "project_id": null,
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:57:37.617555+00:00",
-      "version": 2
-    },
-    {
-      "card_id": "01a1ffeb-3da6-7093-a936-be6c79576976",
-      "created_at": "2026-11-23T08:57:37.926192+00:00",
-      "expires_at": null,
-      "gate": "card_done",
-      "id": "01a207a0-078a-73ad-adc8-098a632f2e4e",
-      "kind": "card_dod",
-      "meta": {
-        "evidence_waiver": "the rework package v1-w4a-2:T13 is a materialised view of its finding; the finding is resolved in docs/evidence/v1-conformance-findings.json and that resolution is the card's Definition of Done"
-      },
-      "project_id": null,
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:57:38.040498+00:00",
-      "version": 2
-    },
-    {
-      "card_id": "01a1ffeb-4900-7007-b262-2e7959803552",
-      "created_at": "2026-11-23T08:57:38.346556+00:00",
-      "expires_at": null,
-      "gate": "card_done",
-      "id": "01a207a0-092e-74ce-ad33-fbf81078d7e1",
-      "kind": "card_dod",
-      "meta": {
-        "evidence_waiver": "the rework package v1-p81-1:T9 is a materialised view of its finding; the finding is resolved in docs/evidence/v1-conformance-findings.json and that resolution is the card's Definition of Done"
-      },
-      "project_id": null,
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:57:38.457198+00:00",
-      "version": 2
-    },
-    {
-      "card_id": "01a1ffeb-5445-733d-af3b-a320b82fe4d6",
-      "created_at": "2026-11-23T08:57:38.764444+00:00",
-      "expires_at": null,
-      "gate": "card_done",
-      "id": "01a207a0-0ad0-730d-9594-9ce1f05792ad",
-      "kind": "card_dod",
-      "meta": {
-        "evidence_waiver": "the rework package v1-p81-2:T9 is a materialised view of its finding; the finding is resolved in docs/evidence/v1-conformance-findings.json and that resolution is the card's Definition of Done"
-      },
-      "project_id": null,
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:57:38.879051+00:00",
-      "version": 2
-    },
-    {
-      "card_id": "01a1ffeb-5fd8-7f91-adfd-fbe5716a699c",
-      "created_at": "2026-11-23T08:57:39.187669+00:00",
-      "expires_at": null,
-      "gate": "card_done",
-      "id": "01a207a0-0c77-790c-bb68-93f7aedff6b0",
-      "kind": "card_dod",
-      "meta": {
-        "evidence_waiver": "the rework package v1-p81-3:T9 is a materialised view of its finding; the finding is resolved in docs/evidence/v1-conformance-findings.json and that resolution is the card's Definition of Done"
-      },
-      "project_id": null,
-      "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
-      "required_decisions": 1,
-      "run_id": null,
-      "status": "approved",
-      "updated_at": "2026-11-23T08:57:39.302021+00:00",
+      "updated_at": "2026-11-24T08:09:21.819118+00:00",
       "version": 2
     }
   ],
@@ -4154,6 +2111,38 @@
       "position": 0,
       "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
       "version": 1
+    },
+    {
+      "created_at": "2026-11-19T07:36:44.012+00:00",
+      "id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "name": "Board",
+      "position": 0,
+      "project_id": "01a1f2bc-86f7-7904-ac48-b45cad0d1393",
+      "version": 1
+    },
+    {
+      "created_at": "2026-11-19T07:40:36.265466+00:00",
+      "id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "name": "Board",
+      "position": 0,
+      "project_id": "01a1f2c0-1239-7b59-a0bd-e0609219fa8b",
+      "version": 1
+    },
+    {
+      "created_at": "2026-11-24T07:41:22.15583+00:00",
+      "id": "01a20c80-b7cc-7d05-bc66-6ed9d667e927",
+      "name": "Board",
+      "position": 0,
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "version": 1
+    },
+    {
+      "created_at": "2026-11-24T07:41:22.15583+00:00",
+      "id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "name": "Board",
+      "position": 0,
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "version": 1
     }
   ],
   "card_types": [
@@ -4400,6 +2389,31 @@
       "id": "01a1d039-0ce0-7e6f-b3b0-b953708f906b",
       "is_active": true,
       "label": "Bdd test improvement",
+      "version": 1
+    },
+    {
+      "code": "benchmark",
+      "definition": {
+        "acceptance": [
+          "READY: instance_id_and_base_commit_pinned",
+          "DOING: patch_is_one_unified_diff_against_the_base_commit",
+          "DONE: patch_collected"
+        ],
+        "human_task": false,
+        "inputs": [
+          "instance_id",
+          "base_commit"
+        ],
+        "outputs": [
+          "patch"
+        ],
+        "rules": [
+          "repo_write"
+        ]
+      },
+      "id": "01a20c80-7f9f-74ad-8ebe-4579e9940ebe",
+      "is_active": true,
+      "label": "Benchmark",
       "version": 1
     },
     {
@@ -5294,6 +3308,53 @@
       "version": 1
     },
     {
+      "code": "meeting",
+      "definition": {
+        "acceptance": [
+          "READY: agenda_has_evidence",
+          "DOING: positions_recorded_per_seat",
+          "QA: every_agenda_item_closed_with_an_outcome",
+          "DONE: minutes_published"
+        ],
+        "definition_of_done": "agenda_closed_and_minutes_published",
+        "human_task": true,
+        "inputs": [],
+        "outputs": [
+          "meeting_id",
+          "minutes_asset_id"
+        ],
+        "rules": []
+      },
+      "id": "01a20c80-868d-72b8-8112-fca9e0d91b72",
+      "is_active": true,
+      "label": "Meeting",
+      "version": 1
+    },
+    {
+      "code": "meeting_action",
+      "definition": {
+        "acceptance": [
+          "READY: owner_and_due_named",
+          "QA: closed_with_evidence",
+          "DONE: card_closed"
+        ],
+        "definition_of_done": "card_closed",
+        "human_task": true,
+        "inputs": [
+          "meeting_id",
+          "agenda_item_id"
+        ],
+        "outputs": [
+          "card_id"
+        ],
+        "rules": []
+      },
+      "id": "01a20c80-86a6-745e-a606-6b69b96dc79c",
+      "is_active": true,
+      "label": "Meeting action",
+      "version": 1
+    },
+    {
       "code": "narrative_design",
       "definition": {
         "acceptance": [
@@ -5995,6 +4056,31 @@
       "version": 1
     },
     {
+      "code": "test_process_evaluation",
+      "definition": {
+        "acceptance": [
+          "READY: outline_within_card_scope",
+          "DOING: every_claim_cites_a_source",
+          "DOING: every_cited_source_exists",
+          "QA: no_unsupported_claims",
+          "QA: capability_acceptance_met",
+          "DONE: artifact_is_qa_version"
+        ],
+        "human_task": false,
+        "inputs": [],
+        "outputs": [
+          "draft_artifact_id",
+          "reviewed_artifact_id",
+          "published_artifact_id"
+        ],
+        "rules": []
+      },
+      "id": "01a1d039-0cec-7576-b1d6-2e2717b547a0",
+      "is_active": true,
+      "label": "Test process evaluation",
+      "version": 1
+    },
+    {
       "code": "testing_evaluation",
       "definition": {
         "acceptance": [
@@ -6094,31 +4180,6 @@
       "id": "01a1d039-0ced-7047-82e8-46d4f80e6a62",
       "is_active": true,
       "label": "Testing strategy",
-      "version": 1
-    },
-    {
-      "code": "test_process_evaluation",
-      "definition": {
-        "acceptance": [
-          "READY: outline_within_card_scope",
-          "DOING: every_claim_cites_a_source",
-          "DOING: every_cited_source_exists",
-          "QA: no_unsupported_claims",
-          "QA: capability_acceptance_met",
-          "DONE: artifact_is_qa_version"
-        ],
-        "human_task": false,
-        "inputs": [],
-        "outputs": [
-          "draft_artifact_id",
-          "reviewed_artifact_id",
-          "published_artifact_id"
-        ],
-        "rules": []
-      },
-      "id": "01a1d039-0cec-7576-b1d6-2e2717b547a0",
-      "is_active": true,
-      "label": "Test process evaluation",
       "version": 1
     },
     {
@@ -7928,6 +5989,81 @@
       "archived_at": null,
       "assignee_id": null,
       "assignee_name": null,
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "card_type_id": "01a1d039-0ce8-7d5c-83dc-f2034fbfd24c",
+      "created_at": "2026-11-19T07:36:44.012+00:00",
+      "created_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "due_at": null,
+      "id": "01a1f2bc-8723-751a-af62-a8c8f05e1e51",
+      "issue": null,
+      "list_changed_at": "2026-11-19T07:36:44.012+00:00",
+      "list_id": "01a1f2bc-8703-7235-80d1-4a02d820a14f",
+      "name": "Project start request analysis",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
+      "unit_key": null,
+      "updated_at": "2026-11-19T07:36:44.012+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": "2026-11-19T07:41:22.881078+00:00",
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "card_type_id": "01a1d039-0ce8-7d5c-83dc-f2034fbfd24c",
+      "created_at": "2026-11-19T07:40:36.265466+00:00",
+      "created_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "due_at": null,
+      "id": "01a1f2c0-128d-78ec-8ed2-122c54c70284",
+      "issue": null,
+      "list_changed_at": "2026-11-19T07:41:22.881078+00:00",
+      "list_id": "01a1f2c0-125e-7507-9b9b-03a147fc78d4",
+      "name": "Project start request analysis",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 1024,
+      "process_key": null,
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
+      "unit_key": null,
+      "updated_at": "2026-11-19T07:41:22.536194+00:00",
+      "version": 2
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "card_type_id": "01a1f2a5-894f-7b79-9d59-aa940e6d50d4",
+      "created_at": "2026-11-19T08:00:59.913448+00:00",
+      "created_by": null,
+      "due_at": null,
+      "id": "01a1f2d2-c174-7b94-9e80-cd31c35f9c8e",
+      "issue": null,
+      "list_changed_at": "2026-11-19T08:00:59.913448+00:00",
+      "list_id": "01a1f2bc-8703-7235-80d1-4a02d820a14f",
+      "name": "Coach: Project start request analysis",
+      "parent_card_id": null,
+      "plan": null,
+      "position": 2048,
+      "process_key": null,
+      "rework_key": null,
+      "rule": null,
+      "severity": null,
+      "unit_key": null,
+      "updated_at": "2026-11-19T08:00:59.913448+00:00",
+      "version": 1
+    },
+    {
+      "archived_at": null,
+      "assignee_id": null,
+      "assignee_name": null,
       "board_id": "01a1d3e7-9cc7-76aa-9e23-898fab034b6f",
       "card_type_id": "01a1f7fc-5827-74b8-920b-7af40ffeef4b",
       "created_at": "2026-11-20T08:04:51.913389+00:00",
@@ -8285,19 +6421,19 @@
       "due_at": null,
       "id": "01a1ffea-48b5-7eb2-ab4f-eb59d2670fac",
       "issue": null,
-      "list_changed_at": "2026-11-23T08:57:37.379165+00:00",
-      "list_id": "01a1d3e7-bd2f-7998-bf7b-8b4039393db9",
+      "list_changed_at": "2026-11-21T21:01:46.122724+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
       "name": "Project start passes when the programme has no tranche row [T10]",
       "parent_card_id": null,
       "plan": null,
-      "position": 3072,
+      "position": 9216,
       "process_key": null,
       "rework_key": "v1-w2b-2:T10",
       "rule": "v1-w2b-2",
       "severity": "P0",
       "unit_key": null,
-      "updated_at": "2026-11-23T08:57:37.379165+00:00",
-      "version": 3
+      "updated_at": "2026-11-21T21:01:46.122724+00:00",
+      "version": 1
     },
     {
       "archived_at": null,
@@ -8335,19 +6471,19 @@
       "due_at": null,
       "id": "01a1ffea-6016-74b3-a32c-31e0e598c037",
       "issue": null,
-      "list_changed_at": "2026-11-23T08:57:36.528821+00:00",
-      "list_id": "01a1d3e7-bd2f-7998-bf7b-8b4039393db9",
+      "list_changed_at": "2026-11-21T21:01:52.113011+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
       "name": "Publish the tranche's PI plan before its cards materialise [tranche-2]",
       "parent_card_id": null,
       "plan": null,
-      "position": 1024,
+      "position": 11264,
       "process_key": null,
       "rework_key": "pi_plan_missing:tranche-2",
       "rule": "pi_plan_missing",
       "severity": "P0",
       "unit_key": null,
-      "updated_at": "2026-11-23T08:57:36.528821+00:00",
-      "version": 3
+      "updated_at": "2026-11-21T21:01:52.113011+00:00",
+      "version": 1
     },
     {
       "archived_at": null,
@@ -8385,19 +6521,19 @@
       "due_at": null,
       "id": "01a1ffea-79b1-79e3-bfef-b22726135492",
       "issue": null,
-      "list_changed_at": "2026-11-23T08:57:36.951052+00:00",
-      "list_id": "01a1d3e7-bd2f-7998-bf7b-8b4039393db9",
+      "list_changed_at": "2026-11-21T21:01:58.662998+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
       "name": "PI plan auto-materialises with no human approval [T10]",
       "parent_card_id": null,
       "plan": null,
-      "position": 2048,
+      "position": 13312,
       "process_key": null,
       "rework_key": "v1-p82-1:T10",
       "rule": "v1-p82-1",
       "severity": "P0",
       "unit_key": null,
-      "updated_at": "2026-11-23T08:57:36.951052+00:00",
-      "version": 3
+      "updated_at": "2026-11-21T21:01:58.662998+00:00",
+      "version": 1
     },
     {
       "archived_at": null,
@@ -8560,19 +6696,19 @@
       "due_at": null,
       "id": "01a1ffeb-311e-708e-a994-83eb40fd3a69",
       "issue": null,
-      "list_changed_at": "2026-11-23T08:57:37.798631+00:00",
-      "list_id": "01a1d3e7-bd2f-7998-bf7b-8b4039393db9",
+      "list_changed_at": "2026-11-21T21:02:45.624804+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
       "name": "No spend budget gate: 429 tool_budget_exceeded is unimplemented and tool_call.cost is never written [T13]",
       "parent_card_id": null,
       "plan": null,
-      "position": 4096,
+      "position": 17408,
       "process_key": null,
       "rework_key": "v1-w4a-1:T13",
       "rule": "v1-w4a-1",
       "severity": "P0",
       "unit_key": null,
-      "updated_at": "2026-11-23T08:57:37.798631+00:00",
-      "version": 3
+      "updated_at": "2026-11-21T21:02:45.624804+00:00",
+      "version": 1
     },
     {
       "archived_at": null,
@@ -8585,19 +6721,19 @@
       "due_at": null,
       "id": "01a1ffeb-3da6-7093-a936-be6c79576976",
       "issue": null,
-      "list_changed_at": "2026-11-23T08:57:38.220332+00:00",
-      "list_id": "01a1d3e7-bd2f-7998-bf7b-8b4039393db9",
+      "list_changed_at": "2026-11-21T21:02:48.817156+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
       "name": "Write-verify is unenforced: no checks[]/verdict at call time and no publication gate for a write tool without verification [T13]",
       "parent_card_id": null,
       "plan": null,
-      "position": 5120,
+      "position": 18432,
       "process_key": null,
       "rework_key": "v1-w4a-2:T13",
       "rule": "v1-w4a-2",
       "severity": "P0",
       "unit_key": null,
-      "updated_at": "2026-11-23T08:57:38.220332+00:00",
-      "version": 3
+      "updated_at": "2026-11-21T21:02:48.817156+00:00",
+      "version": 1
     },
     {
       "archived_at": null,
@@ -8610,19 +6746,19 @@
       "due_at": null,
       "id": "01a1ffeb-4900-7007-b262-2e7959803552",
       "issue": null,
-      "list_changed_at": "2026-11-23T08:57:38.638068+00:00",
-      "list_id": "01a1d3e7-bd2f-7998-bf7b-8b4039393db9",
+      "list_changed_at": "2026-11-21T21:02:51.664295+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
       "name": "Phase gates are vacuous without a hand-authored profile, and the caller may choose a draft profile [T9]",
       "parent_card_id": null,
       "plan": null,
-      "position": 6144,
+      "position": 19456,
       "process_key": null,
       "rework_key": "v1-p81-1:T9",
       "rule": "v1-p81-1",
       "severity": "P0",
       "unit_key": null,
-      "updated_at": "2026-11-23T08:57:38.638068+00:00",
-      "version": 3
+      "updated_at": "2026-11-21T21:02:51.664295+00:00",
+      "version": 1
     },
     {
       "archived_at": null,
@@ -8635,19 +6771,19 @@
       "due_at": null,
       "id": "01a1ffeb-5445-733d-af3b-a320b82fe4d6",
       "issue": null,
-      "list_changed_at": "2026-11-23T08:57:39.05925+00:00",
-      "list_id": "01a1d3e7-bd2f-7998-bf7b-8b4039393db9",
+      "list_changed_at": "2026-11-21T21:02:54.622543+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
       "name": "Phase G is not a gate: no contract/review required at design or phase advance, and programme-track projects skip it [T9]",
       "parent_card_id": null,
       "plan": null,
-      "position": 7168,
+      "position": 20480,
       "process_key": null,
       "rework_key": "v1-p81-2:T9",
       "rule": "v1-p81-2",
       "severity": "P0",
       "unit_key": null,
-      "updated_at": "2026-11-23T08:57:39.05925+00:00",
-      "version": 3
+      "updated_at": "2026-11-21T21:02:54.622543+00:00",
+      "version": 1
     },
     {
       "archived_at": null,
@@ -8660,19 +6796,19 @@
       "due_at": null,
       "id": "01a1ffeb-5fd8-7f91-adfd-fbe5716a699c",
       "issue": null,
-      "list_changed_at": "2026-11-23T08:57:39.482513+00:00",
-      "list_id": "01a1d3e7-bd2f-7998-bf7b-8b4039393db9",
+      "list_changed_at": "2026-11-21T21:02:57.583231+00:00",
+      "list_id": "01a1ff65-e289-7e73-b94a-f35583589e5b",
       "name": "Board-adopted ADM profile can be rewritten after adoption and adoption cites an unvalidated decision [T9]",
       "parent_card_id": null,
       "plan": null,
-      "position": 8192,
+      "position": 21504,
       "process_key": null,
       "rework_key": "v1-p81-3:T9",
       "rule": "v1-p81-3",
       "severity": "P0",
       "unit_key": null,
-      "updated_at": "2026-11-23T08:57:39.482513+00:00",
-      "version": 3
+      "updated_at": "2026-11-21T21:02:57.583231+00:00",
+      "version": 1
     },
     {
       "archived_at": null,
@@ -8703,26 +6839,26 @@
       "archived_at": null,
       "assignee_id": null,
       "assignee_name": null,
-      "board_id": "01a1e14c-50f2-7773-ab40-4181cddcfb29",
-      "card_type_id": "01a1f2a5-894f-7b79-9d59-aa940e6d50d4",
-      "created_at": "2026-11-23T08:54:57.553876+00:00",
-      "created_by": null,
+      "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "card_type_id": "01a20c80-868d-72b8-8112-fca9e0d91b72",
+      "created_at": "2026-11-24T07:51:52.718141+00:00",
+      "created_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
       "due_at": null,
-      "id": "01a2079d-9516-7600-9549-de76e139d7a4",
+      "id": "01a20c8a-3370-7a8f-b903-faf5f7cff917",
       "issue": null,
-      "list_changed_at": "2026-11-23T08:54:57.553876+00:00",
-      "list_id": "01a1e14c-5215-7a4c-b3b5-945c38a70289",
-      "name": "Retro — tranche-3",
+      "list_changed_at": "2026-11-24T07:51:52.718141+00:00",
+      "list_id": "01a20c80-ba6b-7fc7-81aa-b385ad40273c",
+      "name": "T19 live gate — decision forum",
       "parent_card_id": null,
       "plan": null,
-      "position": 0,
+      "position": 1024,
       "process_key": null,
       "rework_key": null,
       "rule": null,
       "severity": null,
       "unit_key": null,
-      "updated_at": "2026-11-23T08:54:58.333751+00:00",
-      "version": 3
+      "updated_at": "2026-11-24T07:51:52.718141+00:00",
+      "version": 1
     }
   ],
   "comments": [
@@ -12409,6 +10545,26 @@
     {
       "author_id": null,
       "author_name": null,
+      "card_id": "01a1f2bc-8723-751a-af62-a8c8f05e1e51",
+      "created_at": "2026-11-19T08:00:59.484041+00:00",
+      "edited_at": null,
+      "id": "01a1f2d2-bcfc-79cf-8ce7-1230d5b2bcc7",
+      "updated_at": "2026-11-19T08:00:59.484041+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
+      "card_id": "01a1f2c0-128d-78ec-8ed2-122c54c70284",
+      "created_at": "2026-11-19T08:29:47.674883+00:00",
+      "edited_at": null,
+      "id": "01a1f2ed-1c53-79eb-bb52-d33a44b3ef8c",
+      "updated_at": "2026-11-19T08:29:47.674883+00:00",
+      "version": 1
+    },
+    {
+      "author_id": null,
+      "author_name": null,
       "card_id": "01a1ff65-ef71-7ccb-96de-373594bc2670",
       "created_at": "2026-11-21T21:03:00.39406+00:00",
       "edited_at": null,
@@ -12527,7 +10683,7 @@
       "version": 1
     }
   ],
-  "generated_at": "2026-11-23T09:36:22Z",
+  "generated_at": "2026-11-24T16:30:00Z",
   "lists": [
     {
       "board_id": "01a1d3e7-473e-7ccb-88ca-dbbc10d8e5e5",
@@ -15018,9 +13174,215 @@
       "position": 5120,
       "version": 1,
       "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "color": null,
+      "id": "01a1f2bc-8703-7235-80d1-4a02d820a14f",
+      "kind": "intake",
+      "name": "Intake",
+      "position": 1024,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "color": null,
+      "id": "01a1f2bc-8708-726a-9974-87afa1adad20",
+      "kind": "active",
+      "name": "Active",
+      "position": 2048,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "color": null,
+      "id": "01a1f2bc-870c-7ad0-a7d9-065775095f4e",
+      "kind": "waiting",
+      "name": "Waiting",
+      "position": 3072,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "color": null,
+      "id": "01a1f2bc-8710-7ebd-989d-c7536856d8e4",
+      "kind": "done",
+      "name": "Done",
+      "position": 4096,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2bc-86fd-7dd9-980c-007f03d68054",
+      "color": null,
+      "id": "01a1f2bc-8715-78a2-b7a0-81440c77f632",
+      "kind": "archive",
+      "name": "Archive",
+      "position": 5120,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "color": null,
+      "id": "01a1f2c0-1248-7f2d-8518-bab9e22e945f",
+      "kind": "intake",
+      "name": "Intake",
+      "position": 1024,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "color": null,
+      "id": "01a1f2c0-124e-77a5-8163-c33190322a1a",
+      "kind": "active",
+      "name": "Active",
+      "position": 2048,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "color": null,
+      "id": "01a1f2c0-1253-7b96-aa03-c5302a2dbec1",
+      "kind": "waiting",
+      "name": "Waiting",
+      "position": 3072,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "color": null,
+      "id": "01a1f2c0-1258-7af4-915c-c18e35f87bab",
+      "kind": "done",
+      "name": "Done",
+      "position": 4096,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a1f2c0-1242-72c6-8aa5-9a14e2cfc141",
+      "color": null,
+      "id": "01a1f2c0-125e-7507-9b9b-03a147fc78d4",
+      "kind": "archive",
+      "name": "Archive",
+      "position": 5120,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-b7cc-7d05-bc66-6ed9d667e927",
+      "color": null,
+      "id": "01a20c80-b84d-7f0f-9c44-50dee3f09063",
+      "kind": "intake",
+      "name": "Intake",
+      "position": 1024,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-b7cc-7d05-bc66-6ed9d667e927",
+      "color": null,
+      "id": "01a20c80-b89c-75ad-8873-8e9a176bcaeb",
+      "kind": "active",
+      "name": "Active",
+      "position": 2048,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-b7cc-7d05-bc66-6ed9d667e927",
+      "color": null,
+      "id": "01a20c80-b8ea-7834-81ef-b6dd1b4a71f6",
+      "kind": "waiting",
+      "name": "Waiting",
+      "position": 3072,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-b7cc-7d05-bc66-6ed9d667e927",
+      "color": null,
+      "id": "01a20c80-b937-765d-9288-2339a98262a1",
+      "kind": "done",
+      "name": "Done",
+      "position": 4096,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-b7cc-7d05-bc66-6ed9d667e927",
+      "color": null,
+      "id": "01a20c80-b984-7486-868c-47b24d217310",
+      "kind": "archive",
+      "name": "Archive",
+      "position": 5120,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "color": null,
+      "id": "01a20c80-ba6b-7fc7-81aa-b385ad40273c",
+      "kind": "intake",
+      "name": "Intake",
+      "position": 1024,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "color": null,
+      "id": "01a20c80-bab8-74bc-af89-7c6daa99ddad",
+      "kind": "active",
+      "name": "Active",
+      "position": 2048,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "color": null,
+      "id": "01a20c80-bb05-7045-9477-96b9308813b6",
+      "kind": "waiting",
+      "name": "Waiting",
+      "position": 3072,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "color": null,
+      "id": "01a20c80-bb51-739d-bbb9-de60a19d60c4",
+      "kind": "done",
+      "name": "Done",
+      "position": 4096,
+      "version": 1,
+      "wip_limit": null
+    },
+    {
+      "board_id": "01a20c80-ba1e-7dcc-8398-018a70414523",
+      "color": null,
+      "id": "01a20c80-bb9d-7380-b456-62dd2ba219ba",
+      "kind": "archive",
+      "name": "Archive",
+      "position": 5120,
+      "version": 1,
+      "wip_limit": null
     }
   ],
   "people": [
+    {
+      "display_name": "FR Test",
+      "id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "kind": "human",
+      "status": "active"
+    },
     {
       "display_name": "conveyor-approver",
       "id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
@@ -15030,12 +13392,6 @@
     {
       "display_name": "conveyor-e2e",
       "id": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
-      "kind": "human",
-      "status": "active"
-    },
-    {
-      "display_name": "FR Test",
-      "id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
       "kind": "human",
       "status": "active"
     },
@@ -15273,7 +13629,7 @@
       "started_at": "2026-11-13T07:55:11.729458+00:00"
     },
     {
-      "last_activity_at": "2026-11-23T08:57:39.482513+00:00",
+      "last_activity_at": "2026-11-21T21:03:22.583046+00:00",
       "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
       "started_at": "2026-11-13T07:55:11.729458+00:00"
     },
@@ -15283,9 +13639,24 @@
       "started_at": "2026-11-13T07:55:11.729458+00:00"
     },
     {
-      "last_activity_at": "2026-11-23T08:54:57.553876+00:00",
+      "last_activity_at": "2026-11-16T10:36:54.1832+00:00",
       "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
       "started_at": "2026-11-16T02:59:03.927994+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-19T08:15:43.924145+00:00",
+      "project_id": "01a1f2bc-86f7-7904-ac48-b45cad0d1393",
+      "started_at": "2026-11-19T07:36:44.012+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-19T08:29:42.337419+00:00",
+      "project_id": "01a1f2c0-1239-7b59-a0bd-e0609219fa8b",
+      "started_at": "2026-11-19T07:40:36.265466+00:00"
+    },
+    {
+      "last_activity_at": "2026-11-24T07:51:52.718141+00:00",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "started_at": "2026-11-24T07:51:52.718141+00:00"
     }
   ],
   "run_steps": [
@@ -28554,6 +26925,114 @@
       "started_at": "2026-11-16T10:36:52.472548+00:00",
       "status": "succeeded",
       "updated_at": "2026-11-16T10:36:54.1832+00:00"
+    },
+    {
+      "action": "agent.run",
+      "attempt": 1,
+      "created_at": "2026-11-19T07:36:44.012+00:00",
+      "duration_ms": null,
+      "finished_at": "2026-11-19T07:50:56.816487+00:00",
+      "id": "01a1f2bc-874f-7b44-9020-efd48620130f",
+      "input_hash": null,
+      "node_id": null,
+      "output_hash": null,
+      "position": 1,
+      "procedure_version": 1,
+      "process_step_id": "01a1d3e9-ed25-77a8-b38f-d28533d36c88",
+      "run_id": "01a1f2bc-8747-775d-8799-9cf197b0b4b7",
+      "started_at": "2026-11-19T07:47:44.781777+00:00",
+      "status": "failed",
+      "updated_at": "2026-11-19T07:50:56.816487+00:00"
+    },
+    {
+      "action": "cards.move",
+      "attempt": 1,
+      "created_at": "2026-11-19T07:36:44.012+00:00",
+      "duration_ms": null,
+      "finished_at": "2026-11-19T07:50:56.816487+00:00",
+      "id": "01a1f2bc-8751-7651-89ee-d8703867b587",
+      "input_hash": null,
+      "node_id": null,
+      "output_hash": null,
+      "position": 2,
+      "procedure_version": null,
+      "process_step_id": "01a1d3e9-ed42-7b16-b042-08d1898ace0e",
+      "run_id": "01a1f2bc-8747-775d-8799-9cf197b0b4b7",
+      "started_at": null,
+      "status": "skipped",
+      "updated_at": "2026-11-19T07:50:56.816487+00:00"
+    },
+    {
+      "action": "agent.run",
+      "attempt": 1,
+      "created_at": "2026-11-19T07:40:36.265466+00:00",
+      "duration_ms": null,
+      "finished_at": "2026-11-19T08:20:43.797457+00:00",
+      "id": "01a1f2c0-12dd-752d-84f7-59770a732495",
+      "input_hash": null,
+      "node_id": null,
+      "output_hash": null,
+      "position": 1,
+      "procedure_version": 1,
+      "process_step_id": "01a1d3e9-ed25-77a8-b38f-d28533d36c88",
+      "run_id": "01a1f2c0-12d2-7218-8053-e049920e49ba",
+      "started_at": "2026-11-19T07:51:04.450486+00:00",
+      "status": "succeeded",
+      "updated_at": "2026-11-19T08:20:43.797457+00:00"
+    },
+    {
+      "action": "cards.move",
+      "attempt": 1,
+      "created_at": "2026-11-19T07:40:36.265466+00:00",
+      "duration_ms": null,
+      "finished_at": "2026-11-19T08:29:42.337419+00:00",
+      "id": "01a1f2c0-12e0-7169-9137-510365185c95",
+      "input_hash": null,
+      "node_id": null,
+      "output_hash": null,
+      "position": 2,
+      "procedure_version": 1,
+      "process_step_id": "01a1d3e9-ed42-7b16-b042-08d1898ace0e",
+      "run_id": "01a1f2c0-12d2-7218-8053-e049920e49ba",
+      "started_at": "2026-11-19T08:29:41.241801+00:00",
+      "status": "failed",
+      "updated_at": "2026-11-19T08:29:42.337419+00:00"
+    },
+    {
+      "action": "agent.run",
+      "attempt": 1,
+      "created_at": "2026-11-19T08:00:59.913448+00:00",
+      "duration_ms": null,
+      "finished_at": "2026-11-19T08:15:43.924145+00:00",
+      "id": "01a1f2d2-c6a4-7fb1-a78f-07c3c5176255",
+      "input_hash": null,
+      "node_id": null,
+      "output_hash": null,
+      "position": 1,
+      "procedure_version": 1,
+      "process_step_id": "01a1f2a6-567e-7706-be1d-fd6ff5ba2e52",
+      "run_id": "01a1f2d2-c5e7-7872-8eb2-12391226777b",
+      "started_at": "2026-11-19T08:10:42.543771+00:00",
+      "status": "failed",
+      "updated_at": "2026-11-19T08:15:43.924145+00:00"
+    },
+    {
+      "action": "coach.remedy",
+      "attempt": 1,
+      "created_at": "2026-11-19T08:00:59.913448+00:00",
+      "duration_ms": null,
+      "finished_at": "2026-11-19T08:15:43.924145+00:00",
+      "id": "01a1f2d2-c6bf-7b8a-aacf-19a5ee2a9b5f",
+      "input_hash": null,
+      "node_id": null,
+      "output_hash": null,
+      "position": 2,
+      "procedure_version": null,
+      "process_step_id": "01a1f2a6-569b-75ef-bdaa-946490ccecfa",
+      "run_id": "01a1f2d2-c5e7-7872-8eb2-12391226777b",
+      "started_at": null,
+      "status": "skipped",
+      "updated_at": "2026-11-19T08:15:43.924145+00:00"
     }
   ],
   "runs": [
@@ -36649,6 +35128,72 @@
       "status": "succeeded",
       "step_id": null,
       "updated_at": "2026-11-16T10:36:54.1832+00:00",
+      "version": 3,
+      "workflow_id": null,
+      "workflow_step_id": null
+    },
+    {
+      "attempt": 1,
+      "capability_agent_id": "01a1d3e9-e904-7be0-be1d-35204dbe36ef",
+      "capability_id": "01a1d039-0cfe-71a0-905c-cd4b4311f6ce",
+      "card_id": "01a1f2bc-8723-751a-af62-a8c8f05e1e51",
+      "created_at": "2026-11-19T07:36:44.012+00:00",
+      "depth": 0,
+      "error_class": "process_step_failed",
+      "finished_at": "2026-11-19T07:50:56.816487+00:00",
+      "id": "01a1f2bc-8747-775d-8799-9cf197b0b4b7",
+      "parent_run_id": null,
+      "process_id": "01a1d3e9-ecff-7539-a4a9-8db1d2a72cf7",
+      "process_version": 1,
+      "project_id": "01a1f2bc-86f7-7904-ac48-b45cad0d1393",
+      "started_at": "2026-11-19T07:36:44.012+00:00",
+      "status": "failed",
+      "step_id": null,
+      "updated_at": "2026-11-19T07:50:56.816487+00:00",
+      "version": 3,
+      "workflow_id": null,
+      "workflow_step_id": null
+    },
+    {
+      "attempt": 1,
+      "capability_agent_id": "01a1d3e9-e904-7be0-be1d-35204dbe36ef",
+      "capability_id": "01a1d039-0cfe-71a0-905c-cd4b4311f6ce",
+      "card_id": "01a1f2c0-128d-78ec-8ed2-122c54c70284",
+      "created_at": "2026-11-19T07:40:36.265466+00:00",
+      "depth": 0,
+      "error_class": "process_step_failed",
+      "finished_at": "2026-11-19T08:29:42.337419+00:00",
+      "id": "01a1f2c0-12d2-7218-8053-e049920e49ba",
+      "parent_run_id": null,
+      "process_id": "01a1d3e9-ecff-7539-a4a9-8db1d2a72cf7",
+      "process_version": 1,
+      "project_id": "01a1f2c0-1239-7b59-a0bd-e0609219fa8b",
+      "started_at": "2026-11-19T07:40:36.265466+00:00",
+      "status": "failed",
+      "step_id": null,
+      "updated_at": "2026-11-19T08:29:42.337419+00:00",
+      "version": 3,
+      "workflow_id": null,
+      "workflow_step_id": null
+    },
+    {
+      "attempt": 1,
+      "capability_agent_id": "01a1f2a6-48a3-737e-a232-bb5dd7f32c64",
+      "capability_id": "01a1d039-0cfd-71e9-99ed-2c1e8707de00",
+      "card_id": "01a1f2d2-c174-7b94-9e80-cd31c35f9c8e",
+      "created_at": "2026-11-19T08:00:59.913448+00:00",
+      "depth": 0,
+      "error_class": "process_step_failed",
+      "finished_at": "2026-11-19T08:15:43.924145+00:00",
+      "id": "01a1f2d2-c5e7-7872-8eb2-12391226777b",
+      "parent_run_id": null,
+      "process_id": "01a1f2a6-5647-79e5-86eb-f4a703ac658f",
+      "process_version": 1,
+      "project_id": "01a1f2bc-86f7-7904-ac48-b45cad0d1393",
+      "started_at": "2026-11-19T08:00:59.913448+00:00",
+      "status": "failed",
+      "step_id": null,
+      "updated_at": "2026-11-19T08:15:43.924145+00:00",
       "version": 3,
       "workflow_id": null,
       "workflow_step_id": null

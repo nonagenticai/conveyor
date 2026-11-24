@@ -8,9 +8,12 @@
 //! * P2.2 `the_implementer_cannot_decide_its_own_merge_gate`
 //! * P2.3 `auto_merge_defaults_off_and_reads_the_tenant_policy_row`
 //! * P3.1 `a_deploy_without_a_tested_rollback_is_refused`
+//! * P3.2 `an_exercised_rollback_records_both_digests_and_the_schema_generation`
+//! * P3.2 `an_application_rollback_across_a_non_additive_migration_is_refused`
 //!
-//! P1.3 and P3.2 are live scenarios: they are proven against the deployed revision after the
-//! merge and recorded on the issue with the deployed digest.
+//! P1.3 and P3.2's live half are proven against the deployed revision after the merge and
+//! recorded on the issue with the deployed digest; the offline half records the exercised
+//! rollback's evidence, including the schema generation (issue #669).
 
 mod support;
 
@@ -297,6 +300,70 @@ async fn merged(
     development_project_id
 }
 
+/// branch → PR → CI → review → merge → tested rollback plan → deploy gate → deploy → live
+/// check. The deploy records the schema generation (`migration_generation`); the caller
+/// decides the plan's expand/contract declaration.
+#[allow(clippy::too_many_arguments)]
+async fn deployed(
+    pg: &support::Pg,
+    tenant: TenantId,
+    admin: Uuid,
+    implementer: Uuid,
+    reviewer: Uuid,
+    tag: &str,
+    digest: &str,
+    migration_generation: i64,
+    rollback_plan: Value,
+) -> String {
+    let development_project_id = merged(pg, tenant, admin, implementer, reviewer, tag).await;
+    record(
+        pg,
+        tenant,
+        implementer,
+        &development_project_id,
+        "rollback_plan",
+        rollback_plan,
+    )
+    .await;
+    let deploy_gate = gate(
+        pg,
+        tenant,
+        implementer,
+        "development_projects.deploy_gate",
+        &development_project_id,
+    )
+    .await;
+    let approval_id = deploy_gate["approval_id"]
+        .as_str()
+        .expect("a deploy approval id")
+        .to_owned();
+    decide(pg, tenant, admin, &approval_id).await;
+    record(
+        pg,
+        tenant,
+        implementer,
+        &development_project_id,
+        "deploy",
+        json!({"digest": digest, "migration_generation": migration_generation}),
+    )
+    .await;
+    record(
+        pg,
+        tenant,
+        implementer,
+        &development_project_id,
+        "live_verify",
+        json!({
+            "health_status": 200,
+            "serving_digest": digest,
+            "acceptance_command": "curl -fsS \"$CONVEYOR_BASE_URL/health\"",
+            "acceptance_exit": 0,
+        }),
+    )
+    .await;
+    development_project_id
+}
+
 async fn refused_invocations(pg: &support::Pg, tenant: TenantId, action: &str) -> i64 {
     let mut tx = store::begin_scoped(&pg.owner, tenant)
         .await
@@ -404,6 +471,7 @@ async fn a_development_project_records_every_step_from_lane_to_live_verify() {
             "prior_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
             "method": "flux: pin the image digest back to the previous release",
             "tested": true,
+            "backward_compatible": true,
             "evidence": ["staging rollback exercised 2026-11-24; /health 200 at the prior digest"],
         }),
     )
@@ -430,7 +498,7 @@ async fn a_development_project_records_every_step_from_lane_to_live_verify() {
         implementer,
         &dev,
         "deploy",
-        json!({"digest": digest, "revision": "t6-1"}),
+        json!({"digest": digest, "revision": "t6-1", "migration_generation": 70}),
     )
     .await;
     record(
@@ -484,6 +552,11 @@ async fn a_development_project_records_every_step_from_lane_to_live_verify() {
     assert_eq!(
         closure["closure"]["deploy"]["approval_id"],
         json!(deploy_id)
+    );
+    assert_eq!(
+        closure["closure"]["deploy"]["migration_generation"],
+        json!(70),
+        "the closure names the schema generation the deploy applied"
     );
 
     let read = ok(
@@ -942,6 +1015,7 @@ async fn a_deploy_without_a_tested_rollback_is_refused() {
             "prior_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
             "method": "flux: pin the previous digest",
             "tested": false,
+            "backward_compatible": true,
             "evidence": ["the plan exists but was never exercised"],
         }),
     )
@@ -969,6 +1043,7 @@ async fn a_deploy_without_a_tested_rollback_is_refused() {
             "prior_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
             "method": "flux: pin the previous digest",
             "tested": true,
+            "backward_compatible": true,
             "evidence": ["staging rollback exercised; /health 200 at the prior digest"],
         }),
     )
@@ -987,5 +1062,197 @@ async fn a_deploy_without_a_tested_rollback_is_refused() {
         gate["approver_kind"],
         json!("human"),
         "the deploy is a person's decision"
+    );
+}
+
+// ── P3.2 ─────────────────────────────────────────────────────────────────────────────────
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_exercised_rollback_records_both_digests_and_the_schema_generation() {
+    let pg = support::Pg::fresh().await;
+    let alice = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let reviewer = support::reviewer_id(&pg).await;
+    let implementer = coder(&pg, alice.tenant).await;
+
+    let deployed_digest = "sha256:4444444444444444444444444444444444444444444444444444444444444444";
+    let restored_digest = "sha256:5555555555555555555555555555555555555555555555555555555555555555";
+    let dev = deployed(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        implementer,
+        reviewer,
+        "p32a",
+        deployed_digest,
+        70,
+        json!({
+            "prior_digest": restored_digest,
+            "method": "flux: pin the previous digest",
+            "tested": true,
+            "backward_compatible": true,
+            "evidence": ["staging rollback exercised; /health 200 at the prior digest"],
+        }),
+    )
+    .await;
+
+    // The rollback names the generation the deploy applied; a different one is refused rather
+    // than recorded as free text.
+    let mismatch = refused(
+        &pg,
+        alice.tenant,
+        implementer,
+        "development_projects.rollback",
+        json!({
+            "development_project_id": dev,
+            "deployed_digest": deployed_digest,
+            "restored_digest": restored_digest,
+            "migration_generation": 69,
+            "health_status": 200,
+            "evidence": ["kubectl rollout undo"],
+        }),
+    )
+    .await;
+    assert_eq!(mismatch.status, 422, "{}", mismatch.detail);
+    assert_eq!(mismatch.errors[0].field, "migration_generation");
+
+    let step = ok(
+        &pg,
+        alice.tenant,
+        implementer,
+        "development_projects.rollback",
+        json!({
+            "development_project_id": dev,
+            "deployed_digest": deployed_digest,
+            "restored_digest": restored_digest,
+            "migration_generation": 70,
+            "health_status": 200,
+            "evidence": ["kubectl rollout undo; the prior digest served /health 200"],
+        }),
+    )
+    .await;
+    assert_eq!(step["step"], json!("rollback_exercise"));
+    assert_eq!(step["evidence"]["deployed_digest"], json!(deployed_digest));
+    assert_eq!(step["evidence"]["restored_digest"], json!(restored_digest));
+    assert_eq!(step["evidence"]["migration_generation"], json!(70));
+    assert_eq!(step["evidence"]["health_status"], json!(200));
+
+    let closure = ok(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        "development_projects.close",
+        json!({"development_project_id": dev}),
+    )
+    .await;
+    assert_eq!(
+        closure["rollback"]["migration_generation"],
+        json!(70),
+        "the closure's rollback evidence names the schema generation"
+    );
+    assert_eq!(
+        closure["rollback"]["deployed_digest"],
+        json!(deployed_digest)
+    );
+    assert_eq!(
+        closure["rollback"]["restored_digest"],
+        json!(restored_digest)
+    );
+    assert_eq!(
+        closure["closure"]["deploy"]["migration_generation"],
+        json!(70)
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_application_rollback_across_a_non_additive_migration_is_refused() {
+    let pg = support::Pg::fresh().await;
+    let alice = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let reviewer = support::reviewer_id(&pg).await;
+    let implementer = coder(&pg, alice.tenant).await;
+
+    let deployed_digest = "sha256:6666666666666666666666666666666666666666666666666666666666666666";
+    let restored_digest = "sha256:7777777777777777777777777777777777777777777777777777777777777777";
+    let restore_path = "ops.restore: restore conveyor from the nightly dump to generation 69";
+    let dev = deployed(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        implementer,
+        reviewer,
+        "p32b",
+        deployed_digest,
+        70,
+        json!({
+            "prior_digest": restored_digest,
+            "method": "restore the database to generation 69, then pin the prior digest",
+            "tested": true,
+            "backward_compatible": false,
+            "restore_path": restore_path,
+            "evidence": ["staging restore exercised; /health 200 at the prior digest"],
+        }),
+    )
+    .await;
+
+    // The deploy was allowed (a restore-based plan is a valid rollback plan), but an
+    // application-only rollback is refused and names the restore path.
+    let refusal = refused(
+        &pg,
+        alice.tenant,
+        implementer,
+        "development_projects.rollback",
+        json!({
+            "development_project_id": dev,
+            "deployed_digest": deployed_digest,
+            "restored_digest": restored_digest,
+            "migration_generation": 70,
+            "health_status": 200,
+            "evidence": ["kubectl rollout undo"],
+        }),
+    )
+    .await;
+    assert_eq!(refusal.status, 409, "{}", refusal.detail);
+    assert_eq!(refusal.code, "schema_restore_required");
+    assert!(
+        refusal.detail.contains("restore") && refusal.detail.contains("nightly dump"),
+        "the refusal names the restore path: {}",
+        refusal.detail
+    );
+
+    // A plan cannot declare a non-additive deploy without naming its restore path.
+    let dev_missing = merged(
+        &pg,
+        alice.tenant,
+        alice.user_id,
+        implementer,
+        reviewer,
+        "p32c",
+    )
+    .await;
+    let missing = refused(
+        &pg,
+        alice.tenant,
+        implementer,
+        "development_projects.record_step",
+        json!({
+            "development_project_id": dev_missing,
+            "step": "rollback_plan",
+            "evidence": {
+                "prior_digest": restored_digest,
+                "method": "flux: pin the previous digest",
+                "tested": true,
+                "backward_compatible": false,
+                "evidence": ["app rollback exercised on staging"],
+            },
+        }),
+    )
+    .await;
+    assert_eq!(missing.status, 422, "{}", missing.detail);
+    assert!(
+        missing
+            .errors
+            .iter()
+            .any(|error| error.detail.contains("restore_path")),
+        "the refusal says the restore path is required: {:?}",
+        missing.errors
     );
 }

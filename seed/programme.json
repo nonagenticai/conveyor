@@ -1347,7 +1347,7 @@
       "key": "T15",
       "name": "Tool authoring and BYO",
       "description": "SPEC_V2 slice T15 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1493,7 +1493,7 @@
       "key": "T19",
       "name": "Decision forums (meetings)",
       "description": "SPEC_V2 slice T19 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1640,7 +1640,6 @@
           435,
           476,
           526,
-          545,
           569,
           572,
           660
