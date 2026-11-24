@@ -186,8 +186,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
       "section": "Design",
-      "sha256": "9e458d5cccadbc30db80c08a147cb469ea48a3262df8e8994866afa138de3a1a",
-      "bytes": 16103,
+      "sha256": "03296e4716d4562df9467a801c36025e0cc5c1aa851abcf9dfa85aaebb9ed474",
+      "bytes": 16426,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md"
     },
     {
@@ -627,8 +627,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "e6cc2c225cf5a9aca9539f8b11abafcd42f90fde5613ef61c7edd2736ef52296",
-      "bytes": 14710,
+      "sha256": "79d1dc773f8cd949c366bf3b71b69be3299ad27e85b58ba930c04231f4c482e1",
+      "bytes": 14742,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -807,9 +807,18 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19/artifact-register.html",
       "source": "docs/plans/T19/artifact-register.md",
       "section": "Plans",
-      "sha256": "b047cc7995b3e26f084c656916d71292697d28c453ea46907c5e744e1a2b0f9d",
-      "bytes": 3430,
+      "sha256": "d6bac4601bfb5ad7b91263ecfb7d18876d016886e16be46913e6533b6a2cc40b",
+      "bytes": 3686,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/artifact-register.md"
+    },
+    {
+      "title": "T19 — Decision forums: evidence",
+      "path": "docs/plans/T19/evidence.html",
+      "source": "docs/plans/T19/evidence.md",
+      "section": "Plans",
+      "sha256": "92dfa8f9a8bfe3f52ec25c32e17a9263e551b77898c39ab02a6516897457ccf1",
+      "bytes": 6828,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/evidence.md"
     },
     {
       "title": "T19 — Inception analysis",

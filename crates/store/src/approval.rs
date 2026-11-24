@@ -971,7 +971,7 @@ pub async fn record_decision_tx(
 }
 
 /// One seat's row in a meeting resolution. The participant is exactly one of a human or a job
-/// binding, matching the `approval_decision` extension (0064_meetings.sql).
+/// binding, matching the `approval_decision` extension (0065_meetings.sql).
 pub struct MeetingDecisionRow<'a> {
     /// `app_user.id` for a human seat; `None` for a job seat.
     pub approver_id: Option<Uuid>,

@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | the real route and its Playwright spec exist | 51 |
-| `extend` | a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner | 8 |
-| `new` | neither the route nor an ancestor exists | 10 |
+| `exists` | the real route and its Playwright spec exist | 58 |
+| `extend` | a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner | 7 |
+| `new` | neither the route nor an ancestor exists | 4 |
 
 ## Rows
 
@@ -38,11 +38,11 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `table:architecture_compliance_review` | §10.3 | table | architecture_compliance_review | `exists` | migrations: CREATE TABLE architecture_compliance_review |
 | `table:architecture_waiver` | §10.3 | table | architecture_waiver | `exists` | migrations: CREATE TABLE architecture_waiver |
 | `table:governance_body` | §10.3 | table | governance_body | `exists` | migrations: CREATE TABLE governance_body |
-| `table:meeting_type` | §10.3 | table | meeting_type | `new` | migrations: no CREATE/ALTER TABLE meeting_type |
-| `table:meeting` | §10.3 | table | meeting | `new` | migrations: no CREATE/ALTER TABLE meeting |
-| `table:meeting_agenda_item` | §10.3 | table | meeting_agenda_item | `new` | migrations: no CREATE/ALTER TABLE meeting_agenda_item |
-| `table:meeting_attendance` | §10.3 | table | meeting_attendance | `new` | migrations: no CREATE/ALTER TABLE meeting_attendance |
-| `table:meeting_position` | §10.3 | table | meeting_position | `new` | migrations: no CREATE/ALTER TABLE meeting_position |
+| `table:meeting_type` | §10.3 | table | meeting_type | `exists` | migrations: CREATE TABLE meeting_type |
+| `table:meeting` | §10.3 | table | meeting | `exists` | migrations: CREATE TABLE meeting |
+| `table:meeting_agenda_item` | §10.3 | table | meeting_agenda_item | `exists` | migrations: CREATE TABLE meeting_agenda_item |
+| `table:meeting_attendance` | §10.3 | table | meeting_attendance | `exists` | migrations: CREATE TABLE meeting_attendance |
+| `table:meeting_position` | §10.3 | table | meeting_position | `exists` | migrations: CREATE TABLE meeting_position |
 | `table:architecture_maturity` | §10.3 | table | architecture_maturity | `exists` | migrations: CREATE TABLE architecture_maturity |
 | `table:architecture_skill_assessment` | §10.3 | table | architecture_skill_assessment | `exists` | migrations: CREATE TABLE architecture_skill_assessment |
 | `table:decision` | §10.3 | table | decision | `exists` | migrations: CREATE TABLE decision |
@@ -59,7 +59,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:procedures` | §10.4 | actions | procedures | `exists` | actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)<br>actions: procedures.* found (procedures.create, procedures.get, procedures.ingest_process…) |
 | `actions:authoring` | §10.4 | actions | authoring | `exists` | actions: authoring.* found (authoring.assets, authoring.draft, authoring.intake…) |
 | `actions:approvals` | §10.4 | actions | approvals | `exists` | actions: approval_policies.* found (approval_policies.get, approval_policies.list, approval_policies.set)<br>actions: approvals.* found (approvals.decide, approvals.list, approvals.request) |
-| `actions:meetings` | §10.4 | actions | meetings | `extend` | actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…)<br>actions: meetings.* absent |
+| `actions:meetings` | §10.4 | actions | meetings | `exists` | actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…)<br>actions: meetings.* found (meetings.agenda_add, meetings.close, meetings.close_item…) |
 | `actions:decision` | §10.4 | actions | decision | `new` | actions: approvals.* found (approvals.decide, approvals.list, approvals.request)<br>actions: decision_options.* absent<br>actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)<br>actions: laya_configs.* found (laya_configs.create, laya_configs.list)<br>actions: refinements.* found (refinements.list, refinements.publish)<br>*V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).* |
 | `actions:PM` | §10.4 | actions | PM | `exists` | actions: pm.* found (pm.charter, pm.close, pm.get…) |
 | `actions:coach` | §10.4 | actions | coach | `exists` | actions: coach.* found (coach.escalate, coach.interrupt, coach.remedy…) |
@@ -75,7 +75,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `destination:Procedures` | §10.5 | destination | Procedures | `exists` | apps/web/src/app.rs: route '/procedures' found<br>apps/web/e2e/procedures.spec.ts: present<br>apps/web/src/app.rs: V1 ancestor '/build/processes', '/build/process-map' found<br>docs/design/v2.js: page 'procedures' — design reference, not implementation<br>*The real /procedures screen reads the tenant's procedures, processes and capabilities and operates the T16 intake, source review and both publication gates. The V1 /build/processes and /build/process-map remain the executable's editor and map. The PKO editor was ruled out on 2026-11-19 and is replaced by the knowledge-pack pairing.* |
 | `destination:Authoring` | §10.5 | destination | Authoring | `exists` | apps/web/src/app.rs: route '/authoring' found<br>apps/web/e2e/authoring.spec.ts: present<br>docs/design/v2.js: page 'authoring' — design reference, not implementation<br>*The /authoring route renders the live authored-asset catalogue: `authoring.assets` is the read, the draft/review/publish gates are governed actions, and the dependency order is T17 (#87).* |
 | `destination:Portfolio` | §10.5 | destination | Portfolio | `exists` | apps/web/src/app.rs: route '/portfolio' found<br>apps/web/src/app.rs: route '/portfolio/:programme_id' found<br>apps/web/e2e/portfolio.spec.ts: present<br>docs/design/v2.js: page 'portfolio' — design reference, not implementation<br>*The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10.* |
-| `destination:Meetings` | §10.5 | destination | Meetings | `new` | apps/web/src/app.rs: route '/meetings' absent<br>apps/web/src/app.rs: route '/meetings/:id' absent<br>apps/web/e2e/meetings.spec.ts: absent |
+| `destination:Meetings` | §10.5 | destination | Meetings | `exists` | apps/web/src/app.rs: route '/meetings' found<br>apps/web/src/app.rs: route '/meetings/:id' found<br>apps/web/e2e/meetings.spec.ts: present |
 | `destination:Programme` | §10.5 | destination | Programme | `exists` | apps/web/src/app.rs: route '/programme' found<br>apps/web/e2e/programme.spec.ts: present<br>docs/design/v2.js: page 'programme' — design reference, not implementation<br>*No route; the MSP definition reads are T10.* |
 | `destination:Architecture` | §10.5 | destination | Architecture | `extend` | apps/web/src/app.rs: route '/design/adm' found<br>apps/web/e2e/adm.spec.ts: absent<br>docs/design/v2.js: page 'adm' — design reference, not implementation<br>apps/web/src/app.rs: route '/design/adm' renders AdmGate (a gate; owner: T9)<br>*V1 /architecture is the system map; the ADM capability at /design/adm and its actions are T9.* |
 | `destination:Plan` | §10.5 | destination | Plan | `exists` | apps/web/src/app.rs: route '/plan' found<br>apps/web/e2e/plan.spec.ts: present<br>apps/web/src/app.rs: V1 ancestor '/boards' found<br>docs/design/v2.js: page 'plan' — design reference, not implementation<br>*The app's /plan route renders the T1 WBS, baselines, registers and change control; the live Boards tab remains at /boards.* |

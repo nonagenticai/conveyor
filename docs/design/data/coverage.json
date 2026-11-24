@@ -2075,7 +2075,7 @@
       "blocked_by": [],
       "evidence": [
         "crates/actions/src/meetings.rs",
-        "migrations/0064_meetings.sql"
+        "migrations/0065_meetings.sql"
       ],
       "gap": null,
       "key": "T19",
