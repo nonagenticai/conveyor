@@ -140,28 +140,60 @@
       "severity": "P0"
     },
     {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "22 mandatory artefact package(s) open: v1-p83-5:T10, std-togaf-phase-g-t10-g:T10, std-togaf-phase-h-t10-h:T10, std-pmp-project-baseline-t10:T10, std-pmp-project-registers-t10:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, +14 more",
+      "id": "T10-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "3 unresolved P0/P1 package(s): v1-p83-5:T10 (P1), std-togaf-phase-g-t10-g:T10 (P1), std-togaf-phase-h-t10-h:T10 (P1)",
+      "id": "T10-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "gate discharged by executable checks: T10-project, T10-baseline, T10-charter, T10-closure-outputs, T10-contract, T10-review, T10-closure-gate, T10-waivers, T10-pi-cadence, T10-pi-plan, T10-pi-objectives, T10-wsjf, T10-demo-credits, T10-lessons, T10-product",
+      "detail": "the gate check 'T10-artefact-standard' did not pass; the gate check 'T10-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
-      "result": "pass",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "a closed project must not carry a red acceptance manifest",
+      "detail": "the project is closed while its manifest is red",
+      "id": "closed-on-red",
+      "kind": "snapshot",
+      "result": "fail",
       "severity": "P0"
     }
   ],
-  "failures": [],
+  "failures": [
+    "T10-artefact-standard (P1): 22 mandatory artefact package(s) open: v1-p83-5:T10, std-togaf-phase-g-t10-g:T10, std-togaf-phase-h-t10-h:T10, std-pmp-project-baseline-t10:T10, std-pmp-project-registers-t10:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, +14 more",
+    "T10-rework (P0): 3 unresolved P0/P1 package(s): v1-p83-5:T10 (P1), std-togaf-phase-g-t10-g:T10 (P1), std-togaf-phase-h-t10-h:T10 (P1)",
+    "gate (P0): the gate check 'T10-artefact-standard' did not pass; the gate check 'T10-rework' did not pass",
+    "closed-on-red (P0): the project is closed on a red manifest"
+  ],
   "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized",
-  "generated_at": "2026-11-24T17:10:34.819681+00:00",
+  "generated_at": "2026-11-24T18:03:27.499658+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T10.toml",
   "name": "SAFe cadence and MSP tranches",
   "project": "T10",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T17:09:25Z",
-    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
-    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
+    "generated_at": "2026-11-24T16:58:37.395498+00:00",
+    "git_sha": "1bf2fb7c92d5db83836034da909495e1bd2361c1",
+    "path": "retained-snapshot/1bf2fb7c92d5db83836034da909495e1bd2361c1"
   },
-  "verdict": "green",
+  "verdict": "red",
   "warnings": []
 }

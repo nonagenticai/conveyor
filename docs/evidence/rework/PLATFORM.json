@@ -68,28 +68,50 @@
       "severity": "P0"
     },
     {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "68 mandatory artefact package(s) open: benefit_baseline_placeholder:programme, closure_outputs_undeclared:tranche-0, closure_outputs_undeclared:tranche-2, dr-w4-prog-mandate-probe-row:PLATFORM, dr-w4-prog-risk-owners:PLATFORM, std-msp-benefit-transition-b1:PLATFORM, std-msp-benefit-transition-b2:PLATFORM, std-msp-benefit-transition-b3:PLATFORM, +60 more (12 not yet due: tranche planned)",
+      "id": "PLATFORM-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "35 unresolved P0/P1 package(s): benefit_baseline_placeholder:programme (P1), closure_outputs_undeclared:tranche-0 (P1), closure_outputs_undeclared:tranche-2 (P1), dr-w4-prog-mandate-probe-row:PLATFORM (P1), dr-w4-prog-risk-owners:PLATFORM (P1), std-msp-benefit-transition-b1:PLATFORM (P1), std-msp-benefit-transition-b2:PLATFORM (P1), std-msp-benefit-transition-b3:PLATFORM (P1), +27 more (12 not yet due: tranche planned)",
+      "id": "PLATFORM-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "gate discharged by executable checks: PLATFORM-project, PLATFORM-baseline, PLATFORM-charter, PLATFORM-pi-cadence, PLATFORM-wsjf, PLATFORM-demo-credits, PLATFORM-product",
+      "detail": "the gate check 'PLATFORM-artefact-standard' did not pass; the gate check 'PLATFORM-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     }
   ],
-  "failures": [],
+  "failures": [
+    "PLATFORM-artefact-standard (P1): 68 mandatory artefact package(s) open: benefit_baseline_placeholder:programme, closure_outputs_undeclared:tranche-0, closure_outputs_undeclared:tranche-2, dr-w4-prog-mandate-probe-row:PLATFORM, dr-w4-prog-risk-owners:PLATFORM, std-msp-benefit-transition-b1:PLATFORM, std-msp-benefit-transition-b2:PLATFORM, std-msp-benefit-transition-b3:PLATFORM, +60 more (12 not yet due: tranche planned)",
+    "PLATFORM-rework (P0): 35 unresolved P0/P1 package(s): benefit_baseline_placeholder:programme (P1), closure_outputs_undeclared:tranche-0 (P1), closure_outputs_undeclared:tranche-2 (P1), dr-w4-prog-mandate-probe-row:PLATFORM (P1), dr-w4-prog-risk-owners:PLATFORM (P1), std-msp-benefit-transition-b1:PLATFORM (P1), std-msp-benefit-transition-b2:PLATFORM (P1), std-msp-benefit-transition-b3:PLATFORM (P1), +27 more (12 not yet due: tranche planned)",
+    "gate (P0): the gate check 'PLATFORM-artefact-standard' did not pass; the gate check 'PLATFORM-rework' did not pass"
+  ],
   "gate": "The standing platform row carries an approved charter and a baseline; it does not close.",
-  "generated_at": "2026-11-24T17:10:30.911536+00:00",
+  "generated_at": "2026-11-24T18:03:23.464496+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/PLATFORM.toml",
   "name": "CI, runners and platform",
   "project": "PLATFORM",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T17:09:25Z",
-    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
-    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
+    "generated_at": "2026-11-24T16:58:37.395498+00:00",
+    "git_sha": "1bf2fb7c92d5db83836034da909495e1bd2361c1",
+    "path": "retained-snapshot/1bf2fb7c92d5db83836034da909495e1bd2361c1"
   },
-  "verdict": "green",
+  "verdict": "red",
   "warnings": []
 }

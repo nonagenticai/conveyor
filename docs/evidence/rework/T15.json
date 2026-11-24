@@ -32,15 +32,6 @@
       "stdout": ""
     },
     {
-      "check": "closure_outputs",
-      "description": "the declared closure outputs are declared and published",
-      "detail": "declared closure outputs are not published: evidence, closure-review",
-      "id": "T15-closure-outputs",
-      "kind": "snapshot",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
       "detail": "no live board-approved delivery contract",
@@ -54,15 +45,6 @@
       "description": "the Phase-G review cites a published standing delegation",
       "detail": "no Phase-G compliance review for the project's live contract",
       "id": "T15-review",
-      "kind": "snapshot",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": "closure_gate",
-      "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "no approved closure gate for the project",
-      "id": "T15-closure-gate",
       "kind": "snapshot",
       "result": "fail",
       "severity": "P0"
@@ -140,9 +122,27 @@
       "severity": "P0"
     },
     {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "4 mandatory artefact package(s) open: std-pmp-change-control-t15:T15, std-pmp-project-baseline-t15:T15, std-pmp-project-registers-t15:T15, std-togaf-compliance-review-t15:T15 (5 not yet due: tranche planned)",
+      "id": "T15-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "no due unresolved P0/P1 package; 5 not yet due (tranche planned)",
+      "id": "T15-rework",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T15-baseline' did not pass; the gate check 'T15-charter' did not pass; the gate check 'T15-closure-outputs' did not pass; the gate check 'T15-contract' did not pass; the gate check 'T15-review' did not pass; the gate check 'T15-closure-gate' did not pass; the gate check 'T15-pi-cadence' did not pass; the gate check 'T15-pi-plan' did not pass; the gate check 'T15-pi-objectives' did not pass; the gate check 'T15-wsjf' did not pass; the gate check 'T15-demo-credits' did not pass; the gate check 'T15-lessons' did not pass",
+      "detail": "the gate check 'T15-baseline' did not pass; the gate check 'T15-charter' did not pass; the gate check 'T15-contract' did not pass; the gate check 'T15-review' did not pass; the gate check 'T15-pi-cadence' did not pass; the gate check 'T15-pi-plan' did not pass; the gate check 'T15-pi-objectives' did not pass; the gate check 'T15-wsjf' did not pass; the gate check 'T15-demo-credits' did not pass; the gate check 'T15-lessons' did not pass; the gate check 'T15-artefact-standard' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -152,29 +152,28 @@
   "failures": [
     "T15-baseline (P0): no project baseline",
     "T15-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-    "T15-closure-outputs (P0): declared closure outputs are not published: evidence, closure-review",
     "T15-contract (P0): no live board-approved delivery contract",
     "T15-review (P0): no Phase-G compliance review for the project's live contract",
-    "T15-closure-gate (P0): no approved closure gate for the project",
     "T15-pi-cadence (P0): no PI cadence row for tranche-12",
     "T15-pi-plan (P0): no published pi-plan output for tranche-12",
     "T15-pi-objectives (P0): no published pi-objectives output for tranche-12",
     "T15-wsjf (P0): no WBS deliverable carries the plan",
     "T15-demo-credits (P0): no accepted deliverable to demo",
     "T15-lessons (P1): no retro cadence row for tranche-12",
-    "gate (P0): the gate check 'T15-baseline' did not pass; the gate check 'T15-charter' did not pass; the gate check 'T15-closure-outputs' did not pass; the gate check 'T15-contract' did not pass; the gate check 'T15-review' did not pass; the gate check 'T15-closure-gate' did not pass; the gate check 'T15-pi-cadence' did not pass; the gate check 'T15-pi-plan' did not pass; the gate check 'T15-pi-objectives' did not pass; the gate check 'T15-wsjf' did not pass; the gate check 'T15-demo-credits' did not pass; the gate check 'T15-lessons' did not pass"
+    "T15-artefact-standard (P1): 4 mandatory artefact package(s) open: std-pmp-change-control-t15:T15, std-pmp-project-baseline-t15:T15, std-pmp-project-registers-t15:T15, std-togaf-compliance-review-t15:T15 (5 not yet due: tranche planned)",
+    "gate (P0): the gate check 'T15-baseline' did not pass; the gate check 'T15-charter' did not pass; the gate check 'T15-contract' did not pass; the gate check 'T15-review' did not pass; the gate check 'T15-pi-cadence' did not pass; the gate check 'T15-pi-plan' did not pass; the gate check 'T15-pi-objectives' did not pass; the gate check 'T15-wsjf' did not pass; the gate check 'T15-demo-credits' did not pass; the gate check 'T15-lessons' did not pass; the gate check 'T15-artefact-standard' did not pass"
   ],
   "gate": "T15 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling' \u2014 is the condition on which it may be closed, not a claim that it is met.",
-  "generated_at": "2026-11-24T17:10:35.476202+00:00",
+  "generated_at": "2026-11-24T18:03:28.170410+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T15.toml",
   "name": "Tool authoring and BYO",
   "project": "T15",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T17:09:25Z",
-    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
-    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
+    "generated_at": "2026-11-24T16:58:37.395498+00:00",
+    "git_sha": "1bf2fb7c92d5db83836034da909495e1bd2361c1",
+    "path": "retained-snapshot/1bf2fb7c92d5db83836034da909495e1bd2361c1"
   },
   "verdict": "red",
   "warnings": []

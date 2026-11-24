@@ -140,9 +140,27 @@
       "severity": "P0"
     },
     {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "9 mandatory artefact package(s) open: std-pmp-change-control-s07:S07, std-pmp-project-baseline-s07:S07, closed_without_closure_review:S07, std-pmp-project-wbs-s07:S07, std-togaf-delivery-contract-s07:S07, v1-w2c-5:S07, v1-w2c-6:S07, std-pmp-project-registers-s07:S07, +1 more",
+      "id": "S07-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "8 unresolved P0/P1 package(s): std-pmp-change-control-s07:S07 (P0), std-pmp-project-baseline-s07:S07 (P0), closed_without_closure_review:S07 (P1), std-pmp-project-wbs-s07:S07 (P1), v1-s07-1:S07 (P1), std-togaf-delivery-contract-s07:S07 (P1), v1-w2c-5:S07 (P1), v1-w2c-6:S07 (P1)",
+      "id": "S07-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S07-baseline' did not pass; the gate check 'S07-charter' did not pass; the gate check 'S07-closure-outputs' did not pass; the gate check 'S07-contract' did not pass; the gate check 'S07-review' did not pass; the gate check 'S07-closure-gate' did not pass; the gate check 'S07-wsjf' did not pass; the gate check 'S07-demo-credits' did not pass; the gate check 'S07-product' did not pass",
+      "detail": "the gate check 'S07-baseline' did not pass; the gate check 'S07-charter' did not pass; the gate check 'S07-closure-outputs' did not pass; the gate check 'S07-contract' did not pass; the gate check 'S07-review' did not pass; the gate check 'S07-closure-gate' did not pass; the gate check 'S07-wsjf' did not pass; the gate check 'S07-demo-credits' did not pass; the gate check 'S07-product' did not pass; the gate check 'S07-artefact-standard' did not pass; the gate check 'S07-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -168,20 +186,22 @@
     "S07-wsjf (P0): no WBS deliverable carries the plan",
     "S07-demo-credits (P0): no accepted deliverable to demo",
     "S07-product (P0): 2 open P0 package(s): std-pmp-change-control-s07:S07, std-pmp-project-baseline-s07:S07",
-    "gate (P0): the gate check 'S07-baseline' did not pass; the gate check 'S07-charter' did not pass; the gate check 'S07-closure-outputs' did not pass; the gate check 'S07-contract' did not pass; the gate check 'S07-review' did not pass; the gate check 'S07-closure-gate' did not pass; the gate check 'S07-wsjf' did not pass; the gate check 'S07-demo-credits' did not pass; the gate check 'S07-product' did not pass",
+    "S07-artefact-standard (P1): 9 mandatory artefact package(s) open: std-pmp-change-control-s07:S07, std-pmp-project-baseline-s07:S07, closed_without_closure_review:S07, std-pmp-project-wbs-s07:S07, std-togaf-delivery-contract-s07:S07, v1-w2c-5:S07, v1-w2c-6:S07, std-pmp-project-registers-s07:S07, +1 more",
+    "S07-rework (P0): 8 unresolved P0/P1 package(s): std-pmp-change-control-s07:S07 (P0), std-pmp-project-baseline-s07:S07 (P0), closed_without_closure_review:S07 (P1), std-pmp-project-wbs-s07:S07 (P1), v1-s07-1:S07 (P1), std-togaf-delivery-contract-s07:S07 (P1), v1-w2c-5:S07 (P1), v1-w2c-6:S07 (P1)",
+    "gate (P0): the gate check 'S07-baseline' did not pass; the gate check 'S07-charter' did not pass; the gate check 'S07-closure-outputs' did not pass; the gate check 'S07-contract' did not pass; the gate check 'S07-review' did not pass; the gate check 'S07-closure-gate' did not pass; the gate check 'S07-wsjf' did not pass; the gate check 'S07-demo-credits' did not pass; the gate check 'S07-product' did not pass; the gate check 'S07-artefact-standard' did not pass; the gate check 'S07-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "the relevance eval set beats the agreed baseline \u2014 3 revisions with a dense sequence, an idempotent seed, both GIN indexes used, relevance targets met, traceability in both directions with 0 cross-tenant rows, quality read-only, and no orphan",
-  "generated_at": "2026-11-24T17:10:32.364718+00:00",
+  "generated_at": "2026-11-24T18:03:24.984899+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S07.toml",
   "name": "Requirements, catalogues, revisions, quality scoring, search",
   "project": "S07",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T17:09:25Z",
-    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
-    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
+    "generated_at": "2026-11-24T16:58:37.395498+00:00",
+    "git_sha": "1bf2fb7c92d5db83836034da909495e1bd2361c1",
+    "path": "retained-snapshot/1bf2fb7c92d5db83836034da909495e1bd2361c1"
   },
   "verdict": "red",
   "warnings": []

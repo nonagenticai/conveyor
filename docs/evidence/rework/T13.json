@@ -140,28 +140,60 @@
       "severity": "P0"
     },
     {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "18 mandatory artefact package(s) open: std-togaf-phase-g-t13-g:T13, std-togaf-phase-h-t13-h:T13, std-pmp-project-baseline-t13:T13, std-pmp-project-registers-t13:T13, std-togaf-architecture-artifact-instance-01a20275-1783-769e-9744-fa9246b22916:T13, std-togaf-architecture-artifact-instance-01a20275-6094-70ad-89a6-512086e3a162:T13, std-togaf-architecture-artifact-instance-01a20275-a8ee-7e43-afaa-505a452e314d:T13, std-togaf-architecture-artifact-instance-01a20275-f69f-77aa-b414-595b4337e30c:T13, +10 more",
+      "id": "T13-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "4 unresolved P0/P1 package(s): v1-p116-1:T13 (P1), v1-w4a-6:T13 (P1), std-togaf-phase-g-t13-g:T13 (P1), std-togaf-phase-h-t13-h:T13 (P1)",
+      "id": "T13-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "gate discharged by executable checks: T13-project, T13-baseline, T13-charter, T13-closure-outputs, T13-contract, T13-review, T13-closure-gate, T13-waivers, T13-pi-cadence, T13-pi-plan, T13-pi-objectives, T13-wsjf, T13-demo-credits, T13-lessons, T13-product",
+      "detail": "the gate check 'T13-artefact-standard' did not pass; the gate check 'T13-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
-      "result": "pass",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "a closed project must not carry a red acceptance manifest",
+      "detail": "the project is closed while its manifest is red",
+      "id": "closed-on-red",
+      "kind": "snapshot",
+      "result": "fail",
       "severity": "P0"
     }
   ],
-  "failures": [],
+  "failures": [
+    "T13-artefact-standard (P1): 18 mandatory artefact package(s) open: std-togaf-phase-g-t13-g:T13, std-togaf-phase-h-t13-h:T13, std-pmp-project-baseline-t13:T13, std-pmp-project-registers-t13:T13, std-togaf-architecture-artifact-instance-01a20275-1783-769e-9744-fa9246b22916:T13, std-togaf-architecture-artifact-instance-01a20275-6094-70ad-89a6-512086e3a162:T13, std-togaf-architecture-artifact-instance-01a20275-a8ee-7e43-afaa-505a452e314d:T13, std-togaf-architecture-artifact-instance-01a20275-f69f-77aa-b414-595b4337e30c:T13, +10 more",
+    "T13-rework (P0): 4 unresolved P0/P1 package(s): v1-p116-1:T13 (P1), v1-w4a-6:T13 (P1), std-togaf-phase-g-t13-g:T13 (P1), std-togaf-phase-h-t13-h:T13 (P1)",
+    "gate (P0): the gate check 'T13-artefact-standard' did not pass; the gate check 'T13-rework' did not pass",
+    "closed-on-red (P0): the project is closed on a red manifest"
+  ],
   "gate": "a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt",
-  "generated_at": "2026-11-24T17:10:35.199900+00:00",
+  "generated_at": "2026-11-24T18:03:27.890786+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T13.toml",
   "name": "Tool platform",
   "project": "T13",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T17:09:25Z",
-    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
-    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
+    "generated_at": "2026-11-24T16:58:37.395498+00:00",
+    "git_sha": "1bf2fb7c92d5db83836034da909495e1bd2361c1",
+    "path": "retained-snapshot/1bf2fb7c92d5db83836034da909495e1bd2361c1"
   },
-  "verdict": "green",
+  "verdict": "red",
   "warnings": []
 }

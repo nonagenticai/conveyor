@@ -818,6 +818,52 @@ def _register(snapshot: Snapshot) -> tuple[dict[str, Any] | None, str | None]:
     return register, None
 
 
+def _planned_tranches(snapshot: Snapshot) -> set[int]:
+    """The tranche numbers the programme has not yet authorised.
+
+    SPEC_V2 §8.3: a project does not start before its tranche is authorised. A rework package
+    scoped to a planned tranche is therefore not yet due. The register keeps it — the honest
+    worklist — but a project is not red for work the programme's own authorisation rule forbids it
+    from starting. The moment the tranche is authorised the package counts in full, and the
+    tranche-exit check refuses its `continue` until it is closed.
+    """
+    planned: set[int] = set()
+    for row in (snapshot.msp or {}).get("tranches") or []:
+        try:
+            number = int(row.get("number"))
+        except (TypeError, ValueError):
+            continue
+        if str(row.get("state")) == "planned":
+            planned.add(number)
+    return planned
+
+
+def _package_due(package: dict[str, Any], planned: set[int]) -> bool:
+    """A tranche-scope package is due only once its tranche is authorised."""
+    if not planned:
+        return True
+    scope = str(package.get("scope") or "")
+    match = re.fullmatch(r"tranche-(\d+)", scope)
+    if not match:
+        return True
+    return int(match.group(1)) not in planned
+
+
+def _gate_owner(package: dict[str, Any]) -> str:
+    """The project whose manifest gates this package.
+
+    A project-scope package is the project's own obligation and gates its own manifest. A
+    tranche- or programme-scope package is shared work: the rule's `owner_project` is the
+    programme role accountable for the standard, while `apply_to` is the project that must act.
+    Gating the acting project is what makes the tranche pipeline executable; the accountable
+    role stays on the package for reporting, and the final acceptance still sees every package.
+    """
+    scope = str(package.get("scope") or "")
+    if scope == "programme" or scope.startswith("tranche-"):
+        return str(package.get("apply_to") or package.get("owner_project") or "")
+    return str(package.get("owner_project") or "")
+
+
 def check_artefact_standard(
     snapshot: Snapshot, key: str, params: dict[str, Any]
 ) -> tuple[bool, str]:
@@ -832,17 +878,27 @@ def check_artefact_standard(
         return False, error
     row = snapshot.project(key)
     owners = {key, str(row["id"])}
-    open_keys = [
-        str(package.get("key"))
-        for package in register["packages"]
-        if package.get("standard") in STANDARD_ARTEFACT_STANDARDS
-        and package.get("status") in UNRESOLVED_PACKAGE_STATES
-        and str(package.get("owner_project")) in owners
-    ]
+    planned = _planned_tranches(snapshot)
+    open_keys: list[str] = []
+    not_due: list[str] = []
+    for package in register["packages"]:
+        if (
+            package.get("standard") not in STANDARD_ARTEFACT_STANDARDS
+            or package.get("status") not in UNRESOLVED_PACKAGE_STATES
+            or _gate_owner(package) not in owners
+        ):
+            continue
+        target = open_keys if _package_due(package, planned) else not_due
+        target.append(str(package.get("key")))
     if open_keys:
         preview = ", ".join(open_keys[:8])
         more = "" if len(open_keys) <= 8 else f", +{len(open_keys) - 8} more"
-        return False, f"{len(open_keys)} mandatory artefact package(s) open: {preview}{more}"
+        suffix = f" ({len(not_due)} not yet due: tranche planned)" if not_due else ""
+        return False, f"{len(open_keys)} mandatory artefact package(s) open: {preview}{more}{suffix}"
+    if not_due:
+        return True, (
+            f"no due mandatory artefact package; {len(not_due)} not yet due (tranche planned)"
+        )
     return True, "no open standard artefact package for this project"
 
 
@@ -859,21 +915,29 @@ def check_rework_resolution(
         return False, error
     row = snapshot.project(key)
     owners = {key, str(row["id"])}
+    planned = _planned_tranches(snapshot)
     blocking: list[str] = []
+    not_due: list[str] = []
     for package in register["packages"]:
         # The register lists unresolved packages; only an explicit resolution clears one.
         if package.get("status") in ("resolved", "closed"):
             continue
-        if str(package.get("owner_project")) not in owners:
+        if _gate_owner(package) not in owners:
             continue
         severity = str(package.get("severity"))
         if severity == "P2":
             continue
-        blocking.append(f"{package.get('key')} ({severity})")
+        entry = f"{package.get('key')} ({severity})"
+        (blocking if _package_due(package, planned) else not_due).append(entry)
     if blocking:
         preview = ", ".join(blocking[:8])
         more = "" if len(blocking) <= 8 else f", +{len(blocking) - 8} more"
-        return False, f"{len(blocking)} unresolved P0/P1 package(s): {preview}{more}"
+        suffix = f" ({len(not_due)} not yet due: tranche planned)" if not_due else ""
+        return False, f"{len(blocking)} unresolved P0/P1 package(s): {preview}{more}{suffix}"
+    if not_due:
+        return True, (
+            f"no due unresolved P0/P1 package; {len(not_due)} not yet due (tranche planned)"
+        )
     return True, "no unresolved P0/P1 package for this project"
 
 
@@ -2036,10 +2100,17 @@ severity = "P0"
         )
         return Snapshot(base / "data")
 
-    def register_case(tag: str, packages: Any, check: Callable[..., tuple[bool, str]], expect: bool) -> None:
+    def register_case(
+        tag: str,
+        packages: Any,
+        check: Callable[..., tuple[bool, str]],
+        expect: bool,
+        *,
+        msp: dict[str, Any] | None = None,
+    ) -> None:
         global _REWORK_CACHE
         _REWORK_CACHE = {"packages": packages}
-        snapshot_case = extra_snapshot(tag)
+        snapshot_case = extra_snapshot(tag, msp=msp)
         ok, detail = check(snapshot_case, "TEST", {})
         if ok is not expect:
             failures.append(f"{tag}: expected {'pass' if expect else 'fail'}, got {detail}")
@@ -2073,6 +2144,68 @@ severity = "P0"
     if ok:
         failures.append("a register without a packages array did not red the artefact-standard check")
 
+    planned_msp = {"tranches": [{"number": 5, "state": "planned"}]}
+    authorised_msp = {"tranches": [{"number": 5, "state": "authorised"}]}
+    tranche_pkg = standard_package("mandatory_artefacts:tranche-5", "P1", scope="tranche-5")
+    register_case(
+        "standard-planned-tranche", [tranche_pkg], check_artefact_standard, True, msp=planned_msp
+    )
+    register_case(
+        "standard-authorised-tranche",
+        [tranche_pkg],
+        check_artefact_standard,
+        False,
+        msp=authorised_msp,
+    )
+    register_case(
+        "standard-unknown-tranche", [tranche_pkg], check_artefact_standard, False
+    )
+    register_case(
+        "standard-project-scope-still-due",
+        [standard_package("mandatory_artefacts:Z9", "P1", scope="Z9")],
+        check_artefact_standard,
+        False,
+        msp=planned_msp,
+    )
+    register_case(
+        "standard-tranche-gate-moved",
+        [standard_package(
+            "mandatory_artefacts:tranche-5", "P1",
+            scope="tranche-5", owner_project="TEST", apply_to="OTHER",
+        )],
+        check_artefact_standard,
+        True,
+        msp=authorised_msp,
+    )
+    register_case(
+        "standard-tranche-gate-acting",
+        [standard_package(
+            "mandatory_artefacts:tranche-5", "P1",
+            scope="tranche-5", owner_project="OTHER", apply_to="TEST",
+        )],
+        check_artefact_standard,
+        False,
+        msp=authorised_msp,
+    )
+    register_case(
+        "standard-programme-gate-acting",
+        [standard_package(
+            "std-pmp-programme", "P1",
+            scope="programme", owner_project="TEST", apply_to="OTHER",
+        )],
+        check_artefact_standard,
+        True,
+    )
+    register_case(
+        "standard-project-scope-own-obligation",
+        [standard_package(
+            "mandatory_artefacts:Z9", "P1",
+            scope="Z9", owner_project="TEST", apply_to="OTHER",
+        )],
+        check_artefact_standard,
+        False,
+    )
+
     register_case("resolution-open-p1", [standard_package("pkg-1", "P1")], check_rework_resolution, False)
     register_case(
         "resolution-waiver-p1",
@@ -2099,6 +2232,36 @@ severity = "P0"
         False,
     )
     register_case("resolution-open-p2", [standard_package("pkg-1", "P2")], check_rework_resolution, True)
+    register_case(
+        "resolution-planned-tranche", [tranche_pkg], check_rework_resolution, True, msp=planned_msp
+    )
+    register_case(
+        "resolution-authorised-tranche",
+        [tranche_pkg],
+        check_rework_resolution,
+        False,
+        msp=authorised_msp,
+    )
+    register_case(
+        "resolution-tranche-gate-moved",
+        [standard_package(
+            "mandatory_artefacts:tranche-5", "P1",
+            scope="tranche-5", owner_project="TEST", apply_to="OTHER",
+        )],
+        check_rework_resolution,
+        True,
+        msp=authorised_msp,
+    )
+    register_case(
+        "resolution-tranche-gate-acting",
+        [standard_package(
+            "mandatory_artefacts:tranche-5", "P1",
+            scope="tranche-5", owner_project="OTHER", apply_to="TEST",
+        )],
+        check_rework_resolution,
+        False,
+        msp=authorised_msp,
+    )
     register_case(
         "resolution-expired",
         [standard_package(

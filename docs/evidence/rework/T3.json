@@ -140,9 +140,27 @@
       "severity": "P0"
     },
     {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "4 mandatory artefact package(s) open: std-pmp-project-baseline-t3:T3, std-pmp-project-registers-t3:T3, std-togaf-architecture-artifact-t3:T3, std-togaf-compliance-review-t3:T3",
+      "id": "T3-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "1 unresolved P0/P1 package(s): v1-p61-1:T3 (P1)",
+      "id": "T3-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass",
+      "detail": "the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass; the gate check 'T3-artefact-standard' did not pass; the gate check 'T3-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -152,19 +170,21 @@
   "failures": [
     "T3-contract (P0): no live board-approved delivery contract",
     "T3-review (P0): no Phase-G compliance review for the project's live contract",
-    "gate (P0): the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass"
+    "T3-artefact-standard (P1): 4 mandatory artefact package(s) open: std-pmp-project-baseline-t3:T3, std-pmp-project-registers-t3:T3, std-togaf-architecture-artifact-t3:T3, std-togaf-compliance-review-t3:T3",
+    "T3-rework (P0): 1 unresolved P0/P1 package(s): v1-p61-1:T3 (P1)",
+    "gate (P0): the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass; the gate check 'T3-artefact-standard' did not pass; the gate check 'T3-rework' did not pass"
   ],
   "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request",
-  "generated_at": "2026-11-24T17:10:36.238515+00:00",
+  "generated_at": "2026-11-24T18:03:29.073406+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T3.toml",
   "name": "PM job",
   "project": "T3",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T17:09:25Z",
-    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
-    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
+    "generated_at": "2026-11-24T16:58:37.395498+00:00",
+    "git_sha": "1bf2fb7c92d5db83836034da909495e1bd2361c1",
+    "path": "retained-snapshot/1bf2fb7c92d5db83836034da909495e1bd2361c1"
   },
   "verdict": "red",
   "warnings": []

@@ -113,28 +113,60 @@
       "severity": "P0"
     },
     {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "29 mandatory artefact package(s) open: std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH, std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH, std-togaf-phase-g-design-publish-g:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH, std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH, std-pmp-project-baseline-design-publish:DESIGN-PUBLISH, std-pmp-project-registers-design-publish:DESIGN-PUBLISH, std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH, +21 more",
+      "id": "DESIGN-PUBLISH-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "5 unresolved P0/P1 package(s): std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH (P1), std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH (P1), std-togaf-phase-g-design-publish-g:DESIGN-PUBLISH (P1), std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH (P1), std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH (P1)",
+      "id": "DESIGN-PUBLISH-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "gate discharged by executable checks: DESIGN-PUBLISH-project, DESIGN-PUBLISH-baseline, DESIGN-PUBLISH-charter, DESIGN-PUBLISH-closure-outputs, DESIGN-PUBLISH-contract, DESIGN-PUBLISH-review, DESIGN-PUBLISH-closure-gate, DESIGN-PUBLISH-waivers, DESIGN-PUBLISH-pi-cadence, DESIGN-PUBLISH-wsjf, DESIGN-PUBLISH-demo-credits, DESIGN-PUBLISH-product",
+      "detail": "the gate check 'DESIGN-PUBLISH-artefact-standard' did not pass; the gate check 'DESIGN-PUBLISH-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
-      "result": "pass",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "a closed project must not carry a red acceptance manifest",
+      "detail": "the project is closed while its manifest is red",
+      "id": "closed-on-red",
+      "kind": "snapshot",
+      "result": "fail",
       "severity": "P0"
     }
   ],
-  "failures": [],
+  "failures": [
+    "DESIGN-PUBLISH-artefact-standard (P1): 29 mandatory artefact package(s) open: std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH, std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH, std-togaf-phase-g-design-publish-g:DESIGN-PUBLISH, std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH, std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH, std-pmp-project-baseline-design-publish:DESIGN-PUBLISH, std-pmp-project-registers-design-publish:DESIGN-PUBLISH, std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH, +21 more",
+    "DESIGN-PUBLISH-rework (P0): 5 unresolved P0/P1 package(s): std-togaf-benefits-diagram-design-publish:DESIGN-PUBLISH (P1), std-togaf-candidate-solutions-design-publish:DESIGN-PUBLISH (P1), std-togaf-phase-g-design-publish-g:DESIGN-PUBLISH (P1), std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH (P1), std-togaf-project-context-diagram-design-publish:DESIGN-PUBLISH (P1)",
+    "gate (P0): the gate check 'DESIGN-PUBLISH-artefact-standard' did not pass; the gate check 'DESIGN-PUBLISH-rework' did not pass",
+    "closed-on-red (P0): the project is closed on a red manifest"
+  ],
   "gate": "The closure review exists and every declared closure output is published; the project re-closes through the one gate.",
-  "generated_at": "2026-11-24T17:10:30.660259+00:00",
+  "generated_at": "2026-11-24T18:03:23.218492+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
   "name": "Publish the SPEC_V2 studio design pack, live",
   "project": "DESIGN-PUBLISH",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T17:09:25Z",
-    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
-    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
+    "generated_at": "2026-11-24T16:58:37.395498+00:00",
+    "git_sha": "1bf2fb7c92d5db83836034da909495e1bd2361c1",
+    "path": "retained-snapshot/1bf2fb7c92d5db83836034da909495e1bd2361c1"
   },
-  "verdict": "green",
+  "verdict": "red",
   "warnings": []
 }
