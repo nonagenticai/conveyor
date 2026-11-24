@@ -1711,7 +1711,7 @@ async fn seed_parity_register(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uui
              (tenant_id, project_id, kind, title, probability, impact, owner_job_id,
               review_at, links)
          VALUES ($1, $2, 'risk', 'Parity risk', 'medium', 3, $3, '2026-12-01',
-                 '[{\"kind\":\"objective\",\"ref\":\"parity\"}]'::jsonb)
+                 '{\"cards\": [], \"requirements\": [{\"kind\": \"objective\", \"ref\": \"parity\"}], \"decisions\": []}'::jsonb)
          RETURNING id",
     )
     .bind(ctx.tenant_id)
@@ -8307,7 +8307,11 @@ fn spine_samples() -> Vec<Sample> {
                     "impact": 3,
                     "owner_job_id": ctx.org_job_id,
                     "review_at": "2026-12-01",
-                    "links": [{"kind": "objective", "ref": "parity"}],
+                    "links": {
+                        "cards": [],
+                        "requirements": [{"kind": "objective", "ref": "parity"}],
+                        "decisions": []
+                    },
                 })
             });
             expecting(sample, 201)

@@ -1888,6 +1888,26 @@ fn register_scope(project_id: Option<Uuid>, programme_id: Option<Uuid>) -> Resul
     }
 }
 
+/// §5.5's declared link document: `{cards[], requirements[], decisions[]}`. The actions are the
+/// client boundary, so a bare array (the pre-0098 default) or any other JSON is a 422 on
+/// `links`; the column's CHECK is the second door for a raw writer.
+fn validate_links(links: &Value) -> Result<(), ActionError> {
+    let declared = links.as_object().is_some_and(|map| {
+        map.len() == 3
+            && ["cards", "requirements", "decisions"]
+                .iter()
+                .all(|key| map.get(*key).is_some_and(Value::is_array))
+    });
+    if declared {
+        return Ok(());
+    }
+    Err(invalid(
+        "links",
+        "links_invalid",
+        "links must be an object with `cards`, `requirements` and `decisions` arrays",
+    ))
+}
+
 /// §8.4's risk register rule: a risk is probability, impact, owner, review date and at least
 /// one link. A row missing one is a note, not a managed risk.
 fn risk_missing(
@@ -1911,8 +1931,11 @@ fn risk_missing(
         missing.push("review_at");
     }
     let linked = match links {
-        Value::Array(items) => !items.is_empty(),
-        Value::Object(map) => !map.is_empty(),
+        Value::Object(map) => ["cards", "requirements", "decisions"].iter().any(|key| {
+            map.get(*key)
+                .and_then(Value::as_array)
+                .is_some_and(|items| !items.is_empty())
+        }),
         _ => false,
     };
     if !linked {
@@ -1950,7 +1973,10 @@ async fn registers_create(
         ));
     }
     register_scope(input.project_id, input.programme_id)?;
-    let links = input.links.unwrap_or_else(|| serde_json::json!([]));
+    let links = input
+        .links
+        .unwrap_or_else(store::spine::empty_register_links);
+    validate_links(&links)?;
     if kind == "risk" {
         let missing = risk_missing(
             input.probability.as_deref(),
@@ -2033,6 +2059,9 @@ async fn registers_update(
         .await
         .map_err(|error| spine_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such register item"))?;
+    if let Some(links) = input.links.as_ref() {
+        validate_links(links)?;
+    }
     // The same rule as `registers.create`: a change's approval is the `change` gate's decision,
     // so a status edit cannot manufacture one.
     if current.kind == "change" && input.status.as_deref() == Some("approved") {
