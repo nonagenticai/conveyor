@@ -10,8 +10,12 @@
  "status": "open",
  "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
  "review_at": "2026-11-29",
- "links": [
-  "https://github.com/nonagenticai/conveyor/issues/80",
-  "https://github.com/nonagenticai/conveyor/issues/86"
- ]
+ "links": {
+  "cards": [],
+  "requirements": [
+   "https://github.com/nonagenticai/conveyor/issues/80",
+   "https://github.com/nonagenticai/conveyor/issues/86"
+  ],
+  "decisions": []
+ }
 }

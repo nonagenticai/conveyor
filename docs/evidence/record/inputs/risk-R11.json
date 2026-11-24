@@ -1,1 +1,22 @@
-{"programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac", "kind": "risk", "code": "R11", "title": "Nullable project_id: a consumer returns zero rows silently", "probability": "M", "impact": 5, "owner_job_id": "01a1db6b-4ef7-7e90-accc-c4d025595477", "links": [{"kind": "relates_to", "target": "benefit/B1"}], "review_at": "2026-11-29", "severity": "medium", "status": "open"}
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "kind": "risk",
+ "code": "R11",
+ "title": "Nullable project_id: a consumer returns zero rows silently",
+ "probability": "M",
+ "impact": 5,
+ "owner_job_id": "01a1db6b-4ef7-7e90-accc-c4d025595477",
+ "links": {
+  "cards": [],
+  "requirements": [
+   {
+    "kind": "relates_to",
+    "target": "benefit/B1"
+   }
+  ],
+  "decisions": []
+ },
+ "review_at": "2026-11-29",
+ "severity": "medium",
+ "status": "open"
+}

@@ -1,1 +1,22 @@
-{"programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac", "kind": "risk", "code": "R2", "title": "Record theatre: sections resolve thinly, registers look operated but are not", "probability": "M", "impact": 3, "owner_job_id": "01a1db6b-4f13-7822-8c9a-09e67d5670e0", "links": [{"kind": "relates_to", "target": "benefit/B3"}], "review_at": "2026-11-29", "severity": "medium", "status": "open"}
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "kind": "risk",
+ "code": "R2",
+ "title": "Record theatre: sections resolve thinly, registers look operated but are not",
+ "probability": "M",
+ "impact": 3,
+ "owner_job_id": "01a1db6b-4f13-7822-8c9a-09e67d5670e0",
+ "links": {
+  "cards": [],
+  "requirements": [
+   {
+    "kind": "relates_to",
+    "target": "benefit/B3"
+   }
+  ],
+  "decisions": []
+ },
+ "review_at": "2026-11-29",
+ "severity": "medium",
+ "status": "open"
+}
