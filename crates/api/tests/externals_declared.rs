@@ -76,8 +76,14 @@ fn no_handler_calls_a_service_directly() {
     //     is a `&'static str` — can carry it, and a probe must not use a write action's route. The
     //     transport owns its own 2 s timeout, reads no body and never sends a credential; the base
     //     URL is the engine's own `service_url`. Added 2026-11-19.
+    //   * `tool_authoring.rs` — T15's registered-destination dispatch (`HandlerRef::ToolDestination`).
+    //     A BYO/OpenAPI destination's URL, method and path are DATA registered at publication, so no
+    //     `HandlerRef::External` (a compiled `&'static str` route) can carry them; the dispatch is
+    //     reachable only from the broker (`Authority::Internal`), re-checks the source's egress
+    //     allowlist before the call, opens the binding's credential alias itself and caps the body.
+    //     Added 2026-11-24.
     // A new name here is a decision, not an accident: the list is compared exactly.
-    const ALLOWED: [&str; 11] = [
+    const ALLOWED: [&str; 12] = [
         "invoke.rs",
         "webhooks.rs",
         "channels.rs",
@@ -89,6 +95,7 @@ fn no_handler_calls_a_service_directly() {
         "produce.rs",
         "probe.rs",
         "convert.rs",
+        "tool_authoring.rs",
     ];
 
     let mut offenders = Vec::new();

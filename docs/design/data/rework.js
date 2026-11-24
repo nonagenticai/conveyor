@@ -8,9 +8,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "closure_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -48,9 +50,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but its closure review is not published",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
           "subject": "T16"
         }
@@ -63,9 +65,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "closure_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -103,9 +107,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but its closure review is not published",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
           "subject": "T3"
         }
@@ -118,9 +122,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "closure_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -158,9 +164,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but its closure review is not published",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
           "subject": "T7"
         }
@@ -342,9 +348,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed in tranche 4 whose state is 'planned'",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
           "subject": "T19"
         },
@@ -382,9 +388,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is active in tranche 4 whose state is 'planned'",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T18"
         }
@@ -1977,9 +1983,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "compliance_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 2,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -2018,9 +2026,9 @@ window.CONVEYOR_REWORK = {
           "detail": "a non-conformant review has no active waiver",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
           "subject": "T4"
         },
@@ -2028,9 +2036,9 @@ window.CONVEYOR_REWORK = {
           "detail": "closed delivery project has no Phase-G compliance review",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T4"
         }
@@ -3034,9 +3042,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "closure_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -3074,9 +3084,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but its closure review is not published",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S12"
         }
@@ -3089,9 +3099,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "closure_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -3129,9 +3141,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but its closure review is not published",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S13"
         }
@@ -3201,9 +3213,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "closure_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -3241,9 +3255,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but its closure review is not published",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S17"
         }
@@ -3256,9 +3270,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "closure_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -3296,9 +3312,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but its closure review is not published",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S18"
         }
@@ -3311,9 +3327,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "closure_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -3351,9 +3369,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but its closure review is not published",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S20"
         }
@@ -3366,9 +3384,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "closure_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -3406,9 +3426,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but its closure review is not published",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S21"
         }
@@ -3511,9 +3531,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "closure_outputs",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -3551,9 +3573,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but declares no closure_outputs",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S12"
         }
@@ -3755,9 +3777,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but declares no closure_outputs",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S17"
         }
@@ -3970,9 +3992,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but declares no closure_outputs",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S13"
         }
@@ -3985,9 +4007,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "closure_outputs",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 3,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -4027,9 +4051,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but declares no closure_outputs",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S18"
         },
@@ -4037,9 +4061,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but declares no closure_outputs",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S20"
         },
@@ -4047,9 +4071,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is closed but declares no closure_outputs",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S21"
         }
@@ -5992,9 +6016,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -6032,9 +6058,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S12"
         }
@@ -6047,9 +6073,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 2,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -6088,9 +6116,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S14"
         },
@@ -6098,9 +6126,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T8"
         }
@@ -6113,9 +6141,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 2,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -6154,9 +6184,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S04"
         },
@@ -6164,9 +6194,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: closure-review, evidence, project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T3"
         }
@@ -6226,9 +6256,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S05"
         },
@@ -6236,9 +6266,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S07"
         },
@@ -6246,9 +6276,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S09"
         },
@@ -6276,9 +6306,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: architecture-design, inception-analysis, project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T18"
         }
@@ -6336,9 +6366,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S06"
         },
@@ -6346,9 +6376,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S08"
         },
@@ -6356,9 +6386,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S17"
         },
@@ -6381,9 +6411,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 3,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -6423,9 +6455,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S06b"
         },
@@ -6433,9 +6465,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S10"
         },
@@ -6443,9 +6475,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S11"
         }
@@ -6458,9 +6490,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 3,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -6500,9 +6534,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S06c"
         },
@@ -6510,9 +6544,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S15"
         },
@@ -6520,9 +6554,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S16"
         }
@@ -6535,9 +6569,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 3,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -6577,9 +6613,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S06d"
         },
@@ -6587,9 +6623,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S13"
         },
@@ -6597,9 +6633,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S19"
         }
@@ -6612,9 +6648,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 3,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -6654,9 +6692,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S18"
         },
@@ -6664,9 +6702,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S20"
         },
@@ -6674,9 +6712,9 @@ window.CONVEYOR_REWORK = {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S21"
         }
@@ -8598,9 +8636,9 @@ window.CONVEYOR_REWORK = {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T5"
         },
@@ -8608,9 +8646,9 @@ window.CONVEYOR_REWORK = {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T6"
         },
@@ -8618,9 +8656,9 @@ window.CONVEYOR_REWORK = {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T8"
         },
@@ -8628,9 +8666,9 @@ window.CONVEYOR_REWORK = {
           "detail": "seed status 'active' != live status 'closed'",
           "disposition": "rework",
           "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "expires": null,
+          "owner": null,
+          "reason": null,
           "severity": "P2",
           "subject": "S21"
         },
@@ -13345,9 +13383,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "compliance_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -13385,9 +13425,9 @@ window.CONVEYOR_REWORK = {
           "detail": "closed delivery project has no Phase-G compliance review",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T1"
         }
@@ -13400,9 +13440,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "compliance_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -13440,9 +13482,9 @@ window.CONVEYOR_REWORK = {
           "detail": "closed delivery project has no Phase-G compliance review",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T10"
         }
@@ -13455,9 +13497,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "compliance_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -13495,9 +13539,9 @@ window.CONVEYOR_REWORK = {
           "detail": "closed delivery project has no Phase-G compliance review",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T11"
         }
@@ -13510,9 +13554,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "compliance_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -13550,9 +13596,9 @@ window.CONVEYOR_REWORK = {
           "detail": "closed delivery project has no Phase-G compliance review",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T2"
         }
@@ -13565,9 +13611,11 @@ window.CONVEYOR_REWORK = {
       "artefact": "compliance_review",
       "baseline": {
         "disposition": "rework",
-        "earliest_expires": null,
+        "earliest_expires": "2027-02-18",
         "entries": 1,
-        "owners": []
+        "owners": [
+          "programme owner"
+        ]
       },
       "depends_on": [],
       "disposition": "rework",
@@ -13605,9 +13653,9 @@ window.CONVEYOR_REWORK = {
           "detail": "closed delivery project has no Phase-G compliance review",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T9"
         }
@@ -13980,9 +14028,9 @@ window.CONVEYOR_REWORK = {
           "detail": "delivery project has no live architecture contract",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T18"
         }
@@ -14704,9 +14752,9 @@ window.CONVEYOR_REWORK = {
           "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T18"
         }
@@ -25931,61 +25979,6 @@ window.CONVEYOR_REWORK = {
           "reason": null,
           "severity": "P2",
           "subject": "T12"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T15",
-      "apply_to": "T15",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T15"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T15",
-      "owner_project": "T15",
-      "rule": "status_source_drift",
-      "scope": "T15",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T15"
         }
       ],
       "title": "Reconcile the project's status source"
@@ -41533,11 +41526,11 @@ window.CONVEYOR_REWORK = {
     },
     "SPEC": {
       "findings": 86,
-      "gaps": 25,
+      "gaps": 24,
       "p0": 0,
       "p1": 3,
-      "p2": 22,
-      "packages": 102,
+      "p2": 21,
+      "packages": 101,
       "rules": 8,
       "rules_clean": 3,
       "rules_with_gaps": 5,
@@ -41561,24 +41554,24 @@ window.CONVEYOR_REWORK = {
     "by_severity": {
       "P0": 26,
       "P1": 189,
-      "P2": 218
+      "P2": 217
     },
     "by_standard": {
       "MSP": 74,
       "PMP": 34,
       "SAFe": 13,
-      "SPEC": 102,
+      "SPEC": 101,
       "TOGAF": 210
     },
     "by_status": {
-      "open": 431,
+      "open": 430,
       "suppressed": 2
     },
     "duplicates": 0,
-    "open": 431,
-    "packages": 433,
+    "open": 430,
+    "packages": 432,
     "resolved": 14,
-    "subjects": 548,
+    "subjects": 547,
     "suppressed": 2
   }
 };

@@ -125,8 +125,11 @@ use serde_json::{Value, json};
 /// `review_gate|merge_gate|deploy_gate|close|get|rollback|change_judging_surface` — the
 /// self-development path and its gates, the earned auto-merge read and the closure record.
 /// 539 → **548**. **T8 (#79) adds 3 internal**: `lessons.propose|review|promote` — the
-/// organisational-memory lifecycle. 548 → **551**.
-const EXPECTED: [&str; 551] = [
+/// organisational-memory lifecycle. 548 → **551**. **T15 (#86) adds 10 internal**:
+/// `toolkits.import_openapi|register_mcp|discover_mcp`, `tool_authoring.draft|validate|test|`
+/// `review|publish|promote` and the broker's registered-destination dispatch `tools.dispatch`
+/// — 551 → **561**.
+const EXPECTED: [&str; 561] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -634,8 +637,18 @@ const EXPECTED: [&str; 551] = [
     "tasks.update",
     "tenants.get",
     "tenants.update_settings",
+    "tool_authoring.draft",
+    "tool_authoring.promote",
+    "tool_authoring.publish",
+    "tool_authoring.review",
+    "tool_authoring.test",
+    "tool_authoring.validate",
+    "toolkits.discover_mcp",
+    "toolkits.import_openapi",
     "toolkits.publish",
+    "toolkits.register_mcp",
     "tools.call",
+    "tools.dispatch",
     "tools.probe",
     "tools.usage",
     "trace_links.create",
@@ -785,7 +798,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // T8 (#79) adds three internal actions (`lessons.propose|review|promote`): internal
     // 530 -> 533; external stays 18 — a promotion writes this tenant's own source draft and
     // calls no model.
-    assert_eq!((internal, external), (533, 18));
+    // T15 (#86) adds ten internal actions (`toolkits.import_openapi|register_mcp|discover_mcp`,
+    // `tool_authoring.draft|validate|test|review|publish|promote`, `tools.dispatch`):
+    // internal 533 -> 543; external stays 18 — an authored tool dispatches through the broker's
+    // registered-destination arm, not a new external declaration.
+    assert_eq!((internal, external), (543, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

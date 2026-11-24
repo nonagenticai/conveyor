@@ -62,10 +62,10 @@
       "sha256": "546048d09e2d94b3d3cd3c7fae64dfd25ab915cd370dfd78b431f1514286325e"
     },
     {
-      "bytes": 1403147,
+      "bytes": 1407587,
       "path": "rework.json",
-      "records": 433,
-      "sha256": "5c2393e6076731f11c3e6c32d6e5e80f3d107c0e87a85e5f2a302bdc46246e00"
+      "records": 432,
+      "sha256": "e55442f61a8f165fbd5c7590e056f292658837750613880a492e39dfb3d17bea"
     },
     {
       "bytes": 211,
@@ -74,10 +74,10 @@
       "sha256": "06d500cfd94e192de4e4d3117d156f3a993c04630eb5ddca5c0b7ddc43fff2b4"
     },
     {
-      "bytes": 5098162,
+      "bytes": 5102640,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "81c080e1237501a844e042315d09af742eafd33d92dc452c9d41261e4dc6fc39"
+      "sha256": "680947a5b92f942e6309770b15c30171d18e2d7149bc11a32b415fb3857bc281"
     },
     {
       "bytes": 1215090,

@@ -109,6 +109,9 @@ pub mod spine;
 pub mod storage;
 // T13 (SPEC_V2 §11.3): the `tools.call` action declaration (the broker enforces it).
 pub mod tools;
+// T15 (#86, SPEC_V2 §11.3–§11.6): tool authoring and BYO — OpenAPI draft import, the
+// publication gate, MCP discovery and the registered-destination dispatch.
+pub mod tool_authoring;
 // T2 (SPEC_V2 §7): the decision ladder — `ladder.*` over `decision_policies.*`,
 // `refinements.*` and `laya_configs.*`.
 pub mod ladder;

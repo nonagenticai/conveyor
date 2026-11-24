@@ -1,7 +1,7 @@
 {
   "counts": {
     "P0": 26,
-    "P1": 139,
+    "P1": 142,
     "P2": 42,
     "P3": 0
   },
@@ -1111,6 +1111,30 @@
       "subject": "T8"
     },
     {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T5"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T6"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T8"
+    },
+    {
       "detail": "declared outputs are not published: project-brief",
       "disposition": "rework",
       "evidence": null,
@@ -1495,12 +1519,20 @@
       "subject": "T9"
     },
     {
-      "detail": "coverage says 'proposed', the register says 'active'",
+      "detail": "seed status 'active' != live status 'closed'",
       "disposition": "rework",
       "evidence": null,
-      "rule": "status_source_drift",
+      "rule": "seed_live_drift",
       "severity": "P2",
-      "subject": "T12"
+      "subject": "S21"
+    },
+    {
+      "detail": "seed status 'active' != live status 'closed'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P2",
+      "subject": "T19"
     },
     {
       "detail": "coverage says 'proposed', the register says 'active'",
@@ -1508,7 +1540,7 @@
       "evidence": null,
       "rule": "status_source_drift",
       "severity": "P2",
-      "subject": "T15"
+      "subject": "T12"
     },
     {
       "detail": "coverage says 'proposed', the register says 'active'",
@@ -1525,14 +1557,6 @@
       "rule": "status_source_drift",
       "severity": "P2",
       "subject": "T18"
-    },
-    {
-      "detail": "coverage says 'proposed', the register says 'active'",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "status_source_drift",
-      "severity": "P2",
-      "subject": "T6"
     },
     {
       "detail": "closed without a review date",
@@ -1664,8 +1688,8 @@
     }
   ],
   "snapshot": {
-    "generated_at": "2026-11-24T09:41:16.641438+00:00",
-    "git_sha": "fd652720002ea5886a274557f6d2fb0714f66069",
+    "generated_at": "2026-11-24T10:10:00Z",
+    "git_sha": "7edea5b80ede2a245d297ef7931bd60090d3482b",
     "path": "docs/design/data",
     "tenant": "nonagentic"
   },

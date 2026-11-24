@@ -790,6 +790,7 @@ async fn auto_merge_defaults_off_and_reads_the_tenant_policy_row() {
             approver_kind: ApproverKind::Auto,
             conditions: conditions.clone(),
             expires_at: Some(expires_at),
+            required_decisions: 1,
         },
         Some(alice.user_id),
     )

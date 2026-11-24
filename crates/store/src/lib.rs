@@ -163,6 +163,9 @@ pub mod snapshot;
 pub mod task;
 // T13 (SPEC_V2 §11.8): toolkit/tool/tool_binding resolution and the append-only tool_call ledger.
 pub mod tool;
+// T15 (#86, SPEC_V2 §11.3–§11.6, §11.8): the tool authoring drafts, the registered sources and
+// the immutable publication the broker's registered-destination dispatch resolves.
+pub mod tool_authoring;
 // #160: the tenant's registered inference destination — one row per tenant, read by the executor
 // before it falls back to the platform environment.
 pub mod tenant_inference;

@@ -1,11 +1,11 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `fd652720002ea5886a274557f6d2fb0714f66069` generated `2026-11-24T09:41:16.641438+00:00` from `docs/design/data`.
+Snapshot: `7edea5b80ede2a245d297ef7931bd60090d3482b` generated `2026-11-24T10:10:00Z` from `docs/design/data`.
 
 | Severity | Count |
 |---|---:|
 | P0 | 26 |
-| P1 | 139 |
+| P1 | 142 |
 | P2 | 42 |
 | P3 | 0 |
 
@@ -151,6 +151,9 @@ Snapshot: `fd652720002ea5886a274557f6d2fb0714f66069` generated `2026-11-24T09:41
 | `project_in_unauthorised_tranche` | `T5` | P1 | project is active in tranche 10 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T6` | P1 | project is active in tranche 11 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T8` | P1 | project is active in tranche 11 whose state is 'planned' |
+| `seed_live_drift` | `T5` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `T6` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `T8` | P1 | seed status 'closed' != live status 'active' |
 | `unpublished_declared_output` | `S04` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S05` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S06` | P1 | declared outputs are not published: project-brief |
@@ -213,7 +216,7 @@ Snapshot: `fd652720002ea5886a274557f6d2fb0714f66069` generated `2026-11-24T09:41
 | S18 | closed | 9 | 1 | 4 | 0 | 0 |
 | S19 | active | 8 | 0 | 3 | 1 | 0 |
 | S20 | closed | 9 | 1 | 4 | 0 | 0 |
-| S21 | closed | 9 | 1 | 4 | 0 | 0 |
+| S21 | closed | 9 | 1 | 4 | 1 | 0 |
 | SPEC-V2 | closed | 0 | 0 | 1 | 0 | 0 |
 | T0 | closed | 0 | 0 | 1 | 0 | 0 |
 | T1 | closed | 1 | 0 | 2 | 2 | 0 |
@@ -222,16 +225,16 @@ Snapshot: `fd652720002ea5886a274557f6d2fb0714f66069` generated `2026-11-24T09:41
 | T12 | active | 13 | 0 | 3 | 2 | 0 |
 | T13 | active | 3 | 0 | 0 | 2 | 0 |
 | T14 | active | 4 | 0 | 4 | 1 | 0 |
-| T15 | active | 12 | 0 | 3 | 2 | 0 |
+| T15 | active | 12 | 0 | 3 | 1 | 0 |
 | T16 | closed | 4 | 2 | 3 | 0 | 0 |
 | T17 | active | 5 | 0 | 3 | 2 | 0 |
 | T18 | active | 4 | 0 | 4 | 2 | 0 |
-| T19 | closed | 4 | 1 | 0 | 2 | 0 |
+| T19 | closed | 4 | 1 | 0 | 3 | 0 |
 | T2 | closed | 2 | 0 | 2 | 2 | 0 |
 | T3 | closed | 3 | 1 | 3 | 0 | 0 |
 | T4 | closed | 4 | 2 | 1 | 2 | 0 |
-| T5 | active | 10 | 0 | 3 | 1 | 0 |
-| T6 | active | 11 | 0 | 3 | 2 | 0 |
+| T5 | active | 10 | 0 | 4 | 1 | 0 |
+| T6 | active | 11 | 0 | 4 | 1 | 0 |
 | T7 | closed | 5 | 2 | 3 | 0 | 0 |
-| T8 | active | 11 | 0 | 4 | 1 | 0 |
+| T8 | active | 11 | 0 | 5 | 1 | 0 |
 | T9 | closed | 4 | 1 | 1 | 2 | 0 |
