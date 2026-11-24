@@ -167,6 +167,9 @@ def classify(check: dict[str, Any], gate_text: str) -> str:
     """record / code / probe / generic, inferred from the manifest's own shape."""
     kind = str(check.get("kind") or ("command" if "command" in check else "snapshot"))
     command = str(check.get("command") or "")
+    if kind == "probe":
+        # A probe executes the product. A record read can never masquerade as one.
+        return "record" if RECORD_MARKER in command else "probe"
     if kind == "command":
         if RECORD_MARKER in command:
             return "record"
@@ -606,8 +609,8 @@ def _fixture(root: Path, key: str, check: dict[str, Any], gate: str) -> None:
         "[[check]]",
         f'id = "{check["id"]}"',
     ]
-    if check.get("kind") == "command":
-        lines += ['kind = "command"', f"command = '{command}'"]
+    if check.get("kind") in ("command", "probe"):
+        lines += [f'kind = "{check.get("kind")}"', f"command = '{command}'"]
     else:
         lines.append(f'check = "{check["check"]}"')
     lines.append('severity = "P0"')
@@ -723,12 +726,57 @@ def self_test() -> int:
                 f"fixture C: reason {item_c['reason']!r} does not name the missing project"
             )
 
+        # Fixture D: a declared probe that exercises the gate text and passes -> implemented.
+        fixture_d = base / "fixture-d"
+        _fixture(
+            fixture_d,
+            "S03",
+            {
+                "id": "probe",
+                "kind": "probe",
+                "_command": "true",
+                "description": "the toolkit live probe and one live call",
+            },
+            "the toolkit live probe and one live call",
+        )
+        document_d = audit(fixture_d, ["S03"], snapshot / "data", runner=fixture_runner)
+        item_d = document_d["slices"][0]
+        if item_d["status"] != "implemented":
+            failures.append(
+                f"fixture D: status {item_d['status']!r}, expected 'implemented'"
+            )
+
+        # Fixture E: a record read dressed as a probe is not a probe -> partial, never implemented.
+        fixture_e = base / "fixture-e"
+        _fixture(
+            fixture_e,
+            "S04",
+            {
+                "id": "probe",
+                "kind": "probe",
+                "_command": "python3 scripts/programme-record.py --check --action toolkits.get",
+                "description": "a record read dressed as a probe",
+            },
+            "the toolkit live probe and one live call",
+        )
+        document_e = audit(fixture_e, ["S04"], snapshot / "data", runner=fixture_runner)
+        item_e = document_e["slices"][0]
+        if item_e["status"] != "absent":
+            failures.append(
+                f"fixture E: status {item_e['status']!r}, expected 'absent' "
+                "(a record read is not a probe)"
+            )
+        if "no probe check" not in item_e["reason"]:
+            failures.append(
+                f"fixture E: reason {item_e['reason']!r} does not name the missing probe check"
+            )
+
     if failures:
         print("verify-slices: SELF-TEST FAILED")
         for failure in failures:
             print(f"  - {failure}")
         return 1
-    print("verify-slices: self-test OK (fixture A absent, fixture B partial, fixture C absent)")
+    print("verify-slices: self-test OK (A absent, B partial, C absent, D implemented, E record-read absent)")
     return 0
 
 
