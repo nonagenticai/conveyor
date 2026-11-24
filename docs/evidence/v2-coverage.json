@@ -665,7 +665,7 @@
         "apps/web/e2e/authoring.spec.ts: present",
         "docs/design/v2.js: page 'authoring' — design reference, not implementation"
       ],
-      "note": "The /authoring route renders the live authored-asset catalogue: `authoring.assets` is the read, the draft/review/publish gates are governed actions, and the dependency order is T17 (#87)."
+      "note": "The /authoring route renders and operates the T17 family: the intake queue (the catalogue grouped by `intake_id`, because the intake is write-only and its brief read is #655), the draft catalogue, the review behind an approved `authoring.review` gate, and the release. Section 5.7's dependency order is refused when the draft is attempted, not at publish."
     },
     {
       "id": "destination:Portfolio",

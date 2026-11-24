@@ -1474,22 +1474,23 @@
         "crates/actions/src/knowledge",
         "crates/actions/src/memory",
         "crates/actions/src/prompt",
-        "migrations/0030_prompt_catalogue.sql"
+        "migrations/0030_prompt_catalogue.sql",
+        "migrations/0068_ladder_option_sets.sql"
       ],
-      "gap": null,
+      "gap": "action ladder.case, action ladder.precheck, action decision_option_sets.set, action decision_option_sets.get",
       "key": "S21",
       "measured": {
         "actions": [
           6,
-          6
+          10
         ],
         "modules": [
           4,
           4
         ],
         "tables": [
-          2,
-          2
+          4,
+          4
         ]
       },
       "name": "Message construction (the compiled prompt)",
@@ -1498,7 +1499,7 @@
         "S20"
       ],
       "plan": "docs/plans/slices/S21-message-construction.md",
-      "status": "built",
+      "status": "partial",
       "track": "v1",
       "tranche": 9,
       "units": {
@@ -1749,7 +1750,6 @@
       "blocked_by": [
         "T15",
         "T17",
-        "T5",
         "T6"
       ],
       "evidence": [
@@ -2255,22 +2255,24 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/kata.rs",
+        "migrations/0066_kata.sql",
+        "migrations/0067_kata_gate.sql"
       ],
-      "gap": "no kata.* action family and no measured procedure-change loop",
+      "gap": null,
       "key": "T5",
       "measured": {
         "actions": [
-          0,
-          0
+          8,
+          8
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
-          0,
-          0
+          5,
+          5
         ]
       },
       "name": "Kata",
@@ -2278,7 +2280,7 @@
         "S12"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 10,
       "units": {
@@ -2293,9 +2295,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T5"
-      ],
+      "blocked_by": [],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -2382,9 +2382,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T5"
-      ],
+      "blocked_by": [],
       "evidence": [
         "migrations/0056_cadence_tranche.sql"
       ],
@@ -2726,13 +2724,15 @@
         "absent": 0,
         "archived": 1,
         "built": 41,
-        "partial": 1,
+        "partial": 2,
         "planned": 0,
-        "proposed": 6,
+        "proposed": 5,
         "standing": 1
       },
       "total": 50,
-      "uncovered": [],
+      "uncovered": [
+        "S21"
+      ],
       "with_open_units": 16,
       "without_open_units": 34
     },
