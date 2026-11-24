@@ -14,8 +14,8 @@
     "new": "neither the route nor an ancestor exists"
   },
   "counts": {
-    "exists": 59,
-    "extend": 7,
+    "exists": 61,
+    "extend": 5,
     "new": 3
   },
   "rows": [
@@ -739,13 +739,12 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Improve",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "apps/web/src/app.rs: route '/improve' found",
-        "apps/web/e2e/improve.spec.ts: absent",
+        "apps/web/e2e/improve.spec.ts: present",
         "apps/web/src/app.rs: V1 ancestor '/evals/improvement' found",
-        "docs/design/v2.js: page 'improve' — design reference, not implementation",
-        "apps/web/src/app.rs: route '/improve' renders ImproveGate (a gate; owner: T4, T5)"
+        "docs/design/v2.js: page 'improve' — design reference, not implementation"
       ],
       "note": "V1 /evals/improvement carries the improvement campaigns; the coach/kata/lessons path is T4/T5."
     },
@@ -754,12 +753,11 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Operations",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "apps/web/src/app.rs: route '/operations' found",
-        "apps/web/e2e/operations.spec.ts: absent",
-        "docs/design/v2.js: page 'operations' — design reference, not implementation",
-        "apps/web/src/app.rs: route '/operations' renders OperationsGate (a gate; owner: T7)"
+        "apps/web/e2e/operations.spec.ts: present",
+        "docs/design/v2.js: page 'operations' — design reference, not implementation"
       ],
       "note": "No route and no operations actions; the incident/runbook/postmortem path is T7."
     },
