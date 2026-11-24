@@ -1,0 +1,2 @@
+{"blocked": "content rejected by rework-content-check", "content": "docs/evidence/rework/tranche-4/rework-content-T9.json", "key": "T9", "snapshot_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4", "state": "PREFLIGHTED", "tranche": 4, "ts": "2026-11-24T22:52:20+00:00"}
+{"key": "T9", "reason": "content rejected by rework-content-check", "snapshot_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4", "state": "BLOCKED", "tranche": 4, "ts": "2026-11-24T22:52:20+00:00"}
