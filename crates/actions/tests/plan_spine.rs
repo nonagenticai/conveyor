@@ -1614,3 +1614,166 @@ async fn a_work_package_names_its_card_and_run() {
     assert_eq!(stored.0, Some(card_id), "the node persists its card");
     assert_eq!(stored.1, Some(card_id), "the run carries the same card");
 }
+
+/// v1-p55-1 — §5.5's links document is the declared shape, and the document round-trips.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_register_round_trips_the_link_shape() {
+    let (_pg, running, _seeded) = fixture().await;
+    let project = create_project(&running, "Register link shape").await;
+
+    // An omitted `links` is the empty documented object, never the old bare array.
+    let (status, unlinked) = running
+        .invoke(
+            "registers.create",
+            "dev:alice",
+            json!({
+                "project_id": project,
+                "kind": "issue",
+                "title": "An issue with no links",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{unlinked}");
+    assert_eq!(
+        output(&unlinked)["links"],
+        json!({"cards": [], "requirements": [], "decisions": []}),
+        "{unlinked}"
+    );
+
+    let links = json!({
+        "cards": [{"kind": "card", "id": uuid::Uuid::now_v7().to_string()}],
+        "requirements": [{"kind": "requirement", "id": uuid::Uuid::now_v7().to_string()}],
+        "decisions": [{"kind": "decision", "id": uuid::Uuid::now_v7().to_string()}],
+    });
+    let (status, created) = running
+        .invoke(
+            "registers.create",
+            "dev:alice",
+            json!({
+                "project_id": project,
+                "kind": "issue",
+                "title": "An issue with every link kind",
+                "links": links,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    assert_eq!(output(&created)["links"], links, "{created}");
+
+    let id = id_of(output(&created), "id");
+    let (status, read) = running
+        .invoke(
+            "registers.get",
+            "dev:alice",
+            json!({"id": id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{read}");
+    assert_eq!(
+        output(&read)["links"],
+        links,
+        "one card, one requirement and one decision round-trip: {read}"
+    );
+
+    // A bare array is the pre-0098 shape: the action refuses it as a 422 on `links`.
+    let (status, refused) = running
+        .invoke(
+            "registers.create",
+            "dev:alice",
+            json!({
+                "project_id": project,
+                "kind": "issue",
+                "title": "A bare array",
+                "links": [],
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(refused["errors"][0]["field"], "links", "{refused}");
+    assert_eq!(refused["errors"][0]["code"], "links_invalid", "{refused}");
+}
+
+/// §12 (T1) — a project baseline's change request cannot be decided by the person who requested
+/// it. The programme-level sibling is `the_taker_cannot_approve_their_own_baseline`; this is the
+/// same rule on the project's `change` gate.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_project_baseline_change_cannot_self_approve() {
+    let (pg, running, seeded) = fixture().await;
+    let project = create_project(&running, "Self-approval project").await;
+    let baseline = create_approved_baseline(&pg, &running, &seeded, &project).await;
+
+    let (status, requested) = running
+        .invoke(
+            "changes.request",
+            "dev:alice",
+            json!({
+                "project_id": project,
+                "baseline_id": baseline,
+                "title": "Move the scope",
+                "body": "one person requests and judges the change",
+                "impact": {"scope": "a deliverable moves"}
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{requested}");
+    let change = id_of(output(&requested), "change_id");
+    let gate = id_of(output(&requested), "approval_id");
+
+    // The requester is the gate's `requested_by`, and the store's one decision writer refuses.
+    let (status, refused) = running
+        .invoke(
+            "approvals.decide",
+            "dev:alice",
+            json!({"approval_id": gate, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{refused}");
+    assert!(
+        refused.to_string().contains("requester cannot decide"),
+        "the refusal is the store's RequesterCannotDecide mapping: {refused}"
+    );
+
+    // A distinct principal can decide the same gate, and the gate effect approves the change.
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            "dev:reviewer",
+            json!({"approval_id": gate, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+
+    let (status, read) = running
+        .invoke(
+            "registers.get",
+            "dev:alice",
+            json!({"id": change}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{read}");
+    assert_eq!(output(&read)["status"], "approved", "{read}");
+}

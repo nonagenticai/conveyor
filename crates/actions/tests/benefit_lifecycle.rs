@@ -408,8 +408,10 @@ async fn a_change_request_advances_the_profile() {
             .await
             .expect("the change row");
     assert!(
-        links.to_string().contains(&benefit),
-        "the change must cite the profile back: {links}"
+        links["requirements"].as_array().is_some_and(|items| items
+            .iter()
+            .any(|item| item["id"].as_str() == Some(benefit.as_str()))),
+        "the change must cite the profile back in the declared requirements array: {links}"
     );
 }
 

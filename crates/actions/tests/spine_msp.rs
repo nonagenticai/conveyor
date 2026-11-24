@@ -625,7 +625,11 @@ async fn msp_deletes_and_refusals() {
                 "impact": 3,
                 "owner_job_id": job,
                 "review_at": "2026-12-01",
-                "links": [{"kind": "objective", "ref": "reduce cycle time"}]
+                "links": {
+                    "cards": [],
+                    "requirements": [{"kind": "objective", "ref": "reduce cycle time"}],
+                    "decisions": []
+                }
             }),
             None,
             None,
