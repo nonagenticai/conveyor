@@ -1,11 +1,45 @@
 {
   "issues": [
     {
+      "number": 669,
+      "title": "rollback across a migration boundary cannot serve the prior digest (sqlx VersionMissing 70; Flux restores the pinned image)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/669",
+      "updatedAt": "2026-11-24T15:31:41Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        }
+      ]
+    },
+    {
+      "number": 667,
+      "title": "design: the rework register belongs to the live publish \u2014 stop deriving it in the committed pack",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/667",
+      "updatedAt": "2026-11-24T16:03:25Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 661,
       "title": "fix: the router flushes SSE headers before the upstream's first chunk",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/661",
-      "updatedAt": "2026-11-24T10:06:45Z",
+      "updatedAt": "2026-11-24T14:26:32Z",
       "labels": [
         {
           "name": "unit",
@@ -22,7 +56,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-24T12:22:34Z",
+      "updatedAt": "2026-11-24T14:27:54Z",
       "labels": [
         {
           "name": "programme",
@@ -35,7 +69,7 @@
       "title": "add: the L1 laya gate \u2014 the ladder builds the case, the engine makes the call, the decision cites it",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/656",
-      "updatedAt": "2026-11-24T09:59:54Z",
+      "updatedAt": "2026-11-24T14:30:43Z",
       "labels": [
         {
           "name": "unit",
@@ -100,9 +134,9 @@
     {
       "number": 650,
       "title": "T19 close-out: the live gate, the closure review and the published programme record",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/650",
-      "updatedAt": "2026-11-24T08:57:48Z",
+      "updatedAt": "2026-11-24T13:40:26Z",
       "labels": [
         {
           "name": "unit",
@@ -1083,7 +1117,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-24T10:54:36Z",
+      "updatedAt": "2026-11-24T15:09:32Z",
       "labels": [
         {
           "name": "unit",
@@ -1844,7 +1878,7 @@
       "title": "architecture: the board approves a contract for every delivery project",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/395",
-      "updatedAt": "2026-11-19T08:21:53Z",
+      "updatedAt": "2026-11-24T15:37:32Z",
       "labels": [
         {
           "name": "unit",
@@ -4486,15 +4520,15 @@
       "title": "T12 \u2014 One organisation loop (the acceptance of V2)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/88",
-      "updatedAt": "2026-11-24T07:15:11Z",
+      "updatedAt": "2026-11-24T15:37:53Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T12",
@@ -4526,9 +4560,9 @@
     {
       "number": 86,
       "title": "T15 \u2014 Tool authoring and BYO",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/86",
-      "updatedAt": "2026-11-24T12:12:30Z",
+      "updatedAt": "2026-11-24T14:27:44Z",
       "labels": [
         {
           "name": "unit",
@@ -4654,7 +4688,7 @@
       "title": "T6 \u2014 Development project",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/80",
-      "updatedAt": "2026-11-24T11:32:43Z",
+      "updatedAt": "2026-11-24T15:32:10Z",
       "labels": [
         {
           "name": "unit",
@@ -4675,7 +4709,7 @@
       "title": "T8 \u2014 Organisational memory",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/79",
-      "updatedAt": "2026-11-24T13:02:04Z",
+      "updatedAt": "2026-11-24T14:20:36Z",
       "labels": [
         {
           "name": "unit",
