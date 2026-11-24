@@ -90,6 +90,9 @@ pub mod interaction;
 pub mod inference;
 pub mod invite;
 pub mod jobs;
+// T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata record, its six Gets and the held-out
+// measurement.
+pub mod kata;
 pub mod label;
 // T2 (SPEC_V2 §7): the decision ladder's policies, refinements, laya configs and decisions.
 pub mod ladder;

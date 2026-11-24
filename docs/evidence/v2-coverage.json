@@ -549,7 +549,7 @@
       "concept": "kata",
       "verdict": "new",
       "evidence": [
-        "actions: kata.* absent"
+        "actions: kata.* found (kata.adopt, kata.analyse, kata.get…)"
       ],
       "note": "V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5."
     },

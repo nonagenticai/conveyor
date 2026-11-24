@@ -2355,6 +2355,82 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             tx.commit().await.expect("commit");
             ctx.push(sample.name, binding_id);
         }
+        // T5 (#77): each kata step gets a kata already at the stage it requires. The measurement
+        // sample's instrument has no locked split, so its refusal is the held-out gate itself —
+        // the successful held-out number is `crates/actions/tests/kata_measure.rs`.
+        "kata.open" => {
+            let instrument = seed_locked_eval_version(pg, ctx).await;
+            ctx.push("kata.open.instrument", instrument);
+        }
+        "kata.get" | "kata.observe" => {
+            let kata = seed_parity_kata(pg, ctx, "open", &[], None).await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.analyse" => {
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "observed",
+                &[("observe", json!({"observation": "parity observation"}))],
+                None,
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.hypothesise" => {
+            let instrument = seed_locked_eval_version(pg, ctx).await;
+            ctx.push("kata.instrument", instrument);
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "analysed",
+                &[("observe", json!({})), ("analyse", json!({}))],
+                None,
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.propose" => {
+            let instrument = seed_locked_eval_version(pg, ctx).await;
+            let hypothesis = json!({
+                "prediction": "parity prediction",
+                "instrument_version_id": instrument,
+            });
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "hypothesised",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("hypothesis", hypothesis),
+                ],
+                Some(instrument),
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.measure" => {
+            let instrument = seed_unlocked_eval_version(pg, ctx).await;
+            let hypothesis = json!({
+                "prediction": "parity prediction",
+                "instrument_version_id": instrument,
+            });
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "proposed",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("hypothesis", hypothesis),
+                    ("solution", json!({"candidate_ref": "process:parity:v2"})),
+                ],
+                Some(instrument),
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
         "invites.revoke" => {
             let id = seed_invite(pg, ctx).await;
             ctx.push(sample.name, id);
@@ -3194,6 +3270,114 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
 
 // ── the samples ──────────────────────────────────────────────────────────────────────
 
+/// T5 (#77): one kata at `status`, with the Gets it has already recorded.
+///
+/// `instrument` satisfies the hypothesis pair when the row is past `analysed`; the release hash
+/// is a shape-valid literal because the binding check is the action's, not this fixture's.
+async fn seed_parity_kata(
+    pg: &support::Pg,
+    ctx: &Ctx,
+    status: &str,
+    gets: &[(&str, Value)],
+    instrument: Option<Uuid>,
+) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let kata_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO kata
+             (tenant_id, job_binding_id, release_hash, signature, title, target_surface,
+              target_ref, status, instrument_version_id, prediction, threshold)
+         VALUES ($1, $2, $3, $4, 'Parity kata', 'procedure', 'process:parity', $5, $6, $7, 0.05)
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(ctx.org_binding_id)
+    .bind("a".repeat(64))
+    .bind(format!("parity-kata-{}", Uuid::now_v7()))
+    .bind(status)
+    .bind(instrument)
+    .bind(instrument.map(|_| "parity prediction"))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare a kata");
+    for (get_key, content) in gets {
+        sqlx::query(
+            "INSERT INTO kata_get (tenant_id, kata_id, get_key, content)
+             VALUES ($1, $2, $3, $4)",
+        )
+        .bind(ctx.tenant_id)
+        .bind(kata_id)
+        .bind(*get_key)
+        .bind(content)
+        .execute(&mut *tx)
+        .await
+        .expect("prepare the kata's Gets");
+    }
+    tx.commit().await.expect("commit");
+    kata_id
+}
+
+/// A fresh eval version with a LOCKED split and one quality metric — the hypothesis sample's
+/// pre-registration target. The stable eval fixture's version has no drawn split, so a kata
+/// cannot pre-register it.
+async fn seed_locked_eval_version(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let eval_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO eval (tenant_id, name, subject_kind, entry_action)
+         VALUES ($1, 'Parity kata instrument', 'process', 'eval_runs.start') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare an eval");
+    let version_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO eval_version
+             (tenant_id, eval_id, version, digest, split_sha256, split_locked_at)
+         VALUES ($1, $2, 1, 'parity', $3, now()) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(eval_id)
+    .bind("a".repeat(64))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare an eval version");
+    sqlx::query(
+        "INSERT INTO eval_metric
+             (tenant_id, version_id, key, role, kind, better, label, grader_kind, ordinal)
+         VALUES ($1, $2, 'pass', 'quality', 'binary', 'higher', 'pass', 'programmatic', 0)",
+    )
+    .bind(ctx.tenant_id)
+    .bind(version_id)
+    .execute(&mut *tx)
+    .await
+    .expect("prepare the instrument's metric");
+    tx.commit().await.expect("commit");
+    version_id
+}
+
+/// A fresh eval version with no drawn split — the `kata.measure` sample's refusal.
+async fn seed_unlocked_eval_version(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let eval_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO eval (tenant_id, name, subject_kind, entry_action)
+         VALUES ($1, 'Parity kata instrument', 'process', 'eval_runs.start') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare an eval");
+    let version_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO eval_version (tenant_id, eval_id, version, digest)
+         VALUES ($1, $2, 1, 'parity') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(eval_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare an eval version");
+    tx.commit().await.expect("commit");
+    version_id
+}
+
 fn samples(ctx: &Ctx) -> Vec<Sample> {
     let alice = serde_json::to_value(ctx.alice_user).expect("uuid");
     let mut out = vec![
@@ -3333,6 +3517,88 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             let mut sample = plain("job_releases.retire", json!({}), None);
             sample.input = Box::new(|ctx: &Ctx| json!({"id": ctx.org_release_id}));
             sample
+        },
+        // ── T5: the kata on the spine (#77) ──────────────────────────────────────────────
+        {
+            let mut sample = plain("kata.open", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_binding_id": ctx.org_binding_id,
+                    "signature": format!("parity-kata-{}", Uuid::now_v7()),
+                    "title": "Parity kata",
+                    "target_surface": "procedure",
+                    "target_ref": "process:parity",
+                    "instrument_version_id": ctx.pop("kata.open.instrument"),
+                    "threshold": 0.05,
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("kata.get", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"id": ctx.pop("kata.get")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.observe", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"kata_id": ctx.pop("kata.observe"), "observation": "the parity work"}),
+            );
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.analyse", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.analyse"),
+                    "problem_statement": "the parity problem, with data",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.hypothesise", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.hypothesise"),
+                    "prediction": "the held-out mean rises",
+                    "instrument_version_id": ctx.pop("kata.instrument"),
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.propose", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"kata_id": ctx.pop("kata.propose"), "candidate_ref": "process:parity:v2"}),
+            );
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.measure", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.measure"),
+                    "candidate_run_id": Uuid::now_v7(),
+                    "baseline_run_id": Uuid::now_v7(),
+                })
+            });
+            expecting(sample, 422)
+        },
+        {
+            // P3's adoption gate: a person's act. The sample names an absent kata, so both
+            // transports return the same 404; the human-only refusal has its own suite
+            // (`kata_adopt.rs`).
+            let mut sample = plain("kata.adopt", json!({}), None);
+            sample.input = Box::new(|_ctx: &Ctx| json!({"kata_id": Uuid::nil(), "note": "parity"}));
+            expecting(sample, 404)
         },
         plain("departments.create", json!({"name": "engineering"}), None),
         plain("audit.list", json!({"limit": 10}), None),

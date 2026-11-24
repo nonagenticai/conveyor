@@ -258,7 +258,14 @@ mod tests {
                 // T19 (#606): the decision forum — meeting types, meetings, agenda items,
                 // attendance, positions and the participant extension (0065_meetings.sql,
                 // SPEC_V2 §6.8, D66).
-                (65, "meetings".to_owned())
+                (65, "meetings".to_owned()),
+                // T5 (#77): the kata's record, its six Gets and its held-out measurement
+                // (0066_kata.sql, SPEC_V2 §6.3, §9.3–§9.4).
+                (66, "kata".to_owned()),
+                // T5 P2–P4 (#77): the open-time measurability gate, the pinned pre-kata
+                // procedure version, and the append-only revert and adoption evidence
+                // (0067_kata_gate.sql).
+                (67, "kata gate".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

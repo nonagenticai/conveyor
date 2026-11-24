@@ -119,8 +119,10 @@ use serde_json::{Value, json};
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
 /// `minutes_publish|list|get`) — 518 → **530**.
 /// **S21 step 9 (#649) adds 1 internal**: `cards.assign`, the card handoff (binding + note +
-/// bound run start). 530 → **531**.
-const EXPECTED: [&str; 531] = [
+/// bound run start). 530 → **531**. **T5 (#77) adds 8 internal**: P1's
+/// `kata.open|get|observe|analyse|hypothesise|propose|measure` and P2–P4's `kata.adopt` —
+/// 531 → **539**.
+const EXPECTED: [&str; 539] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -353,6 +355,14 @@ const EXPECTED: [&str; 531] = [
     "job_releases.retire",
     "jobs.list",
     "jobs.retry",
+    "kata.adopt",
+    "kata.analyse",
+    "kata.get",
+    "kata.hypothesise",
+    "kata.measure",
+    "kata.observe",
+    "kata.open",
+    "kata.propose",
     "knowledge.query",
     "labels.create",
     "labels.delete",
@@ -748,9 +758,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // `trend` and `scientific_formal.translate|verify`: internal stays 495, external 13 -> 18.
     // T17 (#87) adds five internal actions (`authoring.intake|draft|review|publish|assets`):
     // 495 -> 500; external stays 18. T19 (#606) adds twelve internal meetings actions:
-    // 500 -> 512; external stays 18. S21 step 9 (#649) adds one internal action
-    // (`cards.assign`): 512 -> 513; external stays 18.
-    assert_eq!((internal, external), (513, 18));
+    // 500 -> 512; external stays 18.
+    // T5 (#77) adds eight internal actions — P1's `kata.open|get|observe|analyse|hypothesise|`
+    // `propose|measure` and P2–P4's `kata.adopt`: internal 512 -> 520. S21 step 9 (#649) adds
+    // one internal (`cards.assign`): 520 -> 521; external stays 18.
+    assert_eq!((internal, external), (521, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
