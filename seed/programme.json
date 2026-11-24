@@ -1495,7 +1495,7 @@
       "key": "T19",
       "name": "Decision forums (meetings)",
       "description": "SPEC_V2 slice T19 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",

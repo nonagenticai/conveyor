@@ -2111,12 +2111,12 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           605,
           606
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2733,8 +2733,8 @@
       },
       "total": 50,
       "uncovered": [],
-      "with_open_units": 17,
-      "without_open_units": 33
+      "with_open_units": 16,
+      "without_open_units": 34
     },
     "screens": {
       "actions_invoked": 39,
