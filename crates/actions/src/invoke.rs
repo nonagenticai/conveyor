@@ -31,6 +31,7 @@ use std::time::{Duration, Instant};
 
 use base64::Engine as _;
 use conveyor_auth::{Role, ScopePolicy};
+use conveyor_domain::ladder::{FailAction, FailPolicy, Outcome, Rung};
 use conveyor_domain::{Id, TenantId};
 use conveyor_store as store;
 use conveyor_store::audit::{self, AuditEntry};
@@ -320,6 +321,38 @@ impl HandlerCtx {
     }
 }
 
+/// The explicit `gate_unavailable` payload an action attaches to its refusal (§7.2, finding
+/// v1-w1c-5).
+///
+/// The handler's transaction rolls back with the error, so the `unavailable` decision cannot be
+/// written there. The invocation boundary reads this payload after the rollback and records the
+/// policy's outcome in its own short transaction — see [`record_unavailable_decision`].
+#[derive(Clone, Debug)]
+pub struct GateUnavailable {
+    /// `closed | open` — the policy's fail behaviour.
+    pub fail_policy: FailPolicy,
+    /// The configured below-threshold action the outcome applied.
+    pub action: FailAction,
+    /// What the outage decided: `refused`, `escalated`, or the annotated `accepted`.
+    pub outcome: Outcome,
+    /// The note an open `annotate` policy records; `None` for every other shape.
+    pub note: Option<String>,
+    /// The policy the decision enforced.
+    pub policy_id: Uuid,
+    /// The policy version it read.
+    pub policy_version: Option<i64>,
+    /// The refinement applied, if any.
+    pub policy_refinement_id: Option<Uuid>,
+    /// The refinement version it read.
+    pub refinement_version: Option<i64>,
+    /// The laya config the policy pinned.
+    pub laya_config_id: Option<Uuid>,
+    /// The laya config version it read.
+    pub laya_config_version: Option<i64>,
+    /// The sha256 of the inputs the outage consumed.
+    pub input_hash: String,
+}
+
 /// An invocation failure, rendered as RFC 9457 by both transports.
 #[derive(Clone, Debug, thiserror::Error)]
 #[error("{code}: {detail}")]
@@ -334,6 +367,8 @@ pub struct ActionError {
     pub errors: Vec<FieldError>,
     /// The current representation a `412` should carry (CONTRACT §3).
     pub current: Option<Value>,
+    /// The `gate_unavailable` outcome to record after the handler transaction rolls back.
+    pub gate_outage: Option<Box<GateUnavailable>>,
 }
 
 impl ActionError {
@@ -345,12 +380,19 @@ impl ActionError {
             detail: detail.into(),
             errors: Vec::new(),
             current: None,
+            gate_outage: None,
         }
     }
 
     /// Attach `errors[]`.
     pub fn with_errors(mut self, errors: Vec<FieldError>) -> Self {
         self.errors = errors;
+        self
+    }
+
+    /// Attach the `gate_unavailable` outcome the invocation boundary records after the rollback.
+    pub fn with_gate_outage(mut self, outage: GateUnavailable) -> Self {
+        self.gate_outage = Some(Box::new(outage));
         self
     }
 
@@ -1240,6 +1282,61 @@ async fn invoke_internal(
         Ok(Err(error)) => {
             let _ = tx.rollback().await;
             let elapsed = started.elapsed().as_millis().min(i32::MAX as u128) as i32;
+            // §7.2 (v1-w1c-5): the gate outage is an outcome, not merely a failure. The
+            // handler's `decision` row rolled back with its transaction, so it is recorded
+            // here, in its own transaction, before the invocation failure is ledgered.
+            if let Some(outage) = error.gate_outage.as_deref() {
+                let kind = input
+                    .get("kind")
+                    .and_then(Value::as_str)
+                    .map(str::trim)
+                    .filter(|kind| !kind.is_empty())
+                    .unwrap_or(spec.name);
+                let question = input
+                    .get("question")
+                    .and_then(Value::as_str)
+                    .unwrap_or(kind);
+                let uuid = |field: &str| {
+                    input
+                        .get(field)
+                        .and_then(Value::as_str)
+                        .and_then(|raw| Uuid::parse_str(raw).ok())
+                };
+                let mut meta = match input.get("meta").cloned() {
+                    Some(Value::Object(meta)) => Value::Object(meta),
+                    // Preserve a non-object caller meta rather than dropping it; the payload
+                    // keys need an object to carry them.
+                    Some(other) => serde_json::json!({ "caller_meta": other }),
+                    None => serde_json::json!({}),
+                };
+                if let Value::Object(meta) = &mut meta {
+                    meta.insert("decision".to_owned(), serde_json::json!("unavailable"));
+                    meta.insert(
+                        "fail_policy".to_owned(),
+                        serde_json::json!(outage.fail_policy.as_str()),
+                    );
+                    meta.insert(
+                        "action".to_owned(),
+                        serde_json::json!(outage.action.as_str()),
+                    );
+                    if let Some(note) = outage.note.as_ref() {
+                        meta.insert("note".to_owned(), serde_json::json!(note));
+                    }
+                }
+                record_unavailable_decision(
+                    pool,
+                    ctx.tenant,
+                    outage,
+                    kind,
+                    question,
+                    uuid("project_id"),
+                    uuid("card_id"),
+                    meta,
+                    &ctx.actor_kind,
+                    Some(ctx.actor_id),
+                )
+                .await;
+            }
             record_failure(
                 pool,
                 spec,
@@ -2059,6 +2156,92 @@ async fn release_claim(
     store::actions::release_idempotency(&mut tx, tenant, scope, key).await?;
     tx.commit().await?;
     Ok(())
+}
+
+/// Record a `gate_unavailable` outcome as its own `decision` row (§7.2, finding v1-w1c-5).
+///
+/// The handler's transaction rolls back with the refusal, so the outage decision is written
+/// afterwards in a fresh short scoped transaction — the same shape as [`record_failure`], and
+/// best effort for the same reason: the caller already holds the typed `503`, and a store fault
+/// must never rewrite the policy's answer into a different one.
+///
+/// An outage has no verified laya answer, so it cannot name a `laya_invocation_id`, which the
+/// `decision_laya_provenance_complete` CHECK requires of the laya rung. The row is therefore the
+/// rule rung: the fail policy is the rule that decided, and the row still pins the policy,
+/// refinement and laya-config versions it read.
+#[allow(clippy::too_many_arguments)]
+pub(crate) async fn record_unavailable_decision(
+    pool: &PgPool,
+    tenant: TenantId,
+    outage: &GateUnavailable,
+    kind: &str,
+    question: &str,
+    project_id: Option<Uuid>,
+    card_id: Option<Uuid>,
+    meta: Value,
+    actor_kind: &str,
+    actor_id: Option<Uuid>,
+) {
+    let decision = store::ladder::NewDecision {
+        kind: kind.to_owned(),
+        rung: Rung::Rule,
+        project_id,
+        card_id,
+        question: question.to_owned(),
+        answer: "unavailable".to_owned(),
+        option_set_id: None,
+        option_set_version: None,
+        option_set_hash: None,
+        option_refinement_hashes: Vec::new(),
+        probabilities: serde_json::json!({}),
+        confidence: None,
+        input_hash: Some(outage.input_hash.clone()),
+        policy_id: Some(outage.policy_id),
+        policy_version: outage.policy_version,
+        policy_refinement_id: outage.policy_refinement_id,
+        refinement_version: outage.refinement_version,
+        laya_config_id: outage.laya_config_id,
+        laya_config_version: outage.laya_config_version,
+        laya_invocation_id: None,
+        laya_request_hash: None,
+        laya_response_hash: None,
+        actor_kind: sanitize_actor_kind(actor_kind).to_owned(),
+        actor_id,
+        approval_id: None,
+        latency_ms: None,
+        outcome: outage.outcome,
+        decided_at: if matches!(outage.outcome, Outcome::Escalated) {
+            None
+        } else {
+            Some(chrono::Utc::now())
+        },
+        meta,
+        options: Vec::new(),
+    };
+    let short = async {
+        let mut tx = store::begin_scoped(pool, tenant).await?;
+        store::actions::set_statement_timeout(&mut tx, BOOKKEEPING_TIMEOUT_MS).await?;
+        store::ladder::record_decision_tx(&mut tx, tenant, &decision)
+            .await
+            .map_err(|error| sqlx::Error::Decode(Box::new(error)))?;
+        tx.commit().await?;
+        Ok::<_, sqlx::Error>(())
+    };
+    match tokio::time::timeout(
+        Duration::from_millis(u64::from(BOOKKEEPING_TIMEOUT_MS)),
+        short,
+    )
+    .await
+    {
+        Ok(Ok(())) => {}
+        Ok(Err(error)) => {
+            tracing::error!(%error, action = kind, "record the unavailable decision")
+        }
+        Err(_) => tracing::error!(
+            action = kind,
+            "recording the unavailable decision timed out"
+        ),
+    }
 }
 
 /// Record a refused/error/timeout invocation in its own short transaction.

@@ -45,7 +45,7 @@ use sqlx::PgConnection;
 use uuid::Uuid;
 
 use crate::control::{etag_of, invalid, parent_error, require_precondition_with, store_error};
-use crate::invoke::{ActionError, HandlerCtx};
+use crate::invoke::{ActionError, GateUnavailable, HandlerCtx};
 use crate::spec::HandlerOutput;
 use crate::views::Page;
 
@@ -1432,14 +1432,20 @@ async fn laya_plan_tx(
 /// The design applies the policy's fail behaviour without ever treating the outage as a pass:
 /// a closed policy's outcome is `refused`; an open policy's is its configured action's
 /// (`escalated`, `refused` or the annotated `accepted` the caller must apply itself). The
-/// response carries that outcome; no `decision` row is written, because there is no answer to
-/// record. Recording the outage is v1-w1c-5's own card.
+/// response carries that outcome, and the error carries the explicit payload the invocation
+/// boundary records as the outage `decision` row after this handler's transaction rolls back
+/// (finding v1-w1c-5).
 fn gate_unavailable(
+    plan: &LayaPlan,
     fail_policy: FailPolicy,
     fail_action: FailAction,
     reason: impl std::fmt::Display,
 ) -> ActionError {
     let outcome = unavailable(fail_policy, fail_action);
+    let reason = reason.to_string();
+    let note = (fail_policy == FailPolicy::Open && fail_action == FailAction::Annotate)
+        .then(|| format!("laya unavailable: {reason}"));
+    let pins = plan.effective.pins();
     ActionError::new(
         503,
         "gate_unavailable",
@@ -1449,6 +1455,19 @@ fn gate_unavailable(
             outcome.as_str()
         ),
     )
+    .with_gate_outage(GateUnavailable {
+        fail_policy,
+        action: fail_action,
+        outcome,
+        note,
+        policy_id: plan.effective.policy.id,
+        policy_version: pins.policy_version,
+        policy_refinement_id: plan.effective.refinement.as_ref().map(|row| row.id),
+        refinement_version: pins.refinement_version,
+        laya_config_id: Some(plan.config.id),
+        laya_config_version: Some(plan.config.version),
+        input_hash: crate::spec::sha256_hex(plan.request.to_string().as_bytes()),
+    })
 }
 
 /// The request `ladder.prepare` returns.
@@ -1560,7 +1579,8 @@ pub struct EvaluateIn {
 /// the `ladder.prepare` document from the same rows, requires a successful `laya.classify`
 /// replay for that exact request hash, and reads the answer from the stored response and the
 /// latency from the invocation's own `duration_ms`. A missing, forged, tampered or unreadable
-/// call is `503 gate_unavailable` and writes nothing.
+/// call is `503 gate_unavailable`; the refusal carries the policy's outcome, which the
+/// invocation boundary records as an `unavailable` decision after the transaction rolls back.
 #[crate::action(
     name = "ladder.evaluate",
     version = 1,
@@ -1642,6 +1662,7 @@ async fn ladder_evaluate(
         } => response,
         store::idempotency::Lookup::Replay { status_code, .. } => {
             return Err(gate_unavailable(
+                &plan,
                 fail_policy,
                 fail_action,
                 format!("the verified call answered {status_code}"),
@@ -1649,6 +1670,7 @@ async fn ladder_evaluate(
         }
         store::idempotency::Lookup::Miss => {
             return Err(gate_unavailable(
+                &plan,
                 fail_policy,
                 fail_action,
                 "no successful laya.classify call carries this key",
@@ -1656,6 +1678,7 @@ async fn ladder_evaluate(
         }
         store::idempotency::Lookup::ConflictHash => {
             return Err(gate_unavailable(
+                &plan,
                 fail_policy,
                 fail_action,
                 "the key's request body is not this decision's request",
@@ -1663,6 +1686,7 @@ async fn ladder_evaluate(
         }
         store::idempotency::Lookup::InFlight => {
             return Err(gate_unavailable(
+                &plan,
                 fail_policy,
                 fail_action,
                 "the laya.classify call is still running",
@@ -1682,6 +1706,7 @@ async fn ladder_evaluate(
     })?
     .ok_or_else(|| {
         gate_unavailable(
+            &plan,
             fail_policy,
             fail_action,
             "no successful laya.classify invocation carries this key",
@@ -1689,6 +1714,7 @@ async fn ladder_evaluate(
     })?;
     if invocation.input_hash != plan.request_hash {
         return Err(gate_unavailable(
+            &plan,
             fail_policy,
             fail_action,
             "the invocation hashed a different request body",
@@ -1696,6 +1722,7 @@ async fn ladder_evaluate(
     }
     let output = response.get("output").ok_or_else(|| {
         gate_unavailable(
+            &plan,
             fail_policy,
             fail_action,
             "the stored replay carries no answer document",
@@ -1714,6 +1741,7 @@ async fn ladder_evaluate(
         }
         Err(laya::LayaError::Unreadable) => {
             return Err(gate_unavailable(
+                &plan,
                 fail_policy,
                 fail_action,
                 "the answer document is unreadable for this question",
