@@ -9,7 +9,13 @@
 //!
 //! Refusal order — every refusal precedes the first write: a foreign card (`404`), an archived
 //! card, the binding (`422 card_unassigned` / `422 job_binding_unusable`), a live root run
-//! (`409 card_has_live_run`), the note (`422 invalid_input`), the andon cord (`409`).
+//! (`409 card_has_live_run`), the handoff package (`422 handoff_incomplete`: its acceptance and
+//! the artefacts' existence in the tenant), the note (`422 invalid_input`), the andon cord
+//! (`409`).
+//!
+//! The package is persisted on the card itself (`meta.handoff`): the acceptance criteria and the
+//! artefact ids travel with the handoff, not only with the note, so the receiver and the lane gate
+//! read one row.
 
 use conveyor_domain::memory::{MemoryKind, validate_remember};
 use conveyor_store as store;
@@ -32,6 +38,10 @@ use crate::memory::remember::{MemoryRememberIn, remember_tx};
 use crate::memory::{MemoryOut, parse_kind, source_from_actor};
 use crate::spec::HandlerOutput;
 
+/// The card `meta` key carrying the handoff package: the acceptance criteria and artefact ids
+/// the receiver was handed.
+const META_HANDOFF: &str = "handoff";
+
 /// `cards.assign`'s input.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CardAssignIn {
@@ -43,6 +53,14 @@ pub struct CardAssignIn {
     pub job_binding_id: Option<Uuid>,
     /// What the receiver must know. Trimmed; empty is refused.
     pub note: String,
+    /// What "done" means for the receiver: one or more acceptance criteria, stored on the
+    /// card's `meta.handoff`. Empty is refused `422 handoff_incomplete`.
+    #[serde(default)]
+    pub acceptance: Vec<String>,
+    /// The artefacts the receiver needs, by id, stored on the card's `meta.handoff`. Every id
+    /// must name an artefact in this tenant; empty is refused `422 handoff_incomplete`.
+    #[serde(default)]
+    pub artifact_ids: Vec<Uuid>,
     /// `fact | attempt | decision | blocker` (default `fact`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kind: Option<String>,
@@ -131,6 +149,53 @@ async fn cards_assign(
         ));
     }
 
+    // The package the receiver is handed: what done means, and which artefacts are the input.
+    // Both travel on the card, and every artefact must be one this tenant can read.
+    let acceptance: Vec<String> = input
+        .acceptance
+        .iter()
+        .map(|line| line.trim())
+        .filter(|line| !line.is_empty())
+        .map(|line| line.to_owned())
+        .collect();
+    if acceptance.is_empty() {
+        return Err(ActionError::new(
+            422,
+            "handoff_incomplete",
+            format!("{action}: the handoff names no acceptance criterion"),
+        ));
+    }
+    if input.artifact_ids.is_empty() {
+        return Err(ActionError::new(
+            422,
+            "handoff_incomplete",
+            format!("{action}: artifact_ids is empty; the handoff names no artefact"),
+        ));
+    }
+    for artifact_id in &input.artifact_ids {
+        let found = store::architecture::get_artifact_tx(&mut *tx, ctx.tenant, *artifact_id)
+            .await
+            .map_err(|error| match error {
+                store::architecture::ArchitectureStoreError::Database(error) => {
+                    store_error(error, action)
+                }
+                other => ActionError::new(
+                    500,
+                    "internal",
+                    format!("{action}: could not read artefact {artifact_id}: {other}"),
+                ),
+            })?;
+        if found.is_none() {
+            return Err(ActionError::new(
+                422,
+                "handoff_incomplete",
+                format!(
+                    "{action}: artifact_ids names {artifact_id}, which is not an artefact in this tenant"
+                ),
+            ));
+        }
+    }
+
     // The note is checked before any write; `remember_tx` applies the same rules when it lands.
     let kind = parse_kind(input.kind.as_deref())
         .map_err(|detail| ActionError::new(422, "invalid_input", format!("{action}: {detail}")))?
@@ -154,12 +219,41 @@ async fn cards_assign(
             Some(record) => record,
             None => return Err(stale_card(&mut *tx, ctx.tenant, current.card.id, action).await?),
         };
+
+    // The handoff package lands on the card itself, beside the binding, in the same
+    // transaction. `set_card_meta_tx` replaces the document, so the merge starts from the row
+    // just read; the version guard is the one the binding update just advanced.
+    let mut next_meta = match record.meta.clone() {
+        Value::Object(map) => Value::Object(map),
+        _ => serde_json::json!({}),
+    };
+    next_meta[META_HANDOFF] = serde_json::json!({
+        "acceptance": acceptance,
+        "artifact_ids": input
+            .artifact_ids
+            .iter()
+            .map(|id| id.to_string())
+            .collect::<Vec<_>>(),
+    });
+    let record = match store::card::set_card_meta_tx(
+        &mut *tx,
+        ctx.tenant,
+        record.card.id,
+        &next_meta,
+        record.card.version,
+    )
+    .await
+    .map_err(|error| store_error(error, action))?
+    {
+        Some(record) => record,
+        None => return Err(stale_card(&mut *tx, ctx.tenant, current.card.id, action).await?),
+    };
     card_event(
         &mut *tx,
         &ctx,
         &record,
         CARD_UPDATED,
-        serde_json::json!({ "card_id": record.card.id, "changed": ["job_binding_id"] }),
+        serde_json::json!({ "card_id": record.card.id, "changed": ["job_binding_id", "meta"] }),
         card_json(&record),
         card_json(&current),
     )
