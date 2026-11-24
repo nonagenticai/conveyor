@@ -268,7 +268,12 @@ mod tests {
                 (67, "kata gate".to_owned()),
                 // T6: the development charter, its immutable step evidence, the closure record,
                 // the one-pending development gate index and the approval-policy auto-merge terms.
-                (68, "development project".to_owned())
+                (68, "development project".to_owned()),
+                // T15 (#86): the tool_draft governed-asset kind, the registered tool sources, the
+                // binding-scoped subset, the ledger's binding pin, the promotion record and the
+                // publication quorum. 69 is the parallel #79 lane's migration and is absent here
+                // until that lane merges; this branch's set skips it deliberately.
+                (70, "tool authoring".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
