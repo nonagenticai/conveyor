@@ -49,6 +49,8 @@ pub struct ResolvedTool {
     pub tool_id: Uuid,
     /// The toolkit version row the binding pins.
     pub toolkit_id: Uuid,
+    /// The grant that made this tool callable (T15: the ledger names it).
+    pub binding_id: Uuid,
     /// The toolkit's key (`coding`).
     pub toolkit_key: String,
     /// The toolkit's semantic version (not the row lock).
@@ -69,6 +71,10 @@ pub struct ResolvedTool {
     pub handler_action: String,
     /// The write verification declaration (§11.3); `{}` on a non-writing tool.
     pub verify: Value,
+    /// The registered source an authored/BYO tool dispatches to (T15), when it has one.
+    pub source_id: Option<Uuid>,
+    /// `{kind, method, path}` or `{kind, mcp_tool}` for a registered source; `{}` otherwise.
+    pub destination: Value,
     /// The binding's ceiling — it narrows the tool's effect and never raises it.
     pub effect_ceiling: String,
     /// The sealed credential alias the broker resolves (never shown to a job).
@@ -125,15 +131,16 @@ pub async fn step_belongs_to_run(
     Ok(found.is_some())
 }
 
-const RESOLVED_COLUMNS: &str = "t.id AS tool_id, k.id AS toolkit_id, k.key AS toolkit_key, \
-     k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, t.idempotency, \
-     t.timeout_secs, t.redact, t.handler_action, t.verify, b.effect_ceiling, b.credential_alias, \
-     k.auth_adapter";
+const RESOLVED_COLUMNS: &str = "t.id AS tool_id, k.id AS toolkit_id, b.id AS binding_id, \
+     k.key AS toolkit_key, k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, \
+     t.idempotency, t.timeout_secs, t.redact, t.handler_action, t.verify, t.source_id, \
+     t.destination, b.effect_ceiling, b.credential_alias, k.auth_adapter";
 
 #[derive(sqlx::FromRow)]
 struct ResolvedRow {
     tool_id: Uuid,
     toolkit_id: Uuid,
+    binding_id: Uuid,
     toolkit_key: String,
     toolkit_version: i64,
     tool_key: String,
@@ -144,6 +151,8 @@ struct ResolvedRow {
     redact: Value,
     handler_action: String,
     verify: Value,
+    source_id: Option<Uuid>,
+    destination: Value,
     effect_ceiling: String,
     credential_alias: Option<String>,
     auth_adapter: String,
@@ -154,6 +163,7 @@ impl From<ResolvedRow> for ResolvedTool {
         Self {
             tool_id: row.tool_id,
             toolkit_id: row.toolkit_id,
+            binding_id: row.binding_id,
             toolkit_key: row.toolkit_key,
             toolkit_version: row.toolkit_version,
             tool_key: row.tool_key,
@@ -164,6 +174,8 @@ impl From<ResolvedRow> for ResolvedTool {
             redact: row.redact,
             handler_action: row.handler_action,
             verify: row.verify,
+            source_id: row.source_id,
+            destination: row.destination,
             effect_ceiling: row.effect_ceiling,
             credential_alias: row.credential_alias,
             auth_adapter: row.auth_adapter,
@@ -195,6 +207,7 @@ pub async fn resolve(
             AND k.status = 'published'
             AND t.key = $5
             AND t.status = 'published'
+            AND (cardinality(b.tool_keys) = 0 OR t.key = ANY (b.tool_keys))
           ORDER BY (b.run_id IS NULL) ASC, b.created_at DESC
           LIMIT 1"
     );
@@ -231,6 +244,7 @@ pub async fn bound_tools(
             AND (b.run_id = $2 OR (b.job_binding_id IS NOT NULL AND b.job_binding_id = $3))
             AND k.status = 'published'
             AND t.status = 'published'
+            AND (cardinality(b.tool_keys) = 0 OR t.key = ANY (b.tool_keys))
           ORDER BY k.key, t.key, (b.run_id IS NULL) ASC, b.created_at DESC"
     );
     let rows: Vec<ResolvedRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
@@ -253,6 +267,8 @@ pub struct NewToolCall<'a> {
     pub card_id: Option<Uuid>,
     /// The exact tool version row.
     pub tool_id: Uuid,
+    /// The grant that authorised the call (T15: binding-scoped BYO discovery is auditable).
+    pub binding_id: Option<Uuid>,
     /// The canonical name the caller used.
     pub tool_key: &'a str,
     /// The toolkit key.
@@ -291,12 +307,12 @@ pub async fn insert_call(
     call: &NewToolCall<'_>,
 ) -> Result<Uuid, ToolStoreError> {
     let id: (Uuid,) = sqlx::query_as(
-        "INSERT INTO tool_call (tenant_id, run_id, run_step_id, card_id, tool_id, tool_key,
-                                toolkit_key, toolkit_version, input_hash, status, http_status,
-                                latency_ms, request_bytes, response_bytes, cost, error_class,
-                                error_message, resume_token)
+        "INSERT INTO tool_call (tenant_id, run_id, run_step_id, card_id, tool_id, binding_id,
+                                tool_key, toolkit_key, toolkit_version, input_hash, status,
+                                http_status, latency_ms, request_bytes, response_bytes, cost,
+                                error_class, error_message, resume_token)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17,
-                 $18)
+                 $18, $19)
          RETURNING id",
     )
     .bind(tenant.as_uuid())
@@ -304,6 +320,7 @@ pub async fn insert_call(
     .bind(call.run_step_id)
     .bind(call.card_id)
     .bind(call.tool_id)
+    .bind(call.binding_id)
     .bind(call.tool_key)
     .bind(call.toolkit_key)
     .bind(call.toolkit_version)
@@ -368,6 +385,8 @@ pub struct ToolCallRow {
     pub run_id: Option<Uuid>,
     /// The tool version it pinned.
     pub tool_id: Uuid,
+    /// The grant the call was authorised by.
+    pub binding_id: Option<Uuid>,
     /// The canonical name the caller used.
     pub tool_key: String,
     /// The toolkit key.
@@ -391,8 +410,8 @@ pub async fn calls_for_run(
     run_id: Uuid,
 ) -> Result<Vec<ToolCallRow>, ToolStoreError> {
     let rows: Vec<ToolCallRow> = sqlx::query_as(
-        "SELECT id, run_id, tool_id, tool_key, toolkit_key, toolkit_version, input_hash, status,
-                http_status, latency_ms
+        "SELECT id, run_id, tool_id, binding_id, tool_key, toolkit_key, toolkit_version,
+                input_hash, status, http_status, latency_ms
            FROM tool_call
           WHERE tenant_id = $1 AND run_id = $2
           ORDER BY created_at ASC, id ASC",
@@ -412,8 +431,8 @@ pub async fn calls_for_tool(
     limit: i64,
 ) -> Result<Vec<ToolCallRow>, ToolStoreError> {
     let rows: Vec<ToolCallRow> = sqlx::query_as(
-        "SELECT id, run_id, tool_id, tool_key, toolkit_key, toolkit_version, input_hash, status,
-                http_status, latency_ms
+        "SELECT id, run_id, tool_id, binding_id, tool_key, toolkit_key, toolkit_version,
+                input_hash, status, http_status, latency_ms
            FROM tool_call
           WHERE tenant_id = $1 AND tool_id = $2
           ORDER BY created_at DESC, id DESC

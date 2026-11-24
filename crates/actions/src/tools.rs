@@ -27,7 +27,11 @@ use crate::spec::{
 pub const TOOLS_CALL: &str = "tools.call";
 
 /// The broker's input.
+///
+/// Closed: a caller names a run, a tool and the tool's input. A `url`, a `destination` or any
+/// other member is `422 unknown_field` before the broker resolves anything (§11.3 step 5).
 #[derive(schemars::JsonSchema)]
+#[serde(deny_unknown_fields)]
 #[allow(dead_code)]
 struct ToolCallIn {
     /// The run the call is made for; its binding is what authorises the tool.

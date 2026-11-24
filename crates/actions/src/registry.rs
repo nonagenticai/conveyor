@@ -274,7 +274,10 @@ pub fn validate(registry: &Registry) -> Result<(), RegistryError> {
         // dispatched by the engine itself (`HandlerRef::Broker`), which is the same guarantee a
         // `HandlerRef::Internal` carries — a compiled, in-process path, never a missing arm.
         if spec.kind == ActionKind::Internal
-            && !matches!(spec.handler, HandlerRef::Internal(_) | HandlerRef::Broker)
+            && !matches!(
+                spec.handler,
+                HandlerRef::Internal(_) | HandlerRef::Broker | HandlerRef::ToolDestination
+            )
         {
             return Err(RegistryError::Handlerless(spec.name.to_owned()));
         }

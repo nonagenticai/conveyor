@@ -152,7 +152,7 @@ fn sanitize(text: &str) -> String {
 }
 
 /// Resolve a same-document `$ref` chain (the stored spec must stand alone).
-fn resolve(value: &Value, root: &Value, depth: usize) -> Value {
+pub(crate) fn resolve(value: &Value, root: &Value, depth: usize) -> Value {
     if depth > 32 {
         return value.clone();
     }
@@ -179,7 +179,7 @@ fn resolve(value: &Value, root: &Value, depth: usize) -> Value {
     }
 }
 
-fn pointer<'a>(root: &'a Value, reference: &str) -> Option<&'a Value> {
+pub(crate) fn pointer<'a>(root: &'a Value, reference: &str) -> Option<&'a Value> {
     let path = reference.strip_prefix("#/")?;
     let mut current = root;
     for segment in path.split('/') {
@@ -271,7 +271,7 @@ pub fn discover(
     Ok(out)
 }
 
-fn success_schema(operation: &Value) -> Value {
+pub(crate) fn success_schema(operation: &Value) -> Value {
     let Some(responses) = operation.get("responses").and_then(Value::as_object) else {
         return json!({"type": "object"});
     };

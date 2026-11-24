@@ -36,6 +36,7 @@ impl From<&ApprovalPolicy> for ApprovalPolicyOut {
             approver_kind: policy.approver_kind.as_str().to_owned(),
             conditions: policy.conditions.clone(),
             expires_at: policy.expires_at,
+            required_decisions: policy.required_decisions,
         }
     }
 }
@@ -125,7 +126,8 @@ async fn approval_policies_set(
     // A waiver for an action nothing gates is dead configuration that reads like a decision. The
     // destructive gate only ever consults policies for destructive actions; T6's development
     // gates are the one other governed surface (their policy row is §6.4's auto-merge).
-    let governed = crate::development::is_governed_gate(spec.name);
+    let governed = crate::development::is_governed_gate(spec.name)
+        || crate::tool_authoring::is_governed_gate(spec.name);
     if spec.effect != Effect::Destructive && !governed {
         return Err(invalid(
             "action",
@@ -207,8 +209,8 @@ async fn approval_policies_set(
                     "approver_kind",
                     "invalid_value",
                     format!(
-                        "{} is not a governed development gate; auto-merge applies only to \
-                         development review/merge/deploy gates",
+                        "{} is not a governed gate; an auto policy applies only to a \
+                         development gate or the tool-authoring publication gate",
                         spec.name
                     ),
                 ));
@@ -222,8 +224,23 @@ async fn approval_policies_set(
                     "an auto-merge policy still requires the gate; it never waives it",
                 ));
             }
-            AutoMergeConditions::parse(&conditions)
-                .map_err(|error| invalid("conditions", "invalid_value", error.to_string()))?;
+            // A development gate carries §6.4's typed auto-merge conditions; the publication
+            // gate carries `max_effect`, the highest effect a rule may publish. The action that
+            // evaluates the policy reads the shape it owns.
+            if crate::development::is_governed_gate(spec.name) {
+                AutoMergeConditions::parse(&conditions)
+                    .map_err(|error| invalid("conditions", "invalid_value", error.to_string()))?;
+            } else if let Some(raw) = conditions
+                .get("max_effect")
+                .and_then(serde_json::Value::as_str)
+                && Effect::parse(raw).is_none()
+            {
+                return Err(invalid(
+                    "conditions",
+                    "invalid_value",
+                    "max_effect must be read, write, spend or destructive",
+                ));
+            }
             let expires_at = input.expires_at.ok_or_else(|| {
                 invalid(
                     "expires_at",
@@ -253,6 +270,21 @@ async fn approval_policies_set(
         }
     }
 
+    let required_decisions = input.required_decisions.unwrap_or(1);
+    if !(1..=255).contains(&required_decisions) {
+        return Err(invalid(
+            "required_decisions",
+            "invalid_value",
+            "a gate needs between 1 and 255 decisions",
+        ));
+    }
+    if approver_kind == ApproverKind::Auto && required_decisions != 1 {
+        return Err(invalid(
+            "required_decisions",
+            "invalid_value",
+            "an auto policy is one rule decision; the quorum is 1",
+        ));
+    }
     let policy = ApprovalPolicy {
         action: spec.name.to_owned(),
         approval,
@@ -260,6 +292,7 @@ async fn approval_policies_set(
         approver_kind,
         conditions,
         expires_at: input.expires_at,
+        required_decisions,
     };
     store::approval_policy::set(&mut *tx, ctx.tenant, &policy, Some(ctx.actor_id))
         .await

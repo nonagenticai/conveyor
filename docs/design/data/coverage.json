@@ -1750,7 +1750,6 @@
     },
     {
       "blocked_by": [
-        "T15",
         "T17"
       ],
       "evidence": [
@@ -1887,28 +1886,30 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/tool_authoring.rs",
+        "crates/store/src/tool_authoring.rs",
+        "migrations/0070_tool_authoring.sql"
       ],
-      "gap": "no tool authoring, OpenAPI draft import or BYO tool binding",
+      "gap": null,
       "key": "T15",
       "measured": {
         "actions": [
-          0,
-          0
+          10,
+          10
         ],
         "modules": [
-          0,
-          0
+          2,
+          2
         ],
         "tables": [
-          0,
-          0
+          2,
+          2
         ]
       },
       "name": "Tool authoring and BYO",
       "parallel_with": [],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 12,
       "units": {
@@ -2728,10 +2729,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 43,
+        "built": 44,
         "partial": 1,
         "planned": 0,
-        "proposed": 4,
+        "proposed": 3,
         "standing": 1
       },
       "total": 50,
