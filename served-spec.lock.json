@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "5709dc341ef089dd91f4ca003c2784be949ca23eb36403372e78568ef2fd57f0",
+    "GET /api/actions": "d423afd931265259f92c5d8104ff8909508919ed55af33f75dfd9d6311845355",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -264,6 +264,8 @@
     "POST /api/actions/invites.create/invocations": "f9d2d501c6b45c56b3dff1d7870c9ea384042f74fb97aee9f178ffac31ed4405",
     "POST /api/actions/invites.list/invocations": "fc1f0ace46fa57310d95bc0976b1dc17828b16936dde0b3e94b109bae31c2a22",
     "POST /api/actions/invites.revoke/invocations": "2239db25e91a24306269dfac3974edfcc3845ec6ddee249bef3544f58a782044",
+    "POST /api/actions/job_authorities.get/invocations": "11cd813c353fd991377c8fa7b07db9a70be27e23e7bc887213e2c5f824317f46",
+    "POST /api/actions/job_authorities.set/invocations": "671ddfb91bbf2aac74b9a6f3925fd8d46d23e489697be37e504fc42fcd8d52b2",
     "POST /api/actions/job_bindings.create/invocations": "975e51b736a3d290e77559a2108ff0ef7040a99a12d59ff4b4f85262e0a67aff",
     "POST /api/actions/job_bindings.get/invocations": "17a5f15765df413f58398615f358b81fcfd03fffd4c3c08fecc11c8f84f559fc",
     "POST /api/actions/job_bindings.list/invocations": "0f335d35a0ec172fd9ef8de03db35e79c3d65488f91999b3488974716e847ac8",
