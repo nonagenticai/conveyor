@@ -24,6 +24,9 @@ UPDATE run
               END;
 
 ALTER TABLE run
+    -- A raw insert (a fixture, a repair) that says nothing is a project run: the safe default,
+    -- because a job run MUST name its binding and the CHECK below would refuse a false job.
+    ALTER COLUMN kind SET DEFAULT 'project',
     ALTER COLUMN kind SET NOT NULL,
     ADD CONSTRAINT run_kind_vocabulary
         CHECK (kind IN ('job', 'project', 'process', 'workflow')),
