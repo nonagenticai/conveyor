@@ -2902,7 +2902,12 @@
    ],
    "failure_scenario": "Downstream slices T4, T7 and T10 treat the PM job as working when no end-to-end PM run or self-approval refusal was ever recorded; the organisation loop (T12) then starts on an unexercised spine.",
    "acceptance": "T3 cites a PM run record, a self-approval refusal test and a baseline-change-request test; its closure review exists in the output index.",
-   "owner_project": "T3"
+   "owner_project": "T3",
+   "resolved_by": {
+    "commit": "874cdb247aaef2cb1f5f307bbe77db09b134df43",
+    "test": "crates/api/tests/pm_lifecycle.rs::the_pm_charters_plans_and_baselines_a_request; crates/api/tests/pm_self_approval.rs::the_pm_cannot_decide_its_own_gate; crates/api/tests/pm_baseline_change.rs::plan_without_a_change_request_is_refused; crates/api/tests/pm_status.rs::status_report_cites_live_baseline_and_gates",
+    "evidence": "scripts/v2-slice-artefacts.json now cites the four PM test files instead of the specification; docs/evidence/T3-PM.md maps each T3 \u00a712 clause to its test and command; build-coverage.py --check exits 0 (coverage.json and .js current). pm_lifecycle 5, pm_self_approval 5, pm_baseline_change 7, pm_status 5."
+   }
   },
   {
    "id": "v1-w4c-1",
@@ -4801,7 +4806,12 @@
    ],
    "failure_scenario": "The PM runs pm.plan and the scope baseline is approved. The PM runs pm.plan again with added nodes: a second scope baseline is inserted with change_id NULL, its gate opens and is approved, and the latest approved baseline is the changed scope. No change register row exists.",
    "acceptance": "plan_project refuses with 409 change_request_required when an approved baseline of that kind exists unless an approved change naming it is supplied, and refuses the duplicate WBS; a test re-calls pm.plan and projects.baseline after approval and asserts the refusal, and both paths share one guard.",
-   "owner_project": "T3"
+   "owner_project": "T3",
+   "resolved_by": {
+    "commit": "b01aef4da748be81571575d52ce28474978219be",
+    "test": "crates/api/tests/pm_baseline_change.rs::plan_without_a_change_request_is_refused; crates/api/tests/pm_baseline_change.rs::plan_with_an_approved_change_advances; crates/api/tests/pm_baseline_change.rs::a_new_baseline_without_a_change_request_is_refused",
+    "evidence": "cargo test -p conveyor-api --test pm_baseline_change: 7 passed. pm.plan runs the baseline guard BEFORE any WBS write; a re-plan without an approved change request is refused 409 change_request_required with the WBS and baseline rows unchanged; a named approved change advances the baseline."
+   }
   },
   {
    "id": "v1-p61-2",
@@ -4830,7 +4840,12 @@
    ],
    "failure_scenario": "A sponsor asks for the project's status. The PM can only dump rows through pm.get; no report asset exists to gate, version or cite at a tranche review, so status reporting happens outside the governed record and cannot be audited.",
    "acceptance": "A pm.status action writes or returns a report with the PM's status narrative scoped to the project, WBS and gates, backed by a status-report asset kind or a documented non-asset contract; a test asserts the report cites the live baseline and gate set.",
-   "owner_project": "T3"
+   "owner_project": "T3",
+   "resolved_by": {
+    "commit": "93c91ef81e486d2836660763090cc466e17c0143",
+    "test": "crates/api/tests/pm_status.rs::status_report_cites_live_baseline_and_gates; crates/api/tests/pm_status.rs::empty_narrative_refused",
+    "evidence": "cargo test -p conveyor-api --test pm_status: 5 passed; -p conveyor-actions --test registry: 15 passed. pm.status writes a draft status_report governed asset citing the live project, baselines, WBS, gates and open changes; migration 0101 admits the kind; the action dump and served lock carry pm.status."
+   }
   },
   {
    "id": "v1-p116-1",
