@@ -2522,7 +2522,8 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let id = seed_list(pg, ctx).await;
             ctx.push(sample.name, id);
         }
-        "cards.update" | "cards.move" | "cards.archive" | "cards.duplicate" | "cards.comment" => {
+        "cards.update" | "cards.move" | "cards.archive" | "cards.duplicate" | "cards.comment"
+        | "cards.assign" => {
             let id = seed_card(pg, ctx, "active").await;
             ctx.push(sample.name, id);
         }
@@ -3796,6 +3797,21 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample
         },
         on_prepared("cards.update", Some("\"1\"")),
+        {
+            // S21 step 9: the handoff binds a fresh card to the active org binding, records
+            // its note and starts the bound run — one execution per round, replayed by the
+            // other transport under the same key.
+            let binding = ctx.org_binding_id;
+            let mut sample = on_prepared("cards.assign", Some("\"1\""));
+            sample.input = Box::new(move |ctx: &Ctx| {
+                json!({
+                    "card_id": ctx.pop("cards.assign"),
+                    "job_binding_id": binding,
+                    "note": "the parity handoff",
+                })
+            });
+            expecting(sample, 201)
+        },
         on_prepared("cards.archive", Some("\"1\"")),
         on_prepared("cards.unarchive", Some("\"1\"")),
         on_prepared("cards.duplicate", None),

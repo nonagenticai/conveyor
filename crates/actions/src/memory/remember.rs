@@ -64,6 +64,20 @@ async fn memory_remember(
     ctx: HandlerCtx,
     input: MemoryRememberIn,
 ) -> Result<HandlerOutput<MemoryOut>, ActionError> {
+    let out = remember_tx(&mut *tx, &ctx, input).await?;
+    Ok(HandlerOutput::created(out))
+}
+
+/// Write one hot row in the caller's transaction.
+///
+/// Shared by `memory.remember` and the card handoff (`cards.assign`, S21 step 9): one writer,
+/// one event and one set of body/kind/source rules (CONTRACT §17). The caller supplies its
+/// transaction, so the row and whatever the caller writes commit together.
+pub(crate) async fn remember_tx(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    input: MemoryRememberIn,
+) -> Result<MemoryOut, ActionError> {
     let action = "memory.remember";
     let kind = parse_kind(input.kind.as_deref())
         .map_err(|detail| ActionError::new(422, "invalid_input", format!("{action}: {detail}")))?
@@ -95,7 +109,7 @@ async fn memory_remember(
     let out = MemoryOut::from(record);
     append_raw_event(
         &mut *tx,
-        &ctx,
+        ctx,
         &RawEvent {
             topic: format!("card:{}", out.card_id),
             board_id: None,
@@ -114,7 +128,7 @@ async fn memory_remember(
     )
     .await?;
 
-    Ok(HandlerOutput::created(out))
+    Ok(out)
 }
 
 fn memory_error(error: MemoryStoreError, action: &str) -> ActionError {

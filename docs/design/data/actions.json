@@ -89,6 +89,7 @@
     "card_types.list",
     "cards.add_label",
     "cards.archive",
+    "cards.assign",
     "cards.claim",
     "cards.comment",
     "cards.create",

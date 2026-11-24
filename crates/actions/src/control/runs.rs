@@ -12,7 +12,7 @@
 
 use conveyor_domain::RunStatus;
 use conveyor_store as store;
-use conveyor_store::run::{NewRun, RunRecord};
+use conveyor_store::run::RunRecord;
 use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
@@ -21,6 +21,7 @@ use crate::board::events::{RawEvent, append_raw_event};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
+use super::run_create::create_bound_run_tx;
 use super::views::{
     IdIn, RunCancelIn, RunCreateIn, RunFinishIn, RunGetIn, RunGetOut, RunListIn, RunOut,
     RunProcessRef, RunStepOut, RunTreeChildOut, RunTreeOut,
@@ -232,79 +233,18 @@ async fn runs_create(
         (Some(requested), _) => Some(requested),
         (None, on_card) => on_card,
     };
-    let board = store::board::get_board_tx(&mut *tx, ctx.tenant, card.board_id)
-        .await
-        .map_err(|error| store_error(error, action))?
-        .ok_or_else(|| ActionError::resource_not_found("board"))?;
-
-    let andon = store::andon::get_tx(&mut *tx, ctx.tenant)
-        .await
-        .map_err(|error| {
-            tracing::error!(%error, "read andon state");
-            ActionError::internal()
-        })?;
-    if andon.is_some_and(|state| state.engaged) {
-        return Err(ActionError::new(
-            409,
-            "andon-engaged",
-            "the tenant's andon cord is pulled; no run may be created while it is engaged",
-        ));
-    }
-
-    let attempt = store::run::next_attempt_for_card_tx(&mut *tx, ctx.tenant, card.id)
-        .await
-        .map_err(|error| store_error(error, action))?;
-
-    let run = store::run::insert_run_tx(
-        &mut *tx,
-        ctx.tenant,
-        &NewRun {
-            card_id: Some(card.id),
-            project_id: board.project_id,
-            attempt,
-            correlation_id: input.correlation_id,
-            process_id: None,
-            inputs: serde_json::Value::Object(serde_json::Map::new()),
-            capability_id: None,
-            capability_agent_id: None,
-            // `runs.create` is a ROOT: a plain run has no parent, no step and pins no process.
-            parent_run_id: None,
-            step_id: None,
-            workflow_step_id: None,
-            depth: 0,
-            process_version: 1,
-            // T0: a run may name the organisation binding (and the release it claims) it
-            // executes under. The store refuses a retired binding or a stale pin 409 before
-            // the INSERT (SPEC_V2 §4.4). S21 step 6: a card's own binding is inherited when
-            // the request omits one.
-            job_binding_id,
-            release_hash: input.release_hash.clone(),
-        },
-    )
-    .await
-    .map_err(|error| run_error(error, action))?;
-
-    store::run::enqueue_run_execute_tx(&mut *tx, ctx.tenant, run.id)
-        .await
-        .map_err(|error| store_error(error, action))?;
-
-    let record = read_record(tx, &ctx, run.id, action).await?;
-    let out = run_out(&record);
-    emit_run_event(
+    let (run, out) = create_bound_run_tx(
         &mut *tx,
         &ctx,
-        run.id,
-        "run.created",
-        serde_json::json!({
-            "run_id": run.id,
-            "card_id": run.card_id,
-            "attempt": run.attempt,
-        }),
-        serde_json::to_value(&out).unwrap_or(serde_json::Value::Null),
+        &card,
+        job_binding_id,
+        input.correlation_id,
+        input.release_hash.clone(),
+        action,
     )
     .await?;
 
-    Ok(HandlerOutput::created(out).with_etag(run.version.etag()))
+    Ok(HandlerOutput::created(out).with_etag(run.run.version.etag()))
 }
 
 /// Move a queued run to `running`.

@@ -118,7 +118,11 @@ use serde_json::{Value, json};
 /// asset authoring family. 513 → 518. **T19 (#606) adds 12 internal**: the meetings family
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
 /// `minutes_publish|list|get`) — 518 → **530**.
-const EXPECTED: [&str; 538] = [
+/// **S21 step 9 (#649) adds 1 internal**: `cards.assign`, the card handoff (binding + note +
+/// bound run start). 530 → **531**. **T5 (#77) adds 8 internal**: P1's
+/// `kata.open|get|observe|analyse|hypothesise|propose|measure` and P2–P4's `kata.adopt` —
+/// 531 → **539**.
+const EXPECTED: [&str; 539] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -211,6 +215,7 @@ const EXPECTED: [&str; 538] = [
     "card_types.list",
     "cards.add_label",
     "cards.archive",
+    "cards.assign",
     "cards.claim",
     "cards.comment",
     "cards.create",
@@ -755,8 +760,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // 495 -> 500; external stays 18. T19 (#606) adds twelve internal meetings actions:
     // 500 -> 512; external stays 18.
     // T5 (#77) adds eight internal actions — P1's `kata.open|get|observe|analyse|hypothesise|`
-    // `propose|measure` and P2–P4's `kata.adopt`: internal 512 -> 520; external stays 18.
-    assert_eq!((internal, external), (520, 18));
+    // `propose|measure` and P2–P4's `kata.adopt`: internal 512 -> 520. S21 step 9 (#649) adds
+    // one internal (`cards.assign`): 520 -> 521; external stays 18.
+    assert_eq!((internal, external), (521, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

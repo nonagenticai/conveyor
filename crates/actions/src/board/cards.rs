@@ -989,11 +989,11 @@ fn map_archive_error(error: ArchiveError) -> ActionError {
     }
 }
 
-fn card_json(record: &CardRecord) -> serde_json::Value {
+pub(crate) fn card_json(record: &CardRecord) -> serde_json::Value {
     serde_json::to_value(card_out(record)).unwrap_or(serde_json::Value::Null)
 }
 
-async fn read_card(
+pub(crate) async fn read_card(
     tx: &mut PgConnection,
     tenant: conveyor_store::TenantId,
     id: Uuid,
@@ -1011,7 +1011,7 @@ async fn read_card(
 /// `active`; a draft or retired binding cannot be assigned, so the write is refused before it
 /// lands. The binding's own pin and freshness are checked by `insert_run_tx` when a run is
 /// created; this is only the assignment check.
-async fn ensure_card_binding(
+pub(crate) async fn ensure_card_binding(
     tx: &mut PgConnection,
     tenant: conveyor_store::TenantId,
     job_binding_id: Uuid,
@@ -1041,7 +1041,7 @@ async fn ensure_card_binding(
 
 /// A zero-row edit is either a vanished card (`404`) or a stale version (`412` with the
 /// current representation, CONTRACT §3).
-async fn stale_card(
+pub(crate) async fn stale_card(
     tx: &mut PgConnection,
     tenant: conveyor_store::TenantId,
     id: Uuid,
