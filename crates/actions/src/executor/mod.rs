@@ -30,7 +30,7 @@ use conveyor_domain::executor::{BindingConfig, ExecutorKind, Registry};
 use conveyor_domain::organisation::{ReleaseAnatomy, parse_release_anatomy, release_hash};
 use conveyor_store as store;
 use conveyor_store::organisation::BindingRow;
-use conveyor_store::run::RunContext;
+use conveyor_store::run::{RunContext, RunKind};
 use serde_json::json;
 use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
@@ -263,8 +263,28 @@ pub async fn execute_run(
         return Ok(());
     }
 
-    // The T0 start hook: a run with no organisation pin is a bare `queued → running` task, which
-    // is what `projects.execute` creates. It keeps working exactly as before this unit.
+    // The kind decides whether a binding is owed. A job run executes a card's work package and
+    // cannot exist unbound (the store refuses the insert and the database CHECK is the second
+    // door), so a stored job row with no binding is broken state and fails closed. Project,
+    // process and workflow runs may be unbound and take the T0 start hook below.
+    if run.kind == RunKind::Job && run.job_binding_id.is_none() {
+        finish_failed(
+            &mut tx,
+            tenant,
+            app_key,
+            run_id,
+            "binding_required",
+            "a job run cannot execute without the job binding and release pin it was created under",
+        )
+        .await?;
+        tx.commit()
+            .await
+            .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
+        return Ok(());
+    }
+
+    // The T0 start hook: a NON-JOB run with no organisation pin is a bare `queued → running`
+    // task, which is what `projects.execute` creates. It keeps working exactly as before.
     let Some(binding_id) = run.job_binding_id else {
         let ctx = service_ctx(tenant, None, app_key, "run.execute");
         match store::run::transition_run_tx(&mut tx, tenant, run_id, RunStatus::Running).await {
