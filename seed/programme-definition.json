@@ -176,6 +176,14 @@
       "benefit": "B7",
       "strategic_objective": "decision ladder (rule -> laya -> generation -> human)",
       "kind": "benefit"
+    },
+    {
+      "output_ref": "T19F forum governance",
+      "capability_ref": "a forum's policy is versioned and its decisions are seated",
+      "operational_outcome": "O7 Meetings decide with the affected departments",
+      "benefit": "B7",
+      "strategic_objective": "decision ladder (rule -> laya -> generation -> human)",
+      "kind": "benefit"
     }
   ],
   "tranches": [
@@ -225,7 +233,7 @@
       "number": 6,
       "state": "planned",
       "entry": "the tranche 5 review decides continue; its exit criteria are met",
-      "exit": "every project in tranche 6 (S06a, S06b, S10, S11) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "exit": "every project in tranche 6 (S06a, S06b, S10, S11, T19F) meets its acceptance with published evidence, and the review records continue, pause or stop",
       "review_at": null
     },
     {
@@ -476,6 +484,10 @@
       "plateau": "capability"
     },
     "T19": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T19F": {
       "adm_phase": "G",
       "plateau": "capability"
     }

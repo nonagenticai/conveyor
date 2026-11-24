@@ -33,13 +33,13 @@ async fn a_refresh_applies_the_embedded_seed_and_a_second_is_all_skipped() {
         .invoke("programmes.refresh", TOKEN, json!({}), None, None, None)
         .await;
     assert_eq!(status, 200, "{body}");
-    assert_eq!(output(&body)["created"], 51, "{body}");
+    assert_eq!(output(&body)["created"], 52, "{body}");
     assert_eq!(output(&body)["updated"], 0, "{body}");
     assert_eq!(output(&body)["skipped"], 0, "{body}");
-    // The archived project (S06a) is skipped by design; the other 49 get their board.
+    // The archived project (S06a) is skipped by design; the other 50 get their board.
     assert_eq!(
         output(&body)["boards_created"],
-        49,
+        50,
         "every non-archived seeded project gets its board: {body}"
     );
 
@@ -49,7 +49,7 @@ async fn a_refresh_applies_the_embedded_seed_and_a_second_is_all_skipped() {
             .fetch_one(&pg.super_pool)
             .await
             .expect("count the tenant's projects");
-    assert_eq!(projects, 50, "the tenant owns the seeded projects");
+    assert_eq!(projects, 51, "the tenant owns the seeded projects");
 
     let (status, body) = running
         .invoke("programmes.refresh", TOKEN, json!({}), None, None, None)
@@ -57,7 +57,7 @@ async fn a_refresh_applies_the_embedded_seed_and_a_second_is_all_skipped() {
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["created"], 0, "a second call creates nothing");
     assert_eq!(output(&body)["updated"], 0, "a second call updates nothing");
-    assert_eq!(output(&body)["skipped"], 51, "{body}");
+    assert_eq!(output(&body)["skipped"], 52, "{body}");
     assert_eq!(output(&body)["boards_created"], 0, "{body}");
 }
 
