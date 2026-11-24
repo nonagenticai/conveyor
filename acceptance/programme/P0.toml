@@ -2,8 +2,7 @@
 key = "P0"
 name = "Programme definition — vision, blueprint, plan and project briefs"
 gate = "The definition set is published; the charter and scope baseline are approved; the closure review and close gate are recorded."
-gate_checks = ["P0-project", "P0-baseline", "P0-charter", "P0-closure-outputs", "P0-contract", "P0-review", "P0-closure-gate", "P0-waivers", "P0-benefit-baseline", "P0-pi-cadence", "P0-wsjf", "P0-demo-credits", "P0-lessons", "P0-pi-plan", "P0-pi-objectives", "P0-product"]
-
+gate_checks = ["P0-project", "P0-baseline", "P0-charter", "P0-closure-outputs", "P0-contract", "P0-review", "P0-closure-gate", "P0-waivers", "P0-benefit-baseline", "P0-pi-cadence", "P0-wsjf", "P0-demo-credits", "P0-lessons", "P0-pi-plan", "P0-pi-objectives", "P0-product", "P0-artefact-standard", "P0-rework"]
 [[check]]
 id = "P0-project"
 check = "project"
@@ -110,3 +109,15 @@ id = "P0-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "P0-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "P0-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

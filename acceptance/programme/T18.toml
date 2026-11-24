@@ -2,7 +2,7 @@
 key = "T18"
 name = "The real V2 UI"
 gate = "a signed-in tenant drives portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports exists only from a real route and a present spec; no production screen renders a fixture"
-gate_checks = ["T18-project", "T18-baseline", "T18-contract", "T18-review", "T18-waivers", "T18-pi-cadence", "T18-pi-plan", "T18-pi-objectives", "T18-wsjf", "T18-demo-credits", "T18-lessons", "T18-product", "T18-coverage"]
+gate_checks = ["T18-project", "T18-baseline", "T18-contract", "T18-review", "T18-waivers", "T18-pi-cadence", "T18-pi-plan", "T18-pi-objectives", "T18-wsjf", "T18-demo-credits", "T18-lessons", "T18-product", "T18-coverage", "T18-artefact-standard", "T18-rework"]
 [[check]]
 id = "T18-project"
 check = "project"
@@ -83,3 +83,15 @@ kind = "command"
 severity = "P0"
 description = "the V2 coverage record reports every destination's route and present spec as exists; no screen renders a fixture"
 command = '''python3 scripts/build-v2-coverage.py --check'''
+
+[[check]]
+id = "T18-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "T18-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

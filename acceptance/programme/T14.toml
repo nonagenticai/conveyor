@@ -2,8 +2,7 @@
 key = "T14"
 name = "Estate toolkits"
 gate = "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish"
-gate_checks = ["T14-project", "T14-baseline", "T14-charter", "T14-closure-outputs", "T14-contract", "T14-review", "T14-closure-gate", "T14-waivers", "T14-pi-cadence", "T14-pi-plan", "T14-pi-objectives", "T14-wsjf", "T14-demo-credits", "T14-lessons", "T14-product"]
-
+gate_checks = ["T14-project", "T14-baseline", "T14-charter", "T14-closure-outputs", "T14-contract", "T14-review", "T14-closure-gate", "T14-waivers", "T14-pi-cadence", "T14-pi-plan", "T14-pi-objectives", "T14-wsjf", "T14-demo-credits", "T14-lessons", "T14-product", "T14-artefact-standard", "T14-rework"]
 [[check]]
 id = "T14-project"
 check = "project"
@@ -104,3 +103,15 @@ id = "T14-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "T14-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "T14-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

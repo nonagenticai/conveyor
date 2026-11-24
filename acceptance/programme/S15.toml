@@ -2,7 +2,7 @@
 key = "S15"
 name = "Capability, knowledge and memory"
 gate = "At the end, a card's run resolves its capability and executor, the capability's readiness is reported before the run starts, a cited passage is retrieved from a pinned `strata` pack, work-package memory is written, consolidated into `strata_rag`, and recalled by `source_id`."
-gate_checks = ["S15-project", "S15-baseline", "S15-charter", "S15-contract", "S15-review", "S15-waivers", "S15-pi-cadence", "S15-pi-plan", "S15-pi-objectives", "S15-wsjf", "S15-demo-credits", "S15-lessons", "S15-product"]
+gate_checks = ["S15-project", "S15-baseline", "S15-charter", "S15-contract", "S15-review", "S15-waivers", "S15-pi-cadence", "S15-pi-plan", "S15-pi-objectives", "S15-wsjf", "S15-demo-credits", "S15-lessons", "S15-product", "S15-artefact-standard", "S15-rework"]
 [[check]]
 id = "S15-project"
 check = "project"
@@ -92,3 +92,15 @@ id = "S15-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S15-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S15-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

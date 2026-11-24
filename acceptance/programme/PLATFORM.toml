@@ -2,7 +2,7 @@
 key = "PLATFORM"
 name = "CI, runners and platform"
 gate = "The standing platform row carries an approved charter and a baseline; it does not close."
-gate_checks = ["PLATFORM-project", "PLATFORM-baseline", "PLATFORM-charter", "PLATFORM-pi-cadence", "PLATFORM-wsjf", "PLATFORM-demo-credits", "PLATFORM-product"]
+gate_checks = ["PLATFORM-project", "PLATFORM-baseline", "PLATFORM-charter", "PLATFORM-pi-cadence", "PLATFORM-wsjf", "PLATFORM-demo-credits", "PLATFORM-product", "PLATFORM-artefact-standard", "PLATFORM-rework"]
 [[check]]
 id = "PLATFORM-project"
 check = "project"
@@ -56,3 +56,15 @@ id = "PLATFORM-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "PLATFORM-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "PLATFORM-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

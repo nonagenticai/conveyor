@@ -2,8 +2,7 @@
 key = "T3"
 name = "PM job"
 gate = "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request"
-gate_checks = ["T3-project", "T3-baseline", "T3-charter", "T3-closure-outputs", "T3-contract", "T3-review", "T3-closure-gate", "T3-waivers", "T3-pi-cadence", "T3-pi-plan", "T3-pi-objectives", "T3-wsjf", "T3-demo-credits", "T3-lessons", "T3-product"]
-
+gate_checks = ["T3-project", "T3-baseline", "T3-charter", "T3-closure-outputs", "T3-contract", "T3-review", "T3-closure-gate", "T3-waivers", "T3-pi-cadence", "T3-pi-plan", "T3-pi-objectives", "T3-wsjf", "T3-demo-credits", "T3-lessons", "T3-product", "T3-artefact-standard", "T3-rework"]
 [[check]]
 id = "T3-project"
 check = "project"
@@ -104,3 +103,15 @@ id = "T3-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "T3-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "T3-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

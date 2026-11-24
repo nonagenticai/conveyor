@@ -2,8 +2,7 @@
 key = "S06c"
 name = "MCP tasks — a long-running project asks for input"
 gate = "At the end, an MCP client that declares `io.modelcontextprotocol/tasks` calls `projects.execute`, receives `resultType:\"task\"`, polls `tasks/get` through a project that waits on an approval, answers it with `tasks/update`, and reads a terminal result — with no Python service in the path and no new table."
-gate_checks = ["S06c-project", "S06c-baseline", "S06c-charter", "S06c-closure-outputs", "S06c-contract", "S06c-review", "S06c-closure-gate", "S06c-waivers", "S06c-pi-cadence", "S06c-pi-plan", "S06c-pi-objectives", "S06c-wsjf", "S06c-demo-credits", "S06c-lessons", "S06c-product"]
-
+gate_checks = ["S06c-project", "S06c-baseline", "S06c-charter", "S06c-closure-outputs", "S06c-contract", "S06c-review", "S06c-closure-gate", "S06c-waivers", "S06c-pi-cadence", "S06c-pi-plan", "S06c-pi-objectives", "S06c-wsjf", "S06c-demo-credits", "S06c-lessons", "S06c-product", "S06c-artefact-standard", "S06c-rework"]
 [[check]]
 id = "S06c-project"
 check = "project"
@@ -104,3 +103,15 @@ id = "S06c-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S06c-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S06c-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

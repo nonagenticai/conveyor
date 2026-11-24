@@ -2,8 +2,7 @@
 key = "T10"
 name = "SAFe cadence and MSP tranches"
 gate = "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized"
-gate_checks = ["T10-project", "T10-baseline", "T10-charter", "T10-closure-outputs", "T10-contract", "T10-review", "T10-closure-gate", "T10-waivers", "T10-pi-cadence", "T10-pi-plan", "T10-pi-objectives", "T10-wsjf", "T10-demo-credits", "T10-lessons", "T10-product"]
-
+gate_checks = ["T10-project", "T10-baseline", "T10-charter", "T10-closure-outputs", "T10-contract", "T10-review", "T10-closure-gate", "T10-waivers", "T10-pi-cadence", "T10-pi-plan", "T10-pi-objectives", "T10-wsjf", "T10-demo-credits", "T10-lessons", "T10-product", "T10-artefact-standard", "T10-rework"]
 [[check]]
 id = "T10-project"
 check = "project"
@@ -104,3 +103,15 @@ id = "T10-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "T10-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "T10-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

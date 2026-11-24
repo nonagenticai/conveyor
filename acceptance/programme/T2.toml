@@ -2,8 +2,7 @@
 key = "T2"
 name = "Decision ladder"
 gate = "a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card"
-gate_checks = ["T2-project", "T2-baseline", "T2-charter", "T2-closure-outputs", "T2-contract", "T2-review", "T2-closure-gate", "T2-waivers", "T2-pi-cadence", "T2-pi-plan", "T2-pi-objectives", "T2-wsjf", "T2-demo-credits", "T2-lessons", "T2-product"]
-
+gate_checks = ["T2-project", "T2-baseline", "T2-charter", "T2-closure-outputs", "T2-contract", "T2-review", "T2-closure-gate", "T2-waivers", "T2-pi-cadence", "T2-pi-plan", "T2-pi-objectives", "T2-wsjf", "T2-demo-credits", "T2-lessons", "T2-product", "T2-artefact-standard", "T2-rework"]
 [[check]]
 id = "T2-project"
 check = "project"
@@ -105,3 +104,15 @@ id = "T2-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "T2-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "T2-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

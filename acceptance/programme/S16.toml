@@ -2,8 +2,7 @@
 key = "S16"
 name = "Inference ledger and prompt audit"
 gate = "Every model call the conveyor makes becomes a durable, tenant-scoped row carrying the prompt's identity, the token counts and the provider's prompt-cache classes, so \"what did this cost and was it cached\" is a query rather than a guess."
-gate_checks = ["S16-project", "S16-baseline", "S16-charter", "S16-closure-outputs", "S16-contract", "S16-review", "S16-closure-gate", "S16-waivers", "S16-pi-cadence", "S16-pi-plan", "S16-pi-objectives", "S16-wsjf", "S16-demo-credits", "S16-lessons", "S16-product"]
-
+gate_checks = ["S16-project", "S16-baseline", "S16-charter", "S16-closure-outputs", "S16-contract", "S16-review", "S16-closure-gate", "S16-waivers", "S16-pi-cadence", "S16-pi-plan", "S16-pi-objectives", "S16-wsjf", "S16-demo-credits", "S16-lessons", "S16-product", "S16-artefact-standard", "S16-rework"]
 [[check]]
 id = "S16-project"
 check = "project"
@@ -104,3 +103,15 @@ id = "S16-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "S16-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "S16-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"

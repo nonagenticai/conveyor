@@ -2,8 +2,7 @@
 key = "T9"
 name = "TOGAF ADM capability"
 gate = "an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata"
-gate_checks = ["T9-project", "T9-baseline", "T9-charter", "T9-closure-outputs", "T9-contract", "T9-review", "T9-closure-gate", "T9-waivers", "T9-pi-cadence", "T9-pi-plan", "T9-pi-objectives", "T9-wsjf", "T9-demo-credits", "T9-lessons", "T9-product"]
-
+gate_checks = ["T9-project", "T9-baseline", "T9-charter", "T9-closure-outputs", "T9-contract", "T9-review", "T9-closure-gate", "T9-waivers", "T9-pi-cadence", "T9-pi-plan", "T9-pi-objectives", "T9-wsjf", "T9-demo-credits", "T9-lessons", "T9-product", "T9-artefact-standard", "T9-rework"]
 [[check]]
 id = "T9-project"
 check = "project"
@@ -104,3 +103,15 @@ id = "T9-product"
 check = "product_findings"
 severity = "P0"
 description = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "T9-artefact-standard"
+check = "artefact_standard"
+severity = "P1"
+description = "every mandatory standard artefact this project owns is evidenced"
+
+[[check]]
+id = "T9-rework"
+check = "rework_resolution"
+severity = "P0"
+description = "no unresolved P0/P1 rework package remains for the project"
