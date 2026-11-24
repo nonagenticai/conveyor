@@ -2458,6 +2458,35 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             .await;
             ctx.push(sample.name, kata);
         }
+        // T8 (#79): a proposal needs TWO independent objects, so each round gets a fresh failed
+        // run beside the stable anchor card; review/promote get a lesson already at the stage
+        // the action requires.
+        "lessons.propose" => {
+            let card = Uuid::parse_str(&ctx.anchor_card).expect("anchor card uuid");
+            let project = Uuid::parse_str(&ctx.project_id).expect("project uuid");
+            let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+            let run: Uuid = sqlx::query_scalar(
+                "INSERT INTO run (tenant_id, card_id, project_id, status, error_class)
+                 VALUES ($1, $2, $3, 'failed', 'tool_error') RETURNING id",
+            )
+            .bind(ctx.tenant_id)
+            .bind(card)
+            .bind(project)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("prepare a failed run");
+            tx.commit().await.expect("commit");
+            ctx.push(sample.name, run);
+        }
+        "lessons.review" | "lessons.promote" => {
+            let state = if sample.name == "lessons.review" {
+                "proposed"
+            } else {
+                "reviewed"
+            };
+            let lesson = seed_parity_lesson(pg, ctx, state).await;
+            ctx.push(sample.name, lesson);
+        }
         // T6 (#80): each development-project sample gets its own chartered project per round.
         "development_projects.get"
         | "development_projects.record_step"
@@ -3313,6 +3342,41 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
 ///
 /// `instrument` satisfies the hypothesis pair when the row is past `analysed`; the release hash
 /// is a shape-valid literal because the binding check is the action's, not this fixture's.
+/// A lesson row at the stage a `lessons.review`/`lessons.promote` parity sample needs. Direct
+/// SQL is the fixture's right here: the action under test is the transition, not the proposal
+/// path (which has its own sample and its own suite).
+async fn seed_parity_lesson(pg: &support::Pg, ctx: &Ctx, state: &str) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let evidence = json!([
+        {"kind": "card", "id": ctx.anchor_card},
+        {"kind": "run", "id": Uuid::now_v7()},
+    ]);
+    let reviewed_by = if state == "reviewed" {
+        Some(ctx.alice_user)
+    } else {
+        None
+    };
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO lesson
+             (tenant_id, statement, evidence, independent_count, state, source, proposer_id,
+              reviewed_by, reviewed_at)
+         VALUES ($1, $2, $3, 2, $4, 'propose', $5, $6,
+                 CASE WHEN $6::uuid IS NULL THEN NULL ELSE now() END)
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(format!("parity lesson {}", Uuid::now_v7()))
+    .bind(&evidence)
+    .bind(state)
+    .bind(ctx.bob_user)
+    .bind(reviewed_by)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare a lesson");
+    tx.commit().await.expect("commit");
+    id
+}
+
 async fn seed_parity_kata(
     pg: &support::Pg,
     ctx: &Ctx,
@@ -3638,6 +3702,43 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             let mut sample = plain("kata.adopt", json!({}), None);
             sample.input = Box::new(|_ctx: &Ctx| json!({"kata_id": Uuid::nil(), "note": "parity"}));
             expecting(sample, 404)
+        },
+        // ── T8: organisational memory (#79) ──────────────────────────────────────────────
+        // The proposal names the stable anchor card plus a fresh failed run each round: two
+        // distinct referenced objects, and a statement unique to this execution.
+        {
+            let mut sample = plain("lessons.propose", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "statement": format!("parity lesson {}", Uuid::now_v7()),
+                    "evidence": [
+                        {"kind": "card", "id": ctx.anchor_card},
+                        {"kind": "run", "id": ctx.pop("lessons.propose")},
+                    ],
+                })
+            });
+            expecting(sample, 201)
+        },
+        // A person (alice, admin) approves a lesson proposed by bob: promotion to a source draft.
+        {
+            let mut sample = plain("lessons.review", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "lesson_id": ctx.pop("lessons.review"),
+                    "decision": "approve",
+                    "note": "parity review",
+                })
+            });
+            expecting(sample, 200)
+        },
+        // The explicit promotion of an already-reviewed lesson; idempotent on the promoted row.
+        {
+            let mut sample = plain("lessons.promote", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"lesson_id": ctx.pop("lessons.promote")}));
+            expecting(sample, 200)
         },
         // ── T6: the development project (#80) ────────────────────────────────────────────
         {
