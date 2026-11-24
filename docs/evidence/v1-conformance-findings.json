@@ -2674,6 +2674,11 @@
   },
   {
    "id": "v1-w4a-6",
+   "resolved_by": {
+    "commit": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+    "test": "crates/actions/tests/byo_tools.rs::only_the_bound_subset_is_callable_and_each_call_is_audited; crates/actions/tests/byo_tools.rs::a_call_time_url_is_refused_and_a_byo_toolkit_is_tenant_scoped; crates/actions/tests/tool_authoring.rs::the_publishing_job_cannot_widen_its_own_effect_ceiling",
+    "evidence": "cargo-guard test -p conveyor-actions --test byo_tools: 5 passed; --test tool_authoring: 12 passed at d1284e12. T15 (#666, a2ef9194) added toolkits.import_openapi/register_mcp/discover_mcp, the tool_source registry, the binding-scoped subset and the effect-ceiling refusal; this re-anchor records that the finding's surface exists and is proved"
+   },
    "area": "\u00a711.5",
    "standard": "SPEC",
    "spec": "\u00a711.5",
@@ -4182,6 +4187,11 @@
   },
   {
    "id": "v1-u5a-tool-idempotency-publish-1",
+   "resolved_by": {
+    "commit": "d1284e129a236a9732049c42c32dd2c457f70cd1",
+    "test": "crates/actions/tests/tool_authoring.rs::a_published_tool_carries_its_idempotency_and_output_schema",
+    "evidence": "cargo-guard test -p conveyor-actions --test tool_authoring: 12 passed at d1284e12. The imported destructive tool declares x-idempotency=required, publish stores it on the tool version, and the test reads the stored row"
+   },
    "area": "\u00a711.3",
    "standard": "SPEC",
    "spec": "\u00a711.3",
