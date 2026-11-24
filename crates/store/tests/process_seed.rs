@@ -414,9 +414,12 @@ async fn applying_the_catalogue_twice_inserts_nothing_and_creates_no_version_two
     assert_eq!(maps.len(), 3, "maps.yaml ships exactly three maps");
 
     // The key, its project type and the exact phase sequence, in order — the loader resolved
-    // every node against the project type's `meta.phases`, so a silent drift shows here.
+    // every node against the project type's `meta.phases`, so a silent drift shows here. The
+    // catalogue now carries every SPEC project type; only the three the maps bind are expected.
+    let map_keys: Vec<&str> = maps.iter().map(|(_, key, _, _, _)| key.as_str()).collect();
     let mut expected: Vec<(String, Vec<String>)> = catalogue_project_types()
         .into_iter()
+        .filter(|(code, _, _)| map_keys.contains(&code.as_str()))
         .map(|(code, _, phases)| (code, phases))
         .collect();
     expected.sort();
