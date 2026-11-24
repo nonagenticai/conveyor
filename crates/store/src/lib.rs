@@ -89,6 +89,10 @@ pub mod interaction;
 // S16: the inference ledger — the engine's write, the keyset list and the usage aggregate.
 pub mod inference;
 pub mod invite;
+// #526 (SPEC_V2 §6.7, ledger v1-w1b-5): the tenant's meta-role × action authority matrix and
+// the run-bound resolver — the binding narrows, the tenant row decides, an absent row is the
+// compiled §6.7 cell.
+pub mod job_authority;
 pub mod jobs;
 
 // T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata record, its six Gets and the held-out
