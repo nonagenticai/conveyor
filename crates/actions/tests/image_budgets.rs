@@ -51,8 +51,8 @@ fn every_shared_host_budget_outlasts_its_host() {
     );
     assert_eq!(
         budget("laya.judge"),
-        60_000,
-        "a decision is an inference call, not a local read"
+        3_000,
+        "SPEC_V2 §10.2: the conveyor→laya seam's hard budget is 3 s"
     );
 }
 

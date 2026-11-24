@@ -1269,3 +1269,93 @@ async fn a_failed_eval_grade_never_creates_a_second_grade_or_job() {
     );
     assert_eq!(run_status(&pg, &seeded, &run).await.0, "running");
 }
+
+// ── the hard budget: a stalled engine is abandoned, not waited on ──────────────────────
+
+/// A laya that accepts every connection and never answers — the stall SPEC_V2 §10.2's 3 s hard
+/// budget exists for. The accepted sockets are held (never read or written) until the guard
+/// drops, which aborts the task and closes them.
+struct StalledLaya {
+    base: String,
+    task: tokio::task::JoinHandle<()>,
+}
+
+impl Drop for StalledLaya {
+    fn drop(&mut self) {
+        self.task.abort();
+    }
+}
+
+async fn stalled_laya() -> StalledLaya {
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind the stalled laya");
+    let addr = listener.local_addr().expect("the stalled laya's address");
+    let task = tokio::spawn(async move {
+        let mut held = Vec::new();
+        while let Ok((socket, _)) = listener.accept().await {
+            held.push(socket);
+        }
+    });
+    StalledLaya {
+        base: format!("http://{addr}"),
+        task,
+    }
+}
+
+/// SPEC_V2 §10.2 (finding v1-p102-1): laya accepts the connection and never answers. The judge
+/// abandons the call at the 3 s hard budget, records the outage and parks the attempt —
+/// `unavailable`, never a reject — instead of holding a worker for the old 60 s.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_stalled_laya_judge_is_abandoned_within_three_seconds_and_parked_unavailable() {
+    let _env = LAYA_ENV.lock().await;
+    let (pg, running, seeded) = fixture().await;
+    // The service resolves and the tenant holds a token, so the call reaches the socket and
+    // stalls there instead of failing closed before the budget applies.
+    let stalled = stalled_laya().await;
+    support::set_env(LAYA_URL_ENV, &stalled.base);
+    seal_laya_token(&pg, &seeded).await;
+
+    let (board, lane) = board_and_lane(&pg, &seeded).await;
+    let card = create_card(&running, &board, &lane).await;
+    let sop = publish_sop(
+        &running,
+        "judge.laya",
+        json!({"kind": "laya", "threshold": 0.5}),
+    )
+    .await;
+    let process = create_process(
+        &running,
+        "judge-laya",
+        json!([{"action": "cards.get", "procedure_id": sop,
+                "input_template": {"id": "{{card.id}}"}}]),
+    )
+    .await;
+    publish(&running, &process).await;
+    let run = start(&running, &card, "judge-laya", json!({})).await;
+
+    let started = std::time::Instant::now();
+    execute(&pg, &seeded, &run, 1, 1).await;
+    let elapsed = started.elapsed();
+
+    let (status, _, _, error, judge) = step_row(&pg, &seeded, &run, 1, 1).await;
+    assert_eq!(
+        status, "running",
+        "an abandoned judge neither decides nor drops the attempt"
+    );
+    assert_eq!(error, None, "nothing was decided, so nothing failed");
+    let judge = judge.expect("a park document");
+    assert_eq!(judge["decision"], "unavailable");
+    assert!(
+        judge["detail"]
+            .as_str()
+            .is_some_and(|detail| detail.contains("action-timeout")),
+        "the park names the timeout, got {judge}"
+    );
+    // The acceptance is the abandonment and the recorded outcome, not an exact wall clock: the
+    // old 60 s budget could not finish inside this bound.
+    assert!(
+        elapsed < std::time::Duration::from_secs(10),
+        "a stalled laya must be abandoned at the 3 s hard budget, took {elapsed:?}"
+    );
+}

@@ -1805,3 +1805,75 @@ async fn an_open_laya_outage_records_its_action_and_annotate_note() {
         "the outage faked an L1 row"
     );
 }
+
+// ── the seam's budget (SPEC_V2 §10.2, finding v1-p102-1) ────────────────────────────────
+
+/// §10.2 fixes the conveyor→laya seam at a 1500 ms default: a config that names no timeout
+/// stores that default, never the old 30 s.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_laya_config_defaults_to_fifteen_hundred_ms() {
+    let (_pg, running, _seeded) = fixture().await;
+    let (status, created) = running
+        .invoke(
+            "laya_configs.create",
+            "dev:alice",
+            json!({"model_ref": "jev-latest"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    assert_eq!(
+        output(&created)["timeout_ms"],
+        1500,
+        "the seam's measured default is 1500 ms (SPEC_V2 §10.2)"
+    );
+}
+
+/// A configured budget above the seam's hard budget is refused as a field failure — never
+/// silently clamped — and the hard budget itself is accepted and usable by `ladder.prepare`.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_laya_config_timeout_is_capped_at_the_hard_budget() {
+    let (_pg, running, _seeded) = fixture().await;
+    let (status, refused) = running
+        .invoke(
+            "laya_configs.create",
+            "dev:alice",
+            json!({"model_ref": "jev-latest", "timeout_ms": 3001}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(
+        output(&refused)["type"],
+        "timeout_above_budget",
+        "{refused}"
+    );
+    assert_eq!(refused["errors"][0]["field"], "timeout_ms", "{refused}");
+    assert_eq!(
+        refused["errors"][0]["code"], "timeout_above_budget",
+        "{refused}"
+    );
+
+    let (status, accepted) = running
+        .invoke(
+            "laya_configs.create",
+            "dev:alice",
+            json!({"model_ref": "jev-latest", "timeout_ms": 3000}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{accepted}");
+    assert_eq!(output(&accepted)["timeout_ms"], 3000, "{accepted}");
+    let config_id = id_of(output(&accepted), "id");
+    let (status, prepared) = prepare(&running, KIND, Some(&config_id)).await;
+    assert_eq!(
+        status, 200,
+        "the hard budget is a usable seam budget: {prepared}"
+    );
+}

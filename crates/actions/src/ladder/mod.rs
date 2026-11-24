@@ -46,7 +46,8 @@ use uuid::Uuid;
 
 use crate::control::{etag_of, invalid, parent_error, require_precondition_with, store_error};
 use crate::invoke::{ActionError, GateUnavailable, HandlerCtx};
-use crate::spec::HandlerOutput;
+use crate::process::judge::{LAYA_DEFAULT_TIMEOUT_MS, LAYA_HARD_TIMEOUT_MS};
+use crate::spec::{FieldError, HandlerOutput};
 use crate::views::Page;
 
 pub(crate) mod laya;
@@ -663,7 +664,7 @@ pub struct LayaConfigCreateIn {
     pub model_ref: String,
     /// The request parameters.
     pub params: Option<Value>,
-    /// The request timeout; defaults to 30000 ms.
+    /// The request timeout; defaults to 1500 ms and is refused above the 3000 ms hard budget.
     pub timeout_ms: Option<i32>,
 }
 
@@ -684,13 +685,39 @@ async fn laya_configs_create(
     ctx: HandlerCtx,
     input: LayaConfigCreateIn,
 ) -> Result<HandlerOutput<LayaConfigOut>, ActionError> {
+    // SPEC_V2 §10.2: the seam defaults to 1500 ms and never exceeds the 3 s hard budget. A
+    // configured value above it is refused as a field failure, not silently clamped — the
+    // caller must know its budget was not accepted.
+    let timeout_ms = input.timeout_ms.unwrap_or(LAYA_DEFAULT_TIMEOUT_MS);
+    if timeout_ms > LAYA_HARD_TIMEOUT_MS {
+        let detail = format!(
+            "the conveyor→laya seam's hard budget is {LAYA_HARD_TIMEOUT_MS} ms (SPEC_V2 §10.2); \
+             {timeout_ms} ms cannot be configured"
+        );
+        return Err(
+            ActionError::new(422, "timeout_above_budget", detail.clone()).with_errors(vec![
+                FieldError {
+                    field: "timeout_ms".to_owned(),
+                    code: "timeout_above_budget".to_owned(),
+                    detail,
+                },
+            ]),
+        );
+    }
+    if timeout_ms < 1 {
+        return Err(invalid(
+            "timeout_ms",
+            "invalid_value",
+            "timeout_ms must be at least 1 ms",
+        ));
+    }
     let record = store::ladder::insert_laya_config_tx(
         &mut *tx,
         ctx.tenant,
         &NewLayaConfig {
             model_ref: input.model_ref.trim().to_owned(),
             params: input.params.unwrap_or_else(|| serde_json::json!({})),
-            timeout_ms: input.timeout_ms.unwrap_or(30_000),
+            timeout_ms,
         },
     )
     .await

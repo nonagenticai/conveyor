@@ -1095,17 +1095,44 @@ pub async fn precheck<'a>(
     })
 }
 
+/// `min(action, override)`: a per-request override can only LOWER an action's own budget.
+fn effective_timeout_ms(action: u32, override_ms: Option<u64>) -> u32 {
+    match override_ms {
+        Some(ms) => u32::try_from(ms).unwrap_or(action).min(action),
+        None => action,
+    }
+}
+
 pub async fn invoke(
     pool: &PgPool,
     registry: &Registry,
     tenant: TenantId,
     request: InvokeRequest,
 ) -> Result<InvokeOutcome, ActionError> {
+    invoke_with_timeout(pool, registry, tenant, request, None).await
+}
+
+/// [`invoke`] with a per-request ceiling on the action's own timeout.
+///
+/// The override is a CEILING, never an extension: the effective budget is
+/// `min(spec.timeout_ms, override)`, so a caller can be more impatient than the contract but can
+/// never make a call outlive the action's declared budget. It is how the ladder passes a tenant's
+/// `laya_inference_config.timeout_ms` to `laya.classify` (SPEC_V2 §10.2, finding v1-p102-1).
+pub async fn invoke_with_timeout(
+    pool: &PgPool,
+    registry: &Registry,
+    tenant: TenantId,
+    request: InvokeRequest,
+    timeout_ms: Option<u64>,
+) -> Result<InvokeOutcome, ActionError> {
     let Prechecked {
         spec,
         input,
         precondition,
     } = precheck(pool, registry, tenant, &request).await?;
+
+    // A caller's override may only LOWER the action's declared budget.
+    let timeout_ms = effective_timeout_ms(spec.timeout_ms, timeout_ms);
 
     let input_hash = idempotency::request_hash(&input);
     let (version, if_match) = match precondition {
@@ -1158,8 +1185,12 @@ pub async fn invoke(
     }
 
     match spec.kind {
-        ActionKind::Internal => invoke_internal(pool, spec, ctx, input, input_hash, &request).await,
-        ActionKind::External => invoke_external(pool, spec, ctx, input, input_hash, &request).await,
+        ActionKind::Internal => {
+            invoke_internal(pool, spec, ctx, input, input_hash, &request, timeout_ms).await
+        }
+        ActionKind::External => {
+            invoke_external(pool, spec, ctx, input, input_hash, &request, timeout_ms).await
+        }
         ActionKind::Workflow => Err(ActionError::workflow(spec.name)),
     }
 }
@@ -1171,6 +1202,7 @@ async fn invoke_internal(
     input: Value,
     input_hash: String,
     request: &InvokeRequest,
+    timeout_ms: u32,
 ) -> Result<InvokeOutcome, ActionError> {
     let HandlerRef::Internal(handler) = spec.handler else {
         return Err(ActionError::internal());
@@ -1182,7 +1214,7 @@ async fn invoke_internal(
             tracing::error!(%error, action = spec.name, "begin invocation transaction");
             ActionError::internal()
         })?;
-    store::actions::set_statement_timeout(&mut tx, spec.timeout_ms)
+    store::actions::set_statement_timeout(&mut tx, timeout_ms)
         .await
         .map_err(|error| {
             tracing::error!(%error, action = spec.name, "set statement_timeout");
@@ -1265,7 +1297,7 @@ async fn invoke_internal(
         Ok::<_, ActionError>((output, body, invocation_id))
     };
 
-    match tokio::time::timeout(Duration::from_millis(u64::from(spec.timeout_ms)), work).await {
+    match tokio::time::timeout(Duration::from_millis(u64::from(timeout_ms)), work).await {
         Ok(Ok((output, body, invocation_id))) => {
             tx.commit().await.map_err(|error| {
                 tracing::error!(%error, action = spec.name, "commit invocation");
@@ -1365,7 +1397,7 @@ async fn invoke_internal(
                 elapsed,
             )
             .await;
-            Err(ActionError::timeout(spec.name, spec.timeout_ms))
+            Err(ActionError::timeout(spec.name, timeout_ms))
         }
     }
 }
@@ -1467,6 +1499,7 @@ async fn invoke_external(
     input: Value,
     input_hash: String,
     request: &InvokeRequest,
+    timeout_ms: u32,
 ) -> Result<InvokeOutcome, ActionError> {
     let HandlerRef::External {
         service,
@@ -1718,7 +1751,7 @@ async fn invoke_external(
     // bill. Measured 2026-11-19 on tenant `nonagentic-conveyor`: two cancelled `inference.chat`
     // calls left ~62k vLLM prompt tokens with no billing row and put
     // `LocalLlmMeteringCoverageLow` at 0.75. Unmetered actions keep the old behaviour.
-    let timeout = Duration::from_millis(u64::from(spec.timeout_ms));
+    let timeout = Duration::from_millis(u64::from(timeout_ms));
     let result = if spec.captures_usage {
         send_metered(builder, timeout).await
     } else {
@@ -1759,7 +1792,7 @@ async fn invoke_external(
     };
 
     let (status, body) = match result {
-        Err(_) => return failure(ActionError::timeout(spec.name, spec.timeout_ms), false).await,
+        Err(_) => return failure(ActionError::timeout(spec.name, timeout_ms), false).await,
         Ok(Err(error)) => {
             tracing::warn!(%error, action = spec.name, "external call failed");
             // Distinct from `upstream_failed`: the service never ANSWERED, so a caller cannot
