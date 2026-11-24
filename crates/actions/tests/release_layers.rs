@@ -46,11 +46,22 @@ async fn invoke_ok(
     action: &str,
     input: Value,
 ) -> Value {
+    invoke_as_ok(pg, seeded, seeded.user_id, action, input).await
+}
+
+/// Invoke one action as a named principal and return its output document.
+async fn invoke_as_ok(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    actor_id: Uuid,
+    action: &str,
+    input: Value,
+) -> Value {
     let outcome = invoke(
         &pg.runtime,
         registry(),
         seeded.tenant,
-        request(action, input, seeded.user_id),
+        request(action, input, actor_id),
     )
     .await
     .unwrap_or_else(|error| panic!("{action}: {error:?}"));
@@ -60,6 +71,55 @@ async fn invoke_ok(
         outcome.body
     );
     outcome.body["output"].clone()
+}
+
+/// Make a freshly created job live the way a tenant does (v1-w1a-4): the `status: "active"`
+/// update opens the `job_activation` gate, and only a second principal's approval flips it.
+async fn activate_job(pg: &support::Pg, seeded: &support::Seeded, job: &Value) {
+    let job_id = id_of(job);
+    let version = job["version"].as_i64().expect("the created job's version");
+    let draft = invoke_ok(
+        pg,
+        seeded,
+        "job_catalogue.update",
+        json!({"id": job_id, "version": version, "status": "active"}),
+    )
+    .await;
+    assert_eq!(
+        draft["status"],
+        json!("draft"),
+        "activation waits for another principal: {draft}"
+    );
+
+    let pending = invoke_ok(
+        pg,
+        seeded,
+        "approvals.list",
+        json!({"status": "pending", "limit": 50}),
+    )
+    .await;
+    let gate = pending["items"]
+        .as_array()
+        .expect("items")
+        .iter()
+        .find(|item| item["gate"] == "job_catalogue.update" && item["kind"] == "job_activation")
+        .unwrap_or_else(|| panic!("no pending activation gate in {pending}"));
+    let approval_id = gate["id"]
+        .as_str()
+        .and_then(|raw| Uuid::parse_str(raw).ok())
+        .unwrap_or_else(|| panic!("no approval id in {gate}"));
+
+    // §5.4: the requester may not decide their own activation; the seeded reviewer is a second
+    // admin in the same tenant.
+    let decided = invoke_as_ok(
+        pg,
+        seeded,
+        support::reviewer_id(pg).await,
+        "approvals.decide",
+        json!({"approval_id": approval_id, "decision": "approve"}),
+    )
+    .await;
+    assert_eq!(decided["status"], json!("approved"), "{decided}");
 }
 
 /// The id of an output document.
@@ -135,6 +195,9 @@ async fn create_org(
         }),
     )
     .await;
+    // v1-w1a-4 (T0): only a live, curated job compiles into a release; a draft is refused
+    // `409 job_not_live`. Create is born draft, so the fixture must activate it.
+    activate_job(pg, seeded, &job).await;
     Org {
         industry: industry_id,
         delivery: delivery_id,
