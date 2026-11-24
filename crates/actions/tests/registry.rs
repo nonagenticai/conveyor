@@ -136,7 +136,7 @@ use serde_json::{Value, json};
 /// ten authoring/BYO actions, the lane's own families, and **#526 U5.1c's two
 /// `job_authorities.get|set` actions**. The merged registry is
 /// **598: 579 internal, 19 external**.
-const EXPECTED: [&str; 598] = [
+const EXPECTED: [&str; 599] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -520,6 +520,7 @@ const EXPECTED: [&str; 598] = [
     "pm.get",
     "pm.plan",
     "pm.route_gate",
+    "pm.status",
     "portfolio.in_flight",
     "principles.create",
     "principles.dismiss_conflict",
@@ -827,12 +828,13 @@ fn the_registry_is_exactly_the_declared_set() {
     // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
     // 520 -> 525; external stays 14.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
-    // The merged registry is 598: 579 internal (the lane's 553 + main's 13 new kata/T6/T8
+    // The merged registry was 598: 579 internal (the lane's 553 + main's 13 new kata/T6/T8
     // actions + `programme_lessons.propose`, the lane's programme register which the union
     // renamed out of SPEC §D36's `lessons.*` family + T15's ten authoring/BYO actions +
     // #526 U5.1c's two `job_authorities.*` actions), 19 external. T5's kata names are one
     // family: main's eight implementations plus the lane's `kata.list`/`propagate`/`close`.
-    assert_eq!((internal, external), (579, 19));
+    // v1-p61-2 adds `pm.status` (internal, write): 579 -> 580, total 599; external stays 19.
+    assert_eq!((internal, external), (580, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
