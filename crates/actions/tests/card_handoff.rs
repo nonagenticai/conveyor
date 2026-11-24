@@ -72,7 +72,8 @@ async fn board_and_lane(running: &support::Running) -> (String, String) {
         .await;
     assert_eq!(status, 200, "{view}");
     let board_id = text(&output(&view)["boards"][0], "id");
-    (board_id, lane_of_kind(running, &board_id, "active").await)
+    let lane = lane_of_kind(running, &board_id, "active").await;
+    (board_id, lane)
 }
 
 /// One lane of a board, by kind.
