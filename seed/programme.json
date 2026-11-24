@@ -683,7 +683,7 @@
       "key": "S18",
       "name": "Kata continuous improvement",
       "description": "Plan: docs/plans/slices/S18-kata-improvement.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S18-kata-improvement.md",
@@ -778,7 +778,7 @@
       "key": "S21",
       "name": "Message construction (the compiled prompt)",
       "description": "Plan: docs/plans/slices/S21-message-construction.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S21-message-construction.md",
@@ -791,7 +791,8 @@
           612,
           624,
           649,
-          656
+          656,
+          697
         ],
         "depends_on": [
           "S09",
@@ -1227,7 +1228,7 @@
       "key": "T12",
       "name": "One organisation loop",
       "description": "SPEC_V2 slice T12 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1653,6 +1654,7 @@
         "plan": "docs/plans/development-process-speed.md",
         "track": "programme",
         "issues": [
+          16,
           17,
           22,
           43,
@@ -1676,9 +1678,12 @@
           569,
           572,
           660,
+          669,
           680,
           681,
-          691
+          691,
+          693,
+          696
         ],
         "depends_on": [],
         "plan_status": "active",
@@ -1700,7 +1705,7 @@
       "key": "SPEC-V2",
       "name": "SPEC V2 — the organisational operating model",
       "description": "Programme-level unit (plan: docs/SPEC_V2.md)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md",
