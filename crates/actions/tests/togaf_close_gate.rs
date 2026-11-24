@@ -47,15 +47,41 @@ async fn programme_track_project(
     .fetch_one(&pg.super_pool)
     .await
     .expect("insert the programme");
-    sqlx::query(
-        "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
-         VALUES ($1, $2, 0, 'authorised'), ($1, $2, 1, 'authorised')",
-    )
-    .bind(seeded.tenant_id)
-    .bind(programme)
-    .execute(&pg.super_pool)
-    .await
-    .expect("insert the authorised tranches");
+    // T10: a tranche is authorised by its continue review, and the start gate reads the link.
+    for number in [0, 1] {
+        let tranche: Uuid = sqlx::query_scalar(
+            "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
+             VALUES ($1, $2, $3, 'authorised') RETURNING id",
+        )
+        .bind(seeded.tenant_id)
+        .bind(programme)
+        .bind(number)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("insert an authorised tranche");
+        let review: Uuid = sqlx::query_scalar(
+            "INSERT INTO programme_tranche_review (tenant_id, tranche_id, decision, evidence,
+                                                   reviewed_by)
+             VALUES ($1, $2, 'continue', '{\"acceptance\": \"fixture\"}'::jsonb, $3)
+             RETURNING id",
+        )
+        .bind(seeded.tenant_id)
+        .bind(tranche)
+        .bind(seeded.user_id)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("insert the tranche review");
+        sqlx::query(
+            "UPDATE programme_tranche SET authorisation_review_id = $2
+              WHERE tenant_id = $1 AND id = $3",
+        )
+        .bind(seeded.tenant_id)
+        .bind(review)
+        .bind(tranche)
+        .execute(&pg.super_pool)
+        .await
+        .expect("link the tranche review");
+    }
     let (status, created) = running
         .invoke(
             "projects.create",

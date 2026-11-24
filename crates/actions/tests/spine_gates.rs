@@ -431,8 +431,8 @@ async fn a_change_gate_request_carries_the_change_it_authorises() {
     )
     .await
     .expect("a change gate is requested");
-    assert_eq!(outcome.status, 201, "{}", outcome.body);
-    let approval: Uuid = serde_json::from_value(outcome.body["id"].clone())
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+    let approval: Uuid = serde_json::from_value(outcome.body["output"]["id"].clone())
         .expect("the request returns the approval id");
     let meta: Value =
         sqlx::query_scalar("SELECT meta FROM approval WHERE tenant_id = $1 AND id = $2")
@@ -874,6 +874,32 @@ async fn try_review_tranche(
 }
 
 /// Submit a tranche review with caller-supplied evidence (the snapshot-identity cases).
+/// Link the continue review a tranche's authorisation requires (T10's MSP order).
+async fn authorise_tranche(pg: &support::Pg, seeded: &support::Seeded, tranche: Uuid) -> Uuid {
+    let review: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche_review (tenant_id, tranche_id, decision, evidence,
+                                               reviewed_by)
+         VALUES ($1, $2, 'continue', '{\"acceptance\": \"fixture\"}'::jsonb, $3)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(tranche)
+    .bind(seeded.user_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the tranche review");
+    sqlx::query(
+        "UPDATE programme_tranche SET authorisation_review_id = $2 WHERE tenant_id = $1 AND id = $3",
+    )
+    .bind(seeded.tenant_id)
+    .bind(review)
+    .bind(tranche)
+    .execute(&pg.super_pool)
+    .await
+    .expect("link the tranche review");
+    review
+}
+
 async fn try_review_tranche_with_evidence(
     pg: &support::Pg,
     running: &support::Running,
@@ -1269,10 +1295,12 @@ async fn a_tranche_review_without_a_snapshot_identity_is_refused() {
     let (pg, running, seeded) = running_fixture().await;
     let (_programme, tranche) = programme_and_tranche(&pg, seeded.tenant_id, "planned").await;
     let delegation = support::delegation_ref(&running, TOKEN).await;
+    // Complete evidence (the §8.3 classes are arrays of ids, so the completeness predicate
+    // passes and the pin check is reached) but with no snapshot identity.
     let evidence = json!({
-        "baselines": ["B0"],
-        "benefit_status": {"BEN-1": "tracking"},
-        "risk_register": ["risk-1"]
+        "baselines": [Uuid::now_v7().to_string()],
+        "benefit_status": [Uuid::now_v7().to_string()],
+        "risk_register": [Uuid::now_v7().to_string()],
     });
     let error = try_review_tranche_with_evidence(
         &pg,
@@ -1285,8 +1313,8 @@ async fn a_tranche_review_without_a_snapshot_identity_is_refused() {
     )
     .await
     .expect_err("a review with no snapshot identity must be refused");
-    assert_eq!(error.status, 422, "{}", error.detail);
-    assert_eq!(error.code, "tranche_review_unpinned", "{}", error.detail);
+    assert_eq!(error.status, 422, "{error:?}");
+    assert_eq!(error.code, "tranche_review_unpinned", "{error:?}");
     assert!(
         error.detail.contains("snapshot_sha"),
         "the refusal names the missing key: {}",
@@ -1377,17 +1405,29 @@ async fn programme_project(
     .fetch_one(&pg.super_pool)
     .await
     .expect("insert the programme");
-    sqlx::query(
+    let tranche: Uuid = sqlx::query_scalar(
         // Number 1 is the project's default tranche when it names none, so the start gate reads
         // this row; a number-0 plan would make the project sit in an undeclared tranche.
         "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
-         VALUES ($1, $2, 1, 'authorised')",
+         VALUES ($1, $2, 1, 'authorised') RETURNING id",
     )
     .bind(seeded.tenant_id)
     .bind(programme)
-    .execute(&pg.super_pool)
+    .fetch_one(&pg.super_pool)
     .await
     .expect("insert the authorised tranche");
+    let first_review = authorise_tranche(&pg, seeded, tranche).await;
+    let second: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche (tenant_id, programme_id, number, state,
+                                        authorisation_review_id)
+         VALUES ($1, $2, 2, 'authorised', $3) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(programme)
+    .bind(first_review)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert tranche 2 authorised by the predecessor's continue review");
     let (status, created) = running
         .invoke(
             "projects.create",
@@ -1414,7 +1454,7 @@ async fn programme_project(
                 "id": id,
                 "meta": {
                     "track": "v2",
-                    "tranche": 1,
+                    "tranche": 2,
                     "expected_outputs": [],
                     "closure_outputs": [],
                 },
@@ -1504,7 +1544,7 @@ async fn satisfy_mandatory_set(
     seeded: &support::Seeded,
     project: &str,
 ) {
-    const DOCUMENTS: [&str; 7] = [
+    const DOCUMENTS: [&str; 11] = [
         "project-brief",
         "evidence",
         "closure-review",
@@ -1512,6 +1552,10 @@ async fn satisfy_mandatory_set(
         "project-registers",
         "architecture-artifact",
         "statement-of-architecture-work",
+        "benefits-diagram",
+        "candidate-solutions",
+        "gap-analysis",
+        "project-context-diagram",
     ];
     for category in DOCUMENTS {
         let body = conveyor_domain::output_standard::template(category)
@@ -1746,7 +1790,7 @@ async fn a_compliant_project_closes_in_a_resumed_tranche() {
     let delegation = support::delegation_ref(&running, TOKEN).await;
     let project = programme_project(&pg, &running, &seeded).await;
     let tranche: Uuid =
-        sqlx::query_scalar("SELECT id FROM programme_tranche WHERE tenant_id = $1 AND number = 1")
+        sqlx::query_scalar("SELECT id FROM programme_tranche WHERE tenant_id = $1 AND number = 2")
             .bind(seeded.tenant_id)
             .fetch_one(&pg.super_pool)
             .await

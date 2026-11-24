@@ -62,15 +62,38 @@ async fn programme_project_keyed(
     .fetch_one(&pg.super_pool)
     .await
     .expect("insert the programme");
-    sqlx::query(
+    // A tranche is authorised only through its review (T10's MSP order): the state alone is
+    // not the authority, so the fixture writes the continue review and links it.
+    let tranche: Uuid = sqlx::query_scalar(
         "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
-         VALUES ($1, $2, 1, 'authorised')",
+         VALUES ($1, $2, 1, 'authorised') RETURNING id",
     )
     .bind(seeded.tenant_id)
     .bind(programme)
-    .execute(&pg.super_pool)
+    .fetch_one(&pg.super_pool)
     .await
     .expect("insert the authorised tranche");
+    let review: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche_review (tenant_id, tranche_id, decision, evidence,
+                                               reviewed_by)
+         VALUES ($1, $2, 'continue', '{\"acceptance\": \"fixture\"}'::jsonb, $3)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(tranche)
+    .bind(seeded.user_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the tranche review");
+    sqlx::query(
+        "UPDATE programme_tranche SET authorisation_review_id = $2 WHERE tenant_id = $1 AND id = $3",
+    )
+    .bind(seeded.tenant_id)
+    .bind(review)
+    .bind(tranche)
+    .execute(&pg.super_pool)
+    .await
+    .expect("link the review");
     let (status, created) = running
         .invoke(
             "projects.create",
@@ -360,7 +383,7 @@ async fn close(
 /// (`project-brief`, `evidence`, `closure-review`), PMP's WBS and registers, and — because a
 /// programme project is governed — TOGAF's artefact pages. The delivery contract/compliance
 /// review are Phase-G rows; baseline and change control are typed rows.
-const MANDATORY_DOCUMENTS: [&str; 7] = [
+const MANDATORY_DOCUMENTS: [&str; 11] = [
     "project-brief",
     "evidence",
     "closure-review",
@@ -368,6 +391,11 @@ const MANDATORY_DOCUMENTS: [&str; 7] = [
     "project-registers",
     "architecture-artifact",
     "statement-of-architecture-work",
+    // The TOGAF artefact pages the mandatory set names per §8.1 (A–D deliverables).
+    "benefits-diagram",
+    "candidate-solutions",
+    "gap-analysis",
+    "project-context-diagram",
 ];
 
 /// Compose and publish one output; the standard's skeleton carries its required headings.
