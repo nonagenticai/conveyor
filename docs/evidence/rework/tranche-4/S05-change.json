@@ -1,0 +1,9 @@
+{
+ "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+ "baseline_id": "01a20ec8-1ee4-766c-8dbe-9e1cd474cc3c",
+ "title": "Accept the retrospective WBS deliverable for S05",
+ "body": "The scope baseline freezes the plan; recording the deliverable's acceptance with its evidence is the one change this record makes to it.",
+ "impact": {
+  "scope": "the WBS deliverable's acceptance evidence"
+ }
+}
