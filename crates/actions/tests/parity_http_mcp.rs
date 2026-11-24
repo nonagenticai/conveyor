@@ -2363,10 +2363,14 @@ async fn seed_arch_board(pg: &support::Pg, ctx: &Ctx) -> Uuid {
             body.id,
             "approved",
             json!({ "charter": "parity" }),
-            ctx.alice_user,
             store::architecture::BoardSubject {
                 kind: Some("board"),
                 id: None,
+            },
+            store::architecture::BoardDecider {
+                decided_by: ctx.alice_user,
+                decided_by_kind: "human",
+                delegation_ref: None,
             },
         )
         .await
@@ -2548,10 +2552,14 @@ async fn seed_arch_profile(pg: &support::Pg, ctx: &Ctx, project: Uuid) {
             board.id,
             "approved",
             json!({ "charter": "parity" }),
-            ctx.alice_user,
             store::architecture::BoardSubject {
                 kind: Some("board"),
                 id: None,
+            },
+            store::architecture::BoardDecider {
+                decided_by: ctx.alice_user,
+                decided_by_kind: "human",
+                delegation_ref: None,
             },
         )
         .await
@@ -2562,10 +2570,14 @@ async fn seed_arch_profile(pg: &support::Pg, ctx: &Ctx, project: Uuid) {
             board.id,
             "approved",
             json!({ "charter": "parity" }),
-            ctx.alice_user,
             store::architecture::BoardSubject {
                 kind: Some("adm_profile"),
                 id: Some(profile.id),
+            },
+            store::architecture::BoardDecider {
+                decided_by: ctx.alice_user,
+                decided_by_kind: "human",
+                delegation_ref: None,
             },
         )
         .await

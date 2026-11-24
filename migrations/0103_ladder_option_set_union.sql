@@ -41,6 +41,10 @@ ALTER TABLE decision_option_entry
     RENAME CONSTRAINT decision_option_set_option_outcome TO decision_option_entry_outcome;
 
 ALTER TABLE decision_option_entry ADD COLUMN id uuid;
+-- The backfills below must see every tenant's rows. `decision_option_entry` is FORCE RLS
+-- (0071), and the migration role is the owner, so with FORCE on the UPDATE would see only the
+-- unset tenant and leave the rows NULL — the same failure 0096 hit on the production dump.
+ALTER TABLE decision_option_entry NO FORCE ROW LEVEL SECURITY;
 UPDATE decision_option_entry SET id = uuidv7() WHERE id IS NULL;
 ALTER TABLE decision_option_entry ALTER COLUMN id SET NOT NULL;
 
@@ -54,6 +58,7 @@ FROM (
     FROM decision_option_entry
 ) AS ordered
 WHERE e.set_id = ordered.set_id AND e.key = ordered.key;
+ALTER TABLE decision_option_entry FORCE ROW LEVEL SECURITY;
 
 ALTER TABLE decision_option_entry
     ADD COLUMN criteria text NOT NULL DEFAULT '',
