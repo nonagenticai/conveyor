@@ -425,6 +425,24 @@
         "docs/SPEC_V2.md"
       ],
       "gap": null
+    },
+    "T19F": {
+      "status": "proposed",
+      "tables": [],
+      "actions": [
+        "meetings.type_list",
+        "meetings.type_get",
+        "architecture.board_sit_open",
+        "architecture.board_sit_decide",
+        "cadences.materialise"
+      ],
+      "modules": [],
+      "evidence": [
+        "docs/plans/T19F-meeting-bindings.md",
+        "docs/plans/T19F/architecture-design.md",
+        "docs/SPEC_V2.md"
+      ],
+      "gap": "the five actions are the implementation (#683); none is measured before it lands"
     }
   }
 }
