@@ -203,6 +203,8 @@ pub struct TestDb {
     pub super_pool: PgPool,
     /// `conveyor_migrate`: owns the schema, still subject to FORCE RLS.
     pub owner: PgPool,
+    /// The schema owner's URL (a migration control session opens its own connection).
+    pub owner_url: String,
     /// `conveyor_runtime`: NOSUPERUSER NOBYPASSRLS, the role every request runs as.
     pub runtime: PgPool,
     /// The runtime role's URL (an `AppState` uses it).
@@ -264,6 +266,7 @@ impl TestDb {
         TestDb {
             super_pool,
             owner,
+            owner_url,
             runtime,
             runtime_url,
             name,
