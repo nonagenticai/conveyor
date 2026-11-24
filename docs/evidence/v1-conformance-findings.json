@@ -147,7 +147,12 @@
    ],
    "failure_scenario": "A cardless run or an unlinked work_package node is created and executes steps with no path from project to WBS to work package.",
    "acceptance": "work_package nodes require card_id and run.card_id is NOT NULL (or the store refuses cardless runs), proven by an insert without the link being refused.",
-   "owner_project": "T1"
+   "owner_project": "T1",
+   "resolved_by": {
+    "commit": "b75651645a65ff6c24775291d3c187485ae81473",
+    "test": "crates/actions/tests/plan_spine.rs::a_work_package_without_a_card_is_refused; crates/actions/tests/plan_spine.rs::a_work_package_names_its_card_and_run; crates/store/tests/run_binding.rs::a_job_run_without_a_card_is_refused_before_the_insert",
+    "evidence": "cargo test -p conveyor-actions --test plan_spine: 23 passed; --test spine_gates: 22; --test spine_msp: 10; --test togaf_close_gate: 4; --test programme_close: 21; -p conveyor-store --test run_binding: 3. wbs.create/pm.plan require the card on a work-package node (422 card_required), the node persists it, and the DB CHECK enforces both the work-package card and the job-run card."
+   }
   },
   {
    "id": "v1-p5-6",
@@ -4545,7 +4550,12 @@
    ],
    "failure_scenario": "After migrate --seed, projects.create with project_type_code media (or delivery, development, operations, setup) returns 422; the \u00a75.2.1 media sequence and the \u00a79.1 development gates cannot be selected at all.",
    "acceptance": "The seed carries active rows for delivery, architecture, improvement, development, operations, setup and media, each with its phase template and gate references; a test creates one project of each type and asserts its phases and gates.",
-   "owner_project": "T1"
+   "owner_project": "T1",
+   "resolved_by": {
+    "commit": "efdd12e5bb33bac784717f6ed374da1970111d33",
+    "test": "crates/actions/tests/project_types.rs::each_spec_project_type_creates_with_phases_and_gates",
+    "evidence": "cargo test -p conveyor-actions --test project_types: 4 passed; -p conveyor-store --test process_seed: 7; --test s07_seed: 3. seed/catalogue.json now carries all seven SPEC project types with their \u00a75.2 phases and gates; the dev-seed delivery row reads the embedded export (DELIVERY_MATRIX removed)."
+   }
   },
   {
    "id": "v1-p55-1",
