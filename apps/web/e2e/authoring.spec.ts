@@ -74,8 +74,10 @@ test("the intake queue reads the tenant's rows", async ({ page, request }) => {
 
   // The queue is the catalogue grouped by the intake each draft cites: the row this spec
   // created appears with its draft count — no intake read exists to show the brief itself.
+  // Ids minted seconds apart share their 8-character display prefix, so the row is matched on
+  // the full id the row carries, never on the shortened cell.
   const queue = page.getByTestId("authoring-intakes");
-  const row = queue.locator("tr", { hasText: intake.id.slice(0, 8) });
+  const row = queue.locator(`tr[data-intake="${intake.id}"]`);
   await expect(row).toBeVisible();
   await expect(row).toContainText("1 draft(s)");
   await expect(row).toContainText("department");

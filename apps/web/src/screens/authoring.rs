@@ -495,7 +495,7 @@ fn intake_panel(
                                 </tr></thead>
                                 <tbody>
                                     {summaries.iter().map(|intake| view! {
-                                        <tr>
+                                        <tr data-intake=intake.id.clone()>
                                             <td class="mono">{short_id(Some(&intake.id))}</td>
                                             <td>{format!("{} draft(s)", intake.drafts)}</td>
                                             <td>{intake.kinds.join(", ")}</td>
