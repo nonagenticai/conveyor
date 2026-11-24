@@ -1843,15 +1843,15 @@ def _scope_of(gap: dict[str, Any], row: dict[str, Any], dataset: Dataset) -> str
     """The package scope a gap belongs to: a project key, `tranche-<n>`, or `programme`."""
     subject = str(gap.get("subject", ""))
     head = subject.split(":", 1)[0]
+    if head in dataset.by_key:
+        # A gap about a specific project belongs to that project, whatever the rule's
+        # artefact scope: only the project (or its acting owner) can close its own missing
+        # record. Grouping a project's gap under its tranche hands the card to whichever
+        # member is alphabetically first and makes it unfixable by that member. The rule's
+        # `scope: tranche` still governs the standard's applicability and the roll-up.
+        return head
     scope = row.get("scope", "programme")
-    if scope == "project":
-        return head if head in dataset.by_key else "programme"
     if scope == "tranche":
-        project = dataset.by_key.get(head)
-        if project:
-            tranche = (project.get("meta") or {}).get("tranche")
-            if tranche is not None:
-                return f"tranche-{tranche}"
         match = re.match(r"tranche\s+(\d+)", subject)
         if match:
             return f"tranche-{match.group(1)}"
@@ -3034,6 +3034,16 @@ def self_test() -> None:
             "evidence": None,
         }
     )
+    register_gaps.append(
+        {
+            "rule": "mandatory_artefacts",
+            "severity": "P1",
+            "subject": "tranche 1",
+            "detail": "d",
+            "disposition": "rework",
+            "evidence": None,
+        }
+    )
     register_baseline = {
         "version": 1,
         "entries": [
@@ -3103,8 +3113,13 @@ def self_test() -> None:
     if json.dumps(first, sort_keys=True) != json.dumps(second, sort_keys=True):
         fail("the rework register is not deterministic")
     keys = [package["key"] for package in first["packages"]]
-    if "contract_missing:tranche-1#1" not in keys or "contract_missing:tranche-1#2" not in keys:
-        fail(f"the 21-subject tranche rule did not split at the cap: {keys}")
+    # A project-subject gap is the project's own card, keyed by the project, and the cap
+    # splits it deterministically.
+    if "contract_missing:T1#1" not in keys or "contract_missing:T1#2" not in keys:
+        fail(f"the 21-subject project rule did not split at the cap: {keys}")
+    # A gap whose subject is the tranche itself stays tranche-scoped.
+    if "mandatory_artefacts:tranche-1" not in keys:
+        fail(f"a tranche-subject gap lost its tranche scope: {keys}")
     if not any(
         package["key"] == "closed_without_closure_review:P0" and package["subject_count"] == 1
         for package in first["packages"]

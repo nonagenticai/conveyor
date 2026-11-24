@@ -2,12 +2,13 @@
 key = "S05"
 name = "Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE"
 gate = "replay a board export, win a two-client race and survive the 1k-card load — zero deltas on 1,000 cards, one 200 and one 412 with the current representation, p95 ≤ 120 ms at 20 rps, the exact webhook shape, SSE within 200 ms, and no second store"
-gate_checks = ["S05-project", "S05-baseline", "S05-charter", "S05-closure-outputs", "S05-contract", "S05-review", "S05-closure-gate", "S05-waivers", "S05-pi-cadence", "S05-pi-plan", "S05-pi-objectives", "S05-lessons", "S05-wsjf", "S05-demo-credits", "S05-product", "S05-artefact-standard", "S05-rework"]
+gate_checks = ["S05-project", "S05-baseline", "S05-charter", "S05-contract", "S05-review", "S05-waivers", "S05-pi-cadence", "S05-pi-plan", "S05-pi-objectives", "S05-lessons", "S05-wsjf", "S05-demo-credits", "S05-product", "S05-artefact-standard", "S05-rework"]
 [[check]]
 id = "S05-project"
 check = "project"
+status = "active"
 severity = "P0"
-description = "S05 is closed"
+description = "S05 is active — reworked to the record set, held open until its six gate properties execute"
 
 [[check]]
 id = "S05-baseline"
@@ -33,12 +34,6 @@ assert gates.get("charter")=="approved", gates
 '''
 
 [[check]]
-id = "S05-closure-outputs"
-check = "closure_outputs"
-severity = "P0"
-description = "the declared closure outputs are declared and published"
-
-[[check]]
 id = "S05-contract"
 check = "contract"
 severity = "P0"
@@ -49,12 +44,6 @@ id = "S05-review"
 check = "review"
 severity = "P0"
 description = "the Phase-G review cites a published standing delegation"
-
-[[check]]
-id = "S05-closure-gate"
-check = "closure_gate"
-severity = "P0"
-description = "the closure gate was decided by an approver other than its requester"
 
 [[check]]
 id = "S05-waivers"
