@@ -7777,7 +7777,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "mixed",
         "earliest_expires": "2027-02-18",
-        "entries": 9,
+        "entries": 12,
         "owners": [
           "programme owner"
         ]
@@ -7801,8 +7801,11 @@ window.CONVEYOR_REWORK = {
           "source": "snapshot",
           "subjects": [
             "S12",
+            "S13",
+            "S17",
             "S18",
             "S20",
+            "S21",
             "T11",
             "T16",
             "T7",
@@ -7820,7 +7823,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§5.3",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 9,
+      "subject_count": 12,
       "subjects": [
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -7831,6 +7834,26 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S12"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S13"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "S17"
         },
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -7851,6 +7874,16 @@ window.CONVEYOR_REWORK = {
           "reason": null,
           "severity": "P1",
           "subject": "S20"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S21"
         },
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -29577,9 +29610,9 @@ window.CONVEYOR_REWORK = {
     },
     "SPEC": {
       "findings": 86,
-      "gaps": 41,
+      "gaps": 44,
       "p0": 0,
-      "p1": 6,
+      "p1": 9,
       "p2": 35,
       "packages": 107,
       "rules": 8,
@@ -29622,7 +29655,7 @@ window.CONVEYOR_REWORK = {
     "open": 326,
     "packages": 329,
     "resolved": 14,
-    "subjects": 430,
+    "subjects": 433,
     "suppressed": 3
   }
 };
