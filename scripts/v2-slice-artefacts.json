@@ -91,7 +91,10 @@
         "changes.request"
       ],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/api/tests/pm_lifecycle.rs",
+        "crates/api/tests/pm_self_approval.rs",
+        "crates/api/tests/pm_baseline_change.rs",
+        "crates/api/tests/pm_status.rs"
       ],
       "gap": null
     },
