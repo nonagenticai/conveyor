@@ -1301,7 +1301,7 @@ def run_project(
             "severity": severity,
             "description": description,
         }
-        if kind == "command":
+        if kind in ("command", "probe"):
             command = str(check.get("command") or "")
             if not command:
                 fail(f"{identifier}: a command check needs `command`")
@@ -1311,7 +1311,7 @@ def run_project(
             )
         else:
             if kind != "snapshot":
-                fail(f"{identifier}: kind must be snapshot or command")
+                fail(f"{identifier}: kind must be snapshot, command or probe")
             if name not in CHECKS:
                 fail(f"{identifier}: no shared check named {name!r}")
             ok, detail = CHECKS[name](snapshot, key, check)
@@ -2378,7 +2378,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--snapshot", type=Path, default=DEFAULT_SNAPSHOT)
     parser.add_argument("--evidence-dir", type=Path, default=DEFAULT_EVIDENCE)
-    parser.add_argument("--kind", choices=("all", "snapshot", "command"), default="all")
+    parser.add_argument(
+        "--kind", choices=("all", "snapshot", "command", "probe"), default="all"
+    )
     parser.add_argument("--exclude", default="", help="comma-separated check ids or names to skip")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args(argv)
