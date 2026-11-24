@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d2c-7322-b2f9-4dd041153894\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
       "exit": 1,
       "id": "S07-charter",
       "kind": "command",
       "result": "fail",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
       "stdout": ""
     },
     {
@@ -106,7 +106,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a20fba-ccfe-7e9a-81f3-c8e89cf78ac9 carries a statement and evidence from the tranche-4 retro",
       "id": "S07-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -178,7 +178,7 @@
   ],
   "failures": [
     "S07-baseline (P0): no project baseline",
-    "S07-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "S07-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
     "S07-closure-outputs (P0): the project declares no closure_outputs",
     "S07-contract (P0): no live board-approved delivery contract",
     "S07-review (P0): no Phase-G compliance review for the project's live contract",
@@ -192,16 +192,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "the relevance eval set beats the agreed baseline \u2014 3 revisions with a dense sequence, an idempotent seed, both GIN indexes used, relevance targets met, traceability in both directions with 0 cross-tenant rows, quality read-only, and no orphan",
-  "generated_at": "2026-11-24T21:07:26.093894+00:00",
+  "generated_at": "2026-11-24T22:51:45.589565+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S07.toml",
   "name": "Requirements, catalogues, revisions, quality scoring, search",
   "project": "S07",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T18:25:22.625551+00:00",
-    "git_sha": "86f5da93480fa1b163dd4ee35085cd72882f9b01",
-    "path": "retained-snapshot/86f5da93480fa1b163dd4ee35085cd72882f9b01"
+    "generated_at": "2026-11-24T22:44:10.403624+00:00",
+    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
+    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
   },
   "verdict": "red",
   "warnings": []
