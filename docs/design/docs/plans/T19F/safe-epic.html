@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F — SAFe epic · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/safe-epic.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f--safe-epic">T19F — SAFe epic</h1>
+<h2 id="epic-hypothesis">Epic hypothesis</h2>
+<p>If a forum policy is a reviewed authoring release and the board/cadence rows name their meeting types, then every change to how the organisation decides is governed, every board decision carries its deliberation, and every cadence sitting has its meeting — measured by the B7 increment.</p>
+<p><strong>Leading indicator:</strong> a policy v2 published through the authoring route with v1 still pinned by an in-flight meeting; one board sitting whose decisions are <code>via='meeting'</code>; one cadence slot materialised once. <strong>Lagging indicator:</strong> B7's board-sitting and cadence counts at the tranche-6 review.</p>
+<h2 id="non-goals">Non-goals</h2>
+<p>A second decision store; a chat/AV/transcript system; a rebuild of T9/T10; a change to the direct board path; a new UI destination.</p>
+<h2 id="features">Features</h2>
+<table>
+<thead>
+<tr>
+<th>Id</th>
+<th>Feature</th>
+<th>Traces</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1</td>
+<td>A reviewed policy asset publishes the next immutable <code>meeting_type</code> version</td>
+<td>R1, R2, R3</td>
+</tr>
+<tr>
+<td>F2</td>
+<td>A board subject decision is taken in a sitting with per-seat <code>via='meeting'</code> decisions</td>
+<td>R4, R5, R7</td>
+</tr>
+<tr>
+<td>F3</td>
+<td>A cadence row names its type and materialises exactly one meeting</td>
+<td>R6</td>
+</tr>
+<tr>
+<td>F4</td>
+<td>The mock UI and the real app show the policy versions, the sitting and the cadence state</td>
+<td>§10.5; T18's screen</td>
+</tr>
+</tbody>
+</table>
+<h2 id="enablers">Enablers</h2>
+<table>
+<thead>
+<tr>
+<th>Id</th>
+<th>Enabler</th>
+<th>Serves</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>Migration 0068: the authoring link, the two binding keys and the cadence-slot index</td>
+<td>F1, F2, F3</td>
+</tr>
+<tr>
+<td>E2</td>
+<td>The extracted board approval insert shared by <code>board_decide</code> and <code>board_sit_open</code></td>
+<td>F2</td>
+</tr>
+<tr>
+<td>E3</td>
+<td>The registry/OpenAPI/coverage regeneration and the T19F programme row</td>
+<td>F1–F4</td>
+</tr>
+</tbody>
+</table>
+<h2 id="wsjf-inputs">WSJF inputs</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th style="text-align: right;">Business value</th>
+<th style="text-align: right;">Time criticality</th>
+<th style="text-align: right;">Risk reduction</th>
+<th style="text-align: right;">Job size</th>
+<th style="text-align: right;">WSJF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1 policy route</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">6.0</td>
+</tr>
+<tr>
+<td>F2 board sitting</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4.2</td>
+</tr>
+<tr>
+<td>F3 cadence</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">4.3</td>
+</tr>
+<tr>
+<td>F4 surfaces</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3.7</td>
+</tr>
+</tbody>
+</table>
+<h2 id="pi-objectives">PI objectives</h2>
+<table>
+<thead>
+<tr>
+<th>Objective</th>
+<th>Outcome</th>
+<th>Confidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>O1</td>
+<td>The policy route is proven by a unit and a live gate</td>
+<td>high</td>
+</tr>
+<tr>
+<td>O2</td>
+<td>The board sitting is proven with a real subject decision</td>
+<td>high</td>
+</tr>
+<tr>
+<td>O3</td>
+<td>The cadence slot materialises once, idempotently</td>
+<td>high</td>
+</tr>
+<tr>
+<td>O4</td>
+<td>T19F is in the programme record with its artefacts and a strict publish</td>
+<td>medium (deployment-gated)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="inspect-and-adapt">Inspect and adapt</h2>
+<p>The PI review reads the live gate and the B7 increment; a policy change that cannot be published, a sitting that cannot reach quorum, or a cadence that materialises twice is a defect and a kata candidate, not a waived item.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T19F/safe-epic.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

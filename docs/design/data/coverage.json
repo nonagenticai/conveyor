@@ -353,18 +353,18 @@
           223,
           224,
           225,
-          395,
-          410,
-          426,
           435,
           476,
           526,
           569,
           572,
-          660
+          660,
+          680,
+          681,
+          691
         ],
-        "open": 15,
-        "ready": 5,
+        "open": 14,
+        "ready": 7,
         "unknown": 0
       }
     },
@@ -697,7 +697,8 @@
       "parallel_with": [
         "S06b",
         "S10",
-        "S11"
+        "S11",
+        "T19F"
       ],
       "plan": "docs/plans/slices/S06a-mcp-server-channel.md",
       "status": "archived",
@@ -738,7 +739,8 @@
       "parallel_with": [
         "S06a",
         "S10",
-        "S11"
+        "S11",
+        "T19F"
       ],
       "plan": "docs/plans/slices/S06b-agent-direct-interface.md",
       "status": "built",
@@ -1007,7 +1009,8 @@
       "parallel_with": [
         "S06a",
         "S06b",
-        "S11"
+        "S11",
+        "T19F"
       ],
       "plan": "docs/plans/slices/S10-copilot-ag-ui.md",
       "status": "built",
@@ -1048,7 +1051,8 @@
       "parallel_with": [
         "S06a",
         "S06b",
-        "S10"
+        "S10",
+        "T19F"
       ],
       "plan": "docs/plans/slices/S11-procedures.md",
       "status": "built",
@@ -1504,7 +1508,7 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           15,
           581,
@@ -1515,7 +1519,7 @@
           649,
           656
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1749,9 +1753,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T17"
-      ],
+      "blocked_by": [],
       "evidence": [
         "apps/server/tests/organisation_loop.rs"
       ],
@@ -1779,11 +1781,11 @@
       "tranche": 13,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           88
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1871,14 +1873,15 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           83,
           558,
           560,
-          561
+          561,
+          688
         ],
-        "open": 1,
+        "open": 2,
         "ready": 1,
         "unknown": 0
       }
@@ -1975,22 +1978,23 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/authoring",
+        "migrations/0064_authoring.sql"
       ],
-      "gap": "no tenant asset authoring intake or review queue",
+      "gap": null,
       "key": "T17",
       "measured": {
         "actions": [
-          0,
-          0
+          6,
+          6
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
-          0,
-          0
+          2,
+          2
         ]
       },
       "name": "Tenant asset authoring",
@@ -2001,7 +2005,7 @@
         "T7"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 5,
       "units": {
@@ -2012,8 +2016,8 @@
           629,
           655
         ],
-        "open": 1,
-        "ready": 1,
+        "open": 0,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2119,6 +2123,51 @@
           650
         ],
         "open": 0,
+        "ready": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "blocked_by": [],
+      "evidence": [
+        "docs/SPEC_V2.md"
+      ],
+      "gap": "action meetings.type_list, action meetings.type_get, action architecture.board_sit_open, action architecture.board_sit_decide, action cadences.materialise",
+      "key": "T19F",
+      "measured": {
+        "actions": [
+          0,
+          5
+        ],
+        "modules": [
+          0,
+          0
+        ],
+        "tables": [
+          0,
+          0
+        ]
+      },
+      "name": "Decision-forum governance (follow-on)",
+      "parallel_with": [
+        "S06a",
+        "S06b",
+        "S10",
+        "S11"
+      ],
+      "plan": "docs/plans/T19F-meeting-bindings.md",
+      "status": "proposed",
+      "track": "v2",
+      "tranche": 6,
+      "units": {
+        "blocked": 2,
+        "claimed": 1,
+        "numbers": [
+          682,
+          683,
+          684
+        ],
+        "open": 3,
         "ready": 0,
         "unknown": 0
       }
@@ -2729,16 +2778,16 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 45,
+        "built": 46,
         "partial": 1,
         "planned": 0,
         "proposed": 2,
         "standing": 1
       },
-      "total": 50,
+      "total": 51,
       "uncovered": [],
-      "with_open_units": 13,
-      "without_open_units": 37
+      "with_open_units": 11,
+      "without_open_units": 40
     },
     "screens": {
       "actions_invoked": 39,

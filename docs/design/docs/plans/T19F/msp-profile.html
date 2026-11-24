@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F — MSP profile · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/msp-profile.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f--msp-profile">T19F — MSP profile</h1>
+<h2 id="business-case">Business case</h2>
+<p>T19 delivered the meeting as the decision forum; its policy could not be changed through a governance route and its two consumers — the T9 board and the T10 cadence — did not name the type they use. T19F closes both seams by reusing the built authoring route and T19's arithmetic. The cost is one migration, five actions, two test files and two UI panels; the alternative is a policy that can only be changed by a redeploy and a board whose decisions are not seated.</p>
+<h2 id="benefit-b7--deliberated-cross-department-decisions">Benefit B7 — Deliberated cross-department decisions</h2>
+<p>B7's existing baseline (<code>seed/programme-definition.json</code>) is a measurement record: zero deliberated decision rows before T19. T19F does <strong>not</strong> overwrite it. It adds the realisation increment:</p>
+<table>
+<thead>
+<tr>
+<th>Measure</th>
+<th>Before T19F</th>
+<th>After T19F</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Board subject decisions with per-seat positions</td>
+<td>0 (direct approval rows only)</td>
+<td>a query over <code>approval_decision.via</code> for <code>surface='meeting'</code></td>
+</tr>
+<tr>
+<td>Cadence slots with a materialised meeting</td>
+<td>0</td>
+<td>a query over <code>meeting.cadence_slot</code></td>
+</tr>
+<tr>
+<td>Policy versions with an authoring provenance</td>
+<td>0</td>
+<td><code>authoring_asset.published_meeting_type_id</code></td>
+</tr>
+</tbody>
+</table>
+<p>The measurement method is the existing read-time aggregate over <code>meeting</code>, <code>meeting_agenda_item</code>, <code>meeting_attendance</code>, <code>meeting_position</code>, <code>approval_decision</code> and <code>project_dependency</code>; T19F adds the two joins (the authored policy and the cadence slot) and writes nothing at read time.</p>
+<h2 id="benefits-map-link">Benefits map link</h2>
+<table>
+<thead>
+<tr>
+<th>Output</th>
+<th>Capability</th>
+<th>Outcome</th>
+<th>Benefit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T19F forum governance</td>
+<td>a forum's policy is versioned and its decisions are seated</td>
+<td>O7 Meetings decide with the affected departments</td>
+<td>B7</td>
+</tr>
+</tbody>
+</table>
+<h2 id="risk">Risk</h2>
+<table>
+<thead>
+<tr>
+<th>Id</th>
+<th>Risk</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R20 (T19, carried)</td>
+<td>a never-decided forum</td>
+<td>the T19 retirement flag; T19F adds the sitting's own decision evidence</td>
+</tr>
+<tr>
+<td>R21</td>
+<td>a policy change published without evidence</td>
+<td><code>authoring.review</code> requires an approved approval; the plan tests the refusal</td>
+</tr>
+<tr>
+<td>R22</td>
+<td>a cadence slot gets a second meeting</td>
+<td>the partial unique index; the action is idempotent</td>
+</tr>
+<tr>
+<td>R23</td>
+<td>the board's direct path is broken by the sitting</td>
+<td>the direct path is unchanged; the test proves it</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stakeholders">Stakeholders</h2>
+<p>The SRO, the programme manager, the Architecture Board, the BCM, the department heads that staff the board's seats, and the delivery teams that use the direct board path.</p>
+<h2 id="tranche-evidence">Tranche evidence</h2>
+<p>T19F is at tranche 6 by the coverage graph (T19 tranche 4, T17 tranche 5). The tranche-6 review reads: the plan and artefacts (#682), the implementation evidence (#683), the live chain and gate (#684), and the closure review's deferral. The project stays <code>active</code> until that review; closing it in a planned tranche would manufacture an unledgered P0.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T19F/msp-profile.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
