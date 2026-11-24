@@ -22,7 +22,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-24T09:00:52Z",
+      "updatedAt": "2026-11-24T10:52:34Z",
       "labels": [
         {
           "name": "programme",
@@ -1083,7 +1083,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-24T09:20:28Z",
+      "updatedAt": "2026-11-24T10:54:36Z",
       "labels": [
         {
           "name": "unit",
@@ -4652,9 +4652,9 @@
     {
       "number": 80,
       "title": "T6 \u2014 Development project",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/80",
-      "updatedAt": "2026-11-24T09:28:57Z",
+      "updatedAt": "2026-11-24T11:32:43Z",
       "labels": [
         {
           "name": "unit",
