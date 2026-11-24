@@ -1099,56 +1099,6 @@ impl Drop for Stub {
     }
 }
 
-/// A laya stub: every call is answered with one fixed document and counted.
-pub struct LayaStub {
-    pub base: String,
-    pub hits: StubHits,
-    task: tokio::task::JoinHandle<()>,
-}
-
-impl LayaStub {
-    /// A stub answering every laya call with `body`, counting the calls it served.
-    pub async fn start(body: Value) -> LayaStub {
-        let hits = StubHits::default();
-        let app = Router::new()
-            .fallback(post(laya_answer))
-            .with_state(LayaAnswer {
-                body,
-                hits: hits.clone(),
-            });
-        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
-            .await
-            .expect("bind the laya stub");
-        let addr = listener.local_addr().expect("the laya stub's address");
-        let task = tokio::spawn(async move {
-            let _ = axum::serve(listener, app).await;
-        });
-        LayaStub {
-            base: format!("http://{addr}"),
-            hits,
-            task,
-        }
-    }
-}
-
-impl Drop for LayaStub {
-    fn drop(&mut self) {
-        self.task.abort();
-    }
-}
-
-/// The laya stub's state: the document it answers and the count of answers served.
-#[derive(Clone)]
-struct LayaAnswer {
-    body: Value,
-    hits: StubHits,
-}
-
-async fn laya_answer(State(answer): State<LayaAnswer>) -> axum::Json<Value> {
-    answer.hits.0.fetch_add(1, Ordering::SeqCst);
-    axum::Json(answer.body)
-}
-
 async fn echo(
     State(_hits): State<StubHits>,
     axum::Json(body): axum::Json<Value>,
