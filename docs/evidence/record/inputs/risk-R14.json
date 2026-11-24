@@ -1,1 +1,22 @@
-{"programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac", "kind": "risk", "code": "R14", "title": "CI/agent budget: an agent burst or a probe run", "probability": "M", "impact": 3, "owner_job_id": "01a1db6b-4f11-75a6-bec6-675c8fd11224", "links": [{"kind": "relates_to", "target": "benefit/B5"}], "review_at": "2026-11-29", "severity": "medium", "status": "open"}
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "kind": "risk",
+ "code": "R14",
+ "title": "CI/agent budget: an agent burst or a probe run",
+ "probability": "M",
+ "impact": 3,
+ "owner_job_id": "01a1db6b-4f11-75a6-bec6-675c8fd11224",
+ "links": {
+  "cards": [],
+  "requirements": [
+   {
+    "kind": "relates_to",
+    "target": "benefit/B5"
+   }
+  ],
+  "decisions": []
+ },
+ "review_at": "2026-11-29",
+ "severity": "medium",
+ "status": "open"
+}

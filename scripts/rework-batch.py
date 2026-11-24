@@ -380,7 +380,9 @@ def preflight(plan: list[dict], snapshot: Path, dry_run: bool) -> list[dict]:
             "--closes",
             "true" if member["closes"] else "false",
         ]
-        code = run_command(checker, dry_run=dry_run)
+        # The checker is read-only: a dry run must still validate every pack, or the dry run
+        # proves nothing about the content it is about to publish.
+        code = run_command(checker, dry_run=False)
         if code != 0:
             member["blocked"] = "content rejected by rework-content-check"
             ready.append(member)

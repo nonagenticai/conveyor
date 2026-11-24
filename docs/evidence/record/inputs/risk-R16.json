@@ -10,8 +10,12 @@
  "status": "open",
  "owner_job_id": "01a1db6b-4f1b-7180-86f8-f991cb9b78d0",
  "review_at": "2026-11-29",
- "links": [
-  "acceptance/programme/P0.toml",
-  "docs/evidence/conformance-gap-register.json"
- ]
+ "links": {
+  "cards": [],
+  "requirements": [
+   "acceptance/programme/P0.toml",
+   "docs/evidence/conformance-gap-register.json"
+  ],
+  "decisions": []
+ }
 }
