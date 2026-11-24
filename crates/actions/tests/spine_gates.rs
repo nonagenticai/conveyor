@@ -1416,8 +1416,8 @@ async fn programme_project(
     .fetch_one(&pg.super_pool)
     .await
     .expect("insert the authorised tranche");
-    let first_review = authorise_tranche(&pg, seeded, tranche).await;
-    let second: Uuid = sqlx::query_scalar(
+    let first_review = authorise_tranche(pg, seeded, tranche).await;
+    let _second: Uuid = sqlx::query_scalar(
         "INSERT INTO programme_tranche (tenant_id, programme_id, number, state,
                                         authorisation_review_id)
          VALUES ($1, $2, 2, 'authorised', $3) RETURNING id",
