@@ -129,7 +129,7 @@ use serde_json::{Value, json};
 /// `toolkits.import_openapi|register_mcp|discover_mcp`, `tool_authoring.draft|validate|test|`
 /// `review|publish|promote` and the broker's registered-destination dispatch `tools.dispatch`
 /// — 551 → **561**; T12 (#88) adds the three remaining kata Gets → **564**.
-const EXPECTED: [&str; 564] = [
+const EXPECTED: [&str; 565] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -180,6 +180,7 @@ const EXPECTED: [&str; 564] = [
     "authoring.assets",
     "authoring.draft",
     "authoring.intake",
+    "authoring.intakes",
     "authoring.publish",
     "authoring.review",
     "baselines.get",
@@ -807,7 +808,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // registered-destination arm, not a new external declaration.
     // T12 (#88) adds three internal kata Gets (`kata.standardise|sustain|stretch`):
     // internal 543 -> 546; external stays 18.
-    assert_eq!((internal, external), (546, 18));
+    // #655 (T17b) adds one internal read (`authoring.intakes`): internal 546 -> 547;
+    // external stays 18 — the queue reads this tenant's own intake rows.
+    assert_eq!((internal, external), (547, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
