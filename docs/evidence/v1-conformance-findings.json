@@ -1923,7 +1923,12 @@
    ],
    "failure_scenario": "Laya times out during a closed safety-gate pre-check. The caller has no confidence to post, so ladder.evaluate returns 422 confidence_missing and no decision row exists; there is no gate_unavailable, no refused outcome and no escalation record. An operator auditing the run cannot tell whether the gate passed, was skipped, or was never evaluated, and downstream policy can treat the missing row as 'not blocking'.",
    "acceptance": "A gate_unavailable path exists on the ladder that records the outage and applies fail_policy (closed => refused, open => the policy action), with a test for an unreachable laya on both a closed and an open policy; open with annotate must record the note, closed must record the refusal.",
-   "owner_project": "T2"
+   "owner_project": "T2",
+   "resolved_by": {
+    "commit": "bfbfa65a2cea55bc2e3e6e2528bbfca6dce59705",
+    "test": "crates/actions/tests/decision_ladder.rs::a_closed_laya_outage_records_a_refused_unavailable_decision; crates/actions/tests/decision_ladder.rs::an_open_laya_outage_records_its_action_and_annotate_note",
+    "evidence": "cargo test -p conveyor-actions --test decision_ladder: 25 passed. A laya outage returns 503 gate_unavailable and records one unavailable decision after the handler rollback, applying fail_policy: closed records the refusal, open records the policy action and the annotate note."
+   }
   },
   {
    "id": "v1-w1c-6",
@@ -5078,7 +5083,12 @@
    ],
    "failure_scenario": "A laya judge rejects a step. ladder.list returns nothing for that gate, and the row carries no policy version, input hash or latency, so the refusal is unreproducible and invisible to the reporting that finds gates which never refuse.",
    "acceptance": "Every laya, checker and eval verdict writes one decision row with rung, answer, versions, input hash and latency, linked to the run step in the same transaction; a test asserts the decision count equals the judged steps and that ladder.list returns the step gate.",
-   "owner_project": "T2"
+   "owner_project": "T2",
+   "resolved_by": {
+    "commit": "03c94a652f77f166fbf5186343c8a2a0b4fc11b6",
+    "test": "crates/actions/tests/step_judge_decisions.rs::every_checker_laya_and_eval_verdict_writes_one_decision_row_linked_to_its_step; crates/actions/tests/step_judge_decisions.rs::a_rejudged_step_writes_one_decision_not_two; crates/actions/tests/step_judge_decisions.rs::ladder_list_returns_the_step_judge_decisions",
+    "evidence": "cargo test -p conveyor-actions --test step_judge_decisions: 6 passed. Every checker, laya and eval verdict writes exactly one decision row (rung, answer, pins, input hash, latency, run/step links) in the same transaction as run_step.judge; migration 0099 links the decision to the run step."
+   }
   },
   {
    "id": "v1-p102-1",
@@ -5107,7 +5117,12 @@
    ],
    "failure_scenario": "The laya bridge accepts connections and stops answering; every judge call holds a worker for 30 seconds, and the decision policy's unavailable path cannot run inside the contract, so a stalled laya becomes a worker starvation event.",
    "acceptance": "laya dispatch uses min(config timeout, 3000 ms) with a 1500 ms default; a stalled fake laya test asserts abandonment within 3 seconds and records the unavailable outcome under the decision policy.",
-   "owner_project": "T2"
+   "owner_project": "T2",
+   "resolved_by": {
+    "commit": "a16d45ef8fd8d79e63aa9c46cfd1cdb915e619b0",
+    "test": "crates/actions/tests/judge.rs::a_stalled_laya_judge_is_abandoned_within_three_seconds_and_parked_unavailable; crates/actions/tests/decision_ladder.rs::a_laya_config_timeout_is_capped_at_the_hard_budget; crates/actions/tests/decision_ladder.rs::a_laya_config_defaults_to_fifteen_hundred_ms",
+    "evidence": "cargo test -p conveyor-actions --test judge: 12 passed; --test decision_ladder: 25; --test image_budgets: 2; --check-lock exit 0. The seam defaults to 1500 ms, the hard budget is 3000 (a higher config is refused 422 timeout_above_budget), and a stalled laya is abandoned within the bound and parked gate_unavailable."
+   }
   },
   {
    "id": "v1-p102-2",
