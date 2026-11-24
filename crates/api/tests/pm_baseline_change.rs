@@ -532,8 +532,8 @@ async fn plan_with_an_approved_change_advances() {
     );
     assert_eq!(
         wbs_count(&pg, seeded.tenant_id, project_id).await,
-        before + 1,
-        "the re-plan did not add the hardening phase"
+        before + 3,
+        "the re-plan inserts the three nodes it names (the action appends to the tree)"
     );
 
     let rows = baseline_rows(&pg, seeded.tenant_id, project_id).await;
