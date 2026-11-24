@@ -47,7 +47,7 @@
         "memory": "work-package hot + one digest",
         "grants": [{"op": "coding.jobs.create", "max_side_effect": "write"}, {"op": "coding.jobs.get", "max_side_effect": "read"}, {"op": "coding.test_runs.create", "max_side_effect": "write"}],
         "binding": "toolkit coding@4 · ceiling write · credential coding.tenant",
-        "limits": {"max_iterations": 12, "timeout_secs": 300, "max_tool_calls": 20, "max_tokens": 40000, "cost_budget_usd": 2.5, "display": "12 turns · 40k tokens · $2.50"},
+        "limits": {"max_iterations": 12, "timeout_secs": 300, "max_tool_calls": 20, "max_tokens": 40000, "cost_budget_usd": 2.5},
         "gates": "design (conditional) · merge · deploy",
         "authority": "implement, test, propose PR"
       }
@@ -70,7 +70,7 @@
         "memory": "work-package hot + one digest",
         "grants": [{"op": "strata.query", "max_side_effect": "read"}],
         "binding": "toolkit strata@2 · ceiling read · credential strata_rag.tenant",
-        "limits": {"max_iterations": 16, "timeout_secs": 300, "max_tool_calls": 30, "max_tokens": 60000, "cost_budget_usd": 4, "display": "16 turns · 60k tokens · $4.00"},
+        "limits": {"max_iterations": 16, "timeout_secs": 300, "max_tool_calls": 30, "max_tokens": 60000, "cost_budget_usd": 4},
         "gates": "design · architecture contract · closure",
         "authority": "draft contracts and ADRs; no merge"
       }
@@ -93,7 +93,7 @@
         "memory": "portfolio digest + project hot",
         "grants": [],
         "binding": "toolkit billing@1 · ceiling read · credential billing.tenant",
-        "limits": {"max_iterations": 8, "timeout_secs": 300, "max_tool_calls": 10, "max_tokens": 20000, "cost_budget_usd": 1, "display": "8 turns · 20k tokens · $1.00"},
+        "limits": {"max_iterations": 8, "timeout_secs": 300, "max_tool_calls": 10, "max_tokens": 20000, "cost_budget_usd": 1},
         "gates": "charter · baseline · change · closure",
         "authority": "create/close project; never sole approver"
       }
@@ -116,7 +116,7 @@
         "memory": "board hot + interruption digest",
         "grants": [],
         "binding": "toolkit coding@4 · ceiling read · credential coding.tenant",
-        "limits": {"max_iterations": 8, "timeout_secs": 300, "max_tool_calls": 10, "max_tokens": 20000, "cost_budget_usd": 1.5, "display": "8 turns · 20k tokens · $1.50"},
+        "limits": {"max_iterations": 8, "timeout_secs": 300, "max_tool_calls": 10, "max_tokens": 20000, "cost_budget_usd": 1.5},
         "gates": "escalation only",
         "authority": "triage + remedy within the closed set"
       }
@@ -139,7 +139,7 @@
         "memory": "incident hot + postmortem digest",
         "grants": [{"op": "ops.k8s_read", "max_side_effect": "read"}, {"op": "ops.k8s_restart", "max_side_effect": "destructive"}, {"op": "ops.git_read", "max_side_effect": "read"}],
         "binding": "toolkit ops@5 · ceiling destructive · credential ops.namespace",
-        "limits": {"max_iterations": 10, "timeout_secs": 300, "max_tool_calls": 20, "max_tokens": 30000, "cost_budget_usd": 3, "display": "10 turns · 30k tokens · $3.00"},
+        "limits": {"max_iterations": 10, "timeout_secs": 300, "max_tool_calls": 20, "max_tokens": 30000, "cost_budget_usd": 3},
         "gates": "destructive action · postmortem",
         "authority": "read-first; write behind a gate"
       }
