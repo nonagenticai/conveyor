@@ -4584,7 +4584,12 @@
    ],
    "failure_scenario": "A change row created without links stores an empty array; a client reading links.requirements or links.decisions gets null, and a later benefit citation appends an array element, so a typed reader cannot rely on the documented shape.",
    "acceptance": "The column and both writers enforce {cards:[], requirements:[], decisions:[]}; a test round-trips one card, requirement and decision link through create and get.",
-   "owner_project": "T1"
+   "owner_project": "T1",
+   "resolved_by": {
+    "commit": "03d8e97d37a10dd0a191a64682340829a0af7c70",
+    "test": "crates/actions/tests/plan_spine.rs::a_register_round_trips_the_link_shape; crates/actions/tests/plan_spine.rs::a_project_baseline_change_cannot_self_approve; crates/store/tests/register_links.rs::the_column_refuses_a_bare_array",
+    "evidence": "cargo test -p conveyor-actions --test plan_spine: 25 passed; --test risk_register: 10; --test benefit_lifecycle: 17; --test parity_http_mcp: 7; --test spine_msp: 10; -p conveyor-store --test register_links: 1. The column default and CHECK require {cards,requirements,decisions} arrays; create/update refuse a bare array 422 links_invalid; the benefit citation appends within the shape; the project baseline change refuses self-approval."
+   }
   },
   {
    "id": "v1-p56-1",
