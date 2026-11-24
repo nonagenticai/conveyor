@@ -2574,6 +2574,18 @@ def remap_payload(
     key = entry.key
     assert key is not None
     payload = copy.deepcopy(entry.payload)
+    if entry.action == "changes.request" and not (
+        isinstance(payload.get("body"), str) and payload["body"].strip()
+    ):
+        # The change action now requires a rationale. Two recorded requests predate that
+        # requirement (their input files carry only the impact block). The replay supplies a
+        # labelled note rather than inventing a rationale: it says exactly what it is. This is
+        # a standalone step, not an elif: the baseline remap below still has to run.
+        payload["body"] = (
+            "Replayed from docs/evidence/record/journal.jsonl (natural key "
+            f"{entry.natural_key}); the recorded request carried no rationale. "
+            f"Impact: {json.dumps(payload.get('impact'), sort_keys=True)}"
+        )
     if entry.action == "benefits.measure":
         benefit = benefit_by_reference(state, key.first)
         if benefit is None:
@@ -2731,6 +2743,23 @@ def remap_payload(
         if not production:
             known = change_index.get(key.second or "")
             production = known.get("approval_id") if known else None
+        if not production and key.first in (
+            "closure",
+            "projects.close",
+            "charter",
+            "baseline",
+        ):
+            # A project-scoped gate is opened by the action that precedes it (the charter,
+            # the plan or the close request), whose journal entry carries the gate id, not
+            # the decide's staging id. Resolve the production gate by its name and project
+            # — the same match `existing_for` uses — so a first replay decides the pending
+            # row instead of demanding an id no entry recorded.
+            for gate in state.approvals:
+                if gate.get("gate") != key.first:
+                    continue
+                if gate.get("project_id") == key.second:
+                    production = gate.get("id")
+                    break
         if not production:
             raise PromoteError(
                 f"approval gate {staging_approval!r} has no production id; "
