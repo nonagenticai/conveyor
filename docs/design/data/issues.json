@@ -235,7 +235,7 @@
       "title": "T19: decision forums \u2014 meetings as the decision forum",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/606",
-      "updatedAt": "2026-11-24T00:03:50Z",
+      "updatedAt": "2026-11-24T00:59:23Z",
       "labels": [
         {
           "name": "unit",
@@ -529,7 +529,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/569",
-      "updatedAt": "2026-11-23T23:51:15Z",
+      "updatedAt": "2026-11-24T00:58:13Z",
       "labels": [
         {
           "name": "programme",
@@ -940,7 +940,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-23T23:12:08Z",
+      "updatedAt": "2026-11-24T00:13:01Z",
       "labels": [
         {
           "name": "unit",
@@ -4362,9 +4362,9 @@
     {
       "number": 87,
       "title": "T17 \u2014 Tenant asset authoring",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/87",
-      "updatedAt": "2026-11-24T00:01:19Z",
+      "updatedAt": "2026-11-24T01:21:23Z",
       "labels": [
         {
           "name": "unit",
