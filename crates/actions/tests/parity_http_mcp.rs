@@ -4393,6 +4393,25 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 Box::new(|ctx: &Ctx| json!({"id": ctx.pop("job_bindings.retire"), "version": 1}));
             sample
         },
+        // SPEC_V2 §6.7's authority matrix is tenant data. The read names one of the five
+        // roles; the write stores the compiled default's value (`delivery` may already create
+        // a card), so no later sample's effective authority changes.
+        expecting(
+            plain(
+                "job_authorities.get",
+                json!({"meta_role": "delivery"}),
+                None,
+            ),
+            200,
+        ),
+        expecting(
+            plain(
+                "job_authorities.set",
+                json!({"meta_role": "delivery", "action": "cards.create", "allowed": true}),
+                None,
+            ),
+            200,
+        ),
         {
             let mut sample = plain("job_releases.retire", json!({}), None);
             sample.input = Box::new(|ctx: &Ctx| json!({"id": ctx.org_release_id}));
