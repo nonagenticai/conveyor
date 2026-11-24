@@ -264,6 +264,44 @@ async fn laya_decision(
     evaluate(running, kind, Some(laya_config_id), key).await
 }
 
+/// The same settled path, with the decision bound to a card and carrying row metadata.
+///
+/// `card_id`/`meta` are row fields, not part of the request the laya call verified, so the
+/// replay still hashes the same document; the binding is what `ladder.apply_draft` reads.
+async fn laya_decision_bound(
+    running: &support::Running,
+    kind: &str,
+    laya_config_id: &str,
+    key: &str,
+    card_id: &str,
+    meta: Option<Value>,
+) -> (u16, Value) {
+    let (status, prepared) = prepare(running, kind, Some(laya_config_id)).await;
+    if status != 200 {
+        return (status, prepared);
+    }
+    let request = output(&prepared)["request"].clone();
+    let (status, classified) = classify(running, request, key).await;
+    if status != 200 {
+        return (status, classified);
+    }
+    let mut input = json!({
+        "kind": kind,
+        "gate": GATE,
+        "question": QUESTION,
+        "input": facts(),
+        "laya_key": key,
+        "laya_config_id": laya_config_id,
+        "card_id": card_id,
+    });
+    if let Some(meta) = meta {
+        input["meta"] = meta;
+    }
+    running
+        .invoke("ladder.evaluate", "dev:alice", input, None, None, None)
+        .await
+}
+
 async fn laya_rows(pg: &support::Pg, seeded: &support::Seeded) -> i64 {
     sqlx::query_scalar("SELECT count(*) FROM decision WHERE tenant_id = $1 AND rung = 'laya'")
         .bind(seeded.tenant.as_uuid())
@@ -804,7 +842,11 @@ async fn every_decision_pins_the_refinement_and_laya_config_versions() {
 /// draft reaches a card, and the ordinary edit path refuses the generated class outright.
 #[tokio::test(flavor = "multi_thread")]
 async fn a_generated_draft_cannot_transition_a_card() {
-    let (_pg, running, _seeded) = fixture().await;
+    let _env = LAYA_ENV.lock().await;
+    let (pg, running, seeded) = fixture().await;
+    seal_laya_token(&pg, &seeded).await;
+    // The merged contract reads the answer from a verified laya call, not from the caller.
+    let _stub = laya_stub(json!({"score": 0.9})).await;
     create_policy(
         &running,
         "gate.precheck",
@@ -814,7 +856,7 @@ async fn a_generated_draft_cannot_transition_a_card() {
         "block",
     )
     .await;
-    create_laya_config(&running).await;
+    let config = create_laya_config(&running).await;
 
     // A project, its board, an active lane and a card to apply to.
     let (status, project) = running
@@ -877,27 +919,6 @@ async fn a_generated_draft_cannot_transition_a_card() {
     assert_eq!(status, 201, "{card}");
     let card_id = id_of(output(&card), "id");
 
-    // A below-threshold decision: the gate refuses, and it cannot apply a draft.
-    let (status, refused) = running
-        .invoke(
-            "ladder.evaluate",
-            "dev:alice",
-            json!({
-                "kind": "gate.precheck",
-                "gate": "capability_ready",
-                "card_id": card_id,
-                "answer": "pass",
-                "confidence": 0.4,
-                "latency_ms": 5
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 201, "{refused}");
-    assert_eq!(output(&refused)["outcome"], "refused", "{refused}");
-
     // A generated draft artefact.
     let (status, draft) = running
         .invoke(
@@ -917,7 +938,17 @@ async fn a_generated_draft_cannot_transition_a_card() {
     assert_eq!(status, 201, "{draft}");
     let document_id = id_of(output(&draft), "id");
 
-    // Applying with a refused decision is refused; nothing is attached.
+    // A decision that does not name this draft cannot attach it, whatever its outcome.
+    let (status, unrelated) = laya_decision_bound(
+        &running,
+        "gate.precheck",
+        &config,
+        "draft-unrelated",
+        &card_id,
+        None,
+    )
+    .await;
+    assert_eq!(status, 201, "{unrelated}");
     let (status, refused_apply) = running
         .invoke(
             "ladder.apply_draft",
@@ -925,7 +956,7 @@ async fn a_generated_draft_cannot_transition_a_card() {
             json!({
                 "document_id": document_id,
                 "card_id": card_id,
-                "decision_id": id_of(output(&refused), "id")
+                "decision_id": id_of(output(&unrelated), "id")
             }),
             None,
             None,
@@ -934,25 +965,16 @@ async fn a_generated_draft_cannot_transition_a_card() {
         .await;
     assert_eq!(status, 422, "{refused_apply}");
 
-    // An accepted L1 decision is the gate.
-    let (status, accepted) = running
-        .invoke(
-            "ladder.evaluate",
-            "dev:alice",
-            json!({
-                "kind": "gate.precheck",
-                "gate": "capability_ready",
-                "card_id": card_id,
-                "answer": "pass",
-                "confidence": 0.9,
-                "latency_ms": 5,
-                "meta": {"draft_document_id": document_id}
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
+    // The settled L1 path, bound to the card and naming the draft, is the gate.
+    let (status, accepted) = laya_decision_bound(
+        &running,
+        "gate.precheck",
+        &config,
+        "draft-accepted",
+        &card_id,
+        Some(json!({"draft_document_id": document_id})),
+    )
+    .await;
     assert_eq!(status, 201, "{accepted}");
     assert_eq!(output(&accepted)["outcome"], "accepted", "{accepted}");
     let decision_id = id_of(output(&accepted), "id");
