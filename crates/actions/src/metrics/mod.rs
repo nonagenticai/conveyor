@@ -605,9 +605,8 @@ fn benefit_evaluation(row: &store::metrics::BenefitRow) -> (Option<f64>, String)
     )
 }
 
-// Keep the reconciliation enum referenced until the P2 action lands on this branch; the state
-// constant is the stored vocabulary and must not drift.
-#[allow(dead_code)]
+/// The stored vocabulary is recomputed at read time, so the read action proves the record and
+/// its verdict still agree (v1-w4b-6).
 fn reconciliation_verdict(
     conveyor_usd: f64,
     billing_usd: f64,
@@ -964,6 +963,9 @@ pub struct BillingSummaryOut {
     pub inference_calls: i64,
     /// Tool calls in the window.
     pub tool_calls: i64,
+    /// Calls the price catalogue or the tool ledger could not price (SPEC §11.9; v1-p75-6).
+    /// A nonzero count means `total_usd` is incomplete, never a silent zero.
+    pub unpriced_calls: i64,
 }
 
 /// The cost/budget overview, derived from the conveyor's own ledger.
@@ -1000,6 +1002,7 @@ async fn billing_summary(
         total_usd: summary.total_usd,
         inference_calls: summary.inference_calls,
         tool_calls: summary.tool_calls,
+        unpriced_calls: summary.unpriced_calls,
     })
 }
 
@@ -1031,6 +1034,8 @@ pub struct ReconcileOut {
     pub delta_usd: Option<f64>,
     pub incident_card_id: Option<Uuid>,
     pub upstream_error: Option<String>,
+    /// Calls the period could not price. A nonzero count refuses the verdict before this output.
+    pub unpriced_calls: i64,
 }
 
 #[crate::action(
@@ -1065,9 +1070,22 @@ async fn metrics_reconcile(
         .and_hms_opt(0, 0, 0)
         .map(|value| value.and_utc())
         .ok_or_else(ActionError::internal)?;
-    let conveyor_usd = store::metrics::conveyor_cost_tx(&mut *tx, ctx.tenant, since, until)
+    let summary = store::metrics::usage_summary_tx(&mut *tx, ctx.tenant, since, until)
         .await
         .map_err(|error| metrics_error(error, ctx.action))?;
+    let conveyor_usd = summary.total_usd;
+    // An exact comparison needs every call priced. A silent zero would make conveyor look
+    // cheaper than billing and manufacture a difference (v1-p75-6).
+    if summary.unpriced_calls > 0 {
+        return Err(ActionError::new(
+            422,
+            "unpriced_calls",
+            format!(
+                "{} calls in the period have no price; the reconciliation cannot be exact until they are priced",
+                summary.unpriced_calls
+            ),
+        ));
+    }
     let (state, billing_usd, delta) = match (
         input.billing_total_usd,
         input.billing_error.as_deref(),
@@ -1157,7 +1175,95 @@ async fn metrics_reconcile(
         delta_usd: Some(delta),
         incident_card_id,
         upstream_error: None,
+        unpriced_calls: 0,
     })
+}
+
+// ── the reconciliation history (v1-w4b-6) ──────────────────────────────────────────────
+
+/// The read that makes the reconciliation record more than a write-only aggregate.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct ReconciliationHistoryIn {
+    /// Periods to return, newest first; default 30, bounded `1..=365`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+}
+
+/// One recorded period with its derived verdict and the delta's movement.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ReconciliationPeriodOut {
+    pub period_start: NaiveDate,
+    pub period_end: NaiveDate,
+    /// The state the row recorded.
+    pub state: String,
+    /// The verdict recomputed from the recorded figures; equal to `state` except `unavailable`.
+    pub verdict: String,
+    pub conveyor_usd: Option<f64>,
+    pub billing_usd: Option<f64>,
+    pub delta_usd: Option<f64>,
+    /// This period's delta less the previous period's delta; absent when either is unknown.
+    pub delta_trend: Option<f64>,
+    pub incident_card_id: Option<Uuid>,
+    pub upstream_error: Option<String>,
+    pub recorded_at: DateTime<Utc>,
+}
+
+/// The recorded reconciliation periods, newest first.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ReconciliationHistoryOut {
+    pub periods: Vec<ReconciliationPeriodOut>,
+}
+
+/// `metrics.reconciliation` — the recorded billing verdicts, their trend and incident links.
+#[crate::action(
+    name = "metrics.reconciliation",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn metrics_reconciliation(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ReconciliationHistoryIn,
+) -> Result<ReconciliationHistoryOut, ActionError> {
+    let limit = input.limit.unwrap_or(30).clamp(1, 365);
+    let rows = store::metrics::list_reconciliations_tx(&mut *tx, ctx.tenant, limit)
+        .await
+        .map_err(|error| metrics_error(error, ctx.action))?;
+    let mut periods = Vec::with_capacity(rows.len());
+    for (index, row) in rows.iter().enumerate() {
+        let verdict = match (row.conveyor_usd, row.billing_usd) {
+            (Some(conveyor), Some(billing)) => reconciliation_verdict(conveyor, billing)
+                .0
+                .as_str()
+                .to_owned(),
+            _ => row.state.clone(),
+        };
+        let delta_trend = row.delta_usd.and_then(|delta| {
+            rows.get(index + 1)
+                .and_then(|older| older.delta_usd)
+                .map(|older| delta - older)
+        });
+        periods.push(ReconciliationPeriodOut {
+            period_start: row.period_start,
+            period_end: row.period_end,
+            state: row.state.clone(),
+            verdict,
+            conveyor_usd: row.conveyor_usd,
+            billing_usd: row.billing_usd,
+            delta_usd: row.delta_usd,
+            delta_trend,
+            incident_card_id: row.incident_card_id,
+            upstream_error: row.upstream_error.clone(),
+            recorded_at: row.created_at,
+        });
+    }
+    Ok(ReconciliationHistoryOut { periods })
 }
 
 async fn record_unavailable(
@@ -1190,5 +1296,6 @@ async fn record_unavailable(
         delta_usd: None,
         incident_card_id: None,
         upstream_error: Some(reason.to_owned()),
+        unpriced_calls: 0,
     })
 }

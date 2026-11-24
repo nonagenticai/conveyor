@@ -997,6 +997,45 @@ pub async fn record_reconciliation_tx(
         .await?)
 }
 
+/// One recorded reconciliation period, as the read action serves it.
+#[derive(Debug, Clone, sqlx::FromRow)]
+pub struct ReconciliationRecord {
+    pub period_start: chrono::NaiveDate,
+    pub period_end: chrono::NaiveDate,
+    pub conveyor_usd: Option<f64>,
+    pub billing_usd: Option<f64>,
+    pub delta_usd: Option<f64>,
+    pub state: String,
+    pub upstream_error: Option<String>,
+    pub incident_card_id: Option<Uuid>,
+    pub created_at: DateTime<Utc>,
+}
+
+/// The recorded verdicts, newest period first. The table holds one row per period (its unique
+/// constraint makes a re-run an update), so this is the latest state per period; the caller
+/// derives the trend from consecutive deltas and reads the incident link from the row.
+pub async fn list_reconciliations_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    limit: i64,
+) -> Result<Vec<ReconciliationRecord>, MetricsStoreError> {
+    Ok(sqlx::query_as(
+        "SELECT period_start, period_end,
+                conveyor_usd::double precision AS conveyor_usd,
+                billing_usd::double precision AS billing_usd,
+                delta_usd::double precision AS delta_usd,
+                state, upstream_error, incident_card_id, created_at
+           FROM metric_reconciliation
+          WHERE tenant_id = $1
+          ORDER BY period_start DESC, period_end DESC
+          LIMIT $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(limit.clamp(1, 365))
+    .fetch_all(&mut *conn)
+    .await?)
+}
+
 /// The conveyor's own derived spend over `[since, until)`: inference cost from the price catalogue
 /// plus the ledger's recorded tool cost. Unpriced calls contribute tokens but no money; the
 /// reconciliation reports a figure only when both sides can be read (P2.3 never invents a zero).
@@ -1047,6 +1086,10 @@ pub struct UsageSummary {
     pub inference_calls: i64,
     /// Tool calls recorded in the window.
     pub tool_calls: i64,
+    /// Calls the price catalogue or the tool ledger could not price. A nonzero count makes the
+    /// window's total incomplete: a summary may report it, and a reconciliation must refuse an
+    /// exact verdict while it is nonzero (v1-p75-6).
+    pub unpriced_calls: i64,
 }
 
 /// The ledger summary `billing.summary` serves (issue #450; SPEC_V2 §11.3, #46).
@@ -1079,10 +1122,39 @@ pub async fn usage_summary_tx(
     .bind(until)
     .fetch_one(&mut *conn)
     .await?;
+    // A call is unpriced when the cost derivation could not price it: an inference call whose
+    // model/unit has no catalogue row, or a tool call the ledger recorded without a cost. The
+    // join is the same one `conveyor_cost_tx` uses, so the count names exactly the rows whose
+    // contribution to `total_usd` is a silent zero.
+    let unpriced_inference: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint
+           FROM inference_call ic
+           LEFT JOIN commercial_price pr
+                  ON pr.model = coalesce(ic.served_model, ic.model)
+                 AND ((pr.unit = 'token' AND ic.usage_unit IS NULL) OR pr.unit = ic.usage_unit)
+          WHERE ic.tenant_id = $1 AND ic.created_at >= $2 AND ic.created_at < $3
+            AND pr.model IS NULL",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .bind(until)
+    .fetch_one(&mut *conn)
+    .await?;
+    let unpriced_tools: i64 = sqlx::query_scalar(
+        "SELECT count(*)::bigint FROM tool_call
+          WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3
+            AND cost IS NULL",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .bind(until)
+    .fetch_one(&mut *conn)
+    .await?;
     Ok(UsageSummary {
         total_usd,
         inference_calls,
         tool_calls,
+        unpriced_calls: unpriced_inference + unpriced_tools,
     })
 }
 
