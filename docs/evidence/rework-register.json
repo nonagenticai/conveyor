@@ -20264,8 +20264,8 @@
       "title": "Reconcile the project's status source"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T6",
-      "apply_to": "T6",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T5",
+      "apply_to": "T5",
       "artefact": "status_source",
       "baseline": {
         "disposition": "rework",
@@ -20291,14 +20291,14 @@
           "rule": "status_source_drift",
           "source": "snapshot",
           "subjects": [
-            "T6"
+            "T5"
           ]
         }
       ],
-      "key": "status_source_drift:T6",
-      "owner_project": "T6",
+      "key": "status_source_drift:T5",
+      "owner_project": "T5",
       "rule": "status_source_drift",
-      "scope": "T6",
+      "scope": "T5",
       "severity": "P2",
       "spec": "\u00a75.3",
       "standard": "SPEC",
@@ -20313,7 +20313,7 @@
           "owner": null,
           "reason": null,
           "severity": "P2",
-          "subject": "T6"
+          "subject": "T5"
         }
       ],
       "title": "Reconcile the project's status source"

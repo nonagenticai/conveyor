@@ -14,8 +14,11 @@
 
 use std::str::FromStr;
 
+use chrono::Utc;
+use conveyor_domain::development::{ApproverKind, AutoMergeConditions};
 use conveyor_store as store;
 use conveyor_store::approval_policy::{ApprovalPolicy, ApprovalRequirement, SelfApproval};
+use serde_json::json;
 use sqlx::PgConnection;
 
 use crate::invoke::{ActionError, HandlerCtx};
@@ -30,6 +33,9 @@ impl From<&ApprovalPolicy> for ApprovalPolicyOut {
             action: policy.action.clone(),
             approval: policy.approval.as_str().to_owned(),
             self_approval: policy.self_approval.as_str().to_owned(),
+            approver_kind: policy.approver_kind.as_str().to_owned(),
+            conditions: policy.conditions.clone(),
+            expires_at: policy.expires_at,
         }
     }
 }
@@ -117,14 +123,16 @@ async fn approval_policies_set(
 ) -> Result<ApprovalPolicyOut, ActionError> {
     let spec = known_action(&input.action)?;
     // A waiver for an action nothing gates is dead configuration that reads like a decision. The
-    // gate only ever consults policies for destructive actions, so anything else is refused here
-    // rather than stored and silently ignored.
-    if spec.effect != Effect::Destructive {
+    // destructive gate only ever consults policies for destructive actions; T6's development
+    // gates are the one other governed surface (their policy row is §6.4's auto-merge).
+    let governed = crate::development::is_governed_gate(spec.name);
+    if spec.effect != Effect::Destructive && !governed {
         return Err(invalid(
             "action",
             "invalid_value",
             format!(
-                "{} is not a destructive action, so it has no approval to waive",
+                "{} is not a destructive action or a governed gate, so it has no approval to \
+                 waive",
                 spec.name
             ),
         ));
@@ -143,10 +151,100 @@ async fn approval_policies_set(
             "must be `forbidden` or `allowed`",
         )
     })?;
+    let approver_kind = match input.approver_kind.as_deref() {
+        None => ApproverKind::Human,
+        Some(raw) => ApproverKind::from_str(raw).map_err(|_| {
+            invalid(
+                "approver_kind",
+                "invalid_value",
+                "must be `human` or `auto`",
+            )
+        })?,
+    };
+    let conditions = input.conditions.unwrap_or_else(|| json!({}));
+    if !conditions.is_object() {
+        return Err(invalid(
+            "conditions",
+            "invalid_value",
+            "must be a JSON object",
+        ));
+    }
+
+    match approver_kind {
+        ApproverKind::Human => {
+            // A human policy does not carry terms. Silently accepting them would store a row
+            // that reads like an auto policy while a person still decides.
+            if conditions
+                .as_object()
+                .is_some_and(|object| !object.is_empty())
+                || input.expires_at.is_some()
+            {
+                return Err(invalid(
+                    "conditions",
+                    "invalid_value",
+                    "a `human` policy carries no conditions and no expiry; use `auto`",
+                ));
+            }
+        }
+        ApproverKind::Auto => {
+            if !governed {
+                return Err(invalid(
+                    "approver_kind",
+                    "invalid_value",
+                    format!(
+                        "{} is not a governed development gate; auto-merge applies only to \
+                         development review/merge/deploy gates",
+                        spec.name
+                    ),
+                ));
+            }
+            // Auto-merge lowers no approval: the row is the tenant's earned decision, not a
+            // waiver. A waiver would bypass the gate and its conditions entirely.
+            if approval != ApprovalRequirement::Required {
+                return Err(invalid(
+                    "approval",
+                    "invalid_value",
+                    "an auto-merge policy still requires the gate; it never waives it",
+                ));
+            }
+            AutoMergeConditions::parse(&conditions)
+                .map_err(|error| invalid("conditions", "invalid_value", error.to_string()))?;
+            let expires_at = input.expires_at.ok_or_else(|| {
+                invalid(
+                    "expires_at",
+                    "missing",
+                    "an auto-merge policy is earned for a period and must carry an expiry",
+                )
+            })?;
+            if expires_at <= Utc::now() {
+                return Err(invalid(
+                    "expires_at",
+                    "invalid_value",
+                    "an auto-merge policy must expire in the future",
+                ));
+            }
+            // §6.4: the policy is itself a gated change. The approval is opened by the tenant's
+            // governance path (`approvals.request`, gate `approval_policies.set`) and its target
+            // is the action this policy governs, so an approval for one gate can never authorise
+            // another.
+            super::approvals::require_approval_tx(
+                &mut *tx,
+                &ctx,
+                "approval_policies.set",
+                spec.name,
+                ctx.approval_id,
+            )
+            .await?;
+        }
+    }
+
     let policy = ApprovalPolicy {
         action: spec.name.to_owned(),
         approval,
         self_approval,
+        approver_kind,
+        conditions,
+        expires_at: input.expires_at,
     };
     store::approval_policy::set(&mut *tx, ctx.tenant, &policy, Some(ctx.actor_id))
         .await

@@ -17,6 +17,9 @@
 use std::str::FromStr;
 
 use conveyor_domain::TenantId;
+use conveyor_domain::Timestamp;
+use conveyor_domain::development::ApproverKind;
+use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -107,7 +110,12 @@ impl std::str::FromStr for SelfApproval {
 }
 
 /// One tenant's decision about one action.
-#[derive(Clone, Debug, Eq, PartialEq)]
+///
+/// The first two fields are #282's destructive-action policy. The second three are T6's
+/// auto-merge extension on the same row (§6.4): an approver kind (`human` by default, so
+/// auto-merge is off until a tenant records it), the typed conditions that earn it and its
+/// expiry. A row with `approver_kind = 'human'` keeps `conditions = {}` and `expires_at = NULL`.
+#[derive(Clone, Debug, PartialEq)]
 pub struct ApprovalPolicy {
     /// The action the policy governs.
     pub action: String,
@@ -115,6 +123,12 @@ pub struct ApprovalPolicy {
     pub approval: ApprovalRequirement,
     /// Whether its requester may decide its gate.
     pub self_approval: SelfApproval,
+    /// Who decides the gate: a person (the default) or the tenant's earned policy.
+    pub approver_kind: ApproverKind,
+    /// The typed conditions an auto policy carries (§6.4).
+    pub conditions: Value,
+    /// When an auto policy stops applying. An expired policy falls back to a human.
+    pub expires_at: Option<Timestamp>,
 }
 
 impl ApprovalPolicy {
@@ -124,6 +138,9 @@ impl ApprovalPolicy {
             action: action.to_owned(),
             approval: ApprovalRequirement::Required,
             self_approval: SelfApproval::Forbidden,
+            approver_kind: ApproverKind::Human,
+            conditions: Value::Object(serde_json::Map::new()),
+            expires_at: None,
         }
     }
 }
@@ -133,6 +150,9 @@ struct PolicyRow {
     action: String,
     approval: String,
     self_approval: String,
+    approver_kind: String,
+    conditions: Value,
+    expires_at: Option<Timestamp>,
 }
 
 impl PolicyRow {
@@ -141,11 +161,19 @@ impl PolicyRow {
             approval: ApprovalRequirement::from_str(&self.approval)?,
             self_approval: SelfApproval::from_str(&self.self_approval)?,
             action: self.action,
+            approver_kind: ApproverKind::from_str(&self.approver_kind).map_err(|_| {
+                ApprovalPolicyStoreError::Vocabulary {
+                    what: "approval_policy.approver_kind",
+                    value: self.approver_kind,
+                }
+            })?,
+            conditions: self.conditions,
+            expires_at: self.expires_at,
         })
     }
 }
 
-const COLUMNS: &str = "action, approval, self_approval";
+const COLUMNS: &str = "action, approval, self_approval, approver_kind, conditions, expires_at";
 
 /// The tenant's policy for one action, or `None` when it has set none.
 ///
@@ -186,11 +214,15 @@ pub async fn set(
     updated_by: Option<Uuid>,
 ) -> Result<ApprovalPolicy, ApprovalPolicyStoreError> {
     sqlx::query(
-        "INSERT INTO approval_policy (tenant_id, action, approval, self_approval, updated_by)
-         VALUES ($1, $2, $3, $4, $5)
+        "INSERT INTO approval_policy (tenant_id, action, approval, self_approval, approver_kind,
+                                      conditions, expires_at, updated_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          ON CONFLICT (tenant_id, action) DO UPDATE
             SET approval = excluded.approval,
                 self_approval = excluded.self_approval,
+                approver_kind = excluded.approver_kind,
+                conditions = excluded.conditions,
+                expires_at = excluded.expires_at,
                 updated_by = excluded.updated_by,
                 updated_at = now()",
     )
@@ -198,6 +230,9 @@ pub async fn set(
     .bind(&policy.action)
     .bind(policy.approval.as_str())
     .bind(policy.self_approval.as_str())
+    .bind(policy.approver_kind.as_str())
+    .bind(&policy.conditions)
+    .bind(policy.expires_at)
     .bind(updated_by)
     .execute(conn)
     .await?;

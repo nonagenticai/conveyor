@@ -93,6 +93,9 @@ pub mod jobs;
 // T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata record, its six Gets and the held-out
 // measurement.
 pub mod kata;
+// T6 (SPEC_V2 §5.4, §6.4, §9.1, §9.3; issue #80): the development charter, its immutable step
+// evidence and the closure record.
+pub mod development;
 pub mod label;
 // T2 (SPEC_V2 §7): the decision ladder's policies, refinements, laya configs and decisions.
 pub mod ladder;

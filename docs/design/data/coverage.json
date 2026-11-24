@@ -1752,7 +1752,7 @@
       "blocked_by": [
         "T15",
         "T17",
-        "T6"
+        "T5"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -1886,9 +1886,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T6"
-      ],
+      "blocked_by": [],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -2259,24 +2257,22 @@
     {
       "blocked_by": [],
       "evidence": [
-        "crates/actions/src/kata.rs",
-        "migrations/0066_kata.sql",
-        "migrations/0067_kata_gate.sql"
+        "docs/SPEC_V2.md"
       ],
-      "gap": null,
+      "gap": "no kata.* action family and no measured procedure-change loop",
       "key": "T5",
       "measured": {
         "actions": [
-          8,
-          8
+          0,
+          0
         ],
         "modules": [
-          1,
-          1
+          0,
+          0
         ],
         "tables": [
-          5,
-          5
+          0,
+          0
         ]
       },
       "name": "Kata",
@@ -2284,7 +2280,7 @@
         "S12"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "built",
+      "status": "proposed",
       "track": "v2",
       "tranche": 10,
       "units": {
@@ -2300,24 +2296,27 @@
       }
     },
     {
-      "blocked_by": [],
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "blocked_by": [
+        "T5"
       ],
-      "gap": "no development-project path over conveyor and a dependency repo",
+      "evidence": [
+        "crates/actions/src/development.rs",
+        "migrations/0068_development_project.sql"
+      ],
+      "gap": null,
       "key": "T6",
       "measured": {
         "actions": [
-          0,
-          0
+          9,
+          9
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
-          0,
-          0
+          3,
+          3
         ]
       },
       "name": "Development project",
@@ -2326,7 +2325,7 @@
         "T8"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 11,
       "units": {
@@ -2387,7 +2386,9 @@
       }
     },
     {
-      "blocked_by": [],
+      "blocked_by": [
+        "T5"
+      ],
       "evidence": [
         "migrations/0056_cadence_tranche.sql"
       ],
