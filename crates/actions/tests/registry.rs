@@ -821,7 +821,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // external stays 18 — the queue reads this tenant's own intake rows.
     // S21 step 10 (#656) adds three internal actions (`ladder.case`, `decision_option_sets.get|set`)
     // and one external (`ladder.precheck`): internal 547 -> 550, external 18 -> 19.
-    assert_eq!((internal, external), (550, 19));
+    // S21 step 11 (#697) adds two internal actions (`organisation_layers.get|set`): internal
+    // 550 -> 552; external stays 19 — both read and write this tenant's own layer rows.
+    assert_eq!((internal, external), (552, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

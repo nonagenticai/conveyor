@@ -962,9 +962,24 @@ async fn the_release_resolves_layers_in_declared_order() {
     )
     .await;
 
+    // A second write to the same (level, scope, kind) is the one row's version bump, not a
+    // second row: the later value wins.
+    set_layer(
+        &db,
+        tenant,
+        "job",
+        None,
+        None,
+        Some(job),
+        "style",
+        Some(json!("job-style-2")),
+        false,
+    )
+    .await;
+
     let release = publish(&db, tenant, job).await.expect("publish");
     let layers = &release.release_snapshot["layers"];
-    assert_eq!(layers["style"]["value"], json!("job-style"));
+    assert_eq!(layers["style"]["value"], json!("job-style-2"));
     assert_eq!(layers["style"]["level"], json!("job"));
     assert_eq!(layers["style"]["source"], json!("job_layer_order"));
     assert_eq!(

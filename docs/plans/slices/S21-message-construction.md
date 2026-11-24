@@ -34,9 +34,9 @@ makes the call and the decision cites the recorded exchange) is **built and merg
 2026-11-24**; the design is §22, the decision record ADR 0018 and the receipt
 `docs/evidence/S21-LAYA.md`. Step 11 (the level closes — an accepted gate applies its draft, every
 model call carries a compiled prompt and a 64-hex hash, a recipe ceiling is authorable, and a job
-release compiles its knowledge layers or refuses) is **open, #697**; the design is §23, the decision
-records ADR 0019 and ADR 0020, and the receipts are `docs/evidence/S21-EXECUTION.md` and
-`docs/evidence/T0-RELEASE-LAYERS.md`.
+release compiles its knowledge layers or refuses) is **built, in review, #697**; the design is
+§23, the decision records ADR 0019 and ADR 0020, and the receipts are
+`docs/evidence/S21-EXECUTION.md` and `docs/evidence/T0-RELEASE-LAYERS.md`.
 **Depends on:** S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps),
 S09 (`retrieval.query` / `strata` packs).
 **Owner ruling:** George, 2026-11-09 — *a prompt is a run-time compilation from the procedure and the

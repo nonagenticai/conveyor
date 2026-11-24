@@ -204,8 +204,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/decisions/0019-accepted-draft-and-prompt-receipts.html",
       "source": "docs/decisions/0019-accepted-draft-and-prompt-receipts.md",
       "section": "Decisions",
-      "sha256": "9d1033784770be750794aea54e52f82f418bc4fad76eb3e26d0b64fd0071fd43",
-      "bytes": 5883,
+      "sha256": "5b96c380773c731af94b466eede02594e154d5b7500df1d708b134b865d16141",
+      "bytes": 6059,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0019-accepted-draft-and-prompt-receipts.md"
     },
     {
@@ -987,8 +987,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "5713da073f388bbe66bc839b92f14662ad2e889ad9ea6e854dcc0c08a12eaa28",
-      "bytes": 93664,
+      "sha256": "8a73e35d9c49120ea06ed48034674e460321863b2b4d46f59a0bcad8063d2c1a",
+      "bytes": 93787,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -1671,8 +1671,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "7a86783d49f24fe2f923fb3c9c27dfd5d06de0a53b5fdc8c05bdc0d266dcb4fd",
-      "bytes": 62771,
+      "sha256": "e5b058850c1fb9d0d52a981acb14a9c57e334d6a041c43c05b5bc32eb832f44a",
+      "bytes": 62903,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

@@ -428,6 +428,19 @@ async fn a_new_version_changes_the_ceiling() {
     let (pg, running, seeded) = fixture().await;
     let created = create(&running, budget_recipe("p3_raise", Some(5))).await;
     assert_eq!(output(&created)["budget_chars"], json!(5));
+    // One draft per key (migration 0062): the tight version is activated before the next is
+    // authored, and the new version then replaces it on activation.
+    let (status, body) = running
+        .invoke(
+            "prompt_recipes.activate",
+            TOKEN,
+            json!({"key": "p3_raise", "version": 1}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
     let created = create(&running, budget_recipe("p3_raise", Some(10_000))).await;
     assert_eq!(
         output(&created)["version"],

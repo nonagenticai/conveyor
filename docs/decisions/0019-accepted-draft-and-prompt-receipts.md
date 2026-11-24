@@ -23,10 +23,11 @@ Status: Accepted · Date: 2026-11-24 · Issue: #697 · Resolves: S21 §23, rewor
    before any write. A stored policy that cannot be honoured is not a runtime surprise.
 
 4. **An `internal_agent` run is always carded.** The dispatcher already refuses a cardless
-   `internal_agent` run `capability_not_ready` before the executor runs ("an internal_agent run
-   must execute on a card"), so there is no work package without a card. The executor still
-   guards the case — a cardless accepted run records `apply_skipped: no_card` and attaches
-   nothing — as defence in depth, not as a product path.
+   `internal_agent` run `capability_not_ready` before the executor runs
+   (`crates/actions/src/executor/mod.rs:458`, "an internal_agent run must execute on a card"), so
+   there is no work package without a card. The executor still guards the case — a cardless
+   accepted run records `apply_skipped: no_card` and attaches nothing — as defence in depth, not
+   as a product path.
 
 5. **A declared apply that cannot apply fails the run.** If `apply_draft_tx` refuses (a broken
    decision binding is a runtime inconsistency, not a user error), the run finishes `failed` with

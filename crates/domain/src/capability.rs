@@ -513,6 +513,33 @@ mod tests {
     }
 
     #[test]
+    fn an_active_executor_requires_a_prompt() {
+        let actions: Vec<String> = Vec::new();
+        let draft = AgentConfig {
+            model_ref: "model:primary",
+            prompt_ref: None,
+            active: false,
+            allowed_actions: &actions,
+            max_iterations: 1,
+            timeout_secs: 1,
+        };
+        assert_eq!(validate_agent_config(&draft), Ok(()));
+        let active = AgentConfig {
+            active: true,
+            ..draft.clone()
+        };
+        assert_eq!(
+            validate_agent_config(&active),
+            Err(CapabilityError::PromptRequired)
+        );
+        let named = AgentConfig {
+            prompt_ref: Some("agent@1"),
+            ..active
+        };
+        assert_eq!(validate_agent_config(&named), Ok(()));
+    }
+
+    #[test]
     fn capability_allowed_actions_are_checked_for_grammar_and_duplicates() {
         let ok: Vec<String> = vec![
             "agent.run".to_owned(),
@@ -522,6 +549,7 @@ mod tests {
         let config = AgentConfig {
             model_ref: "model:primary",
             prompt_ref: Some("prompt_audit@1"),
+            active: true,
             allowed_actions: &ok,
             max_iterations: 1,
             timeout_secs: 1,
