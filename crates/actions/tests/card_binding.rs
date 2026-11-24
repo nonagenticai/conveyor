@@ -291,7 +291,14 @@ async fn a_run_on_an_unbound_card_is_refused() {
         )
         .await;
     assert_eq!(status, 422, "{body}");
-    assert_eq!(body["type"], "binding_required", "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "binding_required",
+        "the refusal names the missing binding: {body}"
+    );
+    assert_eq!(
+        body["errors"][0]["field"], "job_binding_id",
+        "the refusal points at the absent binding: {body}"
+    );
 
     // Nothing was written: the unbound card has no run.
     let mut tx = begin_scoped(&pg.runtime, seeded.tenant)

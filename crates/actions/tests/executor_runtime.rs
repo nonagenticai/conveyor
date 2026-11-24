@@ -297,13 +297,15 @@ async fn an_unbound_run_keeps_the_start_hook() {
         let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
             .await
             .expect("scope");
-        let project_id: Uuid =
-            sqlx::query_scalar("SELECT project_id FROM card WHERE tenant_id = $1 AND id = $2")
-                .bind(seeded.tenant)
-                .bind(card_id)
-                .fetch_one(&mut *tx)
-                .await
-                .expect("the card's project");
+        let project_id: Uuid = sqlx::query_scalar(
+            "SELECT b.project_id FROM card c JOIN board b ON b.id = c.board_id \
+              WHERE c.tenant_id = $1 AND c.id = $2",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(card_id)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("the card's project");
         let mut input = store::run::NewRun::new(project_id, Some(card_id));
         input.kind = store::run::RunKind::Project;
         let run = store::run::insert_run_tx(&mut tx, seeded.tenant, &input)
