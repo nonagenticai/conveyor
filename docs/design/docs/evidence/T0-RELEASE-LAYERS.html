@@ -25,11 +25,11 @@
     </header>
     <main class="doc-body"><h1 id="t0--the-release-compiles-the-knowledge-layers-receipt">T0 — the release compiles the knowledge layers: receipt</h1>
 <p>Issue #697 · branch <code>issue/697-s21-execution-loop</code> · ADR <code>0020-release-knowledge-layers</code> · CONTRACT §30 · S21 §23 P4 · migration <code>0072</code> · resolves rework <code>v1-w1a-2</code></p>
-<p><strong>State: planned.</strong> This file is the skeleton the issue's Definition of Done fills at the exact PR head. Nothing here is claimed until the measured tables carry the head's rows.</p>
+<p><strong>State: built.</strong> Measured on 2026-11-24 at the code of <code>b7722710</code> (the suites at <code>54c51a63</code>), before the PR. The merge is the lane's last CI run; nothing here is claimed for <code>main</code> yet.</p>
 <h2 id="what-changes-at-this-level">What changes at this level</h2>
 <p>Before: <code>compile_release_tx</code> built the release snapshot from <code>job_catalogue.definition</code>, the industry and the placement rows. No code read a knowledge layer, so an unresolved required kind could not stop a publish and two sibling departments could disagree silently; neither <code>release_not_ready</code> nor <code>department_conflict</code> existed anywhere under <code>crates/</code>.</p>
 <p>After: migration <code>0072</code> adds <code>organisation_layer</code> (base, industry, department archetype, each department in declared <code>ordinal</code>, job). The publish resolves each kind in that order, tightens <code>required</code> downward only, refuses <code>422 department_conflict</code> for disagreeing siblings unless a job-layer row resolves it, and refuses <code>409 release_not_ready</code> naming the kind and department when a required kind has no value. The snapshot carries every resolved value with its level and source key, sorted, so two identical publishes hash identically. <code>organisation_layers.set|list</code> author and read the rows; no new scope.</p>
-<h2 id="measured-suites-exact-head-pending">Measured suites (exact head <code>PENDING</code>)</h2>
+<h2 id="measured-suites-code-b7722710-suites-at-54c51a63">Measured suites (code <code>b7722710</code>, suites at <code>54c51a63</code>)</h2>
 <table>
 <thead>
 <tr>
@@ -39,36 +39,32 @@
 </thead>
 <tbody>
 <tr>
-<td><code>crates/actions/tests/release_layers.rs</code> (new)</td>
-<td>PENDING</td>
-</tr>
-<tr>
-<td><code>crates/store/tests/organisation.rs</code></td>
-<td>PENDING</td>
-</tr>
-<tr>
-<td><code>crates/actions/tests/registry.rs</code></td>
-<td>PENDING</td>
+<td><code>crates/store/tests/organisation.rs</code> (five new layer tests)</td>
+<td><strong>14 passed</strong></td>
 </tr>
 <tr>
 <td><code>crates/actions/tests/parity_http_mcp.rs</code></td>
-<td>PENDING</td>
+<td><strong>7 passed</strong> — <code>organisation_layers.set|list</code> sampled over HTTP and MCP</td>
 </tr>
 <tr>
-<td><code>crates/store/tests/s07_schema.rs</code> (ledger through <code>0072</code>)</td>
-<td>PENDING</td>
+<td><code>crates/actions/tests/registry.rs</code></td>
+<td><strong>12 passed</strong> — 571 actions (552 internal, 19 external)</td>
 </tr>
 <tr>
-<td><code>clippy -D warnings</code> / <code>fmt --check</code></td>
-<td>PENDING</td>
+<td><code>clippy -D warnings</code> (store, actions; all targets) / <code>fmt --check</code></td>
+<td><strong>exit 0</strong></td>
 </tr>
 <tr>
-<td><code>served-spec.lock.json</code> <code>--check-lock</code></td>
-<td>PENDING</td>
+<td><code>crates/store/src/migrate.rs</code> — the embedded set</td>
+<td><strong>asserts 72</strong>; the <code>organisation</code> fixture applied <code>0072</code></td>
+</tr>
+<tr>
+<td><code>served-spec.lock.json</code></td>
+<td><strong>602 operations</strong>, <code>--check-lock</code> exit 0</td>
 </tr>
 <tr>
 <td>rework audit <code>--rework-check v1-w1a-2</code></td>
-<td>PENDING</td>
+<td><strong>prints "is cleared"</strong></td>
 </tr>
 </tbody>
 </table>
@@ -84,33 +80,33 @@
 <tbody>
 <tr>
 <td>P4.1 the declared layer order resolves, sources named</td>
-<td><code>release_layers::the_release_resolves_layers_in_declared_order</code></td>
-<td>PENDING</td>
+<td><code>organisation::the_release_resolves_layers_in_declared_order</code></td>
+<td><strong>pass</strong></td>
 </tr>
 <tr>
 <td>P4.2 an unresolved required kind refuses publish</td>
-<td><code>release_layers::an_unresolved_required_kind_refuses_publish</code></td>
-<td>PENDING</td>
+<td><code>organisation::an_unresolved_required_kind_refuses_publish</code></td>
+<td><strong>pass</strong></td>
 </tr>
 <tr>
 <td>P4.3 sibling departments conflict unless the job resolves</td>
-<td><code>release_layers::sibling_departments_conflict_unless_the_job_resolves</code></td>
-<td>PENDING</td>
+<td><code>organisation::sibling_departments_conflict_unless_the_job_resolves</code></td>
+<td><strong>pass</strong></td>
 </tr>
 <tr>
 <td>P4.4 required only tightens downward</td>
-<td><code>release_layers::required_only_tightens_downward</code></td>
-<td>PENDING</td>
+<td><code>organisation::required_only_tightens_downward</code></td>
+<td><strong>pass</strong></td>
 </tr>
 <tr>
 <td>P4.5 two identical publishes hash identically</td>
 <td><code>organisation::two_identical_publishes_hash_identically</code></td>
-<td>PENDING</td>
+<td><strong>pass</strong></td>
 </tr>
 <tr>
 <td>P4.6 the two actions are parity-sampled</td>
 <td><code>parity_http_mcp</code> + <code>--check-lock</code></td>
-<td>PENDING</td>
+<td><strong>pass</strong></td>
 </tr>
 </tbody>
 </table>
@@ -129,31 +125,31 @@
 <td>1</td>
 <td>the layer read in <code>compile_release_tx</code></td>
 <td>P4.1</td>
-<td>PENDING</td>
+<td><strong>red</strong> — the snapshot carries no <code>layers</code></td>
 </tr>
 <tr>
 <td>2</td>
 <td>the <code>release_not_ready</code> check</td>
 <td>P4.2</td>
-<td>PENDING</td>
+<td><strong>red</strong> — the release is published with the kind unresolved</td>
 </tr>
 <tr>
 <td>3</td>
 <td>the sibling-conflict check</td>
 <td>P4.3</td>
-<td>PENDING</td>
+<td><strong>red</strong> — the later department's value wins silently</td>
 </tr>
 <tr>
 <td>4</td>
 <td>the downward-only <code>required</code> merge</td>
 <td>P4.4</td>
-<td>PENDING</td>
+<td><strong>red</strong> — a lower <code>required=false</code> loosens the ancestor's</td>
 </tr>
 <tr>
 <td>5</td>
-<td>the sorted snapshot section</td>
+<td>a timestamp in the snapshot (non-determinism)</td>
 <td>P4.5</td>
-<td>PENDING</td>
+<td><strong>red</strong> — two identical publishes hash differently</td>
 </tr>
 </tbody>
 </table>

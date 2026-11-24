@@ -3,8 +3,8 @@
 Issue #697 · branch `issue/697-s21-execution-loop` · ADR `0019-accepted-draft-and-prompt-receipts`
 · CONTRACT §29 · S21 §23 · resolves rework `v1-p77-1`, `v1-p77-2`
 
-**State: planned.** This file is the skeleton the issue's Definition of Done fills at the exact PR
-head. Nothing here is claimed until the measured tables carry the head's rows.
+**State: built.** Measured at `54c51a63` on 2026-11-24, before the PR. The merge is the lane's last
+CI run; nothing here is claimed for `main` yet.
 
 ## What changes at this level
 
@@ -21,50 +21,50 @@ activation, readiness and execution, and every recorded call carries a 64-hex `p
 `prompt_recipes.create` writes the recipe's `budget_chars`, so the measured refusal is reachable
 from an authored recipe.
 
-## Measured suites (exact head `PENDING`)
+## Measured suites (exact head `54c51a63`)
 
 | Suite | Result |
 |---|---|
-| `crates/actions/tests/internal_agent_runtime.rs` | PENDING |
-| `crates/actions/tests/draft_apply.rs` | PENDING |
-| `crates/actions/tests/decision_ladder.rs` | PENDING |
-| `crates/actions/tests/capability.rs` | PENDING |
-| `crates/actions/tests/agent_run_resolved.rs` | PENDING |
-| `crates/actions/tests/prompt_recipes.rs` | PENDING |
-| `crates/actions/tests/prompt_compile.rs` | PENDING |
-| `crates/actions/tests/registry.rs` | PENDING |
-| `crates/actions/tests/parity_http_mcp.rs` | PENDING |
-| `clippy -D warnings` / `fmt --check` | PENDING |
-| `served-spec.lock.json` `--check-lock` | PENDING |
-| design-pack gate | PENDING |
-| rework audit `--rework-check v1-p77-1`, `-2` | PENDING |
+| `crates/actions/tests/internal_agent_runtime.rs` | **22 passed, 2 ignored** (the live proofs) |
+| `crates/actions/tests/draft_apply.rs` | **7 passed** |
+| `crates/actions/tests/decision_ladder.rs` | **8 passed** |
+| `crates/actions/tests/capability.rs` | **15 passed** |
+| `crates/actions/tests/agent_run_resolved.rs` | **16 passed** |
+| `crates/actions/tests/prompt_recipes.rs` | **10 passed** |
+| `crates/actions/tests/prompt_compile.rs` | **7 passed** |
+| `crates/actions/tests/registry.rs` | **12 passed** — 571 actions (552 internal, 19 external) |
+| `crates/actions/tests/parity_http_mcp.rs` | **7 passed** — both layer actions sampled over HTTP and MCP |
+| `clippy -D warnings` (domain, store, actions, api, server; all targets) / `fmt --check` | **exit 0** |
+| `served-spec.lock.json` | **602 operations**, `--check-lock` exit 0 |
+| design-pack gate (coverage ×2, seed, docs, data, board dry-run) | **all pass** |
+| rework audit `--rework-check v1-p77-1`, `-2` | **each prints "is cleared"** |
 
 ## Scenarios
 
 | Scenario | Test | Result |
 |---|---|---|
-| P1.1 an accepted draft is applied under `on_accept=apply` | `internal_agent_runtime::an_accepted_draft_is_applied_when_the_policy_says_apply` | PENDING |
-| P1.2 `park` leaves the draft unattached | `internal_agent_runtime::an_accepted_draft_parks_by_default` | PENDING |
-| P1.3 an unknown `on_accept` is refused at authoring | `decision_ladder::an_unknown_on_accept_value_is_refused` | PENDING |
-| P1.4 a cardless accepted run applies nothing | `internal_agent_runtime::a_cardless_run_applies_nothing` | PENDING |
-| P2.1 an active agent without a prompt is refused | `capability::an_active_agent_without_a_prompt_is_refused` | PENDING |
-| P2.2 activation without a prompt is refused | `capability::activating_an_agent_without_a_prompt_is_refused` | PENDING |
-| P2.3 readiness blocks it | `capability::readiness_blocks_an_agent_with_no_prompt` | PENDING |
-| P2.4 `agent.run` makes zero calls without compiled text | `agent_run_resolved::a_run_with_no_compiled_prompt_makes_no_call` | PENDING |
-| P2.5 every call carries a 64-hex hash | `internal_agent_runtime::every_internal_agent_call_records_a_64_hex_hash` | PENDING |
-| P3.1 a recipe budget refuses measured | `prompt_recipes::a_recipe_budget_is_written_and_refuses_measured` | PENDING |
-| P3.2 a new version changes the ceiling | `prompt_recipes::a_new_version_changes_the_ceiling` | PENDING |
-| P3.3 a zero budget is refused | `prompt_recipes::a_zero_budget_is_refused` | PENDING |
+| P1.1 an accepted draft is applied under `on_accept=apply` | `internal_agent_runtime::an_accepted_draft_is_applied_when_the_policy_says_apply` | **pass** |
+| P1.2 `park` leaves the draft unattached | `internal_agent_runtime::an_accepted_draft_parks_by_default` | **pass** |
+| P1.3 an unknown `on_accept` is refused at authoring | `decision_ladder::an_unknown_on_accept_value_is_refused` | **pass** |
+| P1.4 a cardless internal_agent run is refused before any call | `internal_agent_runtime::a_cardless_internal_agent_run_is_refused_before_any_call` | **pass** |
+| P2.1 an active agent without a prompt is refused | `capability::an_active_agent_without_a_prompt_is_refused` | **pass** |
+| P2.2 activation without a prompt is refused | `capability::activating_an_agent_without_a_prompt_is_refused` | **pass** |
+| P2.3 readiness blocks it | `capability::readiness_blocks_an_agent_with_no_prompt` | **pass** |
+| P2.4 `agent.run` makes zero calls without compiled text | `agent_run_resolved::a_run_with_no_compiled_prompt_makes_no_call` | **pass** |
+| P2.5 every call carries a 64-hex hash | `internal_agent_runtime::every_internal_agent_call_records_a_64_hex_hash` | **pass** |
+| P3.1 a recipe budget refuses measured | `prompt_recipes::a_recipe_budget_is_written_and_refuses_measured` | **pass** |
+| P3.2 a new version changes the ceiling | `prompt_recipes::a_new_version_changes_the_ceiling` | **pass** |
+| P3.3 a zero budget is refused | `prompt_recipes::a_zero_budget_is_refused` | **pass** |
 
 ## Reversal proofs
 
 | # | What is reverted | Test that must go red | Result |
 |---|---|---|---|
-| 1 | the apply call in the accepted arm | P1.1 | PENDING |
-| 2 | the `on_accept` validation | P1.3 | PENDING |
-| 3 | the domain's `prompt_ref` requirement | P2.1 | PENDING |
-| 4 | the execution guard | P2.4 | PENDING |
-| 5 | the recipe `budget_chars` write | P3.1 | PENDING |
+| 1 | the apply call in the accepted arm | P1.1 | **red** — the draft stays unattached |
+| 2 | the `on_accept` validation | P1.3 | **red** — `on_accept: "later"` is stored |
+| 3 | the domain's `prompt_ref` requirement | P2.1 | **red** — an active agent without a prompt is created |
+| 4 | the execution guard | P2.4 | **red** — the run succeeds and the model is called |
+| 5 | the recipe `budget_chars` write | P3.1 | **red** — the created version carries no ceiling |
 
 ## Live proof (P5)
 

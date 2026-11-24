@@ -2096,3 +2096,45 @@ async fn a_cardless_internal_agent_run_is_refused_before_any_call() {
     assert_eq!(calls, 0, "the refusal precedes any model call");
     assert_eq!(*hits.lock().expect("hits"), 0, "and any laya call");
 }
+
+/// P2.5 (S21 step 11, issue #697): every recorded internal_agent call carries a 64-hex prompt hash.
+#[tokio::test]
+async fn every_internal_agent_call_records_a_64_hex_hash() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    // No gate policy: the draft path only, which still compiles the one prompt.
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "hashed_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let run = start_run(&running, &card, binding).await;
+    execute(&pg, &seeded, run).await;
+
+    let calls: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        run,
+    )
+    .await;
+    let hashed: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2 \
+         AND prompt_sha256 ~ '^[0-9a-f]{64}$'",
+        run,
+    )
+    .await;
+    assert_eq!(calls, 1, "one call");
+    assert_eq!(hashed, calls, "the call carries a compiled prompt's hash");
+}

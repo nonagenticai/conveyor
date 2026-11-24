@@ -3,8 +3,8 @@
 Issue #697 · branch `issue/697-s21-execution-loop` · ADR `0020-release-knowledge-layers` ·
 CONTRACT §30 · S21 §23 P4 · migration `0072` · resolves rework `v1-w1a-2`
 
-**State: planned.** This file is the skeleton the issue's Definition of Done fills at the exact PR
-head. Nothing here is claimed until the measured tables carry the head's rows.
+**State: built.** Measured on 2026-11-24 at the code of `b7722710` (the suites at `54c51a63`),
+before the PR. The merge is the lane's last CI run; nothing here is claimed for `main` yet.
 
 ## What changes at this level
 
@@ -21,39 +21,38 @@ required kind has no value. The snapshot carries every resolved value with its l
 sorted, so two identical publishes hash identically. `organisation_layers.set|list` author and read
 the rows; no new scope.
 
-## Measured suites (exact head `PENDING`)
+## Measured suites (code `b7722710`, suites at `54c51a63`)
 
 | Suite | Result |
 |---|---|
-| `crates/actions/tests/release_layers.rs` (new) | PENDING |
-| `crates/store/tests/organisation.rs` | PENDING |
-| `crates/actions/tests/registry.rs` | PENDING |
-| `crates/actions/tests/parity_http_mcp.rs` | PENDING |
-| `crates/store/tests/s07_schema.rs` (ledger through `0072`) | PENDING |
-| `clippy -D warnings` / `fmt --check` | PENDING |
-| `served-spec.lock.json` `--check-lock` | PENDING |
-| rework audit `--rework-check v1-w1a-2` | PENDING |
+| `crates/store/tests/organisation.rs` (five new layer tests) | **14 passed** |
+| `crates/actions/tests/parity_http_mcp.rs` | **7 passed** — `organisation_layers.set\|list` sampled over HTTP and MCP |
+| `crates/actions/tests/registry.rs` | **12 passed** — 571 actions (552 internal, 19 external) |
+| `clippy -D warnings` (store, actions; all targets) / `fmt --check` | **exit 0** |
+| `crates/store/src/migrate.rs` — the embedded set | **asserts 72**; the `organisation` fixture applied `0072` |
+| `served-spec.lock.json` | **602 operations**, `--check-lock` exit 0 |
+| rework audit `--rework-check v1-w1a-2` | **prints "is cleared"** |
 
 ## Scenarios
 
 | Scenario | Test | Result |
 |---|---|---|
-| P4.1 the declared layer order resolves, sources named | `release_layers::the_release_resolves_layers_in_declared_order` | PENDING |
-| P4.2 an unresolved required kind refuses publish | `release_layers::an_unresolved_required_kind_refuses_publish` | PENDING |
-| P4.3 sibling departments conflict unless the job resolves | `release_layers::sibling_departments_conflict_unless_the_job_resolves` | PENDING |
-| P4.4 required only tightens downward | `release_layers::required_only_tightens_downward` | PENDING |
-| P4.5 two identical publishes hash identically | `organisation::two_identical_publishes_hash_identically` | PENDING |
-| P4.6 the two actions are parity-sampled | `parity_http_mcp` + `--check-lock` | PENDING |
+| P4.1 the declared layer order resolves, sources named | `organisation::the_release_resolves_layers_in_declared_order` | **pass** |
+| P4.2 an unresolved required kind refuses publish | `organisation::an_unresolved_required_kind_refuses_publish` | **pass** |
+| P4.3 sibling departments conflict unless the job resolves | `organisation::sibling_departments_conflict_unless_the_job_resolves` | **pass** |
+| P4.4 required only tightens downward | `organisation::required_only_tightens_downward` | **pass** |
+| P4.5 two identical publishes hash identically | `organisation::two_identical_publishes_hash_identically` | **pass** |
+| P4.6 the two actions are parity-sampled | `parity_http_mcp` + `--check-lock` | **pass** |
 
 ## Reversal proofs
 
 | # | What is reverted | Test that must go red | Result |
 |---|---|---|---|
-| 1 | the layer read in `compile_release_tx` | P4.1 | PENDING |
-| 2 | the `release_not_ready` check | P4.2 | PENDING |
-| 3 | the sibling-conflict check | P4.3 | PENDING |
-| 4 | the downward-only `required` merge | P4.4 | PENDING |
-| 5 | the sorted snapshot section | P4.5 | PENDING |
+| 1 | the layer read in `compile_release_tx` | P4.1 | **red** — the snapshot carries no `layers` |
+| 2 | the `release_not_ready` check | P4.2 | **red** — the release is published with the kind unresolved |
+| 3 | the sibling-conflict check | P4.3 | **red** — the later department's value wins silently |
+| 4 | the downward-only `required` merge | P4.4 | **red** — a lower `required=false` loosens the ancestor's |
+| 5 | a timestamp in the snapshot (non-determinism) | P4.5 | **red** — two identical publishes hash differently |
 
 ## Residuals
 
