@@ -68,9 +68,10 @@ test("the roll-ups drill to the call", async ({ page, request }) => {
   await page.getByRole("tab", { name: "Run", exact: true }).click();
   await expect(page.getByTestId("metering-table").locator("tbody tr")).toHaveCount(run.rows.length);
   if (scoped) {
+    // The full key, not eight characters: a UUIDv7's timestamp prefix repeats within a
+    // millisecond, so a prefix match is ambiguous when many runs were seeded together.
     await page
-      .getByTestId("metering-table")
-      .locator("tbody tr", { hasText: scoped.key.slice(0, 8) })
+      .locator(`tr[data-run="${scoped.key}"]`)
       .getByRole("button", { name: "Drill to calls" })
       .click();
     await expect(page.getByTestId("metering-scope")).toBeVisible();

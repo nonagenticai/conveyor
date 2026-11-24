@@ -209,10 +209,13 @@ pub fn Metering() -> impl IntoView {
                                                     {rows.into_iter().map(|row| {
                                                         let key = row.get("key").and_then(Value::as_str).unwrap_or("—").to_owned();
                                                         let drill = is_id(&key);
+                                                        let row_key = key.clone();
                                                         let to_steps = key.clone();
                                                         let to_calls = key.clone();
                                                         view! {
-                                                            <tr>
+                                                            // The full key is the row's identity: eight characters are not
+                                                            // unique (UUIDv7's timestamp prefix repeats within a millisecond).
+                                                            <tr data-run=row_key>
                                                                 <td>{shown_level.clone()}</td>
                                                                 <td class="mono">{key_label(&key)}</td>
                                                                 <td class="n">{fmt_int(integer(&row, "calls"))}</td>
