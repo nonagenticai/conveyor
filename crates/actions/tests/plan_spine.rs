@@ -581,6 +581,8 @@ async fn a_direct_change_request_authorises_a_post_baseline_wbs_acceptance() {
                 "project_id": project,
                 "baseline_id": baseline,
                 "title": "Accept the delivered scope",
+                // §8.4/T18: a change request carries its rationale in `body`.
+                "body": "the deliverable is accepted against the scope baseline",
                 "impact": {"scope": "the promised deliverable is accepted"}
             }),
             None,
@@ -668,7 +670,12 @@ async fn a_direct_change_request_refuses_an_invalid_baseline() {
         .invoke(
             "changes.request",
             "dev:alice",
-            json!({"project_id": project, "title": "No authority", "impact": {"scope": "x"}}),
+            json!({
+                "project_id": project,
+                "title": "No authority",
+                "body": "no authority names a baseline or a job binding",
+                "impact": {"scope": "x"}
+            }),
             None,
             None,
             None,
@@ -693,6 +700,7 @@ async fn a_direct_change_request_refuses_an_invalid_baseline() {
                 "project_id": project,
                 "baseline_id": foreign,
                 "title": "Foreign baseline",
+                "body": "the baseline under test authorises this change",
                 "impact": {"scope": "x"}
             }),
             None,
@@ -718,6 +726,7 @@ async fn a_direct_change_request_refuses_an_invalid_baseline() {
                 "project_id": unapproved_project,
                 "baseline_id": unapproved,
                 "title": "Unapproved baseline",
+                "body": "the baseline under test authorises this change",
                 "impact": {"scope": "x"}
             }),
             None,
@@ -739,6 +748,7 @@ async fn a_direct_change_request_refuses_an_invalid_baseline() {
                 "project_id": schedule_project,
                 "baseline_id": schedule,
                 "title": "Schedule baseline",
+                "body": "the baseline under test authorises this change",
                 "impact": {"scope": "x"}
             }),
             None,
@@ -770,6 +780,7 @@ async fn a_direct_change_request_refuses_an_invalid_baseline() {
                 "project_id": superseded_project,
                 "baseline_id": superseded,
                 "title": "Superseded baseline",
+                "body": "the baseline under test authorises this change",
                 "impact": {"scope": "x"}
             }),
             None,
