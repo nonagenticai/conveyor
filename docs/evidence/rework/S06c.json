@@ -195,7 +195,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "At the end, an MCP client that declares `io.modelcontextprotocol/tasks` calls `projects.execute`, receives `resultType:\"task\"`, polls `tasks/get` through a project that waits on an approval, answers it with `tasks/update`, and reads a terminal result \u2014 with no Python service in the path and no new table.",
-  "generated_at": "2026-11-24T20:29:56.952970+00:00",
+  "generated_at": "2026-11-24T21:07:25.950808+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S06c.toml",
   "name": "MCP tasks \u2014 a long-running project asks for input",
@@ -203,8 +203,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-24T18:25:22.625551+00:00",
-    "git_sha": "ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47",
-    "path": "retained-snapshot/ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47"
+    "git_sha": "86f5da93480fa1b163dd4ee35085cd72882f9b01",
+    "path": "retained-snapshot/86f5da93480fa1b163dd4ee35085cd72882f9b01"
   },
   "verdict": "red",
   "warnings": []
