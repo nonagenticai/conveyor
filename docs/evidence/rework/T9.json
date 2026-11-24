@@ -52,7 +52,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a20fba-dc6f-70cf-98c4-81f88dcaf55b (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+      "detail": "review 01a20e7e-7e98-7d48-a8a4-1e4ab3728a7a (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
       "id": "T9-review",
       "kind": "snapshot",
       "result": "pass",
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a20fba-967c-7acf-85b9-fd2c702cb17c decided by a distinct approver",
+      "detail": "latest closure gate 01a20e7e-3788-7486-ae00-dc934a7e0bd3 decided by a distinct approver",
       "id": "T9-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -124,7 +124,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a20fba-ccfe-7e9a-81f3-c8e89cf78ac9 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
       "id": "T9-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "58 mandatory artefact package(s) open: mandatory_artefacts:S00, mandatory_artefacts:S01, mandatory_artefacts:S02, mandatory_artefacts:S04, mandatory_artefacts:S05, mandatory_artefacts:S06, mandatory_artefacts:S06b, mandatory_artefacts:S06c, +50 more",
+      "detail": "57 mandatory artefact package(s) open: mandatory_artefacts:S00, mandatory_artefacts:S01, mandatory_artefacts:S02, mandatory_artefacts:S04, mandatory_artefacts:S06, mandatory_artefacts:S06b, mandatory_artefacts:S06c, mandatory_artefacts:S06d, +49 more",
       "id": "T9-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -151,7 +151,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "42 unresolved P0/P1 package(s): mandatory_artefacts:S00 (P1), mandatory_artefacts:S01 (P1), mandatory_artefacts:S02 (P1), mandatory_artefacts:S04 (P1), mandatory_artefacts:S05 (P1), mandatory_artefacts:S06 (P1), mandatory_artefacts:S06b (P1), mandatory_artefacts:S06c (P1), +34 more",
+      "detail": "41 unresolved P0/P1 package(s): mandatory_artefacts:S00 (P1), mandatory_artefacts:S01 (P1), mandatory_artefacts:S02 (P1), mandatory_artefacts:S04 (P1), mandatory_artefacts:S06 (P1), mandatory_artefacts:S06b (P1), mandatory_artefacts:S06c (P1), mandatory_artefacts:S06d (P1), +33 more",
       "id": "T9-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -177,22 +177,22 @@
     }
   ],
   "failures": [
-    "T9-artefact-standard (P1): 58 mandatory artefact package(s) open: mandatory_artefacts:S00, mandatory_artefacts:S01, mandatory_artefacts:S02, mandatory_artefacts:S04, mandatory_artefacts:S05, mandatory_artefacts:S06, mandatory_artefacts:S06b, mandatory_artefacts:S06c, +50 more",
-    "T9-rework (P0): 42 unresolved P0/P1 package(s): mandatory_artefacts:S00 (P1), mandatory_artefacts:S01 (P1), mandatory_artefacts:S02 (P1), mandatory_artefacts:S04 (P1), mandatory_artefacts:S05 (P1), mandatory_artefacts:S06 (P1), mandatory_artefacts:S06b (P1), mandatory_artefacts:S06c (P1), +34 more",
+    "T9-artefact-standard (P1): 57 mandatory artefact package(s) open: mandatory_artefacts:S00, mandatory_artefacts:S01, mandatory_artefacts:S02, mandatory_artefacts:S04, mandatory_artefacts:S06, mandatory_artefacts:S06b, mandatory_artefacts:S06c, mandatory_artefacts:S06d, +49 more",
+    "T9-rework (P0): 41 unresolved P0/P1 package(s): mandatory_artefacts:S00 (P1), mandatory_artefacts:S01 (P1), mandatory_artefacts:S02 (P1), mandatory_artefacts:S04 (P1), mandatory_artefacts:S06 (P1), mandatory_artefacts:S06b (P1), mandatory_artefacts:S06c (P1), mandatory_artefacts:S06d (P1), +33 more",
     "gate (P0): the gate check 'T9-artefact-standard' did not pass; the gate check 'T9-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "an architecture project passes Preliminary and A\u2013F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata",
-  "generated_at": "2026-11-24T22:51:50.331319+00:00",
+  "generated_at": "2026-11-24T22:54:30.690454+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T9.toml",
   "name": "TOGAF ADM capability",
   "project": "T9",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:44:10.403624+00:00",
-    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
-    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
+    "generated_at": "2026-11-24T18:25:22.625551+00:00",
+    "git_sha": "86f5da93480fa1b163dd4ee35085cd72882f9b01",
+    "path": "retained-snapshot/86f5da93480fa1b163dd4ee35085cd72882f9b01"
   },
   "verdict": "red",
   "warnings": []
