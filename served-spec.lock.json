@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "1e9d09b7316a1a0a4cb51b3e2afb9904adfae4306730afd4927bdb106c2f53ef",
+    "GET /api/actions": "e55050409dfc490d25ad652456e83729acb4d95dd541f90f7422f6b8cef09bba",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -69,7 +69,8 @@
     "POST /api/actions/audit.list/invocations": "f08fd6574e6ac314263b6df0fc843699fde6a4eebf9f761c84548d908c755c06",
     "POST /api/actions/authoring.assets/invocations": "10dd76e3aeb98f7960cd30bc5adcce6f436b8a20a74444c0a1cf9807cfc5e1a0",
     "POST /api/actions/authoring.draft/invocations": "a43c12abb3aee2fab7e8a9d6455e6d254e4611561ed66e00e435417d153f761e",
-    "POST /api/actions/authoring.intake/invocations": "5f054ddb784b4b6ba88bbc305aa3791cc561223a30c42c95ce05d31b0fb42d22",
+    "POST /api/actions/authoring.intake/invocations": "3a07c99d806ef5d7c33819090bfd68bec93faf298e2c55287c92f145f9373231",
+    "POST /api/actions/authoring.intakes/invocations": "1d1b9645951b6144458be93e55ad5aaaef6667a06862065c172fa9ae61fce421",
     "POST /api/actions/authoring.publish/invocations": "0f81ce6716ca7fccd2a44ad8bb9edfc298ff33646df4168bb71d31af63c3054f",
     "POST /api/actions/authoring.review/invocations": "5d640894829581892f83014b924cc0101d5584f7cff5229401eae18822e19888",
     "POST /api/actions/baselines.get/invocations": "9e523e441feff165c6a712bed78c339b802c84091fe21b48d745f067b64d5005",

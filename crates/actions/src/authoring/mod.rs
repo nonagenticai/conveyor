@@ -2,10 +2,11 @@
 //! T17 (#87, ported from #526; SPEC_V2 §5.7, §10.4): tenant asset authoring — the intake brief, the drafts it
 //! produces, the review gate that settles them and the publication that releases them.
 //!
-//! Five actions over [`conveyor_store::authoring`], the family's only SQL (CONTRACT §1):
-//! `authoring.intake` records the brief and its documents, `authoring.draft` writes one asset
-//! draft citing that intake, `authoring.review` records the human decision on it,
-//! `authoring.publish` releases a reviewed asset, and `authoring.assets` reads the catalogue.
+//! Six actions over [`conveyor_store::authoring`], the family's only SQL (CONTRACT §1):
+//! `authoring.intake` records the brief and its documents, `authoring.intakes` reads the
+//! recorded intakes, `authoring.draft` writes one asset draft citing that intake,
+//! `authoring.review` records the human decision on it, `authoring.publish` releases a reviewed
+//! asset, and `authoring.assets` reads the catalogue.
 //!
 //! §5.7's rules are enforced by the store, never restated here: every output is a draft behind
 //! a review gate, a payload can never carry `approval_policy`, `effect_ceiling`, `grants` or
@@ -109,6 +110,8 @@ pub struct IntakeOut {
     pub status: String,
     /// The change counter.
     pub version: i64,
+    /// When the brief was recorded.
+    pub created_at: DateTime<Utc>,
 }
 
 fn intake_out(record: &IntakeRecord) -> IntakeOut {
@@ -118,6 +121,7 @@ fn intake_out(record: &IntakeRecord) -> IntakeOut {
         sources: record.sources.clone(),
         status: record.status.clone(),
         version: record.version,
+        created_at: record.created_at,
     }
 }
 
@@ -173,6 +177,17 @@ pub struct AuthoringIntakeIn {
 
 fn empty_sources() -> Value {
     Value::Array(Vec::new())
+}
+
+/// `authoring.intakes`.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct AuthoringIntakesIn {
+    /// Exact-match status filter (`open` or `closed`).
+    #[serde(default)]
+    pub status: Option<String>,
+    /// The shared pagination envelope; the queue is returned whole.
+    #[serde(flatten)]
+    pub page: PageIn,
 }
 
 /// `authoring.draft`.
@@ -258,6 +273,32 @@ async fn authoring_intake(
     .await
     .map_err(|error| authoring_error(error, ctx.action))?;
     Ok(HandlerOutput::created(intake_out(&record)))
+}
+
+/// List the tenant's recorded intakes, newest first.
+#[crate::action(
+    name = "authoring.intakes",
+    version = 1,
+    kind = "internal",
+    scopes = ["organisation:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn authoring_intakes(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: AuthoringIntakesIn,
+) -> Result<Page<IntakeOut>, ActionError> {
+    let records = store::authoring::intake_list_tx(&mut *tx, ctx.tenant, input.status.as_deref())
+        .await
+        .map_err(|error| authoring_error(error, ctx.action))?;
+    Ok(Page {
+        items: records.iter().map(intake_out).collect(),
+        next_cursor: None,
+    })
 }
 
 /// Draft one asset from an intake; §5.7's dependency order is enforced at the draft.

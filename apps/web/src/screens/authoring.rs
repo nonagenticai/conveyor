@@ -5,14 +5,15 @@
 //! queue, a draft catalogue, review & publish and the dependency status. The four tabs here are
 //! that page's, rendered with the app's own classes and no `v2-*` CSS.
 //!
-//! Every read is an action's page (`authoring.assets`, `approvals.list`) and every write is the
-//! owning slice's action: `authoring.intake|draft|review|publish` and `approvals.request|decide`.
-//! Two measured constraints shape the screen rather than being papered over:
+//! Every read is an action's page (`authoring.intakes`, `authoring.assets`, `approvals.list`)
+//! and every write is the owning slice's action: `authoring.intake|draft|review|publish` and
+//! `approvals.request|decide`. Two measured constraints shape the screen rather than being
+//! papered over:
 //!
-//! * **There is no intake read.** The family exposes intake write-only, so the queue is the draft
-//!   catalogue grouped by `AssetOut.intake_id`, plus the intake this screen has just recorded from
-//!   its own action's response. The brief/sources of past intakes wait on `authoring.intakes`
-//!   (issue #655).
+//! * **The intake queue reads the recorded intakes.** `authoring.intakes` returns the brief,
+//!   sources, status and `created_at`; the draft count joins the catalogue by `intake_id`. A
+//!   role whose manifest lacks the read falls back to the catalogue-derived queue, named as such
+//!   rather than passed off as the recorded briefs.
 //! * **The dependency order is enforced at the draft, not at publish** (`asset_draft_tx`), so the
 //!   refusal this screen surfaces is the draft's `422 asset_dependency_unpublished`.
 //!
@@ -86,9 +87,13 @@ const TABS: [(Tab, &str); 4] = [
     (Tab::Dependencies, "Dependency status"),
 ];
 
-/// The tenant's rows for the whole screen: the asset page and the pending + approved gates.
+/// The tenant's rows for the whole screen: the intake and asset pages and the pending + approved
+/// gates. `intakes_readable` is false when this role's manifest has no `authoring.intakes` read,
+/// in which case the queue falls back to the catalogue and says so.
 #[derive(Clone, Debug, Default)]
 struct Data {
+    intakes: Vec<Value>,
+    intakes_readable: bool,
     assets: Vec<Value>,
     gates: Vec<Value>,
 }
@@ -123,6 +128,10 @@ impl Form {
 async fn load(ctx: AppCtx) -> Result<Data, ApiError> {
     let client = ctx.client();
     let mut data = Data::default();
+    if ctx.has_action("authoring.intakes") {
+        data.intakes = read_rows(&client, "authoring.intakes", json!({ "limit": 200 })).await?;
+        data.intakes_readable = true;
+    }
     if ctx.has_action("authoring.assets") {
         data.assets = read_rows(&client, "authoring.assets", json!({ "limit": 200 })).await?;
     }
@@ -270,6 +279,80 @@ fn intakes(assets: &[Value]) -> Vec<IntakeSummary> {
     order
         .into_iter()
         .filter_map(|id| by_id.remove(&id))
+        .collect()
+}
+
+/// One row of the intake queue: the recorded intake, and the drafts the catalogue says it
+/// produced.
+#[derive(Clone, Debug)]
+struct IntakeRow {
+    id: String,
+    brief: String,
+    sources: usize,
+    status: String,
+    version: i64,
+    recorded: String,
+    drafts: usize,
+    kinds: Vec<String>,
+}
+
+/// The drafts one intake produced, and their distinct kinds — the client's join against
+/// `authoring.assets` (`authoring.intakes` carries no draft count by design).
+fn draft_summary(assets: &[Value], intake_id: &str) -> (usize, Vec<String>) {
+    let mut drafts = 0;
+    let mut kinds: Vec<String> = Vec::new();
+    for asset in assets {
+        if field(asset, "intake_id").as_deref() != Some(intake_id) {
+            continue;
+        }
+        drafts += 1;
+        let kind = text(asset, "kind");
+        if !kinds.contains(&kind) {
+            kinds.push(kind);
+        }
+    }
+    (drafts, kinds)
+}
+
+/// The queue's rows, in order: the recorded intakes when this role can read them, newest first,
+/// else the catalogue's intakes with the brief named as unreadable.
+fn intake_rows(data: &Data) -> Vec<IntakeRow> {
+    if data.intakes_readable {
+        return data
+            .intakes
+            .iter()
+            .map(|row| {
+                let id = text(row, "id");
+                let (drafts, kinds) = draft_summary(&data.assets, &id);
+                IntakeRow {
+                    id,
+                    brief: text(row, "brief"),
+                    sources: row
+                        .get("sources")
+                        .and_then(Value::as_array)
+                        .map(Vec::len)
+                        .unwrap_or(0),
+                    status: text(row, "status"),
+                    version: int(row, "version"),
+                    recorded: date(row, "created_at"),
+                    drafts,
+                    kinds,
+                }
+            })
+            .collect();
+    }
+    intakes(&data.assets)
+        .into_iter()
+        .map(|summary| IntakeRow {
+            id: summary.id,
+            brief: "— (no authoring.intakes read for this role)".to_owned(),
+            sources: 0,
+            status: summary.state().to_owned(),
+            version: 0,
+            recorded: "—".to_owned(),
+            drafts: summary.drafts,
+            kinds: summary.kinds,
+        })
         .collect()
 }
 
@@ -422,8 +505,9 @@ fn intake_panel(
     refresh: Callback<()>,
     notice: RwSignal<Option<String>>,
 ) -> AnyView {
-    let summaries = intakes(&data.assets);
-    let total: usize = summaries.iter().map(|intake| intake.drafts).sum();
+    let rows = intake_rows(&data);
+    let readable = data.intakes_readable;
+    let total: usize = rows.iter().map(|intake| intake.drafts).sum();
 
     let submit = move |_event: web_sys::MouseEvent| {
         let brief = form.brief.get().trim().to_owned();
@@ -467,7 +551,7 @@ fn intake_panel(
             <section class="panel" data-testid="authoring-intakes">
                 <div class="ph">
                     <span>"Intake queue"</span>
-                    <span class="muted">{format!("{} draft(s) across {} intake(s)", total, summaries.len())}</span>
+                    <span class="muted">{format!("{} draft(s) across {} intake(s)", total, rows.len())}</span>
                 </div>
                 {move || match last.get() {
                     Some(intake) => view! {
@@ -482,24 +566,32 @@ fn intake_panel(
                         <p class="muted">"No intake has been recorded from this screen yet."</p>
                     }.into_any(),
                 }}
-                {if summaries.is_empty() {
+                {if rows.is_empty() {
                     view! {
-                        <Empty message="No draft in this tenant cites an intake yet; record a brief below and draft from it in the Draft catalogue.".to_owned()/>
+                        <Empty message="No intake has been recorded in this tenant yet; record a brief below and draft from it in the Draft catalogue.".to_owned()/>
                     }.into_any()
                 } else {
                     view! {
                         <div class="tablewrap">
                             <table class="table">
                                 <thead><tr>
-                                    <th>"Intake"</th><th>"Produces"</th><th>"Kinds"</th><th>"State"</th>
+                                    <th>"Brief"</th><th>"Sources"</th><th>"Status"</th><th>"Produces"</th><th>"Recorded"</th>
                                 </tr></thead>
                                 <tbody>
-                                    {summaries.iter().map(|intake| view! {
+                                    {rows.iter().map(|intake| view! {
                                         <tr data-intake=intake.id.clone()>
-                                            <td class="mono">{short_id(Some(&intake.id))}</td>
-                                            <td>{format!("{} draft(s)", intake.drafts)}</td>
-                                            <td>{intake.kinds.join(", ")}</td>
-                                            <td><StatusPill status=intake.state().to_owned()/></td>
+                                            <td>{intake.brief.clone()}</td>
+                                            <td>{format!("{} source(s)", intake.sources)}</td>
+                                            <td>
+                                                <StatusPill status=intake.status.clone()/>
+                                                <span class="muted">{format!(" v{}", intake.version)}</span>
+                                            </td>
+                                            <td>{if intake.drafts == 0 {
+                                                "yet to draft".to_owned()
+                                            } else {
+                                                format!("{} draft(s) · {}", intake.drafts, intake.kinds.join(", "))
+                                            }}</td>
+                                            <td class="muted">{intake.recorded.clone()}</td>
                                         </tr>
                                     }).collect_view()}
                                 </tbody>
@@ -508,7 +600,11 @@ fn intake_panel(
                     }.into_any()
                 }}
                 <p class="muted">
-                    "The queue groups the draft catalogue by the intake each draft cites: T17 exposes the intake write-only, so a recorded brief and its sources are not readable back. The read is T17b (#655); until it lands this queue names the intake every draft already carries."
+                    {if readable {
+                        "The queue reads the tenant's recorded intakes (authoring.intakes); the draft count joins the catalogue by intake_id."
+                    } else {
+                        "This role has no authoring.intakes read; the queue is the draft catalogue grouped by the intake each draft cites."
+                    }}
                 </p>
             </section>
             <section class="panel">

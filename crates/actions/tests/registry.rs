@@ -129,7 +129,7 @@ use serde_json::{Value, json};
 /// `toolkits.import_openapi|register_mcp|discover_mcp`, `tool_authoring.draft|validate|test|`
 /// `review|publish|promote` and the broker's registered-destination dispatch `tools.dispatch`
 /// — 551 → **561**.
-const EXPECTED: [&str; 561] = [
+const EXPECTED: [&str; 562] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -180,6 +180,7 @@ const EXPECTED: [&str; 561] = [
     "authoring.assets",
     "authoring.draft",
     "authoring.intake",
+    "authoring.intakes",
     "authoring.publish",
     "authoring.review",
     "baselines.get",
@@ -802,7 +803,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // `tool_authoring.draft|validate|test|review|publish|promote`, `tools.dispatch`):
     // internal 533 -> 543; external stays 18 — an authored tool dispatches through the broker's
     // registered-destination arm, not a new external declaration.
-    assert_eq!((internal, external), (543, 18));
+    // #655 (T17b) adds one internal read (`authoring.intakes`): internal 543 -> 544; external
+    // stays 18 — the queue reads this tenant's own intake rows.
+    assert_eq!((internal, external), (544, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

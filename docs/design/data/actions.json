@@ -47,6 +47,7 @@
     "authoring.assets",
     "authoring.draft",
     "authoring.intake",
+    "authoring.intakes",
     "authoring.publish",
     "authoring.review",
     "baselines.get",
