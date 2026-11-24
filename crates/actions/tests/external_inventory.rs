@@ -71,6 +71,11 @@ const DESTINATIONS: &[Destination] = &[
         evidence: "mac-mini asr-backend-rs on :9201 — 2026-11-19",
     },
     Destination {
+        service: "billing_shim",
+        runtime: "Rust",
+        evidence: "apps/billing-shim (Rust, SPEC §12 T11 shim) — 2026-11-24",
+    },
+    Destination {
         service: "scientific",
         runtime: "Rust",
         evidence: "apps/scientific (Rust, absorbed by #105); deployment at zero replicas — 2026-11-22",

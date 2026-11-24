@@ -1008,17 +1008,18 @@ async fn billing_summary(
 
 // ── the billing reconciliation (P2) ─────────────────────────────────────────────────────
 
-/// The billing figure is read by the **declared** `billing.summary` read action, never by a
-/// handler: the engine owns that path's timeout, breaker, idempotency and audit. This action
-/// consumes the attestation — the total, or the failure when that action could not read.
+/// The billing figure is read by the **declared** `billing.rollup` action, never by a handler:
+/// the engine owns that path's timeout, breaker, idempotency and audit. This action consumes the
+/// attestation — the roll-up document, or the failure when that action could not read.
 /// `metrics.reconcile` — the conveyor's metering against billing's roll-up for one period.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ReconcileIn {
     pub period_start: NaiveDate,
     pub period_end: NaiveDate,
-    /// The billing roll-up total, as returned by the declared `billing.summary` action.
-    pub billing_total_usd: Option<f64>,
-    /// The upstream error when `billing.summary` could not read the service.
+    /// The document the declared `billing.rollup` action returned. The billing total is the sum
+    /// of its `rows[].cost_usd`; a document without that shape is refused, never read as zero.
+    pub billing_rollup: Option<Value>,
+    /// The upstream error when `billing.rollup` could not read the service.
     pub billing_error: Option<String>,
     /// Where an incident card is opened when the totals differ.
     pub board_id: Option<Uuid>,
@@ -1036,6 +1037,19 @@ pub struct ReconcileOut {
     pub upstream_error: Option<String>,
     /// Calls the period could not price. A nonzero count refuses the verdict before this output.
     pub unpriced_calls: i64,
+}
+
+/// The billing total, summed from the document the declared `billing.rollup` action returned.
+///
+/// A document that does not carry `rows[].cost_usd` is malformed, not zero: a missing figure
+/// must never manufacture a match (P1.4/P5.4).
+fn billing_rollup_total(rollup: &Value) -> Option<f64> {
+    let rows = rollup.get("rows")?.as_array()?;
+    let mut total = 0.0_f64;
+    for row in rows {
+        total += row.get("cost_usd")?.as_f64()?;
+    }
+    total.is_finite().then_some(total)
 }
 
 #[crate::action(
@@ -1087,10 +1101,17 @@ async fn metrics_reconcile(
         ));
     }
     let (state, billing_usd, delta) = match (
-        input.billing_total_usd,
+        input.billing_rollup.as_ref(),
         input.billing_error.as_deref(),
     ) {
-        (Some(total), None) if total.is_finite() => {
+        (Some(rollup), None) => {
+            let Some(total) = billing_rollup_total(rollup) else {
+                return Err(ActionError::new(
+                    422,
+                    "billing_rollup_invalid",
+                    "billing_rollup is not the document billing.rollup returned: it must carry rows[], each with a numeric cost_usd",
+                ));
+            };
             let (state, delta) = rules::reconcile(conveyor_usd, total);
             (state, total, delta)
         }
@@ -1101,7 +1122,7 @@ async fn metrics_reconcile(
             return Err(ActionError::new(
                 422,
                 "billing_figure_required",
-                "name exactly one of billing_total_usd (from the declared billing.summary action) or billing_error (that action's upstream failure)",
+                "name exactly one of billing_rollup (the document from the declared billing.rollup action) or billing_error (that action's upstream failure)",
             ));
         }
     };

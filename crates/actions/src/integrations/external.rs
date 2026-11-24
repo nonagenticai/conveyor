@@ -8,10 +8,11 @@
 //! The base URL is per service: `CONVEYOR_EXTERNAL_<SERVICE>_URL`. An unset service is `ActionError::unconfigured`
 //! — a visible refusal, never a call to a guessable default.
 //!
-//! Every destination left here is a Rust service: the coding fleet, a mac-mini model server (speech,
-//! transcription, images, model calls), the strata retriever, the third-party laya judge, and the
-//! local fixtures transport. The five V1 displays that named a Python destination or a service that
-//! no longer exists were moved onto conveyor state in #450 — see the note above `coding_jobs.create`.
+//! Every destination left here is a Rust service: the coding fleet, the billing shim, a mac-mini
+//! model server (speech, transcription, images, model calls), the strata retriever, the third-party
+//! laya judge, and the local fixtures transport. The five V1 displays that named a Python
+//! destination or a service that no longer exists were moved onto conveyor state in #450 — see the
+//! note above `coding_jobs.create`.
 //!
 //! ⚠️ **`HandlerRef` has no path templating**: the path is static and a `GET` carries no body. So `coding_jobs.get`
 //! is a POST with the id in the body against `/api/jobs/status`, and the coding gateway must serve that route.
@@ -99,6 +100,26 @@ fn coding_job_create_input() -> Schema {
 
 fn coding_job_get_input() -> Schema {
     schemars::schema_for!(CodingJobGetIn)
+}
+
+/// The body `billing.rollup` sends to the billing shim (SPEC §12 T11).
+///
+/// The engine passes an external action's input through **verbatim**, so this is the shim's own
+/// roll-up request document: the window and, optionally, the dimensions to group by.
+#[derive(schemars::JsonSchema)]
+#[allow(dead_code)]
+struct BillingRollupIn {
+    /// First day of the window (inclusive).
+    since: chrono::NaiveDate,
+    /// Last day of the window (inclusive).
+    until: chrono::NaiveDate,
+    /// The fields the shim groups the rows by; absent means the shim's default.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    group_by: Option<Vec<String>>,
+}
+
+fn billing_rollup_input() -> Schema {
+    schemars::schema_for!(BillingRollupIn)
 }
 
 /// One external target: where the call goes and what it is allowed to do.
@@ -222,3 +243,23 @@ fn retrieval_query() -> ActionSpec {
     })
 }
 inventory::submit! { ActionRegistration::new(retrieval_query) }
+
+/// `billing.rollup` — the billing shim's usage roll-up for one period (SPEC §12 T11).
+///
+/// A read, and a passthrough: `metrics.reconcile` sums the returned `rows[].cost_usd`; the
+/// conveyor does not re-model the shim's document.
+fn billing_rollup() -> ActionSpec {
+    let mut action = spec(Target {
+        name: "billing.rollup",
+        service: "billing_shim",
+        method: "POST",
+        path: "/api/usage/rollup",
+        scopes: READ,
+        timeout_ms: 5_000,
+        effect: Effect::Read,
+        idempotent: true,
+    });
+    action.input = billing_rollup_input;
+    action
+}
+inventory::submit! { ActionRegistration::new(billing_rollup) }

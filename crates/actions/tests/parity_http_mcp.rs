@@ -5882,6 +5882,18 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("scientific_stats.trend", json!({}), None),
         plain("scientific_formal.translate", json!({}), None),
         plain("scientific_formal.verify", json!({}), None),
+        // T11 (#526): the billing shim has no host in this harness. `CONVEYOR_EXTERNAL_BILLING_SHIM_URL`
+        // is unset here, so both transports must produce the SAME typed refusal (`unconfigured`, 503) —
+        // the parity property that matters for a declared external action: a missing address is a
+        // visible refusal on every transport, never one transport guessing a default.
+        expecting(
+            plain(
+                "billing.rollup",
+                json!({"since": "2099-01-01", "until": "2099-01-31"}),
+                None,
+            ),
+            503,
+        ),
         // S10: the copilot's model call. The stub's catch-all answers the router's path, so the two
         // transports receive the same document — this proves the declaration, not a model.
         plain(
@@ -8616,7 +8628,7 @@ fn spine_samples() -> Vec<Sample> {
         expecting(
             plain(
                 "metrics.reconcile",
-                json!({"period_start": "2099-01-01", "period_end": "2099-01-01", "billing_total_usd": 0.0}),
+                json!({"period_start": "2099-01-01", "period_end": "2099-01-01", "billing_rollup": {"rows": []}}),
                 None,
             ),
             200,
