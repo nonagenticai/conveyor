@@ -935,6 +935,11 @@ impl StubHits {
     pub fn get(&self) -> usize {
         self.0.load(Ordering::SeqCst)
     }
+
+    /// Record one hit against the stub.
+    pub fn record(&self) {
+        self.0.fetch_add(1, Ordering::SeqCst);
+    }
 }
 
 /// A running external stub and its base URL.
@@ -991,7 +996,7 @@ pub struct LayaStub {
     /// The base URL to put in `CONVEYOR_EXTERNAL_LAYA_URL`.
     pub base: String,
     /// How many times `/v1/systemone` was asked.
-    pub hits: Arc<std::sync::Mutex<usize>>,
+    pub hits: StubHits,
     answer: Arc<std::sync::Mutex<Value>>,
 }
 
@@ -999,7 +1004,7 @@ impl LayaStub {
     /// Start a stub answering `answer` for every call.
     pub async fn start(answer: Value) -> LayaStub {
         let answer = Arc::new(std::sync::Mutex::new(answer));
-        let hits: Arc<std::sync::Mutex<usize>> = Arc::new(std::sync::Mutex::new(0));
+        let hits = StubHits::default();
         let answer_state = answer.clone();
         let hit_state = hits.clone();
         let app = Router::new().route(
@@ -1008,7 +1013,7 @@ impl LayaStub {
                 let answer_state = answer_state.clone();
                 let hit_state = hit_state.clone();
                 async move {
-                    *hit_state.lock().expect("laya hits") += 1;
+                    hit_state.record();
                     axum::Json(answer_state.lock().expect("laya answer").clone())
                 }
             }),
@@ -1030,7 +1035,7 @@ impl LayaStub {
 
     /// How many calls the stub has answered.
     pub fn calls(&self) -> usize {
-        *self.hits.lock().expect("laya hits")
+        self.hits.get()
     }
 }
 
