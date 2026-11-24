@@ -378,6 +378,23 @@ async fn one_licence_principal_task_creates_reads_decides_and_closes() {
         .collect();
     assert!(ids.contains(&approval_id.as_str()), "{listed}");
 
+    // SPEC_V2 §5.4: a machine decides only a gate the tenant declares non-governance. This
+    // tenant declares its design question agent-decidable; the one decision writer reads this
+    // row, so the test exercises the real authorisation rather than bypassing it.
+    let mut tx = begin_scoped(&pg.owner, seeded.tenant)
+        .await
+        .expect("scope the gate-policy write");
+    sqlx::query(
+        "INSERT INTO approval_policy (tenant_id, action, approval, self_approval, approver_kind)
+         VALUES ($1, 'design_choice', 'required', 'forbidden', 'agent')
+         ON CONFLICT (tenant_id, action) DO UPDATE SET approver_kind = 'agent'",
+    )
+    .bind(seeded.tenant_id)
+    .execute(&mut *tx)
+    .await
+    .expect("declare the design gate agent-decidable");
+    tx.commit().await.expect("commit the gate policy");
+
     // 4. Decide, as the agent (property e).
     let decided = mcp
         .call(

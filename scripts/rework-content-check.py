@@ -39,6 +39,19 @@ REQUIRED_ARTEFACTS = [
     ("c", "hld", "catalog"),
     ("d", "hld", "catalog"),
 ]
+# The architecture track's E–H set (owner tailoring 2026-11-24). A delivery pack carries the
+# seven A–D artefacts; a programme/architecture pack carries these eight after them, in the
+# order the standard seeds them (migration 0102).
+ARCHITECTURE_ARTEFACTS = [
+    ("e", "hld", "matrix"),
+    ("e", "hld", "catalog"),
+    ("e", "hld", "diagram"),
+    ("e", "hld", "diagram"),
+    ("f", "hld", "catalog"),
+    ("g", "hld", "catalog"),
+    ("h", "hld", "catalog"),
+    ("h", "hld", "catalog"),
+]
 LEVELS = {"irrelevant", "consistent", "compliant", "conformant", "fully_conformant", "non_conformant"}
 
 
@@ -67,7 +80,8 @@ def all_ids(value: Any, found: set[str]) -> None:
 
 
 def check(content: dict, template_standard: dict, snapshot_ids: set[str],
-          wsjf: tuple[int, int, int, int], closes: bool) -> list[str]:
+          wsjf: tuple[int, int, int, int], closes: bool,
+          architecture: bool = False) -> list[str]:
     problems: list[str] = []
 
     def expect(condition: bool, message: str) -> None:
@@ -81,9 +95,11 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
            "soaw must be {title, body: object}")
 
     artefacts = content.get("artifacts") or []
-    expect(len(artefacts) == 7, f"artifacts must be exactly 7, got {len(artefacts)}")
+    expected = REQUIRED_ARTEFACTS + (ARCHITECTURE_ARTEFACTS if architecture else [])
+    expect(len(artefacts) == len(expected),
+           f"artifacts must be exactly {len(expected)}, got {len(artefacts)}")
     pairs = [(a.get("phase_code"), a.get("plateau"), a.get("artifact_kind")) for a in artefacts]
-    expect(pairs == REQUIRED_ARTEFACTS, f"artefact phase/plateau/kind set is {pairs}")
+    expect(pairs == expected, f"artefact phase/plateau/kind set is {pairs}")
     expect(all(isinstance(a.get("title"), str) and a["title"].strip() for a in artefacts),
            "every artefact needs a title")
     expect(all(isinstance(a.get("entries"), list) and a["entries"] for a in artefacts),
@@ -156,6 +172,24 @@ def load_snapshot_ids(snapshot: Path) -> set[str]:
         text = outputs.read_text(encoding="utf-8")
         walk(json.loads(text[text.find("{") : text.rfind("}") + 1]))
     return ids
+
+
+def project_architecture(snapshot: Path, project: str) -> bool:
+    """The project's track from the snapshot: the architecture track carries E–H, delivery A–D.
+
+    Same rule as the generator and the audit: `meta.adm_profile` wins when it names an
+    architecture profile; otherwise `meta.track == "programme"`.
+    """
+    data = json.loads((snapshot / "programme.json").read_text(encoding="utf-8"))
+    for row in data.get("projects") or []:
+        if row.get("key") != project:
+            continue
+        meta = row.get("meta") or {}
+        named = str(meta.get("adm_profile") or "").strip().lower()
+        if named:
+            return "architecture" in named or named in {"programme", "a-h", "ah"}
+        return str(meta.get("track") or "").strip().lower() == "programme"
+    fail(f"project {project!r} is not in the snapshot")
 
 
 def self_test() -> None:
@@ -243,7 +277,8 @@ def main() -> None:
     standard = json.loads((ROOT / "seed" / "output-standard.json").read_text(encoding="utf-8"))
     content = json.loads(args.content.read_text(encoding="utf-8"))
     problems = check(content, standard, load_snapshot_ids(args.snapshot), wsjf,
-                     args.closes == "true")
+                     args.closes == "true",
+                     architecture=project_architecture(args.snapshot, args.project))
     if problems:
         for problem in problems:
             print(f"FAIL {problem}", file=sys.stderr)
