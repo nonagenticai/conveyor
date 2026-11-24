@@ -25,6 +25,7 @@ use conveyor_store as store;
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::FieldError;
 
+pub mod assign;
 pub mod boards;
 pub mod card_types;
 pub mod cards;
