@@ -42,6 +42,16 @@ const DELEGATE: &str = "dev:delegate";
 /// The machine that tries to adopt its own kata (a `kata_executor` principal).
 const KATA_MACHINE: &str = "dev:robot";
 
+/// The incident card's service, severity and timestamps plus its mitigation record.
+type IncidentMetaRow = (
+    Option<String>,
+    Option<String>,
+    Option<String>,
+    Option<String>,
+    Option<String>,
+    Option<Value>,
+);
+
 // ── small helpers ───────────────────────────────────────────────────────────────────────────
 
 fn output(body: &Value) -> &Value {
@@ -627,7 +637,7 @@ async fn pm_to_delivery_jobs() {
             .is_some_and(|rows| !rows.is_empty()),
         "the card names its acceptance criteria: {card}"
     );
-    let card_binding = text(&card, "job_binding_id");
+    let card_binding = text(card, "job_binding_id");
     assert_eq!(card_binding, h.delivery_binding.to_string());
 
     let run = ok(&h, ALICE, "runs.get", json!({"id": d.run_id})).await;
@@ -1728,9 +1738,7 @@ async fn mitigate(h: &Harness, incident_id: Uuid, patches: &AtomicUsize) -> Stri
 
 #[tokio::test]
 async fn deploy_failure_to_incident() {
-    let _env = OPS_ENV
-        .lock()
-        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    let _env = OPS_ENV.lock().await;
     let h = harness().await;
     let g = governed_project(&h).await;
     let (board_id, lane_id) = board_lanes(&h, g.project_id).await;
@@ -1772,22 +1780,16 @@ async fn deploy_failure_to_incident() {
 
     // The incident card records service, severity and every timestamp; the mitigation names
     // its approved gate and its read-back.
-    let (service, severity, detected, mitigated, resolved, mitigation): (
-        Option<String>,
-        Option<String>,
-        Option<String>,
-        Option<String>,
-        Option<String>,
-        Option<Value>,
-    ) = sqlx::query_as(
-        "SELECT meta->>'service', meta->>'severity', meta->>'detected_at',
+    let (service, severity, detected, mitigated, resolved, mitigation): IncidentMetaRow =
+        sqlx::query_as(
+            "SELECT meta->>'service', meta->>'severity', meta->>'detected_at',
                 meta->>'mitigated_at', meta->>'resolved_at', meta->'mitigation'
            FROM card WHERE id = $1",
-    )
-    .bind(incident.card_id)
-    .fetch_one(&h.pg.super_pool)
-    .await
-    .expect("read the incident card");
+        )
+        .bind(incident.card_id)
+        .fetch_one(&h.pg.super_pool)
+        .await
+        .expect("read the incident card");
     assert_eq!(service.as_deref(), Some("conveyor"));
     assert_eq!(severity.as_deref(), Some("sev2"));
     assert!(detected.is_some() && mitigated.is_some() && resolved.is_some());
@@ -1830,9 +1832,7 @@ async fn systemic_postmortem(h: &Harness, incident_id: Uuid) -> Value {
 
 #[tokio::test]
 async fn incident_to_promoted_lesson() {
-    let _env = OPS_ENV
-        .lock()
-        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    let _env = OPS_ENV.lock().await;
     let h = harness().await;
     let g = governed_project(&h).await;
     let (board_id, lane_id) = board_lanes(&h, g.project_id).await;
@@ -2054,9 +2054,7 @@ async fn loop_artefact_chain(h: &Harness, board_id: Uuid, lane_id: Uuid) -> (Uui
 
 #[tokio::test]
 async fn every_loop_transition_audited() {
-    let _env = OPS_ENV
-        .lock()
-        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    let _env = OPS_ENV.lock().await;
     let h = harness().await;
     let g = governed_project(&h).await;
     let (board_id, lane_id) = board_lanes(&h, g.project_id).await;
@@ -2917,7 +2915,7 @@ async fn architecture_and_benefits_acceptance() {
         .await
         .expect("scope the benefit read");
     let realized =
-        conveyor_store::spine::benefit_realization_tx(&mut *tx, h.anchor.seeded.tenant, benefit_id)
+        conveyor_store::spine::benefit_realization_tx(&mut tx, h.anchor.seeded.tenant, benefit_id)
             .await
             .expect("the benefit realization");
     tx.commit().await.expect("commit the read");
@@ -3242,4 +3240,4 @@ async fn the_buildout_runs_under_the_capability() {
 }
 
 // A process-wide lock: the ops connector reads its base URL from the environment.
-static OPS_ENV: std::sync::Mutex<()> = std::sync::Mutex::new(());
+static OPS_ENV: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());

@@ -1273,6 +1273,17 @@ pub async fn get_body_tx(
         .await?)
 }
 
+/// Who took a board decision and under what authority.
+#[derive(Clone, Copy, Debug)]
+pub struct BoardDecider<'a> {
+    /// The deciding actor.
+    pub decided_by: Uuid,
+    /// `human | agent | rule` — derived from the authenticated principal.
+    pub decided_by_kind: &'a str,
+    /// The published standing delegation the act cites, when it is a delegated rule decision.
+    pub delegation_ref: Option<Uuid>,
+}
+
 /// What a board decision is about.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct BoardSubject<'a> {
@@ -1289,10 +1300,8 @@ pub async fn decide_board_tx(
     body_id: Uuid,
     decision: &str,
     evidence: Value,
-    decided_by: Uuid,
     subject: BoardSubject<'_>,
-    decided_by_kind: &str,
-    delegation_ref: Option<Uuid>,
+    decider: BoardDecider<'_>,
 ) -> Result<Uuid, ArchitectureStoreError> {
     if decision != "approved" && decision != "rejected" {
         return Err(ArchitectureStoreError::Conflict {
@@ -1368,7 +1377,7 @@ pub async fn decide_board_tx(
     )
     .bind(tenant.as_uuid())
     .bind(decision)
-    .bind(decided_by)
+    .bind(decider.decided_by)
     .bind(json!({
         "body_id": body_id,
         "evidence": evidence,
@@ -1382,7 +1391,7 @@ pub async fn decide_board_tx(
     // the act cites are written in the same transaction as the approval and decision. This is
     // the type `approvals.decide` writes; the board macro had no decision row before, so a
     // delegated board act left no typed record of who decided it or under what authority.
-    if let Some(delegation_ref) = delegation_ref {
+    if let Some(delegation_ref) = decider.delegation_ref {
         sqlx::query(
             "INSERT INTO approval_decision
                 (tenant_id, approval_id, approver_id, decision, decided_by_kind, via)
@@ -1390,13 +1399,13 @@ pub async fn decide_board_tx(
         )
         .bind(tenant.as_uuid())
         .bind(id)
-        .bind(decided_by)
+        .bind(decider.decided_by)
         .bind(if decision == "approved" {
             "approve"
         } else {
             "reject"
         })
-        .bind(decided_by_kind)
+        .bind(decider.decided_by_kind)
         .bind(json!({
             "channel": "internal",
             "delegation_ref": delegation_ref.to_string(),

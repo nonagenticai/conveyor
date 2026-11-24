@@ -1775,13 +1775,15 @@ async fn architecture_board_decide(
         input.body_id,
         &input.decision,
         evidence,
-        ctx.actor_id,
         store::architecture::BoardSubject {
             kind: input.subject_kind.as_deref(),
             id: input.subject_id,
         },
-        &delegated_decider_kind(&ctx.actor_kind),
-        input.delegation_ref,
+        store::architecture::BoardDecider {
+            decided_by: ctx.actor_id,
+            decided_by_kind: &delegated_decider_kind(&ctx.actor_kind),
+            delegation_ref: input.delegation_ref,
+        },
     )
     .await
     .map_err(|error| arch_error(error, ctx.action))?;
