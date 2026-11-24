@@ -417,13 +417,15 @@ async fn every_checker_laya_and_eval_verdict_writes_one_decision_row_linked_to_i
 
     execute(&pg, &seeded, &run, 1, 1).await;
     execute(&pg, &seeded, &run, 2, 1).await;
-    // The eval's first entry creates the one-shot grade and parks; the settled grade is the
-    // verdict on re-entry, and only then is a decision owed.
+    // Steps 1 and 2 each wrote their verdict. The eval's first entry on step 3 creates the
+    // one-shot grade and parks; the settled grade is the verdict on re-entry, and only then is
+    // a decision owed — so step 3 adds no row yet.
+    let before = step_decisions(&pg, &seeded, &run).await.len();
     execute(&pg, &seeded, &run, 3, 1).await;
     assert_eq!(
         step_decisions(&pg, &seeded, &run).await.len(),
-        0,
-        "a pending grade decides nothing, so no decision row exists yet"
+        before,
+        "a pending grade decides nothing, so no decision row exists for step 3 yet"
     );
     let park = judge_of(&pg, &seeded, &run, 3, 1)
         .await
