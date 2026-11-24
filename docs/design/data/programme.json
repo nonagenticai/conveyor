@@ -1,151 +1,8 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-24T09:41:16.641438+00:00",
+  "generated_at": "2026-11-24T10:00:00Z",
   "issue_registry": {
     "issues": [
-      {
-        "labels": [
-          {
-            "color": "1D76DB",
-            "name": "unit"
-          },
-          {
-            "color": "FBCA04",
-            "name": "status:claimed"
-          }
-        ],
-        "number": 661,
-        "state": "OPEN",
-        "title": "fix: the router flushes SSE headers before the upstream's first chunk",
-        "updatedAt": "2026-11-24T09:26:34Z",
-        "url": "https://github.com/nonagenticai/conveyor/issues/661"
-      },
-      {
-        "labels": [
-          {
-            "color": "5319E7",
-            "name": "programme"
-          }
-        ],
-        "number": 660,
-        "state": "OPEN",
-        "title": "conveyor-buildout — the SPEC_V2 programme",
-        "updatedAt": "2026-11-24T09:00:52Z",
-        "url": "https://github.com/nonagenticai/conveyor/issues/660"
-      },
-      {
-        "labels": [
-          {
-            "color": "1D76DB",
-            "name": "unit"
-          },
-          {
-            "color": "FBCA04",
-            "name": "status:claimed"
-          },
-          {
-            "color": "6E7781",
-            "name": "S21"
-          }
-        ],
-        "number": 656,
-        "state": "OPEN",
-        "title": "add: the L1 laya gate — the ladder builds the case, the engine makes the call, the decision cites it",
-        "updatedAt": "2026-11-24T09:18:58Z",
-        "url": "https://github.com/nonagenticai/conveyor/issues/656"
-      },
-      {
-        "labels": [
-          {
-            "color": "1D76DB",
-            "name": "unit"
-          },
-          {
-            "color": "0E8A16",
-            "name": "status:ready"
-          },
-          {
-            "color": "6E7781",
-            "name": "T17"
-          },
-          {
-            "color": "5319E7",
-            "name": "programme"
-          }
-        ],
-        "number": 655,
-        "state": "OPEN",
-        "title": "add: the authoring intake queue read (authoring.intakes)",
-        "updatedAt": "2026-11-24T09:26:37Z",
-        "url": "https://github.com/nonagenticai/conveyor/issues/655"
-      },
-      {
-        "labels": [
-          {
-            "color": "1D76DB",
-            "name": "unit"
-          },
-          {
-            "color": "FBCA04",
-            "name": "status:claimed"
-          },
-          {
-            "color": "6E7781",
-            "name": "T5"
-          }
-        ],
-        "number": 653,
-        "state": "CLOSED",
-        "title": "data: T5 measures built — register the kata's tables, actions and module",
-        "updatedAt": "2026-11-24T09:00:44Z",
-        "url": "https://github.com/nonagenticai/conveyor/issues/653"
-      },
-      {
-        "labels": [
-          {
-            "color": "1D76DB",
-            "name": "unit"
-          },
-          {
-            "color": "FBCA04",
-            "name": "status:claimed"
-          },
-          {
-            "color": "5319E7",
-            "name": "programme"
-          },
-          {
-            "color": "6E7781",
-            "name": "T19"
-          }
-        ],
-        "number": 650,
-        "state": "OPEN",
-        "title": "T19 close-out: the live gate, the closure review and the published programme record",
-        "updatedAt": "2026-11-24T08:57:48Z",
-        "url": "https://github.com/nonagenticai/conveyor/issues/650"
-      },
-      {
-        "labels": [
-          {
-            "color": "1D76DB",
-            "name": "unit"
-          },
-          {
-            "color": "FBCA04",
-            "name": "status:claimed"
-          },
-          {
-            "color": "6E7781",
-            "name": "S21"
-          }
-        ],
-        "number": 649,
-        "state": "OPEN",
-        "title": "add: the card handoff — the binding, what the receiver must know, and the bound run start",
-        "updatedAt": "2026-11-24T07:51:46Z",
-        "url": "https://github.com/nonagenticai/conveyor/issues/649"
-      },
       {
         "labels": [
           {
@@ -218,7 +75,7 @@
         "number": 630,
         "state": "OPEN",
         "title": "T18-3c: the run inspector's executor kind, binding pin and tools panel",
-        "updatedAt": "2026-11-24T07:30:28Z",
+        "updatedAt": "2026-11-23T20:16:33Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/630"
       },
       {
@@ -228,8 +85,8 @@
             "name": "unit"
           },
           {
-            "color": "FBCA04",
-            "name": "status:claimed"
+            "color": "D93F0B",
+            "name": "status:blocked"
           },
           {
             "color": "6E7781",
@@ -245,9 +102,9 @@
           }
         ],
         "number": 629,
-        "state": "CLOSED",
+        "state": "OPEN",
         "title": "T18-3b: the Authoring destination live over T17's authoring.* actions",
-        "updatedAt": "2026-11-24T09:27:30Z",
+        "updatedAt": "2026-11-23T20:34:59Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/629"
       },
       {
@@ -268,7 +125,7 @@
         "number": 626,
         "state": "CLOSED",
         "title": "fix: the router refuses unknown models, forwards the OpenAI knobs it documents, and every conveyor client honours Retry-After",
-        "updatedAt": "2026-11-24T07:32:52Z",
+        "updatedAt": "2026-11-24T00:05:13Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/626"
       },
       {
@@ -398,7 +255,7 @@
         "number": 606,
         "state": "CLOSED",
         "title": "T19: decision forums — meetings as the decision forum",
-        "updatedAt": "2026-11-24T07:20:17Z",
+        "updatedAt": "2026-11-24T02:29:08Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/606"
       },
       {
@@ -680,7 +537,7 @@
         "number": 569,
         "state": "OPEN",
         "title": "conveyor-buildout — the SPEC_V2 programme",
-        "updatedAt": "2026-11-24T04:28:12Z",
+        "updatedAt": "2026-11-24T04:12:17Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/569"
       },
       {
@@ -755,7 +612,7 @@
         "number": 564,
         "state": "CLOSED",
         "title": "T18-3: Procedures, Capabilities, Authoring, Execution and Run history",
-        "updatedAt": "2026-11-24T07:20:29Z",
+        "updatedAt": "2026-11-24T00:05:13Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/564"
       },
       {
@@ -1099,7 +956,7 @@
         "number": 526,
         "state": "OPEN",
         "title": "#526 programme: the retrospective rework — tranche 0, all remaining tranches, benefits and the viability gate (U5a–U5h, U6, U7)",
-        "updatedAt": "2026-11-24T09:20:28Z",
+        "updatedAt": "2026-11-24T00:13:01Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/526"
       },
       {
@@ -4502,7 +4359,7 @@
         "number": 88,
         "state": "OPEN",
         "title": "T12 — One organisation loop (the acceptance of V2)",
-        "updatedAt": "2026-11-24T07:15:11Z",
+        "updatedAt": "2026-11-22T22:32:10Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/88"
       },
       {
@@ -4523,7 +4380,7 @@
         "number": 87,
         "state": "CLOSED",
         "title": "T17 — Tenant asset authoring",
-        "updatedAt": "2026-11-24T07:15:09Z",
+        "updatedAt": "2026-11-24T01:21:23Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/87"
       },
       {
@@ -4659,8 +4516,8 @@
             "name": "unit"
           },
           {
-            "color": "FBCA04",
-            "name": "status:claimed"
+            "color": "D93F0B",
+            "name": "status:blocked"
           },
           {
             "color": "6E7781",
@@ -4670,7 +4527,7 @@
         "number": 80,
         "state": "OPEN",
         "title": "T6 — Development project",
-        "updatedAt": "2026-11-24T09:28:57Z",
+        "updatedAt": "2026-11-22T07:37:05Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/80"
       },
       {
@@ -4680,8 +4537,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "D93F0B",
+            "name": "status:blocked"
           },
           {
             "color": "6E7781",
@@ -4691,7 +4548,7 @@
         "number": 79,
         "state": "OPEN",
         "title": "T8 — Organisational memory",
-        "updatedAt": "2026-11-24T08:00:43Z",
+        "updatedAt": "2026-11-19T07:48:58Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/79"
       },
       {
@@ -4731,9 +4588,9 @@
           }
         ],
         "number": 77,
-        "state": "CLOSED",
+        "state": "OPEN",
         "title": "T5 — Kata",
-        "updatedAt": "2026-11-24T08:01:51Z",
+        "updatedAt": "2026-11-23T20:51:23Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/77"
       },
       {
