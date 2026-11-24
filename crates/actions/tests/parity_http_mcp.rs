@@ -5167,6 +5167,13 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("scientific_stats.trend", json!({}), None),
         plain("scientific_formal.translate", json!({}), None),
         plain("scientific_formal.verify", json!({}), None),
+        // T14 (#561): the webscraper and Lean reads. An empty body is refused by each closed
+        // input schema on both transports (422 / `isError`), so no call leaves the process.
+        plain("webscraper.scrape_url", json!({}), None),
+        plain("webscraper.scrape_bulk", json!({}), None),
+        plain("lean4.check", json!({}), None),
+        plain("lean4.elaborate", json!({}), None),
+        plain("lean4.prove", json!({}), None),
         // S10: the copilot's model call. The stub's catch-all answers the router's path, so the two
         // transports receive the same document — this proves the declaration, not a model.
         plain(

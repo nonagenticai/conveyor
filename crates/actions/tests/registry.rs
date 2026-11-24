@@ -129,7 +129,7 @@ use serde_json::{Value, json};
 /// `toolkits.import_openapi|register_mcp|discover_mcp`, `tool_authoring.draft|validate|test|`
 /// `review|publish|promote` and the broker's registered-destination dispatch `tools.dispatch`
 /// — 551 → **561**; T12 (#88) adds the three remaining kata Gets → **564**.
-const EXPECTED: [&str; 565] = [
+const EXPECTED: [&str; 570] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -394,6 +394,10 @@ const EXPECTED: [&str; 565] = [
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
+    // T14 (#561): the Lean prover's three read actions.
+    "lean4.check",
+    "lean4.elaborate",
+    "lean4.prove",
     // T8 (#79): the organisational-memory lifecycle — propose with independent evidence,
     // a person's review, and promotion to a governed-asset source draft.
     "lessons.promote",
@@ -681,6 +685,9 @@ const EXPECTED: [&str; 565] = [
     "webhooks.delete",
     "webhooks.test",
     "webhooks.update",
+    // T14 (#561): the webscraper's two read actions.
+    "webscraper.scrape_bulk",
+    "webscraper.scrape_url",
     "workers.list",
     "workflows.create",
     "workflows.get",
@@ -810,7 +817,10 @@ fn the_registry_is_exactly_the_declared_set() {
     // internal 543 -> 546; external stays 18.
     // #655 (T17b) adds one internal read (`authoring.intakes`): internal 546 -> 547;
     // external stays 18 — the queue reads this tenant's own intake rows.
-    assert_eq!((internal, external), (547, 18));
+    // T14 (#561) adds five external reads (`webscraper.scrape_url|scrape_bulk`,
+    // `lean4.check|elaborate|prove`): internal stays 547, external 18 -> 23 — each call
+    // dispatches to a Rust service, not a new internal action.
+    assert_eq!((internal, external), (547, 23));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
