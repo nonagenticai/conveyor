@@ -4975,7 +4975,12 @@
    ],
    "failure_scenario": "A tenant wants to cap the copilot prompt; there is no prompt create or update action and no route exposing budget_chars, so the only route is direct SQL. Every compiled prompt is unbounded and an oversized prompt is sent rather than refused.",
    "acceptance": "An action can set and version prompt.budget_chars and prompt_section.budget_chars; with a tight ceiling the compile refuses with the measured size over the limit and makes no model call; a test sets a ceiling and asserts the refusal.",
-   "owner_project": "PLATFORM"
+   "owner_project": "PLATFORM",
+   "resolved_by": {
+    "commit": "1413157b0b2eb7ef5f2e75522bcda3f187504b46",
+    "test": "crates/actions/tests/prompt_recipes.rs::whole_prompt_budget_round_trips; crates/actions/tests/prompt_compile.rs::an_action_set_budget_refuses_over_budget",
+    "evidence": "cargo test -p conveyor-actions --test prompt_recipes: 8 passed; --test prompt_compile: 8 passed; --check-lock exit 0. prompt_recipes.create writes prompt.budget_chars and versions it; a tight ceiling is refused with the typed over-budget error before any model call."
+   }
   },
   {
    "id": "v1-p76-2",
