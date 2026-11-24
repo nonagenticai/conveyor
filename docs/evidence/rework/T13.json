@@ -52,7 +52,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a207b2-5d8c-7ecb-a7ad-af815b8fc70c (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+      "detail": "review 01a20e7e-7dc4-7569-bfaa-bc084615d3ea (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
       "id": "T13-review",
       "kind": "snapshot",
       "result": "pass",
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a2076b-29cc-7536-992c-4293a57c419b decided by a distinct approver",
+      "detail": "latest closure gate 01a20e7e-30c4-70a8-b100-74db10f197a5 decided by a distinct approver",
       "id": "T13-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -124,7 +124,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a2076b-52f9-78a7-a9da-ea7e3b4a8c18 carries a statement and evidence from the tranche-3 retro",
+      "detail": "lesson 01a20e7e-5f79-7724-98da-dc9c07c3ea2c carries a statement and evidence from the tranche-3 retro",
       "id": "T13-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -151,16 +151,16 @@
   ],
   "failures": [],
   "gate": "a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt",
-  "generated_at": "2026-11-23T21:01:16.618185+00:00",
+  "generated_at": "2026-11-24T17:10:35.199900+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T13.toml",
   "name": "Tool platform",
   "project": "T13",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T10:28:30.225766+00:00",
-    "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
-    "path": "retained-snapshot/f3bfa7ab7abf9f520d880e1816b50e6db2b86031"
+    "generated_at": "2026-11-24T17:09:25Z",
+    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
+    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
   },
   "verdict": "green",
   "warnings": []

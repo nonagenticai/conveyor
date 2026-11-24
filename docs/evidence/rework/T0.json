@@ -3,7 +3,7 @@
     {
       "check": "project",
       "description": "T0 is closed",
-      "detail": "project T0 is active",
+      "detail": "project T0 is closed",
       "id": "T0-project",
       "kind": "snapshot",
       "result": "pass",
@@ -124,16 +124,16 @@
   ],
   "failures": [],
   "gate": "The A\u2013D set is approved; the project re-closes through the one gate.",
-  "generated_at": "2026-11-23T21:01:16.000784+00:00",
+  "generated_at": "2026-11-24T17:10:34.584827+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T0.toml",
   "name": "Model and contracts",
   "project": "T0",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T10:28:30.225766+00:00",
-    "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
-    "path": "retained-snapshot/f3bfa7ab7abf9f520d880e1816b50e6db2b86031"
+    "generated_at": "2026-11-24T17:09:25Z",
+    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
+    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
   },
   "verdict": "green",
   "warnings": []

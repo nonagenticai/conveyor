@@ -3,7 +3,7 @@
     {
       "check": "project",
       "description": "T16 is closed",
-      "detail": "project T16 is closed",
+      "detail": "project T16 is active",
       "id": "T16-project",
       "kind": "snapshot",
       "result": "pass",
@@ -12,32 +12,32 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "no project baseline",
+      "detail": "baseline 01a20e7e-814e-761e-8176-6750e2a6eefc approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "T16-baseline",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d38-76fb-9394-b75934d16fcd\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "T16-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "",
       "stdout": ""
     },
     {
       "check": "closure_outputs",
       "description": "the declared closure outputs are declared and published",
-      "detail": "declared closure outputs are not published: closure-review",
+      "detail": "1 closure outputs published",
       "id": "T16-closure-outputs",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -61,10 +61,10 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "no approved closure gate for the project",
+      "detail": "latest closure gate 01a20e7e-8b26-77fd-ac15-57c255a9c6e1 decided by a distinct approver",
       "id": "T16-closure-gate",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -106,25 +106,25 @@
     {
       "check": "wsjf",
       "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
-      "detail": "no WBS deliverable carries the plan",
+      "detail": "6 WBS node(s) carry the four WSJF inputs",
       "id": "T16-wsjf",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "demo_credits",
       "description": "every accepted deliverable has a demo credit carrying its evidence",
-      "detail": "no accepted deliverable to demo",
+      "detail": "6 accepted deliverable(s), each with a demo credit",
       "id": "T16-demo-credits",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
       "id": "T16-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -133,55 +133,38 @@
     {
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "3 open P0 package(s): closed_without_closure_review:T16, std-pmp-change-control-t16:T16, std-pmp-project-baseline-t16:T16",
+      "detail": "no open P0 package for this project",
       "id": "T16-product",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T16-baseline' did not pass; the gate check 'T16-charter' did not pass; the gate check 'T16-closure-outputs' did not pass; the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-closure-gate' did not pass; the gate check 'T16-wsjf' did not pass; the gate check 'T16-demo-credits' did not pass; the gate check 'T16-product' did not pass",
+      "detail": "the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
       "result": "fail",
       "severity": "P0"
     }
   ],
   "failures": [
-    "T16-baseline (P0): no project baseline",
-    "T16-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-    "T16-closure-outputs (P0): declared closure outputs are not published: closure-review",
     "T16-contract (P0): no live board-approved delivery contract",
     "T16-review (P0): no Phase-G compliance review for the project's live contract",
-    "T16-closure-gate (P0): no approved closure gate for the project",
-    "T16-wsjf (P0): no WBS deliverable carries the plan",
-    "T16-demo-credits (P0): no accepted deliverable to demo",
-    "T16-product (P0): 3 open P0 package(s): closed_without_closure_review:T16, std-pmp-change-control-t16:T16, std-pmp-project-baseline-t16:T16",
-    "gate (P0): the gate check 'T16-baseline' did not pass; the gate check 'T16-charter' did not pass; the gate check 'T16-closure-outputs' did not pass; the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-closure-gate' did not pass; the gate check 'T16-wsjf' did not pass; the gate check 'T16-demo-credits' did not pass; the gate check 'T16-product' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
+    "gate (P0): the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass"
   ],
   "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds",
-  "generated_at": "2026-11-23T21:01:17.028078+00:00",
+  "generated_at": "2026-11-24T17:10:35.604507+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T16.toml",
   "name": "SOP, RDF/OWL and process-document ingestion",
   "project": "T16",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T10:28:30.225766+00:00",
-    "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
-    "path": "retained-snapshot/f3bfa7ab7abf9f520d880e1816b50e6db2b86031"
+    "generated_at": "2026-11-24T17:09:25Z",
+    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
+    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
   },
   "verdict": "red",
   "warnings": []
