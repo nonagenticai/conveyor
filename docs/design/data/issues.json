@@ -233,9 +233,9 @@
     {
       "number": 606,
       "title": "T19: decision forums \u2014 meetings as the decision forum",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/606",
-      "updatedAt": "2026-11-24T01:32:14Z",
+      "updatedAt": "2026-11-24T02:29:08Z",
       "labels": [
         {
           "name": "unit",
@@ -529,7 +529,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/569",
-      "updatedAt": "2026-11-24T00:58:13Z",
+      "updatedAt": "2026-11-24T02:05:21Z",
       "labels": [
         {
           "name": "programme",
