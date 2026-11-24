@@ -7777,7 +7777,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "mixed",
         "earliest_expires": "2027-02-18",
-        "entries": 12,
+        "entries": 13,
         "owners": [
           "programme owner"
         ]
@@ -7808,6 +7808,7 @@ window.CONVEYOR_REWORK = {
             "T11",
             "T16",
             "T5",
+            "T6",
             "T7",
             "T13",
             "T14",
@@ -7823,7 +7824,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§5.3",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 12,
+      "subject_count": 13,
       "subjects": [
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -7904,6 +7905,16 @@ window.CONVEYOR_REWORK = {
           "reason": null,
           "severity": "P1",
           "subject": "T5"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T6"
         },
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -29500,9 +29511,9 @@ window.CONVEYOR_REWORK = {
     },
     "SPEC": {
       "findings": 86,
-      "gaps": 42,
+      "gaps": 43,
       "p0": 0,
-      "p1": 9,
+      "p1": 10,
       "p2": 33,
       "packages": 105,
       "rules": 8,
@@ -29545,7 +29556,7 @@ window.CONVEYOR_REWORK = {
     "open": 324,
     "packages": 327,
     "resolved": 14,
-    "subjects": 431,
+    "subjects": 432,
     "suppressed": 3
   }
 };
