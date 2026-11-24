@@ -32,10 +32,12 @@ with the register) after the strict gate.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import copy
 import hashlib
 import html
 import importlib.util
+import io
 import json
 import re
 import sys
@@ -163,15 +165,27 @@ def pointer(document: Any, path: str) -> Any:
     return value
 
 
-def pointer_problems(std: dict[str, Any], snapshot: dict[str, Any]) -> list[str]:
+def pointer_defects(std: dict[str, Any], snapshot: dict[str, Any]) -> list[dict[str, Any]]:
     """Every declared row source must resolve against the snapshot it will be read with.
 
     A wrong `file` or a mistyped pointer used to be indistinguishable from a real data gap: the
     section rendered `absent` forever and the catalogue never failed. This gate makes the pointer
-    part of the contract. `--check` refuses on any problem; a generate run prints them as
-    warnings so the record still describes the snapshot honestly.
+    part of the contract. Each defect is structured (category, heading, source path, reason) so
+    the generator can emit a STANDARD finding for it; `--check` refuses on any defect, and a
+    generate run also prints the warnings so stderr still describes the snapshot honestly.
     """
-    problems: list[str] = []
+    defects: list[dict[str, Any]] = []
+
+    def add(category: str, heading: str, file: str, pointer: str, reason: str) -> None:
+        defects.append({
+            "category": category,
+            "heading": heading,
+            "file": file,
+            "pointer": pointer,
+            "source": f"{file}#{pointer}" if pointer else file,
+            "reason": reason,
+        })
+
     for category, template in sorted((std.get("templates") or {}).items()):
         for heading, sources in sorted((template.get("sources") or {}).items()):
             for source in sources:
@@ -194,13 +208,14 @@ def pointer_problems(std: dict[str, Any], snapshot: dict[str, Any]) -> list[str]
                 file = str(source.get("file") or "")
                 document = snapshot.get(Path(file).stem)
                 if document is None:
-                    problems.append(f"{category} / {heading}: no snapshot file {file!r}")
+                    add(category, heading, file, str(source.get("pointer") or ""),
+                        f"no snapshot file {file!r}")
                     continue
                 path = str(source.get("pointer") or "/")
                 if path in ("", "/"):
                     continue
                 if not path.startswith("/"):
-                    problems.append(f"{category} / {heading}: {path!r} is not a JSON pointer")
+                    add(category, heading, file, path, f"{path!r} is not a JSON pointer")
                     continue
                 value: Any = document
                 broken = False
@@ -210,24 +225,33 @@ def pointer_problems(std: dict[str, Any], snapshot: dict[str, Any]) -> list[str]
                         try:
                             value = value[int(part)]
                         except (ValueError, IndexError):
-                            problems.append(f"{category} / {heading}: {file}#{path} does not resolve")
+                            add(category, heading, file, path,
+                                f"{file}#{path} does not resolve")
                             broken = True
                             break
                     elif isinstance(value, dict):
                         if part not in value:
-                            problems.append(
-                                f"{category} / {heading}: {file}#{path} has no key {part!r}"
-                            )
+                            add(category, heading, file, path,
+                                f"{file}#{path} has no key {part!r}")
                             broken = True
                             break
                         value = value[part]
                     else:
-                        problems.append(f"{category} / {heading}: {file}#{path} is not a container")
+                        add(category, heading, file, path,
+                            f"{file}#{path} is not a container")
                         broken = True
                         break
                 if broken:
                     continue
-    return problems
+    return defects
+
+
+def pointer_problems(std: dict[str, Any], snapshot: dict[str, Any]) -> list[str]:
+    """The historical string form of `pointer_defects`, one line per defect."""
+    return [
+        f"{defect['category']} / {defect['heading']}: {defect['reason']}"
+        for defect in pointer_defects(std, snapshot)
+    ]
 
 
 def substitute(value: Any, subject: dict[str, Any], category: str, phase: str | None) -> Any:
@@ -1680,8 +1704,10 @@ def build_findings(
     instances: Iterable[dict[str, Any]],
     snapshot: dict[str, Any],
     covered_keys: set[str] | None = None,
+    standard_defect_categories: set[str] | None = None,
 ) -> list[dict[str, Any]]:
     covered_keys = covered_keys or set()
+    standard_defect_categories = standard_defect_categories or set()
     findings: list[dict[str, Any]] = []
     manifest = snapshot.get("manifest") or {}
     sha = str(manifest.get("git_sha") or "")
@@ -1713,6 +1739,11 @@ def build_findings(
             continue
         covered = coverage_key(artefact["category"], artefact, covered_keys)
         artefact["covered_key"] = covered
+        if artefact["category"] in standard_defect_categories:
+            # A source this category declares cannot resolve, so the STANDARD defect finding
+            # owns the category (one per broken source). A record package here would queue work
+            # no row or document can discharge until the pointer or the projection lands.
+            continue
         if covered and artefact["status"] == "absent":
             # The gap rule owns the whole artefact. The artefact record keeps the honest status
             # and links to that package; a second finding would be the same defect twice. A
@@ -1818,6 +1849,78 @@ def build_findings(
     return findings
 
 
+def pointer_defect_findings(
+    defects: list[dict[str, Any]], std: dict[str, Any], snapshot: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """One STANDARD finding per declared source that cannot resolve.
+
+    The pointer is the standard's own defect: no row or published document can satisfy the
+    heading until the source is corrected or projected, so the package must be STANDARD and the
+    artefact must stay partial or absent. The finding names the category, the heading and the
+    unresolvable source so the fix is a pointer edit, not a record hunt.
+    """
+    manifest = snapshot.get("manifest") or {}
+    sha = str(manifest.get("git_sha") or "")
+    if not re.fullmatch(r"[0-9a-f]{40}", sha):
+        sha = "0" * 40
+    findings: list[dict[str, Any]] = []
+    used: set[str] = set()
+    for defect in defects:
+        template = (std.get("templates") or {}).get(defect["category"]) or {}
+        base = "std-source-" + "-".join(
+            slug(part) for part in (defect["category"], defect["heading"], defect["source"])
+        )
+        identifier = base
+        duplicate = 2
+        while identifier in used:
+            identifier = f"{base}-{duplicate}"
+            duplicate += 1
+        used.add(identifier)
+        findings.append({
+            "id": identifier,
+            "area": defect["category"],
+            "category": defect["category"],
+            "heading": defect["heading"],
+            "source": defect["source"],
+            "reason": defect["reason"],
+            "standard": str(template.get("standard") or ""),
+            "spec": str(template.get("spec") or ""),
+            "severity": "P1",
+            "kind": "STANDARD",
+            "title": (
+                f"{template.get('standard') or 'STANDARD'} artefact standard: "
+                f"{defect['category']} / {defect['heading']} names an unresolvable source"
+            ),
+            "problem": (
+                f"The {defect['category']} template's {defect['heading']!r} section reads "
+                f"{defect['source']}, which cannot resolve against the snapshot: "
+                f"{defect['reason']}. The section therefore renders as an absent record, and no "
+                "row or document can evidence it until the standard's source is corrected."
+            ),
+            "evidence": [{
+                "source": "standard",
+                "path": "seed/output-standard.json",
+                "category": defect["category"],
+                "heading": defect["heading"],
+                "snapshot": [defect["file"], defect["pointer"]],
+            }],
+            "failure_scenario": (
+                f"The {defect['category']} artefact publishes or reports "
+                f"{defect['heading']!r} as missing rows while the source pointer itself is "
+                "broken, so record work is queued for a defect no record can discharge."
+            ),
+            "acceptance": (
+                f"Correct seed/output-standard.json's {defect['category']} / "
+                f"{defect['heading']} source {defect['source']}, or project the collection it "
+                "names; `python3 scripts/generate-standards.py --check` must then report no "
+                "finding for it."
+            ),
+            "owner_project": "PLATFORM",
+            "audited_sha": sha,
+        })
+    return findings
+
+
 def findings_document(findings: list[dict[str, Any]], snapshot: dict[str, Any]) -> dict[str, Any]:
     manifest = snapshot.get("manifest") or {}
     sha = str(manifest.get("git_sha") or "")
@@ -1828,9 +1931,10 @@ def findings_document(findings: list[dict[str, Any]], snapshot: dict[str, Any]) 
         "audited_sha": sha,
         "audited_at": str(manifest.get("generated_at") or "1970-01-01T00:00:00Z")[:10],
         "method": (
-            "generate-standards.py resolves every section of every applicable standards artefact "
-            "against the published snapshot, its documents and the artefact standard; only an "
-            "unresolved mandatory section becomes a finding."
+            "generate-standards.py resolves every declared source and every section of every "
+            "applicable standards artefact against the published snapshot, its documents and "
+            "the artefact standard; an unresolvable source or an unresolved mandatory section "
+            "becomes a finding."
         ),
         "findings": findings,
     }
@@ -2138,8 +2242,17 @@ def generate(
     covered_keys: set[str] | None = None,
     declared_phases: dict[str, str] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
+    defects = pointer_defects(std, snapshot)
+    defect_categories = {defect["category"] for defect in defects}
     instances, _ = build_instances(std, snapshot, outputs_dir, declared_phases, register=register)
-    findings = build_findings(instances, snapshot, covered_keys)
+    # A source that cannot resolve is a standard defect: the artefact that depends on it stays
+    # partial or absent, never evidenced by its other sources.
+    for artefact in instances:
+        if artefact["category"] in defect_categories and artefact["status"] == "evidenced":
+            artefact["status"] = "partial"
+    findings = build_findings(instances, snapshot, covered_keys, defect_categories)
+    findings.extend(pointer_defect_findings(defects, std, snapshot))
+    findings.sort(key=lambda item: (item["severity"], item["id"]))
     if register is not None:
         packages = [package for package in register.get("packages") or [] if isinstance(package, dict)]
         by_key = {str(package.get("key")): package for package in packages}
@@ -2732,6 +2845,59 @@ def self_test_section_cause(outputs: Path, fixture: dict[str, Any]) -> None:
     print("generate-standards: self-test case section-cause-decides-kind OK")
 
 
+def self_test_broken_source_finding(outputs: Path, std: dict[str, Any]) -> None:
+    """A source that cannot resolve is a STANDARD finding, and `--check` refuses it.
+
+    The broken source is added beside the heading's working document source, so the section
+    alone would still be evidenced: the artefact must not stay evidenced while one of its
+    declared sources is broken.
+    """
+    broken = copy.deepcopy(std)
+    broken["templates"]["vision"]["sources"]["Purpose"].append({
+        "kind": "rows", "file": "msp.json", "pointer": "/does-not-exist",
+    })
+    fixture = self_test_fixture()
+    defects = pointer_defects(broken, fixture)
+    assert any(
+        defect["category"] == "vision" and defect["heading"] == "Purpose"
+        for defect in defects
+    ), defects
+    document, findings = generate(broken, fixture, outputs)
+    named = [
+        row for row in findings["findings"]
+        if row.get("category") == "vision" and row.get("heading") == "Purpose"
+    ]
+    assert len(named) == 1, f"one finding per defect, got {named}"
+    finding = named[0]
+    assert finding["kind"] == "STANDARD", finding
+    assert finding["severity"] == "P1", finding
+    assert finding["source"] == "msp.json#/does-not-exist", finding
+    assert "has no key" in finding["reason"], finding
+    by_id = {artefact["id"]: artefact for artefact in document["artefacts"]}
+    vision = by_id.get("std-msp-vision-p0") or by_id.get("std-msp-vision-pg1")
+    assert vision is not None and vision["status"] == "partial", (
+        f"a broken source must keep the artefact out of evidenced, got {vision and vision['status']}"
+    )
+    # `--check` is the gate: with a current findings file the defect must still fail it.
+    with tempfile.TemporaryDirectory() as tmp:
+        snapshot_dir = Path(tmp) / "data"
+        snapshot_dir.mkdir()
+        findings_path = Path(tmp) / "standards-findings.json"
+        _, committed = generate(broken, fixture, outputs)
+        findings_path.write_text(
+            json.dumps(committed, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        stderr = io.StringIO()
+        with contextlib.redirect_stderr(stderr):
+            code = check(
+                broken, fixture, snapshot_dir, outputs, set(), findings_path=findings_path,
+            )
+        assert code == 1, f"--check must fail on a broken source, got {code}"
+        assert "vision / Purpose" in stderr.getvalue(), stderr.getvalue()
+    print("generate-standards: self-test case broken-source-finding OK")
+
+
 def self_test_computed_sources(fixture: dict[str, Any]) -> None:
     """The sources the W4 STANDARD packages depend on resolve from the record they name.
 
@@ -2841,6 +3007,7 @@ def self_test() -> int:
         self_test_demo_and_lessons_mandatory(outputs, std)
         self_test_gap_analysis(outputs, std)
         self_test_section_cause(outputs, fixture)
+        self_test_broken_source_finding(outputs, std)
     print(f"generate-standards: self-test OK ({len(document['artefacts'])} artefact instances)")
     return 0
 
