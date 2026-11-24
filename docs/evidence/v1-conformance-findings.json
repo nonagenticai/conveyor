@@ -1656,7 +1656,12 @@
    ],
    "failure_scenario": "Call job_catalogue.create (the only creation path, always draft), then job_releases.publish on the returned id: it returns 200 with a release hash. job_bindings.create pins that release and runs execute against a position no person ever curated or activated. No call can ever return 409 job_not_live, because no action changes status to active and no publish path checks for liveness.",
    "acceptance": "An activation/curation action moves draft\u2192active with a version and gate; job_releases.publish on a draft or retired job returns 409 job_not_live; publish on an active job succeeds; a test proves draft publication is refused.",
-   "owner_project": "T0"
+   "owner_project": "T0",
+   "resolved_by": {
+    "commit": "c472dff946874ab98dc9dedf975b3b6a1755f946",
+    "test": "crates/actions/tests/job_activation.rs::a_draft_job_cannot_be_published; crates/actions/tests/job_activation.rs::an_approved_activation_flips_draft_to_active_then_publish_succeeds",
+    "evidence": "cargo test -p conveyor-actions --test job_activation: 7 passed; --test release_layers: 6 passed; --test sop_ingestion: 13 passed. A job is born draft, activation opens a job_activation gate and the requester cannot decide it; only an active job publishes a release or is pinned by a binding (409 job_not_live)."
+   }
   },
   {
    "id": "v1-w1a-5",
@@ -1680,7 +1685,12 @@
    ],
    "failure_scenario": "Call runs.create with only {\"project_id\": <project>} (no job_binding_id, no release_hash). The run is inserted queued with job_binding_id=NULL and release_hash=NULL and executes; there is no binding to be stale, no release to be ready, and no job pin in the record, so the job_binding_stale, job_not_live and release_not_ready refusals cannot apply.",
    "acceptance": "A run that executes conveyor job work requires job_binding_id; an insert with no binding on the job path is refused before the INSERT (409/422 binding_required). Runs that are not job runs are explicitly typed and excluded from the job executor path. A test asserts no job run row can exist with NULL job_binding_id.",
-   "owner_project": "T0"
+   "owner_project": "T0",
+   "resolved_by": {
+    "commit": "fd44c64b6aa10ae538702ae3c055d501caa0c433",
+    "test": "crates/store/tests/run_binding.rs::a_job_run_without_a_binding_is_refused_before_the_insert; crates/actions/tests/card_binding.rs::a_run_on_an_unbound_card_is_refused",
+    "evidence": "cargo test -p conveyor-store --test run_binding: 3 passed; --test transitions: 4; --test s11_process: 14; -p conveyor-actions --test card_binding: 8; --test executor_runtime: 8; --test parity_http_mcp: 7. run.kind is typed, the DB CHECK refuses a job row with no binding, the store refuses pre-INSERT (422 binding_required), and a child inherits its parent's kind."
+   }
   },
   {
    "id": "v1-w1b-3",
@@ -4506,7 +4516,12 @@
    ],
    "failure_scenario": "A tenant activates thousands of jobs. An operator asks for delivery's backend jobs and receives the entire catalogue in one uncursored response, so the console truncates or times out and the promised search is impossible.",
    "acceptance": "list accepts code, capability and department filters plus limit and cursor and returns next_cursor; a test inserts more than one page and asserts each filter and the page bound.",
-   "owner_project": "T0"
+   "owner_project": "T0",
+   "resolved_by": {
+    "commit": "c472dff946874ab98dc9dedf975b3b6a1755f946",
+    "test": "crates/actions/tests/job_catalogue_list.rs::the_page_bound_and_next_cursor_hold; crates/actions/tests/job_catalogue_list.rs::each_filter_selects_only_its_jobs; crates/actions/tests/job_catalogue_list.rs::a_bad_cursor_is_refused",
+    "evidence": "cargo test -p conveyor-actions --test job_catalogue_list: 6 passed. job_catalogue.list filters by code/capability/department, keyset-paginates with a bounded page and next_cursor, and refuses a bad cursor 422 invalid_cursor."
+   }
   },
   {
    "id": "v1-p52-1",
@@ -4732,7 +4747,12 @@
    ],
    "failure_scenario": "The PM needs delivery binding J-4 to do WP-3 and calls cards.create. The row lands with job_binding_id NULL and no acceptance, and any delivery binding with cards:write can claim it; the run starts with no binding, so which job was asked, and what done means, is unrecorded and unauditable.",
    "acceptance": "A handoff action (cards.assign, or a binding on create) requires an active job_binding_id plus artefact ids and acceptance criteria, writes card.job_binding_id, emits an event and is exposed on CardOut; moving a delivery card into a work lane without a binding is refused 422; a test proves the binding reaches the run.",
-   "owner_project": "T0"
+   "owner_project": "T0",
+   "resolved_by": {
+    "commit": "73480d98b3bf645e169816b367a08ebee252076b",
+    "test": "crates/actions/tests/card_handoff.rs::a_handoff_without_acceptance_is_refused; crates/actions/tests/card_handoff.rs::a_handoff_without_artefacts_is_refused; crates/actions/tests/card_handoff.rs::moving_an_unbound_delivery_card_into_active_is_refused",
+    "evidence": "cargo test -p conveyor-actions --test card_handoff: 17 passed. cards.assign requires acceptance and artefacts and persists them under card.meta.handoff; a delivery card entering Active with no job_binding_id is refused 422 card_unassigned."
+   }
   },
   {
    "id": "v1-p61-1",
