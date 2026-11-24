@@ -404,7 +404,10 @@ mod tests {
                 (99, "step decisions".to_owned()),
                 // #526 (v1-p102-1): the laya config default and its hard-budget check
                 // (0100_laya_timeout_default.sql).
-                (100, "laya timeout default".to_owned())
+                (100, "laya timeout default".to_owned()),
+                // #526 (v1-p61-2): the status_report governed-asset kind
+                // (0101_status_report_asset_kind.sql).
+                (101, "status report asset kind".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
