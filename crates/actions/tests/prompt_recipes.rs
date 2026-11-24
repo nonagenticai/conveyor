@@ -355,6 +355,19 @@ async fn whole_prompt_budget_round_trips() {
     assert_eq!(status, 200, "{response}");
     assert_eq!(output(&response)["budget_chars"], 4096, "{response}");
 
+    // One draft per key: the v1 draft must be active before v2 can be created.
+    let (status, response) = running
+        .invoke(
+            "prompt_recipes.activate",
+            TOKEN,
+            json!({"key": "agent_budget", "version": 1}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{response}");
+
     // A version is immutable: changing the ceiling is the next version, not an edit in place.
     let mut body = recipe("agent_budget", "Budgeted agent v2");
     body["budget_chars"] = json!(1024);
