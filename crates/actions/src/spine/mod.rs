@@ -1743,28 +1743,33 @@ async fn baselines_take(
             "kind must be scope, schedule or cost",
         ));
     }
+    baseline_change_guard(&mut *tx, &ctx, input.project_id, &kind, input.change_id).await?;
     let record =
-        take_baseline_guarded(&mut *tx, &ctx, input.project_id, &kind, input.change_id).await?;
+        take_baseline_linked(&mut *tx, &ctx, input.project_id, &kind, input.change_id).await?;
     emit_spine_event(&mut *tx, &ctx, "project_baseline", record.id, "created").await?;
     Ok(HandlerOutput::created(baseline_out(&record)).with_etag(etag_of(record.version)))
 }
 
-/// Take a baseline under T3's change guard: an approved baseline of the same kind advances only
-/// through a change request whose `change` gate an approver has decided. The change row and the
-/// new baseline cite each other (`change_id` on the baseline, `meta.baseline_id` on the change).
+/// Refuse a new baseline of `kind` under T3's change guard: an approved baseline of the same
+/// kind advances only through a change request whose `change` gate an approver has decided.
+///
+/// This is the guard half of a re-baseline, split out because a caller with its own writes
+/// (`pm.plan`'s WBS rows) must run it BEFORE those writes: a refusal after the inserts would
+/// leave a plan without a baseline. Take the baseline with [`take_baseline_linked`] in the
+/// same transaction once the guard passes.
 ///
 /// The approval is the second principal's decision, NEVER the row's self-declared `status`:
 /// `registers.create`/`update` write any status, so a status read would let any
 /// `portfolio:write` caller approve its own change and re-baseline (§8.4). The guard reads
 /// [`store::spine::change_is_approved_tx`], the same approval the decide path writes.
-async fn take_baseline_guarded(
+pub(crate) async fn baseline_change_guard(
     tx: &mut PgConnection,
     ctx: &HandlerCtx,
     project_id: Uuid,
     kind: &str,
     change_id: Option<Uuid>,
-) -> Result<store::spine::BaselineRecord, ActionError> {
-    let action = "baselines.take";
+) -> Result<(), ActionError> {
+    let action = ctx.action;
     if let Some(previous) =
         store::spine::latest_approved_baseline_tx(tx, ctx.tenant, project_id, kind)
             .await
@@ -1807,6 +1812,20 @@ async fn take_baseline_guarded(
             "there is no approved baseline of this kind to change",
         ));
     }
+    Ok(())
+}
+
+/// Take a baseline and, when the caller cites one, link the change request to the new row
+/// (`change_id` on the baseline, `meta.baseline_id` on the change). The take half of a
+/// re-baseline; [`baseline_change_guard`] must have passed in the same transaction.
+pub(crate) async fn take_baseline_linked(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    project_id: Uuid,
+    kind: &str,
+    change_id: Option<Uuid>,
+) -> Result<store::spine::BaselineRecord, ActionError> {
+    let action = ctx.action;
     let record =
         store::spine::take_baseline_tx(tx, ctx.tenant, project_id, kind, ctx.actor_id, change_id)
             .await

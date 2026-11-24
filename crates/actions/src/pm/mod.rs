@@ -469,6 +469,11 @@ pub struct PmPlanIn {
     /// `scope | schedule | cost`; `scope` when absent.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub baseline_kind: Option<String>,
+    /// The approved change request that names the baseline this plan replaces (§6.1). Required
+    /// when the project already holds an approved baseline of `baseline_kind`; an initial
+    /// baseline needs none.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
 }
 
 /// `pm.plan`'s result.
@@ -499,7 +504,15 @@ async fn pm_plan(
     input: PmPlanIn,
 ) -> Result<HandlerOutput<PmPlanOut>, ActionError> {
     assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
-    plan_project(tx, &ctx, input.project_id, input.wbs, input.baseline_kind).await
+    plan_project(
+        tx,
+        &ctx,
+        input.project_id,
+        input.wbs,
+        input.baseline_kind,
+        input.change_id,
+    )
+    .await
 }
 
 /// `projects.baseline` — the charter-gated plan without a PM job binding.
@@ -516,6 +529,10 @@ pub struct ProjectBaselineIn {
     /// `scope | schedule | cost`; `scope` when absent.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub baseline_kind: Option<String>,
+    /// The approved change request that names the baseline this plan replaces (§6.1); required
+    /// only when the project already holds an approved baseline of `baseline_kind`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
 }
 
 #[crate::action(
@@ -534,7 +551,15 @@ async fn projects_baseline(
     ctx: HandlerCtx,
     input: ProjectBaselineIn,
 ) -> Result<HandlerOutput<PmPlanOut>, ActionError> {
-    plan_project(tx, &ctx, input.project_id, input.wbs, input.baseline_kind).await
+    plan_project(
+        tx,
+        &ctx,
+        input.project_id,
+        input.wbs,
+        input.baseline_kind,
+        input.change_id,
+    )
+    .await
 }
 
 /// The charter-gated plan shared by `pm.plan` and `projects.baseline`: WBS nodes, the baseline
@@ -545,6 +570,7 @@ async fn plan_project(
     project_id: Uuid,
     wbs: Vec<PmWbsNode>,
     baseline_kind: Option<String>,
+    change_id: Option<Uuid>,
 ) -> Result<HandlerOutput<PmPlanOut>, ActionError> {
     let charter_gate = approved_gate(&mut *tx, ctx.tenant, project_id, "charter").await?;
     let Some(_charter_gate) = charter_gate else {
@@ -554,6 +580,17 @@ async fn plan_project(
             "the charter gate must be approved before the project can be planned",
         ));
     };
+    let kind = baseline_kind.unwrap_or_else(|| "scope".to_owned());
+    if !matches!(kind.as_str(), "scope" | "schedule" | "cost") {
+        return Err(ActionError::new(
+            422,
+            "unknown_kind",
+            "baseline_kind must be scope, schedule or cost",
+        ));
+    }
+    // §6.1: replacing an approved baseline needs a named, approved change request. The guard
+    // runs BEFORE the WBS inserts so a refused re-plan writes nothing — no duplicate WBS.
+    crate::spine::baseline_change_guard(&mut *tx, ctx, project_id, &kind, change_id).await?;
     let mut wbs_ids = Vec::with_capacity(wbs.len());
     for node in &wbs {
         let parent_id = match node.parent_index {
@@ -603,21 +640,8 @@ async fn plan_project(
         })?;
         wbs_ids.push(row.id);
     }
-    let kind = baseline_kind.unwrap_or_else(|| "scope".to_owned());
-    if !matches!(kind.as_str(), "scope" | "schedule" | "cost") {
-        return Err(ActionError::new(
-            422,
-            "unknown_kind",
-            "baseline_kind must be scope, schedule or cost",
-        ));
-    }
     let baseline =
-        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, project_id, &kind, ctx.actor_id, None)
-            .await
-            .map_err(|error| {
-                tracing::error!(%error, "pm.plan: take baseline");
-                ActionError::internal()
-            })?;
+        crate::spine::take_baseline_linked(&mut *tx, ctx, project_id, &kind, change_id).await?;
     let approval_id = open_gate(
         &mut *tx,
         ctx,
