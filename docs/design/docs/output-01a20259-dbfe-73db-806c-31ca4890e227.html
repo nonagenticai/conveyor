@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S04 Requirements Catalogue - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: S04 Requirements Catalogue</li>
+<li>Phase: a</li>
+<li>Purpose: State the functional and non-functional requirements S04 must satisfy, with the proof each demands.</li>
+<li>Scope: Derived from the S04 plan's declaration, invocation/MCP and OpenAPI/ingest sections; 16 internal and four external actions are in scope.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Functional / ACT-01 Action manifest</strong> - {"detail": "ETag/If-None-Match wraps it and returns 304 on a match.", "objective": "GET /api/actions returns ActionManifest {actions:[{name,version,kind,spec_hash,scopes,idempotent,timeout_ms}], generated_at}."}</li>
+<li><strong>Functional / ACT-02 Invocation route</strong> - {"detail": "A spec_exempt fallback at /api/actions/{name}/invocations returns action-not-found.", "objective": "POST /api/actions/&lt;literal name&gt;/invocations accepts {input} and returns {output}."}</li>
+<li><strong>Functional / ACT-03 Internal actions</strong> - {"detail": "Each declares input/output schema, scope, idempotency and timeout.", "objective": "Provide 16 internal actions: actions.list, actions.describe, me.get, tenants.get, tenants.update_settings, members.list, members.set_role, departments.list, departments.create, audit.list, jobs.list, jobs.retry, schedules.list, schedules.upsert, events.list, licences.get."}</li>
+<li><strong>Functional / ACT-04 External fixtures</strong> - {"detail": "They are served by the external_actions.rs stub at CONVEYOR_EXTERNAL_FIXTURES_URL.", "objective": "Ingest four external actions from crates/actions/tests/fixtures/external/openapi.json: fixtures.echo, fixtures.slow, fixtures.fail, fixtures.timeout."}</li>
+<li><strong>Non-functional / NFR-01 HTTP/MCP parity</strong> - {"detail": "With request_id and duration_ms stripped, http.body equals mcp.structuredContent.", "objective": "All 20 actions behave identically over HTTP and MCP."}</li>
+<li><strong>Non-functional / NFR-02 Idempotent replay</strong> - {"detail": "Two identical POSTs with one key return the same status and body and leave one action_invocation; the loser replays the winner.", "objective": "Idempotency-Key is scoped (tenant_id, action name, key) and claimed by INSERT ... ON CONFLICT DO NOTHING."}</li>
+<li><strong>Non-functional / NFR-03 Timeout isolation</strong> - {"detail": "A timeout rolls the invocation transaction back; a separate short transaction records action_invocation(outcome='timeout') and audit_event(status='error').", "objective": "SET LOCAL statement_timeout = timeout_ms plus tokio::time::timeout bound every invocation."}</li>
+<li><strong>Non-functional / NFR-04 External failure mapping</strong> - {"detail": "4xx becomes action-external-refused, never a 500; 5xx becomes 502 action-upstream-failed; five failures in 30 s open the breaker (503 action-circuit-open, no upstream call).", "objective": "Map external outcomes to stable RFC 9457 problems."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-24T10:10:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

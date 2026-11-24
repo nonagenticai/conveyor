@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Requirements Catalog — DESIGN-PUBLISH - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Requirements Catalog — DESIGN-PUBLISH</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: State the conditions the published pack must meet, each with the gate that refuses it, so done is a check and not an opinion.</li>
+<li>Scope: The pack's own gates in docs/design/scripts and the design-pack job of .github/workflows/ci-public.yml, measured 2026-11-21.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>R1 offline entry / studio.html opens from file:// with local assets and fonts; no build, server or account</strong> - node docs/design/scripts/check-studio.cjs</li>
+<li><strong>R2 snapshot integrity / every manifest file exists and its bytes hash to the manifest value; snapshot.js is a valid window.CONVEYOR_SNAPSHOT assignment</strong> - node docs/design/scripts/check-data.cjs</li>
+<li><strong>R3 redaction / no email, credential-shaped string, private key, private IP or home path in any data file; secrets.json is metadata only</strong> - node docs/design/scripts/check-data.cjs</li>
+<li><strong>R4 index and pages agree / every committed output-*.html is named by outputs.js and every entry's path resolves</strong> - node docs/design/scripts/check-outputs.cjs (#516); a placeholder index with committed pages is a regression</li>
+<li><strong>R5 documents rendered from the tree / every docs/</strong>/*.md is one standalone HTML page, listed in documents.json with its sha256** - python3 docs/design/scripts/build-docs.py --check</li>
+<li><strong>R6 signed-out silence / a signed-out pack makes zero API requests; 401 and 412 are rendered, and a missing asset is served no-store rather than cached as a 404</strong> - node docs/design/scripts/check-console.cjs</li>
+<li><strong>R7 coverage is derived / coverage.json still matches the tree; an uncovered project fails the gate</strong> - python3 scripts/build-coverage.py --check</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Publish the SPEC_V2 studio design pack, live · conveyor output · published 2026-11-24T10:10:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

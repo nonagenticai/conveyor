@@ -140,10 +140,30 @@
       "gap": null
     },
     "T6": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "tables": [
+        "development_project",
+        "development_step",
+        "development_closure"
       ],
-      "gap": "no development-project path over conveyor and a dependency repo"
+      "actions": [
+        "development_projects.change_judging_surface",
+        "development_projects.charter",
+        "development_projects.close",
+        "development_projects.deploy_gate",
+        "development_projects.get",
+        "development_projects.merge_gate",
+        "development_projects.record_step",
+        "development_projects.review_gate",
+        "development_projects.rollback"
+      ],
+      "modules": [
+        "development"
+      ],
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "migrations/0068_development_project.sql"
+      ],
+      "gap": null
     },
     "T7": {
       "actions": [
@@ -174,7 +194,22 @@
     "T8": {
       "tables": [
         "lesson"
-      ]
+      ],
+      "actions": [
+        "lessons.promote",
+        "lessons.propose",
+        "lessons.review"
+      ],
+      "modules": [
+        "crates/actions/src/lesson.rs",
+        "crates/store/src/lesson.rs"
+      ],
+      "evidence": [
+        "migrations/0069_lesson_lifecycle.sql",
+        "crates/actions/tests/lessons.rs",
+        "crates/store/tests/lesson.rs"
+      ],
+      "gap": null
     },
     "T9": {
       "tables": [
@@ -290,10 +325,33 @@
       "gap": null
     },
     "T15": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "actions": [
+        "tool_authoring.draft",
+        "tool_authoring.promote",
+        "tool_authoring.publish",
+        "tool_authoring.review",
+        "tool_authoring.test",
+        "tool_authoring.validate",
+        "toolkits.discover_mcp",
+        "toolkits.import_openapi",
+        "toolkits.register_mcp",
+        "tools.dispatch"
       ],
-      "gap": "no tool authoring, OpenAPI draft import or BYO tool binding"
+      "modules": [
+        "crates/actions/src/tool_authoring.rs",
+        "crates/store/src/tool_authoring.rs"
+      ],
+      "tables": [
+        "tool_source",
+        "tool_promotion"
+      ],
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "crates/actions/tests/tool_authoring.rs",
+        "crates/actions/tests/byo_tools.rs",
+        "migrations/0070_tool_authoring.sql"
+      ],
+      "gap": null
     },
     "T16": {
       "actions": [
@@ -355,6 +413,8 @@
       ],
       "evidence": [
         "docs/plans/T19-decision-forums.md",
+        "docs/plans/T19/evidence.md",
+        "docs/plans/T19/closure-review.md",
         "docs/SPEC_V2.md"
       ],
       "gap": null

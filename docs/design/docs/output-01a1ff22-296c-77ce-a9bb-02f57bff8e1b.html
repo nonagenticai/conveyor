@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>PI plan — tranche 0 (retrospective) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>PI plan — tranche 0 (retrospective)</h1>
+<h2>Objectives</h2>
+<p>The tranche-0 exit criteria, restated as this PI's objectives: every project in tranche 0 (P0,
+PLATFORM, DESIGN-PUBLISH, SPEC-V2, S00, S01, T0) meets its acceptance with published evidence, and
+the tranche review records continue, pause or stop. The seven deliverables below are the WBS nodes
+that carry those objectives.</p>
+<h2>Plan</h2>
+<table><thead><tr><th>project</th><th>deliverable</th><th>business value</th><th>time criticality</th><th>risk reduction</th><th>job size</th></tr></thead><tbody>
+<tr><td>P0</td><td>the programme definition set, verified at the branch SHA</td><td>8</td><td>8</td><td>5</td><td>15</td></tr>
+<tr><td>PLATFORM</td><td>the standing platform record (charter and baseline)</td><td>5</td><td>5</td><td>3</td><td>6</td></tr>
+<tr><td>DESIGN-PUBLISH</td><td>the published design pack with its closure review</td><td>5</td><td>5</td><td>3</td><td>12</td></tr>
+<tr><td>SPEC-V2</td><td>the adopted specification and its closure record</td><td>8</td><td>5</td><td>3</td><td>12</td></tr>
+<tr><td>S00</td><td>the usage inventory and its evidence record</td><td>5</td><td>5</td><td>3</td><td>12</td></tr>
+<tr><td>S01</td><td>the UI-stack decision record</td><td>3</td><td>5</td><td>3</td><td>13</td></tr>
+<tr><td>T0</td><td>the model and contracts record</td><td>8</td><td>5</td><td>3</td><td>12</td></tr>
+</tbody></table>
+<h2>WSJF order</h2>
+<p>The four inputs are typed integers: business value is the contribution to B1 (auditable decisions);
+time criticality is the tranche-0 review dependency; risk reduction is the conformance P0 count the
+project closes; job size is the number of checks in its acceptance manifest. The score is computed
+from those inputs, never stored.</p>
+<p>Order: PLATFORM 2.17, P0 1.40, SPEC-V2 1.33, T0 1.33, DESIGN-PUBLISH 1.08, S00 1.08, S01 0.85.
+P0 is taken before PLATFORM in the batch because the other six cite its definition set; that
+dependency is the one exception to the order.</p>
+<h2>Capacity and WIP</h2>
+<p>WIP limit 7 — the tranche's project count. The programme has one review board and one executor; the
+plan takes all seven, in the order above, and takes no project beyond them.</p>
+<h2>Evidence</h2>
+<ul>
+<li>cadence rows <code>01a1ff21-33f0-7e5a-bafc-b09b6fc73c13</code> (pi) and <code>01a1ff21-547f-73e8-b256-4bee7fdc9c70</code>
+(refinement), recorded 2026-11-21</li>
+<li>the seven acceptance manifests under <code>acceptance/programme/</code> and their runs in <code>docs/evidence/rework/</code></li>
+<li>the tranche-0 review of 2026-11-17 and the delegation extension <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code></li>
+</ul>
+<h2>Dependencies</h2>
+<p>P0's definition set is the input to the other six; the tranche-0 review is the gate the whole PI is
+judged by.</p>
+<h2>Links</h2>
+<p>Issue #526; <code>docs/plans/P0-programme-definition.md</code>; <code>acceptance/programme/</code>.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-24T10:10:00Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

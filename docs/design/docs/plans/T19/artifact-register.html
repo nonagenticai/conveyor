@@ -131,11 +131,116 @@
 <td>evidence</td>
 <td>G / capability</td>
 <td>published</td>
-<td>1</td>
+<td>3</td>
 <td>programme-manager</td>
 <td>Architecture Board</td>
-<td>2026-11-23</td>
+<td>2026-11-24</td>
 <td><code>docs/plans/T19/evidence.md</code></td>
+</tr>
+<tr>
+<td>T19-A8</td>
+<td>Closure review</td>
+<td>closure-review</td>
+<td>G / capability</td>
+<td>published</td>
+<td>2</td>
+<td>programme-manager</td>
+<td>Architecture Board</td>
+<td>2026-11-24</td>
+<td><code>docs/plans/T19/closure-review.md</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="typed-togaf-rows-live-t9-repository-deployed-7e617673-2026-11-24">Typed TOGAF rows (live, T9 repository, deployed <code>7e617673</code>, 2026-11-24)</h2>
+<p>The seven mandatory artefacts are now rows in <code>architecture_artifact</code>, approved by the tenant's <code>conveyor-approver</code> seat under the standing delegation <code>01a1fb9f-ac2d-732d-b274-1079be3dd2b3</code>; entries are the tables in <code>docs/plans/T19/architecture-design.md</code>. Read-back: <code>python3 scripts/t19-governance-chain.py --check</code>; per-act evidence in <code>docs/evidence/t19/gov/</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Artefact id</th>
+<th>Phase / plateau</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>requirements_catalog</code></td>
+<td><code>01a20cde-371c-7d85-ae2d-780453958bef</code></td>
+<td>A / PSA</td>
+<td>approved</td>
+</tr>
+<tr>
+<td><code>stakeholder_map</code></td>
+<td><code>01a20cdd-e71f-7d06-8ca5-701ff6b7d69e</code></td>
+<td>A / PSA</td>
+<td>approved</td>
+</tr>
+<tr>
+<td><code>driver_goal_objective</code></td>
+<td><code>01a20cde-0f97-7f74-afd8-7cd74e0990e3</code></td>
+<td>A / PSA</td>
+<td>approved</td>
+</tr>
+<tr>
+<td><code>solution_concept</code></td>
+<td><code>01a20cde-5f86-7720-9a16-36a964ef255d</code></td>
+<td>A / PSA</td>
+<td>approved</td>
+</tr>
+<tr>
+<td><code>business_capability_map</code></td>
+<td><code>01a20cde-86d7-7257-a45e-b4731ab423a4</code></td>
+<td>B / HLD</td>
+<td>approved</td>
+</tr>
+<tr>
+<td><code>data_entity_catalog</code></td>
+<td><code>01a20cde-adbf-7626-9b2b-58faf7164755</code></td>
+<td>C / HLD</td>
+<td>approved</td>
+</tr>
+<tr>
+<td><code>technology_standards</code></td>
+<td><code>01a20cde-d6bd-7cfe-88ad-42a1e6db30a7</code></td>
+<td>D / HLD</td>
+<td>approved</td>
+</tr>
+</tbody>
+</table>
+<p>Seven <code>architecture_artifact_link</code> edges connect them (derivation from the goals to the requirements and the solution concept; realization of the data entities and the capability map; dependency of the stakeholder map; realization of both on the technology standards).</p>
+<table>
+<thead>
+<tr>
+<th>Artefact</th>
+<th>Id</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Statement of Architecture Work — T19 (contract, phase A)</td>
+<td><code>01a20ce0-5183-776c-84bd-327f2301b19b</code></td>
+<td>live, board decision <code>01a20ce0-644d-7340-a696-1af10fa8c61e</code></td>
+</tr>
+<tr>
+<td>Delivery contract — T19 (contract, phase F)</td>
+<td><code>01a20cea-91bb-77f4-a880-044c90bb5f0e</code></td>
+<td>live, board decision <code>01a20cea-a68f-7e08-8d0c-399759ef16e0</code></td>
+</tr>
+<tr>
+<td>Phase-G compliance review (SoAW)</td>
+<td>recorded 2026-11-24</td>
+<td><code>conformant</code></td>
+</tr>
+<tr>
+<td>Phase-G compliance review (delivery contract)</td>
+<td>recorded 2026-11-24</td>
+<td><code>conformant</code></td>
+</tr>
+<tr>
+<td>Architecture artifact — the typed TOGAF set (published output)</td>
+<td><code>01a20ce4-73e4-7009-9ec7-eb2265e9e84e</code></td>
+<td>published (Metadata / Entries / Links / Document)</td>
 </tr>
 </tbody>
 </table>
@@ -199,7 +304,7 @@
 </tbody>
 </table>
 <h2 id="review">Review</h2>
-<p>The set is reviewed together on 2026-11-30. An artefact missing its owner, reviewer, review date or document is refused at the review; an approved artefact is superseded, never edited in place. The future T9 import maps each row to <code>architecture_artifact</code> + <code>architecture_artifact_entry</code> + <code>architecture_artifact_link</code>; the document becomes the published body.</p>
+<p>The set is reviewed together on 2026-11-30. An artefact missing its owner, reviewer, review date or document is refused at the review; an approved artefact is superseded, never edited in place. The T9 import has happened: the seven mandatory rows above are live and approved, the documents are published, and the remaining register rows are the repository's markdown sources until each is published as its own output.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/plans/T19/artifact-register.md</code> at build time.</span>

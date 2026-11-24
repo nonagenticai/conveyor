@@ -585,6 +585,33 @@ async fn seed_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     .await
 }
 
+/// A chartered development project for the `development_projects.*` samples (T6, #80).
+///
+/// Each round gets its own project + charter, and the implementer is the fixture's alice (a
+/// member), so every sample reaches the rule it is sampling rather than a membership refusal.
+/// The gates then assert their own precondition (`ci_missing`, `merge_missing`, `steps_missing`);
+/// the successful delivery path has its own suite (`development_project.rs`).
+async fn seed_parity_development_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let project = seed_project(pg, ctx).await;
+    let lane = format!("issue/parity-{}", Uuid::now_v7().simple());
+    scoped(pg, ctx, async |conn| {
+        sqlx::query_scalar(
+            "INSERT INTO development_project
+                 (tenant_id, project_id, repo, lane, implementer_id, acceptance_command)
+             VALUES ($1, $2, 'nonagenticai/conveyor', $3, $4, 'cargo test')
+             RETURNING id",
+        )
+        .bind(ctx.tenant_id)
+        .bind(project)
+        .bind(lane)
+        .bind(ctx.alice_user)
+        .fetch_one(&mut *conn)
+        .await
+        .expect("prepared development project")
+    })
+    .await
+}
+
 /// A CLOSED project carrying the retrospective's `rework` verdict, for `projects.reopen`:
 /// each round gets its own row, so the reopen is a real transition in both rounds.
 async fn seed_reopenable_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
@@ -2062,8 +2089,154 @@ async fn seed_arch_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     project
 }
 
+/// Seed one valid tool draft (T15's parity fixtures): one closed read operation.
+async fn seed_tool_draft(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let key = format!("parity_tool_{}", Uuid::now_v7().simple());
+    let meta = json!({
+        "toolkit": {
+            "key": key,
+            "title": "Parity tool",
+            "service": key,
+            "owner": "tenant",
+            "auth_adapter": "bearer",
+            "catalog": "tenant"
+        },
+        "source": {
+            "kind": "openapi",
+            "key": key,
+            "base_url": "http://127.0.0.1:9",
+            "credential_alias": null,
+            "egress": ["127.0.0.1"]
+        },
+        "source_id": null,
+        "operations": [{
+            "key": "ping",
+            "method": "POST",
+            "path": "/ping",
+            "mcp_tool": null,
+            "summary": "",
+            "input_schema": {
+                "type": "object",
+                "properties": {"message": {"type": "string"}},
+                "required": ["message"],
+                "additionalProperties": false
+            },
+            "output_schema": null,
+            "effect": null,
+            "idempotency": null,
+            "timeout_secs": 30,
+            "redact": [],
+            "egress": []
+        }]
+    });
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant)
+        .await
+        .expect("scope the tool draft");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO governed_asset (tenant_id, kind, key, title, body, status, meta)
+         VALUES ($1, 'tool_draft', $2, 'Parity tool draft', '', 'draft', $3) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(&key)
+    .bind(meta)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("seed the tool draft");
+    tx.commit().await.expect("commit the tool draft");
+    id
+}
+
+/// Seed a registered OpenAPI source — what an MCP discovery refuses by kind.
+async fn seed_openapi_source(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let key = format!("parity_source_{}", Uuid::now_v7().simple());
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant)
+        .await
+        .expect("scope the source");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO tool_source (tenant_id, key, title, kind, base_url, auth_adapter, egress)
+         VALUES ($1, $2, 'Parity source', 'openapi', 'http://127.0.0.1:9', 'none',
+                 '[\"127.0.0.1\"]'::jsonb)
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(&key)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("seed the source");
+    tx.commit().await.expect("commit the source");
+    id
+}
+
+/// Seed a published tenant toolkit and a development project with an approved review.
+async fn seed_promotion_fixture(pg: &support::Pg, ctx: &Ctx) -> (Uuid, Uuid) {
+    let key = format!("parity_promote_{}", Uuid::now_v7().simple());
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant)
+        .await
+        .expect("scope the promotion fixture");
+    let project: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name) VALUES ($1, $2, 'Parity promotion')
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(format!("PAR-{}", Uuid::now_v7().simple()))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("seed the project");
+    let development: Uuid = sqlx::query_scalar(
+        "INSERT INTO development_project (tenant_id, project_id, repo, lane, implementer_id,
+                                          acceptance_command)
+         VALUES ($1, $2, 'nonagenticai/conveyor', 'issue/parity', $3, 'cargo test') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(project)
+    .bind(ctx.alice_user)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("seed the development project");
+    sqlx::query(
+        "INSERT INTO approval (tenant_id, project_id, gate, kind, status, required_decisions, meta)
+         VALUES ($1, $2, 'development_projects.review', 'development', 'approved', 1, $3)",
+    )
+    .bind(ctx.tenant_id)
+    .bind(project)
+    .bind(json!({"development_project_id": development.to_string()}))
+    .execute(&mut *tx)
+    .await
+    .expect("seed the review gate");
+    let toolkit: Uuid = sqlx::query_scalar(
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, owner, status, meta)
+         VALUES ($1, $2, 1, 'Parity tenant toolkit', $3, 'tenant', 'published', $4) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(&key)
+    .bind(&key)
+    .bind(json!({"catalog": "tenant"}))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("seed the toolkit");
+    tx.commit().await.expect("commit the promotion fixture");
+    (toolkit, development)
+}
+
 async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
     match sample.name {
+        // ── T15: tool authoring and BYO ───────────────────────────────────────────────────
+        "tool_authoring.validate"
+        | "tool_authoring.test"
+        | "tool_authoring.review"
+        | "tool_authoring.publish" => {
+            let draft = seed_tool_draft(pg, ctx).await;
+            ctx.push(sample.name, draft);
+        }
+        "tool_authoring.promote" => {
+            let (toolkit, development) = seed_promotion_fixture(pg, ctx).await;
+            ctx.push("toolkit_id", toolkit);
+            ctx.push("development_project_id", development);
+        }
+        "toolkits.discover_mcp" => {
+            let source = seed_openapi_source(pg, ctx).await;
+            ctx.push(sample.name, source);
+        }
         // ── T1 plan spine ─────────────────────────────────────────────────────────────────
         "wbs.create" => {
             let p = seed_parity_project(pg, ctx).await;
@@ -2435,6 +2608,47 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             )
             .await;
             ctx.push(sample.name, kata);
+        }
+        // T8 (#79): a proposal needs TWO independent objects, so each round gets a fresh failed
+        // run beside the stable anchor card; review/promote get a lesson already at the stage
+        // the action requires.
+        "lessons.propose" => {
+            let card = Uuid::parse_str(&ctx.anchor_card).expect("anchor card uuid");
+            let project = Uuid::parse_str(&ctx.project_id).expect("project uuid");
+            let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+            let run: Uuid = sqlx::query_scalar(
+                "INSERT INTO run (tenant_id, card_id, project_id, status, error_class)
+                 VALUES ($1, $2, $3, 'failed', 'tool_error') RETURNING id",
+            )
+            .bind(ctx.tenant_id)
+            .bind(card)
+            .bind(project)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("prepare a failed run");
+            tx.commit().await.expect("commit");
+            ctx.push(sample.name, run);
+        }
+        "lessons.review" | "lessons.promote" => {
+            let state = if sample.name == "lessons.review" {
+                "proposed"
+            } else {
+                "reviewed"
+            };
+            let lesson = seed_parity_lesson(pg, ctx, state).await;
+            ctx.push(sample.name, lesson);
+        }
+        // T6 (#80): each development-project sample gets its own chartered project per round.
+        "development_projects.get"
+        | "development_projects.record_step"
+        | "development_projects.review_gate"
+        | "development_projects.merge_gate"
+        | "development_projects.deploy_gate"
+        | "development_projects.close"
+        | "development_projects.change_judging_surface"
+        | "development_projects.rollback" => {
+            let development_project = seed_parity_development_project(pg, ctx).await;
+            ctx.push(sample.name, development_project);
         }
         "invites.revoke" => {
             let id = seed_invite(pg, ctx).await;
@@ -3279,6 +3493,41 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
 ///
 /// `instrument` satisfies the hypothesis pair when the row is past `analysed`; the release hash
 /// is a shape-valid literal because the binding check is the action's, not this fixture's.
+/// A lesson row at the stage a `lessons.review`/`lessons.promote` parity sample needs. Direct
+/// SQL is the fixture's right here: the action under test is the transition, not the proposal
+/// path (which has its own sample and its own suite).
+async fn seed_parity_lesson(pg: &support::Pg, ctx: &Ctx, state: &str) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let evidence = json!([
+        {"kind": "card", "id": ctx.anchor_card},
+        {"kind": "run", "id": Uuid::now_v7()},
+    ]);
+    let reviewed_by = if state == "reviewed" {
+        Some(ctx.alice_user)
+    } else {
+        None
+    };
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO lesson
+             (tenant_id, statement, evidence, independent_count, state, source, proposer_id,
+              reviewed_by, reviewed_at)
+         VALUES ($1, $2, $3, 2, $4, 'propose', $5, $6,
+                 CASE WHEN $6::uuid IS NULL THEN NULL ELSE now() END)
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(format!("parity lesson {}", Uuid::now_v7()))
+    .bind(&evidence)
+    .bind(state)
+    .bind(ctx.bob_user)
+    .bind(reviewed_by)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare a lesson");
+    tx.commit().await.expect("commit");
+    id
+}
+
 async fn seed_parity_kata(
     pg: &support::Pg,
     ctx: &Ctx,
@@ -3604,6 +3853,145 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             let mut sample = plain("kata.adopt", json!({}), None);
             sample.input = Box::new(|_ctx: &Ctx| json!({"kata_id": Uuid::nil(), "note": "parity"}));
             expecting(sample, 404)
+        },
+        // ── T8: organisational memory (#79) ──────────────────────────────────────────────
+        // The proposal names the stable anchor card plus a fresh failed run each round: two
+        // distinct referenced objects, and a statement unique to this execution.
+        {
+            let mut sample = plain("lessons.propose", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "statement": format!("parity lesson {}", Uuid::now_v7()),
+                    "evidence": [
+                        {"kind": "card", "id": ctx.anchor_card},
+                        {"kind": "run", "id": ctx.pop("lessons.propose")},
+                    ],
+                })
+            });
+            expecting(sample, 201)
+        },
+        // A person (alice, admin) approves a lesson proposed by bob: promotion to a source draft.
+        {
+            let mut sample = plain("lessons.review", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "lesson_id": ctx.pop("lessons.review"),
+                    "decision": "approve",
+                    "note": "parity review",
+                })
+            });
+            expecting(sample, 200)
+        },
+        // The explicit promotion of an already-reviewed lesson; idempotent on the promoted row.
+        {
+            let mut sample = plain("lessons.promote", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"lesson_id": ctx.pop("lessons.promote")}));
+            expecting(sample, 200)
+        },
+        // ── T6: the development project (#80) ────────────────────────────────────────────
+        {
+            // A real charter: the implementer is the fixture's alice, and the title/lane carry
+            // a fresh UUID so the derived project key cannot collide across the two rounds.
+            let mut sample = plain("development_projects.charter", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "title": format!("Parity development {}", Uuid::now_v7().simple()),
+                    "repo": "nonagenticai/conveyor",
+                    "lane": format!("issue/parity-{}", Uuid::now_v7().simple()),
+                    "implementer_id": ctx.alice_user,
+                    "acceptance_command": "cargo test -p conveyor-actions --test development_project",
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("development_projects.get", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.get")}),
+            );
+            expecting(sample, 200)
+        },
+        {
+            // The first step has no predecessor, so this is a real write on both transports.
+            let mut sample = plain("development_projects.record_step", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "development_project_id": ctx.pop("development_projects.record_step"),
+                    "step": "branch",
+                    "evidence": {"name": "issue/parity", "base": "main"},
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("development_projects.review_gate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.review_gate")}),
+            );
+            expecting(sample, 409)
+        },
+        {
+            let mut sample = plain("development_projects.merge_gate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.merge_gate")}),
+            );
+            expecting(sample, 409)
+        },
+        {
+            let mut sample = plain("development_projects.deploy_gate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.deploy_gate")}),
+            );
+            expecting(sample, 409)
+        },
+        {
+            let mut sample = plain("development_projects.close", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.close")}),
+            );
+            expecting(sample, 409)
+        },
+        {
+            // The project's own attempt to change the gates that judge it: the refusal is the
+            // feature, and it is the same body over both transports.
+            let mut sample = plain(
+                "development_projects.change_judging_surface",
+                json!({}),
+                None,
+            );
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "development_project_id": ctx.pop("development_projects.change_judging_surface"),
+                    "surface": "gate_set",
+                    "change": {"value": "parity"},
+                })
+            });
+            expecting(sample, 403)
+        },
+        {
+            let mut sample = plain("development_projects.rollback", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "development_project_id": ctx.pop("development_projects.rollback"),
+                    "deployed_digest": "sha256:parity-deployed",
+                    "restored_digest": "sha256:parity-restored",
+                    "migration_generation": 70,
+                    "health_status": 200,
+                    "evidence": ["parity rollback evidence"],
+                })
+            });
+            expecting(sample, 409)
         },
         plain("departments.create", json!({"name": "engineering"}), None),
         plain("audit.list", json!({"limit": 10}), None),
@@ -6038,6 +6426,158 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         expecting(plain("toolkits.publish", json!({}), None), 200),
         expecting(plain("tools.probe", json!({"dry_run": true}), None), 200),
         expecting(plain("tools.usage", json!({"window_days": 30}), None), 200),
+        // ── T15 (#86): tool authoring and BYO ──────────────────────────────────────────────
+        // The import and the manual draft are closed read operations against a destination
+        // that is registered but never called here; both are writes whose rows are unique per
+        // tenant. The prepared samples read a draft (or a promotion fixture) written before
+        // each round, so a replay and an execution compare the same shape.
+        expecting(
+            plain(
+                "toolkits.import_openapi",
+                json!({
+                    "key": "parity_import",
+                    "title": "Parity import",
+                    "base_url": "http://127.0.0.1:9",
+                    "document": {
+                        "openapi": "3.1.0",
+                        "info": {"title": "parity", "version": "1.0.0"},
+                        "paths": {
+                            "/ping": {
+                                "post": {
+                                    "operationId": "ping",
+                                    "requestBody": {
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "type": "object",
+                                                    "properties": {"message": {"type": "string"}},
+                                                    "required": ["message"],
+                                                    "additionalProperties": false
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "responses": {"200": {"description": "ok"}}
+                                }
+                            }
+                        }
+                    }
+                }),
+                None,
+            ),
+            201,
+        ),
+        expecting(
+            plain(
+                "toolkits.register_mcp",
+                json!({
+                    "key": "parity_mcp",
+                    "title": "Parity MCP",
+                    "url": "http://127.0.0.1:9/mcp",
+                    "auth_adapter": "none"
+                }),
+                None,
+            ),
+            201,
+        ),
+        // A registered OpenAPI source is not an MCP endpoint: discovery is a typed refusal.
+        expecting(
+            prepared_field("toolkits.discover_mcp", "source_id", None),
+            422,
+        ),
+        expecting(
+            plain(
+                "tool_authoring.draft",
+                json!({
+                    "key": "parity_manual",
+                    "title": "Parity manual",
+                    "source": {
+                        "kind": "openapi",
+                        "key": "parity_manual",
+                        "base_url": "http://127.0.0.1:9"
+                    },
+                    "operations": [{
+                        "key": "ping",
+                        "method": "POST",
+                        "path": "/ping",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {"message": {"type": "string"}},
+                            "required": ["message"],
+                            "additionalProperties": false
+                        }
+                    }]
+                }),
+                None,
+            ),
+            201,
+        ),
+        expecting(
+            prepared_field("tool_authoring.validate", "draft_id", None),
+            200,
+        ),
+        {
+            let mut sample = plain("tool_authoring.test", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "draft_id": ctx.pop("tool_authoring.test"),
+                    "replay": {
+                        "operation": "ping",
+                        "request": {"message": "hello"},
+                        "response": {"status": 200, "body": {}}
+                    }
+                })
+            });
+            sample.prepare = true;
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("tool_authoring.review", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "draft_id": ctx.pop("tool_authoring.review"),
+                    "decision": "approve"
+                })
+            });
+            sample.prepare = true;
+            expecting(sample, 200)
+        },
+        // The default policy opens one human gate; round B opens one for its own fresh draft.
+        {
+            let mut sample = plain("tool_authoring.publish", json!({}), None);
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"draft_id": ctx.pop("tool_authoring.publish")}));
+            sample.prepare = true;
+            expecting(sample, 200)
+        },
+        // A promotion names a development project with an approved review; the fixture writes
+        // both before each round.
+        {
+            let mut sample = plain("tool_authoring.promote", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "toolkit_id": ctx.pop("toolkit_id"),
+                    "development_project_id": ctx.pop("development_project_id")
+                })
+            });
+            sample.prepare = true;
+            expecting(sample, 200)
+        },
+        // The registered-destination dispatch is the broker's arm: a direct caller is refused.
+        expecting(
+            plain(
+                "tools.dispatch",
+                json!({
+                    "source_id": "00000000-0000-0000-0000-000000000000",
+                    "toolkit_key": "parity",
+                    "tool_key": "ping",
+                    "destination": {"kind": "openapi", "method": "POST", "path": "/ping"},
+                    "arguments": {}
+                }),
+                None,
+            ),
+            403,
+        ),
         // ── T9: the architecture capability (#81) ─────────────────────────────────────────
         // Reads anchored on rows the fixture/prepare writes; writes on a fresh row per round.
         expecting(plain("architecture.artifacts_list", json!({}), None), 200),

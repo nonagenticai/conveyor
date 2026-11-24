@@ -80,3 +80,9 @@ REVOKE UPDATE, DELETE ON kata_get, kata_measurement FROM conveyor_runtime;
 -- T5 P2/P3 (0067): the revert and the adoption are append-only evidence — a regression's reason
 -- and a person's decision are never edited or erased.
 REVOKE UPDATE, DELETE ON kata_revert, kata_adoption FROM conveyor_runtime;
+
+-- T6 (0068): a development project's step evidence and closure record are the audit trail the
+-- self-development path is judged on. A step is written once (the unique key says so) and the
+-- closure links what was delivered; UPDATE and DELETE are withheld so an application bug cannot
+-- rewrite either. The `development_project` charter row stays mutable for its status.
+REVOKE UPDATE, DELETE ON development_step, development_closure FROM conveyor_runtime;

@@ -1339,7 +1339,7 @@ CREATE TABLE job_binding (
 </tbody>
 </table>
 <p>The handoff is the level's entry (SPEC_V2 §6.6.1–5): the card names the binding, the note is memory, the run starts. It is not a lane move — <code>cards.move</code> changes no run and writes no memory. It accepts no <code>release_hash</code> (the binding is the pin) and writes no <code>run_step</code>; the run's first step is the executor's own (S21 step 4).</p>
-<h3 id="230-the-l1-laya-evaluation--s21-step-10-migration-0068">2.30 The L1 laya evaluation — S21 step 10 (migration <code>0068</code>)</h3>
+<h3 id="230-the-l1-laya-evaluation--s21-step-10-migration-0071">2.30 The L1 laya evaluation — S21 step 10 (migration <code>0071</code>)</h3>
 <p>The ladder stops trusting its caller: the case is built by the ladder and the verdict comes from a recorded laya exchange. Two tables and one column, all new; no existing row changes shape.</p>
 <table>
 <thead>
@@ -1409,7 +1409,7 @@ CREATE TABLE job_binding (
 </tr>
 </tbody>
 </table>
-<p><strong>Authoring a set is one row's version bump, never a second row.</strong> <code>decision_option_sets.set</code> updates the existing header (<code>version = version + 1</code>) and replaces its children inside the same transaction, so the partial unique indexes in <code>0068</code> are never asked to hold two live sets and a reader never sees a half-replaced menu. Old labels survive only in <code>decision_option</code> — the per-decision record of what that decision chose between; a decision is reproducible from its own row plus its set version.</p>
+<p><strong>Authoring a set is one row's version bump, never a second row.</strong> <code>decision_option_sets.set</code> updates the existing header (<code>version = version + 1</code>) and replaces its children inside the same transaction, so the partial unique indexes in <code>0071</code> are never asked to hold two live sets and a reader never sees a half-replaced menu. Old labels survive only in <code>decision_option</code> — the per-decision record of what that decision chose between; a decision is reproducible from its own row plus its set version.</p>
 <p><strong>The call itself writes no conveyor row of ours beyond the engine's own bookkeeping.</strong> The laya service is external: <code>ladder.precheck</code> is dispatched with the tenant's sealed <code>laya.token</code>, and the engine records the claim (<code>idempotency_key</code>), the invocation (<code>action_invocation</code>) and the response body that the <code>idempotency_key.response</code> column already holds. That record is the provenance: the decision cites it rather than restating it, so nothing in <code>decision</code> can be written from a request body.</p>
 <h2 id="3-state-machines-and-enforcement">3. State machines and enforcement</h2>
 <p>Every transition is a pure function in <code>crates/domain</code>; no DB trigger, no per-flow rule, no CHECK that duplicates the function. The CHECK constraints below guard <em>vocabulary</em>, never <em>legality</em>.</p>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Driver / Goal / Objective Catalog — S02 Skeleton (retrospective, 2026-11-21) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Driver / Goal / Objective Catalog — S02 Skeleton (retrospective, 2026-11-21)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: Trace each S02 driver to a goal and a measurable objective, so a skeleton mechanism that serves no gate can be identified and retired.</li>
+<li>Scope: The S2 gate and proof rows in docs/plans/slices/S02-skeleton.md §7 and the mechanisms delivered in migrations/0001_platform.sql, crates/store, crates/auth and crates/api; recorded retrospectively on 2026-11-21.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>One product must serve many tenants without a per-tenant fork (SPEC §5.1, CONTRACT §9) / Two tenants are isolated, including under RLS</strong> - {"measure": "as conveyor_runtime scoped to A, count(*) FROM event returns 0 of B's rows; a forged tenant_id = B insert fails WITH CHECK; the owner also sees 0; the superuser sees both", "verify": "cargo test -p conveyor-server --test rls -- --nocapture"}</li>
+<li><strong>The tenant comes from membership, never a client header (CONTRACT §9) / Login works</strong> - {"measure": "Bearer dev:alice returns 200 at /api/me; with APP_ENV=production the process exits non-zero", "verify": "plan \u00a77 gate row; apps/server/tests/rls.rs"}</li>
+<li><strong>A worker killed mid-handler must not lose or double-run durable work / A fenced lease, not a process lock, owns a job</strong> - {"measure": "JOB_LEASE_SECS=2; kill -9 mid-handler; restart reclaims the row on lease expiry, attempts increments, and the stale token writes nothing", "verify": "cargo test -p conveyor-store --test jobs; apps/server/tests/jobs_kill.rs"}</li>
+<li><strong>A UI must reconnect without losing or duplicating events / SSE replays by event.seq inside the subscriber's tenant scope</strong> - {"measure": "three events; reconnect with Last-Event-ID of e1 returns e2 then e3 once each in seq order; B's events are absent", "verify": "cargo test -p conveyor-server --test events"}</li>
+<li><strong>Audit is a record, not editable state / Append-only by GRANT</strong> - {"measure": "UPDATE audit_event as conveyor_runtime is denied; details are capped at 8192 bytes", "verify": "cargo test -p conveyor-store --test audit_idempotency"}</li>
+<li><strong>Entitlement fails closed and core requests never call the licences service / RequireLicence reads app_licence only</strong> - {"measure": "no row, a row older than 3600 s, an expired, revoked or unknown status all refuse; a JWT-shaped token that fails verification is a hard 401", "verify": "cargo test -p conveyor-auth --test licence; crates/auth/src/licence.rs"}</li>
+<li><strong>Migrations must be reproducible, forward-only and found from the crate that embeds them / One embedded migration set at the workspace root</strong> - {"measure": "sqlx::migrate!("../../migrations") and a unit test asserting the embedded set is exactly [(1, "platform")]", "verify": "cargo test -p conveyor-store"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-24T10:10:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

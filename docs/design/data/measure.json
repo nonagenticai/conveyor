@@ -1,16 +1,68 @@
 {
-  "generated_at": "2026-11-20T11:50:50.848127361+00:00",
+  "generated_at": "2026-11-24T10:10:00Z",
   "inference": {
     "by_caller": [
       {
         "caller_kind": "agent_run",
-        "calls": 604,
-        "total_tokens": 9457017
+        "calls": 632,
+        "total_tokens": 9548085
       },
       {
         "caller_kind": "other",
-        "calls": 5,
-        "total_tokens": 1451
+        "calls": 14,
+        "total_tokens": 2718
+      }
+    ],
+    "by_card": [
+      {
+        "calls": 7,
+        "card_id": "01a1e24b-3e5c-78f5-8629-d71afa10edee",
+        "completion_tokens": 987,
+        "cost_usd": "0.000616",
+        "priced_calls": 7,
+        "prompt_tokens": 2427,
+        "total_tokens": 3414,
+        "unpriced_calls": 0
+      },
+      {
+        "calls": 1,
+        "card_id": "01a1e3ed-fe68-78cf-9fc8-fbbf1a6abfa1",
+        "completion_tokens": 53,
+        "cost_usd": "0.000232",
+        "priced_calls": 1,
+        "prompt_tokens": 1551,
+        "total_tokens": 1604,
+        "unpriced_calls": 0
+      },
+      {
+        "calls": 11,
+        "card_id": "01a1f2bc-8723-751a-af62-a8c8f05e1e51",
+        "completion_tokens": 1523,
+        "cost_usd": "0.004524",
+        "priced_calls": 11,
+        "prompt_tokens": 29265,
+        "total_tokens": 30788,
+        "unpriced_calls": 0
+      },
+      {
+        "calls": 8,
+        "card_id": "01a1f2c0-128d-78ec-8ed2-122c54c70284",
+        "completion_tokens": 1582,
+        "cost_usd": "0.053787",
+        "priced_calls": 8,
+        "prompt_tokens": 381030,
+        "total_tokens": 382612,
+        "unpriced_calls": 0
+      },
+      {
+        "calls": 7,
+        "card_id": "01a1f2d2-c174-7b94-9e80-cd31c35f9c8e",
+        "completion_tokens": 1414,
+        "cost_usd": "0",
+        "priced_calls": 0,
+        "prompt_tokens": 142349,
+        "total_tokens": 143763,
+        "unpriced_calls": 7
       }
     ],
     "by_model": [
@@ -24,7 +76,7 @@
       },
       {
         "cache_hits": 0,
-        "calls": 3,
+        "calls": 4,
         "completion_tokens": 0,
         "model": "image_gen",
         "prompt_tokens": 0,
@@ -32,25 +84,73 @@
       },
       {
         "cache_hits": 0,
-        "calls": 525,
-        "completion_tokens": 74844,
+        "calls": 558,
+        "completion_tokens": 118281,
         "model": "local-llm",
-        "prompt_tokens": 8413106,
-        "total_tokens": 8487950
+        "prompt_tokens": 8461543,
+        "total_tokens": 8579824
+      },
+      {
+        "cache_hits": 0,
+        "calls": 1,
+        "completion_tokens": 42,
+        "model": "router/medium",
+        "prompt_tokens": 16,
+        "total_tokens": 58
+      },
+      {
+        "cache_hits": 0,
+        "calls": 2,
+        "completion_tokens": 122,
+        "model": "tier-medium",
+        "prompt_tokens": 281,
+        "total_tokens": 403
+      }
+    ],
+    "by_project": [
+      {
+        "calls": 8,
+        "completion_tokens": 1040,
+        "cost_usd": "0.000848",
+        "priced_calls": 8,
+        "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+        "prompt_tokens": 3978,
+        "total_tokens": 5018,
+        "unpriced_calls": 0
+      },
+      {
+        "calls": 18,
+        "completion_tokens": 2937,
+        "cost_usd": "0.004524",
+        "priced_calls": 11,
+        "project_id": "01a1f2bc-86f7-7904-ac48-b45cad0d1393",
+        "prompt_tokens": 171614,
+        "total_tokens": 174551,
+        "unpriced_calls": 7
+      },
+      {
+        "calls": 8,
+        "completion_tokens": 1582,
+        "cost_usd": "0.053787",
+        "priced_calls": 8,
+        "project_id": "01a1f2c0-1239-7b59-a0bd-e0609219fa8b",
+        "prompt_tokens": 381030,
+        "total_tokens": 382612,
+        "unpriced_calls": 0
       }
     ],
     "totals": {
       "cache_hit_calls": 0,
-      "cache_miss_calls": 606,
+      "cache_miss_calls": 642,
       "cache_write_calls": 0,
-      "calls": 609,
-      "completion_tokens": 84273,
+      "calls": 646,
+      "completion_tokens": 127874,
       "non_ok_calls": 0,
-      "prompt_tokens": 9374195,
-      "total_tokens": 9458468,
-      "unknown_cache_calls": 3
+      "prompt_tokens": 9422929,
+      "total_tokens": 9550803,
+      "unknown_cache_calls": 4
     }
   },
-  "note": "tokens are stored; cost is derived by the app from the pinned price version and is not stored in the ledger",
+  "note": "tokens are stored; cost is derived by the app from the pinned price version and is not stored in the ledger. `totals`, `by_model` and `by_caller` are tenant-wide; `by_project` and `by_card` cover only the rows this snapshot publishes, so the differences are the boundary, not a missing call",
   "schema": "design-snapshot/v1"
 }

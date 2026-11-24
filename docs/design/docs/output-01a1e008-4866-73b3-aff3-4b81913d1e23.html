@@ -24,34 +24,71 @@
       >
     </header>
     <main class="doc-body"><h1>T15 — Tool authoring and BYO</h1>
-<p><strong>Track:</strong> v2 · <strong>Tranche:</strong> 12 · <strong>Measured status:</strong> proposed · <strong>Plan:</strong> <code>docs/SPEC_V2.md#12</code>
-<strong>Dependencies:</strong> T13, T6, P0 · <strong>Issues:</strong> #86</p>
+<ul>
+<li><strong>Status:</strong> published</li>
+<li><strong>Version:</strong> 1.0</li>
+<li><strong>Author / date:</strong> conveyor programme session / 2026-11-21</li>
+<li><strong>Reviewer / review date:</strong> #347 independent review / 2026-11-18; owner publication / 2026-11-21</li>
+<li><strong>Related project:</strong> T15 — Tool authoring and BYO · issue #86 · live document <code>01a1e008-4866-73b3-aff3-4b81913d1e23</code></li>
+<li><strong>Rationale:</strong> state the inception basis for T15: a tool generated from an OpenAPI spec or a BYO MCP server is published, called by a job, and bounded by its effect ceiling and the tenant approval policy.</li>
+<li><strong>Published document:</strong> <code>01a1e008-4866-73b3-aff3-4b81913d1e23</code> — published 2026-11-21</li>
+<li><strong>Contract:</strong> pending</li>
+<li><strong>ADM phase / plateau:</strong> A / PSA for the artefact (project row: G / capability)</li>
+<li><strong>Entries:</strong> outcome, boundary, reuse sources, inception units, dependencies, acceptance, capabilities, plan, risks, links.</li>
+<li><strong>Derivation / realization / reuse / dependency:</strong> derived from SPEC_V2 §11.5–§11.6 and §12 T15, and P0 §4; realized by #86; reuse sources below; depends on T13, T6 and P0.</li>
+<li><strong>Links:</strong> issue #86; <code>docs/SPEC_V2.md</code> §12; <code>01-inception-analysis.md</code>; <code>02-architecture-design.md</code>; <code>seed/programme.json</code>.</li>
+</ul>
 <h2>Outcome</h2>
 <p>A tool generated from an OpenAPI spec or a BYO MCP server is published, called by a job, and bounded by its effect ceiling and tenant approval policy.</p>
 <h2>Boundary</h2>
-<p>In scope: the V2 slice as defined in SPEC_V2 §12. Out of scope: V1's built slices (they are not re-opened) and the product surfaces outside this slice's aggregates.</p>
+<p>In scope: toolkit import (draft <code>toolkit</code>/<code>tool</code> rows), remote-MCP discovery as a client, tenant-binding resolution in the broker, and the promotion request — as toolkit rows, never as new actions.</p>
+<p>Out of scope: executing tenant code; a caller-supplied URL at call time (§11.5); the agent platform's MCP server as a dependency (§11.7); binding any archived kag component (R19); a second control plane or a second OpenAPI reader; T13's broker and tool tables (reused, not forked).</p>
 <h2>Reuse sources</h2>
-<p>V1's <code>project</code>, <code>board</code>, <code>card</code>, <code>document</code> and <code>action registry</code> surfaces in <code>crates/</code> (the aggregates this slice extends); the estate capabilities in <code>docs/plans/04-TOOL-ESTATE-INVENTORY.md</code>; the SPEC_V2 §12 gate names the new tables and actions. The inception analysis resolves the exact symbols and boundaries.</p>
+<ul>
+<li><code>crates/actions/src/ingest.rs</code> — OpenAPI parsing, <code>DiscoveredAction</code>, the breaking-change diff; reuse both, never a second reader.</li>
+<li><code>crates/actions/src/mcp.rs</code> + <code>rmcp</code> 3.9.0 — the streamable-HTTP transport and sessions; reuse as a client.</li>
+<li><code>migrations/0050_approval_policies.sql</code> — the per-tenant, per-action approval policy; the publication key.</li>
+<li><code>migrations/0013_documents.sql:secret</code> — the sealed credential store; alias-only, no reveal path.</li>
+<li><code>migrations/0002_domain.sql:governed_asset</code> — the draft-lifecycle parent; decide whether a tool draft extends it or a new aggregate is needed.</li>
+<li>Estate capability, by role: the coding fleet's OpenAPI 3.1 documents and effect-classed operations — import fixtures, not a second control plane.</li>
+<li>Estate capability, by role: the agent-platform MCP server's catalog shape — immutable versions, binding-scoped discovery.</li>
+<li>Upstream: the workspace crates — no new dependency without a workspace decision.</li>
+</ul>
 <h2>Inception units</h2>
 <ol>
-<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
-<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+<li><code>inception-analysis</code> — <code>01-inception-analysis.md</code>; live <code>01a1ee5f-51f8-7613-8d20-35d470d53ecc</code> (published 2026-11-21).</li>
+<li><code>architecture-design</code> — <code>02-architecture-design.md</code>; live <code>01a1ee5f-5b42-70c5-9c35-86f977d14e85</code> (published 2026-11-21).</li>
 </ol>
-<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<p>Both are published (owner publication, 2026-11-21); the inception gate is met.</p>
 <h2>Dependencies</h2>
-<p>Blocked-by: T13, T6, P0.</p>
+<p>Typed, from <code>seed/programme.json</code>: blocked-by T13, T6 and P0; related #86 (delivery). T13 owns <code>tool</code>/<code>toolkit</code>/<code>tool_binding</code>/<code>tool_call</code>; T6 owns the approval-policy use. The delivery unit is <code>status:blocked</code> because tranche 12 is not authorised.</p>
 <h2>Acceptance</h2>
-<p>a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling</p>
-<p>Verify: the gate above, recorded on this project as the run/evidence output</p>
+<p>The project gate: a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling.</p>
+<p>Verify: #86's scenarios (<code>crates/actions/tests/</code> targets, to create there); at inception, the published analysis+design pair, not yet satisfied.</p>
 <h2>Capabilities</h2>
-<p><code>development</code>, <code>design</code></p>
-<h2>Gaps</h2>
+<p><code>development</code>, <code>design</code> — the tool authoring surfaces; no other capability may grant a tool binding.</p>
+<h2>Plan</h2>
+<p><code>docs/SPEC_V2.md</code> §11.5–§11.6 and §12 row T15. Delivery unit #86; no separate <code>S##</code> slice file. Target tranche <strong>12 — not authorised</strong>.</p>
+<h2>Risks</h2>
 <ul>
-<li>None recorded beyond the inception units themselves.</li>
+<li>A ceiling gap between actions and tools until T13/T15 land → check: neither exists today.</li>
+<li>OpenAPI 3.1 fidelity: <code>openapiv3</code> 2.2.0 may not parse 3.1 → check: a 3.1 fixture (to create at <code>crates/actions/tests/openapi31.rs</code>).</li>
+<li>Tool-as-action namespace leak → check: toolkit import writes no <code>action_registry</code> row.</li>
+<li>MCP discovery widening → check: a BYO test (to create at <code>apps/server/tests/byo_mcp.rs</code>).</li>
+<li>Unconfigurable approval: <code>approval_policy</code> refuses an action name no registered action carries → check: <code>tools.publish</code> is absent from <code>actions.json</code> today.</li>
+<li>Credential leakage into the ledger → check: the <code>tool_call</code> schema has no credential field (to create with T13).</li>
+<li>Seed claims read as built → check: <code>git grep 'toolkit coding@4'</code> matches only <code>seed/organisation.json</code>.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Issue #86 (delivery; blocked).</li>
+<li><code>docs/SPEC_V2.md</code> §11.5–§11.6, §12 T15.</li>
+<li><code>seed/programme.json</code> row T15.</li>
+<li><code>01-inception-analysis.md</code>, <code>02-architecture-design.md</code>.</li>
 </ul>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Tool authoring and BYO · conveyor output · published 2026-11-20T11:50:50.848127361+00:00</code> at publish time.</span>
+      <span>Rendered from <code>Tool authoring and BYO · conveyor output · published 2026-11-24T10:10:00Z</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

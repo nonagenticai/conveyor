@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19 — Architecture artifact (the typed TOGAF set) · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-document-compose.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19--architecture-artifact-the-typed-togaf-set">T19 — Architecture artifact (the typed TOGAF set)</h1>
+<p>Action <code>documents.compose</code> for project T19, category architecture-artifact. The body carries the standard's Metadata / Entries / Links / Document headings; publication is the admin act <code>documents.publish</code>.</p>
+<pre><code>== write: documents.compose ==
+{
+  &quot;body&quot;: &quot;# Architecture artefact \u2014 T19 decision forums\n\nThe typed TOGAF artefact set for T19: seven artefacts, their links, the published \ndocument and the Statement of Architecture Work they sit under.\n\n## Metadata\n\n| Field | Value |\n|---|---|\n| Project | T19 \u2014 Decision forums (meetings) |\n| Artefact type | architecture-artifact (TOGAF, \u00a78.1) |\n| Version | 1 |\n| Owner | programme-architect |\n| Reviewer | Conveyor Architecture Board |\n| Review date | 2026-11-24 |\n| Phase / plateau | A\u2013D / PSA + HLD |\n| Authority | standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3 (published decision output under P0) |\n\n## Entries\n\n| Artefact | Type | Phase / plateau | Entries | Status |\n|---|---|---|---|---|\n| T19 \u2014 Technology standards (01a20cde-d6bd-7cfe-88ad-42a1e6db30a7) | technology_standards | d/hld | 7 | approved |\n| T19 \u2014 Data entity catalog (01a20cde-adbf-7626-9b2b-58faf7164755) | data_entity_catalog | c/hld | 7 | approved |\n| T19 \u2014 Business capability map (01a20cde-86d7-7257-a45e-b4731ab423a4) | business_capability_map | b/hld | 8 | approved |\n| T19 \u2014 Solution concept (01a20cde-5f86-7720-9a16-36a964ef255d) | solution_concept | a/psa | 11 | approved |\n| T19 \u2014 Requirements catalog (01a20cde-371c-7d85-ae2d-780453958bef) | requirements_catalog | a/psa | 14 | approved |\n| T19 \u2014 Drivers, goals and objectives (01a20cde-0f97-7f74-afd8-7cd74e0990e3) | driver_goal_objective | a/psa | 5 | approved |\n| T19 \u2014 Stakeholder map (01a20cdd-e71f-7d06-8ca5-701ff6b7d69e) | stakeholder_map | a/psa | 9 | approved |\n\nEvery entry is a row in `architecture_artifact_entry`; the seven types are the standard&#39;s phase A\u2013D mandatory set for a project at phase G.\n\n## Links\n\n| From | Kind | To |\n|---|---|---|\n| T19 \u2014 Drivers, goals and objectives | derivation | T19 \u2014 Requirements catalog |\n| T19 \u2014 Requirements catalog | derivation | T19 \u2014 Solution concept |\n| T19 \u2014 Solution concept | realization | T19 \u2014 Data entity catalog |\n| T19 \u2014 Solution concept | realization | T19 \u2014 Business capability map |\n| T19 \u2014 Stakeholder map | dependency | T19 \u2014 Business capability map |\n| T19 \u2014 Business capability map | realization | T19 \u2014 Technology standards |\n| T19 \u2014 Data entity catalog | realization | T19 \u2014 Technology standards |\n\nThe edges follow the design&#39;s \u00a75: goals derive requirements, requirements derive the \nsolution concept, the concept realizes the data entities and the capability map, the \nstakeholder map depends on the capability map, and both the capability map and the data \nentities are realized on the technology standards.\n\n## Document\n\nThis output is the published `architecture-artifact` document for T19 (id to be assigned by the compose). The artefact set sits under the Statement of Architecture Work `Statement of Architecture Work \u2014 T19 decision forums (2026-11-24)` (01a20ce0-5183-776c-84bd-327f2301b19b), approved by the Architecture Board under the standing delegation; the board decision is `01a20ce0-644d-7340-a696-1af10fa8c61e`.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;architecture-artifact&quot;,
+  &quot;content_hash&quot;: &quot;75ec8530e0dfc83abaf8b451fc93e93faf7450c06215f2580ec46eca3f387526&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-24T09:30:28.081869Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a20ce4-73e4-7009-9ec7-eb2265e9e84e&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;architecture-artifact&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;75ec8530e0dfc83abaf8b451fc93e93faf7450c06215f2580ec46eca3f387526&quot;,
+    &quot;size_bytes&quot;: 2996,
+    &quot;unit&quot;: &quot;T19&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: false,
+  &quot;published_at&quot;: null,
+  &quot;published_by&quot;: null,
+  &quot;published_by_name&quot;: null,
+  &quot;size_bytes&quot;: 2996,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;T19 \u2014 Architecture artifact (the typed TOGAF set)&quot;,
+  &quot;unit&quot;: &quot;T19&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-24T09:30:28.081869Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: documents.get ==
+{
+  &quot;body&quot;: &quot;# Architecture artefact \u2014 T19 decision forums\n\nThe typed TOGAF artefact set for T19: seven artefacts, their links, the published \ndocument and the Statement of Architecture Work they sit under.\n\n## Metadata\n\n| Field | Value |\n|---|---|\n| Project | T19 \u2014 Decision forums (meetings) |\n| Artefact type | architecture-artifact (TOGAF, \u00a78.1) |\n| Version | 1 |\n| Owner | programme-architect |\n| Reviewer | Conveyor Architecture Board |\n| Review date | 2026-11-24 |\n| Phase / plateau | A\u2013D / PSA + HLD |\n| Authority | standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3 (published decision output under P0) |\n\n## Entries\n\n| Artefact | Type | Phase / plateau | Entries | Status |\n|---|---|---|---|---|\n| T19 \u2014 Technology standards (01a20cde-d6bd-7cfe-88ad-42a1e6db30a7) | technology_standards | d/hld | 7 | approved |\n| T19 \u2014 Data entity catalog (01a20cde-adbf-7626-9b2b-58faf7164755) | data_entity_catalog | c/hld | 7 | approved |\n| T19 \u2014 Business capability map (01a20cde-86d7-7257-a45e-b4731ab423a4) | business_capability_map | b/hld | 8 | approved |\n| T19 \u2014 Solution concept (01a20cde-5f86-7720-9a16-36a964ef255d) | solution_concept | a/psa | 11 | approved |\n| T19 \u2014 Requirements catalog (01a20cde-371c-7d85-ae2d-780453958bef) | requirements_catalog | a/psa | 14 | approved |\n| T19 \u2014 Drivers, goals and objectives (01a20cde-0f97-7f74-afd8-7cd74e0990e3) | driver_goal_objective | a/psa | 5 | approved |\n| T19 \u2014 Stakeholder map (01a20cdd-e71f-7d06-8ca5-701ff6b7d69e) | stakeholder_map | a/psa | 9 | approved |\n\nEvery entry is a row in `architecture_artifact_entry`; the seven types are the standard&#39;s phase A\u2013D mandatory set for a project at phase G.\n\n## Links\n\n| From | Kind | To |\n|---|---|---|\n| T19 \u2014 Drivers, goals and objectives | derivation | T19 \u2014 Requirements catalog |\n| T19 \u2014 Requirements catalog | derivation | T19 \u2014 Solution concept |\n| T19 \u2014 Solution concept | realization | T19 \u2014 Data entity catalog |\n| T19 \u2014 Solution concept | realization | T19 \u2014 Business capability map |\n| T19 \u2014 Stakeholder map | dependency | T19 \u2014 Business capability map |\n| T19 \u2014 Business capability map | realization | T19 \u2014 Technology standards |\n| T19 \u2014 Data entity catalog | realization | T19 \u2014 Technology standards |\n\nThe edges follow the design&#39;s \u00a75: goals derive requirements, requirements derive the \nsolution concept, the concept realizes the data entities and the capability map, the \nstakeholder map depends on the capability map, and both the capability map and the data \nentities are realized on the technology standards.\n\n## Document\n\nThis output is the published `architecture-artifact` document for T19 (id to be assigned by the compose). The artefact set sits under the Statement of Architecture Work `Statement of Architecture Work \u2014 T19 decision forums (2026-11-24)` (01a20ce0-5183-776c-84bd-327f2301b19b), approved by the Architecture Board under the standing delegation; the board decision is `01a20ce0-644d-7340-a696-1af10fa8c61e`.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;architecture-artifact&quot;,
+  &quot;content_hash&quot;: &quot;75ec8530e0dfc83abaf8b451fc93e93faf7450c06215f2580ec46eca3f387526&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-24T09:30:28.081869Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a20ce4-73e4-7009-9ec7-eb2265e9e84e&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;architecture-artifact&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;75ec8530e0dfc83abaf8b451fc93e93faf7450c06215f2580ec46eca3f387526&quot;,
+    &quot;size_bytes&quot;: 2996,
+    &quot;unit&quot;: &quot;T19&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a20c80-b9b8-7214-abc6-f2c4f75a1fc1&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: false,
+  &quot;published_at&quot;: null,
+  &quot;published_by&quot;: null,
+  &quot;published_by_name&quot;: null,
+  &quot;size_bytes&quot;: 2996,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;T19 \u2014 Architecture artifact (the typed TOGAF set)&quot;,
+  &quot;unit&quot;: &quot;T19&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-24T09:30:28.081869Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19/gov/artifact-document-compose.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

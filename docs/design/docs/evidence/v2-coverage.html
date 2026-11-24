@@ -37,7 +37,7 @@
 <tr>
 <td><code>exists</code></td>
 <td>the real route and its Playwright spec exist</td>
-<td>58</td>
+<td>59</td>
 </tr>
 <tr>
 <td><code>extend</code></td>
@@ -47,7 +47,7 @@
 <tr>
 <td><code>new</code></td>
 <td>neither the route nor an ancestor exists</td>
-<td>4</td>
+<td>3</td>
 </tr>
 </tbody>
 </table>
@@ -510,15 +510,15 @@
 <td>actions</td>
 <td>tools</td>
 <td><code>extend</code></td>
-<td>actions: tool_authoring.* absent<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* found (toolkits.publish)<br>actions: tools.* found (tools.probe, tools.usage)</td>
+<td>actions: tool_authoring.* found (tool_authoring.draft, tool_authoring.promote, tool_authoring.publish…)<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* found (toolkits.discover_mcp, toolkits.import_openapi, toolkits.publish…)<br>actions: tools.* found (tools.probe, tools.usage)</td>
 </tr>
 <tr>
 <td><code>actions:memory</code></td>
 <td>§10.4</td>
 <td>actions</td>
 <td>memory</td>
-<td><code>new</code></td>
-<td>actions: lessons.* absent</td>
+<td><code>exists</code></td>
+<td>actions: lessons.* found (lessons.promote, lessons.propose, lessons.review)</td>
 </tr>
 <tr>
 <td><code>actions:metrics</code></td>

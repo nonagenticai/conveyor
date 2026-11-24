@@ -14,12 +14,39 @@
 //! unprivileged (the agent pattern's `DO` block swallowed `insufficient_privilege`, so a
 //! migration could pass with no runtime role and every GRANT was a no-op), runs the
 //! embedded migrations, then re-applies the runtime grants.
+//!
+//! ⚠️ **Every migration must be expand/contract** — backward-compatible with the immediately
+//! prior release. The runtime migrator ([`runtime_migrator`]) tolerates applied versions the
+//! binary does not embed, so an application-only rollback can bring the prior release up
+//! against the newer schema (issue #669). That tolerance is only sound under the
+//! expand/contract obligation: a non-additive migration (a rename, a drop, a narrowing type
+//! change) forbids an application-only rollback and requires a restore-based rollback through
+//! the gated ops path. See `migrations/README.md`.
 
 use sqlx::PgPool;
 use sqlx::migrate::{MigrateError, Migrator};
 
 /// The embedded migrations, from the workspace root `migrations/`.
 pub static MIGRATOR: Migrator = sqlx::migrate!("../../migrations");
+
+/// The migrator [`migrate`] runs: the same embedded set, with sqlx's tolerance for applied
+/// versions this binary does not embed switched on.
+///
+/// Without it, `sqlx` fails closed with `VersionMissing(version)` when the database carries a
+/// migration a newer release applied (sqlx-core 0.9's `validate_applied_migrations`). An
+/// application-only rollback — the prior image started against the newer schema — would then
+/// never reach Ready (issue #669). With it, the older release starts and ignores *newer*
+/// applied versions.
+///
+/// This does **not** weaken checksum validation: a version this binary does embed whose
+/// checksum changed is still refused with `VersionMismatch` (`sqlx` checks that in its apply
+/// loop, which `ignore_missing` does not skip). It is only safe because every migration is
+/// expand/contract (module docs and `migrations/README.md`).
+pub fn runtime_migrator() -> Migrator {
+    let mut migrator = Migrator::with_migrations(MIGRATOR.iter().cloned().collect());
+    migrator.set_ignore_missing(true);
+    migrator
+}
 
 /// The role every request runs as. Created by `scripts/db-roles.sql`, never by a migration.
 pub const RUNTIME_ROLE: &str = "conveyor_runtime";
@@ -73,11 +100,12 @@ pub async fn apply_runtime_grants(pool: &PgPool) -> Result<(), StoreMigrateError
     Ok(())
 }
 
-/// The one migration entry point: assert the runtime role, apply the embedded migrations,
-/// re-apply the grants. Never called implicitly by `serve` (CONTRACT §10).
+/// The one migration entry point: assert the runtime role, apply the embedded migrations
+/// (tolerating newer applied versions — see [`runtime_migrator`]), re-apply the grants. Never
+/// called implicitly by `serve` (CONTRACT §10).
 pub async fn migrate(pool: &PgPool) -> Result<(), StoreMigrateError> {
     assert_runtime_role(pool, RUNTIME_ROLE).await?;
-    MIGRATOR.run(pool).await?;
+    runtime_migrator().run(pool).await?;
     apply_runtime_grants(pool).await?;
     Ok(())
 }
@@ -85,6 +113,33 @@ pub async fn migrate(pool: &PgPool) -> Result<(), StoreMigrateError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_runtime_migrator_embeds_the_same_set_and_tolerates_newer_applied_versions() {
+        let embedded: Vec<(i64, String)> = MIGRATOR
+            .iter()
+            .map(|m| (m.version, m.description.to_string()))
+            .collect();
+        let runtime = runtime_migrator();
+        let runtime_set: Vec<(i64, String)> = runtime
+            .iter()
+            .map(|m| (m.version, m.description.to_string()))
+            .collect();
+        assert_eq!(
+            runtime_set, embedded,
+            "the runtime migrator must carry the same embedded set as MIGRATOR; a second \
+             sqlx::migrate! path is how the two drift"
+        );
+        assert!(
+            runtime.ignore_missing,
+            "the runtime migrator must tolerate applied versions a newer release added, or an \
+             application-only rollback dies on VersionMissing (issue #669)"
+        );
+        assert!(
+            !MIGRATOR.ignore_missing,
+            "the control used by the store integration test keeps sqlx's fail-closed default"
+        );
+    }
 
     #[test]
     fn embedded_migrations_are_exactly_the_s0_set() {
@@ -266,9 +321,20 @@ mod tests {
                 // procedure version, and the append-only revert and adoption evidence
                 // (0067_kata_gate.sql).
                 (67, "kata gate".to_owned()),
-                // S21 step 10 (#656): the authored, versioned option set a case is built from,
-                // and the policy's `fire_when` (0068_ladder_option_sets.sql, SPEC_V2 §7.2).
-                (68, "ladder option sets".to_owned())
+                // T6: the development charter, its immutable step evidence, the closure record,
+                // the one-pending development gate index and the approval-policy auto-merge terms.
+                (68, "development project".to_owned()),
+                // T8 (#79): the lesson lifecycle — the independent-evidence CHECK, the proposer/
+                // reviewer record and the governed-asset source draft promotion
+                // (0069_lesson_lifecycle.sql, SPEC_V2 §7.6, §10.3, §10.4, §12 T8, D36).
+                (69, "lesson lifecycle".to_owned()),
+                // T15 (#86): the tool_draft governed-asset kind, the registered tool sources, the
+                // binding-scoped subset, the ledger's binding pin, the promotion record and the
+                // publication quorum (0070_tool_authoring.sql, SPEC_V2 §11.3–§11.6, D42/D43/D50).
+                (70, "tool authoring".to_owned()),
+                // S21 step 10 (#656): the authored option set and the policy's fire_when
+                // (0071_ladder_option_sets.sql, SPEC_V2 §7.2, §7.3).
+                (71, "ladder option sets".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

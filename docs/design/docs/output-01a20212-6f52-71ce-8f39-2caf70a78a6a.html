@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Requirements Catalog — T11 Metrics, metering and maturity (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Requirements Catalog — T11 Metrics, metering and maturity (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: The testable requirements behind the T11 gate, each with the executable acceptance that proves it.</li>
+<li>Scope: The eight metrics actions, the two T11 tables, the read models, the console screen and the manifest.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>R1 / Every metric recomputes from rows</strong> - {"acceptance": "The five read actions return aggregates over ledger rows and write no metric row. crates/actions/tests/metrics.rs::a_level_moves_only_when_the_evidence_crosses_the_recorded_threshold counts four threshold rows and zero reconciliation rows after the reads; migrations/0059_metrics.sql creates no metric table.", "priority": "must"}</li>
+<li><strong>R2 / Every metering level sums to its children</strong> - {"acceptance": "crates/actions/tests/metrics.rs::every_metering_level_sums_to_its_children: tenant 3 calls and 3,150 tokens; project, programme, run, department, job and call each return the same 3 calls and 3,150 tokens; an unattributed caller-kind <code>other</code> call appears in its own bucket; a new ledger row changes the figure on the next read.", "priority": "must"}</li>
+<li><strong>R3 / The run drill-down sums to its call rows</strong> - {"acceptance": "crates/actions/tests/metrics.rs::the_run_drilldown_sums_to_the_call_rows: the run's steps and its calls each sum to 4,500 tokens, and the per-step cost sums to the run cost within 1e-9.", "priority": "must"}</li>
+<li><strong>R4 / Flow recomputes; a missing ledger is unavailable, not zero</strong> - {"acceptance": "crates/actions/tests/metrics.rs::flow_recomputes_and_a_missing_ledger_is_unavailable: throughput 1, lead 3,600 s, cycle 1,800 s, queue 1,800 s, block 540 s and flow efficiency 0.35, each within its stated tolerance; knowledge.lesson_promotion_rate is listed in <code>unavailable</code> with the reason that the T8 ledger does not exist.", "priority": "must"}</li>
+<li><strong>R5 / Threshold changes are versioned configuration</strong> - {"acceptance": "crates/actions/tests/metrics.rs::a_level_moves_only_when_the_evidence_crosses_the_recorded_threshold: C1 versions 1, 2 and 3 are three append-only rows and no code changes; each read names the version that authorised the level.", "priority": "must"}</li>
+<li><strong>R6 / A level moves only when evidence crosses its recorded threshold, with no gaps</strong> - {"acceptance": "The same test: five approvals at rate 1.0 meet C1 v1; one rejection lowers the rate to 0.833 and still meets 0.8; raising the recorded threshold to 0.9 drops the level back to C0 without changing the evidence; lowering it to 0.8 returns C1 at v3. crates/domain/src/metrics.rs::a_missing_metric_never_lifts_a_level and current_level stop at the first unmet level.", "priority": "must"}</li>
+<li><strong>R7 / Reconciliation is exact to six decimals or opens an incident</strong> - {"acceptance": "crates/actions/tests/metrics.rs::reconciliation_is_exact_or_opens_an_incident: total 0.002 matches with delta 0; total 0.003 is <code>difference</code> and opens an <code>incident</code> card whose meta records conveyor_usd 0.002 and billing_usd 0.003; a 503 is <code>unavailable</code> with the upstream error and null figures, never zero. crates/domain/src/metrics.rs::reconciliation_is_exact_to_six_decimals fixes the precision.", "priority": "must"}</li>
+<li><strong>R8 / A gate that never refused is flagged</strong> - {"acceptance": "crates/actions/tests/metrics.rs::a_gate_with_no_refusal_is_flagged_and_one_refusal_clears_it: tranche_review with 3 approvals and 0 rejections is in <code>never_refused</code>; one rejection removes it; benefit_review's pending approvals are untouched; latency is reported.", "priority": "must"}</li>
+<li><strong>R9 / Cost is derived from the pinned price catalogue, never stored</strong> - {"acceptance": "crates/store/src/metrics.rs joins commercial_price on model and unit at read time and returns cost_usd plus priced_calls and unpriced_calls; migrations/0059_metrics.sql states that no metric is stored; the snapshot's measure note fixes cost as a read-time derivation.", "priority": "must"}</li>
+<li><strong>R10 / Both T11 tables are tenant-isolated</strong> - {"acceptance": "migrations/0059_metrics.sql enables and forces RLS with the tenant_isolation policy on metric_threshold and metric_reconciliation; crates/store/tests/rls_domain.rs::metric_thresholds_are_tenant_isolated proves tenant A sees only its C0 row and a forged write under A's scope for tenant B fails WITH CHECK.", "priority": "must"}</li>
+<li><strong>R11 / The eight metrics actions are one served contract surface</strong> - {"acceptance": "served-spec.lock.json pins metrics.flow, metrics.job, metrics.usage, metrics.programme, metrics.maturity, metrics.reconcile, metrics.threshold_get and metrics.threshold_update; each is an ActionSpec projected to HTTP and MCP; docs/evidence/v2-coverage.json records actions:metrics at 8/8, modules 3/3 and tables 2/2.", "priority": "must"}</li>
+<li><strong>R12 / The console Metering screen reads live aggregates and never borrows a fixture</strong> - {"acceptance": "docs/design/v2.js meteringLive() renders measure.inference totals, by caller and by model from the published snapshot; docs/design/scripts/check-v2.cjs 9b\u20139d assert the live rows, no fixture figure, the snapshot's cost note and the no-measure sentence (#458).", "priority": "must"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Metrics, metering and maturity · conveyor output · published 2026-11-24T10:10:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

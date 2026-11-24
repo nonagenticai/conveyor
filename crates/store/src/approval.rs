@@ -120,6 +120,10 @@ pub enum ApprovalStoreError {
     /// `approvals.decide` path must not be a weaker door into the same row.
     #[error("an eval sign-off requires the evals:approve scope")]
     EvalScopeRequired,
+    /// The implementing principal of a development project tried to decide a gate that judges
+    /// its work (SPEC_V2 §5.4, §9.3; T6). The gate stays pending for a different principal.
+    #[error("the implementer cannot decide the gate that judges its own work")]
+    ImplementerCannotDecide,
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -859,6 +863,19 @@ pub async fn record_decision_tx(
         .fetch_optional(&mut *conn)
         .await?;
     let row = row.ok_or(ApprovalStoreError::NotFound)?;
+    // T6 (SPEC_V2 §5.4, §9.3): a development project's implementing principal can never decide
+    // the review, merge or deploy gate that judges its own work. This is checked before the
+    // generic requester rule because the implementing job is normally the gate's requester too;
+    // the specific rule is the honest refusal (and it holds even if a tenant ever allowed
+    // requester self-approval on the action). The gate is project-scoped and carries
+    // `meta.development_project_id`; every other gate answers `None` and is unchanged. The
+    // refusal is before the insert, so a refused attempt leaves no decision row and the gate
+    // stays pending for a different principal.
+    if crate::development::implementer_for_approval_tx(&mut *conn, tenant, approval_id).await?
+        == Some(decision.approver_id)
+    {
+        return Err(ApprovalStoreError::ImplementerCannotDecide);
+    }
     // T1 P1.3 / SPEC_V2 §5.4: the requester cannot decide the gate that judges their own work.
     // This is the one writer every decision path traverses, so the exclusion lives here rather
     // than in a UI or in `approvals.decide` alone.

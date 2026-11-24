@@ -56,6 +56,13 @@ pub mod invoke;
 // T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata — six Gets, the pre-registered
 // prediction and the held-out measurement, on an ordinary V2 binding.
 pub mod kata;
+// T8 (SPEC_V2 §7.6, §10.3, §10.4, §12 T8, D36; issue #79): organisational memory — the
+// `lessons.*` family, independent evidence, a person's review and promotion to a source draft.
+pub mod lesson;
+// T6 (SPEC_V2 §5.4, §6.4, §9.1, §9.3; issue #80): the development project — the charter, the
+// immutable step evidence, the review/merge/deploy gates, the earned auto-merge policy and the
+// closure record.
+pub mod development;
 // S15: capability-bound retrieval from strata platform packs.
 pub mod knowledge;
 pub mod lock;
@@ -102,6 +109,9 @@ pub mod spine;
 pub mod storage;
 // T13 (SPEC_V2 §11.3): the `tools.call` action declaration (the broker enforces it).
 pub mod tools;
+// T15 (#86, SPEC_V2 §11.3–§11.6): tool authoring and BYO — OpenAPI draft import, the
+// publication gate, MCP discovery and the registered-destination dispatch.
+pub mod tool_authoring;
 // T2 (SPEC_V2 §7): the decision ladder — `ladder.*` over `decision_policies.*`,
 // `refinements.*` and `laya_configs.*`.
 pub mod ladder;

@@ -24,34 +24,72 @@
       >
     </header>
     <main class="doc-body"><h1>T12 — One organisation loop</h1>
-<p><strong>Track:</strong> v2 · <strong>Tranche:</strong> 13 · <strong>Measured status:</strong> proposed · <strong>Plan:</strong> <code>docs/SPEC_V2.md#12</code>
-<strong>Dependencies:</strong> T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T13, T14, T15, T16, T17, P0 · <strong>Issues:</strong> #88</p>
+<ul>
+<li><strong>Status:</strong> published</li>
+<li><strong>Version:</strong> 1.0</li>
+<li><strong>Author / date:</strong> conveyor programme session / 2026-11-21</li>
+<li><strong>Reviewer / review date:</strong> #347 independent review / 2026-11-18; owner publication / 2026-11-21</li>
+<li><strong>Related project:</strong> T12 — One organisation loop · issue #88 · live document <code>01a1e008-2e2f-71fa-8714-2c4802220b43</code></li>
+<li><strong>Rationale:</strong> state the inception basis for T12 — the acceptance of V2: one tenant runs the whole loop, audited and within budget, proved by a harness rather than a new production aggregate.</li>
+<li><strong>Published document:</strong> <code>01a1e008-2e2f-71fa-8714-2c4802220b43</code> — published 2026-11-21</li>
+<li><strong>Contract:</strong> pending</li>
+<li><strong>ADM phase / plateau:</strong> A / PSA for the artefact (project row: G / capability)</li>
+<li><strong>Entries:</strong> outcome, boundary, reuse sources, inception units, dependencies, acceptance, capabilities, plan, risks, links.</li>
+<li><strong>Derivation / realization / reuse / dependency:</strong> derived from SPEC_V2 §12 T12 and §9.4, and P0 §4; realized by #88; reuse sources below; depends on every T slice and P0.</li>
+<li><strong>Links:</strong> issue #88; <code>docs/SPEC_V2.md</code> §12; <code>01-inception-analysis.md</code>; <code>02-architecture-design.md</code>; <code>seed/programme.json</code>.</li>
+</ul>
 <h2>Outcome</h2>
-<p>One tenant runs request → PM → delivery → coach → kata → development → deploy → operations → lesson, audited and within budget.</p>
+<p>One tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, audited and within budget.</p>
 <h2>Boundary</h2>
-<p>In scope: the V2 slice as defined in SPEC_V2 §12. Out of scope: V1's built slices (they are not re-opened) and the product surfaces outside this slice's aggregates.</p>
+<p>In scope: the end-to-end acceptance harness — one test-crate family under <code>apps/server/tests/</code> that drives the registered actions through every loop stage and asserts the audit row, the budget refusal and the benefit attribution.</p>
+<p>Out of scope: any production table, action, module or migration; a loop aggregate; a second audit writer; a coach, kata or development implementation inside the test; an HTTP client that bypasses the action registry. Every production stage stays with its own slice; T12 drives it, never forks it.</p>
 <h2>Reuse sources</h2>
-<p>V1's <code>project</code>, <code>board</code>, <code>card</code>, <code>document</code> and <code>action registry</code> surfaces in <code>crates/</code> (the aggregates this slice extends); the estate capabilities in <code>docs/plans/04-TOOL-ESTATE-INVENTORY.md</code>; the SPEC_V2 §12 gate names the new tables and actions. The inception analysis resolves the exact symbols and boundaries.</p>
+<ul>
+<li><code>crates/store/src/audit.rs:177</code> — the one audit writer; every loop transition must land a row.</li>
+<li><code>migrations/0044_plan_spine.sql:28</code> + <code>crates/actions/src/spine/mod.rs:1889</code> — WBS, baselines and benefits rows.</li>
+<li><code>migrations/0046_decision_ladder.sql:17</code> — the decision shape; every loop decision is an L0/L1/L3 row with pinned versions.</li>
+<li><code>crates/actions/src/pm/mod.rs:256</code> — the PM family; <code>pm.plan</code> cards name a binding, inputs and acceptance.</li>
+<li><code>crates/actions/src/board/pull.rs:149</code> — the coach wiring and the seeded process.</li>
+<li><code>migrations/0041_runner.sql:21</code> — run evidence; the artefact chain the loop reads.</li>
+<li><code>migrations/0024_s16_inference_audit.sql:10</code> — the call ledger; cost and budget at call grain.</li>
+<li><code>crates/store/src/eval/runs.rs:2</code> + <code>migrations/0034_s18_kata_arm.sql:17</code> — held-out instruments; the kata and the benefit delta.</li>
+<li><code>apps/server/tests/organisation_gate.rs:1</code> — the wire-gate fixture pattern, reused unchanged.</li>
+<li><code>docs/design/data/actions.json:270</code> — the inventory; it lacks four loop families, so it is a source, not the plan.</li>
+<li>Estate capabilities, by role: coding fleet, knowledge ingest/retrieval, inference router, laya, the cluster.</li>
+</ul>
 <h2>Inception units</h2>
 <ol>
-<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
-<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+<li><code>inception-analysis</code> — <code>01-inception-analysis.md</code>; live <code>01a1ee5f-b75b-76ee-93f3-62903c1661ba</code> (published 2026-11-21).</li>
+<li><code>architecture-design</code> — <code>02-architecture-design.md</code>; live <code>01a1ee5f-c33a-70bd-8cb2-a8ca3b379634</code> (published 2026-11-21).</li>
 </ol>
-<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<p>Both are published (owner publication, 2026-11-21); the inception gate is met.</p>
 <h2>Dependencies</h2>
-<p>Blocked-by: T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T13, T14, T15, T16, T17, P0.</p>
+<p>Typed, from <code>seed/programme.json</code>: blocked-by every T slice (T0–T11, T13–T17) and P0; related #88 (delivery). The live halves of P6/P7 wait on the deployment slice #8 (S14), not #18 (closed). The delivery unit is <code>status:blocked</code> because tranche 13 is not authorised.</p>
 <h2>Acceptance</h2>
-<p>one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget</p>
-<p>Verify: the gate above, recorded on this project as the run/evidence output</p>
+<p>The project gate: one tenant runs request → PM → delivery jobs → coach interruption → kata → development project → deploy → operations incident → lesson, all audited, within budget; one benefit is baselined before its transition and measured after it, with the delta attributable to the operational area.</p>
+<p>Verify: the harness scenarios at #88 (<code>apps/server/tests/</code>, to create there); the live half names #8. At inception, the acceptance is the published analysis+design pair, not yet satisfied.</p>
 <h2>Capabilities</h2>
-<p><code>program_management</code></p>
-<h2>Gaps</h2>
+<p><code>program_management</code> — owns the loop's acceptance; no slice may fork the harness.</p>
+<h2>Plan</h2>
+<p><code>docs/SPEC_V2.md</code> §12 row T12 and §9.4. Delivery unit #88; no separate <code>S##</code> slice file. Target tranche <strong>13 — not authorised</strong>.</p>
+<h2>Risks</h2>
 <ul>
-<li>None recorded beyond the inception units themselves.</li>
+<li>A blocker is unmerged, so the harness cannot compile → check per part before writing: the expected action names and the loop-test listing.</li>
+<li>The audit primitive is mistaken for coverage → P9 must count <code>audit_event</code> per transition and fail on a missing row.</li>
+<li>No conveyor-side budget refusal → P10 fails, not passes; check <code>git grep -n budget_exceeded -- crates apps/server</code>.</li>
+<li>P6/P7 live halves wait on the deployment slice #8 (S14); #18 is closed and must not be cited as the blocker.</li>
+<li>Benefit attribution degrades to prose → check that "operational area" is a <code>benefit_profile</code> field and <code>benefits.transition_upsert</code> stores both measurements.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Issue #88 (delivery; blocked).</li>
+<li><code>docs/SPEC_V2.md</code> §12 T12, §9.4.</li>
+<li><code>seed/programme.json</code> row T12.</li>
+<li><code>01-inception-analysis.md</code>, <code>02-architecture-design.md</code>.</li>
 </ul>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>One organisation loop · conveyor output · published 2026-11-20T11:50:50.848127361+00:00</code> at publish time.</span>
+      <span>Rendered from <code>One organisation loop · conveyor output · published 2026-11-24T10:10:00Z</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

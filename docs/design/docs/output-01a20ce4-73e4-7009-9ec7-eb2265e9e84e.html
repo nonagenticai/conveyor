@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T19 — Architecture artifact (the typed TOGAF set) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Architecture artefact — T19 decision forums</h1>
+<p>The typed TOGAF artefact set for T19: seven artefacts, their links, the published
+document and the Statement of Architecture Work they sit under.</p>
+<h2>Metadata</h2>
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Project</td><td>T19 — Decision forums (meetings)</td></tr>
+<tr><td>Artefact type</td><td>architecture-artifact (TOGAF, §8.1)</td></tr>
+<tr><td>Version</td><td>1</td></tr>
+<tr><td>Owner</td><td>programme-architect</td></tr>
+<tr><td>Reviewer</td><td>Conveyor Architecture Board</td></tr>
+<tr><td>Review date</td><td>2026-11-24</td></tr>
+<tr><td>Phase / plateau</td><td>A–D / PSA + HLD</td></tr>
+<tr><td>Authority</td><td>standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3 (published decision output under P0)</td></tr>
+</tbody></table>
+<h2>Entries</h2>
+<table><thead><tr><th>Artefact</th><th>Type</th><th>Phase / plateau</th><th>Entries</th><th>Status</th></tr></thead><tbody>
+<tr><td>T19 — Technology standards (01a20cde-d6bd-7cfe-88ad-42a1e6db30a7)</td><td>technology_standards</td><td>d/hld</td><td>7</td><td>approved</td></tr>
+<tr><td>T19 — Data entity catalog (01a20cde-adbf-7626-9b2b-58faf7164755)</td><td>data_entity_catalog</td><td>c/hld</td><td>7</td><td>approved</td></tr>
+<tr><td>T19 — Business capability map (01a20cde-86d7-7257-a45e-b4731ab423a4)</td><td>business_capability_map</td><td>b/hld</td><td>8</td><td>approved</td></tr>
+<tr><td>T19 — Solution concept (01a20cde-5f86-7720-9a16-36a964ef255d)</td><td>solution_concept</td><td>a/psa</td><td>11</td><td>approved</td></tr>
+<tr><td>T19 — Requirements catalog (01a20cde-371c-7d85-ae2d-780453958bef)</td><td>requirements_catalog</td><td>a/psa</td><td>14</td><td>approved</td></tr>
+<tr><td>T19 — Drivers, goals and objectives (01a20cde-0f97-7f74-afd8-7cd74e0990e3)</td><td>driver_goal_objective</td><td>a/psa</td><td>5</td><td>approved</td></tr>
+<tr><td>T19 — Stakeholder map (01a20cdd-e71f-7d06-8ca5-701ff6b7d69e)</td><td>stakeholder_map</td><td>a/psa</td><td>9</td><td>approved</td></tr>
+</tbody></table>
+<p>Every entry is a row in <code>architecture_artifact_entry</code>; the seven types are the standard's phase A–D mandatory set for a project at phase G.</p>
+<h2>Links</h2>
+<table><thead><tr><th>From</th><th>Kind</th><th>To</th></tr></thead><tbody>
+<tr><td>T19 — Drivers, goals and objectives</td><td>derivation</td><td>T19 — Requirements catalog</td></tr>
+<tr><td>T19 — Requirements catalog</td><td>derivation</td><td>T19 — Solution concept</td></tr>
+<tr><td>T19 — Solution concept</td><td>realization</td><td>T19 — Data entity catalog</td></tr>
+<tr><td>T19 — Solution concept</td><td>realization</td><td>T19 — Business capability map</td></tr>
+<tr><td>T19 — Stakeholder map</td><td>dependency</td><td>T19 — Business capability map</td></tr>
+<tr><td>T19 — Business capability map</td><td>realization</td><td>T19 — Technology standards</td></tr>
+<tr><td>T19 — Data entity catalog</td><td>realization</td><td>T19 — Technology standards</td></tr>
+</tbody></table>
+<p>The edges follow the design's §5: goals derive requirements, requirements derive the
+solution concept, the concept realizes the data entities and the capability map, the
+stakeholder map depends on the capability map, and both the capability map and the data
+entities are realized on the technology standards.</p>
+<h2>Document</h2>
+<p>This output is the published <code>architecture-artifact</code> document for T19. The artefact set sits under the Statement of Architecture Work <code>Statement of Architecture Work — T19 decision forums (2026-11-24)</code> (01a20ce0-5183-776c-84bd-327f2301b19b), approved by the Architecture Board under the standing delegation; the board decision is <code>01a20ce0-644d-7340-a696-1af10fa8c61e</code>.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision forums (meetings) · conveyor output · published 2026-11-24T10:10:00Z · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

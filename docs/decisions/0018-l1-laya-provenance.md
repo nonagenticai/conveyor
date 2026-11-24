@@ -37,7 +37,7 @@ rework `v1-w1c-3:T2`, `v1-w1c-4:T2`, `v1-w1c-5:T2`
    `meta.laya_call_key`, `meta.laya_invocation_id`, `meta.case_hash`, the option-set version and
    the measured latency, so §7.2's "a decision is reproducible from the row" holds.
 
-5. **Options are authored, versioned rows.** Migration `0068` adds `decision_option_set` and
+5. **Options are authored, versioned rows.** Migration `0071` adds `decision_option_set` and
    `decision_option_set_option`: one live set per `(tenant, kind, gate)`, a monotonically increasing
    `version`, and rows carrying `key`, `label`, `payload` and an explicit `payload.outcome ∈
    accepted | refused | escalated`. `decision_option_sets.set` authors a set (the one row's version
@@ -60,7 +60,7 @@ rework `v1-w1c-3:T2`, `v1-w1c-4:T2`, `v1-w1c-5:T2`
    outage.
 
 7. **`fire_when` decides whether the case is asked.** `decision_policy` gains a nullable
-   `fire_when` expression in migration `0068`. When it does not hold for the resolved case, no laya
+   `fire_when` expression in migration `0071`. When it does not hold for the resolved case, no laya
    request is made, no decision is written, and the step proceeds. Its first form is a small
    structured expression (`{"all_of": [...]}` / `{"any_of": [...]}` over `{kind, gate, field}`
    predicates), evaluated in `crates/domain`; `field` names a member of the case's fact document
@@ -119,7 +119,7 @@ needed.
 - The action surface gains `ladder.case`, `ladder.precheck` and `decision_option_sets.set|get`, and
   `ladder.evaluate` loses six input fields. The served-spec lock moves by those operations; the
   registry counts and the parity sample move with them.
-- Migration `0068` adds two tables and one nullable column. A tenant with a `gate.precheck` policy
+- Migration `0071` adds two tables and one nullable column. A tenant with a `gate.precheck` policy
   and no authored option set is refused `409 option_set_missing` until one is authored — a
   deliberate fail-closed: the alternative is answering a question whose menu the caller chose.
 - Every existing test that posted `answer`/`confidence` to `ladder.evaluate` now encodes a contract

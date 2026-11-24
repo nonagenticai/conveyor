@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S04 Technology Standards Catalogue - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: S04 Technology Standards Catalogue</li>
+<li>Phase: d</li>
+<li>Purpose: Record the technologies and standards S04 standardises on, drawn from the plan's deliverables, traps and build order.</li>
+<li>Scope: Standards used by the S04 slice; versions and pins are those stated in the plan.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Language / Rust workspace</strong> - {"detail": "crates/actions-derive is a 10th member (proc-macro = true, CONTRACT section 1); the build order inspects generated code with expand -p conveyor-actions.", "objective": "Build the slice as a Rust workspace member set."}</li>
+<li><strong>Schema / schemars</strong> - {"detail": "ActionSpec input and output are schema functions; a hand-written registry naming each schema twice is the drift surface.", "objective": "Declare input and output schemas once."}</li>
+<li><strong>Schema / JSON Schema</strong> - {"detail": "spec_hash equality is asserted across manifest, resolved operation and MCP tool.", "objective": "Keep manifest, OpenAPI and MCP schemas identical."}</li>
+<li><strong>Protocol / rmcp streamable HTTP</strong> - {"detail": "One session per tenant; tools/list and tools/call come from the same Registry.", "objective": "Serve MCP at /mcp."}</li>
+<li><strong>Protocol / openapiv3 and OpenApiRouter</strong> - {"detail": "Only OpenApiRouter::merge is allowed because Router::merge drops the second crate's paths from the spec.", "objective": "Fold and ingest OpenAPI."}</li>
+<li><strong>Errors / RFC 9457 problem details</strong> - {"detail": "Used for schema-invalid input and for action-external-refused, action-upstream-failed, action-circuit-open and action-recursion-limit.", "objective": "Return uniform machine-readable errors."}</li>
+<li><strong>Database / PostgreSQL with RLS</strong> - {"detail": "migrations/0003_action_registry.sql uses RLS ENABLE+FORCE+policy and grants; the migrate subcommand must run twice cleanly.", "objective": "Persist action_registry and invocation state."}</li>
+<li><strong>Quality / Workspace quality gate</strong> - {"detail": "Preflight the workspace tests; finish with clippy --workspace --all-targets -- -D warnings and a --check-lock run.", "objective": "Gate the slice with the workspace test suite and clippy."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-24T10:10:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

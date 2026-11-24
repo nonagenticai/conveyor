@@ -1,0 +1,148 @@
+== write: approvals.decide ==
+{
+  "approvals": 0,
+  "card_id": null,
+  "created_at": "2026-11-24T07:48:27.429958Z",
+  "decisions": [],
+  "description": "Decision item 1 for the T19 live gate: approve the evidence record for the web-room decision.",
+  "expires_at": null,
+  "gate": "t19_live_gate_web",
+  "id": "01a20c87-0fd0-7a68-be24-c1e0f5be9f77",
+  "kind": "meeting",
+  "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+  "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+  "requested_by_label": "FR Test",
+  "required_decisions": 1,
+  "run_id": null,
+  "status": "rejected",
+  "version": 2
+}
+== read-back: approvals.list ==
+{
+  "items": [
+    {
+      "approvals": 1,
+      "card_id": "01a20c8a-3370-7a8f-b903-faf5f7cff917",
+      "created_at": "2026-11-24T07:53:56.197132Z",
+      "decisions": [
+        {
+          "approver": "FR Test",
+          "approver_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+          "decided_at": "2026-11-24T08:09:21.819118Z",
+          "decided_by_kind": "human",
+          "decision": "approve",
+          "note": "",
+          "via": {
+            "channel": "web"
+          }
+        }
+      ],
+      "description": "Publish the minutes of the T19 live-gate meeting (the chair's publication gate).",
+      "expires_at": null,
+      "gate": "meeting_minutes",
+      "id": "01a20c8c-1428-79d4-a64e-fdeaa033a182",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "requested_by_label": "conveyor-e2e",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "version": 2
+    },
+    {
+      "approvals": 1,
+      "card_id": null,
+      "created_at": "2026-11-24T07:51:22.746435Z",
+      "decisions": [
+        {
+          "approver": "FR Test",
+          "approver_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+          "decided_at": "2026-11-24T08:19:08.868783Z",
+          "decided_by_kind": "human",
+          "decision": "approve",
+          "note": "",
+          "via": {
+            "channel": "mcp",
+            "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+            "surface": "meeting"
+          }
+        }
+      ],
+      "description": "item 2 for the T19 live gate: approve the evidence record for the MCP decision.",
+      "expires_at": null,
+      "gate": "t19_live_gate_mcp",
+      "id": "01a20c89-bc7e-791c-b9cf-381d0b352562",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "requested_by_label": "conveyor-e2e",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "version": 2
+    },
+    {
+      "approvals": 1,
+      "card_id": null,
+      "created_at": "2026-11-24T07:50:58.376814Z",
+      "decisions": [
+        {
+          "approver": "FR Test",
+          "approver_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+          "decided_at": "2026-11-24T07:55:12.305673Z",
+          "decided_by_kind": "human",
+          "decision": "approve",
+          "note": "",
+          "via": {
+            "channel": "web",
+            "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+            "surface": "meeting"
+          }
+        }
+      ],
+      "description": "item 1 for the T19 live gate: approve the evidence record for the web-room decision.",
+      "expires_at": null,
+      "gate": "t19_live_gate_web_v2",
+      "id": "01a20c89-5d47-754f-a183-b5074804c7d3",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "requested_by_label": "conveyor-e2e",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "version": 2
+    },
+    {
+      "approvals": 0,
+      "card_id": null,
+      "created_at": "2026-11-24T07:48:27.429958Z",
+      "decisions": [
+        {
+          "approver": "conveyor-e2e",
+          "approver_id": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "decided_at": "2026-11-24T08:22:27.516211Z",
+          "decided_by_kind": "service",
+          "decision": "reject",
+          "note": "superseded by t19_live_gate_web_v2: the first request named the deciding seat as its own requester, so the P4 conflict rule excludes it; the meeting did not use this gate",
+          "via": {
+            "channel": "internal"
+          }
+        }
+      ],
+      "description": "Decision item 1 for the T19 live gate: approve the evidence record for the web-room decision.",
+      "expires_at": null,
+      "gate": "t19_live_gate_web",
+      "id": "01a20c87-0fd0-7a68-be24-c1e0f5be9f77",
+      "kind": "meeting",
+      "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+      "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "requested_by_label": "FR Test",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "rejected",
+      "version": 2
+    }
+  ]
+}

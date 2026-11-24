@@ -1467,7 +1467,7 @@ The handoff is the level's entry (SPEC_V2 §6.6.1–5): the card names the bindi
 the run starts. It is not a lane move — `cards.move` changes no run and writes no memory. It accepts
 no `release_hash` (the binding is the pin) and writes no `run_step`; the run's first step is the
 executor's own (S21 step 4).
-### 2.30 The L1 laya evaluation — S21 step 10 (migration `0068`)
+### 2.30 The L1 laya evaluation — S21 step 10 (migration `0071`)
 
 The ladder stops trusting its caller: the case is built by the ladder and the verdict comes from a
 recorded laya exchange. Two tables and one column, all new; no existing row changes shape.
@@ -1492,7 +1492,7 @@ recorded laya exchange. Two tables and one column, all new; no existing row chan
 
 **Authoring a set is one row's version bump, never a second row.** `decision_option_sets.set` updates
 the existing header (`version = version + 1`) and replaces its children inside the same transaction,
-so the partial unique indexes in `0068` are never asked to hold two live sets and a reader never sees
+so the partial unique indexes in `0071` are never asked to hold two live sets and a reader never sees
 a half-replaced menu. Old labels survive only in `decision_option` — the per-decision record of what
 that decision chose between; a decision is reproducible from its own row plus its set version.
 

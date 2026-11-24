@@ -763,7 +763,7 @@ probabilities and latency come from that exchange; the decision records `meta.la
 `meta.laya_invocation_id` and `meta.case_hash`. A request carrying a verdict is `422
 caller_supplied_verdict`; an unverifiable key is `422 laya_call_unverified`.
 
-**P2 — options are authored, versioned rows.** Migration `0068` adds `decision_option_set` and
+**P2 — options are authored, versioned rows.** Migration `0071` adds `decision_option_set` and
 `decision_option_set_option` (one live set per `(tenant, kind, gate)`, a monotonic version, rows
 with `key`, `label`, `payload.outcome`). `decision_option_sets.set` authors a set — the one row's
 version increments and its children are replaced in the same transaction — and `.get` reads it. A
@@ -779,7 +779,7 @@ written; the executor applies `domain::ladder::unavailable(fail_policy, action)`
 open → the action's outcome: handover escalates, block refuses, annotate proceeds). A **recorded**
 call that completed without a readable answer is recorded by `ladder.evaluate` as `unavailable` with
 `meta.gate_unavailable = true`, under the same policy. Never a pass. `decision_policy` gains a
-nullable `fire_when` in `0068`, validated at authoring; a case that does not fire is not asked, no
+nullable `fire_when` in `0071`, validated at authoring; a case that does not fire is not asked, no
 decision is written, and the step proceeds. The executor makes exactly one laya request per gate.
 
 **P4 — the proofs and the register.** The existing tests that post a verdict are rewritten to go

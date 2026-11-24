@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Solution Concept Diagram — S03 Domain and schema (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Solution Concept Diagram — S03 Domain and schema (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: diagram</li>
+<li>Purpose: The fourteen tables, the one migration, the state machines and the primitives that carry the domain's refusals.</li>
+<li>Scope: migrations/0002_domain.sql, the Rust machines in crates/domain, the store <code>_tx</code> modules and the RLS policy.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>migrations/0002_domain.sql / the one baseline migration</strong> - {"kind": "component", "note": "459 lines; 14 CREATE TABLE; 14 FORCE ROW LEVEL SECURITY; no CREATE TYPE; no IF NOT EXISTS"}</li>
+<li><strong>programme / project / board / list / card_type / the container rows</strong> - {"kind": "component", "note": "data-arch \u00a72.3 verbatim; list.kind is text CHECK intake|active|waiting|done|archive, never a Postgres enum"}</li>
+<li><strong>card / the board card</strong> - {"kind": "component", "note": "claim columns assignee_id/lease_expires_at/lease_token/claim_fence; paired-null CHECK (lease_expires_at IS NULL) = (lease_token IS NULL); prev_list_id, list_changed_at, generated tsv, version; no state/status"}</li>
+<li><strong>card indexes / the hot paths</strong> - {"kind": "component", "note": "card_board_list_position_idx and card_board_position_idx carry WHERE archived_at IS NULL (lines 155\u2013158); card_assignee_lease_idx is partial on assignee_id IS NOT NULL; card_tsv_idx is gin(tsv); later names add no archive predicate"}</li>
+<li><strong>run / the run machine</strong> - {"kind": "component", "note": "status CHECK queued|running|waiting_approval|succeeded|failed|cancelled; 0002 ships the card-wide uq_run_live; the 2026-11-09 amendment rebuilds the tree in 0037_run_tree_workflow_step.sql around parent_run_id"}</li>
+<li><strong>approval / the gate row</strong> - {"kind": "component", "note": "status pending|approved|rejected|expired|voided; uq_appr_pending (tenant_id, run_id, gate) WHERE status='pending'"}</li>
+<li><strong>approval_decision / the immutable decision</strong> - {"kind": "component", "note": "decided_by_kind and via ported from \u00a72.3; no version; immutable after insert (S3-D5)"}</li>
+<li><strong>governed_asset / revision / the governed asset and its history</strong> - {"kind": "component", "note": "transition Draft|InReview|Approved|Superseded|Archived; superseded implies superseded_by_id as an immediate CHECK; revision.seq = version from 1 (S3-D4)"}</li>
+<li><strong>trace_link / catalogue_entry / the trace and the vocabulary</strong> - {"kind": "component", "note": "typed trace edges; catalogue_entry.kind has no CHECK by design and S03 fixes the eleven labels; the delivery matrix is one project_type row"}</li>
+<li><strong>andon_state / the andon row</strong> - {"kind": "component", "note": "one lazily created row per tenant, pk tenant_id (S3-D5); engaged partial index"}</li>
+<li><strong>may_move / the one transition function</strong> - {"kind": "component", "note": "crates/domain/src/board.rs line 260; reads project_type.meta.matrix; absent entry, card type or row denies (S3-D3)"}</li>
+<li><strong>tenant_isolation policy / the tenancy primitive</strong> - {"kind": "component", "note": "FOR ALL USING (tenant_id = app_current_tenant()) WITH CHECK (the same), on all fourteen tables with ENABLE and FORCE"}</li>
+<li><strong>card / list</strong> - {"kind": "edge", "note": "card.board_id is denormalised and must equal list.board_id; move_card_tx and claim_card_tx join list in the same statement (plan trap 8)"}</li>
+<li><strong>card / claim_card_tx</strong> - {"kind": "edge", "note": "the version precondition and the lease arm decide the grant; claim_fence is monotonic; release and completion are fenced"}</li>
+<li><strong>approval / uq_appr_pending</strong> - {"kind": "edge", "note": "the index, not the code, is the guarantee; 23505 maps to ApprovalConflict and a refused decision writes no row"}</li>
+<li><strong>governed_asset / revision</strong> - {"kind": "edge", "note": "transition_asset_tx writes the revision row with seq = version in the same transaction"}</li>
+<li><strong>project_type.meta.matrix / may_move</strong> - {"kind": "edge", "note": "the matrix is catalogue data on one project_type row; an absent entry denies rather than allows"}</li>
+<li><strong>S02 platform / 0002_domain.sql</strong> - {"kind": "edge", "note": "0001_platform.sql, begin_scoped, the conveyor_runtime role and domain::{TenantId, Id, Version} are the base the domain rows and policies stand on"}</li>
+<li><strong>archived_at / the board scan</strong> - {"kind": "edge", "note": "the stamp excludes a card from the two board-scan indexes; the lease and search scans include stamped cards, so the absolute exclusion claim is the P2 package v1-s03-2"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Domain and schema — aggregates, state machines, baseline domain migration · conveyor output · published 2026-11-24T10:10:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -83,6 +83,9 @@ READ_ONLY_ACTIONS = {
     "programmes.baselines_list",
     "projects.get",
     "architecture.board_get",
+    # The plural reads do not end in `list`/`get`, so the suffix rule below misses them.
+    "architecture.artifacts_links",
+    "architecture.artifacts_entries",
     "approvals.list",
     "approvals.get",
     "documents.get",

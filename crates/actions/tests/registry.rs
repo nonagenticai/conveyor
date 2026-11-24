@@ -121,10 +121,17 @@ use serde_json::{Value, json};
 /// **S21 step 9 (#649) adds 1 internal**: `cards.assign`, the card handoff (binding + note +
 /// bound run start). 530 → **531**. **T5 (#77) adds 8 internal**: P1's
 /// `kata.open|get|observe|analyse|hypothesise|propose|measure` and P2–P4's `kata.adopt` —
-/// 531 → **539**. **S21 step 10 (#656) adds 4**: `ladder.case` and the two
-/// `decision_option_sets.*` actions (internal) and `ladder.precheck` (external) — 539 → **543**,
-/// internal 521 → 524, external 18 → 19.
-const EXPECTED: [&str; 543] = [
+/// 531 → **539**. **T6 (#80) adds 9 internal**: `development_projects.charter|record_step|`
+/// `review_gate|merge_gate|deploy_gate|close|get|rollback|change_judging_surface` — the
+/// self-development path and its gates, the earned auto-merge read and the closure record.
+/// 539 → **548**. **T8 (#79) adds 3 internal**: `lessons.propose|review|promote` — the
+/// organisational-memory lifecycle. 548 → **551**. **T15 (#86) adds 10 internal**:
+/// `toolkits.import_openapi|register_mcp|discover_mcp`, `tool_authoring.draft|validate|test|`
+/// `review|publish|promote` and the broker's registered-destination dispatch `tools.dispatch`
+/// — 551 → **561**. **S21 step 10 (#656) adds 4**: `ladder.case` and
+/// `decision_option_sets.get|set` (internal) and `ladder.precheck` (external) — 561 → **565**,
+/// internal 543 → 546, external 18 → 19.
+const EXPECTED: [&str; 565] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -271,6 +278,15 @@ const EXPECTED: [&str; 543] = [
     "decision_policies.update",
     "departments.create",
     "departments.list",
+    "development_projects.change_judging_surface",
+    "development_projects.charter",
+    "development_projects.close",
+    "development_projects.deploy_gate",
+    "development_projects.get",
+    "development_projects.merge_gate",
+    "development_projects.record_step",
+    "development_projects.review_gate",
+    "development_projects.rollback",
     "documents.compose",
     "documents.create",
     "documents.delete",
@@ -374,12 +390,17 @@ const EXPECTED: [&str; 543] = [
     "ladder.apply_draft",
     "ladder.case",
     "ladder.evaluate",
-    "ladder.precheck",
     "ladder.list",
+    "ladder.precheck",
     "ladder.record",
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
+    // T8 (#79): the organisational-memory lifecycle — propose with independent evidence,
+    // a person's review, and promotion to a governed-asset source draft.
+    "lessons.promote",
+    "lessons.propose",
+    "lessons.review",
     "licences.get",
     "lists.create",
     "lists.move",
@@ -622,8 +643,18 @@ const EXPECTED: [&str; 543] = [
     "tasks.update",
     "tenants.get",
     "tenants.update_settings",
+    "tool_authoring.draft",
+    "tool_authoring.promote",
+    "tool_authoring.publish",
+    "tool_authoring.review",
+    "tool_authoring.test",
+    "tool_authoring.validate",
+    "toolkits.discover_mcp",
+    "toolkits.import_openapi",
     "toolkits.publish",
+    "toolkits.register_mcp",
     "tools.call",
+    "tools.dispatch",
     "tools.probe",
     "tools.usage",
     "trace_links.create",
@@ -767,10 +798,19 @@ fn the_registry_is_exactly_the_declared_set() {
     // 500 -> 512; external stays 18.
     // T5 (#77) adds eight internal actions — P1's `kata.open|get|observe|analyse|hypothesise|`
     // `propose|measure` and P2–P4's `kata.adopt`: internal 512 -> 520. S21 step 9 (#649) adds
-    // one internal (`cards.assign`): 520 -> 521. S21 step 10 (#656) adds three internal
-    // (`ladder.case`, `decision_option_sets.get|set`) and one external (`ladder.precheck`):
-    // 521 -> 524, 18 -> 19.
-    assert_eq!((internal, external), (524, 19));
+    // one internal (`cards.assign`): 520 -> 521; external stays 18.
+    // T6 (#80) adds nine internal actions (`development_projects.*`): internal 521 -> 530;
+    // external stays 18 — the evidence is rows on this tenant's own database.
+    // T8 (#79) adds three internal actions (`lessons.propose|review|promote`): internal
+    // 530 -> 533; external stays 18 — a promotion writes this tenant's own source draft and
+    // calls no model.
+    // T15 (#86) adds ten internal actions (`toolkits.import_openapi|register_mcp|discover_mcp`,
+    // `tool_authoring.draft|validate|test|review|publish|promote`, `tools.dispatch`):
+    // internal 533 -> 543; external stays 18 — an authored tool dispatches through the broker's
+    // registered-destination arm, not a new external declaration.
+    // S21 step 10 (#656) adds three internal actions (`ladder.case`, `decision_option_sets.get|set`)
+    // and one external (`ladder.precheck`): internal 543 -> 546, external 18 -> 19.
+    assert_eq!((internal, external), (546, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
