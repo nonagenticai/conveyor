@@ -51,6 +51,12 @@ Natural keys and existence
     would skip the first run, because B1-B6 pre-exist in the production dump; the update's
     own effect is the idempotency test.  Likewise a decided gate, not merely an open gate,
     is an existing approval decision.
+``contract:<staging id>``
+    an architecture contract with the same governing project, kind and title (the staging
+    id is not portable).  ``board-decide:<body>:<subject>``: the ``architecture_board``
+    approval the subject contract cites as its ``approval_id`` — the one read surface that
+    ties a tenant-scoped board gate to the row it decided.  ``contract-approve:<staging id>``:
+    a contract whose status is already ``live``.
 
 Staging ids are remapped from earlier action outputs: ``changes.request`` returns
 ``change_id`` and ``approval_id``; ``benefits.create`` returns ``id``; measurements,
@@ -137,6 +143,12 @@ WRITE_ACTIONS = {
     # (project, type); the approve names the create's staging id, which the replay maps.
     "architecture.artifacts_create",
     "architecture.artifacts_approve",
+    # The §8.1 contract chain (v1-promotion-contract-actions-1): the request creates the
+    # contract, the Board's decision is the approval row it is governed by, and the approval
+    # makes it live. Without these three a replayed project loses its live contract.
+    "architecture.contracts_request",
+    "architecture.board_decide",
+    "architecture.contracts_approve",
     # The governed-asset family (SPEC_V2 §8.3, §10.4): the MSP programme artefacts no fixed
     # family owns are composed on the programme-definition project and stepped through
     # draft → in_review → approved. Without these three the MSP rows cannot replay at all.
@@ -177,6 +189,8 @@ READ_ACTIONS = {
     "baselines.list",
     "architecture.artifacts_list",
     "architecture.artifacts_get",
+    "architecture.contracts_list",
+    "architecture.contracts_get",
 }
 
 # The release this script ships with has no action that lists measurements.  If one is
@@ -222,6 +236,12 @@ CARD_COMMENT_KEY_RE = re.compile(r"^card-comment:([0-9a-f-]{36}):([0-9a-f]{8,64}
 CARD_MOVE_KEY_RE = re.compile(r"^card-move:([0-9a-f-]{36}):(intake|active|waiting|done|archive)$")
 ARTIFACT_KEY_RE = re.compile(r"^architecture-artifact:([0-9a-f-]{36}):([0-9a-f-]{36})$")
 ARTIFACT_APPROVE_KEY_RE = re.compile(r"^architecture-artifact-approve:([0-9a-f-]{36})$")
+# The §8.1 contract chain.  The request and the approval key on the staging row ids the
+# replay maps; the Board's decision keys on the body and the contract it decides, because
+# its output is an approval id and its input carries no contract id of its own.
+CONTRACT_KEY_RE = re.compile(r"^contract:([0-9a-f-]{36})$")
+BOARD_DECIDE_KEY_RE = re.compile(r"^board-decide:([0-9a-f-]{36}):([0-9a-f-]{36})$")
+CONTRACT_APPROVE_KEY_RE = re.compile(r"^contract-approve:([0-9a-f-]{36})$")
 BENEFIT_LINK_KEY_RE = re.compile(rf"^benefit-link:({TOKEN}):(.+)$")
 DECISION_KEY_RE = re.compile(rf"^decision:({TOKEN})(?:/(draft|in_review|approved|superseded|archived))?$")
 # The governed-asset family (SPEC_V2 §8.3).  Compose keys by its content — kind, owning
@@ -307,6 +327,12 @@ class NaturalKey:
             return f"architecture-artifact:{self.first}:{self.second}"
         if self.kind == "architecture_artifact_approve":
             return f"architecture-artifact-approve:{self.first}"
+        if self.kind == "contract":
+            return f"contract:{self.first}"
+        if self.kind == "board_decide":
+            return f"board-decide:{self.first}:{self.second}"
+        if self.kind == "contract_approve":
+            return f"contract-approve:{self.first}"
         if self.kind == "benefit_link":
             return f"benefit-link:{self.first}:{self.second}"
         if self.kind == "decision":
@@ -457,6 +483,15 @@ def parse_natural_key(value: str) -> NaturalKey:
     match = ARTIFACT_KEY_RE.match(value)
     if match:
         return NaturalKey("architecture_artifact", match.group(1), match.group(2))
+    match = CONTRACT_APPROVE_KEY_RE.match(value)
+    if match:
+        return NaturalKey("contract_approve", match.group(1))
+    match = CONTRACT_KEY_RE.match(value)
+    if match:
+        return NaturalKey("contract", match.group(1))
+    match = BOARD_DECIDE_KEY_RE.match(value)
+    if match:
+        return NaturalKey("board_decide", match.group(1), match.group(2))
     raise PromoteError(f"malformed natural key: {value!r}")
 
 
@@ -927,6 +962,60 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                 errors.append(
                     f"line {entry.lineno}: natural key {key.first!r} does not match "
                     f"input id {entry.payload.get('id')!r}"
+                )
+        elif entry.action == "architecture.contracts_request":
+            if key.kind != "contract":
+                errors.append(
+                    f"line {entry.lineno}: architecture.contracts_request key must be "
+                    "contract:<staging contract id>"
+                )
+                continue
+            if entry.output_id != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"output_id {entry.output_id!r}"
+                )
+            for name in ("project_id", "kind", "phase_code", "title"):
+                if not entry.payload.get(name):
+                    errors.append(
+                        f"line {entry.lineno}: a contract request needs a {name}"
+                    )
+        elif entry.action == "architecture.board_decide":
+            if key.kind != "board_decide":
+                errors.append(
+                    f"line {entry.lineno}: architecture.board_decide key must be "
+                    "board-decide:<body id>:<subject id>"
+                )
+                continue
+            if str(entry.payload.get("body_id")) != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input body_id {entry.payload.get('body_id')!r}"
+                )
+            if str(entry.payload.get("subject_id")) != key.second:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.second!r} does not match "
+                    f"input subject_id {entry.payload.get('subject_id')!r}"
+                )
+            if entry.payload.get("decision") not in ("approved", "rejected"):
+                errors.append(
+                    f"line {entry.lineno}: a board decision must be approved or rejected"
+                )
+        elif entry.action == "architecture.contracts_approve":
+            if key.kind != "contract_approve":
+                errors.append(
+                    f"line {entry.lineno}: architecture.contracts_approve key must be "
+                    "contract-approve:<staging contract id>"
+                )
+                continue
+            if str(entry.payload.get("id")) != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input id {entry.payload.get('id')!r}"
+                )
+            if not entry.payload.get("delegation_ref"):
+                errors.append(
+                    f"line {entry.lineno}: a contract approval needs a delegation_ref"
                 )
         elif entry.action == "wbs.update":
             if key.kind != "wbs_accept":
@@ -1471,6 +1560,10 @@ class State:
     # The architecture compliance reviews, by contract id. (The plain `reviews` field is the
     # tranche review list; this is the architecture one.)
     compliance_reviews: dict[str, list[dict]] = field(default_factory=dict)
+    # The §8.1 architecture contracts, tenant-wide.  The request's natural key is content
+    # (project, kind, title) and the approval's is the contract's `approval_id` the board
+    # decision left behind, so the rows are read before either act is repeated.
+    contracts: list[dict] = field(default_factory=list)
     # The tr3 record family's production rows: benefits-map edges by benefit.
     links: list[dict] = field(default_factory=list)
     # The document family's production rows, by (project, category) as listed.
@@ -1564,6 +1657,18 @@ def load_state(
             if row.get("id") not in seen_registers:
                 state.registers.append(row)
                 seen_registers.add(row.get("id"))
+    if any(
+        entry.action
+        in (
+            "architecture.contracts_request",
+            "architecture.board_decide",
+            "architecture.contracts_approve",
+        )
+        for entry in entries
+    ):
+        # The contracts are tenant-scoped: a board decision carries no project id, and the
+        # approval is read back against the contract it cites.
+        state.contracts.extend(rows(client, "architecture.contracts_list", {}))
     if any(
         entry.action in ("decisions.create", "decisions.transition") for entry in entries
     ):
@@ -1787,6 +1892,8 @@ def load_state(
     chain_actions = {"cadences.approve_plan", "tranches.review", "tranches.authorise"}
     if any(
         entry.action in chain_actions
+        or entry.action
+        in ("architecture.board_decide", "architecture.contracts_approve")
         or (
             entry.action == "approvals.request"
             and entry.key is not None
@@ -2255,6 +2362,50 @@ def existing_for(
         gate = tranche_review_gate(state, tranche.get("id") if tranche else None)
         if gate is not None and gate.get("status") == expected_gate_status(entry.payload):
             return gate
+        return None
+    if entry.action == "architecture.contracts_request":
+        # The staging contract id is not portable: the contract is the same row when its
+        # governing project, kind and title match.
+        project_id = (id_map or {}).get(
+            str(entry.payload.get("project_id") or ""),
+            str(entry.payload.get("project_id") or ""),
+        )
+        for row in state.contracts:
+            if (
+                str(row.get("project_id")) == project_id
+                and row.get("kind") == entry.payload.get("kind")
+                and row.get("title") == entry.payload.get("title")
+            ):
+                return row
+        return None
+    if entry.action == "architecture.board_decide":
+        # The contract's `approval_id` is the board decision that governs it: it is the one
+        # read surface (`architecture.contracts_list`/`contracts_get` + `approvals.list`)
+        # that ties a tenant-scoped `architecture_board` gate to its subject.  A rejected
+        # decision leaves no such link and has no read surface that names the subject.
+        subject = (id_map or {}).get(key.second, key.second)
+        expected = entry.payload.get("decision")
+        for row in state.contracts:
+            if str(row.get("id")) != str(subject):
+                continue
+            approval_id = row.get("approval_id")
+            if not approval_id:
+                continue
+            for gate in state.approvals:
+                if str(gate.get("id")) == str(approval_id) and (
+                    gate.get("status") == expected
+                ):
+                    return gate
+        return None
+    if entry.action == "architecture.contracts_approve":
+        production = (id_map or {}).get(key.first)
+        if production:
+            for row in state.contracts:
+                if (
+                    str(row.get("id")) == str(production)
+                    and row.get("status") == "live"
+                ):
+                    return row
         return None
     if entry.action == "registers.create":
         return risk_by_code(state, key.first)
@@ -2739,10 +2890,63 @@ def remap_payload(
                 "entry must create or find it first"
             )
         payload["id"] = production
+    elif entry.action == "architecture.contracts_request":
+        project_id = payload.get("project_id")
+        if not project_id:
+            raise PromoteError(
+                "architecture.contracts_request: the input names no project_id"
+            )
+        # The governing project is remapped like every project reference; a restored row
+        # keeps its id and the fallback is the same rule.
+        payload["project_id"] = id_map.get(str(project_id), str(project_id))
+        supersedes = payload.get("supersedes_id")
+        if supersedes:
+            production = id_map.get(str(supersedes))
+            if production:
+                payload["supersedes_id"] = production
+            else:
+                # A contract the journal does not replay cannot be cited in production; a
+                # dangling staging FK is worse than an un-superseded request.
+                payload.pop("supersedes_id", None)
+    elif entry.action == "architecture.board_decide":
+        body = payload.get("body_id")
+        if not body:
+            raise PromoteError("architecture.board_decide: the input names no body_id")
+        payload["body_id"] = id_map.get(str(body), str(body))
+        subject = payload.get("subject_id")
+        if subject:
+            production = id_map.get(str(subject))
+            if not production:
+                raise PromoteError(
+                    f"architecture.board_decide: subject {subject!r} has no production "
+                    "id; the contract request must create or find it first"
+                )
+            payload["subject_id"] = production
+    elif entry.action == "architecture.contracts_approve":
+        staging = payload.get("id")
+        production = id_map.get(str(staging)) if staging else None
+        if not production:
+            raise PromoteError(
+                f"architecture.contracts_approve: contract {staging!r} has no production "
+                "id; the request entry must create or find it first"
+            )
+        payload["id"] = production
+        staging_approval = payload.get("approval_id")
+        if staging_approval:
+            approval = id_map.get(str(staging_approval))
+            if not approval:
+                raise PromoteError(
+                    f"architecture.contracts_approve: approval {staging_approval!r} has "
+                    "no production id; the board decision must run first"
+                )
+            payload["approval_id"] = approval
+        delegation = payload.get("delegation_ref")
+        if delegation:
+            payload["delegation_ref"] = id_map.get(str(delegation), str(delegation))
     elif entry.action == "architecture.artifacts_create":
-        # The artefact's contract is an architecture-domain row the journal does not yet
-        # replay (v1-promotion-contract-actions-1). A mapped contract is carried; an
-        # unmapped staging reference is dropped rather than written as a dangling FK.
+        # The artefact's contract is an architecture-domain row the request entry may have
+        # created; a mapped contract is carried and an unmapped staging reference is dropped
+        # rather than written as a dangling FK.
         contract = payload.get("contract_id")
         if contract:
             payload["contract_id"] = id_map.get(str(contract))
@@ -3069,6 +3273,13 @@ def output_id_for(action: str, output: Any) -> tuple[str, str | None]:
         if not approval_id:
             raise PromoteError("cadences.approve_plan: output has no approval_id")
         return str(approval_id), None
+    if action == "architecture.board_decide":
+        # The act's output is the approval row that records the decision; the contract
+        # approval after it cites that id.
+        approval_id = output.get("approval_id")
+        if not approval_id:
+            raise PromoteError("architecture.board_decide: output has no approval_id")
+        return str(approval_id), None
     row_id = output.get("id")
     if not row_id:
         raise PromoteError(f"{action}: output has no id")
@@ -3207,6 +3418,54 @@ def readback_entry(
                 f"architecture.artifacts_get: status is {row.get('status')!r}, "
                 "not 'approved'"
             )
+        return row
+    if entry.action == "architecture.contracts_request":
+        row = read_row(client, "architecture.contracts_get", production_id)
+        if row.get("kind") != entry.payload.get("kind"):
+            raise ReadbackError(
+                f"architecture.contracts_get: kind is {row.get('kind')!r}, not "
+                f"{entry.payload.get('kind')!r}"
+            )
+        if row.get("title") != entry.payload.get("title"):
+            raise ReadbackError(
+                f"architecture.contracts_get: title is {row.get('title')!r}, not "
+                f"{entry.payload.get('title')!r}"
+            )
+        return row
+    if entry.action == "architecture.board_decide":
+        try:
+            gates = list_all(client, "approvals.list", {})
+        except PromoteError as error:
+            raise ReadbackError(str(error)) from None
+        for gate in gates:
+            if gate.get("id") != production_id:
+                continue
+            if gate.get("gate") != "architecture_board":
+                raise ReadbackError(
+                    f"approvals.list: the board decision is a {gate.get('gate')!r} gate"
+                )
+            if gate.get("status") != entry.payload.get("decision"):
+                raise ReadbackError(
+                    f"approvals.list: the board decision is {gate.get('status')!r}, "
+                    f"not {entry.payload.get('decision')!r}"
+                )
+            return gate
+        raise ReadbackError("approvals.list: the board decision is not readable")
+    if entry.action == "architecture.contracts_approve":
+        row = read_row(client, "architecture.contracts_get", production_id)
+        if row.get("status") != "live":
+            raise ReadbackError(
+                f"architecture.contracts_get: status is {row.get('status')!r}, "
+                "not 'live'"
+            )
+        staging_approval = entry.payload.get("approval_id")
+        if staging_approval:
+            wanted = (id_map or {}).get(str(staging_approval))
+            if wanted and str(row.get("approval_id")) != str(wanted):
+                raise ReadbackError(
+                    f"architecture.contracts_get: approval is "
+                    f"{row.get('approval_id')!r}, not {wanted!r}"
+                )
         return row
     if entry.action == "wbs.update":
         nodes = rows(client, "wbs.list", {"project_id": key.first})
@@ -3629,6 +3888,17 @@ def apply_entries(
                         "for If-Match"
                     )
                 output = client.invoke(entry.action, payload, if_match=version, actor=actor)
+            elif entry.action == "architecture.contracts_approve":
+                current = read_row(
+                    client, "architecture.contracts_get", str(payload["id"])
+                )
+                version = current.get("version")
+                if not isinstance(version, int):
+                    raise PromoteError(
+                        f"architecture.contracts_get: {payload['id']} has no version "
+                        "for If-Match"
+                    )
+                output = client.invoke(entry.action, payload, if_match=version, actor=actor)
             elif entry.action == "documents.publish":
                 current = read_row(client, "documents.get", str(payload["id"]))
                 version = current.get("version")
@@ -3788,6 +4058,13 @@ def apply_entries(
                     upsert_row(state.tranches, row)
                 elif entry.action == "approvals.request" and key.kind == "tranche_review_gate":
                     upsert_row(state.approvals, row)
+                elif entry.action == "architecture.board_decide":
+                    upsert_row(state.approvals, row)
+                elif entry.action in (
+                    "architecture.contracts_request",
+                    "architecture.contracts_approve",
+                ):
+                    upsert_row(state.contracts, row)
             outcomes.append(
                 Outcome(entry, entry.output_id, production_id, "created")
             )
@@ -3984,6 +4261,66 @@ class FakeClient:
                 if row.get("id") == payload.get("id"):
                     return copy.deepcopy(row)
             return None
+        if action == "architecture.contracts_list":
+            return {
+                "items": self._rows(self.state.contracts, payload),
+                "next_cursor": None,
+            }
+        if action == "architecture.contracts_get":
+            for row in self.state.contracts:
+                if row.get("id") == payload.get("id"):
+                    return copy.deepcopy(row)
+            raise PromoteError(
+                f"architecture.contracts_get: no contract {payload.get('id')}"
+            )
+        if action == "architecture.contracts_request":
+            row = copy.deepcopy(payload)
+            row.update(
+                id=self._id("contract"),
+                status="draft",
+                approval_id=None,
+                requested_by=actor,
+                version=1,
+            )
+            self.state.contracts.append(row)
+            return copy.deepcopy(row)
+        if action == "architecture.board_decide":
+            approval_id = self._id("board-decision")
+            self.state.approvals.append({
+                "id": approval_id,
+                "gate": "architecture_board",
+                "kind": "architecture_board",
+                "status": payload.get("decision"),
+                "project_id": None,
+                "target": None,
+                "meta": {
+                    "body_id": payload.get("body_id"),
+                    "evidence": payload.get("evidence"),
+                    "subject_kind": payload.get("subject_kind"),
+                    "subject_id": payload.get("subject_id"),
+                },
+                "version": 1,
+            })
+            return {"approval_id": approval_id}
+        if action == "architecture.contracts_approve":
+            for row in self.state.contracts:
+                if row.get("id") != payload.get("id"):
+                    continue
+                if row.get("status") != "draft":
+                    raise PromoteError(
+                        "architecture.contracts_approve: contract is "
+                        f"{row.get('status')!r}; only a draft can be approved"
+                    )
+                if if_match != row.get("version"):
+                    raise PromoteError("architecture.contracts_approve: If-Match is stale")
+                row["status"] = "live"
+                row["approval_id"] = payload.get("approval_id")
+                row["approved_by"] = actor
+                row["version"] = int(row.get("version") or 1) + 1
+                return copy.deepcopy(row)
+            raise PromoteError(
+                f"architecture.contracts_approve: no contract {payload.get('id')}"
+            )
         if action == "governed_assets.compose":
             row = copy.deepcopy(payload)
             row.update(
@@ -4727,6 +5064,140 @@ def self_test() -> int:
         entries, unreplayable, errors = build_entries(family)
         ok(not errors and not unreplayable, f"the artefact family parses: {errors}")
         ok(not validate_entries(entries), "the artefact family validates")
+
+        # 1c. architecture_contract_chain_replays (v1-promotion-contract-actions-1): the
+        #     request, the Board's decision and the approval replay with the staging ids
+        #     mapped to the production rows, and a second replay over the production reads
+        #     skips all three instead of duplicating the contract.
+        contract_staging = "01a20ce0-0000-4000-8000-000000000001"
+        decision_staging = "01a20ce0-0000-4000-8000-000000000002"
+        board_body = "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e"
+        delegation = "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        contract_project = "01a1d039-0d38-76fb-9394-b75934d16fcd"
+        contract_input = root / "contract-request.json"
+        contract_input.write_text(
+            json.dumps({
+                "project_id": contract_project,
+                "kind": "delivery_contract",
+                "phase_code": "f",
+                "title": "Delivery contract — fixture",
+                "body": {"manifest": "fixture"},
+            }),
+            encoding="utf-8",
+        )
+        decision_input = root / "contract-board-decision.json"
+        decision_input.write_text(
+            json.dumps({
+                "body_id": board_body,
+                "decision": "approved",
+                "evidence": {"delegation_ref": delegation,
+                             "manifest": "fixture"},
+                "subject_kind": "contract",
+                "subject_id": contract_staging,
+            }),
+            encoding="utf-8",
+        )
+        approve_input = root / "contract-approve.json"
+        approve_input.write_text(
+            json.dumps({
+                "id": contract_staging,
+                "approval_id": decision_staging,
+                "delegation_ref": delegation,
+            }),
+            encoding="utf-8",
+        )
+        contract_key = f"contract:{contract_staging}"
+        decide_key = f"board-decide:{board_body}:{contract_staging}"
+        approve_key = f"contract-approve:{contract_staging}"
+        for value, kind in (
+            (contract_key, "contract"),
+            (decide_key, "board_decide"),
+            (approve_key, "contract_approve"),
+        ):
+            parsed = parse_natural_key(value)
+            ok(
+                parsed.kind == kind and parsed.canonical() == value,
+                f"the {kind} natural key round-trips",
+            )
+        contract_entries, contract_unreplayable, contract_errors = build_entries([
+            (2, {"action": "architecture.contracts_request",
+                 "input": str(contract_input), "natural_key": contract_key,
+                 "output_id": contract_staging}),
+            (3, {"action": "architecture.board_decide",
+                 "input": str(decision_input), "natural_key": decide_key,
+                 "output_id": decision_staging}),
+            (4, {"action": "architecture.contracts_approve",
+                 "input": str(approve_input), "natural_key": approve_key,
+                 "output_id": contract_staging}),
+        ])
+        ok(
+            not contract_errors and not contract_unreplayable,
+            f"the contract chain parses with no unreplayable_input: "
+            f"{contract_errors} {[e.unreplayable for e in contract_unreplayable]}",
+        )
+        ok(not validate_entries(contract_entries), "the contract chain validates")
+
+        contract_state = State()
+        contract_client = FakeClient(contract_state)
+        contract_map, contract_outcomes = apply_entries(
+            contract_client, contract_entries, contract_state, None
+        )
+        ok(
+            [outcome.verdict for outcome in contract_outcomes]
+            == ["created", "created", "created"],
+            f"the contract chain applies: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in contract_outcomes]}",
+        )
+        production_contract = contract_map[contract_staging]
+        production_decision = contract_map[decision_staging]
+        ok(
+            production_contract != contract_staging
+            and production_decision != decision_staging,
+            "the request and the Board decision map their staging ids",
+        )
+        decide_call = [
+            payload for action, payload, _, _ in contract_client.calls
+            if action == "architecture.board_decide"
+        ][-1]
+        ok(
+            decide_call["subject_id"] == production_contract,
+            "the Board decision names the production contract, not the staging one",
+        )
+        approve_call, approve_match = [
+            (payload, if_match) for action, payload, if_match, _ in contract_client.calls
+            if action == "architecture.contracts_approve"
+        ][-1]
+        ok(
+            approve_call["id"] == production_contract
+            and approve_call["approval_id"] == production_decision,
+            "the approval names the production contract and the production decision",
+        )
+        ok(
+            approve_match == 1,
+            f"the approval sends the production version for If-Match: {approve_match}",
+        )
+        ok(
+            contract_state.contracts[0]["status"] == "live"
+            and contract_state.contracts[0]["approval_id"] == production_decision,
+            "the replayed contract is live under the Board's production decision",
+        )
+
+        replay_reads = load_state(
+            FakeClient(contract_state), contract_entries, None,
+            programme_id="01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        )
+        replay_client = FakeClient(contract_state)
+        replay_map, replay_outcomes = apply_entries(
+            replay_client, contract_entries, replay_reads, None
+        )
+        ok(
+            [outcome.verdict for outcome in replay_outcomes]
+            == ["skipped", "skipped", "skipped"],
+            f"a second replay skips the contract chain: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in replay_outcomes]}",
+        )
+        ok(replay_map == contract_map, "the contract map is stable across runs")
+        ok(not replay_client.calls, "a skipped contract chain invokes no write")
 
         # 2. duplicate refusal.
         duplicate = _fixture_entries(paths, ("risk", "risk"))
