@@ -480,7 +480,7 @@
     "POST /api/actions/prompt_findings.decide/invocations": "2c64c27946283bde80e650542347b9b2261f401e0b4b0c37bffd7163c89973a1",
     "POST /api/actions/prompt_findings.list/invocations": "2e25a430bbde216df44c63a05e4b6427375215817cb5429f2dcf3647a199dfd1",
     "POST /api/actions/prompt_recipes.activate/invocations": "914f33fbdde862cb9fb8fe445124c5ad4bd2d1f5b5afbabfeeae40f9da68e59d",
-    "POST /api/actions/prompt_recipes.create/invocations": "8477bf6af4d0dfe5d41367e8f8153b4c4bdb9837c45345c8b3ad3c91c5d807dc",
+    "POST /api/actions/prompt_recipes.create/invocations": "2c9a140a4ba787d436c011f3ae594f2eea896edc6116879db8a5e4577664f144",
     "POST /api/actions/prompt_recipes.get/invocations": "2f3e1f7d83fcec5510cadc0e45aa9ea778847ccf43b30e46c2ba3e3c6aac38ad",
     "POST /api/actions/prompt_recipes.list/invocations": "30c27c4e1c44757fdf4c63465d38c66be3f71a7906baaa837de731253ecca86b",
     "POST /api/actions/prompt_recipes.retire/invocations": "ec592f55003b2207cde57bd50bc70914b3f42d015c270c6443dd633ed7660b5a",
