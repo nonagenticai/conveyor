@@ -309,7 +309,16 @@ pub fn problem(status: u16, text: &str) -> ApiError {
         .unwrap_or_else(|| format!("HTTP {status}"));
     match status {
         401 => ApiError::Unauthenticated,
-        403 => ApiError::Forbidden(detail),
+        403 => {
+            // The problem's `type` is the machine code the contract names
+            // (`tool_effect_forbidden`, …). The console shows it beside the server's sentence;
+            // the detail is unchanged, so an assertion on the text still reads the sentence.
+            let detail = match problem.kind.as_deref() {
+                Some(kind) if !detail.ends_with(kind) => format!("{detail} [{kind}]"),
+                _ => detail,
+            };
+            ApiError::Forbidden(detail)
+        }
         404 => ApiError::NotFound(detail),
         409 => ApiError::Conflict(detail),
         412 => ApiError::Precondition(detail),
