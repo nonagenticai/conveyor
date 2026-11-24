@@ -177,6 +177,10 @@ async fn assert_pm(
 
 /// Insert one approval and return its id.
 ///
+/// The tenant's gate policy row (`approval_policies.set` on the gate's name) is the floor: the
+/// caller may ask for more decisions, never fewer. The row's approver kind and the floor it set
+/// are recorded on the approval, which is what the decide path reads.
+///
 /// `pub(crate)`: `projects.charter` (the existing-project charter path) opens the same gate
 /// `pm.charter` opens, and must not grow a second approval writer.
 pub(crate) async fn open_gate(
@@ -185,14 +189,50 @@ pub(crate) async fn open_gate(
     project_id: Uuid,
     gate: &str,
     kind: &str,
-    required_decisions: u16,
-    meta: Value,
+    requested_decisions: Option<u16>,
+    mut meta: Value,
 ) -> Result<Uuid, ActionError> {
+    // An absent row is the strict default (one human decision), never a waiver. A row this
+    // build cannot parse is treated the same way: the gate opens at the default, and the decide
+    // path independently refuses a non-human decider it cannot authorise.
+    let (policy, source) = match store::approval_policy::get(&mut *conn, ctx.tenant, gate).await {
+        Ok(Some(policy)) => (policy, "tenant"),
+        Ok(None) => (
+            store::approval_policy::ApprovalPolicy::default_for(gate),
+            "default",
+        ),
+        Err(store::approval_policy::ApprovalPolicyStoreError::Database(error)) => {
+            tracing::error!(%error, "pm: read gate policy");
+            return Err(ActionError::internal());
+        }
+        Err(other) => {
+            tracing::warn!(%other, gate, "pm: unreadable gate policy, using the default");
+            (
+                store::approval_policy::ApprovalPolicy::default_for(gate),
+                "default",
+            )
+        }
+    };
+    let floor = policy.required_decisions;
+    // ⛔ A caller may raise the quorum, never lower the tenant's floor.
+    let required_decisions = requested_decisions.unwrap_or(floor).max(floor);
+    let Some(meta) = meta.as_object_mut() else {
+        tracing::error!(gate, "pm: gate meta is not an object");
+        return Err(ActionError::internal());
+    };
+    meta.insert(
+        "approver_kind".to_owned(),
+        json!(policy.approver_kind.as_str()),
+    );
+    meta.insert(
+        "gate_policy".to_owned(),
+        json!({"source": source, "floor": floor}),
+    );
     let mut approval = NewApproval::new(gate, kind);
     approval.project_id = Some(project_id);
     approval.required_decisions = required_decisions;
     approval.requested_by = Some(ctx.actor_id);
-    approval.meta = meta;
+    approval.meta = Value::Object(std::mem::take(meta));
     let record = store::approval::insert_approval_tx(&mut *conn, ctx.tenant, &approval)
         .await
         .map_err(|error| {
@@ -374,7 +414,7 @@ async fn pm_charter(
         project.id,
         "charter",
         "pm",
-        1,
+        None,
         json!({
             "charter_asset_id": asset.id.to_string(),
             "description": format!("Approve the charter for {}", project.key),
@@ -571,7 +611,7 @@ async fn plan_project(
         project_id,
         "baseline",
         "pm",
-        1,
+        None,
         json!({
             "baseline_id": baseline.id.to_string(),
             "description": format!("Approve the {kind} baseline"),
@@ -724,7 +764,7 @@ async fn pm_route_gate(
         input.project_id,
         gate,
         kind,
-        required,
+        input.required_decisions,
         Value::Object(meta),
     )
     .await?;
@@ -1120,7 +1160,7 @@ async fn changes_request(
         input.project_id,
         "change",
         "pm",
-        1,
+        None,
         json!({
             "change_id": change.id.to_string(),
             "description": format!("Approve change {}", change.id),

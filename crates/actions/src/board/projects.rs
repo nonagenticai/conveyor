@@ -643,7 +643,7 @@ async fn projects_close_request(
         project.id,
         "closure",
         "pm",
-        1,
+        None,
         serde_json::json!({
             "closure_asset_id": asset.id.to_string(),
             "delegation_ref": input.delegation_ref.to_string(),
@@ -727,7 +727,7 @@ async fn projects_charter(
         project.id,
         "charter",
         "pm",
-        1,
+        None,
         serde_json::json!({
             "charter_asset_id": asset.id.to_string(),
             "description": format!("Approve the charter for {}", project.key),
