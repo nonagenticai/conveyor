@@ -1275,8 +1275,9 @@ fn job_authority_error(
 /// Read the tenant's meta-role × action matrix.
 ///
 /// The stored overrides are the queried role's rows; the effective matrix is the five §6.7
-/// roles over [`matrix_actions`], each cell attributed to its stored row or the compiled
-/// default. Read-only: `effect = "read"`, no audit event.
+/// roles over [`matrix_actions`], each cell attributed to its stored row, the compiled §6.7
+/// cell, or `ungoverned` (an action the matrix does not name, left to the RBAC scope check).
+/// Read-only: `effect = "read"`, no audit event.
 #[crate::action(
     name = "job_authorities.get",
     version = 1,
@@ -1313,16 +1314,20 @@ async fn job_authorities_get(
             let stored_allowed = stored
                 .get(&(role.to_owned(), (*action).to_owned()))
                 .copied();
+            // A stored row wins. An absent row is the compiled §6.7 cell when the matrix governs
+            // this action; an ungoverned action is allowed and left to the RBAC scope check.
+            let (allowed, source) = match stored_allowed {
+                Some(allowed) => (allowed, "stored"),
+                None => match store::job_authority::compiled_default(role, *action) {
+                    Some(allowed) => (allowed, "compiled_default"),
+                    None => (true, "ungoverned"),
+                },
+            };
             effective.push(JobAuthorityCellOut {
                 meta_role: role.to_owned(),
                 action: (*action).to_owned(),
-                allowed: stored_allowed
-                    .unwrap_or_else(|| store::job_authority::compiled_default(role, *action)),
-                source: if stored_allowed.is_some() {
-                    "stored".to_owned()
-                } else {
-                    "compiled_default".to_owned()
-                },
+                allowed,
+                source: source.to_owned(),
             });
         }
     }

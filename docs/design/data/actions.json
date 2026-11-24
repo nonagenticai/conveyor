@@ -241,6 +241,8 @@
     "invites.create",
     "invites.list",
     "invites.revoke",
+    "job_authorities.get",
+    "job_authorities.set",
     "job_bindings.create",
     "job_bindings.get",
     "job_bindings.list",
