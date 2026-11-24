@@ -778,7 +778,7 @@
       "key": "S21",
       "name": "Message construction (the compiled prompt)",
       "description": "Plan: docs/plans/slices/S21-message-construction.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S21-message-construction.md",
@@ -789,9 +789,7 @@
           590,
           599,
           612,
-          624,
-          649,
-          656
+          624
         ],
         "depends_on": [
           "S09",
@@ -982,8 +980,7 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          77,
-          653
+          77
         ],
         "depends_on": [
           "T2",
@@ -1425,8 +1422,7 @@
         "track": "v2",
         "issues": [
           87,
-          629,
-          655
+          629
         ],
         "depends_on": [
           "T16",
@@ -1497,15 +1493,14 @@
       "key": "T19",
       "name": "Decision forums (meetings)",
       "description": "SPEC_V2 slice T19 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
           605,
-          606,
-          650
+          606
         ],
         "depends_on": [
           "T1",

@@ -1,5 +1,5 @@
 window.CONVEYOR_REWORK = {
-  "generated_at": "2026-11-24T08:28:49.048603+00:00",
+  "generated_at": "2026-11-24T08:29:31.004848+00:00",
   "git_sha": "97100b6e18474ccd26ef2e6ff82a0d94500926cd",
   "packages": [
     {
@@ -25425,6 +25425,336 @@ window.CONVEYOR_REWORK = {
       "title": "Correct a claim that a stored value is derived when it is not"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T12",
+      "apply_to": "T12",
+      "artefact": "status_source",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The reported status is the live source, not a stale pasted value",
+          "met": false
+        },
+        {
+          "item": "The audit reports no status_source_drift gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "status_source_drift",
+          "source": "snapshot",
+          "subjects": [
+            "T12"
+          ]
+        }
+      ],
+      "key": "status_source_drift:T12",
+      "owner_project": "T12",
+      "rule": "status_source_drift",
+      "scope": "T12",
+      "severity": "P2",
+      "spec": "§5.3",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "coverage says 'proposed', the register says 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T12"
+        }
+      ],
+      "title": "Reconcile the project's status source"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T15",
+      "apply_to": "T15",
+      "artefact": "status_source",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The reported status is the live source, not a stale pasted value",
+          "met": false
+        },
+        {
+          "item": "The audit reports no status_source_drift gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "status_source_drift",
+          "source": "snapshot",
+          "subjects": [
+            "T15"
+          ]
+        }
+      ],
+      "key": "status_source_drift:T15",
+      "owner_project": "T15",
+      "rule": "status_source_drift",
+      "scope": "T15",
+      "severity": "P2",
+      "spec": "§5.3",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "coverage says 'proposed', the register says 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T15"
+        }
+      ],
+      "title": "Reconcile the project's status source"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T17",
+      "apply_to": "T17",
+      "artefact": "status_source",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The reported status is the live source, not a stale pasted value",
+          "met": false
+        },
+        {
+          "item": "The audit reports no status_source_drift gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "status_source_drift",
+          "source": "snapshot",
+          "subjects": [
+            "T17"
+          ]
+        }
+      ],
+      "key": "status_source_drift:T17",
+      "owner_project": "T17",
+      "rule": "status_source_drift",
+      "scope": "T17",
+      "severity": "P2",
+      "spec": "§5.3",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "coverage says 'proposed', the register says 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T17"
+        }
+      ],
+      "title": "Reconcile the project's status source"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T18",
+      "apply_to": "T18",
+      "artefact": "status_source",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The reported status is the live source, not a stale pasted value",
+          "met": false
+        },
+        {
+          "item": "The audit reports no status_source_drift gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "status_source_drift",
+          "source": "snapshot",
+          "subjects": [
+            "T18"
+          ]
+        }
+      ],
+      "key": "status_source_drift:T18",
+      "owner_project": "T18",
+      "rule": "status_source_drift",
+      "scope": "T18",
+      "severity": "P2",
+      "spec": "§5.3",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "coverage says 'proposed', the register says 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T18"
+        }
+      ],
+      "title": "Reconcile the project's status source"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T5",
+      "apply_to": "T5",
+      "artefact": "status_source",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The reported status is the live source, not a stale pasted value",
+          "met": false
+        },
+        {
+          "item": "The audit reports no status_source_drift gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "status_source_drift",
+          "source": "snapshot",
+          "subjects": [
+            "T5"
+          ]
+        }
+      ],
+      "key": "status_source_drift:T5",
+      "owner_project": "T5",
+      "rule": "status_source_drift",
+      "scope": "T5",
+      "severity": "P2",
+      "spec": "§5.3",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "coverage says 'proposed', the register says 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T5"
+        }
+      ],
+      "title": "Reconcile the project's status source"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T6",
+      "apply_to": "T6",
+      "artefact": "status_source",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The reported status is the live source, not a stale pasted value",
+          "met": false
+        },
+        {
+          "item": "The audit reports no status_source_drift gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "status_source_drift",
+          "source": "snapshot",
+          "subjects": [
+            "T6"
+          ]
+        }
+      ],
+      "key": "status_source_drift:T6",
+      "owner_project": "T6",
+      "rule": "status_source_drift",
+      "scope": "T6",
+      "severity": "P2",
+      "spec": "§5.3",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "coverage says 'proposed', the register says 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T6"
+        }
+      ],
+      "title": "Reconcile the project's status source"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p102-1:T2",
       "apply_to": "PLATFORM",
       "artefact": "§10.2",
@@ -40549,14 +40879,14 @@ window.CONVEYOR_REWORK = {
     },
     "SPEC": {
       "findings": 86,
-      "gaps": 16,
+      "gaps": 22,
       "p0": 0,
       "p1": 0,
-      "p2": 16,
-      "packages": 97,
+      "p2": 22,
+      "packages": 103,
       "rules": 8,
-      "rules_clean": 5,
-      "rules_with_gaps": 3,
+      "rules_clean": 4,
+      "rules_with_gaps": 4,
       "suppressed": 0
     },
     "TOGAF": {
@@ -40572,29 +40902,29 @@ window.CONVEYOR_REWORK = {
       "suppressed": 0
     }
   },
-  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.QtVPK1x8to/data",
+  "snapshot": "docs/design/data",
   "summary": {
     "by_severity": {
       "P0": 26,
       "P1": 185,
-      "P2": 210
+      "P2": 216
     },
     "by_standard": {
       "MSP": 74,
       "PMP": 34,
       "SAFe": 13,
-      "SPEC": 97,
+      "SPEC": 103,
       "TOGAF": 203
     },
     "by_status": {
-      "open": 419,
+      "open": 425,
       "suppressed": 2
     },
     "duplicates": 0,
-    "open": 419,
-    "packages": 421,
+    "open": 425,
+    "packages": 427,
     "resolved": 14,
-    "subjects": 534,
+    "subjects": 540,
     "suppressed": 2
   }
 };
