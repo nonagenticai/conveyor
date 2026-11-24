@@ -821,6 +821,60 @@ async fn start_run(
     (status, body)
 }
 
+/// Make a freshly created job live the way a tenant does (v1-w1a-4): the `status: "active"`
+/// update opens the `job_activation` gate, and only a second principal's approval flips it.
+async fn activate_job(running: &support::Running, job: &Value) {
+    let job_id = field(job, "id").to_owned();
+    let version = output(job)["version"]
+        .as_i64()
+        .expect("the created job's version");
+    let (status, draft) = running
+        .invoke(
+            "job_catalogue.update",
+            TOKEN,
+            json!({"id": job_id, "version": version, "status": "active"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{draft}");
+    assert_eq!(
+        output(&draft)["status"],
+        "draft",
+        "activation waits for another principal: {draft}"
+    );
+    let (status, pending) = running
+        .invoke(
+            "approvals.list",
+            TOKEN,
+            json!({"status": "pending", "limit": 50}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{pending}");
+    let gate = output(&pending)["items"]
+        .as_array()
+        .expect("items")
+        .iter()
+        .find(|item| item["gate"] == "job_catalogue.update" && item["kind"] == "job_activation")
+        .unwrap_or_else(|| panic!("no pending activation gate in {pending}"));
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            REVIEWER,
+            json!({"approval_id": gate["id"], "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+    assert_eq!(output(&decided)["status"], "approved", "{decided}");
+}
+
 /// A job, its release and an APPROVED `procedure` binding pinned to `process_id`.
 /// Returns `(binding_id, release_hash, binding_version)` — the version after activation, which
 /// is what an `If-Match` on the retire must carry (v1-p44-2).
@@ -871,6 +925,9 @@ async fn bind_process(
         .await;
     assert!(status == 200 || status == 201, "{job}");
     let job_id = field(&job, "id").to_owned();
+    // v1-w1a-4 (T0): a draft job can neither publish a release nor bind one (`409
+    // job_not_live`); create leaves it draft, so the fixture activates it first.
+    activate_job(running, &job).await;
     let (status, release) = running
         .invoke(
             "job_releases.publish",
