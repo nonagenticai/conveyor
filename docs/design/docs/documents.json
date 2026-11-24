@@ -42,8 +42,8 @@
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "571e2a241be13dcc686a4e2863b66282d0c6cd67bd4519a08f5262470b21993e",
-      "bytes": 196052,
+      "sha256": "2c944b95a7cd14b570996d8a6997766ddf3d1dfef0ad44eac867a258a557581e",
+      "bytes": 196503,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -627,8 +627,8 @@
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "322feda4904b2d2ec1a45ad7414ef95b19496907c69989b86a928c9eb35e5b81",
-      "bytes": 14781,
+      "sha256": "6fc8339071e30cf72f988bed2b6891efed61630377e1a641f50e793461a6ac1c",
+      "bytes": 14949,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -753,8 +753,8 @@
       "path": "docs/plans/T18-real-v2-ui.html",
       "source": "docs/plans/T18-real-v2-ui.md",
       "section": "Plans",
-      "sha256": "856f35830ac643e60d42be2a90794287823f15e82a535bbe19f88cfbc63dfa1f",
-      "bytes": 17090,
+      "sha256": "d8fd549f7f47dc9fdd510575d957bedf84b942d8bcafeb0b61ee93441e3d1b23",
+      "bytes": 17688,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18-real-v2-ui.md"
     },
     {

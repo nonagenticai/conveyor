@@ -123,9 +123,14 @@ owning slice's existing actions or literal `GET`s; T18 adds neither. Write paths
   (the provenance and explain-context) at `/execution`. The executor kind, `job_binding_id` and
   `release_hash` are not exposed by the run read model (T0/T4/S21), and the tools panel needs
   `tool_calls.list` (T13); the screen names both gaps. Spec: `execution.spec.ts`.
-- **Authoring** — reads `authoring.assets`, the draft queue and dependency status; writes
-  `authoring.intake|draft|review|publish`. A draft whose asset is unpublished refuses
-  `422 asset_dependency_unpublished`. Spec: `authoring.spec.ts`.
+- **Authoring** — reads `authoring.assets` and the `authoring.review` gates through
+  `approvals.list`; writes `authoring.intake|draft|review|publish` and the gate through
+  `approvals.request`. The intake queue is the catalogue grouped by `AssetOut.intake_id`: T17
+  exposes the intake write-only, so no read returns a recorded brief and the queue's brief read is
+  carried by #655. §5.7's order is refused when the draft is attempted
+  (`422 asset_dependency_unpublished`); the release re-checks it, but nothing can unpublish a
+  dependency. Review records an approved gate whose `meta.target` is the asset id. Spec:
+  `authoring.spec.ts`.
 - **Portfolio** — reads the computed project/programme set, `programme_config.get`,
   `project_dependencies.list`, `cadences.list`, `metrics.programme`; writes `project_dependencies.*`,
   `programmes.update`, `wbs.*`/`baselines.*` where the Plan owns them. A dependency cycle is refused.
@@ -197,7 +202,9 @@ Files: `app.rs`, `screens/{procedures,execution}.rs`, `mod.rs`,
 `e2e/{procedures,authoring,execution}.spec.ts`. Acceptance: SOP/RDF/OWL/BPMN intake, the PDDL step
 workspace, the knowledge-pack pairing and the two publication gates from the real T16 actions; the
 capability catalogue as a read-only section (T16's ingest creates capabilities); the Authoring
-route is the honest gate naming T17 (no `authoring.*` action exists); the execution room renders
+route landed as the honest gate naming T17 — T17 (#87, PR #632) then made it a live read-only
+catalogue and #629 delivered the operating half (intake, draft, review, publish), with the queue
+derived from the catalogue because the family has no intake read (#655); the execution room renders
 the run's provenance and names the missing executor/pin and T13 tool ledger. The PKO workspace is
 not restored (owner decision 2026-11-19). Capabilities is not a separate route; `runs.rs` stays the
 V1 queue.
