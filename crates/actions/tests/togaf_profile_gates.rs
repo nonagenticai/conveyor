@@ -519,3 +519,49 @@ async fn adoption_requires_an_approved_decision_about_this_profile() {
     let project = arch::project(&f.running, "architecture").await;
     close_preliminary(&f, &project).await;
 }
+
+/// The standard must carry E–H, or an architecture profile can never satisfy a phase-E/F/H gate
+/// (migration 0102). A profile naming the eight types is adopted; dropping one mandatory E–H
+/// type from a phase the profile keeps is refused as a weakened gate.
+#[tokio::test]
+async fn the_standard_carries_the_architecture_tracks_e_to_h() {
+    let f = arch::fixture().await;
+    let requirements = json!({
+        "preliminary": { "psa": P },
+        "a": { "psa": A },
+        "b": { "hld": ["business_capability_map"] },
+        "c": { "hld": ["data_entity_catalog"] },
+        "d": { "hld": ["technology_standards"] },
+        "e": { "hld": ["gap_analysis", "candidate_solutions", "project_context_diagram", "benefits_diagram"] },
+        "f": { "hld": ["implementation_migration_plan"] },
+        "g": { "hld": ["compliance_review"] },
+        "h": { "hld": ["architecture_change_request", "architecture_requirement"] },
+    });
+    let phases = json!(["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"]);
+    let adopted = adopt(
+        &f,
+        "adm-e-h",
+        phases.clone(),
+        requirements.clone(),
+        json!({ "g": "statement_of_intent", "h": "request_for_architecture" }),
+    )
+    .await;
+    assert_eq!(adopted["status"], "adopted", "{adopted}");
+
+    let mut weakened = requirements;
+    weakened["e"] =
+        json!({ "hld": ["gap_analysis", "candidate_solutions", "project_context_diagram"] });
+    let (status, refused) = tailor(
+        &f,
+        tailor_input("adm-e-h-weak", phases, weakened, json!({})),
+    )
+    .await;
+    assert_eq!(status, 422, "{refused}");
+    assert!(
+        refused["errors"][0]["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("benefits_diagram"),
+        "{refused}"
+    );
+}

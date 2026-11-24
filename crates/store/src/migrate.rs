@@ -407,7 +407,11 @@ mod tests {
                 (100, "laya timeout default".to_owned()),
                 // #526 (v1-p61-2): the status_report governed-asset kind
                 // (0101_status_report_asset_kind.sql).
-                (101, "status report asset kind".to_owned())
+                (101, "status report asset kind".to_owned()),
+                // #526 (§8.1, owner tailoring 2026-11-24): the ADM phases E–H in the artefact
+                // standard, so a phase-E/F/H requirement can resolve to a typed row
+                // (0102_phase_e_h_artifacts.sql).
+                (102, "phase e h artifacts".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

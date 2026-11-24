@@ -1370,6 +1370,20 @@ class Audit:
                 "the Preliminary architecture capability has no approved artefact of this type",
             )
 
+    def architecture_track(self, project: dict) -> bool:
+        """The programme (architecture) track, from the live meta — never a guess.
+
+        Mirrors `generate-standards.py`: `meta.adm_profile` wins when it names an architecture
+        profile; otherwise the programme seed's `meta.track == "programme"`. The owner's
+        tailoring (2026-11-24) gives delivery projects A–D and the Phase-G review; E–H are the
+        architecture track's.
+        """
+        meta = project.get("meta") or {}
+        named = str(meta.get("adm_profile") or "").strip().lower()
+        if named:
+            return "architecture" in named or named in {"programme", "a-h", "ah"}
+        return str(meta.get("track") or "").strip().lower() == "programme"
+
     def artefacts(self) -> None:
         profile = self.data.profile or {}
         requirements = profile.get("artifact_requirements") or {}
@@ -1384,8 +1398,13 @@ class Audit:
             if phase not in phases:
                 continue
             limit = phases.index(phase)
+            # Delivery projects carry A–D and the Phase-G review; only the programme
+            # (architecture) track carries E–H (owner tailoring 2026-11-24).
+            applicable = phases if self.architecture_track(project) else [
+                item for item in phases[: limit + 1] if item in {"a", "b", "c", "d"}
+            ]
             required: set[str] = set()
-            for ph in phases[: limit + 1]:
+            for ph in applicable:
                 for plateau, kinds in (requirements.get(ph) or {}).items():
                     if isinstance(kinds, list):
                         required.update(kinds)
