@@ -79,6 +79,12 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             format!("the {what} changed since it was read"),
         ),
         PlanStoreError::Parent(parent) => parent_error(parent, action),
+        // v1-p5-5 (SPEC_V2 §5.1): a work package without a card has no path to the work.
+        PlanStoreError::CardRequired => invalid(
+            "card_id",
+            "card_required",
+            "a work package must name the card that executes it",
+        ),
         PlanStoreError::Illegal(PlanError::CadenceWrongKind { expected, actual }) => invalid(
             "cadence_id",
             "cadence_wrong_kind",
@@ -1482,6 +1488,9 @@ async fn wbs_create(
             title,
             body: input.body.unwrap_or_default(),
             acceptance: input.acceptance.unwrap_or_else(|| serde_json::json!([])),
+            // The follow-up slice threads the caller's real card; until then a wbs.create node
+            // is unlinked (v1-p5-5's semantic half).
+            card_id: None,
             inputs,
             meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
         },

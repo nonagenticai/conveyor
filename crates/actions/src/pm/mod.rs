@@ -573,6 +573,8 @@ async fn plan_project(
                 title: node.title.clone(),
                 body: String::new(),
                 acceptance: Value::Array(Vec::new()),
+                // A pm.plan node is unlinked until the follow-up slice threads a card (v1-p5-5).
+                card_id: None,
                 inputs: WsjfInputs {
                     business_value: node.business_value,
                     time_criticality: node.time_criticality,
