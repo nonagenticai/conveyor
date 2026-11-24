@@ -118,11 +118,11 @@ async fn create_then_the_run_sees_the_tool() {
     let mut tx = begin_scoped(&fixture.pg.owner, fixture.tenant)
         .await
         .expect("a scoped read");
-    let context = tool::run_context(&mut *tx, fixture.tenant, run_id)
+    let context = tool::run_context(&mut tx, fixture.tenant, run_id)
         .await
         .expect("read the run context")
         .expect("the run exists");
-    let bound = tool::bound_tools(&mut *tx, fixture.tenant, &context)
+    let bound = tool::bound_tools(&mut tx, fixture.tenant, &context)
         .await
         .expect("the projection");
     tx.commit().await.expect("commit the read");

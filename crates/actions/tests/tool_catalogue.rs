@@ -146,7 +146,7 @@ async fn the_catalogue_reads_only_published_and_pages() {
         .await
         .expect("read the toolkit")
         .expect("the toolkit is published");
-    tool::set_toolkit_status(&mut *tx, fixture.tenant, coding.id, "draft")
+    tool::set_toolkit_status(&mut tx, fixture.tenant, coding.id, "draft")
         .await
         .expect("draft the toolkit");
     tx.commit().await.expect("commit the draft");

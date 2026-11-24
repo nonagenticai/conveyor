@@ -30,7 +30,10 @@ fn invalid(field: &str, code: &str, detail: String) -> ActionError {
     }])
 }
 
-fn page(input: &PageIn) -> Result<(Option<(DateTime<Utc>, Uuid)>, i64), ActionError> {
+/// The decoded cursor and page size a catalogue read applies.
+type PageCursor = (Option<(DateTime<Utc>, Uuid)>, i64);
+
+fn page(input: &PageIn) -> Result<PageCursor, ActionError> {
     let limit = i64::from(input.limit.unwrap_or(DEFAULT_LIMIT).clamp(1, MAX_LIMIT));
     let cursor = match input.cursor.as_deref() {
         None => None,

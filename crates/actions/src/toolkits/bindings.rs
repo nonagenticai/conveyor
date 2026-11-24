@@ -138,7 +138,7 @@ fn current(row: &store::tool::BindingRow) -> Value {
 /// The expected row version, or the `412` the contract requires.
 fn expected_version(ctx: &HandlerCtx, current: Value) -> Result<i64, ActionError> {
     crate::board::require_precondition_with(ctx, ctx.action, current)?;
-    ctx.version.ok_or_else(|| ActionError::internal())
+    ctx.version.ok_or_else(ActionError::internal)
 }
 
 #[crate::action(
