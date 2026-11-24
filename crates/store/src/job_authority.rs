@@ -15,8 +15,8 @@
 //!   the tenant matrix; it can never widen it (§4.4).
 //!
 //! The role names are the §6.7 columns (`pm`, `coach`, `kata`, `delivery`, `ops`). A binding that
-//! names none of them falls back to the job catalogue's `family`; an unknown role matches no
-//! compiled cell and is therefore refused until the tenant grants it.
+//! names none of them falls back to the job catalogue's `family`; a role outside the five has no
+//! §6.7 row, so it is ungoverned here and the RBAC scope check remains its authority.
 //!
 //! Enforcement lives in the action layer (another slice); this module only answers the question
 //! and returns a typed refusal the caller can map to `403 job_authority_forbidden`.

@@ -466,7 +466,24 @@ async fn approvals_request(
     if kind.is_empty() {
         return Err(invalid("kind", "missing", "a gate kind is required"));
     }
-    let required_decisions = input.required_decisions.unwrap_or(1);
+    // The tenant's policy row is the quorum FLOOR (SPEC_V2 §5.4, §6.7). `pm::open_gate` applies
+    // the same rule to the project gates; `approvals.request` is the other door that opens a
+    // named gate, and it must not become the way the stored floor is bypassed. An unreadable row
+    // is a configuration fault, never a licence to fall back to one.
+    let floor = match store::approval_policy::get(&mut *tx, ctx.tenant, gate).await {
+        Ok(Some(policy)) => policy.required_decisions,
+        Ok(None) => 1,
+        Err(store::approval_policy::ApprovalPolicyStoreError::Database(error)) => {
+            tracing::error!(%error, "approvals: read the gate policy");
+            return Err(ActionError::internal());
+        }
+        Err(other) => {
+            tracing::error!(%other, gate, "approvals: unreadable gate policy");
+            return Err(ActionError::internal());
+        }
+    };
+    // ⛔ A caller may raise the quorum, never lower the tenant's floor.
+    let required_decisions = input.required_decisions.unwrap_or(floor).max(floor);
     // The same bound the process gate parser applies (`process/step.rs`): a quorum above 255
     // cannot be reached in practice, so it is a typo or an attempt to make a gate undecidable.
     // Zero already had its own refusal; the type (`u16`) left 256..=65535 open.

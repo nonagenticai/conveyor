@@ -206,11 +206,10 @@ pub(crate) async fn open_gate(
             return Err(ActionError::internal());
         }
         Err(other) => {
-            tracing::warn!(%other, gate, "pm: unreadable gate policy, using the default");
-            (
-                store::approval_policy::ApprovalPolicy::default_for(gate),
-                "default",
-            )
+            // A row the build cannot parse is a configuration fault, not a waiver: falling back
+            // to the default would let a corrupted row lower the tenant's floor silently.
+            tracing::error!(%other, gate, "pm: unreadable gate policy");
+            return Err(ActionError::internal());
         }
     };
     let floor = policy.required_decisions;

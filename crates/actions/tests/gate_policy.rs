@@ -238,3 +238,60 @@ async fn a_tenant_gate_policy_raises_the_quorum_and_pm_route_gate_cannot_lower_i
     .expect("read the decision kind");
     assert_eq!(kinds, vec!["rule".to_owned()]);
 }
+
+/// `approvals.request` is the second door that opens a named gate. The tenant's `change` floor
+/// of two cannot be lowered by the caller there either — the scenario the U5 audit found, where
+/// one human decision resolved a change under a two-decision policy.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn approvals_request_cannot_lower_the_change_gate_floor() {
+    let f = fixture().await;
+    let set = invoke(
+        &f.arch.pg.runtime,
+        registry(),
+        f.arch.seeded.tenant,
+        request(
+            f.arch.seeded.user_id,
+            "approval_policies.set",
+            json!({
+                "action": "change",
+                "approval": "required",
+                "self_approval": "forbidden",
+                "approver_kind": "rule",
+                "required_decisions": 2,
+            }),
+            "user",
+        ),
+    )
+    .await
+    .expect("the change gate is a policy name");
+    assert_eq!(set.status, 200, "{}", set.body);
+
+    // The requester asks for one; the tenant's floor is two.
+    let opened = invoke(
+        &f.arch.pg.runtime,
+        registry(),
+        f.arch.seeded.tenant,
+        request(
+            f.arch.seeded.user_id,
+            "approvals.request",
+            json!({
+                "project_id": f.project,
+                "gate": "change",
+                "kind": "change_gate",
+                "required_decisions": 1,
+            }),
+            "user",
+        ),
+    )
+    .await
+    .expect("the change gate opens");
+    let approval_id: Uuid = opened.body["output"]["id"]
+        .as_str()
+        .and_then(|raw| Uuid::parse_str(raw).ok())
+        .unwrap_or_else(|| panic!("no approval id: {}", opened.body));
+    let (required_decisions, _) = approval_row(&f, approval_id).await;
+    assert_eq!(
+        required_decisions, 2,
+        "approvals.request cannot lower the tenant's change floor"
+    );
+}
