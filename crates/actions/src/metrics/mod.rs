@@ -736,6 +736,13 @@ pub struct FlowOut {
     pub total_count: i64,
     /// `rework_count / total_count`, null when the window had no runs (never NaN).
     pub rework_rate: Option<f64>,
+    /// Retrievals with at least one hit / all retrievals in the window (v1-w1c-6). Null when
+    /// the window had no retrievals — a rate with no denominator is never zero.
+    pub knowledge_pack_hit_rate: Option<f64>,
+    /// Lessons promoted / lessons decided (promoted or rejected) in the window. Null when
+    /// nothing was decided.
+    pub knowledge_lesson_promotion_rate: Option<f64>,
+    /// Figures still without a source ledger. Both knowledge figures now have one.
     pub unavailable: Vec<UnavailableOut>,
 }
 
@@ -763,6 +770,14 @@ async fn metrics_flow(
         store::metrics::rework_totals_tx(&mut *tx, ctx.tenant, input.project_id, since, until)
             .await
             .map_err(|error| metrics_error(error, ctx.action))?;
+    let (retrievals, hitting) =
+        store::metrics::knowledge_retrieval_counts_tx(&mut *tx, ctx.tenant, since, until)
+            .await
+            .map_err(|error| metrics_error(error, ctx.action))?;
+    let (promoted, decided) =
+        store::metrics::lesson_promotion_counts_tx(&mut *tx, ctx.tenant, since, until)
+            .await
+            .map_err(|error| metrics_error(error, ctx.action))?;
     Ok(FlowOut {
         wip: flow.wip,
         throughput: flow.throughput,
@@ -778,16 +793,17 @@ async fn metrics_flow(
         } else {
             Some(rework.rework as f64 / rework.total as f64)
         },
-        unavailable: vec![
-            UnavailableOut {
-                metric: "knowledge.lesson_promotion_rate".to_owned(),
-                reason: "the lesson ledger (T8) is not in the schema".to_owned(),
-            },
-            UnavailableOut {
-                metric: "knowledge.pack_hit_rate".to_owned(),
-                reason: "no knowledge-retrieval ledger exists; inference_call records the prompt, not the pack hit".to_owned(),
-            },
-        ],
+        knowledge_pack_hit_rate: if retrievals == 0 {
+            None
+        } else {
+            Some(hitting as f64 / retrievals as f64)
+        },
+        knowledge_lesson_promotion_rate: if decided == 0 {
+            None
+        } else {
+            Some(promoted as f64 / decided as f64)
+        },
+        unavailable: Vec::new(),
     })
 }
 

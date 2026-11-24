@@ -619,7 +619,7 @@ async fn the_run_drilldown_sums_to_the_call_rows() {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn flow_recomputes_and_a_missing_ledger_is_unavailable() {
+async fn flow_recomputes_and_knowledge_rates_are_null_without_rows() {
     let (pg, running, seeded) = fixture().await;
     let (status, body) = running
         .invoke(
@@ -731,18 +731,76 @@ async fn flow_recomputes_and_a_missing_ledger_is_unavailable() {
     assert!((block - 540.0).abs() < 60.0, "block {block}");
     let efficiency = flow["flow_efficiency"].as_f64().expect("efficiency");
     assert!((efficiency - 0.35).abs() < 0.05, "efficiency {efficiency}");
-    // P1.4 — the knowledge figures have no ledger and are unavailable with a reason, not zero.
-    let unavailable = flow["unavailable"].as_array().expect("unavailable");
+    // P1.4/v1-w1c-6 — both knowledge ledgers exist: without rows the rates are null (never
+    // zero), and nothing is "unavailable" any more.
+    assert!(flow["knowledge_pack_hit_rate"].is_null(), "{flow}");
+    assert!(flow["knowledge_lesson_promotion_rate"].is_null(), "{flow}");
     assert!(
-        unavailable
-            .iter()
-            .any(|row| row["metric"] == "knowledge.lesson_promotion_rate"),
+        flow["unavailable"]
+            .as_array()
+            .expect("unavailable")
+            .is_empty(),
         "{flow}"
     );
     assert!(
         flow["wip"].as_i64().is_some(),
         "the other figures are not affected"
     );
+
+    // Two of three retrievals hit; the one decided lesson was rejected (a real 0.0, not null).
+    for hits in [2i64, 0, 3] {
+        sqlx::query(
+            "INSERT INTO knowledge_retrieval (tenant_id, capability_id, packs, hits, degraded)
+             VALUES ($1, $2, 1, $3, false)",
+        )
+        .bind(seeded.tenant_id)
+        .bind(Uuid::new_v4())
+        .bind(hits)
+        .execute(&pg.super_pool)
+        .await
+        .expect("a retrieval row");
+    }
+    let (status, programme) = running
+        .invoke(
+            "programmes.create",
+            TOKEN,
+            json!({"name": "Flow knowledge programme"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{programme}");
+    let programme_id: Uuid = output(&programme)["id"]
+        .as_str()
+        .expect("programme id")
+        .parse()
+        .expect("uuid");
+    // A rejection names its reviewer (0069's durable-decision rule); a promotion would need its
+    // governed-asset draft, which is T8's own test surface.
+    sqlx::query(
+        "INSERT INTO lesson (tenant_id, programme_id, statement, state, reviewed_by, reviewed_at)
+         VALUES ($1, $2, 'a rejected lesson', 'rejected', $3, now())",
+    )
+    .bind(seeded.tenant_id)
+    .bind(programme_id)
+    .bind(seeded.user_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("a rejected lesson row");
+    let (status, measured) = running
+        .invoke("metrics.flow", TOKEN, json!({}), None, None, None)
+        .await;
+    assert_eq!(status, 200, "{measured}");
+    let measured = output(&measured);
+    let pack = measured["knowledge_pack_hit_rate"]
+        .as_f64()
+        .expect("a pack-hit rate");
+    assert!((pack - 2.0 / 3.0).abs() < 1e-9, "{measured}");
+    let lessons = measured["knowledge_lesson_promotion_rate"]
+        .as_f64()
+        .expect("a lesson-promotion rate");
+    assert!((lessons - 0.0).abs() < 1e-9, "{measured}");
 }
 
 /// One run row: `attempt` is the card's attempt sequence the store derives, never a stored flag.
