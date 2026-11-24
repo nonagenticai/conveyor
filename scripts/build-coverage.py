@@ -247,13 +247,14 @@ def module_path(root: pathlib.Path, name: str) -> str | None:
     than guessing one crate. The path it returns is the evidence the gate checks.
     """
     # An exact repo-relative path is itself the evidence (V2 slice declarations name files),
-    # but only inside a crate or app's `src` tree: `README.md` is not a module.
+    # inside a crate or app's `src` or `tests` tree: `README.md` is not a module, and an
+    # acceptance harness under `tests/` is a slice's real deliverable (T12).
     exact = root / name
     parts = pathlib.PurePosixPath(name).parts
     if (
         len(parts) >= 3
         and parts[0] in ("crates", "apps")
-        and parts[2] == "src"
+        and parts[2] in ("src", "tests")
         and (exact.is_file() or exact.is_dir())
     ):
         return exact.relative_to(root).as_posix()

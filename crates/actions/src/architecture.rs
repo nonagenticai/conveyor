@@ -1716,6 +1716,12 @@ pub struct BoardDecideIn {
     /// The subject's id; absent only for a decision about the board itself.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subject_id: Option<Uuid>,
+    /// The published P0 standing-delegation decision output a delegated rule decision acts
+    /// under. Present ⇒ the decision is recorded as an `approval_decision` row (approver,
+    /// `decided_by_kind`, `via.delegation_ref`) exactly as `approvals.decide` records a
+    /// decision; absent ⇒ the legacy board row only, with no decision row.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub delegation_ref: Option<Uuid>,
 }
 
 /// The recorded decision.
@@ -1741,16 +1747,42 @@ async fn architecture_board_decide(
     ctx: HandlerCtx,
     input: BoardDecideIn,
 ) -> Result<HandlerOutput<BoardDecisionOut>, ActionError> {
+    // A delegated decision cites the owner's published standing delegation. The reference is
+    // validated against the real P0 decision document and copied into the decision's evidence,
+    // so `contracts_approve` can prove the board acted under the same delegation it names.
+    let mut evidence = input.evidence;
+    if let Some(delegation_ref) = input.delegation_ref {
+        crate::programme::assert_delegation_ref(&mut *tx, ctx.tenant, delegation_ref).await?;
+        let cited = evidence
+            .get("delegation_ref")
+            .and_then(Value::as_str)
+            .and_then(|raw| Uuid::parse_str(raw).ok());
+        if cited.is_some_and(|cited| cited != delegation_ref) {
+            return Err(ActionError::new(
+                409,
+                "delegation_ref_mismatch",
+                "the evidence cites a different standing delegation",
+            ));
+        }
+        if !evidence.is_object() {
+            evidence = json!({});
+        }
+        evidence["delegation_ref"] = Value::String(delegation_ref.to_string());
+    }
     let approval_id = store::architecture::decide_board_tx(
         &mut *tx,
         ctx.tenant,
         input.body_id,
         &input.decision,
-        input.evidence,
-        ctx.actor_id,
+        evidence,
         store::architecture::BoardSubject {
             kind: input.subject_kind.as_deref(),
             id: input.subject_id,
+        },
+        store::architecture::BoardDecider {
+            decided_by: ctx.actor_id,
+            decided_by_kind: &delegated_decider_kind(&ctx.actor_kind),
+            delegation_ref: input.delegation_ref,
         },
     )
     .await
@@ -1758,6 +1790,20 @@ async fn architecture_board_decide(
     Ok(HandlerOutput::created(BoardDecisionOut {
         approval_id: approval_id.to_string(),
     }))
+}
+
+/// The `approval_decision.decided_by_kind` of a delegated board act.
+///
+/// A service principal invoking the deterministic board macro under the standing delegation is
+/// the delegated **rule** approver (the owner's ruling); an agent is an agent; a person is a
+/// human. The kind is derived from the authenticated principal, never supplied by the caller.
+fn delegated_decider_kind(actor_kind: &str) -> String {
+    match actor_kind {
+        "service" => "rule",
+        "agent" => "agent",
+        _ => "human",
+    }
+    .to_owned()
 }
 
 /// One dimension or category score.
