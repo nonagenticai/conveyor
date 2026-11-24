@@ -1,29 +1,177 @@
 {
   "checks": [
     {
-      "check": null,
-      "description": "the snapshot carries the project",
-      "detail": "the snapshot has no project 'T18'",
+      "check": "project",
+      "description": "T18 is active",
+      "detail": "project T18 is active",
       "id": "T18-project",
       "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "no project baseline",
+      "id": "T18-baseline",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "closure_outputs",
+      "description": "the declared closure outputs are declared and published",
+      "detail": "declared closure outputs are not published: evidence, closure-review",
+      "id": "T18-closure-outputs",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "no live board-approved delivery contract",
+      "id": "T18-contract",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "no Phase-G compliance review for the project's live contract",
+      "id": "T18-review",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "closure_gate",
+      "description": "the closure gate was decided by an approver other than its requester",
+      "detail": "no approved closure gate for the project",
+      "id": "T18-closure-gate",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "T18-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e for tranche-4",
+      "id": "T18-pi-cadence",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_plan",
+      "description": "the project tranche's PI plan is published",
+      "detail": "the tranche-4 PI plan is published",
+      "id": "T18-pi-plan",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_objectives",
+      "description": "the project tranche's PI objectives are published",
+      "detail": "the tranche-4 PI objectives are published",
+      "id": "T18-pi-objectives",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "no WBS deliverable carries the plan",
+      "id": "T18-wsjf",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "no accepted deliverable to demo",
+      "id": "T18-demo-credits",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "lessons",
+      "description": "the tranche retro produced at least one lesson",
+      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
+      "id": "T18-lessons",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P1"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "2 open P0 package(s): std-pmp-change-control-t18:T18, std-pmp-project-baseline-t18:T18",
+      "id": "T18-product",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/build-v2-coverage.py --check",
+      "description": "the V2 coverage record reports every destination's route and present spec as exists; no screen renders a fixture",
+      "detail": "exit 1: build-v2-coverage: stale output(s): /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/v2-coverage.json, /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/v2-coverage.md; re-run without --check",
+      "exit": 1,
+      "id": "T18-coverage",
+      "kind": "command",
+      "result": "fail",
+      "severity": "P0",
+      "stderr": "build-v2-coverage: stale output(s): /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/v2-coverage.json, /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/v2-coverage.md; re-run without --check\n",
+      "stdout": ""
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "the gate check 'T18-baseline' did not pass; the gate check 'T18-closure-outputs' did not pass; the gate check 'T18-contract' did not pass; the gate check 'T18-review' did not pass; the gate check 'T18-closure-gate' did not pass; the gate check 'T18-wsjf' did not pass; the gate check 'T18-demo-credits' did not pass; the gate check 'T18-product' did not pass; the gate check 'T18-coverage' did not pass",
+      "id": "gate",
+      "kind": "manifest",
       "result": "fail",
       "severity": "P0"
     }
   ],
   "failures": [
-    "T18-project (P0): the snapshot has no project 'T18'"
+    "T18-baseline (P0): no project baseline",
+    "T18-closure-outputs (P0): declared closure outputs are not published: evidence, closure-review",
+    "T18-contract (P0): no live board-approved delivery contract",
+    "T18-review (P0): no Phase-G compliance review for the project's live contract",
+    "T18-closure-gate (P0): no approved closure gate for the project",
+    "T18-wsjf (P0): no WBS deliverable carries the plan",
+    "T18-demo-credits (P0): no accepted deliverable to demo",
+    "T18-product (P0): 2 open P0 package(s): std-pmp-change-control-t18:T18, std-pmp-project-baseline-t18:T18",
+    "T18-coverage (P0): exit 1: build-v2-coverage: stale output(s): /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/v2-coverage.json, /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/v2-coverage.md; re-run without --check",
+    "gate (P0): the gate check 'T18-baseline' did not pass; the gate check 'T18-closure-outputs' did not pass; the gate check 'T18-contract' did not pass; the gate check 'T18-review' did not pass; the gate check 'T18-closure-gate' did not pass; the gate check 'T18-wsjf' did not pass; the gate check 'T18-demo-credits' did not pass; the gate check 'T18-product' did not pass; the gate check 'T18-coverage' did not pass"
   ],
-  "gate": null,
-  "generated_at": "2026-11-23T21:01:17.166488+00:00",
+  "gate": "a signed-in tenant drives portfolio \u2192 programme \u2192 project \u2192 work package, organisation \u2192 release \u2192 binding, procedures intake \u2192 publish, tools call \u2192 ledger, improve \u2192 kata \u2192 adoption, operations incident \u2192 postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports exists only from a real route and a present spec; no production screen renders a fixture",
+  "generated_at": "2026-11-24T17:10:35.854925+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T18.toml",
-  "name": null,
+  "name": "The real V2 UI",
   "project": "T18",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T10:28:30.225766+00:00",
-    "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
-    "path": "retained-snapshot/f3bfa7ab7abf9f520d880e1816b50e6db2b86031"
+    "generated_at": "2026-11-24T17:09:25Z",
+    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
+    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
   },
   "verdict": "red",
   "warnings": []

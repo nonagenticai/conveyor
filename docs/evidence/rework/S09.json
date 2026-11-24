@@ -106,7 +106,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a2076f-aaeb-7d00-a034-3d1a1f3037bb carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
       "id": "S09-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -172,16 +172,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "the feature-list items are green \u2014 a 1 MiB round-trip whose sha256 equals `content_hash` with the object key gone after delete, a 10 MiB upload refused `413`, secrets never returning plaintext, the workers page rendering live rows, every report number equal to its SQL count, `timeout_ms` on every external, and billing with no write action and no metering event",
-  "generated_at": "2026-11-23T21:01:14.022417+00:00",
+  "generated_at": "2026-11-24T17:10:32.641163+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S09.toml",
   "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",
   "project": "S09",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T10:28:30.225766+00:00",
-    "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
-    "path": "retained-snapshot/f3bfa7ab7abf9f520d880e1816b50e6db2b86031"
+    "generated_at": "2026-11-24T17:09:25Z",
+    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
+    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
   },
   "verdict": "red",
   "warnings": []

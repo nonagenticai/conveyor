@@ -79,28 +79,28 @@
     {
       "check": "pi_cadence",
       "description": "the project's PI has a cadence row and a backlog-refinement row",
-      "detail": "no PI cadence row for tranche-5",
+      "detail": "PI cadence 01a20e7e-a65d-7bb3-a451-b1306d79b7ea and refinement 01a20e7e-a7a2-700c-b566-ca72e7a4d2e2 for tranche-5",
       "id": "T17-pi-cadence",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "pi_plan",
       "description": "the project tranche's PI plan is published",
-      "detail": "no published pi-plan output for tranche-5",
+      "detail": "the tranche-5 PI plan is published",
       "id": "T17-pi-plan",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "pi_objectives",
       "description": "the project tranche's PI objectives are published",
-      "detail": "no published pi-objectives output for tranche-5",
+      "detail": "the tranche-5 PI objectives are published",
       "id": "T17-pi-objectives",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -124,10 +124,10 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "no retro cadence row for tranche-5",
+      "detail": "lesson 01a20e7e-ab3e-7c72-8c37-e70c2ab84a06 carries a statement and evidence from the tranche-5 retro",
       "id": "T17-lessons",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T17-baseline' did not pass; the gate check 'T17-charter' did not pass; the gate check 'T17-closure-outputs' did not pass; the gate check 'T17-contract' did not pass; the gate check 'T17-review' did not pass; the gate check 'T17-closure-gate' did not pass; the gate check 'T17-pi-cadence' did not pass; the gate check 'T17-pi-plan' did not pass; the gate check 'T17-pi-objectives' did not pass; the gate check 'T17-wsjf' did not pass; the gate check 'T17-demo-credits' did not pass; the gate check 'T17-lessons' did not pass",
+      "detail": "the gate check 'T17-baseline' did not pass; the gate check 'T17-charter' did not pass; the gate check 'T17-closure-outputs' did not pass; the gate check 'T17-contract' did not pass; the gate check 'T17-review' did not pass; the gate check 'T17-closure-gate' did not pass; the gate check 'T17-wsjf' did not pass; the gate check 'T17-demo-credits' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -156,25 +156,21 @@
     "T17-contract (P0): no live board-approved delivery contract",
     "T17-review (P0): no Phase-G compliance review for the project's live contract",
     "T17-closure-gate (P0): no approved closure gate for the project",
-    "T17-pi-cadence (P0): no PI cadence row for tranche-5",
-    "T17-pi-plan (P0): no published pi-plan output for tranche-5",
-    "T17-pi-objectives (P0): no published pi-objectives output for tranche-5",
     "T17-wsjf (P0): no WBS deliverable carries the plan",
     "T17-demo-credits (P0): no accepted deliverable to demo",
-    "T17-lessons (P1): no retro cadence row for tranche-5",
-    "gate (P0): the gate check 'T17-baseline' did not pass; the gate check 'T17-charter' did not pass; the gate check 'T17-closure-outputs' did not pass; the gate check 'T17-contract' did not pass; the gate check 'T17-review' did not pass; the gate check 'T17-closure-gate' did not pass; the gate check 'T17-pi-cadence' did not pass; the gate check 'T17-pi-plan' did not pass; the gate check 'T17-pi-objectives' did not pass; the gate check 'T17-wsjf' did not pass; the gate check 'T17-demo-credits' did not pass; the gate check 'T17-lessons' did not pass"
+    "gate (P0): the gate check 'T17-baseline' did not pass; the gate check 'T17-charter' did not pass; the gate check 'T17-closure-outputs' did not pass; the gate check 'T17-contract' did not pass; the gate check 'T17-review' did not pass; the gate check 'T17-closure-gate' did not pass; the gate check 'T17-wsjf' did not pass; the gate check 'T17-demo-credits' did not pass"
   ],
   "gate": "A tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant.",
-  "generated_at": "2026-11-23T21:01:17.164624+00:00",
+  "generated_at": "2026-11-24T17:10:35.748928+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T17.toml",
   "name": "Tenant asset authoring",
   "project": "T17",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T10:28:30.225766+00:00",
-    "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
-    "path": "retained-snapshot/f3bfa7ab7abf9f520d880e1816b50e6db2b86031"
+    "generated_at": "2026-11-24T17:09:25Z",
+    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
+    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
   },
   "verdict": "red",
   "warnings": []

@@ -1,0 +1,205 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "T19 is closed",
+      "detail": "project T19 is closed",
+      "id": "T19-project",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "no project baseline",
+      "id": "T19-baseline",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a20c80-b9b8-7214-abc6-f2c4f75a1fc1\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "exit": 1,
+      "id": "T19-charter",
+      "kind": "command",
+      "result": "fail",
+      "severity": "P0",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stdout": ""
+    },
+    {
+      "check": "closure_outputs",
+      "description": "the declared closure outputs are declared and published",
+      "detail": "1 closure outputs published",
+      "id": "T19-closure-outputs",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "contract 01a20ce0-5183-776c-84bd-327f2301b19b approved by board decision 01a20ce0-644d-7340-a696-1af10fa8c61e about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "id": "T19-contract",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "review 01a20ceb-66b2-75a4-ac9f-6ceae8ab187d (conformant) of the live contract cites the published delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+      "id": "T19-review",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "closure_gate",
+      "description": "the closure gate was decided by an approver other than its requester",
+      "detail": "no approved closure gate for the project",
+      "id": "T19-closure-gate",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "T19-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "PI cadence 01a202a1-dbb9-7e49-b64a-cf97c3fab095 and refinement 01a202a2-2705-7392-a2d1-03ca2b3a174e for tranche-4",
+      "id": "T19-pi-cadence",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_plan",
+      "description": "the tranche-4 PI plan is published",
+      "detail": "the tranche-4 PI plan is published",
+      "id": "T19-pi-plan",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_objectives",
+      "description": "the tranche-4 PI objectives are published",
+      "detail": "the tranche-4 PI objectives are published",
+      "id": "T19-pi-objectives",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS node carries the four WSJF inputs",
+      "detail": "no WBS deliverable carries the plan",
+      "id": "T19-wsjf",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit",
+      "detail": "no accepted deliverable to demo",
+      "id": "T19-demo-credits",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "lessons",
+      "description": "the tranche retro produced at least one lesson",
+      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
+      "id": "T19-lessons",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P1"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "2 open P0 package(s): std-pmp-change-control-t19:T19, std-pmp-project-baseline-t19:T19",
+      "id": "T19-product",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "artefact_standard",
+      "description": "every mandatory standard artefact this project owns is evidenced",
+      "detail": "23 mandatory artefact package(s) open: std-pmp-change-control-t19:T19, std-pmp-project-baseline-t19:T19, std-pmp-project-registers-t19:T19, std-pmp-project-wbs-t19:T19, std-togaf-benefits-diagram-t19:T19, std-togaf-candidate-solutions-t19:T19, std-togaf-phase-e-t19-e:T19, std-togaf-phase-g-t19-g:T19, +15 more",
+      "id": "T19-artefact-standard",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "rework_resolution",
+      "description": "no unresolved P0/P1 rework package remains for the project",
+      "detail": "11 unresolved P0/P1 package(s): std-pmp-change-control-t19:T19 (P0), std-pmp-project-baseline-t19:T19 (P0), std-pmp-project-registers-t19:T19 (P1), std-pmp-project-wbs-t19:T19 (P1), v1-meetings-1:T19 (P1), std-togaf-benefits-diagram-t19:T19 (P1), std-togaf-candidate-solutions-t19:T19 (P1), std-togaf-phase-e-t19-e:T19 (P1), +3 more",
+      "id": "T19-rework",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "the gate check 'T19-baseline' did not pass; the gate check 'T19-charter' did not pass; the gate check 'T19-closure-gate' did not pass; the gate check 'T19-wsjf' did not pass; the gate check 'T19-demo-credits' did not pass; the gate check 'T19-product' did not pass; the gate check 'T19-artefact-standard' did not pass; the gate check 'T19-rework' did not pass",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "a closed project must not carry a red acceptance manifest",
+      "detail": "the project is closed while its manifest is red",
+      "id": "closed-on-red",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    }
+  ],
+  "failures": [
+    "T19-baseline (P0): no project baseline",
+    "T19-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+    "T19-closure-gate (P0): no approved closure gate for the project",
+    "T19-wsjf (P0): no WBS deliverable carries the plan",
+    "T19-demo-credits (P0): no accepted deliverable to demo",
+    "T19-product (P0): 2 open P0 package(s): std-pmp-change-control-t19:T19, std-pmp-project-baseline-t19:T19",
+    "T19-artefact-standard (P1): 23 mandatory artefact package(s) open: std-pmp-change-control-t19:T19, std-pmp-project-baseline-t19:T19, std-pmp-project-registers-t19:T19, std-pmp-project-wbs-t19:T19, std-togaf-benefits-diagram-t19:T19, std-togaf-candidate-solutions-t19:T19, std-togaf-phase-e-t19-e:T19, std-togaf-phase-g-t19-g:T19, +15 more",
+    "T19-rework (P0): 11 unresolved P0/P1 package(s): std-pmp-change-control-t19:T19 (P0), std-pmp-project-baseline-t19:T19 (P0), std-pmp-project-registers-t19:T19 (P1), std-pmp-project-wbs-t19:T19 (P1), v1-meetings-1:T19 (P1), std-togaf-benefits-diagram-t19:T19 (P1), std-togaf-candidate-solutions-t19:T19 (P1), std-togaf-phase-e-t19-e:T19 (P1), +3 more",
+    "gate (P0): the gate check 'T19-baseline' did not pass; the gate check 'T19-charter' did not pass; the gate check 'T19-closure-gate' did not pass; the gate check 'T19-wsjf' did not pass; the gate check 'T19-demo-credits' did not pass; the gate check 'T19-product' did not pass; the gate check 'T19-artefact-standard' did not pass; the gate check 'T19-rework' did not pass",
+    "closed-on-red (P0): the project is closed on a red manifest"
+  ],
+  "gate": "the meeting is a card plus a typed record: an agenda item that decides names one approval, each qualifying seat records one position, close_item derives the item's outcome by arithmetic over the positions and the linked approval's stricter policy (quorum, required departments, dual control, evidence, conflict exclusion), an observer never counts, a human who requested the gate is always excluded (P4), a quorum miss defers with reason inquorate, an item with no outcome cannot close, and no transcript or chat is a decision; the eight meetings suites and the web room spec pass",
+  "generated_at": "2026-11-24T17:10:35.993818+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/T19.toml",
+  "name": "Decision forums (meetings)",
+  "project": "T19",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-24T17:09:25Z",
+    "git_sha": "17d0f3af2ce58b8a3d2037154415cdc17db4ff04",
+    "path": "retained-snapshot/17d0f3af2ce58b8a3d2037154415cdc17db4ff04"
+  },
+  "verdict": "red",
+  "warnings": []
+}
