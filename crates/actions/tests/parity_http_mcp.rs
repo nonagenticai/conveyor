@@ -749,6 +749,28 @@ async fn seed_delivery(pg: &support::Pg, tenant: TenantId, sender: Uuid, recipie
     tx.commit().await.expect("commit the delivery seed");
 }
 
+/// Seed D34's earned waiver for `action` — an `auto` approver, typed conditions and a future
+/// expiry — written straight to the policy table because the fixture's subject is not the
+/// (itself gated) policy write. A bare `waived` row admits nothing.
+async fn seed_earned_waiver(tx: &mut sqlx::PgConnection, tenant: TenantId, action: &str) {
+    store::approval_policy::set(
+        tx,
+        tenant,
+        &store::approval_policy::ApprovalPolicy {
+            action: action.to_owned(),
+            approval: store::approval_policy::ApprovalRequirement::Waived,
+            self_approval: store::approval_policy::SelfApproval::Forbidden,
+            approver_kind: conveyor_domain::development::ApproverKind::Auto,
+            conditions: json!({"max_reverts": 0}),
+            expires_at: Some(chrono::Utc::now() + chrono::Duration::days(1)),
+            required_decisions: 1,
+        },
+        None,
+    )
+    .await
+    .expect("seed the earned waiver");
+}
+
 /// Seed a card the caller already holds, at the fence the renew/release samples present.
 ///
 /// `claim_fence = 1` and a live `(lease_token, lease_expires_at)` pair — the CHECK constraint
@@ -9717,33 +9739,23 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
     // #282/#283: a destructive action now runs only behind an approved gate, and `/mcp` has no
     // way to carry an approval id (`mcp.rs` passes `approval_id: None`). This sweep tests
     // TRANSPORT parity — the same body over both — and the gate has its own suite
-    // (`destructive_gate.rs`), so the tenant waives the gate for every destructive action here.
-    // Without this the sweep would compare a 403 (HTTP) with an `isError` (MCP) and prove
-    // nothing about the bodies.
+    // (`destructive_gate.rs`), so the fixture seeds D34's earned waiver (an `auto` approver with
+    // typed conditions and a future expiry) for every destructive action here. Without this the
+    // sweep would compare a 403 (HTTP) with an `isError` (MCP) and prove nothing about the bodies.
     // The `ops.*` verbs are excluded on purpose: their samples assert the refusal a call gets
     // when no cluster is configured (403/503), so waiving their gate would send the call at a
     // backend that does not exist and change what the sample is asserting.
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant)
+        .await
+        .expect("scope the earned waivers");
     for spec in conveyor_actions::registry::registry()
         .iter()
         .filter(|spec| spec.effect == conveyor_actions::Effect::Destructive)
         .filter(|spec| !spec.name.starts_with("ops."))
     {
-        let (status, body) = running
-            .invoke(
-                "approval_policies.set",
-                "dev:alice",
-                json!({
-                    "action": spec.name,
-                    "approval": "waived",
-                    "self_approval": "forbidden",
-                }),
-                None,
-                None,
-                None,
-            )
-            .await;
-        assert_eq!(status, 200, "waive {}: {body}", spec.name);
+        seed_earned_waiver(&mut tx, ctx.tenant, spec.name).await;
     }
+    tx.commit().await.expect("commit the earned waivers");
 
     let mut checked = 0usize;
     let total = registry_names.len();
@@ -10106,23 +10118,13 @@ async fn a_binding_stays_in_the_callers_tenant_and_unbind_removes_it_once() {
     let (status, refused) = bind_channel(&running, Uuid::now_v7(), "parity-route").await;
     assert_eq!(status, 403, "{refused}");
 
-    // #283: unbinding is destructive, so the tenant waives its gate — this test is about the
-    // binding's tenant scoping and idempotence, not about the approval.
-    let (status, body) = running
-        .invoke(
-            "approval_policies.set",
-            "dev:alice",
-            json!({
-                "action": "channels.unbind",
-                "approval": "waived",
-                "self_approval": "forbidden",
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 200, "waive channels.unbind: {body}");
+    // #283: unbinding is destructive, so the fixture seeds D34's earned waiver for it — this test
+    // is about the binding's tenant scoping and idempotence, not about the approval.
+    let mut tx = begin_scoped(&pg.owner, alice.tenant)
+        .await
+        .expect("scope the earned waiver");
+    seed_earned_waiver(&mut tx, alice.tenant, "channels.unbind").await;
+    tx.commit().await.expect("commit the earned waiver");
 
     let (status, removed) = unbind_channel(&running, alice.tenant_id).await;
     assert_eq!(status, 204, "{removed}");

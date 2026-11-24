@@ -121,6 +121,9 @@ async fn approval_policies_get(
 }
 
 /// `approval_policies.set` — record this tenant's decision about one action.
+///
+/// A write that waives a gate or names an `auto` approver is itself gated: the caller must name
+/// an approved `approval_policies.set` gate for exactly this action (SPEC_V2 §6.4 / §9.3, D34).
 #[crate::action(
     name = "approval_policies.set",
     version = 1,
@@ -229,6 +232,36 @@ async fn approval_policies_set(
         ));
     }
 
+    // ⛔ §9.3 / D34: a waiver is never an unconditional off switch. It is an EARNED auto policy —
+    // the tenant's rule engine as approver, typed conditions and a future expiry. Anything less
+    // would let one `approvals:write` holder disable a destructive gate permanently.
+    if approval == ApprovalRequirement::Waived {
+        if approver_kind != ApproverKind::Auto {
+            return Err(invalid(
+                "approver_kind",
+                "invalid_value",
+                "a waiver must be earned by an `auto` approver kind; a human policy cannot waive \
+                 its gate (SPEC_V2 §9.3 / D34)",
+            ));
+        }
+        AutoMergeConditions::parse(&conditions)
+            .map_err(|error| invalid("conditions", "invalid_value", error.to_string()))?;
+        let expires_at = input.expires_at.ok_or_else(|| {
+            invalid(
+                "expires_at",
+                "missing",
+                "an earned waiver is time-bounded and must carry an expiry",
+            )
+        })?;
+        if expires_at <= Utc::now() {
+            return Err(invalid(
+                "expires_at",
+                "invalid_value",
+                "an earned waiver must expire in the future",
+            ));
+        }
+    }
+
     match approver_kind {
         // A human (or the lane's explicit non-human decider) policy does not carry terms.
         // Silently accepting them would store a row that reads like an auto policy.
@@ -249,7 +282,9 @@ async fn approval_policies_set(
                 ));
             }
         }
-        ApproverKind::Auto => {
+        // `waived` on an auto row is the earned waiver validated above. `required` is §6.4's
+        // auto-merge policy and keeps its full validation set.
+        ApproverKind::Auto if approval == ApprovalRequirement::Required => {
             if !governed {
                 return Err(invalid(
                     "approver_kind",
@@ -259,15 +294,6 @@ async fn approval_policies_set(
                          development gate or the tool-authoring publication gate",
                         input.action
                     ),
-                ));
-            }
-            // Auto-merge lowers no approval: the row is the tenant's earned decision, not a
-            // waiver. A waiver would bypass the gate and its conditions entirely.
-            if approval != ApprovalRequirement::Required {
-                return Err(invalid(
-                    "approval",
-                    "invalid_value",
-                    "an auto-merge policy still requires the gate; it never waives it",
                 ));
             }
             // A development gate carries §6.4's typed auto-merge conditions; the publication
@@ -301,19 +327,8 @@ async fn approval_policies_set(
                     "an auto-merge policy must expire in the future",
                 ));
             }
-            // §6.4: the policy is itself a gated change. The approval is opened by the tenant's
-            // governance path (`approvals.request`, gate `approval_policies.set`) and its target
-            // is the action this policy governs, so an approval for one gate can never authorise
-            // another.
-            super::approvals::require_approval_tx(
-                &mut *tx,
-                &ctx,
-                "approval_policies.set",
-                input.action.as_str(),
-                ctx.approval_id,
-            )
-            .await?;
         }
+        ApproverKind::Auto => {}
     }
 
     let required_decisions = input.required_decisions.unwrap_or(1);
@@ -330,6 +345,21 @@ async fn approval_policies_set(
             "invalid_value",
             "an auto policy is one rule decision; the quorum is 1",
         ));
+    }
+    // §6.4 / D34: the policy change is itself a gated change. Both a waiver and an auto policy
+    // reach this point, so no `approvals:write` holder can switch a gate off — or hand it to the
+    // rule engine — behind a plain write. The approval is opened by the tenant's governance path
+    // (`approvals.request`, gate `approval_policies.set`) and its target is the action this
+    // policy governs, so an approval for one gate can never authorise another.
+    if approval == ApprovalRequirement::Waived || approver_kind == ApproverKind::Auto {
+        super::approvals::require_approval_tx(
+            &mut *tx,
+            &ctx,
+            "approval_policies.set",
+            input.action.as_str(),
+            ctx.approval_id,
+        )
+        .await?;
     }
     let policy = ApprovalPolicy {
         action: input.action.clone(),
