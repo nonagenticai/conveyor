@@ -306,6 +306,7 @@ async fn the_snapshot_attributes_tokens_and_cost_by_project_and_card() {
                 run_step_id: None,
                 card_id: None,
                 tool_id: tool,
+                binding_id: None,
                 tool_key: "echo.ping",
                 toolkit_key: "echo",
                 toolkit_version: 1,

@@ -132,9 +132,10 @@ use serde_json::{Value, json};
 /// **T19 (#606) adds 12 internal**: the meetings family
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
 /// **S21 step 9 (#649) adds `cards.assign`**, **T5 (#77) `kata.hypothesise`**, **T6 (#80)
-/// the development-project family**, **T8 (#79) the `lessons.*` lifecycle**, and the lane adds
-/// its own families. The merged registry is **585: 566 internal, 19 external**.
-const EXPECTED: [&str; 586] = [
+/// the development-project family**, **T8 (#79) the `lessons.*` lifecycle**, **T15 (#86)**
+/// ten authoring/BYO actions, and the lane adds its own families. The merged registry is
+/// **596: 577 internal, 19 external**.
+const EXPECTED: [&str; 596] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -669,8 +670,18 @@ const EXPECTED: [&str; 586] = [
     "tool_bindings.list",
     "tool_bindings.retire",
     "tool_bindings.update",
+    "tool_authoring.draft",
+    "tool_authoring.promote",
+    "tool_authoring.publish",
+    "tool_authoring.review",
+    "tool_authoring.test",
+    "tool_authoring.validate",
+    "toolkits.discover_mcp",
+    "toolkits.import_openapi",
     "toolkits.publish",
+    "toolkits.register_mcp",
     "tools.call",
+    "tools.dispatch",
     "tools.probe",
     "tools.resume",
     "tools.retire",
@@ -813,11 +824,12 @@ fn the_registry_is_exactly_the_declared_set() {
     // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
     // 520 -> 525; external stays 14.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
-    // The merged registry is 586: 567 internal (the lane's 553 + main's 13 new kata/T6/T8
+    // The merged registry is 596: 577 internal (the lane's 553 + main's 13 new kata/T6/T8
     // actions + `programme_lessons.propose`, the lane's programme register which the union
-    // renamed out of SPEC §D36's `lessons.*` family), 19 external. T5's kata names are one
-    // family: main's eight implementations plus the lane's `kata.list`/`propagate`/`close`.
-    assert_eq!((internal, external), (567, 19));
+    // renamed out of SPEC §D36's `lessons.*` family + T15's ten authoring/BYO actions), 19
+    // external. T5's kata names are one family: main's eight implementations plus the lane's
+    // `kata.list`/`propagate`/`close`.
+    assert_eq!((internal, external), (577, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

@@ -392,11 +392,23 @@ async fn seed_binding_with_budget(
     let snapshot = match limit_usd {
         Some(limit_usd) => json!({
             "job_key": "budget_job",
-            "anatomy": {"limits": {"cost_budget_usd": limit_usd}}
+            "anatomy": {
+                "limits": {"cost_budget_usd": limit_usd},
+                "grants": [
+                    {"op": "inference.generate", "max_side_effect": "spend"},
+                    {"op": "fixtures.echo", "max_side_effect": "read"}
+                ]
+            }
         }),
         None => json!({
             "job_key": "budget_job",
-            "anatomy": {"charter": "no declared spend ceiling"}
+            "anatomy": {
+                "charter": "no declared spend ceiling",
+                "grants": [
+                    {"op": "inference.generate", "max_side_effect": "spend"},
+                    {"op": "fixtures.echo", "max_side_effect": "read"}
+                ]
+            }
         }),
     };
     let (release_id, release_hash): (Uuid, String) = sqlx::query_as(

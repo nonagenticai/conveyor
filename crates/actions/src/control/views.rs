@@ -857,6 +857,8 @@ pub struct ApprovalPolicyOut {
     pub conditions: Value,
     /// When an auto policy stops applying; `null` for a human policy.
     pub expires_at: Option<DateTime<Utc>>,
+    /// How many decisions the gate needs (1 by default; `≥2` is dual control).
+    pub required_decisions: u16,
 }
 
 /// `approval_policies.get` input.
@@ -893,4 +895,8 @@ pub struct ApprovalPolicySetIn {
     /// When the auto policy expires. Required for `auto`, absent for `human`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<DateTime<Utc>>,
+    /// The quorum the gate requires (1 by default; `≥2` is dual control). An `auto` policy
+    /// carries 1 — a rule is not a second approver.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub required_decisions: Option<u16>,
 }

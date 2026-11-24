@@ -274,13 +274,15 @@ mod tests {
                 // reviewer record and the governed-asset source draft promotion
                 // (0069_lesson_lifecycle.sql, SPEC_V2 §7.6, §10.3, §10.4, §12 T8, D36).
                 (69, "lesson lifecycle".to_owned()),
-                // #526 (the kata union): the lane's candidate and propagation records on main's
-                // kata loop — the columns the coach/ops/architecture `kata_candidate_id`s need
-                // (0070_kata_union.sql).
-                (70, "kata union".to_owned()),
-                // ── The lane's reserved block (0080+), after main's 0066–0069 and the 0070 union.
-                // Versions 0071–0079 stay free for main; the block's SQL is unchanged, only its
-                // version moved.
+                // T15 (#86): the tool_draft governed-asset kind, the registered tool sources, the
+                // binding-scoped subset, the ledger's binding pin, the promotion record and the
+                // publication quorum (0070_tool_authoring.sql, SPEC_V2 §11.3–§11.6, D42/D43/D50).
+                (70, "tool authoring".to_owned()),
+                // ── The lane's reserved block (0080+), after main's 0066–0070. Versions
+                // 0071–0079 stay free for main; the block's SQL is unchanged, only its version
+                // moved. The kata union (the lane's candidate/propagation records and
+                // pre-registration fields on main's 0066/0067) sits at 94, after the block,
+                // because main took 70.
                 // v1-w1a-2 (#526): the release's layered kind store — base → industry →
                 // department archetype → department → job — and `department.archetype`
                 // (0080_release_layers.sql, SPEC_V2 §4.1).
@@ -326,7 +328,11 @@ mod tests {
                 // a benefit's evaluation reads.
                 (92, "benefit measurement typed".to_owned()),
                 // (0093_approval_policy_approver_kind.sql): who may decide a gate, as tenant data.
-                (93, "approval policy approver kind".to_owned())
+                (93, "approval policy approver kind".to_owned()),
+                // #526 (the kata union): the lane's candidate and propagation records on main's
+                // kata loop — the columns the coach/ops/architecture `kata_candidate_id`s need —
+                // and the pre-registration fields (0094_kata_union.sql).
+                (94, "kata union".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

@@ -55,14 +55,14 @@ CREATE POLICY tenant_isolation ON benefit_measurement FOR ALL
 -- "Information, risk, issue, monitoring, communications, quality and resource strategies and
 -- plans" are governed assets, not a new table. T1 (0044) widened the vocabulary to the MSP
 -- definition set; this adds the seven governance artefacts the programme board baselines. The
--- base list carries 0065's `minutes` and 0069's `lesson_source` too: this migration is the last
+-- base list carries 0065's `minutes`, 0069's `lesson_source` and T15's `tool_draft` too: this migration is the last
 -- to rewrite the constraint, so it carries the merged vocabulary rather than narrowing main's.
 ALTER TABLE governed_asset DROP CONSTRAINT governed_asset_kind_check;
 ALTER TABLE governed_asset ADD CONSTRAINT governed_asset_kind_check CHECK (
     kind IN ('requirement', 'principle', 'adr', 'charter', 'closure', 'postmortem',
              'sop_source', 'mandate', 'programme_brief', 'blueprint', 'business_case',
              'refined_vision', 'benefits_strategy', 'benefits_realization_plan',
-             'projects_dossier', 'minutes', 'lesson_source',
+             'projects_dossier', 'minutes', 'lesson_source', 'tool_draft',
              'information_strategy', 'risk_strategy', 'issue_strategy',
              'monitoring_strategy', 'communications_strategy', 'quality_strategy',
              'resource_strategy')

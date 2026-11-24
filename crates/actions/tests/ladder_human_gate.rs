@@ -216,6 +216,26 @@ impl Fixture {
             .await
             .expect("insert the gate");
         if let Some((approver, decided_by_kind)) = decide {
+            // §5.4/§10.4: a machine decision needs the tenant's explicit declaration that the
+            // gate admits that decider kind. The fixture declares it for the gate it decides.
+            if decided_by_kind != DeciderKind::Human {
+                store::approval_policy::set(
+                    &mut tx,
+                    self.seeded.tenant,
+                    &store::approval_policy::ApprovalPolicy {
+                        action: gate.to_owned(),
+                        approval: store::approval_policy::ApprovalRequirement::Required,
+                        self_approval: store::approval_policy::SelfApproval::Forbidden,
+                        approver_kind: decided_by_kind.into(),
+                        conditions: json!({}),
+                        expires_at: None,
+                        required_decisions: 1,
+                    },
+                    None,
+                )
+                .await
+                .expect("declare the gate's approver kind");
+            }
             let decision = Decision {
                 approver_id: approver,
                 kind: DecisionKind::Approve,
@@ -373,7 +393,9 @@ async fn a_human_decision_without_an_approved_human_gate_is_refused() {
         )
         .await
         .expect_err("a pending approval cannot authorise a human decision");
-    assert_field_refusal(&refused, "approval_missing");
+    // An id that names an existing but unresolved gate is not a missing one: the handler's
+    // documented refinement distinguishes `approval_not_accepted` from `approval_missing`.
+    assert_field_refusal(&refused, "approval_not_accepted");
 
     // A resolved gate whose only approve decision is a machine's is not a human act.
     let machine = fx
@@ -450,7 +472,7 @@ async fn a_pending_approval_cannot_gate_a_draft() {
         )
         .await
         .expect_err("a pending approval must not become a human decision");
-    assert_field_refusal(&refused, "approval_missing");
+    assert_field_refusal(&refused, "approval_not_accepted");
 
     // The store writer refuses the same row: a decision cannot cite a pending approval at all.
     let mut tx = store::begin_scoped(&fx.pg.runtime, fx.seeded.tenant)

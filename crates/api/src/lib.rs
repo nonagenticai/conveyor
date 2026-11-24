@@ -419,12 +419,14 @@ mod tests {
         // T5 (#77) adds eight internal kata actions: 530 -> 538; external stays 18.
         // S21 step 9 (#649) adds `cards.assign`: 538 -> 539.
         // T6 (#80) adds nine internal `development_projects.*` actions: 539 -> 548.
-        // T8 (#79) adds three internal `lessons.*` actions: 548 -> 551. T6 (#80) adds ten
-        // internal development-project actions and `cards.assign`; the lane adds its own family.
-        // The merged registry is 586: 567 internal, 19 external.
+        // T8 (#79) adds three internal `lessons.*` actions: 548 -> 551. T15 (#86) adds ten
+        // internal authoring/BYO actions: 551 -> 561. T6 (#80) adds ten internal
+        // development-project actions and `cards.assign`; the lane adds its own families
+        // (`__lessons_namespace__` keeps SPEC §D36's `lessons.*`). The merged registry is 596:
+        // 577 internal, 19 external.
         assert_eq!(
             registry.len(),
-            586,
+            596,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -452,7 +454,10 @@ mod tests {
              tranches.authorise) (497) + #511's five \
              rework-path actions (programmes.baseline|baseline_approve|baselines_list, \
              projects.charter, projects.reopen) (502) + #524's closure-request action \
-             (projects.close_request) (503) + #526's reviews_get (504), its four SAFe demo and \
+             (projects.close_request) (503) + T15's ten authoring/BYO actions \
+             (toolkits.import_openapi|register_mcp|discover_mcp, \
+             tool_authoring.draft|validate|test|review|publish|promote, tools.dispatch) (596) + \
+             #526's reviews_get (504), its four SAFe demo and \
              lesson actions (508), its two retro actions (510), its cadences.approve_plan \
              (511) and its tranches.resume (512), plus the five tenant-asset authoring actions \
              (authoring.intake|draft|review|publish, authoring.assets) (517) + T5's ten kata \

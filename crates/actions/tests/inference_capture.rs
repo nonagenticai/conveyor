@@ -261,13 +261,16 @@ async fn a_capture_failure_keeps_the_call_and_never_retries_the_paid_request() {
     });
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
 
-    // Only the capture target is missing: the invocation, audit and idempotency bookkeeping all
-    // still have their tables, so a successful commit proves the capture rolled back to its own
-    // savepoint instead of poisoning the caller's transaction.
-    sqlx::query("ALTER TABLE inference_call RENAME TO inference_call_unavailable")
+    // Only the capture WRITE fails: the ledger itself stays readable, because the run-level
+    // spend gate (§7.5/D45, #526) reads it before a capturing action dispatches. Breaking the
+    // table would refuse the call at the gate — correctly — and prove nothing about the
+    // capture's savepoint. Revoking INSERT leaves the invocation, audit and idempotency
+    // bookkeeping intact, so a 200 still proves the capture rolled back to its own savepoint
+    // instead of poisoning the caller's transaction.
+    sqlx::query("REVOKE INSERT ON inference_call FROM conveyor_runtime")
         .execute(&pg.super_pool)
         .await
-        .expect("break only the ledger");
+        .expect("break only the capture write");
 
     let request = InvokeRequest {
         credential_alias: None,

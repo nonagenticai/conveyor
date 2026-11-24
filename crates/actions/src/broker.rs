@@ -44,8 +44,10 @@ use conveyor_domain::organisation::{ReleaseAnatomy, parse_release_anatomy};
 /// than carried into a run's context.
 pub const MAX_RESPONSE_BYTES: usize = 1024 * 1024;
 
-/// The broker's input, mirroring `tools.rs`'s schema.
+/// The broker's input, mirroring `tools.rs`'s schema. Unknown members are refused
+/// (`deny_unknown_fields`): a call-time URL has no member to travel in.
 #[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct ToolCallIn {
     run_id: Uuid,
     tool: String,
@@ -416,7 +418,10 @@ async fn invoke_call(
             format!("{} names no registered destination", call.tool),
         )
     })?;
-    if target.kind != ActionKind::External {
+    // A destination is a declared external action (the estate toolkits) or the one registered-
+    // destination dispatch (T15's authored/BYO tools). Anything else would be a second call path.
+    let registered = matches!(target.handler, crate::spec::HandlerRef::ToolDestination);
+    if target.kind != ActionKind::External && !registered {
         tracing::error!(
             tool = %call.tool,
             action = %tool.handler_action,
@@ -429,6 +434,14 @@ async fn invoke_call(
                 "{} names a destination that is not an external action",
                 call.tool
             ),
+        ));
+    }
+    if registered && tool.source_id.is_none() {
+        tracing::error!(tool = %call.tool, "broker: a registered tool carries no source");
+        return Err(ActionError::new(
+            500,
+            "tool_destination_invalid",
+            format!("{} carries no registered destination", call.tool),
         ));
     }
 
@@ -455,9 +468,23 @@ async fn invoke_call(
         usage.run_id = Some(run.run_id);
         usage.run_step_id = run.run_step_id;
     }
+    // An estate tool's external action receives the tool's own input. A registered destination
+    // receives the pinned source and operation — never a URL, never a caller's destination.
+    let target_input = if registered {
+        serde_json::json!({
+            "source_id": tool.source_id,
+            "toolkit_key": tool.toolkit_key,
+            "tool_key": tool.tool_key,
+            "destination": tool.destination,
+            "arguments": call.input.clone(),
+            "credential_alias": tool.credential_alias,
+        })
+    } else {
+        call.input.clone()
+    };
     let target_request = InvokeRequest {
         action: tool.handler_action.clone(),
-        input: call.input.clone(),
+        input: target_input,
         precondition: None,
         idempotency_key: request.idempotency_key.clone(),
         approval_id: ctx.approval_id,
@@ -595,6 +622,7 @@ async fn invoke_call(
         run_step_id: run.run_step_id,
         card_id: run.card_id,
         tool_id: tool.tool_id,
+        binding_id: Some(tool.binding_id),
         tool_key: &call.tool,
         toolkit_key: &tool.toolkit_key,
         toolkit_version: tool.toolkit_version,
@@ -642,6 +670,7 @@ async fn pending_call(
         run_step_id: run.run_step_id,
         card_id: run.card_id,
         tool_id: tool.tool_id,
+        binding_id: Some(tool.binding_id),
         tool_key: &call.tool,
         toolkit_key: &tool.toolkit_key,
         toolkit_version: tool.toolkit_version,

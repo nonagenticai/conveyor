@@ -325,10 +325,33 @@
       "gap": null
     },
     "T15": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "actions": [
+        "tool_authoring.draft",
+        "tool_authoring.promote",
+        "tool_authoring.publish",
+        "tool_authoring.review",
+        "tool_authoring.test",
+        "tool_authoring.validate",
+        "toolkits.discover_mcp",
+        "toolkits.import_openapi",
+        "toolkits.register_mcp",
+        "tools.dispatch"
       ],
-      "gap": "no tool authoring, OpenAPI draft import or BYO tool binding"
+      "modules": [
+        "crates/actions/src/tool_authoring.rs",
+        "crates/store/src/tool_authoring.rs"
+      ],
+      "tables": [
+        "tool_source",
+        "tool_promotion"
+      ],
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "crates/actions/tests/tool_authoring.rs",
+        "crates/actions/tests/byo_tools.rs",
+        "migrations/0070_tool_authoring.sql"
+      ],
+      "gap": null
     },
     "T16": {
       "actions": [
