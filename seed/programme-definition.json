@@ -64,6 +64,16 @@
       "measurement_method": "coverage.json and seed/programme.json regenerated and checked in CI; the P0 checklist counts the published set.",
       "owner_role": "BCM",
       "project_key": "P0"
+    },
+    {
+      "reference": "B7",
+      "description": "Deliberated cross-department decisions",
+      "category": "programme benefit",
+      "target": "every tranche-4 cross-department decision has a meeting record with a position per required department; quorum-miss and commitment slippage are reported at the review",
+      "baseline": "not measured - no meeting rows exist before T19; the current record is the approval row only",
+      "measurement_method": "Read-time aggregates over meeting, meeting_agenda_item, meeting_attendance, meeting_position, approval_decision and project_dependency; a metric reads rows and writes nothing.",
+      "owner_role": "BCM",
+      "project_key": "T19"
     }
   ],
   "links": [
@@ -114,6 +124,22 @@
       "benefit": "B6",
       "strategic_objective": "programme plan and coverage instrument",
       "kind": "benefit"
+    },
+    {
+      "output_ref": "T18 real V2 UI",
+      "capability_ref": "every programme record is readable and actionable in the app",
+      "operational_outcome": "O3 Every decision is auditable",
+      "benefit": "B1",
+      "strategic_objective": "decision ladder (rule -> laya -> generation -> human)",
+      "kind": "benefit"
+    },
+    {
+      "output_ref": "T19 decision forums",
+      "capability_ref": "multi-party decisions carry their deliberation",
+      "operational_outcome": "O7 Meetings decide with the affected departments",
+      "benefit": "B7",
+      "strategic_objective": "decision ladder (rule -> laya -> generation -> human)",
+      "kind": "benefit"
     }
   ],
   "tranches": [
@@ -149,7 +175,7 @@
       "number": 4,
       "state": "planned",
       "entry": "the tranche 3 review decides continue; its exit criteria are met",
-      "exit": "every project in tranche 4 (S05, S07, S09, T10, T14, T16, T4, T9) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "exit": "every project in tranche 4 (S05, S07, S09, T10, T14, T16, T18, T19, T4, T9) meets its acceptance with published evidence, and the review records continue, pause or stop",
       "review_at": null
     },
     {
@@ -408,6 +434,14 @@
     "SPEC-V2": {
       "adm_phase": "Preliminary",
       "plateau": "definition"
+    },
+    "T18": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T19": {
+      "adm_phase": "G",
+      "plateau": "capability"
     }
   }
 }

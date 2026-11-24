@@ -115,6 +115,14 @@ pub(crate) async fn cards_create(
                 )
             })?;
 
+    let job_binding_id = match input.job_binding_id {
+        None => None,
+        Some(id) => {
+            ensure_card_binding(&mut *tx, ctx.tenant, id).await?;
+            Some(id)
+        }
+    };
+
     store::position::lock_board_tx(&mut *tx, ctx.tenant, input.board_id)
         .await
         .map_err(|error| store_error(error, "cards.create"))?;
@@ -140,6 +148,7 @@ pub(crate) async fn cards_create(
             } else {
                 Some(ctx.actor_id)
             },
+            job_binding_id,
             meta,
         },
     )
@@ -300,12 +309,17 @@ async fn cards_update(
     if input.due_done.is_some() {
         changed.push("due_done");
     }
+    if let Some(id) = input.job_binding_id {
+        changed.push("job_binding_id");
+        ensure_card_binding(&mut *tx, ctx.tenant, id).await?;
+    }
 
     let patch = CardUpdate {
         name: input.name.map(|name| name.trim().to_owned()),
         description: input.description,
         due_at: input.due_at,
         due_done: input.due_done,
+        job_binding_id: input.job_binding_id,
     };
     match store::card::update_card_tx(&mut *tx, ctx.tenant, current.card.id, &patch, expected)
         .await
@@ -726,6 +740,7 @@ async fn cards_duplicate(
             } else {
                 Some(ctx.actor_id)
             },
+            job_binding_id: None,
             meta: source.meta.clone(),
         },
     )
@@ -974,11 +989,11 @@ fn map_archive_error(error: ArchiveError) -> ActionError {
     }
 }
 
-fn card_json(record: &CardRecord) -> serde_json::Value {
+pub(crate) fn card_json(record: &CardRecord) -> serde_json::Value {
     serde_json::to_value(card_out(record)).unwrap_or(serde_json::Value::Null)
 }
 
-async fn read_card(
+pub(crate) async fn read_card(
     tx: &mut PgConnection,
     tenant: conveyor_store::TenantId,
     id: Uuid,
@@ -989,9 +1004,44 @@ async fn read_card(
         .ok_or_else(|| ActionError::resource_not_found("card"))
 }
 
+/// Resolve a card's job binding and require it to be usable for a new assignment.
+///
+/// SPEC_V2 §4.4: a card names a binding, not a free-text role. The id must be a row of this
+/// tenant (never another tenant's — the single-column FK would accept it) and it must be
+/// `active`; a draft or retired binding cannot be assigned, so the write is refused before it
+/// lands. The binding's own pin and freshness are checked by `insert_run_tx` when a run is
+/// created; this is only the assignment check.
+pub(crate) async fn ensure_card_binding(
+    tx: &mut PgConnection,
+    tenant: conveyor_store::TenantId,
+    job_binding_id: Uuid,
+) -> Result<(), ActionError> {
+    match store::organisation::job_binding_get_tx(&mut *tx, tenant, job_binding_id).await {
+        Ok(binding) if binding.status == "active" => Ok(()),
+        Ok(binding) => Err(ActionError::new(
+            422,
+            "job_binding_unusable",
+            format!(
+                "job binding {job_binding_id} is {}, not active; a card may only be assigned to \
+                 a live binding",
+                binding.status
+            ),
+        )),
+        Err(store::organisation::OrganisationStoreError::NotFound(_)) => Err(ActionError::new(
+            422,
+            "job_binding_unusable",
+            format!("job binding {job_binding_id} does not exist in this tenant"),
+        )),
+        Err(error) => {
+            tracing::error!(%error, %job_binding_id, "read the card's job binding");
+            Err(ActionError::internal())
+        }
+    }
+}
+
 /// A zero-row edit is either a vanished card (`404`) or a stale version (`412` with the
 /// current representation, CONTRACT §3).
-async fn stale_card(
+pub(crate) async fn stale_card(
     tx: &mut PgConnection,
     tenant: conveyor_store::TenantId,
     id: Uuid,

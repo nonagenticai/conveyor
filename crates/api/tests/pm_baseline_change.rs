@@ -264,6 +264,7 @@ async fn approved_change_request_advances_the_baseline() {
                 "project_id": project_id,
                 "baseline_id": baseline_id,
                 "title": "Add a hardening phase",
+                "body": "Add a hardening phase; the impact block names the schedule cost.",
                 "impact": 5,
             }),
             None,

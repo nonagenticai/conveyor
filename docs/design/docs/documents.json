@@ -42,8 +42,8 @@
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "e7b6a666c2b3a57294cf9517404d4e26fbd6745febeafe0a243c3a597233a663",
-      "bytes": 170681,
+      "sha256": "2c944b95a7cd14b570996d8a6997766ddf3d1dfef0ad44eac867a258a557581e",
+      "bytes": 196503,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -132,17 +132,80 @@
       "path": "docs/decisions/0010-internal-agent-executor-runtime.html",
       "source": "docs/decisions/0010-internal-agent-executor-runtime.md",
       "section": "Decisions",
-      "sha256": "8acb4cb612d7b2d7d687f7a5fe4e4f8b9b5d0cacbeca00a83d49f88412c45e88",
-      "bytes": 8890,
+      "sha256": "322a3262014c4ff44299af7977dc501bcbef9407539f37960665017de1d0b65c",
+      "bytes": 9045,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0010-internal-agent-executor-runtime.md"
+    },
+    {
+      "title": "0011 — The applying gate: a handover parks the run, and a person's approval applies the draft",
+      "path": "docs/decisions/0011-applying-gate.html",
+      "source": "docs/decisions/0011-applying-gate.md",
+      "section": "Decisions",
+      "sha256": "33cd8c2783d3d65b1a4998dcca1866788e1c08c7d7c568ac34d65b3bba42b547",
+      "bytes": 6341,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0011-applying-gate.md"
+    },
+    {
+      "title": "0013 — The real V2 UI is the app, not the design pack",
+      "path": "docs/decisions/0013-real-v2-ui.html",
+      "source": "docs/decisions/0013-real-v2-ui.md",
+      "section": "Decisions",
+      "sha256": "36f048c336414c3935a808810b696c751727bc2a7986dd82a11a99e446c18f88",
+      "bytes": 3686,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0013-real-v2-ui.md"
+    },
+    {
+      "title": "0014 — The work package's run: the card names the binding, the terminal run records its memory",
+      "path": "docs/decisions/0014-work-package-run.html",
+      "source": "docs/decisions/0014-work-package-run.md",
+      "section": "Decisions",
+      "sha256": "844653aa52f5f68de2eb38a28151d502e37711d9e322376c49517fd6ac37b7b7",
+      "bytes": 6614,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0014-work-package-run.md"
+    },
+    {
+      "title": "0015 — The run's episodic memory: prior steps in the compiled prompt",
+      "path": "docs/decisions/0015-run-episodic-memory.html",
+      "source": "docs/decisions/0015-run-episodic-memory.md",
+      "section": "Decisions",
+      "sha256": "919ba6c1a13514c4555c07aed216ebc3f7d77de17f407fe2f258b521b7535424",
+      "bytes": 5457,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0015-run-episodic-memory.md"
+    },
+    {
+      "title": "0016 — The Request source: one declared step, two consumers",
+      "path": "docs/decisions/0016-request-source.html",
+      "source": "docs/decisions/0016-request-source.md",
+      "section": "Decisions",
+      "sha256": "0f0238e5905c39957db243d6750fff728ff64207d1fda8c05ceaf21c75d6b154",
+      "bytes": 5342,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0016-request-source.md"
+    },
+    {
+      "title": "0017 — The card handoff: assign, remember, start",
+      "path": "docs/decisions/0017-card-handoff.html",
+      "source": "docs/decisions/0017-card-handoff.md",
+      "section": "Decisions",
+      "sha256": "c4bd4334f99b72a699394cba7b9e80a693e5ef1af3000d2bd2ded36943c469ad",
+      "bytes": 6053,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0017-card-handoff.md"
+    },
+    {
+      "title": "0018 — The L1 laya gate makes its own call",
+      "path": "docs/decisions/0018-l1-laya-provenance.html",
+      "source": "docs/decisions/0018-l1-laya-provenance.md",
+      "section": "Decisions",
+      "sha256": "b15b88dc01f9d8823a0d250fbfefc9e9b7f593c5ae52966b13783ef4d22a1860",
+      "bytes": 9583,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0018-l1-laya-provenance.md"
     },
     {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
       "section": "Design",
-      "sha256": "b04c408f23e99cecc79ab12c285544d533dd7454797a78c000a739826b1f9474",
-      "bytes": 13342,
+      "sha256": "b534cd0891d6cdf0923586016878c357274a5a80e4c5f0708e2bc3f66b5f1b91",
+      "bytes": 18121,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md"
     },
     {
@@ -150,8 +213,8 @@
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "7e936418480e4a295a5686638c45288b8d58b07632040479df467e912969e63b",
-      "bytes": 24880,
+      "sha256": "370afdcf06026ef6526d99b45c23f2b1cb110402ed1a2936cc8a97b97e83d13e",
+      "bytes": 25873,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -162,6 +225,15 @@
       "sha256": "bceb5d63a826ae0e2401707e4175cada58740f922fec7c073ff29caf7524b992",
       "bytes": 80862,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
+    },
+    {
+      "title": "MSP/TOGAF conformance gap register",
+      "path": "docs/design/data/conformance.html",
+      "source": "docs/design/data/conformance.md",
+      "section": "Design",
+      "sha256": "0b90fd258c3d8161d8c4f55b0a6aef78f286605c785bdf648a013c18e6be6163",
+      "bytes": 24325,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
     {
       "title": "Remaining development work — corrected assessment, 2026-11-10",
@@ -339,8 +411,8 @@
       "path": "docs/evidence/S17-CORE.html",
       "source": "docs/evidence/S17-CORE.md",
       "section": "Evidence",
-      "sha256": "c3e7406e7d8b95974122b81b638f674909aa2317dd7c5f22e1c44eb8dc829895",
-      "bytes": 15353,
+      "sha256": "2966312bda4a98572dd9ca92f791cc7fa1a7c9c44e226c5e9fd6a2a8e60fbad6",
+      "bytes": 21463,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S17-CORE.md"
     },
     {
@@ -360,6 +432,15 @@
       "sha256": "b587959cf368573f414979b43df3b837112589f1198da935ff85b53155ce1314",
       "bytes": 6895,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S18-B.md"
+    },
+    {
+      "title": "S18-loop-29cc3820 — the real improvement loop at one deployed revision",
+      "path": "docs/evidence/S18-loop-29cc3820.html",
+      "source": "docs/evidence/S18-loop-29cc3820.md",
+      "section": "Evidence",
+      "sha256": "38f4ea475bfd481ff05fa76bca25ff3dd1e4d437823575bb3d1d28cb5d2d2427",
+      "bytes": 9299,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S18-loop-29cc3820.md"
     },
     {
       "title": "S19 Part B — run, grade, capture (steps 8–12)",
@@ -389,6 +470,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S20.md"
     },
     {
+      "title": "S21 step 5 — the applying gate (issue #590)",
+      "path": "docs/evidence/S21-APPLY.html",
+      "source": "docs/evidence/S21-APPLY.md",
+      "section": "Evidence",
+      "sha256": "9e6164bf9105f29da2dfce274f546251a29b474009726cb28144113c0c0076d0",
+      "bytes": 3906,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-APPLY.md"
+    },
+    {
       "title": "S21 step 1 — budgeted compile + the role component — evidence",
       "path": "docs/evidence/S21-BUDGET.html",
       "source": "docs/evidence/S21-BUDGET.md",
@@ -402,9 +492,36 @@
       "path": "docs/evidence/S21-EXECUTOR.html",
       "source": "docs/evidence/S21-EXECUTOR.md",
       "section": "Evidence",
-      "sha256": "2b65b6e139883063b531f5b81b1f9b2a417b147156b670d9002fc9c7d08b51a8",
-      "bytes": 5186,
+      "sha256": "5b86488e0e1a049d3b2afd58f4d7918d2b03e7d2e3f81caa4343a86b091dda2c",
+      "bytes": 5241,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-EXECUTOR.md"
+    },
+    {
+      "title": "S21 step 9 — the work package's handoff: assign, remember, start",
+      "path": "docs/evidence/S21-HANDOFF.html",
+      "source": "docs/evidence/S21-HANDOFF.md",
+      "section": "Evidence",
+      "sha256": "452b7a1da7ba507706a804c221cdb73fb73a045ee1944e943e8f2a950c7b9af2",
+      "bytes": 6021,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-HANDOFF.md"
+    },
+    {
+      "title": "S21 step 10 — the L1 laya gate: receipt",
+      "path": "docs/evidence/S21-LAYA.html",
+      "source": "docs/evidence/S21-LAYA.md",
+      "section": "Evidence",
+      "sha256": "51f55a2134c4dc5b9030081e7733c172b10b9da50ad0b1139d231811633eb557",
+      "bytes": 8164,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-LAYA.md"
+    },
+    {
+      "title": "S21 step 7 — the run's episodic memory",
+      "path": "docs/evidence/S21-MEMORY.html",
+      "source": "docs/evidence/S21-MEMORY.md",
+      "section": "Evidence",
+      "sha256": "7c7c32eab5d050917e7839725bcc90e7dc6135cac68c591c901564987d0ef54c",
+      "bytes": 3602,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-MEMORY.md"
     },
     {
       "title": "S21 step 2 — the plan projection over declared step outputs (receipt)",
@@ -416,6 +533,24 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-PLAN.md"
     },
     {
+      "title": "S21 step 8 — the Request source",
+      "path": "docs/evidence/S21-REQUEST.html",
+      "source": "docs/evidence/S21-REQUEST.md",
+      "section": "Evidence",
+      "sha256": "99d3a0465e423dd2411d940a089fd4f259f00b0a051ec4bbb544e0e98d6fc152",
+      "bytes": 4401,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-REQUEST.md"
+    },
+    {
+      "title": "S21 step 6 — the work package's run: card binding, terminal memory, live proof",
+      "path": "docs/evidence/S21-RUN.html",
+      "source": "docs/evidence/S21-RUN.md",
+      "section": "Evidence",
+      "sha256": "bc5bdfb9adfd6b58c11570bfde7fa58cbf9a6b9f3d35aa3fd01a0bb45b2b3327",
+      "bytes": 7430,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-RUN.md"
+    },
+    {
       "title": "S21 step 3 — the work-package prompt envelope (issue #15)",
       "path": "docs/evidence/S21-WORKPACKAGE.html",
       "source": "docs/evidence/S21-WORKPACKAGE.md",
@@ -423,6 +558,15 @@
       "sha256": "d7ce665d7ac7e8ce18f9ca8434a3324ef83061e1d0651fe6ecf16c26a3177cab",
       "bytes": 5255,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-WORKPACKAGE.md"
+    },
+    {
+      "title": "T19 plan audit — independent verification record",
+      "path": "docs/evidence/T19-plan-audit.html",
+      "source": "docs/evidence/T19-plan-audit.md",
+      "section": "Evidence",
+      "sha256": "74e99f19a2c24033195e63f2e31e30c1cd6f8c8086091c950987a7c418c7d084",
+      "bytes": 4302,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/T19-plan-audit.md"
     },
     {
       "title": "The analysis service — capture and drop table (2026-11-15)",
@@ -438,8 +582,8 @@
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "aa21da69c78b166169d06e4d2d6ab4c403eecd991339a0bc78b283560d1be7e7",
-      "bytes": 23231,
+      "sha256": "6f4885caed405068ff0855f3cc5d8d21c94a5f3335ffc526320c254d0b10d0a4",
+      "bytes": 24273,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
     {
@@ -524,12 +668,273 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/produce-capture-2026-11-16.md"
     },
     {
+      "title": "T19 — Business capability map — approval",
+      "path": "docs/evidence/t19/gov/approve-business_capability_map.html",
+      "source": "docs/evidence/t19/gov/approve-business_capability_map.md",
+      "section": "Evidence",
+      "sha256": "7fd4c2de463fde87e329b973e5f2fe82643b269a6da2c68903d6aa85d0ec44c6",
+      "bytes": 2030,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-business_capability_map.md"
+    },
+    {
+      "title": "T19 — Data entity catalog — approval",
+      "path": "docs/evidence/t19/gov/approve-data_entity_catalog.html",
+      "source": "docs/evidence/t19/gov/approve-data_entity_catalog.md",
+      "section": "Evidence",
+      "sha256": "88005bbb23aecebff413297fe780a6ea04bc52bd796363e48f8d9d95a5437f90",
+      "bytes": 2062,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-data_entity_catalog.md"
+    },
+    {
+      "title": "T19 — Drivers, goals and objectives — approval",
+      "path": "docs/evidence/t19/gov/approve-driver_goal_objective.html",
+      "source": "docs/evidence/t19/gov/approve-driver_goal_objective.md",
+      "section": "Evidence",
+      "sha256": "93baae4f132c8d6cb4d39c697e758b117056b69ecf961d19bc825852da48148d",
+      "bytes": 2016,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-driver_goal_objective.md"
+    },
+    {
+      "title": "T19 — Requirements catalog — approval",
+      "path": "docs/evidence/t19/gov/approve-requirements_catalog.html",
+      "source": "docs/evidence/t19/gov/approve-requirements_catalog.md",
+      "section": "Evidence",
+      "sha256": "a8aacbfe8fdff979f1ce714483853900e4a204dce0500327479e929be298c1f8",
+      "bytes": 2083,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-requirements_catalog.md"
+    },
+    {
+      "title": "T19 — Solution concept — approval",
+      "path": "docs/evidence/t19/gov/approve-solution_concept.html",
+      "source": "docs/evidence/t19/gov/approve-solution_concept.md",
+      "section": "Evidence",
+      "sha256": "16c8a62e9f5171e7c9e4fd24ad0bcc7b5c6272deceba3fba09f979ac6dddd96d",
+      "bytes": 1989,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-solution_concept.md"
+    },
+    {
+      "title": "T19 — Stakeholder map — approval",
+      "path": "docs/evidence/t19/gov/approve-stakeholder_map.html",
+      "source": "docs/evidence/t19/gov/approve-stakeholder_map.md",
+      "section": "Evidence",
+      "sha256": "a8d5285a5545c3b8e1a491a9cfc06ff523e7aa775ddcffbdc6a12dc886e56def",
+      "bytes": 2066,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-stakeholder_map.md"
+    },
+    {
+      "title": "T19 — Technology standards — approval",
+      "path": "docs/evidence/t19/gov/approve-technology_standards.html",
+      "source": "docs/evidence/t19/gov/approve-technology_standards.md",
+      "section": "Evidence",
+      "sha256": "c3982a09c3ce22886af7fb006f5f18f859859bded32a7199abaab0149d826951",
+      "bytes": 2003,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/approve-technology_standards.md"
+    },
+    {
+      "title": "T19 — Business capability map",
+      "path": "docs/evidence/t19/gov/artifact-business_capability_map.html",
+      "source": "docs/evidence/t19/gov/artifact-business_capability_map.md",
+      "section": "Evidence",
+      "sha256": "527f326d18fd4154f02c4b12692ccf8c25d46935df36b966d44c5f974c3e7cc6",
+      "bytes": 1913,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-business_capability_map.md"
+    },
+    {
+      "title": "T19 — Data entity catalog",
+      "path": "docs/evidence/t19/gov/artifact-data_entity_catalog.html",
+      "source": "docs/evidence/t19/gov/artifact-data_entity_catalog.md",
+      "section": "Evidence",
+      "sha256": "5a3fbf01c6bba568513d3679ff90551a6eefa985a1dc4c67015743ceef85690a",
+      "bytes": 1941,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-data_entity_catalog.md"
+    },
+    {
+      "title": "T19 — Architecture artifact (the typed TOGAF set)",
+      "path": "docs/evidence/t19/gov/artifact-document-compose.html",
+      "source": "docs/evidence/t19/gov/artifact-document-compose.md",
+      "section": "Evidence",
+      "sha256": "6f2f04321ff2e1ac84bfe3ce7d97eeffdeeb13f2a4646d28ecbbe2444e9e462a",
+      "bytes": 8889,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-document-compose.md"
+    },
+    {
+      "title": "T19 — Architecture artifact (the typed TOGAF set) — publication",
+      "path": "docs/evidence/t19/gov/artifact-document-publish.html",
+      "source": "docs/evidence/t19/gov/artifact-document-publish.md",
+      "section": "Evidence",
+      "sha256": "543005b025ce8caf75341cc381a94a97de7744e1c2948c36330547b6b23d4e67",
+      "bytes": 9022,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-document-publish.md"
+    },
+    {
+      "title": "T19 architecture artifact — the Document section",
+      "path": "docs/evidence/t19/gov/artifact-document-update.html",
+      "source": "docs/evidence/t19/gov/artifact-document-update.md",
+      "section": "Evidence",
+      "sha256": "d164208672b99dae79b15cda592f267f3f2427cddbd15e5e64ac1549b71c8df1",
+      "bytes": 8966,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-document-update.md"
+    },
+    {
+      "title": "T19 — Drivers, goals and objectives",
+      "path": "docs/evidence/t19/gov/artifact-driver_goal_objective.html",
+      "source": "docs/evidence/t19/gov/artifact-driver_goal_objective.md",
+      "section": "Evidence",
+      "sha256": "e9c8fb004eda844b0e6faf3e653cdaf0eaf2f9033da3439935d22e8e819bc5f0",
+      "bytes": 1897,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-driver_goal_objective.md"
+    },
+    {
+      "title": "T19 artefact link — drivergoalobjective derivation requirementscatalog",
+      "path": "docs/evidence/t19/gov/artifact-links.html",
+      "source": "docs/evidence/t19/gov/artifact-links.md",
+      "section": "Evidence",
+      "sha256": "697222d4d84cad812dedb2541adb094ca01fc67982b6bf5d61e5eaaf467ed605",
+      "bytes": 5965,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-links.md"
+    },
+    {
+      "title": "T19 — Requirements catalog",
+      "path": "docs/evidence/t19/gov/artifact-requirements_catalog.html",
+      "source": "docs/evidence/t19/gov/artifact-requirements_catalog.md",
+      "section": "Evidence",
+      "sha256": "0f09d05d2d74e3a9b734008d189ed0824902610f01f31e5c3f79e3145c7f2bfc",
+      "bytes": 1963,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-requirements_catalog.md"
+    },
+    {
+      "title": "T19 — Solution concept",
+      "path": "docs/evidence/t19/gov/artifact-solution_concept.html",
+      "source": "docs/evidence/t19/gov/artifact-solution_concept.md",
+      "section": "Evidence",
+      "sha256": "ff30fa53c52b33dc7286194c3b493406fee8f81b0389d20f7c69698739f27a5d",
+      "bytes": 1865,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-solution_concept.md"
+    },
+    {
+      "title": "T19 — Stakeholder map",
+      "path": "docs/evidence/t19/gov/artifact-stakeholder_map.html",
+      "source": "docs/evidence/t19/gov/artifact-stakeholder_map.md",
+      "section": "Evidence",
+      "sha256": "7708bcc10eb26ecec9e5a7963bcb3d635c2d53363b57aa8394f888775f637e24",
+      "bytes": 1940,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-stakeholder_map.md"
+    },
+    {
+      "title": "T19 — Technology standards",
+      "path": "docs/evidence/t19/gov/artifact-technology_standards.html",
+      "source": "docs/evidence/t19/gov/artifact-technology_standards.md",
+      "section": "Evidence",
+      "sha256": "572d19c7eddaf01227125dfe305198b20469bf7b2a8b56b7d744b36af672687c",
+      "bytes": 1883,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/artifact-technology_standards.md"
+    },
+    {
+      "title": "B7 — the measured baseline",
+      "path": "docs/evidence/t19/gov/benefit-b7-baseline.html",
+      "source": "docs/evidence/t19/gov/benefit-b7-baseline.md",
+      "section": "Evidence",
+      "sha256": "8ee36b8bd3312e7b5b94f5152e0c351a4f092476db4dd1eeb4286c4d7f6f838d",
+      "bytes": 3174,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/benefit-b7-baseline.md"
+    },
+    {
+      "title": "T19 Phase-G compliance review — deliverycontract",
+      "path": "docs/evidence/t19/gov/compliance-review-delivery.html",
+      "source": "docs/evidence/t19/gov/compliance-review-delivery.md",
+      "section": "Evidence",
+      "sha256": "cb339730018c2a706dfaf9dd6093139dc6016ea9680f05b995c946b69f49398d",
+      "bytes": 3198,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/compliance-review-delivery.md"
+    },
+    {
+      "title": "T19 Phase-G compliance review — statementofarchitecturework",
+      "path": "docs/evidence/t19/gov/compliance-review-soaw.html",
+      "source": "docs/evidence/t19/gov/compliance-review-soaw.md",
+      "section": "Evidence",
+      "sha256": "e6f066eee9929ccd767fbdf9fb39426a5a549ade6241e8d6b9d085d7f1a087ea",
+      "bytes": 3197,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/compliance-review-soaw.md"
+    },
+    {
+      "title": "T19 architecture contract — approval",
+      "path": "docs/evidence/t19/gov/contract-approve.html",
+      "source": "docs/evidence/t19/gov/contract-approve.md",
+      "section": "Evidence",
+      "sha256": "369a9cd13f9bbc086624102fc4ffa6ddfc367c18ba84e255f57927d8e3364144",
+      "bytes": 3451,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/contract-approve.md"
+    },
+    {
+      "title": "T19 architecture contract — the Board's decision",
+      "path": "docs/evidence/t19/gov/contract-board-decision.html",
+      "source": "docs/evidence/t19/gov/contract-board-decision.md",
+      "section": "Evidence",
+      "sha256": "d8514ebdf40156d5f87c78cec84e6f0b933f8a8536e2d9ab42e9fcf53ad6b253",
+      "bytes": 1759,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/contract-board-decision.md"
+    },
+    {
+      "title": "Statement of Architecture Work — T19 decision forums (2026-11-24)",
+      "path": "docs/evidence/t19/gov/contract-request.html",
+      "source": "docs/evidence/t19/gov/contract-request.md",
+      "section": "Evidence",
+      "sha256": "a5dc3f5faa5c18ed30ca3bd212da7d3d827b6d62df3500f71a1a43ba1c85a9ce",
+      "bytes": 3213,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/contract-request.md"
+    },
+    {
+      "title": "T19 delivery contract — approval",
+      "path": "docs/evidence/t19/gov/delivery-contract-approve.html",
+      "source": "docs/evidence/t19/gov/delivery-contract-approve.md",
+      "section": "Evidence",
+      "sha256": "10e41d0df321c6792b76ad2a4ddc88a6b40491cad5602bd287a4599912441706",
+      "bytes": 3501,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/delivery-contract-approve.md"
+    },
+    {
+      "title": "T19 delivery contract — the Board's decision",
+      "path": "docs/evidence/t19/gov/delivery-contract-board-decision.html",
+      "source": "docs/evidence/t19/gov/delivery-contract-board-decision.md",
+      "section": "Evidence",
+      "sha256": "9acdf5bda93125e39b37a437c3057254392ae9e861216fc102f5febf17171a5e",
+      "bytes": 1676,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/delivery-contract-board-decision.md"
+    },
+    {
+      "title": "Delivery contract — T19 decision forums (2026-11-24)",
+      "path": "docs/evidence/t19/gov/delivery-contract-request.html",
+      "source": "docs/evidence/t19/gov/delivery-contract-request.md",
+      "section": "Evidence",
+      "sha256": "935a5f9bda3536b30d38d99d8569aead712868287252699fc6e25a096ee63d68",
+      "bytes": 3268,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/gov/delivery-contract-request.md"
+    },
+    {
+      "title": "T19 close-out — live write evidence",
+      "path": "docs/evidence/t19/live-write-evidence.html",
+      "source": "docs/evidence/t19/live-write-evidence.md",
+      "section": "Evidence",
+      "sha256": "b3b6ff1653e1ba823045a13b384f4a642dc41512d212d839ff0c4d4942f7efb2",
+      "bytes": 931,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/live-write-evidence.md"
+    },
+    {
+      "title": "T19 close-out — programmes.refresh evidence",
+      "path": "docs/evidence/t19/refresh-evidence.html",
+      "source": "docs/evidence/t19/refresh-evidence.md",
+      "section": "Evidence",
+      "sha256": "ddac071a949b01161f9bb16d0a38c5749705b774a6b2935b6ef7caf52ad3cc2d",
+      "bytes": 486,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/refresh-evidence.md"
+    },
+    {
       "title": "V1 → SPECV2 coverage",
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "bee0e074baa69d4c363dae0766c4c9800d72064c78d4e15b97824125304b080d",
-      "bytes": 11107,
+      "sha256": "44dba95b94106e44ab0daca16e71050648b6bf72201f4b02b623d64e2609c4e2",
+      "bytes": 15126,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -537,8 +942,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "97868655c78c34514dc5840d52d3a387e18ff658fc5b4df2df48d2f11953541e",
-      "bytes": 252412,
+      "sha256": "b8a0a1edadb3622f7e7e38653cb1765ae3462036963ad051f0ffdcc917a814e6",
+      "bytes": 259149,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -546,8 +951,8 @@
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "1092bfce893cce27d37dd8ff0061ba96b814e36646ec97fa34a7f0ddd1a1c09f",
-      "bytes": 71339,
+      "sha256": "24c093ecc71b23d40f9e5b37bc8f314f66fc60058cddb0221dfbaaaf025692d3",
+      "bytes": 90260,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -555,8 +960,8 @@
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "179802a593b99091eab57542b0ba4242a77f5f01a1803597fec78641b8b3f58e",
-      "bytes": 143841,
+      "sha256": "1dce63a65f1f0a11d922dc8782a448805d3ff3db25b9aec35c920d888e8c73ff",
+      "bytes": 155537,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -627,18 +1032,144 @@
       "path": "docs/plans/05-W2V-ABSORPTION.html",
       "source": "docs/plans/05-W2V-ABSORPTION.md",
       "section": "Plans",
-      "sha256": "3bcca544f04f89a22022d4da65180fbe377ef31dedbf4b8addc31e92e41f51be",
-      "bytes": 8235,
+      "sha256": "87944ed8238aec57213b48968950d68ef80c72820c2852d0349fe5e4a5a79461",
+      "bytes": 8865,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/05-W2V-ABSORPTION.md"
+    },
+    {
+      "title": "06 — Tool provenance and the retirement gate",
+      "path": "docs/plans/06-TOOL-PROVENANCE.html",
+      "source": "docs/plans/06-TOOL-PROVENANCE.md",
+      "section": "Plans",
+      "sha256": "16b6910f7805ff530b8a75c1d7211a2d1df5789d0188145d0b84ba41c56822ad",
+      "bytes": 6451,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/06-TOOL-PROVENANCE.md"
     },
     {
       "title": "P0 — Programme definition",
       "path": "docs/plans/P0-programme-definition.html",
       "source": "docs/plans/P0-programme-definition.md",
       "section": "Plans",
-      "sha256": "538f4aa69586234a3a03c4adb93a51fb30dac859e0b6dc7681ef04988f18cd50",
+      "sha256": "cd7d2968eee9c16df04adc05d3dd3c79a52ce91d09b58c391d3ce3644b05f3b8",
       "bytes": 13658,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
+    },
+    {
+      "title": "T18 — The real V2 UI",
+      "path": "docs/plans/T18-real-v2-ui.html",
+      "source": "docs/plans/T18-real-v2-ui.md",
+      "section": "Plans",
+      "sha256": "d8fd549f7f47dc9fdd510575d957bedf84b942d8bcafeb0b61ee93441e3d1b23",
+      "bytes": 17688,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18-real-v2-ui.md"
+    },
+    {
+      "title": "Architecture design — T18, the real V2 UI",
+      "path": "docs/plans/T18/architecture-design.html",
+      "source": "docs/plans/T18/architecture-design.md",
+      "section": "Plans",
+      "sha256": "8f6e0b4e433229ef620dd6a5ea5a3948035183361bd7d013d80ce4925324ee28",
+      "bytes": 6641,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18/architecture-design.md"
+    },
+    {
+      "title": "Inception analysis — T18, the real V2 UI",
+      "path": "docs/plans/T18/inception-analysis.html",
+      "source": "docs/plans/T18/inception-analysis.md",
+      "section": "Plans",
+      "sha256": "f68b03b787e41ba3f2a7cb2ec53a57994ac302c8d19953180c12ed83b06428fa",
+      "bytes": 4318,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18/inception-analysis.md"
+    },
+    {
+      "title": "Project brief — T18, the real V2 UI",
+      "path": "docs/plans/T18/project-brief.html",
+      "source": "docs/plans/T18/project-brief.md",
+      "section": "Plans",
+      "sha256": "a532c8aab5ef93d8bd5b13d390544ed18050c2fe205ee026fd51e6f0f53b0cc4",
+      "bytes": 3462,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18/project-brief.md"
+    },
+    {
+      "title": "T19 — Decision forums (meetings)",
+      "path": "docs/plans/T19-decision-forums.html",
+      "source": "docs/plans/T19-decision-forums.md",
+      "section": "Plans",
+      "sha256": "316edd9323a47737bda6eb12239bd5f1bcefe40431f99e0a2069e8b09d4a4bf2",
+      "bytes": 25864,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19-decision-forums.md"
+    },
+    {
+      "title": "T19 — Architecture design (PSA and HLD)",
+      "path": "docs/plans/T19/architecture-design.html",
+      "source": "docs/plans/T19/architecture-design.md",
+      "section": "Plans",
+      "sha256": "730266ca5fa0006d7f9059267ba4c6e1bc8e381ffb018e511d888c5f0ebd0371",
+      "bytes": 16429,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/architecture-design.md"
+    },
+    {
+      "title": "T19 — Artefact register",
+      "path": "docs/plans/T19/artifact-register.html",
+      "source": "docs/plans/T19/artifact-register.md",
+      "section": "Plans",
+      "sha256": "44a1f02c2fc887a787a2b50033e7775ae2aec73b28878b1da4452d04208bfd02",
+      "bytes": 5995,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/artifact-register.md"
+    },
+    {
+      "title": "T19 — Decision forums: closure review",
+      "path": "docs/plans/T19/closure-review.html",
+      "source": "docs/plans/T19/closure-review.md",
+      "section": "Plans",
+      "sha256": "d7fe5b981be971797a2768ed5ba67c390ae52edc4afc293d4429ee741abede8d",
+      "bytes": 6122,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/closure-review.md"
+    },
+    {
+      "title": "T19 — Decision forums: evidence",
+      "path": "docs/plans/T19/evidence.html",
+      "source": "docs/plans/T19/evidence.md",
+      "section": "Plans",
+      "sha256": "aeb7d5ed9e5b54fcf67288a57e0d8b4aa66c0f343351bdb97b90e99c142ce6a6",
+      "bytes": 12563,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/evidence.md"
+    },
+    {
+      "title": "T19 — Inception analysis",
+      "path": "docs/plans/T19/inception-analysis.html",
+      "source": "docs/plans/T19/inception-analysis.md",
+      "section": "Plans",
+      "sha256": "77aa784a87f54ce444e5991f2b883e01ae0404aec2efdc443b25675754e7c12a",
+      "bytes": 6378,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/inception-analysis.md"
+    },
+    {
+      "title": "T19 — MSP profile",
+      "path": "docs/plans/T19/msp-profile.html",
+      "source": "docs/plans/T19/msp-profile.md",
+      "section": "Plans",
+      "sha256": "3f4ccfc6d33185e201bb06775a61134e489407aeec9f3f682d3b2c4cbbfa944a",
+      "bytes": 8527,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/msp-profile.md"
+    },
+    {
+      "title": "T19 — Project brief",
+      "path": "docs/plans/T19/project-brief.html",
+      "source": "docs/plans/T19/project-brief.md",
+      "section": "Plans",
+      "sha256": "28ff3029a69911da34695a9862f6ae6e9d83c3b84fe55de010a05a38e8bb4c4f",
+      "bytes": 5364,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/project-brief.md"
+    },
+    {
+      "title": "T19 — SAFe epic",
+      "path": "docs/plans/T19/safe-epic.html",
+      "source": "docs/plans/T19/safe-epic.md",
+      "section": "Plans",
+      "sha256": "c4cd154bc3d1047bdb8bcfb9aec7f62d96580fcdb99b046305b76ed070a2763b",
+      "bytes": 5420,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/safe-epic.md"
     },
     {
       "title": "T9 — TOGAF ADM capability",
@@ -1014,8 +1545,8 @@
       "path": "docs/plans/slices/S18-kata-improvement.html",
       "source": "docs/plans/slices/S18-kata-improvement.md",
       "section": "Plans",
-      "sha256": "f9744cbc6cb89604eb0df2bd754edadfdb4206a9d7f973c35736affc68aa8489",
-      "bytes": 9781,
+      "sha256": "d82a209c37fc298bb416496dd6a86af64342e3cb1da89e017f81edb1467ca461",
+      "bytes": 9778,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S18-kata-improvement.md"
     },
     {
@@ -1041,8 +1572,8 @@
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "839b0fde117c4dbcb6289641430db57655d128203fcb8d5940592489e1743a53",
-      "bytes": 34495,
+      "sha256": "0dca766d1d244ee9e415c15077ec2311311571636f3b81877b08a25eca7e11c8",
+      "bytes": 58188,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

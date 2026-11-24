@@ -63,7 +63,7 @@ pub struct ProgrammeSeed {
 /// One project row the seed owns.
 #[derive(Debug, Deserialize)]
 pub struct ProjectSeed {
-    /// Unique per tenant; `S00`…`S21`, `T0`…`T17`, or a cross-cutting key.
+    /// Unique per tenant; `S00`…`S21`, `T0`…`T18`, or a cross-cutting key.
     pub key: String,
     /// Display name.
     pub name: String,
@@ -228,7 +228,7 @@ async fn seed_export_tx(
     let tenant_id = tenant.as_uuid();
     let mut counts = ProgrammeCounts::default();
     // Resolved once per tenant, not once per project: the lanes are the same for every board,
-    // and a tenant without the template gets one warning, not 48.
+    // and a tenant without the template gets one warning, not 49.
     let lanes = board_lanes(&mut *conn, tenant).await?;
     if lanes.is_none() {
         tracing::warn!(

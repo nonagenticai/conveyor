@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Solution Concept Diagram — DESIGN-PUBLISH - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Solution Concept Diagram — DESIGN-PUBLISH</li>
+<li>Phase: a</li>
+<li>Kind: diagram</li>
+<li>Purpose: Show, surface by surface, what each reader touches and what stands behind it, so a proposed surface is not mistaken for a live one.</li>
+<li>Scope: The pack's two surfaces — the public site and the operator console — and their data sources at 2026-11-21.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>console.js / same-origin /config.json; auth-code + PKCE S256; token in memory</strong> - signed in it is the operator console; signed out there is no API request and no write control</li>
+<li><strong>/design/data/snapshot.js / Postgres for the tenant named by CONVEYOR_PUBLIC_TENANT</strong> - public rows replace the fixtures on the pages that have a live source, under a LIVE ribbon carrying the snapshot hash and timestamp</li>
+<li><strong>/design/docs/outputs.js and output-&lt;id&gt;.html / the published index only</strong> - written by conveyor snapshot --outputs-dir; the live index was generated 2026-11-21T17:23:48Z</li>
+<li><strong>https://conveyor.nonagentic.ai/design/ / the app image's /design route</strong> - runtime files with the generated docs/ and data/ beside them (HTTP 200 live)</li>
+<li><strong>nonagentic.ai/design / the retired homepage mirror</strong> - 308-redirects to the app-served pack since 2026-11-18; the vendored copy is gone</li>
+<li><strong>studio.html / the offline entry: local assets, no server</strong> - opens from file:// and from /design/studio.html (HTTP 200 live, 2026-11-21T17:36Z)</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Publish the SPEC_V2 studio design pack, live · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

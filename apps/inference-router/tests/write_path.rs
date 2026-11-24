@@ -283,7 +283,8 @@ async fn a_failover_bills_each_attempt_with_its_own_tokens() {
 
     let failing = failing_stub_provider().await;
     let serving = stub_provider().await;
-    // No alias for the requested model, so the route is the whole chain and a failure fails over.
+    // The router-pick sentinel walks the whole chain, so a failure fails over. (A name no provider
+    // declares would be a 404 by contract, which is a different test.)
     let catalog = Catalog::from_yaml(&format!(
         "providers:\n  - name: stub-fail\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{failing}/v1\n    model: stub-model\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{serving}/v1\n    model: stub-model\ndefault_chain: [stub-fail, stub-openai]\n"
     ))
@@ -303,7 +304,7 @@ async fn a_failover_bills_each_attempt_with_its_own_tokens() {
 
     let body = Body::from(
         json!({
-            "model": "unaliased-model",
+            "model": "default",
             "messages": [{"role": "user", "content": "failover"}],
             "max_tokens": 8
         })
@@ -994,9 +995,30 @@ async fn an_unvouched_delegation_keeps_the_callers_tenant() {
 
 /// A stub that answers a streaming request with the oracle's five frames plus `[DONE]`.
 async fn stream_stub_provider() -> std::net::SocketAddr {
-    async fn handler(axum::Json(body): axum::Json<Value>) -> axum::response::Response {
+    stream_stub_provider_with(Duration::ZERO, false).await
+}
+
+/// The same frames, optionally delayed and/or failed. The delay is what pushes the router past
+/// its header-flush grace, so these tests exercise the body that opens after the head.
+async fn stream_stub_provider_with(delay: Duration, fail: bool) -> std::net::SocketAddr {
+    async fn handler(
+        axum::extract::State((delay, fail)): axum::extract::State<(Duration, bool)>,
+        axum::Json(body): axum::Json<Value>,
+    ) -> axum::response::Response {
         use axum::response::IntoResponse;
 
+        if !delay.is_zero() {
+            tokio::time::sleep(delay).await;
+        }
+        if fail {
+            return (
+                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                axum::Json(
+                    json!({"error": {"message": "stub provider failure", "type": "server_error"}}),
+                ),
+            )
+                .into_response();
+        }
         if body.get("stream").and_then(Value::as_bool).unwrap_or(false) {
             let frames = [
                 r#"data: {"id":"chatcmpl-stub","object":"chat.completion.chunk","created":0,"model":"stub-model","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}"#,
@@ -1026,7 +1048,9 @@ async fn stream_stub_provider() -> std::net::SocketAddr {
         }))
         .into_response()
     }
-    let app = Router::new().route("/v1/chat/completions", post(handler));
+    let app = Router::new()
+        .route("/v1/chat/completions", post(handler))
+        .with_state((delay, fail));
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
         .await
         .expect("bind stub");
@@ -1061,12 +1085,25 @@ async fn streaming_state(
     address: std::net::SocketAddr,
     recorder: Arc<Recorder>,
 ) -> AppState {
+    streaming_state_with(pool, address, recorder, &[]).await
+}
+
+async fn streaming_state_with(
+    pool: sqlx::PgPool,
+    address: std::net::SocketAddr,
+    recorder: Arc<Recorder>,
+    env: &[(&str, &str)],
+) -> AppState {
     let catalog = Catalog::from_yaml(&format!(
         "providers:\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{address}/v1\n    model: stub-model\n    model_aliases:\n      stub-model: stub-model\ndefault_chain: [stub-openai]\n"
     ))
     .expect("catalog");
     let router = RouterService::new(catalog, Duration::from_secs(1)).expect("router");
-    let config = Config::from_lookup(|_| None).expect("defaults");
+    let map: std::collections::HashMap<String, String> = env
+        .iter()
+        .map(|(key, value)| ((*key).to_owned(), (*value).to_owned()))
+        .collect();
+    let config = Config::from_lookup(|key| map.get(key).cloned()).expect("config");
     AppState::with_deps(
         config,
         router,
@@ -1247,4 +1284,106 @@ async fn a_stream_that_never_opens_is_one_row_with_its_http_code() {
     let events = recorder.0.lock().expect("recorder");
     assert_eq!(events.len(), 1);
     assert_eq!(events[0].output_tokens, 0);
+}
+
+#[tokio::test]
+async fn an_open_that_fails_after_the_head_is_flushed_is_still_one_row() {
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("the service's own migrations");
+    let address = stream_stub_provider_with(Duration::from_millis(300), true).await;
+    let recorder = Arc::new(Recorder::default());
+    let state = streaming_state_with(
+        db.pool.clone(),
+        address,
+        recorder.clone(),
+        &[
+            ("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS", "50"),
+            ("INFERENCE_ROUTER_STREAM_KEEPALIVE_MS", "20"),
+            ("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT", "0.05"),
+        ],
+    )
+    .await;
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .header("x-tenant-id", "7d9c2b6e-0f3a-4a57-9c1e-2b6a1f0e4d55")
+                .body(stream_request())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    // The head went out before the failure; the failure is a frame, never a status.
+    assert_eq!(response.status(), axum::http::StatusCode::OK);
+    let bytes = axum::body::to_bytes(response.into_body(), usize::MAX)
+        .await
+        .expect("body");
+    let text = String::from_utf8(bytes.to_vec()).expect("utf8");
+    assert!(text.contains("data: {\"error\""), "{text}");
+    assert!(text.ends_with("data: [DONE]\n\n"), "{text}");
+
+    wait_for_rows(&db.pool, 1).await;
+    let row = one_row(&db.pool).await;
+    assert_eq!(row["streamed"], true);
+    // The same row the buffered never-opened path writes: the refusal's code, no stream status.
+    assert_eq!(row["stream_status"], Value::Null);
+    assert_eq!(row["status"], "502");
+}
+
+#[tokio::test]
+async fn a_disconnect_while_the_open_is_pending_is_booked() {
+    use futures_util::StreamExt;
+
+    let db = common::fresh().await;
+    conveyor_inference_router::db::migrate(&db.pool)
+        .await
+        .expect("the service's own migrations");
+    let address = stream_stub_provider_with(Duration::from_millis(300), false).await;
+    let recorder = Arc::new(Recorder::default());
+    let state = streaming_state_with(
+        db.pool.clone(),
+        address,
+        recorder.clone(),
+        &[
+            ("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS", "50"),
+            ("INFERENCE_ROUTER_STREAM_KEEPALIVE_MS", "20"),
+            ("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT", "0.05"),
+        ],
+    )
+    .await;
+
+    let response = conveyor_inference_router::router::router(state)
+        .oneshot(
+            Request::post("/api/chat/completions")
+                .header("content-type", "application/json")
+                .header("x-tenant-id", "7d9c2b6e-0f3a-4a57-9c1e-2b6a1f0e4d55")
+                .body(stream_request())
+                .expect("request"),
+        )
+        .await
+        .expect("router answers");
+    assert_eq!(response.status(), axum::http::StatusCode::OK);
+    let mut body = response.into_body().into_data_stream();
+    let first = body
+        .next()
+        .await
+        .expect("a frame arrives while the open is pending")
+        .expect("frame bytes");
+    assert!(
+        first.starts_with(b": keepalive"),
+        "the first body byte must be the keepalive: {first:?}"
+    );
+    // Walk away while the upstream is still opening: that is the pre-open disconnect.
+    drop(body);
+
+    wait_for_rows(&db.pool, 1).await;
+    let row = one_row(&db.pool).await;
+    assert_eq!(row["streamed"], true);
+    assert_eq!(row["stream_status"], "client_disconnect");
+    assert_eq!(row["status"], "error");
+    // No chunk was ever relayed, so there is nothing to hash.
+    assert_eq!(row["response_sha256"], Value::Null);
 }

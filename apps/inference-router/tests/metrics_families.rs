@@ -233,14 +233,14 @@ async fn a_served_request_books_the_attempt_trio() {
     let body = scrape().await;
     let labels = [
         ("provider", "stub-metrics-ok"),
-        ("path", "routed"),
+        ("path", "pinned"),
         ("outcome", "ok"),
         ("caller", "w2v"),
     ];
     assert_eq!(
         series_value(&body, "inference_router_provider_attempts_total", &labels),
         Some(1.0),
-        "one attempt, routed, ok, labelled by the bounded caller"
+        "one attempt, pinned by the declared model id, ok, labelled by the bounded caller"
     );
     let seconds = series_value(
         &body,
@@ -307,7 +307,9 @@ async fn a_failed_attempt_books_its_classification() {
         )
         .await
         .expect("router answers");
-    assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+    // A 500 from the (pinned) provider is a gateway failure; only a shed or an upstream 429/503
+    // is a 503 with pacing.
+    assert_eq!(response.status(), StatusCode::BAD_GATEWAY);
 
     let body = scrape().await;
     assert_eq!(
@@ -316,13 +318,13 @@ async fn a_failed_attempt_books_its_classification() {
             "inference_router_provider_attempts_total",
             &[
                 ("provider", "stub-metrics-fail"),
-                ("path", "routed"),
+                ("path", "pinned"),
                 ("outcome", "error"),
                 ("caller", "unknown"),
             ],
         ),
         Some(1.0),
-        "the failed attempt is counted before the chain gives up"
+        "the failed attempt is counted before the refusal"
     );
     assert_eq!(
         series_value(
@@ -330,7 +332,7 @@ async fn a_failed_attempt_books_its_classification() {
             "inference_router_provider_errors_total",
             &[
                 ("provider", "stub-metrics-fail"),
-                ("path", "routed"),
+                ("path", "pinned"),
                 ("reason", "upstream_5xx"),
             ],
         ),
@@ -1058,7 +1060,7 @@ async fn the_v1_alias_is_served_and_counted_like_the_api_path() {
             "inference_router_provider_attempts_total",
             &[
                 ("provider", "stub-metrics-alias"),
-                ("path", "routed"),
+                ("path", "pinned"),
                 ("outcome", "ok"),
                 ("caller", "agent"),
             ],

@@ -1366,17 +1366,142 @@ A bound run reuses the existing rows; no table and no migration.
 
 | Row | What the runtime writes |
 |---|---|
-| `run` | the binding pin (`job_binding_id`, `release_hash`, both from 0040), `capability_id`/`capability_agent_id` from the binding, the status path `queued → running → succeeded \| failed` (never `waiting_approval` in this unit) |
+| `run` | the binding pin (`job_binding_id`, `release_hash`, both from 0040), `capability_id`/`capability_agent_id` from the binding, the status path `queued → running → waiting_approval → running → succeeded \| failed` (a handover parks it — §2.25/§3.2) |
 | `run_step` | exactly one row: position 1, attempt 1, action `agent.run`, the pin envelope as `input`, the draft's hash as `output_hash`, and `judge` = the laya pre-check record or `{decision:"no_policy"}` |
 | `document` | the draft: `body` = the model's text, `meta.generated = true` + the prompt/binding/run identity; `card_id` null until `ladder.apply_draft` attaches it |
 | `decision` | one `gate.precheck` row when a policy exists: rung `laya`, option-set version, policy/refinement/laya-config versions, answer, probabilities, confidence, input hash, latency |
 | `inference_call` | one per model turn, naming `prompt_ref`/`prompt_version`/`prompt_sha256` and usage |
 | `tool_call` | one per tool call the loop dispatches through `tools.call` |
-| `approval` | one card-scoped row only when the gate's action is `handover` (no `run_id`; the run is terminal) |
+| `approval` | one card-scoped row only when the gate's action is `handover`: kind `executor`, `run_id`/`card_id` inherited from the run, and `meta` naming the draft; the run stays `waiting_approval` until the decision (§2.25) |
 
 The compiled prompt text is never stored: `inference_call` and the draft's `meta` carry the
 identity and the hash. `run_step.node_id` is nullable (0019), so the same store serves a workflow
 node and this run-level step.
+
+### 2.25 The applying gate — S21 step 5 (0 new tables)
+
+The park, the decision and the application reuse the same rows; no table and no migration.
+
+| Row | What the gate writes |
+|---|---|
+| `approval` | one `executor` row on a `handover`: `run_id`/`card_id` inherited, `gate = gate.precheck`, `meta = {run_id, gate, draft_document_id, prompt_sha256, position: 1, attempt: 1, threshold, policy_id, laya_config_id}`; it stays pending until a person decides it |
+| `decision` | on approval, one L3 row: `rung=human`, `kind=gate.draft_apply`, `outcome=accepted`, `approval_id`, `card_id`, `meta` naming `draft_document_id`/`prompt_sha256`/`run_id`; the L1 `gate.precheck` row already names the draft in its `meta` |
+| `approval_decision` | the person's approve/reject, `decided_by_kind='human'`; the executor gate refuses any other decider kind |
+| `job` | one `run.resume` row on approval, payload `{run_id, approval_id, decision_id}`, dedupe `run.resume:{run_id}:{approval_id}`; it is not in `ANDON_ALLOWED_KINDS` |
+| `document` | the draft gets `card_id` only in the resume transaction; a rejection or expiry leaves it null |
+
+The store's one apply helper (`apply_draft_tx`) is shared by `ladder.apply_draft` and the
+`run.resume` worker, so the decision binding is checked once. The run's `waiting_approval` row is
+live work and holds `uq_run_live` until the decision, the rejection or `approval.expire`.
+
+### 2.26 The work package's run — S21 step 6 (0 new tables)
+
+The card's binding and the run's memory reuse existing columns and rows; no table and no migration.
+
+| Row | What the level writes |
+|---|---|
+| `card` | `job_binding_id` (the column from `0040_organisation`) is now written by `cards.create`/`cards.update` and read by every card view; the id must resolve in the tenant and be `active` |
+| `run` | a `runs.create` call with no binding inherits the card's binding before `insert_run_tx` resolves the pin; an explicit conflicting binding is refused before the INSERT; the run row is unchanged |
+| `work_package_memory` | one `kind='attempt'`, `source='system'` hot row per terminal root run of a card, inserted by the terminal transition in the same transaction (`run_id` set; `meta = {run_id, status, error_class}`), then the existing per-card `memory.consolidate` job is enqueued |
+| `job` | the existing `memory.consolidate` row is unchanged; it now has rows to consolidate |
+| `document` | unchanged — the draft's attach path is §2.25's |
+
+A child run (`parent_run_id IS NOT NULL`) and a card-less run write no memory row: a child shares
+its parent's card and is part of the parent's attempt, and a card-less run has no work package.
+The attempt row and the terminal status commit together or not at all. The prompt's memory selector
+reads the card's newest un-consolidated rows, so the next run reads the prior attempt until the
+digest stamps it. The **budget** is not this level's: `run_budget_tx` and the invoke precheck are the
+#526 lane's `v1-p75-1`/`v1-w4a-1`, and `ReleaseLimits.max_tokens` remains that gate's residual.
+
+### 2.27 The run's episodic memory — S21 step 7 (0 new tables)
+
+The run's prior steps, the card's hot rows and the digest are read into the one Memory section; no
+table and no migration.
+
+| Row | What the level reads or writes |
+|---|---|
+| `run_step` | **read, never written** as the run's episodic source: the same `run_id`, statuses `succeeded`/`failed`, `(position, attempt)` before the current step's, ordered by `(position, attempt)`, at most `step_limit` (default 8, max 32). The prompt's identity is `position.attempt`, not the row uuid. Covered by `run_step_run_idx (tenant_id, run_id, position)` |
+| `work_package_memory` | unchanged rows; `hot_for_card_tx` now filters `kind <> 'digest'`, so a digest is never returned as hot |
+| `prompt_section` | unchanged; the memory section's `selector` jsonb gains `include_steps` (default true) and `step_limit` (default 8, max 32) |
+| `run` | unchanged; the terminal attempt row is §2.26's |
+
+A prior-step body renders whole. An over-budget section refuses with the measured size; there is no
+truncation path. The body is data, never instruction, and renders in the Memory section below the
+procedure and capability blocks. A child run's prompt reads only its own `run_step` rows.
+
+### 2.28 The Request source — S21 step 8 (0 new tables)
+
+The current step's declaration is read into the process (Request) section and passed unchanged to
+the judge; no table and no migration.
+
+| Row | What the level reads or writes |
+|---|---|
+| `run_step` | **read**: `input` (the resolved input persisted at claim), `process_step_id`, `position`, `attempt`, `action`, `node_id`, `on_result`. Primary-key read; no index added |
+| `process_step` (`procedure_step`) | **read**: `outputs` (declared paths), `action_text`, `gate_kind`, joined on `run_step.process_step_id`. The row is the run's frozen version (editing a published procedure is copy-forward) |
+| `prompt_section` | unchanged; the process section's `budget_chars` bounds the request |
+| `inference_call` | unchanged; `prompt_sha256` now covers the request document |
+
+The compiler never re-resolves `input_template` and never writes a step row. A synthetic run-level
+`agent.run` step (`process_step_id IS NULL`) contributes none of its `run_step.input` — that value
+is the executor envelope (§2.24), not a request; its Request is the release definition. The document
+is data, never instruction; it renders after the current-step line inside the process block, and the
+section budget refuses with the measured size rather than truncating. A workflow node without a
+`process_step_id` keeps today's rendering (residual).
+
+### 2.29 The card handoff — S21 step 9 (0 new tables)
+
+`cards.assign` writes existing rows in one transaction and starts the run through the same path
+`runs.create` uses; no table, no column, no migration.
+
+| Row | What the handoff reads or writes |
+|---|---|
+| `card` | **write**: `job_binding_id` (an active, tenant-scoped binding) and `version`; **read**: id, board, archive state |
+| `job_binding` | **read**: the active check, and through `insert_run_tx` the release pin and its snapshot |
+| `work_package_memory` | **write**: one hot row (`kind` defaults to `fact`, `source` from the actor, `run_id` set, `meta` free detail) through the shared `remember_tx`; the next prompt's Memory selector reads it (§2.27) |
+| `run` | **write**: one root run — the card's next attempt, the binding inherited, `parent_run_id IS NULL`; `uq_run_live` refuses a second live run with a typed 409 (§3.2) |
+| `job` | **write**: one `run.execute` job in the same transaction |
+| `event` | **write**: `card.updated`, `memory.recorded`, `run.created` |
+| `andon_state` | **read**: an engaged cord refuses the handoff before any write |
+
+The handoff is the level's entry (SPEC_V2 §6.6.1–5): the card names the binding, the note is memory,
+the run starts. It is not a lane move — `cards.move` changes no run and writes no memory. It accepts
+no `release_hash` (the binding is the pin) and writes no `run_step`; the run's first step is the
+executor's own (S21 step 4).
+### 2.30 The L1 laya evaluation — S21 step 10 (migration `0071`)
+
+The ladder stops trusting its caller: the case is built by the ladder and the verdict comes from a
+recorded laya exchange. Two tables and one column, all new; no existing row changes shape.
+
+| Object | What it is |
+|---|---|
+| `decision_option_set` | one live authored set per `(tenant_id, kind, gate)`; `version` is monotonic, and an edit is a new version, never an in-place update |
+| `decision_option_set_option` | the set's rows: `key`, `label`, `payload` (with `payload.outcome ∈ accepted | refused | escalated`) and a position for the ordered menu |
+| `decision_policy.fire_when` | nullable structured expression (`all_of` / `any_of` over `{kind, gate, field}` predicates); `NULL` fires always |
+
+| Row | What the L1 path reads or writes |
+|---|---|
+| `decision_policy` | **read**: threshold, `fail_policy`, `action`, `fire_when`; **pinned**: `policy_version` |
+| `decision_policy_refinement` | **read**: the tenant's override; **pinned**: `refinement_version` |
+| `laya_inference_config` | **read**: `model_ref`, `params`, `timeout_ms`; **pinned**: `laya_config_version` |
+| `decision_option_set` + `_option` | **read**: the authored menu and its version — the question's labels and the answer's legal keys |
+| `idempotency_key` | **read**: the engine's record of the `ladder.precheck` call — `request_hash` must equal the case hash, `status_code` must be 2xx, `response` is the answer document |
+| `action_invocation` | **read**: the invocation named by the key, for its `outcome` and measured `duration_ms` |
+| `decision` | **write**: one row with `rung='laya'`, the response-derived answer/confidence/probabilities, the measured latency, the pins, and `meta.laya_call_key` / `meta.laya_invocation_id` / `meta.case_sha256` |
+| `decision_option` | **write**: the authored rows the decision chose between, with their set version |
+| `event` | **write**: `decision.evaluated` |
+
+**Authoring a set is one row's version bump, never a second row.** `decision_option_sets.set` updates
+the existing header (`version = version + 1`) and replaces its children inside the same transaction,
+so the partial unique indexes in `0071` are never asked to hold two live sets and a reader never sees
+a half-replaced menu. Old labels survive only in `decision_option` — the per-decision record of what
+that decision chose between; a decision is reproducible from its own row plus its set version.
+
+**The call itself writes no conveyor row of ours beyond the engine's own bookkeeping.** The laya
+service is external: `ladder.precheck` is dispatched with the tenant's sealed `laya.token`, and the
+engine records the claim (`idempotency_key`), the invocation (`action_invocation`) and the response
+body that the `idempotency_key.response` column already holds. That record is the provenance: the
+decision cites it rather than restating it, so nothing in `decision` can be written from a request
+body.
 
 ## 3. State machines and enforcement
 
@@ -1406,10 +1531,25 @@ duplicates the function. The CHECK constraints below guard *vocabulary*, never *
 | Stored | `run.status`, `started_at`, `finished_at`, `attempt`, `error_class`, `error_message` |
 | Invariant | **a run is a tree (2026-11-09).** Partial unique `(tenant_id, card_id) WHERE parent_run_id IS NULL AND status IN ('queued','running','waiting_approval')` — **one live ROOT run per card**; the project form is `(tenant_id, project_id) WHERE parent_run_id IS NULL AND card_id IS NULL AND status IN (…)`; one live child per `(parent_run_id, step_id)` and one row per `(parent_run_id, step_id, attempt)`. `CHECK (parent_run_id IS NULL OR step_id IS NOT NULL)` and `CHECK (depth BETWEEN 0 AND 3)`. Cancel cascades from a parent to its children; a child's failure does not re-fire the parent's `err.card`. Enforced by the DB even if two API pods race |
 
-**A bound `internal_agent` run (S21 step 4) uses `queued → running → succeeded | failed` only.** Its
-gate pre-check is recorded on the step and, on `handover`, fails the run `gate_requires_approval`
-and opens a card-scoped approval — the run never enters `waiting_approval`, because no worker kind
-resumes a plain run and parking would hold `uq_run_live`. A resume worker is a separate unit.
+**A bound `internal_agent` run (S21 steps 4–6) uses the full path.** A run created for a card that
+names a binding inherits it (`card.job_binding_id → run.job_binding_id`; an explicit conflicting
+binding is refused `422 card_binding_mismatch` before the INSERT). Its gate pre-check is recorded
+on the step. On `accepted` it succeeds with the draft; on `handover` it parks in `waiting_approval`
+and opens a card-scoped `executor` approval whose `meta` names the draft (§2.25). A person's
+approval settles it `running` and the `run.resume` job applies the draft and finishes it
+`succeeded`. A rejection cancels it; `approval.expire` cancels a still-waiting run with
+`approval_expired`. The parked run is live work and holds `uq_run_live` until one of those outcomes.
+Every terminal root run of a card inserts one `attempt` memory row in the terminal transaction
+(§2.26). The prompt's Memory source also reads the run's own earlier `run_step` rows, before the
+card's hot rows and the digest (§2.27); a process run's attempt is read by the next run on the card.
+**The Request source (S21 step 8)** reads the current step's resolved input from `run_step.input` and
+its declared `outputs`/`action_text`/`gate_kind` from the frozen `process_step` row, renders one
+request document in the process section and passes the same document to the step's laya judge
+(§2.28). A synthetic run-level `internal_agent` step declares none: its release definition is the
+request and its executor envelope never renders. **The handoff (S21 step 9)** writes the card's
+`job_binding_id`, the handoff note as a hot memory row, and the run itself in one transaction,
+starting the run through the same helper `runs.create` uses. The live-run invariant is the gate: a
+card with a live root run refuses the handoff `409 card_has_live_run` before any write (§2.29).
 
 ### 3.3 Approval
 

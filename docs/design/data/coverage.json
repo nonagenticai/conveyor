@@ -333,8 +333,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 8,
-        "claimed": 4,
+        "blocked": 1,
+        "claimed": 2,
         "numbers": [
           17,
           22,
@@ -359,18 +359,11 @@
           435,
           476,
           526,
-          545,
-          559,
-          562,
-          563,
-          564,
-          565,
-          566,
           569,
           572,
-          582
+          660
         ],
-        "open": 23,
+        "open": 15,
         "ready": 5,
         "unknown": 0
       }
@@ -616,6 +609,8 @@
         "T10",
         "T14",
         "T16",
+        "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -669,7 +664,8 @@
         "blocked": 0,
         "claimed": 0,
         "numbers": [
-          4
+          4,
+          604
         ],
         "open": 1,
         "ready": 1,
@@ -868,6 +864,8 @@
         "T10",
         "T14",
         "T16",
+        "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -955,6 +953,8 @@
         "T10",
         "T14",
         "T16",
+        "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -964,7 +964,7 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 2,
+        "claimed": 0,
         "numbers": [
           156,
           168,
@@ -976,7 +976,7 @@
           577,
           579
         ],
-        "open": 2,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1157,7 +1157,9 @@
           7,
           136,
           179,
-          198
+          198,
+          620,
+          626
         ],
         "open": 0,
         "ready": 0,
@@ -1329,11 +1331,12 @@
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
-          11
+          11,
+          635
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1369,14 +1372,14 @@
       "track": "v1",
       "tranche": 9,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           12,
           30
         ],
-        "open": 2,
-        "ready": 1,
+        "open": 0,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1412,12 +1415,12 @@
       "tranche": 8,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           13,
           31
         ],
-        "open": 2,
+        "open": 1,
         "ready": 1,
         "unknown": 0
       }
@@ -1459,8 +1462,8 @@
         "numbers": [
           14
         ],
-        "open": 1,
-        "ready": 1,
+        "open": 0,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1471,22 +1474,23 @@
         "crates/actions/src/knowledge",
         "crates/actions/src/memory",
         "crates/actions/src/prompt",
-        "migrations/0030_prompt_catalogue.sql"
+        "migrations/0030_prompt_catalogue.sql",
+        "migrations/0071_ladder_option_sets.sql"
       ],
       "gap": null,
       "key": "S21",
       "measured": {
         "actions": [
-          5,
-          5
+          10,
+          10
         ],
         "modules": [
           4,
           4
         ],
         "tables": [
-          2,
-          2
+          4,
+          4
         ]
       },
       "name": "Message construction (the compiled prompt)",
@@ -1503,7 +1507,13 @@
         "claimed": 1,
         "numbers": [
           15,
-          581
+          581,
+          590,
+          599,
+          612,
+          624,
+          649,
+          656
         ],
         "open": 1,
         "ready": 0,
@@ -1672,6 +1682,8 @@
         "S09",
         "T14",
         "T16",
+        "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -1738,15 +1750,12 @@
     },
     {
       "blocked_by": [
-        "T15",
-        "T17",
-        "T5",
-        "T6"
+        "T17"
       ],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "apps/server/tests/organisation_loop.rs"
       ],
-      "gap": "the one-organisation acceptance loop is not built",
+      "gap": null,
       "key": "T12",
       "measured": {
         "actions": [
@@ -1754,8 +1763,8 @@
           0
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
           0,
@@ -1765,12 +1774,12 @@
       "name": "One organisation loop",
       "parallel_with": [],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 13,
       "units": {
-        "blocked": 1,
-        "claimed": 0,
+        "blocked": 0,
+        "claimed": 1,
         "numbers": [
           88
         ],
@@ -1810,15 +1819,16 @@
       "track": "v2",
       "tranche": 3,
       "units": {
-        "blocked": 0,
-        "claimed": 0,
+        "blocked": 1,
+        "claimed": 1,
         "numbers": [
           76,
           556,
-          557
+          557,
+          630
         ],
-        "open": 1,
-        "ready": 1,
+        "open": 2,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1850,6 +1860,8 @@
         "S09",
         "T10",
         "T16",
+        "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -1859,54 +1871,54 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 2,
+        "claimed": 0,
         "numbers": [
           83,
           558,
           560,
           561
         ],
-        "open": 3,
+        "open": 1,
         "ready": 1,
         "unknown": 0
       }
     },
     {
-      "blocked_by": [
-        "T6"
-      ],
+      "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/tool_authoring.rs",
+        "crates/store/src/tool_authoring.rs",
+        "migrations/0070_tool_authoring.sql"
       ],
-      "gap": "no tool authoring, OpenAPI draft import or BYO tool binding",
+      "gap": null,
       "key": "T15",
       "measured": {
         "actions": [
-          0,
-          0
+          10,
+          10
         ],
         "modules": [
-          0,
-          0
+          2,
+          2
         ],
         "tables": [
-          0,
-          0
+          2,
+          2
         ]
       },
       "name": "Tool authoring and BYO",
       "parallel_with": [],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 12,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           86
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1939,6 +1951,8 @@
         "S09",
         "T10",
         "T14",
+        "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -1992,11 +2006,119 @@
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
-          87
+          87,
+          629,
+          655
         ],
         "open": 1,
+        "ready": 1,
+        "unknown": 0
+      }
+    },
+    {
+      "blocked_by": [],
+      "evidence": [
+        "docs/plans/T18-real-v2-ui.md",
+        "docs/SPEC_V2.md",
+        "apps/web/src/app.rs"
+      ],
+      "gap": "no V2 route exists in apps/web; the destinations are mock pages only",
+      "key": "T18",
+      "measured": {
+        "actions": [
+          0,
+          0
+        ],
+        "modules": [
+          0,
+          0
+        ],
+        "tables": [
+          0,
+          0
+        ]
+      },
+      "name": "The real V2 UI",
+      "parallel_with": [
+        "S05",
+        "S07",
+        "S09",
+        "T10",
+        "T14",
+        "T16",
+        "T19",
+        "T4",
+        "T9"
+      ],
+      "plan": "docs/SPEC_V2.md#12",
+      "status": "proposed",
+      "track": "v2",
+      "tranche": 4,
+      "units": {
+        "blocked": 1,
+        "claimed": 1,
+        "numbers": [
+          559,
+          562,
+          563,
+          564,
+          565,
+          566
+        ],
+        "open": 2,
+        "ready": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "blocked_by": [],
+      "evidence": [
+        "crates/actions/src/meetings.rs",
+        "migrations/0065_meetings.sql"
+      ],
+      "gap": null,
+      "key": "T19",
+      "measured": {
+        "actions": [
+          12,
+          12
+        ],
+        "modules": [
+          1,
+          1
+        ],
+        "tables": [
+          5,
+          5
+        ]
+      },
+      "name": "Decision forums (meetings)",
+      "parallel_with": [
+        "S05",
+        "S07",
+        "S09",
+        "T10",
+        "T14",
+        "T16",
+        "T18",
+        "T4",
+        "T9"
+      ],
+      "plan": "docs/SPEC_V2.md#12",
+      "status": "built",
+      "track": "v2",
+      "tranche": 4,
+      "units": {
+        "blocked": 0,
+        "claimed": 0,
+        "numbers": [
+          605,
+          606,
+          650
+        ],
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2113,6 +2235,8 @@
         "T10",
         "T14",
         "T16",
+        "T18",
+        "T19",
         "T9"
       ],
       "plan": "docs/SPEC_V2.md#12",
@@ -2133,22 +2257,24 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/kata.rs",
+        "migrations/0066_kata.sql",
+        "migrations/0067_kata_gate.sql"
       ],
-      "gap": "no kata.* action family and no measured procedure-change loop",
+      "gap": null,
       "key": "T5",
       "measured": {
         "actions": [
-          0,
-          0
+          11,
+          11
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
-          0,
-          0
+          5,
+          5
         ]
       },
       "name": "Kata",
@@ -2156,41 +2282,41 @@
         "S12"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 10,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
-          77
+          77,
+          653
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
     },
     {
-      "blocked_by": [
-        "T5"
-      ],
+      "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/actions/src/development.rs",
+        "migrations/0068_development_project.sql"
       ],
-      "gap": "no development-project path over conveyor and a dependency repo",
+      "gap": null,
       "key": "T6",
       "measured": {
         "actions": [
-          0,
-          0
+          9,
+          9
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
-          0,
-          0
+          3,
+          3
         ]
       },
       "name": "Development project",
@@ -2199,16 +2325,16 @@
         "T8"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 11,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           80
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2260,22 +2386,22 @@
       }
     },
     {
-      "blocked_by": [
-        "T5"
-      ],
+      "blocked_by": [],
       "evidence": [
+        "crates/actions/src/lesson.rs",
+        "crates/store/src/lesson.rs",
         "migrations/0056_cadence_tranche.sql"
       ],
       "gap": null,
       "key": "T8",
       "measured": {
         "actions": [
-          0,
-          0
+          3,
+          3
         ],
         "modules": [
-          0,
-          0
+          2,
+          2
         ],
         "tables": [
           1,
@@ -2292,12 +2418,12 @@
       "track": "v2",
       "tranche": 11,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           79
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2332,6 +2458,8 @@
         "T10",
         "T14",
         "T16",
+        "T18",
+        "T19",
         "T4"
       ],
       "plan": "docs/SPEC_V2.md#12",
@@ -2474,6 +2602,15 @@
         "docs/design/v2.js"
       ],
       "gap": null,
+      "key": "meetings",
+      "status": "live",
+      "title": "Meetings"
+    },
+    {
+      "evidence": [
+        "docs/design/v2.js"
+      ],
+      "gap": null,
       "key": "metering",
       "status": "live",
       "title": "Metering"
@@ -2592,26 +2729,26 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 40,
+        "built": 45,
         "partial": 1,
         "planned": 0,
-        "proposed": 5,
+        "proposed": 2,
         "standing": 1
       },
-      "total": 48,
+      "total": 50,
       "uncovered": [],
-      "with_open_units": 20,
-      "without_open_units": 28
+      "with_open_units": 13,
+      "without_open_units": 37
     },
     "screens": {
       "actions_invoked": 39,
       "by_status": {
         "legacy": 7,
-        "live": 14,
+        "live": 15,
         "mixed": 0,
         "proposed": 5
       },
-      "total": 26
+      "total": 27
     }
   },
   "version": 1

@@ -12,7 +12,8 @@
 
 use conveyor_domain::RunStatus;
 use conveyor_store as store;
-use conveyor_store::run::{NewRun, RunRecord};
+use conveyor_store::run::RunRecord;
+use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -20,6 +21,7 @@ use crate::board::events::{RawEvent, append_raw_event};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
+use super::run_create::create_bound_run_tx;
 use super::views::{
     IdIn, RunCancelIn, RunCreateIn, RunFinishIn, RunGetIn, RunGetOut, RunListIn, RunOut,
     RunProcessRef, RunStepOut, RunTreeChildOut, RunTreeOut,
@@ -43,6 +45,60 @@ pub(crate) fn run_out(record: &RunRecord) -> RunOut {
         process_step_id: record.process_step_id.map(|id| id.to_string()),
         workflow_step_id: record.workflow_step_id.map(|id| id.to_string()),
         created_at: record.created_at,
+        // Only `runs.get` loads the trace, so only it can compose a declared output (S18 P3b).
+        output: Value::Null,
+    }
+}
+
+/// Compose a process run's declared outputs from its stored trace (S18 P3b).
+///
+/// `declared` is the process version's `outputs` ([`store::process::ProcessRecord::outputs`],
+/// seeded from `ProcessSpec.outputs`). A process declares its run output by **name**; the value
+/// comes from the **terminal step** of the trace — the highest `position`, at its latest attempt,
+/// which is the step whose answer the process returns. A name resolves, in order, as:
+///
+/// 1. a dot-path into the terminal step's stored output document (`steps.<n>.output`), so a
+///    computed step's named result resolves directly;
+/// 2. for an `agent.run` step, its answer: the step output's `output` member
+///    (`steps.<n>.output.output`, the `AgentRunOut.output`). That is the `swebench-fix` mapping
+///    `patch → steps.<n>.output.output` — the agent's reply IS the patch (or `NONE`).
+///
+/// A declared name that resolves to neither is `null`, never invented: the S18 driver's
+/// `no_attempt` path reads exactly that (P3d). A process that declares no outputs — every
+/// capability process — composes `null`, so "no declared output" is distinguishable from
+/// "declared but unresolved" (`{"patch": null}`) and from a resolved empty answer (which stays
+/// `""`; whether empty is usable is the driver's decision, not this read's).
+fn run_output(declared: &Value, steps: &[store::process::RunStepDetail]) -> Value {
+    let Some(names) = declared.as_array() else {
+        return Value::Null;
+    };
+    if names.is_empty() {
+        return Value::Null;
+    }
+    let mut output = serde_json::Map::new();
+    for name in names.iter().filter_map(Value::as_str) {
+        let value = steps
+            .last()
+            .and_then(|step| resolve_output(name, step))
+            .unwrap_or(Value::Null);
+        output.insert(name.to_owned(), value);
+    }
+    Value::Object(output)
+}
+
+/// One declared name against the terminal step — see [`run_output`] for the resolution order.
+fn resolve_output(name: &str, step: &store::process::RunStepDetail) -> Option<Value> {
+    if let Some(resolved) = name
+        .split('.')
+        .try_fold(&step.output, |current, segment| current.get(segment))
+    {
+        return Some(resolved.clone());
+    }
+    // `steps.<n>.output.output`: an agent step's answer is the `AgentRunOut.output` member.
+    if step.action == "agent.run" {
+        step.output.get("output").cloned()
+    } else {
+        None
     }
 }
 
@@ -154,82 +210,41 @@ async fn runs_create(
     input: RunCreateIn,
 ) -> Result<HandlerOutput<RunOut>, ActionError> {
     let action = "runs.create";
-    let card = store::card::get_card_tx(&mut *tx, ctx.tenant, input.card_id)
+    let record = store::card::get_card_record_tx(&mut *tx, ctx.tenant, input.card_id)
         .await
         .map_err(|error| store_error(error, action))?
         .ok_or_else(|| ActionError::resource_not_found("card"))?;
-    let board = store::board::get_board_tx(&mut *tx, ctx.tenant, card.board_id)
-        .await
-        .map_err(|error| store_error(error, action))?
-        .ok_or_else(|| ActionError::resource_not_found("board"))?;
-
-    let andon = store::andon::get_tx(&mut *tx, ctx.tenant)
-        .await
-        .map_err(|error| {
-            tracing::error!(%error, "read andon state");
-            ActionError::internal()
-        })?;
-    if andon.is_some_and(|state| state.engaged) {
-        return Err(ActionError::new(
-            409,
-            "andon-engaged",
-            "the tenant's andon cord is pulled; no run may be created while it is engaged",
-        ));
-    }
-
-    let attempt = store::run::next_attempt_for_card_tx(&mut *tx, ctx.tenant, card.id)
-        .await
-        .map_err(|error| store_error(error, action))?;
-
-    let run = store::run::insert_run_tx(
-        &mut *tx,
-        ctx.tenant,
-        &NewRun {
-            card_id: Some(card.id),
-            project_id: board.project_id,
-            attempt,
-            correlation_id: input.correlation_id,
-            process_id: None,
-            inputs: serde_json::Value::Object(serde_json::Map::new()),
-            capability_id: None,
-            capability_agent_id: None,
-            // `runs.create` is a ROOT: a plain run has no parent, no step and pins no process.
-            parent_run_id: None,
-            step_id: None,
-            workflow_step_id: None,
-            depth: 0,
-            process_version: 1,
-            // T0: a run may name the organisation binding (and the release it claims) it
-            // executes under. The store refuses a retired binding or a stale pin 409 before
-            // the INSERT (SPEC_V2 §4.4).
-            job_binding_id: input.job_binding_id,
-            release_hash: input.release_hash.clone(),
-        },
-    )
-    .await
-    .map_err(|error| run_error(error, action))?;
-
-    store::run::enqueue_run_execute_tx(&mut *tx, ctx.tenant, run.id)
-        .await
-        .map_err(|error| store_error(error, action))?;
-
-    let record = read_record(tx, &ctx, run.id, action).await?;
-    let out = run_out(&record);
-    emit_run_event(
+    let card = record.card;
+    // SPEC_V2 §4.4 / S21 step 6: the card names the job. A run created for a bound card
+    // executes under that binding; a request that names a different binding is refused rather
+    // than silently overriding the assignment.
+    let job_binding_id = match (input.job_binding_id, record.job_binding_id) {
+        (Some(requested), Some(on_card)) if requested != on_card => {
+            return Err(ActionError::new(
+                422,
+                "card_binding_mismatch",
+                format!(
+                    "card {} is assigned to job binding {on_card}; the run request names \
+                     {requested} — a run executes under its card's assignment",
+                    card.id
+                ),
+            ));
+        }
+        (Some(requested), _) => Some(requested),
+        (None, on_card) => on_card,
+    };
+    let (run, out) = create_bound_run_tx(
         &mut *tx,
         &ctx,
-        run.id,
-        "run.created",
-        serde_json::json!({
-            "run_id": run.id,
-            "card_id": run.card_id,
-            "attempt": run.attempt,
-        }),
-        serde_json::to_value(&out).unwrap_or(serde_json::Value::Null),
+        &card,
+        job_binding_id,
+        input.correlation_id,
+        input.release_hash.clone(),
+        action,
     )
     .await?;
 
-    Ok(HandlerOutput::created(out).with_etag(run.version.etag()))
+    Ok(HandlerOutput::created(out).with_etag(run.run.version.etag()))
 }
 
 /// Move a queued run to `running`.
@@ -622,23 +637,29 @@ async fn runs_get(
     .await
     .map_err(|error| crate::control::approval_error(error, ACTION))?;
 
-    let process = match detail.process_id {
+    let process_record = match detail.process_id {
         Some(id) => store::process::get_process_tx(&mut *tx, ctx.tenant, id)
             .await
-            .map_err(|error| crate::process::process_error(error, ACTION))?
-            .map(|record| RunProcessRef {
-                id: record.id.to_string(),
-                title: record.title,
-                version: record.version,
-            }),
+            .map_err(|error| crate::process::process_error(error, ACTION))?,
         None => None,
     };
+    let process = process_record.as_ref().map(|record| RunProcessRef {
+        id: record.id.to_string(),
+        title: record.title.clone(),
+        version: record.version,
+    });
+    // S18 P3b: the declared run output is composed here, against the trace this read loaded.
+    let output = process_record
+        .as_ref()
+        .map_or(Value::Null, |record| run_output(&record.outputs, &steps));
 
     let mut decisions =
         crate::control::approvals::decisions_by_approval(&mut *tx, ctx.tenant, &approvals).await?;
 
+    let mut run = run_out(&record);
+    run.output = output;
     Ok(HandlerOutput::ok(RunGetOut {
-        run: run_out(&record),
+        run,
         steps: steps
             .into_iter()
             .map(|step| RunStepOut {
@@ -682,4 +703,93 @@ async fn runs_get(
         },
         inputs: detail.inputs,
     }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn step(
+        position: i32,
+        attempt: i32,
+        action: &str,
+        output: Value,
+    ) -> store::process::RunStepDetail {
+        store::process::RunStepDetail {
+            id: Uuid::now_v7(),
+            process_step_id: None,
+            position,
+            attempt,
+            action: action.to_owned(),
+            status: "succeeded".to_owned(),
+            input: json!({}),
+            output,
+            error: None,
+            judge: None,
+            started_at: None,
+            finished_at: None,
+        }
+    }
+
+    #[test]
+    fn a_declared_output_resolves_to_the_terminal_agents_latest_answer() {
+        // The terminal step is the highest position, at its LATEST attempt; the earlier position
+        // and the earlier attempt are both superseded, exactly as the trace read orders them.
+        let steps = vec![
+            step(1, 1, "agent.run", json!({"output": "superseded"})),
+            step(
+                2,
+                1,
+                "agent.run",
+                json!({"output": "first terminal attempt"}),
+            ),
+            step(2, 2, "agent.run", json!({"output": "diff --git a/x b/x\n"})),
+        ];
+        assert_eq!(
+            run_output(&json!(["patch"]), &steps),
+            json!({"patch": "diff --git a/x b/x\n"})
+        );
+    }
+
+    #[test]
+    fn a_named_member_of_the_terminal_output_wins_over_the_agent_fallback() {
+        // A computed step's named result is `steps.<n>.output.<name>`; only an unresolved name on
+        // an agent step falls through to `steps.<n>.output.output`.
+        let computed = vec![step(
+            1,
+            1,
+            "documents.get",
+            json!({"title": "member", "output": "x"}),
+        )];
+        assert_eq!(
+            run_output(&json!(["title"]), &computed),
+            json!({"title": "member"})
+        );
+        let agent = vec![step(
+            1,
+            1,
+            "agent.run",
+            json!({"patch": "member", "output": "answer"}),
+        )];
+        assert_eq!(
+            run_output(&json!(["patch"]), &agent),
+            json!({"patch": "member"})
+        );
+    }
+
+    #[test]
+    fn an_unresolved_declaration_is_null_never_invented() {
+        // Declared but unresolved: the key exists with a null, which is the driver's `no_attempt`
+        // signal (S18 P3d) — never an invented patch and never a missing key.
+        let step_without_an_answer = vec![step(1, 1, "agent.run", json!({"turns": 3}))];
+        assert_eq!(
+            run_output(&json!(["patch"]), &step_without_an_answer),
+            json!({"patch": null})
+        );
+        // No trace at all is the same answer, not an error.
+        assert_eq!(run_output(&json!(["patch"]), &[]), json!({"patch": null}));
+        // No declarations: `null`, so "no declared output" never looks like `{}`.
+        assert_eq!(run_output(&json!([]), &step_without_an_answer), Value::Null);
+    }
 }

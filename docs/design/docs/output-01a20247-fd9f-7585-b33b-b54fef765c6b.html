@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Technology Standards Catalog — T11 Metrics, metering and maturity (Phase D) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Technology Standards Catalog — T11 Metrics, metering and maturity (Phase D)</li>
+<li>Phase: d</li>
+<li>Kind: catalog</li>
+<li>Purpose: The standards T11 fixes for measurement, precision, configuration and the console.</li>
+<li>Scope: Store, migrations, the action surface, precision, error slugs and the snapshot-only console rule.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>PostgreSQL / 18 with ENABLE and FORCE ROW LEVEL SECURITY</strong> - {"usage": "metric_threshold and metric_reconciliation carry tenant_id, FORCE RLS and the tenant_isolation policy; crates/store/tests/rls_domain.rs::metric_thresholds_are_tenant_isolated"}</li>
+<li><strong>Migrations / forward-only, numbered, registered</strong> - {"usage": "migrations/0059_metrics.sql adds the two T11 tables; crates/store/src/migrate.rs registers it"}</li>
+<li><strong>Rust workspace / edition 2024; forbid(unsafe_code)</strong> - {"usage": "crates/domain holds pure rules; crates/store owns SQL; crates/actions exposes ActionSpecs; the dependency direction is api \u2192 actions \u2192 store \u2192 domain"}</li>
+<li><strong>ActionSpec / one declaration → HTTP + MCP + OpenAPI</strong> - {"usage": "the eight metrics actions; served-spec.lock.json pins the served set; parity tests cover HTTP and MCP"}</li>
+<li><strong>Read-time derivation / no stored metric and no stored cost (D37)</strong> - {"usage": "tokens are stored, money is derived from commercial_price; a metrics read writes no metric row; migration 0059's header states the rule"}</li>
+<li><strong>Money precision / numeric(18,6); six-decimal comparison</strong> - {"usage": "metric_reconciliation's columns and shape CHECK; crates/domain/src/metrics.rs::reconcile rounds to 1e-6 and requires exact equality for <code>matched</code>"}</li>
+<li><strong>Threshold configuration / versioned tenant rows (D50)</strong> - {"usage": "metric_threshold with level, version, metrics and note; UNIQUE (tenant_id, level, version); a change is a new version, never an edit"}</li>
+<li><strong>Closed evidence vocabulary / nine names</strong> - {"usage": "approvals.decided, approvals.approved, approvals.rejected, approvals.approval_rate, approvals.evidence_completeness, runs.total, runs.failed, benefits.realised and benefits.planned; an unknown name is refused 422 invalid_threshold"}</li>
+<li><strong>Error contracts / stable problem slugs</strong> - {"usage": "409 threshold_version_conflict; 422 invalid_threshold, unknown_metering_level, missing_scope, invalid_period, billing_figure_required and incident_target_required"}</li>
+<li><strong>Cache classes / V1 D23: read &gt; 0 hit; creation &gt; 0 write; neither miss; no usage unknown</strong> - {"usage": "measure.inference splits cache_hit_calls, cache_miss_calls, cache_write_calls and unknown_cache_calls; the 2026-11-21 snapshot reports 0 hits, 606 misses, 0 writes and 3 unknown"}</li>
+<li><strong>API route convention / unversioned /api/&lt;resource&gt;</strong> - {"usage": "the action routes are /api/actions/&lt;name&gt;/invocations in served-spec.lock.json; no version segment"}</li>
+<li><strong>Console measurement / live snapshot only; no fixture fallback</strong> - {"usage": "docs/design/v2.js meteringLive() reads measure.inference and renders the snapshot's own cost note; a snapshot without the section says the measurement is not published (#458; check-v2.cjs 9b\u20139d)"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Metrics, metering and maturity · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

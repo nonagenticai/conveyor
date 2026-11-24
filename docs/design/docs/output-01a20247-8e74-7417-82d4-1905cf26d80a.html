@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Technology Standards Catalog — T0 Model and contracts (Phase D) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Technology Standards Catalog — T0 Model and contracts (Phase D)</li>
+<li>Phase: d</li>
+<li>Kind: catalog</li>
+<li>Purpose: The standards the model's contracts fix for every later slice.</li>
+<li>Scope: store, hashing, actions, migrations and the executor kind.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>ActionSpec / one declaration → HTTP + MCP + OpenAPI</strong> - {"usage": "the action contracts; names are &lt;resource&gt;.&lt;verb&gt; with exactly one dot; served-spec.lock.json pins the served set"}</li>
+<li><strong>Canonical JSON / the RFC 8785 subset in crates/domain/src/compare.rs</strong> - {"usage": "release_hash identity; the same job and pins compile twice to byte-identical snapshots and the same hash (P2.1)"}</li>
+<li><strong>Error slugs / stable problem type</strong> - {"usage": "409 job_binding_stale; 422 department_industry_mismatch, binding_without_executor and unknown_executor_kind"}</li>
+<li><strong>Executor kind / open slug ^[a-z][a-z0-9_]{1,31}$</strong> - {"usage": "TEXT with no value CHECK; the code registry is the authority, so a new kind needs no migration"}</li>
+<li><strong>HTTP API / unversioned /api/&lt;resource&gt;</strong> - {"usage": "no version segment; errors are RFC 9457 application/problem+json"}</li>
+<li><strong>Migrations / forward only, numbered, never edited after the slice closes</strong> - {"usage": "0040_organisation.sql ships the ten T0 tables; the embedded list names (40, organisation)"}</li>
+<li><strong>PostgreSQL / 18 with FORCE RLS</strong> - {"usage": "the one store; tenant_id plus ENABLE and FORCE ROW LEVEL SECURITY and the tenant_isolation policy on every tenant table; release_snapshot jsonb frozen by scripts/grants-runtime.sql"}</li>
+<li><strong>Rust workspace / edition 2024; forbid(unsafe_code)</strong> - {"usage": "crates/domain is pure (no IO, no sqlx, no axum); crates/store is the only crate that speaks SQL; the dependency direction is api \u2192 actions \u2192 store \u2192 domain"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Model and contracts · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

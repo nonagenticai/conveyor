@@ -23,81 +23,22 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>T9 — Inception analysis</h1>
-<p>Project: T9 — TOGAF ADM capability · Track: v2 · Tranche: 4 · Plan: docs/SPEC_V2.md §12 / docs/plans/T9-architecture-capability.md
-Unit: #81 · PR #350 (merged c8204432, 2026-11-19)
-Measured at: main@f14b7d36, 2026-11-19 · Project row: closed</p>
+    <main class="doc-body"><h1>Inception analysis — T9 TOGAF ADM capability (retrospective, 2026-11-22)</h1>
 <h2>Current state</h2>
-<p>T9 is closed. The capability landed as PR #350 at c8204432: one additive migration, one action family, one store module and a design. Everything below was read at <code>origin/main</code>; no test was executed for this analysis, so "built" means present in the tree, not green in CI.</p>
-<table><thead><tr><th>Claim</th><th>State</th><th>Citation</th></tr></thead><tbody>
-<tr><td>Eleven tenant-scoped tables</td><td>built</td><td><code>migrations/0054_architecture.sql:artifact_type</code>, <code>:adm_profile</code>, <code>:governance_body</code>, <code>:architecture_contract</code>, <code>:architecture_artifact</code>, <code>:architecture_artifact_entry</code>, <code>:architecture_artifact_link</code>, <code>:architecture_compliance_review</code>, <code>:architecture_waiver</code>, <code>:architecture_maturity</code>, <code>:architecture_skill_assessment</code></td></tr>
-<tr><td>Twenty-six actions in one family</td><td>built</td><td><code>crates/actions/src/lib.rs:architecture</code>; <code>crates/actions/src/architecture.rs:architecture.artifacts_list</code> through <code>:architecture.maturity_plan</code></td></tr>
-<tr><td>Invariants, seeding and gates</td><td>built</td><td><code>crates/store/src/architecture.rs:seed_standard_tx</code>, <code>:advance_phase_tx</code>, <code>:assert_design_contract_tx</code>, <code>:decide_board_tx</code></td></tr>
-<tr><td>The design</td><td>built</td><td><code>docs/plans/T9-architecture-capability.md</code></td></tr>
-<tr><td>Tests for D1–D5</td><td>partial</td><td>six files under <code>crates/api/tests/</code>; D5's named kata test is absent (see below)</td></tr>
-<tr><td>D6 console surface</td><td>built in the app; the pack page is a design study</td><td><code>apps/web/src/screens/architecture.rs</code> (four tabs, live invokes, phase-advance refusal), routed at <code>/architecture</code> and merged in <code>c8204432</code>; the signed-out pack renders the study, and #385 lights the pack's page from the published rows</td></tr>
-<tr><td>Seeded artefact standard</td><td>partial — ten types, no add-type action</td><td><code>crates/store/src/architecture.rs:seed_standard_tx</code> seeds a ten-row array; the registry has no artefact-type create action</td></tr>
-<tr><td>Board lifecycle</td><td>partial — the body stays <code>draft</code></td><td><code>crates/store/src/architecture.rs:decide_board_tx</code> inserts an <code>approval</code> row; it never updates <code>governance_body.status</code></td></tr>
-<tr><td>Phase advance</td><td>built, unexercised live</td><td><code>crates/store/src/architecture.rs:advance_phase_tx</code>; the live contract sits at phase A and no advance row exists</td></tr>
-<tr><td>Maturity and skills reads</td><td>absent until #385</td><td>only <code>architecture.maturity_assess</code>, <code>:architecture.maturity_plan</code>, <code>:architecture.skills_assess</code>; <code>architecture.profile_get</code> reads the profile and standard</td></tr>
-<tr><td>Lifecycle events</td><td>unverified</td><td>the plan declares four names; only <code>crates/actions/src/architecture.rs:5</code> asserts an event is emitted</td></tr>
-</tbody></table>
-<p><strong>The live adoption, read back 2026-11-19.</strong> The profile <code>conveyor-software-delivery</code> (<code>01a1f2c1-14c1-74c5-a078-eef117c4f82c</code>) is <code>adopted</code>, version 3, with phases preliminary and A–H, four contract kinds, and it names the board decision that adopted it (<code>01a1f2c8-e26f-79ce-a082-5526648a47c5</code>, kind <code>architecture_board</code>, <code>approved</code>). The board row <code>conveyor-architecture-board</code> (<code>01a1f2c0-b22a-7e27-a6cc-1a8e48db327e</code>) is kind <code>architecture_board</code>, status <code>draft</code>, version 1, with a charter, a chair, three architectural positions and written decision limits. Three Preliminary artefacts are <code>approved</code> at version 2 — the principles catalogue PF-1 (<code>01a1f2c1-5717-75e7-9b3d-1d7707648c09</code>), its derivation (<code>01a1f2c1-94ad-7a92-8aca-57202f48ece9</code>) and its realization (<code>01a1f2c1-9c75-78a2-a2a4-647687dfbe10</code>) — with both links recorded. The Phase A statement of architecture work (<code>01a1f2c2-0e1a-787f-9011-46b424d1ec71</code>) is <code>live</code>, version 2. The maturity baseline scores nine dimensions at stage "under development (baseline 2026-11-19)"; the skills baseline scores seven categories over six roles, and two catalogue positions (programme manager, business change manager) are unstaffed and scored zero — a recorded governance gap.</p>
-<p>Two naming facts matter for anyone re-running the gate. The plan's D5 Verify names <code>crates/api/tests/togaf_h_change.rs::a_systemic_finding_produces_a_kata_candidate</code>; no such function exists at main — the kata assertion lives inside <code>a_scope_change_produces_a_change_register_row</code>. And the plan's four event names (<code>architecture_artifact.changed</code>, <code>architecture_phase.closed</code>, <code>compliance_review.recorded</code>, <code>architecture_waiver.granted</code>) are not literal strings in the module or the store.</p>
+<p>The plan measured the starting state at <code>main@48fc44c</code> on 2026-11-16: the artefact model, ADM phases and contracts, the delivery design gate, compliance and waivers, the capability assessment and the Phase-H outcome were all ABSENT (<code>git grep</code> returned zero hits across <code>crates</code> and <code>migrations</code>). P0's five Preliminary documents existed as proposed content only: <code>architecture-principles</code> (PF-1), <code>adm-profile</code> (ADM-1), <code>artifact-standard</code> (AS-1), <code>maturity-assessment</code> (MA-1) and <code>skills-assessment</code> (SA-1), each stating proposed for P0 acceptance. At HEAD the delivered capability adds the eleven tables, the 26 <code>architecture.*</code> actions, the four events, the Architecture console destination and the named real-Postgres suites. This rework verifies that those test files and names exist at HEAD.</p>
 <h2>Reuse sources</h2>
-<table><thead><tr><th>Source</th><th>Analysis question</th><th>Finding</th></tr></thead><tbody>
-<tr><td>Inside the repo: plan spine</td><td>Are ADM phases a new aggregate?</td><td>No. <code>wbs_node</code> (<code>migrations/0044_plan_spine.sql:wbs_node</code>) holds Preliminary and A–H as phase nodes; <code>crates/store/src/architecture.rs:materialise_adm_phases_tx</code> materialises them.</td></tr>
-<tr><td>Inside the repo: register</td><td>Where does a Phase H change go?</td><td><code>project_register_item</code> (<code>migrations/0044_plan_spine.sql:project_register_item</code>), whose six kinds already include <code>change</code>.</td></tr>
-<tr><td>Inside the repo: approvals</td><td>Is a board decision a new primitive?</td><td>No. <code>approval</code> (<code>migrations/0002_domain.sql:approval</code>) is the record; <code>decide_board_tx</code> inserts kind <code>architecture_board</code>.</td></tr>
-<tr><td>Inside the repo: documents</td><td>Where does a diagram's content live?</td><td>A <code>document</code> row through the existing aggregate (<code>migrations/0042_document_workflow.sql:document</code>); the artefact row carries type and viewpoint, not pixels.</td></tr>
-<tr><td>Inside the repo: definitions</td><td>Should an artefact be a <code>governed_asset</code>?</td><td>No. <code>governed_asset</code> (<code>migrations/0044_plan_spine.sql:governed_asset</code>) is a definition store; architecture artefacts and contracts get their own tables and statuses.</td></tr>
-<tr><td>Inside the repo: action envelope</td><td>Does the family project once to HTTP, MCP and OpenAPI?</td><td>Yes. One <code>#[crate::action]</code> per action through <code>crates/actions/src/invoke.rs</code>; no bespoke route.</td></tr>
-<tr><td>Inside the repo: tenant scope</td><td>Is isolation per table?</td><td>Yes. Every 0054 table enables and forces RLS with <code>tenant_isolation</code>; the scope path is <code>crates/store/src/scope.rs</code>.</td></tr>
-<tr><td>P0's Preliminary documents</td><td>Is the capability's content invented here?</td><td>No. PF-1, ADM-1, AS-1, MA-1 and SA-1 are P0's published proposals; T9 turns them into rows and a profile.</td></tr>
-<tr><td>Wider estate and upstream</td><td>Is there software to adopt?</td><td>No. TOGAF is a body of practice, not a dependency; no ArchiMate editor or metamodel is adopted.</td></tr>
-</tbody></table>
+<p><code>wbs_node</code> and the plan spine from T1; <code>governed_asset</code> for requirements, principles, ADRs and supersession; <code>trace_link</code> for the trace chain; <code>catalogue_entry</code> for the project-type and card-type matrix; <code>process_step.kind='gate'</code> for parked gates; the approval primitive for dual control; <code>document</code> plus MinIO for artefact documents; and T3's PM gate routing. The analysis question for each is whether the capability can consume it without a second store of the same fact.</p>
 <h2>Build vs reuse</h2>
-<table><thead><tr><th>Candidate</th><th>Decision</th><th>Boundary and constraint</th></tr></thead><tbody>
-<tr><td>Artefact standard and repository</td><td>build</td><td><code>artifact_type</code> plus <code>architecture_artifact</code>, entries and links; a typed row with a document, not a file store.</td></tr>
-<tr><td>ADM profile</td><td>build</td><td>filters the seeded standard; tailoring is data, never a branch.</td></tr>
-<tr><td>Architecture Board</td><td>reuse <code>governance_body</code> and <code>approval</code></td><td>the charter is immutable; the decision is an approval row, and the body's own status is not moved (gap).</td></tr>
-<tr><td>ADM contracts</td><td>build</td><td>four kinds in <code>architecture_contract</code>; one live version per project by unique index.</td></tr>
-<tr><td>Phase gates</td><td>reuse <code>wbs_node</code> and the contract row</td><td><code>advance_phase_tx</code> checks the profile's mandatory set and the live contract in one transaction.</td></tr>
-<tr><td>Compliance and waivers</td><td>build</td><td>six levels, one per review; a waiver needs an owner and a date.</td></tr>
-<tr><td>Maturity and skills</td><td>build</td><td>baselines from P0 MA-1/SA-1; write actions only until #385.</td></tr>
-<tr><td>Console</td><td>reuse the app's screen and the design-site study</td><td>the live surface is <code>apps/web</code> <code>/architecture</code> (<code>c8204432</code>); the pack's page is a study, and #385 renders it from the published rows.</td></tr>
-<tr><td>Lifecycle events</td><td>declared in the plan</td><td>no literal subject/verb found in the module or store at main.</td></tr>
-</tbody></table>
+<p>The eleven architecture tables are built, because §10.3 gives an architecture artefact and its contract their own tables and <code>governed_asset.kind</code> is explicitly not widened for them (plan §6). The Board, the approvals, the trace links, the documents, the WBS phase nodes and the PM routing are reused, never rebuilt. ArchiMate modelling, a live metamodel and a diagram renderer are out of scope: a diagram is a document with typed metadata and a viewpoint (§8.6).</p>
 <h2>Risks</h2>
-<table><thead><tr><th>Risk</th><th>What breaks</th><th>Check</th></tr></thead><tbody>
-<tr><td>The standard's ten types are a ceiling</td><td>a phase needing a type outside the ten cannot express it; P0's profile table names a larger set and no action adds a type</td><td><code>seed_standard_tx</code> carries ten keys; the registry has no create-type action</td></tr>
-<tr><td>The board row stays <code>draft</code></td><td>a reader filtering on an active board finds none while an approved decision exists; the approval row is the only record</td><td><code>decide_board_tx</code> inserts <code>approval</code> and does not update <code>governance_body.status</code></td></tr>
-<tr><td>A zero-match Verify passes green</td><td>the D5 selector <code>a_systemic_finding_produces_a_kata_candidate</code> runs no test; the kata assertion actually sits inside <code>a_scope_change_produces_a_change_register_row</code></td><td>the named function is absent from <code>crates/api/tests/togaf_h_change.rs</code></td></tr>
-<tr><td>The phase gate is fixture-tested only</td><td>the first real advance may refuse on a condition the fixture never produces; no live project has advanced</td><td><code>togaf_architecture_phases.rs</code> builds its own fixture; the live contract sits at phase A</td></tr>
-<tr><td>The pack's study can drift from the app's screen</td><td>a reader of the public pack sees a fixture while the app shows live rows</td><td>the pack's page still reads <code>F.architectureCapability</code>; <code>apps/web/src/screens/architecture.rs</code> reads the actions; #385 replaces the pack's fixture path with the snapshot</td></tr>
-<tr><td>Assessments are write-only</td><td>a maturity or skills baseline cannot be read back through an action, so a later decision cannot be replayed from the API</td><td>only assess/plan actions exist; a read action is #385</td></tr>
-<tr><td>The event contract is unproven</td><td>an audit consumer subscribing to the four declared names has no literal evidence they are emitted</td><td>grep of the module and store for the four names returns nothing</td></tr>
-</tbody></table>
+<p>The obvious build risks are a repository that accepts untyped rows (v1-p81-5), a Board that can govern while still draft (v1-p81-4), a profile adopted on an arbitrary UUID (v1-w2a-3), a cross-project contract supersession (v1-w2a-4), an overstating phase-progress read (v1-w2a-6), and a Phase-H gate that checks existence rather than exactly-one (v1-p81-6). Each is an open ledger finding, not a hypothetical.</p>
 <h2>Open questions</h2>
-<ol>
-<li>Which types does P0's profile table name beyond the seeded ten, and does any phase gate depend on one?</li>
-<li>Does adding an artefact type wait for #385, or does it need its own action and issue?</li>
-<li>Should <code>board_decide</code> move <code>governance_body.status</code>, or is the approval row deliberately the sole decision record?</li>
-<li>What are the actual event subject and verb strings, and does the generic action wrapper emit them?</li>
-<li>Is <code>a_systemic_finding_produces_a_kata_candidate</code> a plan erratum or an intended test never written?</li>
-<li>When does the first live architecture project advance past phase A, and what will that exercise the fixture does not?</li>
-</ol>
+<p>The plan's D5 Verify target <code>crates/api/tests/togaf_h_change.rs::a_systemic_finding_produces_a_kata_candidate</code> is absent at HEAD; the kata proof lives in <code>crates/actions/tests/togaf_kata_outcome.rs</code> and the change proof in <code>togaf_h_change.rs::a_scope_change_produces_a_change_register_row</code>. Whether the console and seed checks pass was not executed by this authoring pass.</p>
 <h2>Links</h2>
-<ul>
-<li>Issue: <a href="https://github.com/nonagenticai/conveyor/issues/81">#81</a></li>
-<li>Pull request: <a href="https://github.com/nonagenticai/conveyor/pull/350">#350</a>, merged at <code>c8204432</code></li>
-<li>Plan: <code>docs/plans/T9-architecture-capability.md</code></li>
-<li>Spec: <code>docs/SPEC_V2.md</code> §8.1, §10.3, §10.4, §10.5, §12 T9, D63</li>
-<li>Sibling: the <code>architecture-design</code> output, published on this project</li>
-</ul>
+<p><code>docs/plans/T9-architecture-capability.md</code> §2 and §9; <code>docs/SPEC_V2.md</code> §8.1, §10.3 and §12; <code>docs/evidence/v1-conformance-findings.json</code>; <code>acceptance/programme/T9.toml</code>.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-24T16:30:00Z · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

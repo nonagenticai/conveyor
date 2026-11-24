@@ -8,8 +8,8 @@ needs**. V1 decisions D1–D27 stand unless a V2 decision explicitly extends or 
 is re-opened by this document.
 
 > **In one paragraph.** V2 turns the conveyor from a work system into an organisation. Jobs are configured positions
-> (industry → department → job) that receive cards, decide with rules and laya, generate with LLMs behind gates, and
-> prove their work with runs and instruments. PM, kanban coach, kata, development and operations are jobs, not code.
+> (industry → department → job) that receive cards, decide with rules and laya in typed decision forums, generate with
+> LLMs behind gates, and prove their work with runs and instruments. PM, kanban coach, kata, development and operations are jobs, not code.
 > TOGAF/SAFe/PMP artefacts are rows, gates and evidence. Every cluster service a job may call is a versioned, bound,
 > audited tool. The conveyor develops and operates itself under the same gates it imposes on any work. **The conveyor
 > owns its whole model and is as self-contained as possible**: it reuses ideas — and where useful, code — from the
@@ -117,9 +117,10 @@ Four units, and only four:
 | **Run** | one attempt at a card through an executor, recorded | `conveyor` |
 
 Everything else is a view or an instrument. Departments, programmes and portfolios organise jobs and cards; knowledge,
-memory and tools configure a job; evals, benchmarks and the inference ledger measure it; TOGAF/SAFe/PMP supply the
-process grammar. **The differentiator is not multi-agent conversation — it is that every handoff, decision and claim
-is a durable row with an owner, a state and a proof.**
+memory and tools configure a job; evals, benchmarks and the inference ledger measure it; **a meeting is a decision
+forum over those four units — a card, a set of approvals and typed positions — never a fifth record that decides by
+itself**; TOGAF/SAFe/PMP supply the process grammar. **The differentiator is not multi-agent conversation — it is that
+every handoff, decision and claim is a durable row with an owner, a state and a proof.**
 
 First principles the spec is built on:
 
@@ -621,6 +622,9 @@ The future the owner asked for: a job family that acts on **kubernetes or git is
    permits, otherwise a new run with the previous as a link.
 6. **Escalation is bounded**: a card may escalate to its parent WBS owner, then to the PM, then to the programme; the
    coach can escalate to a human at any point. No unbounded agent-to-agent loops.
+7. **A decision that needs several positions at once is a meeting (§6.8), not a message thread.** Its agenda items
+   resolve existing approvals, each participant records a typed position, and the outcome stays an `approval` row; the
+   meeting adds the deliberation, the conditions, the commitments and the dissent, never a second decision store.
 
 ### 6.7 Authority matrix (defaults; tenant-configurable)
 
@@ -639,6 +643,89 @@ The future the owner asked for: a job family that acts on **kubernetes or git is
 The matrix is data (`tenant_role_scope` and the binding's `authority`), not branches in code. Every gate's required
 decisions and approver kinds are tenant-configured policy rows defaulting to human approval (§5.4).
 
+### 6.8 Meetings — the decision forum
+
+**Why this exists.** Much of the organisation's high-level work — programme management, architecture, analysis, project
+management — is conducted in meetings between positions from different departments, and those meetings are where its
+decisions are made. A single `approval` row records the decision but not the deliberation around it: the trade-offs
+between departments, the conditions attached, the dissent and the commitments given. V2 therefore makes the **meeting**
+a first-class decision forum **over** the existing primitives — never a fifth unit, and never a chat system.
+
+**The four units still hold.** A meeting is a **card** (the convened work package, owned by its chair, under WIP limits
+and DoD like any card). Its agenda items resolve **approvals**; its participants are **job bindings** or **humans**
+(`app_user`); a job's seat is a typed position and the evidence it presents, never a message. Its preparation and its
+minutes are **runs** and a governed asset. Every decision is still recorded on an `approval`
+row, resolved `via='meeting'`, and the meeting is reached from it through `meeting_agenda_item`. There is no second
+decision store. The meeting card's DoD is *every agenda item closed with an outcome and the minutes published*.
+
+| Row | Holds |
+|---|---|
+| `meeting_type` | the forum's policy: purpose, `agenda_sources[]` (the L0 query the item set comes from), required participation (departments and positions with minimum counts), quorum, decision rule (`unanimous \| majority \| chair`), evidence minimum, decision window, timebox and allowed outcome kinds; tenant-scoped and versioned (P11), and who may convene is an authority row, not code |
+| `meeting` | one instance: `card_id`, convener (`governance_body \| job_binding \| app_user`), `meeting_type` version, `opens_at`, `decision_window_end`; one live instance per cadence slot (`uq_meeting_live`, the `uq_run_live` analogue) |
+| `meeting_agenda_item` | sequence, the resolved object (`approval \| register_item \| asset \| cadence`), `participating_departments[]`, evidence refs and the typed outcome |
+| `meeting_attendance` | participant (`job_binding \| app_user`), seat role (`chair \| member \| presenter \| observer \| delegate`), department, invitation and response state; delegation only where the type allows it |
+| `meeting_position` | per item per participant: stance (`approve \| approve_with_conditions \| reject \| abstain \| request_evidence`), rationale, conditions, an optional commitment, the surface and the time; one live position per participant per item, immutable once the item closes |
+
+**A decision is arithmetic over positions, not a summary of them.** An agenda item that decides names exactly one
+`approval`, opened before the meeting with its evidence and its policy — there is no implicit approval. Each qualifying
+seat is one L3 decision: when the item closes, `close_item` writes one `approval_decision` row per qualifying
+participant (`decided_by`, `via='meeting'`), so required decisions and distinct approvers are counted on the decision
+rows themselves; `meeting_position` carries the stance, rationale, conditions and commitment and is never a second
+decision. The item's outcome is derived in that order — the meeting's rule over the decision rows and the attendance
+quorum first, then the linked approval's policy (required decisions, distinct approvers, evidence, conflict exclusion)
+— and the stricter result wins. A meeting never lowers dual control, never waives evidence and never bypasses
+P4: a participant whose own work an item judges is excluded by the same conflict rule, and an `observer` position
+never counts. A majority counts cast positions; abstentions count toward quorum, not toward the majority; a tie
+defers. `chair` means the chair's position carries once quorum exists and every required department has stated one.
+Laya may pre-check whether an item is decision-ready (the §7.3 gate pre-check case); it never scores a position.
+
+**Selection is a query; generation is drafting.** The item set is L0 over `meeting_type.agenda_sources[]` — open
+approvals for the body, register items of the named kinds, dependency slips and cadence slots — plus explicit
+`meetings.agenda_add` actions by a participant with the authority; a job convener selects nothing by judgement and the
+LLM never selects. The LLM drafts the wording, compiles the pre-read pack from the linked evidence and drafts the
+minutes from the typed rows; the chair adopts the agenda. It never decides, never infers a
+position that was not stated, never attributes one and never marks attendance. A live
+discussion — text, or a transcript from the tenant's own AV channel linked on the meeting — is attached to the item as
+evidence; no transcript is a position, and a minute line that does not match a recorded row is a defect.
+
+**Cross-department by construction.** `meeting_type.required_participation` and, per item,
+`participating_departments[]` name which departments and positions must be represented. An item whose required
+department is absent is deferred with reason `inquorate` — it cannot be decided, and the deferral is visible on the
+plan. Each department's position is recorded separately, so "operations rejected, security approved with conditions,
+delivery approved" is a query, not a recollection; dissent is kept verbatim in the minutes even when the item carries.
+
+**The human seat — including the owner.** A human holds a seat like any other, as an ordinary `app_user` attendance
+row: chair, member, presenter, observer or delegate. The owner can be invited to any forum, read the agenda and its
+pre-reads, raise an item, state a position, attach a condition, make a commitment for their seat, delegate it and have
+dissent recorded. Participation is **live** — the web meeting room shows the agenda, evidence, participants, positions
+and the rule's running outcome — or **asynchronous**: every deciding item is also an approval with a decision window,
+answerable from the web UI, Telegram or the agent front end over MCP (§10.2), with `via` recording the surface and
+each human's decision recorded once — the first across surfaces. A conversational room over MCP is the agent front end's surface; the conveyor supplies the
+items and records the positions, so the record does not depend on the room. No calendar system is depended on:
+`meeting_attendance` is the record and an ICS feed is a read of it. Absence is recorded as absence, never invented as
+an approval.
+
+**The closed outcome set.** `decision | commitment | action | information | deferred`. A **decision** is the
+approval's recorded result (approved, approved with conditions, or rejected), derived from the decision rows, never
+entered beside them. A **commitment** names the committing position, the beneficiary, what, by when and its
+condition; it becomes a `project_dependency` edge or a card, and a commitment without an owner and a date is refused.
+An **action** becomes a card (§6.6). An **information** item is typed and counted. An item with no outcome cannot be
+closed; it is deferred with a reason.
+
+**What a meeting is not.** Not a chat — no transcript is a decision and no thread is a minute. Not a handoff — work is
+still assigned by cards. Not a gate bypass — the venue changes nothing in a gate's policy. Not unbounded — a
+`meeting_type` whose instances produce no decision over a cadence cycle is flagged and retired, exactly as a
+never-refused gate is flagged (P10). Minutes are a `governed_asset(kind='minutes')` drafted from the rows and published
+behind the chair's gate; the rows remain the record.
+
+**Meetings are metered.** Participant-hours derive from attendance × duration and enter the same roll-up as tokens and
+tool spend at D52's tenant, department, programme, project and job grain, with `meeting_attendance` as a third source
+row beside `inference_call` and `tool_call`. The instruments: decision latency (item opened → decided), agenda
+conversion (items decided ÷ items scheduled), quorum-miss rate, commitment slippage, action closure, person-hours per
+decision and decisions per meeting. The aggregate passes P10: its named procedures are the Architecture Board and
+Design Board sittings, the programme board and tranche reviews, PI planning, the system demo, inspect & adapt, design
+review and incident review; the metrics above are what reads it.
+
 ---
 
 ## 7. The decision ladder — laya first, LLM last
@@ -650,7 +737,7 @@ decisions and approver kinds are tenant-configured policy rows defaulting to hum
 | **L0 Rule** | deterministic Rust over typed facts | state transitions, WIP limits, WSJF arithmetic, thresholds, policy checks, acceptance | the row + `action_invocation` |
 | **L1 System-1 (laya)** | calibrated choice/score/noul over a finite option set | triage, routing, job/capability selection, remedy selection, severity, priority band, gate pre-check | `decision` row with the answer, probabilities where the question type provides them, and confidence |
 | **L2 Generation (LLM)** | text/code/plan/report synthesis | drafts, answers, patches, narratives, candidate procedures/prompts | `inference_call` + a draft artefact |
-| **L3 Human** | approval | every gate; every override; every irreversible action | `approval` + `approval_decision` |
+| **L3 Human** | approval; a meeting (§6.8) is its multi-party form | every gate; every override; every irreversible action; every forum decision | `approval` + `approval_decision` |
 
 **The hard rule:** L2 has no path to a state transition. A generated output is stored as a draft artefact
 (`governed_asset`, `document`, or a code patch); applying it is an **action**, and the action's gate is L1/L3. The
@@ -868,12 +955,14 @@ review can hold the capability to.
 proposed changes against it, applies the principles where the roadmap is incomplete, commissions solution
 architectures, and submits them to the delivery Design Board. Its membership (enterprise architects, the CIO,
 business-unit leaders), charter, commissioning authority and decision limits are `governance_body` rows and authority
-rows, not prose.
+rows, not prose. Its sittings are meetings (§6.8): the body is the convener and carries the standing `meeting_type`;
+`architecture.board_open|get|decide` are macros over `meetings.open|get|close_item` for that meeting — `board_decide`
+closes one Board agenda item and adds no decision path (the `dev.*` composition precedent).
 
 A delivery project cannot pass its design gate without the contract that governs it; the phase-G review is per
 delivery project, and its compliance level and waivers attach to that delivery's evidence. The conveyor's own
 buildout runs under this capability: P0 is the Preliminary-phase and programme-definition project, and the delivery
-slices T1–T17 each sit under the contract that governs them.
+slices T1–T19 each sit under the contract that governs them.
 
 Scope note: this is a **tailored ADM profile** for software delivery, not a claim of TOGAF certification or full
 conformance. The standard's full catalogue is the reference; the tenant's `adm_profile` names the mandatory set per
@@ -891,6 +980,10 @@ organisation will actually use and measure.
 | System demo | a cadence event requiring each completed deliverable to exhibit its evidence; no demo, no credit |
 | Inspect & adapt | a retro card producing lessons and kata candidates; owned by the coach |
 | Lean governance | gates at value boundaries (phase/increment), not per card |
+
+Each event in the table is a **meeting instance** (§6.8) of a tenant `meeting_type`: PI planning's items resolve the
+plan approval and the capacity commitments, the system demo's items exhibit evidence, and inspect & adapt's items
+produce lessons and kata candidates. The cadence supplies the schedule; the meeting supplies the record.
 
 **WSJF is arithmetic, not opinion:** `(business_value + time_criticality + risk_reduction) / job_size`, all four typed
 integer fields on the backlog/WBS row. The computed score is never stored; the inputs are. An LLM may draft the
@@ -1099,7 +1192,7 @@ the coach's escalations are cards; the PM's closure record is evidence; the oper
 | Industry, department, job, job release, knowledge layers/kinds, packs, decision policies and their tenant refinements, laya inference config, model providers, tool grants, channels, conversations/turns | **`conveyor`** | jobs execute on it; humans and the agent front end |
 | Tool estate: tool/toolkit versions, tool bindings, credential profiles, the `tool_call` ledger (§11) | **`conveyor`** | conveyor jobs through the broker; humans |
 | Tool backends: the coding fleet, the kag-era services, the w2v fleet and `video-compiler`, AHTAPol services, k8s/git APIs | each service / the cluster | the conveyor broker only (§11.3) |
-| Programme, project, WBS, board/list/card, run, approval, procedure, capability, requirements/principles/ADRs, architecture artefacts and contracts, compliance reviews and waivers, maturity and skills assessments, evidence, evals/benchmark, inference ledger, decision options/policies, job bindings | **`conveyor`** | humans; the agent front end over `/mcp` |
+| Programme, project, WBS, board/list/card, run, approval, meeting forums and typed positions, procedure, capability, requirements/principles/ADRs, architecture artefacts and contracts, compliance reviews and waivers, maturity and skills assessments, evidence, evals/benchmark, inference ledger, decision options/policies, job bindings | **`conveyor`** | humans; the agent front end over `/mcp` |
 | Documents/bytes | conveyor `document` + **MinIO**, written by the conveyor's own storage adapter under tenant-separated prefixes (§11.10) | all |
 | Domain knowledge bytes/embeddings | `strata_rag` / `strata_ingest` | conveyor |
 | Models/inference | `inference-router` for text; `mlx-api`/`modality-gateway` for media; laya on the DGX host | conveyor |
@@ -1133,7 +1226,7 @@ conversation that needs internal work opens a card across the MCP seam. Customer
 | conveyor → k8s | the ops toolkit through the broker: namespace-scoped service account; read/write verbs declared as tools with effect classes (§11.4) |
 | conveyor → tool backends | the broker (§11.3): registered destination alias, sealed credential profile, closed input schema, effect class, one `tool_call` row. No caller-supplied URL at call time; no runtime dependency on `nonagenticai_mcp_server` (§11.7) |
 | conveyor → MinIO | the storage adapter: S3 API to tenant-prefixed keys, server-side encryption, content hash, size cap; bucket administration is never a job action (§11.10) |
-| any → human | approval; web, Telegram, an MCP task input request, or the agent front end under its own autonomy configuration |
+| any → human | approval — including a meeting agenda item with its decision window — from the web meeting room, Telegram, an MCP task input request, or the agent front end under its own autonomy configuration |
 
 **How a meta-job actually runs.** The job is a conveyor release; its internal agent executes a PDDL step from a
 prompt compiled from the four sources of §4.5, and its turn opens or advances a **card**. The unit of work is the
@@ -1168,7 +1261,12 @@ the conversation, records only its own turns.
 | `architecture_contract` | SAW, delivery contract, statement of intent, request for architecture work | `kind`, `phase_code`, version; a change re-opens its gate; the approved body is immutable |
 | `architecture_compliance_review` | one typed verdict per delivery project | the six §8.1 levels, findings and evidence refs |
 | `architecture_waiver` | a time-boxed accepted deviation | accepting owner, reason, cost/risk, reassessment date |
-| `governance_body` | the Architecture Board and other decision forums | membership, charter, commissioning authority, decision limits |
+| `governance_body` | the Architecture Board and other decision forums | membership, charter, commissioning authority, decision limits, and its standing `meeting_type` |
+| `meeting_type` | the forum policy (§6.8) | required participation by department/position, quorum, decision rule, evidence minimum, decision window, allowed outcomes; tenant-scoped and versioned; who may convene is an authority row |
+| `meeting` | one convened instance | `card_id`, convener, `meeting_type` version, window; one live instance per cadence slot |
+| `meeting_agenda_item` | one item: the resolved object, participating departments, evidence, typed outcome | an item that decides requires evidence (`422 item_evidence_missing`) and names exactly one `approval` |
+| `meeting_attendance` | participant, seat role, department, invitation/response state | human seats are `app_user`; job seats are `job_binding`; delegation only where the type allows it |
+| `meeting_position` | one participant's typed stance per item, with conditions and an optional commitment | one live position per participant per item; immutable once the item closes |
 | `architecture_maturity` | the capability assessment | nine dimensions, score 0–5, stage, date, evidence |
 | `architecture_skill_assessment` | the Skills Framework assessment | seven categories, role/`job_key`, proficiency, date |
 | `decision` | one L1 decision | probabilities, confidence, policy, latency, input hash |
@@ -1181,7 +1279,7 @@ the conversation, records only its own turns.
 
 Reused, not created: `programme` (extended with `shared_config`), `project`, `card`, `run`, `approval`, `governed_asset` (extend `kind` to
 `charter | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case |
-refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier`; a programme-level asset is attached
+refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier | minutes`; a programme-level asset is attached
 to the programme-definition project; the architecture contract has its own table so a phase gate never depends on a
 generic asset row), `trace_link`, `event`, `job`, `audit_event`,
 `inference_call`, `eval*`, `benchmark*`; `procedure`/`procedure_step` extend with PDDL action text and the
@@ -1201,10 +1299,11 @@ in §11.8.
 | procedures | `procedures.create\|update\|publish\|retire`, `procedures.ingest_sop\|ingest_process\|ingest_rdf\|validate\|review_source`, `capabilities.design\|publish` |
 | authoring | `authoring.intake\|draft\|review\|publish`, `authoring.assets` |
 | approvals | `approval_policies.list\|get\|set`, `approvals.request\|decide\|escalate` |
+| meetings | `meetings.schedule\|open\|invite\|respond\|agenda_add\|position\|defer\|close_item\|close\|minutes_publish\|list\|get` — `close_item` writes one `approval_decision` row per qualifying seat on the linked approval (`via='meeting'`) and derives the item outcome by the type's rule; `meeting_position` is the rationale and commitment record, never a decision, so there is no second decision store. `architecture.board_open\|get\|decide` compose `meetings.open\|get\|close_item` for the Board's standing meeting — `decide` closes one Board agenda item and adds no decision path (§8.1) |
 | decision | `ladder.record\|evaluate\|list\|apply_draft` (the ladder's verbs; a human answer is `approvals.decide` and an escalation opens an approval, not a ladder action), `decision_options.*`, `decision_policies.*`, `refinements.publish\|list`, `laya_configs.*`. ⚠️ `decisions.*` is the **ADR family** (`governance/assets.rs`); the ladder does not reuse it, so the §7 record and an ADR cannot be confused |
 | PM | `pm.charter`, `pm.plan`, `pm.baseline`, `pm.close` |
 | coach | `coach.interrupt`, `coach.triage`, `coach.remedy`, `coach.escalate` |
-| kata | `kata.open\|observe\|analyse\|propose\|measure\|adopt\|propagate\|close` |
+| kata | `kata.open\|observe\|analyse\|hypothesise\|propose\|measure\|adopt\|propagate\|close`, `kata.get` |
 | development | `dev.open\|implement\|verify\|merge\|release\|rollback` (composes coding/git/CI actions) |
 | operations | `ops.incident\|triage\|mitigate\|resolve\|postmortem`, `ops.k8s_*`, `ops.git_*`, `ops.host_*` (§10.4.1) |
 | analysis | `analyse.site`, `analyse.app`, `analyse.video`, `analyse.brand`, `analyse.content`, `analyse.report` |
@@ -1240,26 +1339,129 @@ Until T7 lands that mechanism, `ops.host_*` operations do not exist and a proced
 
 ### 10.5 UI additions
 
-V1's nine destinations stand (Today, Board, Runs, Build, Design, Measure, Evals, Govern, Channels). V2 adds:
+**The real UI is the app.** Every V2 destination is a route in `apps/web` — one Leptos CSR/WASM
+application served by the same binary on the same port (8930). The design pack in `docs/design/`
+remains two things and only two: the **public programme site** served at `/design/` from the same
+image, and the **reviewed design reference** whose pages (`studio.html`, `v2.js`) are evidence of
+intent. A page in the pack is never the implementation of a destination, and no production screen
+renders a fixture row (D64). The V1 routes stand (Today, boards, cockpit, runs, approvals,
+procedures, requirements, models, evals, usage, settings, search, copilot, platform); V2 adds the
+destinations below and rehomes the operator navigation around them.
 
-| Destination | Screens |
-|---|---|
-| **Organisation** | departments/jobs, job catalogue + release, authority matrix, approval policies, decision-policy refinements, laya config, job performance and metering |
-| **Procedures** | capability/procedure workspace, SOP intake (single/batch), RDF/OWL and BPMN/Visio/draw.io intake, PDDL step editor, knowledge-pack pairing (the `knowledge_pack_ref` a procedure pins), publish |
-| **Authoring** | intake queue (chat + documents), asset draft catalogue, review/publish, asset dependency status |
-| **Portfolio** | portfolio view (in-flight projects + programmes), programme shared config + dependency graph, backlog + WSJF, cadence (PI planning, demo, retro), capacity, metering per project |
-| **Programme** | mandate, brief, blueprint and business case; benefit profiles and the benefits map; projects dossier; tranches and end-of-tranche reviews; stakeholder profiles; transition and realized benefits |
-| **Architecture** | Preliminary capability (principles, tailored ADM, board charter, maturity and skills); ADM phases A–H with their artefact sets and contracts; the artefact repository (catalog/matrix/diagram, plateau filter, trace and reuse); compliance reviews and waivers; the Statement of Architecture Work and the Request for Architecture Work |
-| **Plan** | WBS, baseline vs forecast, registers, change control |
-| **Improve** | kata queue, six-Gets workspace, lesson review, adoption |
-| **Operations** | incidents, on-call, runbooks, postmortems, andon |
+| Destination | Route (app) | Screens | Owning slice | Spec |
+|---|---|---|---|---|
+| **Organisation** | `/organisation` | departments/jobs, the job catalogue + release, bindings, the authority matrix, approval policies, decision-policy refinements, laya config, job performance and metering | T0, T2 | `organisation.spec.ts` |
+| **Procedures** | `/procedures` (V1: `/build/processes`, `/build/process-map`) | capability → procedure → step, SOP intake (single/batch), RDF/OWL and BPMN/Visio/draw.io intake, the PDDL step workspace, the knowledge-pack pairing, the process map, publish | T16 | `procedures.spec.ts` |
+| **Authoring** | `/authoring` | intake queue (chat + documents), asset draft catalogue, review/publish, asset dependency status | T17 | `authoring.spec.ts` |
+| **Portfolio** | `/portfolio`, `/portfolio/:programme_id` | the in-flight set, programme shared config + dependency graph, WSJF backlog, cadence, capacity, per-project metering; the L1/L2 delivery view | T1, T10 | `portfolio.spec.ts` |
+| **Meetings** | `/meetings`, `/meetings/:id` | my invitations and seats; the meeting room (agenda with pre-reads and evidence, participants by department and seat, live positions and the rule's outcome); the asynchronous decision queue; minutes and action items; forum history, decision latency and meeting load | T19 | `meetings.spec.ts` |
+| **Programme** | `/programme` | mandate, brief, blueprint and business case; benefit profiles and the benefits map; projects dossier; tranches and end-of-tranche reviews; stakeholder profiles; transition and realised benefits | T10 | `programme.spec.ts` |
+| **Architecture** | `/design/adm` | Preliminary capability, ADM phases A–H with their artefact sets and contracts, the artefact repository, compliance reviews and waivers, the Statement of Architecture Work and the Request for Architecture Work | T9 | `adm.spec.ts` |
+| **Plan** | `/plan` (V1: `/boards`) | WBS, baseline vs forecast, registers, change control; the Boards tab joins the project's GitHub issues | T1 | `plan.spec.ts` |
+| **Improve** | `/improve` (V1: `/evals/improvement`) | coach triage, the kata queue and six Gets, lessons, adoption | T4, T5 | `improve.spec.ts` |
+| **Operations** | `/operations` | incidents, on-call, runbooks, dry-run and gated writes, postmortems, andon | T7 | `operations.spec.ts` |
+| **Tools** | `/tools` | toolkit versions, bindings and grants, effect ceilings, the call ledger, probes, BYO, authoring, the MinIO adapter, credential profiles | T13–T15 | `tools.spec.ts` |
 
-A **Tools** screen under Organisation lists toolkit versions, bindings, effect ceilings, health probes and recent
-calls; the run inspector gains a tools panel (which tool version was called, with which credential alias, what it
-returned). The board remains the work surface; the execution canvas remains the run surface, keeping the provenance
-inspector pattern from `w2v_frontend` (`StageIOInspector`: every stage's input → output is inspectable). Metering
-panels appear on Portfolio (per project and programme), Organisation (per job and department) and Measure (tenant
-roll-up); the run inspector drills to step and tool call (D52). The org chart is not a new runtime.
+The route cell is the measurement contract: the first path is the V2 route, a `V1:` path is the
+ancestor it extends. `scripts/build-v2-coverage.py` reads this table, `apps/web/src/app.rs` and
+`apps/web/e2e/*.spec.ts`; a destination is `exists` only when its V2 route **and** its named spec
+exist. The mock's page is cited as design reference, never as implementation evidence (D65).
+
+#### 10.5.1 Shell and route model
+
+One `Router` in `apps/web/src/app.rs`, one sidebar, one top bar. The nav groups are the mock's,
+trimmed to the destinations that exist: **Portfolio & plan** (Today, Portfolio, Meetings,
+Programme, Projects, Outputs, Plan, Validation, Execution, Decisions, Runs), **Organisation** (Organisation,
+Jobs, Agents, Tools, Project types), **Procedures & authoring** (Procedures, Capabilities,
+Authoring), **Govern & design** (Assurance, Requirements, Principles, Models, Architecture
+capability, System architecture, Documents), **Knowledge & memory** (Knowledge design, Sources,
+Memory), **Measure & improve** (Improve, Evals, Benchmarks, Hillclimb, Usage, Metering),
+**Operations**. A nav item appears only when the signed-in principal holds the scope for at least
+one of its actions or read routes; the existing `has_action` gate is the rule, not a role name.
+The tenant switcher, command palette, theme control and profile sit in the top bar. A deep link to
+a destination the principal cannot read is a sign-in or permission gate, not an empty page.
+
+#### 10.5.2 Destination contracts
+
+Every destination is a contract, not a page. It names its route(s), its screen module, its read
+path (literal `GET`s or read actions), its write path (`POST /api/actions/{name}/invocations`),
+the permission scope each control needs, its empty/partial/error/denied states, and its Playwright
+spec. The action families are §10.4's; the UI adds none. A destination whose owning slice is not
+built renders **not yet live**, names the missing action or slice, and keeps its route so the deep
+link is honest. Authoring is a contract of five actions: `authoring.assets` reads the catalogue and
+`authoring.intake|draft|review|publish` write the brief, the draft, the reviewed decision and the
+release. Its intake queue is the catalogue grouped by the intake each draft cites — the family
+exposes the intake write-only, so a recorded brief is not a read a screen may show — and §5.7's
+dependency order is refused when the draft is attempted, not at publish. The board remains the work surface and the execution canvas remains the run
+surface; the run inspector keeps the provenance pattern (every stage's input → output is
+inspectable), gains the tools panel (tool version, credential alias, returned evidence) and drills
+to step and tool call (D52). The tools panel is T13's ledger (`tool_calls.list`); until that
+action exists the inspector names the gap and carries the step's input, output and judge. Metering
+panels appear on Portfolio, Organisation and Measure.
+
+#### 10.5.3 States and the no-fixture rule
+
+Loading, empty, partial, denied and error are states of the **server's** rows. `apps/web` carries
+no fixture array; a screen with no data says what would create it, which slice owns it and which
+action is missing. A client-side refusal (403/404/409/422) is surfaced with its action code and
+the server's message; a toast never claims a success the server did not return. A mock page is
+design evidence; a fixture value that reaches a production screen is a defect, not a demo.
+
+#### 10.5.4 Writes, approvals and gates
+
+Writes are action invocations; reads are literal `GET`s. Requests carry the bearer, the tenant,
+`If-Match` on an update, `Idempotency-Key` on a create, and the approval id on a gated decision.
+The UI never decides an approval on the user's behalf: dual control is the server's refusal, shown
+with the missing second approver, and the signed-in principal is the deciding human. After a write
+the screen refetches the read model; there is no optimistic mutation. A disabled gate names the
+server's reason (missing artefact, stale binding, unpublished pack); the UI does not pre-empt a
+gate with a rule of its own.
+
+#### 10.5.5 Read models, pagination and live updates
+
+Lists use the action's `next_cursor`; a table pages rather than silently truncating. SSE topics
+(board, card, run, approval) drive live updates where they exist; a screen without a topic polls
+explicitly and says so. The published snapshot (`docs/design/data/*.json`) is the public pack's
+source; it is not the app's source. A screen's data load is cancellable on navigation.
+
+#### 10.5.6 Design system, accessibility and responsive
+
+The app's single stylesheet and its tokens are the design system; the mock's CSS is a reference,
+not a dependency. Focus is visible and returned after a dialog; tables and dialogs are keyboard
+operable; contrast meets WCAG 2.2 AA; reduced motion is honoured; a skip link precedes the shell;
+the mobile layout keeps a 16px gutter and never scrolls horizontally as a page.
+
+#### 10.5.7 Performance
+
+The WASM bundle stays within the budget the web workflow measures; tables virtualise above 200
+rows; a screen makes one load request plus its SSE stream, not one request per row; a route's
+work is abandoned on navigation. The binary, port and Postgres are unchanged (§10.6).
+
+#### 10.5.8 Verification
+
+One Playwright spec per destination, asserting empty, error, happy and one refusal; `web.yml` runs
+the suite on `apps/web/**` and is the browser gate. The design-pack checks are separate and do not
+stand in for the browser suite. A screen ships with its spec or it does not ship. The V2 coverage
+record is the programme's measure of the real routes; the PR's `web.yml` is the proof they work.
+
+#### 10.5.9 The delivery view
+
+The work model is drawn at four levels from one read model: **L1** the portfolio Gantt of
+programmes and standalone change initiatives, **L2** a programme's projects grouped by tranche with
+the benefit and capability rails, **L3** a project's kanban of work packages and loose cards, and
+**L4** a work package's own board (`/projects/:project_id/wp/:card_id`). A bar is **actuals** —
+first observed card or run activity to completion, or to the snapshot time while in flight — and a
+planned window is a dashed track only when the project records both dates; a row with no dated
+activity says so. Spend is the ledger's tokens plus the pinned commercial price; an unpriced row
+renders `—*` with its count, never `$0`. The public boundary is the tenant portfolio; the app shows
+the signed-in tenant's rows. The read model is the same derived `work`/`measure`/programme sections
+the public site publishes, exposed through the owning slices' read actions.
+
+#### 10.5.10 What is not claimed
+
+No SSR, no second router, no mobile application, no design tool and no retirement of the design
+pack. A PR does not invent a live tenant row; the app does not add a table or an action of its own.
+Where a backend capability is absent the destination says so and waits, typed, on its owning slice.
 
 ### 10.6 Deployment and scale
 
@@ -1534,10 +1736,17 @@ slice integrates and when the repo merges. V2 slices build on V1's S-slices and 
 | **T15** | **Tool authoring and BYO** — OpenAPI draft import, service-scaffold registration, remote-MCP binding, tenant binding, promotion path | a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling |
 | **T16** | **SOP, RDF/OWL and process-document ingestion** — SOP intake as a governed asset; RDF/OWL/Turtle imported as a strata knowledge pack; BPMN/Visio/draw.io conversion into PDDL procedure drafts; capability/agent/job design from an SOP; the source review and human publication gates; re-ingest versioning | a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds |
 | **T17** | **Tenant asset authoring** — chat + document intake producing drafts of every tenant asset (organisation, jobs, procedures, packs, policies, templates, tool requests), the review queue, publication | a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant |
+| **T18** | **The real V2 UI** — every V2 destination is a route in `apps/web` with its screen module, read/write contract, honest states and a Playwright spec; the shell and navigation; the L1–L4 delivery view; the design pack remains the public programme site and the reviewed reference | a signed-in tenant drives portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports `exists` only from a real route + spec; no production screen renders a fixture |
+| **T19** | **Decision forums (meetings)** — `meeting_type` policy, `meeting`, agenda items resolving approvals, attendance and positions, quorum and the three decision rules, the closed outcome set, commitments as dependencies or cards, minutes as a governed asset, human seats with live and asynchronous participation | a three-department board meeting decides its agenda items by recorded majority with a recorded dissent; an item missing a required department is deferred `inquorate` and cannot be decided; a meeting cannot lower a linked approval's dual control or waive its evidence; the owner decides one item in the web meeting room and another asynchronously from the agent front end over MCP, both recorded `via='meeting'`; minutes publish behind the chair's gate and every action becomes a card; a forum with no decision over a cycle is flagged |
 
 Dependencies: T0 → T1 → T2 → T3; T4 after T3; T5 after T2 and V1's S16–S20; T6 after T5 **and T13**; T7 after T2/T4
 **and T13**; T9/T10 after T1/T3; T8 after T5; T11 continuous; T12 after all; T13 after T2; T14 after T13; T15 after
 T13 and T6; T16 after T2 and T13; T17 after T16 and T3. T9 and T10 may run in parallel once T1 and T3 exist.
+**T18** starts after T0/T1/T2/T3; each destination's live acceptance waits on its owning slice (T4, T5, T7, T9, T10,
+T11, T13, T16, T17), and T18 closes after T12. **T19** starts after T1, T2 and T3; it tests with a `job_binding` or
+`app_user` convener, and the `governance_body` convener is testable because T9 is built (measured 2026-11-23). T9 and
+T10 are already built; their board and cadence binding to T19's meeting types is a follow-up integration unit, not a
+rebuild.
 
 **The first three months of work are T0–T3 plus T13.** They install the organisation spine and the tool spine;
 everything else is a job that uses them. T16 follows the tool spine and is the first authoring feature built on it;
@@ -1553,6 +1762,7 @@ not use a V2 aggregate does not ship it (P10).
 |---|---|---|
 | Work | projects/cards/runs/approvals | the same, plus programme cadence, WBS, baselines, registers; a computed portfolio of everything in flight |
 | Who does the work | a person creates a project; agents run runs | a conveyor-owned catalogue of jobs; PM/coach/kata/development/operations staff the loop |
+| High-level work | decisions appear as approvals, without the meeting that produced them | **meetings are the decision forum**: cross-department agendas, typed positions, quorum and decision rules, commitments and dissent on the record — and the owner in the room, live or asynchronous |
 | Organisation | none | industry → department(s) → job, immutable releases, tenant-scoped bindings |
 | Procedures | capability → procedure → step | + SOP/RDF/OWL/BPMN ingestion → PDDL procedures and knowledge packs, used to design capabilities, agents and jobs |
 | Self-contained | concepts imported from other apps | **the conveyor owns its whole model**; the agent platform is a front end over MCP |
@@ -1595,14 +1805,15 @@ which confidence, which policy, which person, which evidence.
 | R17 | **Authoring injection / knowledge poisoning** — an SOP, document, diagram or chat message carries instructions or false doctrine into a procedure or any tenant asset | every source is untrusted input; every derived artefact is a draft behind a human gate; provenance is recorded; no source can grant a tool, widen an effect ceiling or change a policy; the procedure, its source and its knowledge pack are reviewed and versioned |
 | R18 | **Tenant-configuration sprawl** — thousands of per-case refinements and autonomy policies diverge, and nobody can explain why a decision happened | platform defaults; every refinement and policy is versioned and gated; every decision row pins the policy, refinement and laya config versions; a per-tenant configuration report; unused refinements are retired (P10) |
 | R19 | **The AHTAPol plan rests on archived kag components** — its service documents assume the kag gateway, `karma_service`, `hirag_service` and `kag_orchestrator`, all archived and undeployed | re-home each function per `SPEC_LEGACY_KAG.md` before the AHTAPol slice that needs it; no archived component may be bound as a tool; the slice gates on the re-homed service's probe, never on the old name |
+| R20 | **Meeting theatre** — the calendar grows, decisions are claimed in conversation, attendance is courtesy and the minutes do not match what was decided | every agenda item resolves a typed object and needs evidence; a closed outcome set; quorum and the decision rule are policy; commitments need an owner and a date; a minute line must match a recorded position; participant-hours are metered and decision-free forums are retired |
 
 ---
 
 ## 15. Decisions and open questions
 
-### 15.1 V2 decisions (D28–D61; D1–D27 of V1 stand, except D14 and D22 as amended below)
+### 15.1 V2 decisions (D28–D66; D1–D27 of V1 stand, except D14 and D22 as amended below)
 
-**D28–D61 are this spec's decisions.** They are written as answers because a spec that only lists questions is not
+**D28–D66 are this spec's decisions.** They are written as answers because a spec that only lists questions is not
 reviewable; each can be accepted, amended or rejected as a unit, and the entries carrying an owner ruling are marked
 with its date. D33, D41, D43 and D45 carry the first review's owner rulings of 2026-11-11; D46–D48 record the procedure/SOP model, the SOP feature and
 the scope that review produced; **D49–D55 carry the second review's owner rulings of 2026-11-11** (portfolio and
@@ -1610,7 +1821,9 @@ programme, tenant configuration, per-case laya config, metering, procedural know
 authoring); **D56–D60 carry the third review's rulings of 2026-11-11** (discovery, live-estate classification and
 direct MinIO storage, the tool monorepo, the permanently separate agent tool path, and the AHTAPol/w2v tenant scope);
 **D61 records the independent runtime review's recommendation** — executor seam to be built in T0, external runtime deferred —
-and is proposed for acceptance with the rest.
+and is proposed for acceptance with the rest. **D62–D63 carry the programme-definition and ADM rulings of 2026-11-16;
+D64–D65 carry the real-UI rulings of 2026-11-22; D66 records the owner's ruling of 2026-11-22** — meetings are the
+decision forum.
 
 | # | Decision | Answer |
 |---|---|---|
@@ -1650,6 +1863,9 @@ and is proposed for acceptance with the rest.
 | **D61** | **Executor seam; external runtime deferred** | The conveyor keeps **one runtime**: `procedure` and `internal_agent` are two implementations of one internal `Executor` contract, and `executor_kind` is an extensible enum rather than a branch through the run path. **An external runtime is an explicit non-goal** until four conditions hold: a generic work-packet ingress returning per-step evidence the conveyor can verify (not outcome-level); governance at the boundary (a produce-only runtime, the conveyor ships); separate owners and roadmaps; and it beats the internal agent on the conveyor's own benchmark. D33/D44 stand — the agent platform is a front end, not a runtime — and D46's two live kinds stand. The product boundary is `/mcp`; only stateless infrastructure is shared (inference-router, strata, MinIO, tool backends). The seam preserves the option at near-zero cost (proposed 2026-11-11, from the independent runtime review) |
 | **D62** | **Programme definition and benefits realization (MSP)** | V2 adopts MSP's programme lifecycle as rows and gates. The **mandate, programme brief, blueprint, business case, refined vision and governance strategies** are `governed_asset` kinds on the programme-definition project. `benefit_profile` is the mandatory measurement record behind `project_register_item(kind='benefit')`; `benefit_link` carries the benefits map (output → capability → operational outcome → benefit → objective); `programme_tranche` carries the management/review unit, and its review is an approval with the baselines, benefit status and risk register as evidence; `benefit_transition` carries the baseline measurement, transition, post-transition measurement and legacy retirement. A benefit without baseline, target, method and owner is refused; a project does not start before the first tranche is authorised; the programme closes only with a realization plan naming post-closure measurement. The SRO, BCM, sponsoring group and programme board are positions with authority rows, not code paths (proposed 2026-11-16, from the programme-architecture and benefits-realization review) |
 | **D63** | **TOGAF ADM as an artefact-typed architecture capability** | The ADM is a capability before it is a project. The **Preliminary phase** establishes the architecture principles, the tailored `adm_profile`, the artefact standard and repository, the Architecture Board (`governance_body` with a charter and decision limits), governance and contracts, and the maturity and skills baseline. An `architecture` project walks phases A–H as WBS nodes; each phase's mandatory artefact set comes from the standard filtered by the profile, and each phase closes on an approved `architecture_contract` (Statement of Architecture Work, delivery contract, statement of intent, Request for Architecture Work). Every artefact is a typed row — **catalog, matrix or diagram**, with the common metadata, a phase and a plateau (PSA / HLD / SD) — whose entries and artefact-to-artefact links are rows, so the repository answers derivation, realization and reuse. The Requirements Catalog is continuous, with requirements typed `condition \| constraint \| assumption \| delta`. A compliance review records exactly one of the six standard levels, and a deviation is rejected, mitigated or waived with a named accepting owner and a reassessment date. A delivery project cannot pass design without the live contract that governs it; a phase-H review produces exactly one change request or kata candidate. Maturity (nine dimensions, 0–5) and skills (seven categories) are dated assessments, not assertions. No ArchiMate tool and no full conformance are claimed (proposed 2026-11-16, from the TOGAF ADM and architecture-artefact standards review) |
+| **D64** | **The real UI is the app; the pack is the public site and the reference** | Every V2 destination is a route in `apps/web` — Leptos CSR in the same binary on port 8930 — not a page in the design pack. The pack stays the public programme site at `/design/` and the reviewed design reference; a mock page is evidence of intent, never of implementation. Production screens read live rows and write only through registered actions; no fixture data ships. The V1 routes stand and the V2 destinations are added around them (proposed 2026-11-22, from the real-UI review) |
+| **D65** | **Measure the real routes, not the mock** | The V2 coverage instrument (`scripts/build-v2-coverage.py`) resolves each §10.5 destination against `apps/web/src/app.rs` and its named Playwright spec. `exists` requires the real route **and** the spec; a V1 ancestor route may justify `extend`, never `exists`; the mock's page is cited as design reference only. A destination's verdict is therefore independent of the pack's page registry (proposed 2026-11-22, from the real-UI review) |
+| **D66** | **Meetings are the decision forum** | Much of the organisation's high-level work — programme management, architecture, analysis, project management — is done in meetings between positions from different departments, and those meetings make the decisions. V2 models a meeting as a **card** (never a fifth unit and never a chat) whose agenda items resolve existing `approval` rows; `meeting_type` policy rows declare `agenda_sources[]`, required cross-department participation, quorum, the decision rule (`unanimous \| majority \| chair`), the evidence minimum, the decision window and the closed outcome set (`decision \| commitment \| action \| information \| deferred`); participants are `job_binding`s or humans with a typed position per item; each qualifying seat writes one `approval_decision` row (`via='meeting'`) on the linked approval, the item outcome derives from those rows by the type's rule, and the stricter of the meeting's rule and the approval's policy wins. Commitments become dependency edges or cards; actions become cards; minutes are a chaired `governed_asset(kind='minutes')` drafted from the rows. **The owner, and any human, holds a seat like any other** — invited, briefed, able to raise items, state positions, attach conditions, make a commitment for their seat, delegate it and record dissent, live in the meeting room or asynchronously from the web UI, Telegram or the agent front end over MCP. The LLM drafts agendas, pre-read packs and minutes; it never selects, decides, infers a position or marks attendance. Meetings are metered in participant-hours as a third D52 source, and a forum that produces no decision over a cycle is retired (owner, 2026-11-22) |
 
 ### 15.2 Open questions at review
 
@@ -1734,6 +1950,9 @@ closed — one runtime, two live executor kinds behind an internal seam.
 | **Run** | one attempt at a card through an executor | a job (the position), a card (the assignment) |
 | **Executor** | the mechanism that executes a run: `procedure` or `internal_agent` behind one contract | a job (the position), a runtime backend |
 | **Approval** | a decision/gate; a question is an approval | a comment, a notification |
+| **Meeting** | the decision forum: a card whose agenda items resolve approvals, with typed participants and positions | a chat, a kanban board, a single approval |
+| **Position** | a participant's recorded stance on an agenda item, with rationale, conditions and an optional commitment | a comment, a vote count |
+| **Commitment** | a promise made by a position in a meeting — what, by whom, by when, under what condition — turned into a dependency edge or a card | an action (assigned work), an approval (a decision) |
 | **Binding** | the join of a job to its immutable release, capability, procedure and executor | the release row itself |
 | **Portfolio** | every project and programme in flight for a tenant — a computed view, never a row | a programme (a set of projects with shared config) |
 | **Programme** | a set of projects with shared configuration and project-level dependencies; carries budget and cadence | a project (a temporary endeavour), the portfolio (a computed view) |
@@ -1768,7 +1987,7 @@ closed — one runtime, two live executor kinds behind an internal seam.
 | D24–D27 (benchmark, eval, hillclimb, compiled prompts) | **Retained**; they are the instruments D32/D37/P5 rely on. D27 governs every prompt the conveyor runs, including the internal agent's (§7.7) |
 | D19's statement that `nonagenticai_mcp_server` remains the agent platform's gateway for every other backend | **Retained for the agent platform; amended for the conveyor** by D44: the conveyor implements its own broker and never routes through it |
 | D14 (adjacent services — `artifacts` not absorbed) | **Amended by D57**: `artifact_service`/`storage-api` stay outside, but the conveyor does not call them for its own bytes — it uses MinIO directly under tenant prefixes |
-| No V1 decision is superseded **by V2** | D18 was superseded by V1's own D19; D6 is clarified (V1's in-app engine is the executor; the n8n product is reference only); D14 is amended by D57; V2 adds D28–D61 and does not re-open the V1 build |
+| No V1 decision is superseded **by V2** | D18 was superseded by V1's own D19; D6 is clarified (V1's in-app engine is the executor; the n8n product is reference only); D14 is amended by D57; V2 adds D28–D66 and does not re-open the V1 build |
 
 ## Appendix C — What we carry from the old design, and what we delete
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "What each V2 slice (SPEC_V2 \u00a712) must deliver, so the programme measures it instead of assuming `proposed`. A slice with `tables`/`actions`/`modules` is measured against migrations, the compiled registry dump and the tree. A behavioural slice with no named schema object carries an explicit `evidence` + `gap` row and stays curated. Credit only what the slice FIRST delivers: an artefact a V1 slice already declared is not re-credited (its extension is the concept map's `extend` verdict), and the generator refuses a cross-track duplicate. The decision-ladder TABLES are T0's (SPEC \u00a712's T0 row) and are never T2's.",
+  "note": "What each V2 slice (SPEC_V2 §12) must deliver, so the programme measures it instead of assuming `proposed`. A slice with `tables`/`actions`/`modules` is measured against migrations, the compiled registry dump and the tree. A behavioural slice with no named schema object carries an explicit `evidence` + `gap` row and stays curated. Credit only what the slice FIRST delivers: an artefact a V1 slice already declared is not re-credited (its extension is the concept map's `extend` verdict), and the generator refuses a cross-track duplicate. The decision-ladder TABLES are T0's (SPEC §12's T0 row) and are never T2's.",
   "slices": {
     "T0": {
       "tables": [
@@ -112,16 +112,61 @@
       "gap": null
     },
     "T5": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "tables": [
+        "kata",
+        "kata_get",
+        "kata_measurement",
+        "kata_adoption",
+        "kata_revert"
       ],
-      "gap": "no kata.* action family and no measured procedure-change loop"
+      "actions": [
+        "kata.adopt",
+        "kata.analyse",
+        "kata.get",
+        "kata.hypothesise",
+        "kata.measure",
+        "kata.observe",
+        "kata.open",
+        "kata.propose",
+        "kata.standardise",
+        "kata.stretch",
+        "kata.sustain"
+      ],
+      "modules": [
+        "kata"
+      ],
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "migrations/0066_kata.sql",
+        "migrations/0067_kata_gate.sql"
+      ],
+      "gap": null
     },
     "T6": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "tables": [
+        "development_project",
+        "development_step",
+        "development_closure"
       ],
-      "gap": "no development-project path over conveyor and a dependency repo"
+      "actions": [
+        "development_projects.change_judging_surface",
+        "development_projects.charter",
+        "development_projects.close",
+        "development_projects.deploy_gate",
+        "development_projects.get",
+        "development_projects.merge_gate",
+        "development_projects.record_step",
+        "development_projects.review_gate",
+        "development_projects.rollback"
+      ],
+      "modules": [
+        "development"
+      ],
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "migrations/0068_development_project.sql"
+      ],
+      "gap": null
     },
     "T7": {
       "actions": [
@@ -152,7 +197,22 @@
     "T8": {
       "tables": [
         "lesson"
-      ]
+      ],
+      "actions": [
+        "lessons.promote",
+        "lessons.propose",
+        "lessons.review"
+      ],
+      "modules": [
+        "crates/actions/src/lesson.rs",
+        "crates/store/src/lesson.rs"
+      ],
+      "evidence": [
+        "migrations/0069_lesson_lifecycle.sql",
+        "crates/actions/tests/lessons.rs",
+        "crates/store/tests/lesson.rs"
+      ],
+      "gap": null
     },
     "T9": {
       "tables": [
@@ -243,10 +303,14 @@
       "gap": null
     },
     "T12": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "modules": [
+        "apps/server/tests/organisation_loop.rs"
       ],
-      "gap": "the one-organisation acceptance loop is not built"
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "apps/server/tests/organisation_loop.rs"
+      ],
+      "gap": null
     },
     "T13": {
       "tables": [
@@ -268,10 +332,33 @@
       "gap": null
     },
     "T15": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "actions": [
+        "tool_authoring.draft",
+        "tool_authoring.promote",
+        "tool_authoring.publish",
+        "tool_authoring.review",
+        "tool_authoring.test",
+        "tool_authoring.validate",
+        "toolkits.discover_mcp",
+        "toolkits.import_openapi",
+        "toolkits.register_mcp",
+        "tools.dispatch"
       ],
-      "gap": "no tool authoring, OpenAPI draft import or BYO tool binding"
+      "modules": [
+        "crates/actions/src/tool_authoring.rs",
+        "crates/store/src/tool_authoring.rs"
+      ],
+      "tables": [
+        "tool_source",
+        "tool_promotion"
+      ],
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "crates/actions/tests/tool_authoring.rs",
+        "crates/actions/tests/byo_tools.rs",
+        "migrations/0070_tool_authoring.sql"
+      ],
+      "gap": null
     },
     "T16": {
       "actions": [
@@ -295,6 +382,49 @@
         "docs/SPEC_V2.md"
       ],
       "gap": "no tenant asset authoring intake or review queue"
+    },
+    "T18": {
+      "status": "proposed",
+      "evidence": [
+        "docs/plans/T18-real-v2-ui.md",
+        "docs/SPEC_V2.md",
+        "apps/web/src/app.rs"
+      ],
+      "gap": "no V2 route exists in apps/web; the destinations are mock pages only"
+    },
+    "T19": {
+      "status": "built",
+      "tables": [
+        "meeting_type",
+        "meeting",
+        "meeting_agenda_item",
+        "meeting_attendance",
+        "meeting_position"
+      ],
+      "actions": [
+        "meetings.schedule",
+        "meetings.open",
+        "meetings.invite",
+        "meetings.respond",
+        "meetings.agenda_add",
+        "meetings.position",
+        "meetings.defer",
+        "meetings.close_item",
+        "meetings.close",
+        "meetings.minutes_publish",
+        "meetings.list",
+        "meetings.get"
+      ],
+      "modules": [
+        "meetings"
+      ],
+      "evidence": [
+        "docs/plans/T19-decision-forums.md",
+        "docs/plans/T19/evidence.md",
+        "docs/plans/T19/closure-review.md",
+        "docs/SPEC_V2.md"
+      ],
+      "gap": null
     }
   }
 }

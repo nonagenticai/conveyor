@@ -77,6 +77,14 @@ struct BoardShared {
     /// refetch cannot recreate the form and lose what a person has typed.
     new_card_name: RwSignal<std::collections::HashMap<String, String>>,
     new_card_type: RwSignal<std::collections::HashMap<String, String>>,
+    /// The new-lane draft lives above the resource-driven render, like the card drafts: a
+    /// refetch recreates `NewLaneForm` and must not lose the typed name.
+    new_lane_name: RwSignal<String>,
+    new_lane_kind: RwSignal<String>,
+    /// The new-label draft is hoisted for the same reason: `LabelsPanel` is recreated by every
+    /// board refetch, and its typed name/colour must survive it.
+    new_label_name: RwSignal<String>,
+    new_label_color: RwSignal<String>,
 }
 
 /// `BoardShared` plus the board snapshot the body rendered. Each component receives one prop,
@@ -95,6 +103,10 @@ struct BoardCtx {
     archived: RwSignal<Vec<CardOut>>,
     new_card_name: RwSignal<std::collections::HashMap<String, String>>,
     new_card_type: RwSignal<std::collections::HashMap<String, String>>,
+    new_lane_name: RwSignal<String>,
+    new_lane_kind: RwSignal<String>,
+    new_label_name: RwSignal<String>,
+    new_label_color: RwSignal<String>,
     labels: Vec<LabelOut>,
     fields: Vec<FieldBrief>,
     lanes: Vec<ListOut>,
@@ -532,6 +544,10 @@ pub fn BoardScreen() -> impl IntoView {
     let archived = RwSignal::new(Vec::<CardOut>::new());
     let new_card_name = RwSignal::new(std::collections::HashMap::<String, String>::new());
     let new_card_type = RwSignal::new(std::collections::HashMap::<String, String>::new());
+    let new_lane_name = RwSignal::new(String::new());
+    let new_lane_kind = RwSignal::new("active".to_owned());
+    let new_label_name = RwSignal::new(String::new());
+    let new_label_color = RwSignal::new("accent".to_owned());
     Effect::new(move |_| {
         if let Some(Ok(body)) = data.get() {
             cards.set(body.cards);
@@ -541,6 +557,10 @@ pub fn BoardScreen() -> impl IntoView {
     Effect::new(move |_| {
         let _ = board_id();
         archived.set(Vec::new());
+        new_lane_name.set(String::new());
+        new_lane_kind.set("active".to_owned());
+        new_label_name.set(String::new());
+        new_label_color.set("accent".to_owned());
     });
 
     let shared = BoardShared {
@@ -555,6 +575,10 @@ pub fn BoardScreen() -> impl IntoView {
         archived,
         new_card_name,
         new_card_type,
+        new_lane_name,
+        new_lane_kind,
+        new_label_name,
+        new_label_color,
     };
 
     view! {
@@ -591,6 +615,10 @@ fn BoardBody(data: BoardData, shared: BoardShared) -> impl IntoView {
         archived: shared.archived,
         new_card_name: shared.new_card_name,
         new_card_type: shared.new_card_type,
+        new_lane_name: shared.new_lane_name,
+        new_lane_kind: shared.new_lane_kind,
+        new_label_name: shared.new_label_name,
+        new_label_color: shared.new_label_color,
         labels,
         fields,
         lanes,
@@ -1188,8 +1216,10 @@ fn LabelsPanel(board: BoardCtx) -> impl IntoView {
     let board_id = board.board_id.clone();
     let label_list = board.labels.clone();
     let label_rows = board.labels;
-    let name = RwSignal::new(String::new());
-    let color = RwSignal::new("accent".to_owned());
+    // The draft lives in the screen's shared state: the resource-driven render recreates this
+    // panel on every refetch and a panel-local signal would lose what the person typed.
+    let name = board.new_label_name;
+    let color = board.new_label_color;
     let busy = RwSignal::new(false);
 
     let create = move |event: web_sys::SubmitEvent| {
@@ -1639,8 +1669,10 @@ fn NewLaneForm(board: BoardCtx) -> impl IntoView {
     let ctx = expect_context::<AppCtx>();
     let resource = board.resource;
     let board_id = board.board_id;
-    let name = RwSignal::new(String::new());
-    let kind = RwSignal::new("active".to_owned());
+    // The draft lives in the screen's shared state: the resource-driven render recreates this
+    // form on every refetch and a form-local signal would lose what the person typed.
+    let name = board.new_lane_name;
+    let kind = board.new_lane_kind;
     let busy = RwSignal::new(false);
 
     let create = move |event: web_sys::SubmitEvent| {

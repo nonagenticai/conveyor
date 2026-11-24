@@ -201,3 +201,99 @@ targets above are green; this is the shared-tree cost, not an S17 defect.
 `served-spec.lock.json` from it — **258 operations**, `--check-lock` exit 0, with 8 benchmark, 6 `workflows.*`,
 4 `eval_runs.*` and 3 `eval_results.*` operations present. The 245-op figure above is this lane's own
 224-action state; 258 is what the tree now holds.
+
+## Live run — hp1 (2026-11-22)
+
+The deployment-gated proof `apps/server/tests/sandbox_live.rs` (`#[ignore]`) ran against the live
+strato cluster from m4 through an SSH tunnel to the kube-apiserver. This is the P1 end-to-end receipt:
+the Job object the API stored, the terminal state, the log, and the delete were observed on a real
+cluster, not against the stub.
+
+| input | value |
+|---|---|
+| namespace / identity | `swe-bench` / ServiceAccount `conveyor-bench` (Role `conveyor-bench-grader`), short-lived token |
+| image | `swebench/sweb.eval.x86_64.django_1776_django-16493@sha256:43fbf022eb3ddbbd32edf3cbc325c8dc532b48551f78fef14c2afd1d26dde858` (`seed/benchmark/images-verified50-v1.lock.json`) |
+| placement | `SANDBOX_NODE_SELECTOR=conveyor.ai/grading=hp1`; hp1 is untainted, so no toleration was set |
+| Job | `swb-7fa599e09fc0-conveyor-live-proof` (recovered from namespace events; the test does not print it) |
+| pod | `swb-7fa599e09fc0-conveyor-live-proof-xjt4m`, scheduled to **hp1** |
+| timeout | `SANDBOX_LIVE_TIMEOUT_S=900` |
+
+```text
+test the_live_sandbox_lifecycle_creates_runs_reads_logs_and_deletes ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 244.18s
+```
+
+The test asserts the stored object (digest image; `automountServiceAccountToken: false`;
+`enableServiceLinks: false`; `backoffLimit: 0`; a positive `activeDeadlineSeconds`;
+`ttlSecondsAfterFinished: 3600`; the hp1 selector), waits for `Succeeded`, reads the log and finds the
+runner's apply marker plus the eval proof `conveyor sandbox live proof`, then deletes the Job and
+waits until the Job and its pod are gone. Cluster events corroborate the lifecycle: pod scheduled to
+hp1, image pulled by digest in 3m4s (1,240,562,520 bytes), container started, and `Job completed` at
+10:02:16Z. After the run `kubectl -n swe-bench get jobs,pods` was empty (only `istio-ca-crl`,
+`istio-ca-root-cert` and `kube-root-ca.crt` remained), so the test's own cleanup left nothing behind.
+
+Run through the sanctioned m4 guard (the token was passed in the environment and never printed):
+
+```bash
+SANDBOX_NAMESPACE=swe-bench SANDBOX_API_URL=https://127.0.0.1:16443 \
+SANDBOX_TOKEN="$(cat "$TOKEN_FILE")" SANDBOX_CA_PATH="$CA_FILE" \
+SANDBOX_NODE_SELECTOR=conveyor.ai/grading=hp1 \
+SANDBOX_LIVE_IMAGE='swebench/sweb.eval.x86_64.django_1776_django-16493@sha256:43fbf022eb3ddbbd32edf3cbc325c8dc532b48551f78fef14c2afd1d26dde858' \
+SANDBOX_LIVE_TIMEOUT_S=900 \
+  ~/.claude/scripts/cargo-guard.py test -p conveyor-server --test sandbox_live -- --ignored --nocapture
+```
+
+## P4 — the workspace suite (2026-11-22)
+
+The workspace suite ran in this PR's `ci-public` on `36967ab6` (run
+[45021016396](https://github.com/nonagenticai/conveyor/actions/runs/45021016396)). The first
+`checks-shard (1)` run hit the load-sensitive `wait_for("three dispatches")` timeout in
+`apps/server/tests/interaction_dispatch.rs`, a file byte-identical to `main` and untouched by this
+branch; the re-run of that shard is the verdict.
+
+| job | result | evidence |
+|---|---|---|
+| `checks-shard (1)` (re-run) | **1914 passed, 0 failed**, 1713 skipped, 348.4 s | [job 137380614684](https://github.com/nonagenticai/conveyor/actions/runs/45021016396/job/137380614684) |
+| `checks-shard (2)` | **1705 passed, 0 failed**, 1922 skipped, 196.9 s | [job 137380616212](https://github.com/nonagenticai/conveyor/actions/runs/45021016396/job/137380616212) |
+
+Both shards are green at the same head. The only non-pass check on the PR is the duplicate
+push-triggered `preflight` that was cancelled, while the dispatched preflight on the same SHA
+(run `45021016048`) succeeded.
+
+## P2/P3 — the live controls and the verification order
+
+The empty control passed before the fix: run `01a202c4-e8ee-7c99-b5e5-dc21a39116b6`, 50/50 graded,
+0 resolved, `control_ok=true`. The pre-fix gold control was 47/50 with `control_ok=false`; the three
+misses are the suite's only `[pdf]`/`[eps]` instances, refused by Ghostscript 9.55 SAFER. Commit
+`36967ab6` adds the scoped `/bench-bin/gs` shim and mounts it in the sandbox Job.
+
+**Verification order (hold released 2026-11-23).** PR images are not published
+(`publish-service-images` skips on a PR), and the cluster runs the digest Flux resolves from
+`:latest` on `main`. The controls therefore run on the deployed service, in this order:
+
+1. merge #11; Flux resolves the new digest and `kubectl -n conveyor rollout status
+   deploy/conveyor` completes;
+2. re-run the three PDF/EPS instances first (`only`), then the full gold control and the empty
+   control through `conveyor admin action invoke --name benchmark_runs.start` in the deployed pod;
+3. append `control_ok`, counts and run ids here.
+
+The previous deployment digest is the rollback. If the gold control is false, the digest is rolled
+back and #11 is reopened with the failure — the deployment is reversible, the evidence is not
+negotiable.
+
+## P5 — the Ghostscript shim, measured in the image (2026-11-23)
+
+Probe `01a20773-06f4-7075-82b0-a56a2ca18a2c` (3 instances, `only`) was 0/3 after the shim merged.
+Read-only pods in `swe-bench` on the three failing images (`matplotlib-23412`, `-23476`, `-24627`;
+digests in `seed/benchmark/images-verified50-v1.lock.json`) show the shim **is** the resolved
+`gs`: `command -v gs` → `/bench-bin/gs`, and there is no `gs` in
+`/opt/miniconda3/envs/testbed/bin` to shadow it. The failure is Ghostscript itself: GPL
+Ghostscript 9.55 refuses every read and write under `/testbed` (`invalidfileaccess`, `Last OS
+error: Permission denied`) with no permit, with `--permit-file-read=/testbed/`,
+`--permit-file-write=/testbed/`, `--permit-file-control=/testbed/`, exact-file permits and globs,
+and with `-dNOSAFER` (this build ignores it). The same binary reads and writes `/tmp` normally,
+and the pod is root writing `/testbed` from Python. This branch's commit replaces the permit shim
+with a relay that mirrors the `/testbed` literals in matplotlib's interactive PostScript stream
+under a private `/tmp` root, runs Ghostscript there, and copies the outputs back before it
+forwards Ghostscript's prompt.
+

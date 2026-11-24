@@ -5,17 +5,18 @@
     "docs/SPEC_V2.md",
     "migrations/*.sql",
     "crates/actions/src/**",
-    "docs/design/v2.js"
+    "apps/web/src/app.rs",
+    "apps/web/e2e/*.spec.ts"
   ],
   "verdicts": {
-    "exists": "implemented in code and backed by real rows",
-    "extend": "a partial implementation exists (a page, a table, or a prefix) that must be extended",
-    "new": "absent"
+    "exists": "the real route and its Playwright spec exist",
+    "extend": "a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner",
+    "new": "neither the route nor an ancestor exists"
   },
   "counts": {
-    "exists": 46,
-    "extend": 6,
-    "new": 8
+    "exists": 59,
+    "extend": 7,
+    "new": 3
   },
   "rows": [
     {
@@ -270,6 +271,56 @@
       ]
     },
     {
+      "id": "table:meeting_type",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "meeting_type",
+      "verdict": "exists",
+      "evidence": [
+        "migrations: CREATE TABLE meeting_type"
+      ]
+    },
+    {
+      "id": "table:meeting",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "meeting",
+      "verdict": "exists",
+      "evidence": [
+        "migrations: CREATE TABLE meeting"
+      ]
+    },
+    {
+      "id": "table:meeting_agenda_item",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "meeting_agenda_item",
+      "verdict": "exists",
+      "evidence": [
+        "migrations: CREATE TABLE meeting_agenda_item"
+      ]
+    },
+    {
+      "id": "table:meeting_attendance",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "meeting_attendance",
+      "verdict": "exists",
+      "evidence": [
+        "migrations: CREATE TABLE meeting_attendance"
+      ]
+    },
+    {
+      "id": "table:meeting_position",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "meeting_position",
+      "verdict": "exists",
+      "evidence": [
+        "migrations: CREATE TABLE meeting_position"
+      ]
+    },
+    {
       "id": "table:architecture_maturity",
       "spec_ref": "§10.3",
       "kind": "table",
@@ -427,9 +478,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "authoring",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: authoring.* absent"
+        "actions: authoring.* found (authoring.assets, authoring.draft, authoring.intake…)"
       ]
     },
     {
@@ -444,6 +495,17 @@
       ]
     },
     {
+      "id": "actions:meetings",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "meetings",
+      "verdict": "exists",
+      "evidence": [
+        "actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…)",
+        "actions: meetings.* found (meetings.agenda_add, meetings.close, meetings.close_item…)"
+      ]
+    },
+    {
       "id": "actions:decision",
       "spec_ref": "§10.4",
       "kind": "actions",
@@ -454,7 +516,7 @@
         "actions: decision_options.* absent",
         "actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)",
         "actions: decisions.* found (decisions.create, decisions.get, decisions.list…)",
-        "actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)",
+        "actions: ladder.* found (ladder.apply_draft, ladder.case, ladder.evaluate…)",
         "actions: laya_configs.* found (laya_configs.create, laya_configs.list)",
         "actions: refinements.* found (refinements.list, refinements.publish)"
       ],
@@ -487,7 +549,7 @@
       "concept": "kata",
       "verdict": "new",
       "evidence": [
-        "actions: kata.* absent"
+        "actions: kata.* found (kata.adopt, kata.analyse, kata.get…)"
       ],
       "note": "V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5."
     },
@@ -538,10 +600,10 @@
       "concept": "tools",
       "verdict": "extend",
       "evidence": [
-        "actions: tool_authoring.* absent",
+        "actions: tool_authoring.* found (tool_authoring.draft, tool_authoring.promote, tool_authoring.publish…)",
         "actions: tool_bindings.* absent",
         "actions: tool_calls.* absent",
-        "actions: toolkits.* found (toolkits.publish)",
+        "actions: toolkits.* found (toolkits.discover_mcp, toolkits.import_openapi, toolkits.publish…)",
         "actions: tools.* found (tools.probe, tools.usage)"
       ]
     },
@@ -550,9 +612,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "memory",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: lessons.* absent"
+        "actions: lessons.* found (lessons.promote, lessons.propose, lessons.review)"
       ]
     },
     {
@@ -572,9 +634,11 @@
       "concept": "Organisation",
       "verdict": "exists",
       "evidence": [
-        "docs/design/v2.js: page 'organisation' registered"
+        "apps/web/src/app.rs: route '/organisation' found",
+        "apps/web/e2e/organisation.spec.ts: present",
+        "docs/design/v2.js: page 'organisation' — design reference, not implementation"
       ],
-      "note": "The page renders the tenant's live industry, department, job, release and binding rows (T0, #34/#65)."
+      "note": "The mock page is a design study; the app's /organisation route renders the T0/T2 organisation reads, and the write verbs remain T0/T2's."
     },
     {
       "id": "destination:Procedures",
@@ -583,42 +647,92 @@
       "concept": "Procedures",
       "verdict": "exists",
       "evidence": [
-        "docs/design/v2.js: page 'procedures' registered"
+        "apps/web/src/app.rs: route '/procedures' found",
+        "apps/web/e2e/procedures.spec.ts: present",
+        "apps/web/src/app.rs: V1 ancestor '/build/processes', '/build/process-map' found",
+        "docs/design/v2.js: page 'procedures' — design reference, not implementation"
       ],
-      "note": "The page operates the T16 intake live (SOP/BPMN/RDF), the source review and the two human publication gates; signed out it renders the published procedure/process/step rows read-only (#448)."
+      "note": "The real /procedures screen reads the tenant's procedures, processes and capabilities and operates the T16 intake, source review and both publication gates. The V1 /build/processes and /build/process-map remain the executable's editor and map. The PKO editor was ruled out on 2026-11-19 and is replaced by the knowledge-pack pairing."
     },
     {
       "id": "destination:Authoring",
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Authoring",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "docs/design/v2.js: page 'authoring' registered"
+        "apps/web/src/app.rs: route '/authoring' found",
+        "apps/web/e2e/authoring.spec.ts: present",
+        "docs/design/v2.js: page 'authoring' — design reference, not implementation"
       ],
-      "note": "A design study only: no authoring actions, no intake queue, no draft catalogue (T17)."
+      "note": "The /authoring route renders and operates the T17 family: the intake queue (the catalogue grouped by `intake_id`, because the intake is write-only and its brief read is #655), the draft catalogue, the review behind an approved `authoring.review` gate, and the release. Section 5.7's dependency order is refused when the draft is attempted, not at publish."
     },
     {
       "id": "destination:Portfolio",
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Portfolio",
+      "verdict": "exists",
+      "evidence": [
+        "apps/web/src/app.rs: route '/portfolio' found",
+        "apps/web/src/app.rs: route '/portfolio/:programme_id' found",
+        "apps/web/e2e/portfolio.spec.ts: present",
+        "docs/design/v2.js: page 'portfolio' — design reference, not implementation"
+      ],
+      "note": "The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10."
+    },
+    {
+      "id": "destination:Meetings",
+      "spec_ref": "§10.5",
+      "kind": "destination",
+      "concept": "Meetings",
+      "verdict": "exists",
+      "evidence": [
+        "apps/web/src/app.rs: route '/meetings' found",
+        "apps/web/src/app.rs: route '/meetings/:id' found",
+        "apps/web/e2e/meetings.spec.ts: present"
+      ]
+    },
+    {
+      "id": "destination:Programme",
+      "spec_ref": "§10.5",
+      "kind": "destination",
+      "concept": "Programme",
+      "verdict": "exists",
+      "evidence": [
+        "apps/web/src/app.rs: route '/programme' found",
+        "apps/web/e2e/programme.spec.ts: present",
+        "docs/design/v2.js: page 'programme' — design reference, not implementation"
+      ],
+      "note": "No route; the MSP definition reads are T10."
+    },
+    {
+      "id": "destination:Architecture",
+      "spec_ref": "§10.5",
+      "kind": "destination",
+      "concept": "Architecture",
       "verdict": "extend",
       "evidence": [
-        "docs/design/v2.js: page 'portfolio' registered"
+        "apps/web/src/app.rs: route '/design/adm' found",
+        "apps/web/e2e/adm.spec.ts: absent",
+        "docs/design/v2.js: page 'adm' — design reference, not implementation",
+        "apps/web/src/app.rs: route '/design/adm' renders AdmGate (a gate; owner: T9)"
       ],
-      "note": "Live programme/project rows render today; shared config, WSJF backlog, cadence and capacity are fixture tabs (T1/T10)."
+      "note": "V1 /architecture is the system map; the ADM capability at /design/adm and its actions are T9."
     },
     {
       "id": "destination:Plan",
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Plan",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
-        "docs/design/v2.js: page 'plan' registered"
+        "apps/web/src/app.rs: route '/plan' found",
+        "apps/web/e2e/plan.spec.ts: present",
+        "apps/web/src/app.rs: V1 ancestor '/boards' found",
+        "docs/design/v2.js: page 'plan' — design reference, not implementation"
       ],
-      "note": "The live Boards tab renders real boards and cards (#57); WBS, baseline, registers and change control are T1."
+      "note": "The app's /plan route renders the T1 WBS, baselines, registers and change control; the live Boards tab remains at /boards."
     },
     {
       "id": "destination:Improve",
@@ -627,31 +741,41 @@
       "concept": "Improve",
       "verdict": "extend",
       "evidence": [
-        "docs/design/v2.js: page 'improve' registered"
+        "apps/web/src/app.rs: route '/improve' found",
+        "apps/web/e2e/improve.spec.ts: absent",
+        "apps/web/src/app.rs: V1 ancestor '/evals/improvement' found",
+        "docs/design/v2.js: page 'improve' — design reference, not implementation",
+        "apps/web/src/app.rs: route '/improve' renders ImproveGate (a gate; owner: T4, T5)"
       ],
-      "note": "The page exists and renders a design study; V1's eval/benchmark/kata rows are the instruments it will read (T5/T8)."
+      "note": "V1 /evals/improvement carries the improvement campaigns; the coach/kata/lessons path is T4/T5."
     },
     {
       "id": "destination:Operations",
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Operations",
-      "verdict": "new",
+      "verdict": "extend",
       "evidence": [
-        "docs/design/v2.js: page 'operations' registered"
+        "apps/web/src/app.rs: route '/operations' found",
+        "apps/web/e2e/operations.spec.ts: absent",
+        "docs/design/v2.js: page 'operations' — design reference, not implementation",
+        "apps/web/src/app.rs: route '/operations' renders OperationsGate (a gate; owner: T7)"
       ],
-      "note": "A design study only: no incident/runbook/postmortem rows or operations actions (T7)."
+      "note": "No route and no operations actions; the incident/runbook/postmortem path is T7."
     },
     {
       "id": "destination:Tools",
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Tools",
-      "verdict": "new",
+      "verdict": "extend",
       "evidence": [
-        "docs/design/v2.js: page 'toolkits' registered"
+        "apps/web/src/app.rs: route '/tools' found",
+        "apps/web/e2e/tools.spec.ts: absent",
+        "docs/design/v2.js: page 'toolkits' — design reference, not implementation",
+        "apps/web/src/app.rs: route '/tools' renders ToolsGate (a gate; owner: T13–T15)"
       ],
-      "note": "The page exists as a catalogue study; tool/toolkit/tool_binding/tool_call do not exist (T13)."
+      "note": "V1 /tools is a legacy coding-action catalogue; the tool/toolkit/binding/call rows are T13–T15."
     }
   ]
 }

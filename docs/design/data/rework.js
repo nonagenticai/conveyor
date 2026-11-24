@@ -1,9 +1,9 @@
 window.CONVEYOR_REWORK = {
-  "generated_at": "2026-11-20T11:50:50.848127361+00:00",
-  "git_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+  "generated_at": "2026-11-24T16:30:00Z",
+  "git_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
   "packages": [
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:DESIGN-PUBLISH",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T16",
       "apply_to": "PLATFORM",
       "artefact": "closure_review",
       "baseline": {
@@ -32,14 +32,14 @@ window.CONVEYOR_REWORK = {
           "rule": "closed_without_closure_review",
           "source": "snapshot",
           "subjects": [
-            "DESIGN-PUBLISH"
+            "T16"
           ]
         }
       ],
-      "key": "closed_without_closure_review:DESIGN-PUBLISH",
-      "owner_project": "DESIGN-PUBLISH",
+      "key": "closed_without_closure_review:T16",
+      "owner_project": "T16",
       "rule": "closed_without_closure_review",
-      "scope": "DESIGN-PUBLISH",
+      "scope": "T16",
       "severity": "P0",
       "spec": "§8.4",
       "standard": "MSP",
@@ -54,13 +54,13 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
-          "subject": "DESIGN-PUBLISH"
+          "subject": "T16"
         }
       ],
       "title": "Publish the project's closure review"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T14",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T3",
       "apply_to": "PLATFORM",
       "artefact": "closure_review",
       "baseline": {
@@ -89,14 +89,14 @@ window.CONVEYOR_REWORK = {
           "rule": "closed_without_closure_review",
           "source": "snapshot",
           "subjects": [
-            "T14"
+            "T3"
           ]
         }
       ],
-      "key": "closed_without_closure_review:T14",
-      "owner_project": "T14",
+      "key": "closed_without_closure_review:T3",
+      "owner_project": "T3",
       "rule": "closed_without_closure_review",
-      "scope": "T14",
+      "scope": "T3",
       "severity": "P0",
       "spec": "§8.4",
       "standard": "MSP",
@@ -111,19 +111,19 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
-          "subject": "T14"
+          "subject": "T3"
         }
       ],
       "title": "Publish the project's closure review"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-1",
-      "apply_to": "S02",
-      "artefact": "tranche_review",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T7",
+      "apply_to": "PLATFORM",
+      "artefact": "closure_review",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 3,
+        "entries": 1,
         "owners": [
           "programme owner"
         ]
@@ -132,72 +132,50 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "The tranche has a recorded continue|pause|stop decision",
+          "item": "A closure review output is published for the project",
           "met": false
         },
         {
-          "item": "The audit reports no project_in_unauthorised_tranche gap for that tranche",
+          "item": "The audit reports no closed_without_closure_review gap for the project",
           "met": false
         }
       ],
       "evidence": [
         {
-          "file": "msp.json",
-          "rule": "project_in_unauthorised_tranche",
+          "file": "programme.json",
+          "rule": "closed_without_closure_review",
           "source": "snapshot",
           "subjects": [
-            "T1",
-            "S02",
-            "T11"
+            "T7"
           ]
         }
       ],
-      "key": "project_in_unauthorised_tranche:tranche-1",
-      "owner_project": "T12",
-      "rule": "project_in_unauthorised_tranche",
-      "scope": "tranche-1",
+      "key": "closed_without_closure_review:T7",
+      "owner_project": "T7",
+      "rule": "closed_without_closure_review",
+      "scope": "T7",
       "severity": "P0",
-      "spec": "§8.3",
+      "spec": "§8.4",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 3,
+      "subject_count": 1,
       "subjects": [
         {
-          "detail": "project is closed in tranche 1 whose state is 'planned'",
+          "detail": "project is closed but its closure review is not published",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
-          "subject": "T1"
-        },
-        {
-          "detail": "project is active in tranche 1 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S02"
-        },
-        {
-          "detail": "project is active in tranche 1 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T11"
+          "subject": "T7"
         }
       ],
-      "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
+      "title": "Publish the project's closure review"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-2",
-      "apply_to": "PLATFORM",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-10",
+      "apply_to": "T5",
       "artefact": "tranche_review",
       "baseline": {
         "disposition": "rework",
@@ -225,15 +203,15 @@ window.CONVEYOR_REWORK = {
           "rule": "project_in_unauthorised_tranche",
           "source": "snapshot",
           "subjects": [
-            "S03",
-            "T2"
+            "S12",
+            "T5"
           ]
         }
       ],
-      "key": "project_in_unauthorised_tranche:tranche-2",
+      "key": "project_in_unauthorised_tranche:tranche-10",
       "owner_project": "T12",
       "rule": "project_in_unauthorised_tranche",
-      "scope": "tranche-2",
+      "scope": "tranche-10",
       "severity": "P0",
       "spec": "§8.3",
       "standard": "MSP",
@@ -241,115 +219,36 @@ window.CONVEYOR_REWORK = {
       "subject_count": 2,
       "subjects": [
         {
-          "detail": "project is closed in tranche 2 whose state is 'planned'",
+          "detail": "project is closed in tranche 10 whose state is 'planned'",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
-          "subject": "S03"
+          "subject": "S12"
         },
         {
-          "detail": "project is closed in tranche 2 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P0",
-          "subject": "T2"
-        }
-      ],
-      "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-3",
-      "apply_to": "S04",
-      "artefact": "tranche_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 3,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The tranche has a recorded continue|pause|stop decision",
-          "met": false
-        },
-        {
-          "item": "The audit reports no project_in_unauthorised_tranche gap for that tranche",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "msp.json",
-          "rule": "project_in_unauthorised_tranche",
-          "source": "snapshot",
-          "subjects": [
-            "T13",
-            "T3",
-            "S04"
-          ]
-        }
-      ],
-      "key": "project_in_unauthorised_tranche:tranche-3",
-      "owner_project": "T12",
-      "rule": "project_in_unauthorised_tranche",
-      "scope": "tranche-3",
-      "severity": "P0",
-      "spec": "§8.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 3,
-      "subjects": [
-        {
-          "detail": "project is closed in tranche 3 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P0",
-          "subject": "T13"
-        },
-        {
-          "detail": "project is closed in tranche 3 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P0",
-          "subject": "T3"
-        },
-        {
-          "detail": "project is active in tranche 3 whose state is 'planned'",
+          "detail": "project is active in tranche 10 whose state is 'planned'",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "S04"
+          "subject": "T5"
         }
       ],
       "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-4",
-      "apply_to": "T16",
+      "apply_to": "T14",
       "artefact": "tranche_review",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 8,
+        "entries": 10,
         "owners": [
           "programme owner"
         ]
@@ -376,10 +275,12 @@ window.CONVEYOR_REWORK = {
             "S07",
             "S09",
             "T10",
-            "T14",
+            "T16",
+            "T19",
             "T4",
             "T9",
-            "T16"
+            "T14",
+            "T18"
           ]
         }
       ],
@@ -391,7 +292,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 8,
+      "subject_count": 10,
       "subjects": [
         {
           "detail": "project is closed in tranche 4 whose state is 'planned'",
@@ -441,7 +342,17 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
-          "subject": "T14"
+          "subject": "T16"
+        },
+        {
+          "detail": "project is closed in tranche 4 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P0",
+          "subject": "T19"
         },
         {
           "detail": "project is closed in tranche 4 whose state is 'planned'",
@@ -471,7 +382,17 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "T16"
+          "subject": "T14"
+        },
+        {
+          "detail": "project is active in tranche 4 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "T18"
         }
       ],
       "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
@@ -507,10 +428,10 @@ window.CONVEYOR_REWORK = {
           "source": "snapshot",
           "subjects": [
             "S08",
-            "S06",
             "S17",
-            "T17",
-            "T7"
+            "T7",
+            "S06",
+            "T17"
           ]
         }
       ],
@@ -535,6 +456,26 @@ window.CONVEYOR_REWORK = {
           "subject": "S08"
         },
         {
+          "detail": "project is closed in tranche 5 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P0",
+          "subject": "S17"
+        },
+        {
+          "detail": "project is closed in tranche 5 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P0",
+          "subject": "T7"
+        },
+        {
           "detail": "project is active in tranche 5 whose state is 'planned'",
           "disposition": "rework",
           "evidence": [],
@@ -552,27 +493,7 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "S17"
-        },
-        {
-          "detail": "project is active in tranche 5 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
           "subject": "T17"
-        },
-        {
-          "detail": "project is active in tranche 5 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T7"
         }
       ],
       "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
@@ -748,7 +669,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-8",
-      "apply_to": "S13",
+      "apply_to": "S19",
       "artefact": "tranche_review",
       "baseline": {
         "disposition": "rework",
@@ -803,13 +724,13 @@ window.CONVEYOR_REWORK = {
           "subject": "S06d"
         },
         {
-          "detail": "project is active in tranche 8 whose state is 'planned'",
+          "detail": "project is closed in tranche 8 whose state is 'planned'",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
+          "severity": "P0",
           "subject": "S13"
         },
         {
@@ -826,13 +747,13 @@ window.CONVEYOR_REWORK = {
       "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check tranche_review_without_authorisation:tranche-0",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-9",
       "apply_to": "PLATFORM",
       "artefact": "tranche_review",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 1,
+        "entries": 3,
         "owners": [
           "programme owner"
         ]
@@ -841,46 +762,68 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "A tranche_review row carries continue|pause|stop with its evidence for the tranche",
+          "item": "The tranche has a recorded continue|pause|stop decision",
           "met": false
         },
         {
-          "item": "No project is active or closed in that tranche without the authorising decision",
+          "item": "The audit reports no project_in_unauthorised_tranche gap for that tranche",
           "met": false
         }
       ],
       "evidence": [
         {
           "file": "msp.json",
-          "rule": "tranche_review_without_authorisation",
+          "rule": "project_in_unauthorised_tranche",
           "source": "snapshot",
           "subjects": [
-            "tranche 0 review"
+            "S18",
+            "S20",
+            "S21"
           ]
         }
       ],
-      "key": "tranche_review_without_authorisation:tranche-0",
+      "key": "project_in_unauthorised_tranche:tranche-9",
       "owner_project": "T12",
-      "rule": "tranche_review_without_authorisation",
-      "scope": "tranche-0",
+      "rule": "project_in_unauthorised_tranche",
+      "scope": "tranche-9",
       "severity": "P0",
       "spec": "§8.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 1,
+      "subject_count": 3,
       "subjects": [
         {
-          "detail": "continue did not authorise tranche 1: state is 'planned'",
+          "detail": "project is closed in tranche 9 whose state is 'planned'",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
-          "subject": "tranche 0 review"
+          "subject": "S18"
+        },
+        {
+          "detail": "project is closed in tranche 9 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P0",
+          "subject": "S20"
+        },
+        {
+          "detail": "project is closed in tranche 9 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P0",
+          "subject": "S21"
         }
       ],
-      "title": "Record the tranche gate decision"
+      "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w2b-2:T10",
@@ -1502,7 +1445,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p75-1:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§7.5",
       "baseline": null,
       "depends_on": [],
@@ -1774,95 +1717,8 @@ window.CONVEYOR_REWORK = {
       "title": "Release compile ignores the knowledge layers and can never refuse release_not_ready or department_conflict"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1c-2:T2",
-      "apply_to": "PLATFORM",
-      "artefact": "§7.1/§7.4",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "ladder.record refuses rung='human' unless the actor is a person and the cited approval has an accepted approval_decision bound to this decision; ladder.apply_draft requires an accepted decision of a dedicated draft-application gate kind (and/or the document's prompt_sha256/inference_call_id) and refuses a generic or pending approval; tests prove a pending approval and an unrelated accepted laya decision both cannot gate a draft.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 1015,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "            actor_kind: ctx.actor_kind.clone(),",
-              "source": "code"
-            },
-            {
-              "line": 809,
-              "path": "crates/store/src/ladder.rs",
-              "quote": "    ensure_optional_parent_tx(&mut *conn, tenant, Parent::Approval, new.approval_id)",
-              "source": "code"
-            },
-            {
-              "line": 1126,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "    if matches!(rung, Rung::Rule) || decision.outcome.as_deref() != Some(\"accepted\") {",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w1c-2",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w1c-2:T2",
-      "owner_project": "T2",
-      "rule": "v1-w1c-2",
-      "scope": "T2",
-      "severity": "P0",
-      "spec": "§7.1/§7.4",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "§7.1 makes L3 a human approval (approval + approval_decision) for every irreversible action, and §7.4 says a generated draft becomes applicable only through an action with a gate. ladder.record accepts rung='human' from any caller holding governance:write (the action is kind=internal) and copies ctx.actor_kind with no check that the actor is a person; record_decision_tx only checks that the cited approval row exists in the tenant, never that its approval_decision is accepted or that it covers this draft. ladder.apply_draft then admits any accepted non-rule decision that names the same card, regardless of the question it answered or the artefact it was about, so a routine accepted laya classification also unlocks a generated patch.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 1015,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "            actor_kind: ctx.actor_kind.clone(),",
-                  "source": "code"
-                },
-                {
-                  "line": 809,
-                  "path": "crates/store/src/ladder.rs",
-                  "quote": "    ensure_optional_parent_tx(&mut *conn, tenant, Parent::Approval, new.approval_id)",
-                  "source": "code"
-                },
-                {
-                  "line": 1126,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "    if matches!(rung, Rung::Rule) || decision.outcome.as_deref() != Some(\"accepted\") {",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w1c-2",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T2"
-        }
-      ],
-      "title": "The L3 human gate on a generated draft is forgeable by any service principal, and any accepted non-rule decision on the card qualifies"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3a-1:T7",
-      "apply_to": "T7",
+      "apply_to": "PLATFORM",
       "artefact": "§9.2",
       "baseline": null,
       "depends_on": [],
@@ -1949,7 +1805,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w4a-1:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.3",
       "baseline": null,
       "depends_on": [],
@@ -2036,7 +1892,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w4a-2:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.3",
       "baseline": null,
       "depends_on": [],
@@ -2120,6 +1976,74 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "Write-verify is unenforced: no checks[]/verdict at call time and no publication gate for a write tool without verification"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check compliance_review_missing:T4",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 2,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A compliance review names one of the six verdicts against the project's contract",
+          "met": false
+        },
+        {
+          "item": "The audit reports no compliance_review_missing gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "architecture.json",
+          "rule": "compliance_review_missing",
+          "source": "snapshot",
+          "subjects": [
+            "T4",
+            "T4"
+          ]
+        }
+      ],
+      "key": "compliance_review_missing:T4",
+      "owner_project": "T4",
+      "rule": "compliance_review_missing",
+      "scope": "T4",
+      "severity": "P0",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 2,
+      "subjects": [
+        {
+          "detail": "a non-conformant review has no active waiver",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P0",
+          "subject": "T4"
+        },
+        {
+          "detail": "closed delivery project has no Phase-G compliance review",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "T4"
+        }
+      ],
+      "title": "Publish the project's Phase G compliance review"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p81-1:T9",
@@ -2598,177 +2522,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "Complete the benefit profiles"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S00",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "S00"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:S00",
-      "owner_project": "S00",
-      "rule": "closed_without_closure_review",
-      "scope": "S00",
-      "severity": "P1",
-      "spec": "§8.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S00"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S01",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "S01"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:S01",
-      "owner_project": "S01",
-      "rule": "closed_without_closure_review",
-      "scope": "S01",
-      "severity": "P1",
-      "spec": "§8.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S01"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S03",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "S03"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:S03",
-      "owner_project": "S03",
-      "rule": "closed_without_closure_review",
-      "scope": "S03",
-      "severity": "P1",
-      "spec": "§8.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S03"
-        }
-      ],
-      "title": "Publish the project's closure review"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S05",
@@ -3284,6 +3037,120 @@ window.CONVEYOR_REWORK = {
       "title": "Publish the project's closure review"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S12",
+      "apply_to": "PLATFORM",
+      "artefact": "closure_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 1,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A closure review output is published for the project",
+          "met": false
+        },
+        {
+          "item": "The audit reports no closed_without_closure_review gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "closed_without_closure_review",
+          "source": "snapshot",
+          "subjects": [
+            "S12"
+          ]
+        }
+      ],
+      "key": "closed_without_closure_review:S12",
+      "owner_project": "S12",
+      "rule": "closed_without_closure_review",
+      "scope": "S12",
+      "severity": "P1",
+      "spec": "§8.4",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "project is closed but its closure review is not published",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S12"
+        }
+      ],
+      "title": "Publish the project's closure review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S13",
+      "apply_to": "PLATFORM",
+      "artefact": "closure_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 1,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A closure review output is published for the project",
+          "met": false
+        },
+        {
+          "item": "The audit reports no closed_without_closure_review gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "closed_without_closure_review",
+          "source": "snapshot",
+          "subjects": [
+            "S13"
+          ]
+        }
+      ],
+      "key": "closed_without_closure_review:S13",
+      "owner_project": "S13",
+      "rule": "closed_without_closure_review",
+      "scope": "S13",
+      "severity": "P1",
+      "spec": "§8.4",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "project is closed but its closure review is not published",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S13"
+        }
+      ],
+      "title": "Publish the project's closure review"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S16",
       "apply_to": "PLATFORM",
       "artefact": "closure_review",
@@ -3341,7 +3208,7 @@ window.CONVEYOR_REWORK = {
       "title": "Publish the project's closure review"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:SPEC-V2",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S17",
       "apply_to": "PLATFORM",
       "artefact": "closure_review",
       "baseline": {
@@ -3370,14 +3237,14 @@ window.CONVEYOR_REWORK = {
           "rule": "closed_without_closure_review",
           "source": "snapshot",
           "subjects": [
-            "SPEC-V2"
+            "S17"
           ]
         }
       ],
-      "key": "closed_without_closure_review:SPEC-V2",
-      "owner_project": "SPEC-V2",
+      "key": "closed_without_closure_review:S17",
+      "owner_project": "S17",
       "rule": "closed_without_closure_review",
-      "scope": "SPEC-V2",
+      "scope": "S17",
       "severity": "P1",
       "spec": "§8.4",
       "standard": "MSP",
@@ -3392,7 +3259,178 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "SPEC-V2"
+          "subject": "S17"
+        }
+      ],
+      "title": "Publish the project's closure review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S18",
+      "apply_to": "PLATFORM",
+      "artefact": "closure_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 1,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A closure review output is published for the project",
+          "met": false
+        },
+        {
+          "item": "The audit reports no closed_without_closure_review gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "closed_without_closure_review",
+          "source": "snapshot",
+          "subjects": [
+            "S18"
+          ]
+        }
+      ],
+      "key": "closed_without_closure_review:S18",
+      "owner_project": "S18",
+      "rule": "closed_without_closure_review",
+      "scope": "S18",
+      "severity": "P1",
+      "spec": "§8.4",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "project is closed but its closure review is not published",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S18"
+        }
+      ],
+      "title": "Publish the project's closure review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S20",
+      "apply_to": "PLATFORM",
+      "artefact": "closure_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 1,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A closure review output is published for the project",
+          "met": false
+        },
+        {
+          "item": "The audit reports no closed_without_closure_review gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "closed_without_closure_review",
+          "source": "snapshot",
+          "subjects": [
+            "S20"
+          ]
+        }
+      ],
+      "key": "closed_without_closure_review:S20",
+      "owner_project": "S20",
+      "rule": "closed_without_closure_review",
+      "scope": "S20",
+      "severity": "P1",
+      "spec": "§8.4",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "project is closed but its closure review is not published",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S20"
+        }
+      ],
+      "title": "Publish the project's closure review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S21",
+      "apply_to": "PLATFORM",
+      "artefact": "closure_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 1,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A closure review output is published for the project",
+          "met": false
+        },
+        {
+          "item": "The audit reports no closed_without_closure_review gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "closed_without_closure_review",
+          "source": "snapshot",
+          "subjects": [
+            "S21"
+          ]
+        }
+      ],
+      "key": "closed_without_closure_review:S21",
+      "owner_project": "S21",
+      "rule": "closed_without_closure_review",
+      "scope": "S21",
+      "severity": "P1",
+      "spec": "§8.4",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "project is closed but its closure review is not published",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S21"
         }
       ],
       "title": "Publish the project's closure review"
@@ -3488,6 +3526,63 @@ window.CONVEYOR_REWORK = {
       "title": "Declare and publish the project's closure outputs"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closure_outputs_undeclared:tranche-10",
+      "apply_to": "T5",
+      "artefact": "closure_outputs",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 1,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "meta.closure_outputs names the closure categories and each is published",
+          "met": false
+        },
+        {
+          "item": "The audit reports no closure_outputs_undeclared gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "closure_outputs_undeclared",
+          "source": "snapshot",
+          "subjects": [
+            "S12"
+          ]
+        }
+      ],
+      "key": "closure_outputs_undeclared:tranche-10",
+      "owner_project": "T5",
+      "rule": "closure_outputs_undeclared",
+      "scope": "tranche-10",
+      "severity": "P1",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "project is closed but declares no closure_outputs",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S12"
+        }
+      ],
+      "title": "Declare and publish the project's closure outputs"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closure_outputs_undeclared:tranche-2",
       "apply_to": "PLATFORM",
       "artefact": "closure_outputs",
@@ -3546,7 +3641,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closure_outputs_undeclared:tranche-4",
-      "apply_to": "T16",
+      "apply_to": "T14",
       "artefact": "closure_outputs",
       "baseline": {
         "disposition": "rework",
@@ -3581,7 +3676,7 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "key": "closure_outputs_undeclared:tranche-4",
-      "owner_project": "T16",
+      "owner_project": "T14",
       "rule": "closure_outputs_undeclared",
       "scope": "tranche-4",
       "severity": "P1",
@@ -3630,7 +3725,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 1,
+        "entries": 2,
         "owners": [
           "programme owner"
         ]
@@ -3653,7 +3748,8 @@ window.CONVEYOR_REWORK = {
           "rule": "closure_outputs_undeclared",
           "source": "snapshot",
           "subjects": [
-            "S08"
+            "S08",
+            "S17"
           ]
         }
       ],
@@ -3665,7 +3761,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 1,
+      "subject_count": 2,
       "subjects": [
         {
           "detail": "project is closed but declares no closure_outputs",
@@ -3676,6 +3772,16 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S08"
+        },
+        {
+          "detail": "project is closed but declares no closure_outputs",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S17"
         }
       ],
       "title": "Declare and publish the project's closure outputs"
@@ -3829,12 +3935,12 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closure_outputs_undeclared:tranche-8",
-      "apply_to": "S13",
+      "apply_to": "S19",
       "artefact": "closure_outputs",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 1,
+        "entries": 2,
         "owners": [
           "programme owner"
         ]
@@ -3857,19 +3963,20 @@ window.CONVEYOR_REWORK = {
           "rule": "closure_outputs_undeclared",
           "source": "snapshot",
           "subjects": [
-            "S06d"
+            "S06d",
+            "S13"
           ]
         }
       ],
       "key": "closure_outputs_undeclared:tranche-8",
-      "owner_project": "S13",
+      "owner_project": "S19",
       "rule": "closure_outputs_undeclared",
       "scope": "tranche-8",
       "severity": "P1",
       "spec": "§8.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 1,
+      "subject_count": 2,
       "subjects": [
         {
           "detail": "project is closed but declares no closure_outputs",
@@ -3880,14 +3987,24 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S06d"
+        },
+        {
+          "detail": "project is closed but declares no closure_outputs",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S13"
         }
       ],
       "title": "Declare and publish the project's closure outputs"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check programme_baselines:programme",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closure_outputs_undeclared:tranche-9",
       "apply_to": "PLATFORM",
-      "artefact": "programme_baseline",
+      "artefact": "closure_outputs",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
@@ -3900,30 +4017,30 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "The management, governance and boundary baselines are recorded and approved",
+          "item": "meta.closure_outputs names the closure categories and each is published",
           "met": false
         },
         {
-          "item": "The audit reports zero programme_baselines gaps",
+          "item": "The audit reports no closure_outputs_undeclared gap for the project",
           "met": false
         }
       ],
       "evidence": [
         {
-          "file": "msp.json",
-          "rule": "programme_baselines",
+          "file": "programme.json",
+          "rule": "closure_outputs_undeclared",
           "source": "snapshot",
           "subjects": [
-            "boundary",
-            "governance",
-            "management"
+            "S18",
+            "S20",
+            "S21"
           ]
         }
       ],
-      "key": "programme_baselines:programme",
-      "owner_project": "T12",
-      "rule": "programme_baselines",
-      "scope": "programme",
+      "key": "closure_outputs_undeclared:tranche-9",
+      "owner_project": "PLATFORM",
+      "rule": "closure_outputs_undeclared",
+      "scope": "tranche-9",
       "severity": "P1",
       "spec": "§8.3",
       "standard": "MSP",
@@ -3931,105 +4048,37 @@ window.CONVEYOR_REWORK = {
       "subject_count": 3,
       "subjects": [
         {
-          "detail": "the programme has no boundary baseline",
+          "detail": "project is closed but declares no closure_outputs",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "boundary"
+          "subject": "S18"
         },
         {
-          "detail": "the programme has no governance baseline",
+          "detail": "project is closed but declares no closure_outputs",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "governance"
+          "subject": "S20"
         },
         {
-          "detail": "the programme has no management baseline",
+          "detail": "project is closed but declares no closure_outputs",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "management"
+          "subject": "S21"
         }
       ],
-      "title": "Take and approve the programme baselines"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-10",
-      "apply_to": "S12",
-      "artefact": "tranche_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 2,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The tranche has a recorded continue|pause|stop decision",
-          "met": false
-        },
-        {
-          "item": "The audit reports no project_in_unauthorised_tranche gap for that tranche",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "msp.json",
-          "rule": "project_in_unauthorised_tranche",
-          "source": "snapshot",
-          "subjects": [
-            "S12",
-            "T5"
-          ]
-        }
-      ],
-      "key": "project_in_unauthorised_tranche:tranche-10",
-      "owner_project": "T12",
-      "rule": "project_in_unauthorised_tranche",
-      "scope": "tranche-10",
-      "severity": "P1",
-      "spec": "§8.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 2,
-      "subjects": [
-        {
-          "detail": "project is active in tranche 10 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S12"
-        },
-        {
-          "detail": "project is active in tranche 10 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T5"
-        }
-      ],
-      "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
+      "title": "Declare and publish the project's closure outputs"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-11",
@@ -4220,85 +4269,6 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T12"
-        }
-      ],
-      "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-9",
-      "apply_to": "S18",
-      "artefact": "tranche_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 3,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The tranche has a recorded continue|pause|stop decision",
-          "met": false
-        },
-        {
-          "item": "The audit reports no project_in_unauthorised_tranche gap for that tranche",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "msp.json",
-          "rule": "project_in_unauthorised_tranche",
-          "source": "snapshot",
-          "subjects": [
-            "S18",
-            "S20",
-            "S21"
-          ]
-        }
-      ],
-      "key": "project_in_unauthorised_tranche:tranche-9",
-      "owner_project": "T12",
-      "rule": "project_in_unauthorised_tranche",
-      "scope": "tranche-9",
-      "severity": "P1",
-      "spec": "§8.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 3,
-      "subjects": [
-        {
-          "detail": "project is active in tranche 9 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S18"
-        },
-        {
-          "detail": "project is active in tranche 9 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S20"
-        },
-        {
-          "detail": "project is active in tranche 9 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S21"
         }
       ],
       "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
@@ -5330,6 +5300,177 @@ window.CONVEYOR_REWORK = {
       "title": "MSP artefact absent: benefit-transition"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-benefit-transition-b7:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "benefit-transition",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-msp-benefit-transition-b7",
+              "section": "Baseline measurement",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-benefit-transition-b7",
+              "section": "Readiness",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-benefit-transition-b7",
+              "section": "Transition",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-benefit-transition-b7",
+              "section": "Post-transition measurement",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-benefit-transition-b7",
+              "section": "Legacy retirement",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-msp-benefit-transition-b7",
+          "source": "audit"
+        }
+      ],
+      "key": "std-msp-benefit-transition-b7:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-msp-benefit-transition-b7",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The benefit-transition artefact for Deliberated cross-department decisions is absent; missing required sections: Baseline measurement, Readiness, Transition, Post-transition measurement, Legacy retirement.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-msp-benefit-transition-b7",
+                  "section": "Baseline measurement",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-benefit-transition-b7",
+                  "section": "Readiness",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-benefit-transition-b7",
+                  "section": "Transition",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-benefit-transition-b7",
+                  "section": "Post-transition measurement",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-benefit-transition-b7",
+                  "section": "Legacy retirement",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-msp-benefit-transition-b7",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "MSP artefact absent: benefit-transition"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
       "apply_to": "PLATFORM",
       "artefact": "blueprint",
@@ -5771,225 +5912,6 @@ window.CONVEYOR_REWORK = {
       "title": "MSP artefact absent: programme-plan"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "programme-strategies",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Information strategy",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "programme-strategies",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Risk strategy",
-              "snapshot": [
-                [
-                  "msp.json",
-                  "/register_items",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Issue strategy",
-              "snapshot": [
-                [
-                  "msp.json",
-                  "/register_items",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Monitoring strategy",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "programme-strategies",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Communications strategy",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "programme-strategies",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Quality strategy",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "programme-strategies",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Resource strategy",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "programme-strategies",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-          "source": "audit"
-        }
-      ],
-      "key": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-      "scope": "PLATFORM",
-      "severity": "P1",
-      "spec": "§8.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The programme-strategies artefact for conveyor buildout is absent; missing required sections: Information strategy, Risk strategy, Issue strategy, Monitoring strategy, Communications strategy, Quality strategy, Resource strategy.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Information strategy",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "programme-strategies",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Risk strategy",
-                  "snapshot": [
-                    [
-                      "msp.json",
-                      "/register_items",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Issue strategy",
-                  "snapshot": [
-                    [
-                      "msp.json",
-                      "/register_items",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Monitoring strategy",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "programme-strategies",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Communications strategy",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "programme-strategies",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Quality strategy",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "programme-strategies",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Resource strategy",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "programme-strategies",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "MSP artefact absent: programme-strategies"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
       "apply_to": "PLATFORM",
       "artefact": "refined-vision",
@@ -6089,8 +6011,8 @@ window.CONVEYOR_REWORK = {
       "title": "MSP artefact absent: refined-vision"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-0",
-      "apply_to": "PLATFORM",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-10",
+      "apply_to": "T5",
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
@@ -6118,14 +6040,14 @@ window.CONVEYOR_REWORK = {
           "rule": "unpublished_declared_output",
           "source": "snapshot",
           "subjects": [
-            "DESIGN-PUBLISH"
+            "S12"
           ]
         }
       ],
-      "key": "unpublished_declared_output:tranche-0",
-      "owner_project": "PLATFORM",
+      "key": "unpublished_declared_output:tranche-10",
+      "owner_project": "T5",
       "rule": "unpublished_declared_output",
-      "scope": "tranche-0",
+      "scope": "tranche-10",
       "severity": "P1",
       "spec": "§8.3",
       "standard": "MSP",
@@ -6133,78 +6055,21 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "declared outputs are not published: closure-review",
+          "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "DESIGN-PUBLISH"
+          "subject": "S12"
         }
       ],
       "title": "Publish every output the project declares"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-1",
-      "apply_to": "S02",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "T11"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-1",
-      "owner_project": "S02",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-1",
-      "severity": "P1",
-      "spec": "§8.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: evidence",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T11"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-4",
-      "apply_to": "T16",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-11",
+      "apply_to": "S14",
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
@@ -6232,15 +6097,15 @@ window.CONVEYOR_REWORK = {
           "rule": "unpublished_declared_output",
           "source": "snapshot",
           "subjects": [
-            "T14",
-            "T16"
+            "S14",
+            "T8"
           ]
         }
       ],
-      "key": "unpublished_declared_output:tranche-4",
-      "owner_project": "T16",
+      "key": "unpublished_declared_output:tranche-11",
+      "owner_project": "S14",
       "rule": "unpublished_declared_output",
-      "scope": "tranche-4",
+      "scope": "tranche-11",
       "severity": "P1",
       "spec": "§8.3",
       "standard": "MSP",
@@ -6248,36 +6113,36 @@ window.CONVEYOR_REWORK = {
       "subject_count": 2,
       "subjects": [
         {
-          "detail": "declared outputs are not published: closure-review, evidence",
+          "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "T14"
+          "subject": "S14"
         },
         {
-          "detail": "declared outputs are not published: evidence",
+          "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "T16"
+          "subject": "T8"
         }
       ],
       "title": "Publish every output the project declares"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-5",
-      "apply_to": "S06",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-3",
+      "apply_to": "S04",
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 1,
+        "entries": 2,
         "owners": [
           "programme owner"
         ]
@@ -6300,6 +6165,189 @@ window.CONVEYOR_REWORK = {
           "rule": "unpublished_declared_output",
           "source": "snapshot",
           "subjects": [
+            "S04",
+            "T3"
+          ]
+        }
+      ],
+      "key": "unpublished_declared_output:tranche-3",
+      "owner_project": "S04",
+      "rule": "unpublished_declared_output",
+      "scope": "tranche-3",
+      "severity": "P1",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 2,
+      "subjects": [
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S04"
+        },
+        {
+          "detail": "declared outputs are not published: closure-review, evidence, project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "T3"
+        }
+      ],
+      "title": "Publish every output the project declares"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-4",
+      "apply_to": "T14",
+      "artefact": "published_output",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 6,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
+          "met": false
+        },
+        {
+          "item": "The audit reports no unpublished_declared_output gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "unpublished_declared_output",
+          "source": "snapshot",
+          "subjects": [
+            "S05",
+            "S07",
+            "S09",
+            "T14",
+            "T16",
+            "T18"
+          ]
+        }
+      ],
+      "key": "unpublished_declared_output:tranche-4",
+      "owner_project": "T14",
+      "rule": "unpublished_declared_output",
+      "scope": "tranche-4",
+      "severity": "P1",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 6,
+      "subjects": [
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S05"
+        },
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S07"
+        },
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S09"
+        },
+        {
+          "detail": "declared outputs are not published: evidence, project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "T14"
+        },
+        {
+          "detail": "declared outputs are not published: closure-review, evidence, project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "T16"
+        },
+        {
+          "detail": "declared outputs are not published: architecture-design, inception-analysis, project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "T18"
+        }
+      ],
+      "title": "Publish every output the project declares"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-5",
+      "apply_to": "S06",
+      "artefact": "published_output",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 4,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
+          "met": false
+        },
+        {
+          "item": "The audit reports no unpublished_declared_output gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "unpublished_declared_output",
+          "source": "snapshot",
+          "subjects": [
+            "S06",
+            "S08",
+            "S17",
             "T7"
           ]
         }
@@ -6312,10 +6360,40 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 1,
+      "subject_count": 4,
       "subjects": [
         {
-          "detail": "declared outputs are not published: evidence",
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S06"
+        },
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S08"
+        },
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S17"
+        },
+        {
+          "detail": "declared outputs are not published: closure-review, evidence, project-brief",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
@@ -6323,6 +6401,322 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T7"
+        }
+      ],
+      "title": "Publish every output the project declares"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-6",
+      "apply_to": "PLATFORM",
+      "artefact": "published_output",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 3,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
+          "met": false
+        },
+        {
+          "item": "The audit reports no unpublished_declared_output gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "unpublished_declared_output",
+          "source": "snapshot",
+          "subjects": [
+            "S06b",
+            "S10",
+            "S11"
+          ]
+        }
+      ],
+      "key": "unpublished_declared_output:tranche-6",
+      "owner_project": "PLATFORM",
+      "rule": "unpublished_declared_output",
+      "scope": "tranche-6",
+      "severity": "P1",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 3,
+      "subjects": [
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S06b"
+        },
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S10"
+        },
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S11"
+        }
+      ],
+      "title": "Publish every output the project declares"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-7",
+      "apply_to": "S15",
+      "artefact": "published_output",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 3,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
+          "met": false
+        },
+        {
+          "item": "The audit reports no unpublished_declared_output gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "unpublished_declared_output",
+          "source": "snapshot",
+          "subjects": [
+            "S06c",
+            "S15",
+            "S16"
+          ]
+        }
+      ],
+      "key": "unpublished_declared_output:tranche-7",
+      "owner_project": "S15",
+      "rule": "unpublished_declared_output",
+      "scope": "tranche-7",
+      "severity": "P1",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 3,
+      "subjects": [
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S06c"
+        },
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S15"
+        },
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S16"
+        }
+      ],
+      "title": "Publish every output the project declares"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-8",
+      "apply_to": "S19",
+      "artefact": "published_output",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 3,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
+          "met": false
+        },
+        {
+          "item": "The audit reports no unpublished_declared_output gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "unpublished_declared_output",
+          "source": "snapshot",
+          "subjects": [
+            "S06d",
+            "S13",
+            "S19"
+          ]
+        }
+      ],
+      "key": "unpublished_declared_output:tranche-8",
+      "owner_project": "S19",
+      "rule": "unpublished_declared_output",
+      "scope": "tranche-8",
+      "severity": "P1",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 3,
+      "subjects": [
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S06d"
+        },
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S13"
+        },
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S19"
+        }
+      ],
+      "title": "Publish every output the project declares"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-9",
+      "apply_to": "PLATFORM",
+      "artefact": "published_output",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 3,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
+          "met": false
+        },
+        {
+          "item": "The audit reports no unpublished_declared_output gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "unpublished_declared_output",
+          "source": "snapshot",
+          "subjects": [
+            "S18",
+            "S20",
+            "S21"
+          ]
+        }
+      ],
+      "key": "unpublished_declared_output:tranche-9",
+      "owner_project": "PLATFORM",
+      "rule": "unpublished_declared_output",
+      "scope": "tranche-9",
+      "severity": "P1",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 3,
+      "subjects": [
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S18"
+        },
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S20"
+        },
+        {
+          "detail": "declared outputs are not published: project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S21"
         }
       ],
       "title": "Publish every output the project declares"
@@ -7129,61 +7523,394 @@ window.CONVEYOR_REWORK = {
       "title": "Benefits-map output_ref is free text, so dependency slips miss benefits"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check cadence_absent:programme",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-closure-review-p0:P0",
       "apply_to": "PLATFORM",
-      "artefact": "programme_cadence",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
+      "artefact": "closure-review",
+      "baseline": null,
       "depends_on": [],
       "disposition": "rework",
       "dod": [
         {
-          "item": "At least one programme_cadence row (pi|demo|retro|refinement) exists for the current period",
-          "met": false
-        },
-        {
-          "item": "The audit reports zero cadence_absent gaps",
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
           "met": false
         }
       ],
       "evidence": [
         {
-          "file": "msp.json",
-          "rule": "cadence_absent",
-          "source": "snapshot",
-          "subjects": [
-            "programme"
-          ]
+          "evidence": [
+            {
+              "artefact": "std-pmp-closure-review-p0",
+              "section": "Outcome vs acceptance",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "closure-review",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-closure-review-p0",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "closure-review",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-closure-review-p0",
+              "section": "Open items",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "closure-review",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-closure-review-p0",
+              "section": "Decision",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "closure-review",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-pmp-closure-review-p0",
+          "source": "audit"
         }
       ],
-      "key": "cadence_absent:programme",
-      "owner_project": "T10",
-      "rule": "cadence_absent",
-      "scope": "programme",
+      "key": "std-pmp-closure-review-p0:P0",
+      "owner_project": "P0",
+      "rule": "std-pmp-closure-review-p0",
+      "scope": "P0",
       "severity": "P1",
-      "spec": "§8.2",
-      "standard": "SAFe",
+      "spec": "§8.4",
+      "standard": "PMP",
       "status": "open",
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "the snapshot publishes no programme_cadence row (pi|demo|retro|refinement)",
+          "detail": "The closure-review artefact for Programme-level unit (plan: docs/plans/P0-programme-definition.md) is absent; missing required sections: Outcome vs acceptance, Evidence, Open items, Decision.",
           "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-pmp-closure-review-p0",
+                  "section": "Outcome vs acceptance",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "closure-review",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-closure-review-p0",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "closure-review",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-closure-review-p0",
+                  "section": "Open items",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "closure-review",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-closure-review-p0",
+                  "section": "Decision",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "closure-review",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-pmp-closure-review-p0",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
           "severity": "P1",
-          "subject": "programme"
+          "subject": "P0"
         }
       ],
-      "title": "Publish the programme cadence"
+      "title": "PMP artefact absent: closure-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s06a:S06a",
+      "apply_to": "PLATFORM",
+      "artefact": "project-brief",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-pmp-project-brief-s06a",
+              "section": "Outcome",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "project-brief",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-brief-s06a",
+              "section": "Boundary",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "project-brief",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-brief-s06a",
+              "section": "Reuse sources",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "project-brief",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-brief-s06a",
+              "section": "Inception units",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "project-brief",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-brief-s06a",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "project-brief",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-brief-s06a",
+              "section": "Acceptance",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "project-brief",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-brief-s06a",
+              "section": "Capabilities",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "project-brief",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-brief-s06a",
+              "section": "Plan",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "project-brief",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-pmp-project-brief-s06a",
+          "source": "audit"
+        }
+      ],
+      "key": "std-pmp-project-brief-s06a:S06a",
+      "owner_project": "S06a",
+      "rule": "std-pmp-project-brief-s06a",
+      "scope": "S06a",
+      "severity": "P1",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The project-brief artefact for Plan: docs/plans/slices/S06a-mcp-server-channel.md is absent; missing required sections: Outcome, Boundary, Reuse sources, Inception units, Dependencies, Acceptance, Capabilities, Plan.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-pmp-project-brief-s06a",
+                  "section": "Outcome",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "project-brief",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-brief-s06a",
+                  "section": "Boundary",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "project-brief",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-brief-s06a",
+                  "section": "Reuse sources",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "project-brief",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-brief-s06a",
+                  "section": "Inception units",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "project-brief",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-brief-s06a",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "project-brief",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-brief-s06a",
+                  "section": "Acceptance",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "project-brief",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-brief-s06a",
+                  "section": "Capabilities",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "project-brief",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-brief-s06a",
+                  "section": "Plan",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "project-brief",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-pmp-project-brief-s06a",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "S06a"
+        }
+      ],
+      "title": "PMP artefact absent: project-brief"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p6-2:T4",
@@ -7322,7 +8049,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p6-3:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§7.5",
       "baseline": null,
       "depends_on": [],
@@ -7862,15 +8589,15 @@ window.CONVEYOR_REWORK = {
       "apply_to": "PLATFORM",
       "artefact": "seed_reconciliation",
       "baseline": {
-        "disposition": "mixed",
+        "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 9,
+        "entries": 5,
         "owners": [
           "programme owner"
         ]
       },
       "depends_on": [],
-      "disposition": "mixed",
+      "disposition": "rework",
       "dod": [
         {
           "item": "The seeded project facts equal the live rows, or the drift is recorded and approved",
@@ -7887,15 +8614,11 @@ window.CONVEYOR_REWORK = {
           "rule": "seed_live_drift",
           "source": "snapshot",
           "subjects": [
-            "S12",
-            "S13",
-            "T11",
-            "T16",
-            "T7",
-            "S09",
-            "T13",
-            "T14",
-            "live project meta"
+            "T5",
+            "T6",
+            "T8",
+            "S21",
+            "T19"
           ]
         }
       ],
@@ -7907,7 +8630,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§5.3",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 9,
+      "subject_count": 5,
       "subjects": [
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -7917,7 +8640,7 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "S12"
+          "subject": "T5"
         },
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -7927,7 +8650,7 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "S13"
+          "subject": "T6"
         },
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -7937,27 +8660,7 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "T11"
-        },
-        {
-          "detail": "seed status 'closed' != live status 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T16"
-        },
-        {
-          "detail": "seed status 'closed' != live status 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T7"
+          "subject": "T8"
         },
         {
           "detail": "seed status 'active' != live status 'closed'",
@@ -7967,7 +8670,7 @@ window.CONVEYOR_REWORK = {
           "owner": null,
           "reason": null,
           "severity": "P2",
-          "subject": "S09"
+          "subject": "S21"
         },
         {
           "detail": "seed status 'active' != live status 'closed'",
@@ -7977,27 +8680,7 @@ window.CONVEYOR_REWORK = {
           "owner": null,
           "reason": null,
           "severity": "P2",
-          "subject": "T13"
-        },
-        {
-          "detail": "seed status 'active' != live status 'closed'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T14"
-        },
-        {
-          "detail": "adm_phase is absent from the live meta for DESIGN-PUBLISH, P0, PLATFORM, S00, S01, S02, S03, S04, S05, S06, S06a, S06b, S06c, S06d, S07, S08, S09, S10, S11, S12, S13, S14, S15, S16, S17, S18, S19, S20, S21, SPEC-V2, T0, T1, T10, T11, T12, T13, T14, T15, T16, T17, T2, T3, T4, T5, T6, T7, T8, T9",
-          "disposition": "unprovable",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "live project meta"
+          "subject": "T19"
         }
       ],
       "title": "Reconcile the seed with the live rows"
@@ -8091,7 +8774,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p102-3:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§10.2",
       "baseline": null,
       "depends_on": [],
@@ -8505,7 +9188,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p111-1:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.1",
       "baseline": null,
       "depends_on": [],
@@ -8592,7 +9275,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p111-2:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.1",
       "baseline": null,
       "depends_on": [],
@@ -8679,7 +9362,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p111-3:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.1",
       "baseline": null,
       "depends_on": [],
@@ -8766,7 +9449,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p1110-1:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.10",
       "baseline": null,
       "depends_on": [],
@@ -8940,7 +9623,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p116-1:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.6",
       "baseline": null,
       "depends_on": [],
@@ -9015,7 +9698,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p119-1:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.9",
       "baseline": null,
       "depends_on": [],
@@ -9336,81 +10019,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "A new binding goes live with no decision"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p45-1:T0",
-      "apply_to": "PLATFORM",
-      "artefact": "§4.5",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The prompt compiler gains a Memory source fed by memory.recall (hot rows plus digest) and the run's prior steps; a test compiles a prompt for a card with a hot row and asserts the text contains it, and an absent memory source is a named refusal.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 38,
-              "path": "crates/domain/src/prompt.rs",
-              "quote": "    Knowledge,",
-              "source": "code"
-            },
-            {
-              "line": 2,
-              "path": "crates/actions/src/memory/recall.rs",
-              "quote": "//! `memory.recall` — hot rows first, then the semantic digest derived from them.",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p45-1",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p45-1:T0",
-      "owner_project": "T0",
-      "rule": "v1-p45-1",
-      "scope": "T0",
-      "severity": "P1",
-      "spec": "§4.5",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "§4.5 assembles the agent prompt from Knowledge, Memory, Request and Tools, but PromptSource has no memory variant and no memory section is rendered, so hot rows and digests never reach an agent.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 38,
-                  "path": "crates/domain/src/prompt.rs",
-                  "quote": "    Knowledge,",
-                  "source": "code"
-                },
-                {
-                  "line": 2,
-                  "path": "crates/actions/src/memory/recall.rs",
-                  "quote": "//! `memory.recall` — hot rows first, then the semantic digest derived from them.",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p45-1",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T0"
-        }
-      ],
-      "title": "The compiled prompt has no Memory source"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p5-3:T1",
@@ -9801,7 +10409,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p54-2:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§5.4",
       "baseline": null,
       "depends_on": [],
@@ -10062,7 +10670,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p75-2:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§7.5",
       "baseline": null,
       "depends_on": [],
@@ -10137,7 +10745,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p75-3:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§7.5",
       "baseline": null,
       "depends_on": [],
@@ -10212,7 +10820,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p75-4:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§7.5",
       "baseline": null,
       "depends_on": [],
@@ -10287,7 +10895,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p75-5:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§7.5",
       "baseline": null,
       "depends_on": [],
@@ -11334,7 +11942,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1b-4:T7",
-      "apply_to": "T7",
+      "apply_to": "PLATFORM",
       "artefact": "§6.5",
       "baseline": null,
       "depends_on": [],
@@ -11682,7 +12290,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3a-5:T7",
-      "apply_to": "T7",
+      "apply_to": "PLATFORM",
       "artefact": "§9.2",
       "baseline": null,
       "depends_on": [],
@@ -11979,7 +12587,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3c-2:T14",
-      "apply_to": "PLATFORM",
+      "apply_to": "T14",
       "artefact": "§12",
       "baseline": null,
       "depends_on": [],
@@ -12201,7 +12809,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w4a-3:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.3",
       "baseline": null,
       "depends_on": [],
@@ -12300,7 +12908,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w4a-4:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.3",
       "baseline": null,
       "depends_on": [],
@@ -12387,7 +12995,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w4a-5:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.3",
       "baseline": null,
       "depends_on": [],
@@ -12486,7 +13094,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w4a-6:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.5",
       "baseline": null,
       "depends_on": [],
@@ -12573,7 +13181,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w4b-3:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§14/R6",
       "baseline": null,
       "depends_on": [],
@@ -12684,7 +13292,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w4b-4:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§14/R5",
       "baseline": null,
       "depends_on": [],
@@ -12770,9 +13378,9 @@ window.CONVEYOR_REWORK = {
       "title": "self_approval='allowed' lets a requester decide their own gate"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check board_not_approved:programme",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check compliance_review_missing:T1",
       "apply_to": "PLATFORM",
-      "artefact": "architecture_board",
+      "artefact": "compliance_review",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
@@ -12785,28 +13393,28 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "The board record is approved by a distinct approver",
+          "item": "A compliance review names one of the six verdicts against the project's contract",
           "met": false
         },
         {
-          "item": "The audit reports zero board_not_approved gaps",
+          "item": "The audit reports no compliance_review_missing gap for the project",
           "met": false
         }
       ],
       "evidence": [
         {
           "file": "architecture.json",
-          "rule": "board_not_approved",
+          "rule": "compliance_review_missing",
           "source": "snapshot",
           "subjects": [
-            "board"
+            "T1"
           ]
         }
       ],
-      "key": "board_not_approved:programme",
-      "owner_project": "T9",
-      "rule": "board_not_approved",
-      "scope": "programme",
+      "key": "compliance_review_missing:T1",
+      "owner_project": "T1",
+      "rule": "compliance_review_missing",
+      "scope": "T1",
       "severity": "P1",
       "spec": "§8.1",
       "standard": "TOGAF",
@@ -12814,26 +13422,26 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "the architecture board is not active",
+          "detail": "closed delivery project has no Phase-G compliance review",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "board"
+          "subject": "T1"
         }
       ],
-      "title": "Approve the Architecture Board"
+      "title": "Publish the project's Phase G compliance review"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check contract_missing:tranche-1",
-      "apply_to": "S02",
-      "artefact": "architecture_contract",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check compliance_review_missing:T10",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance_review",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 2,
+        "entries": 1,
         "owners": [
           "programme owner"
         ]
@@ -12842,47 +13450,93 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "An architecture_contract exists for the project with a declared kind",
+          "item": "A compliance review names one of the six verdicts against the project's contract",
           "met": false
         },
         {
-          "item": "The audit reports no contract_missing gap for the project",
+          "item": "The audit reports no compliance_review_missing gap for the project",
           "met": false
         }
       ],
       "evidence": [
         {
           "file": "architecture.json",
-          "rule": "contract_missing",
+          "rule": "compliance_review_missing",
           "source": "snapshot",
           "subjects": [
-            "T1",
-            "T11"
+            "T10"
           ]
         }
       ],
-      "key": "contract_missing:tranche-1",
-      "owner_project": "S02",
-      "rule": "contract_missing",
-      "scope": "tranche-1",
+      "key": "compliance_review_missing:T10",
+      "owner_project": "T10",
+      "rule": "compliance_review_missing",
+      "scope": "T10",
       "severity": "P1",
       "spec": "§8.1",
       "standard": "TOGAF",
       "status": "open",
-      "subject_count": 2,
+      "subject_count": 1,
       "subjects": [
         {
-          "detail": "delivery project has no live architecture contract",
+          "detail": "closed delivery project has no Phase-G compliance review",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "T1"
+          "subject": "T10"
+        }
+      ],
+      "title": "Publish the project's Phase G compliance review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check compliance_review_missing:T11",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 1,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A compliance review names one of the six verdicts against the project's contract",
+          "met": false
         },
         {
-          "detail": "delivery project has no live architecture contract",
+          "item": "The audit reports no compliance_review_missing gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "architecture.json",
+          "rule": "compliance_review_missing",
+          "source": "snapshot",
+          "subjects": [
+            "T11"
+          ]
+        }
+      ],
+      "key": "compliance_review_missing:T11",
+      "owner_project": "T11",
+      "rule": "compliance_review_missing",
+      "scope": "T11",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "closed delivery project has no Phase-G compliance review",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
@@ -12892,11 +13546,125 @@ window.CONVEYOR_REWORK = {
           "subject": "T11"
         }
       ],
-      "title": "Put the project under an approved architecture contract"
+      "title": "Publish the project's Phase G compliance review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check compliance_review_missing:T2",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 1,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A compliance review names one of the six verdicts against the project's contract",
+          "met": false
+        },
+        {
+          "item": "The audit reports no compliance_review_missing gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "architecture.json",
+          "rule": "compliance_review_missing",
+          "source": "snapshot",
+          "subjects": [
+            "T2"
+          ]
+        }
+      ],
+      "key": "compliance_review_missing:T2",
+      "owner_project": "T2",
+      "rule": "compliance_review_missing",
+      "scope": "T2",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "closed delivery project has no Phase-G compliance review",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "T2"
+        }
+      ],
+      "title": "Publish the project's Phase G compliance review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check compliance_review_missing:T9",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 1,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A compliance review names one of the six verdicts against the project's contract",
+          "met": false
+        },
+        {
+          "item": "The audit reports no compliance_review_missing gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "architecture.json",
+          "rule": "compliance_review_missing",
+          "source": "snapshot",
+          "subjects": [
+            "T9"
+          ]
+        }
+      ],
+      "key": "compliance_review_missing:T9",
+      "owner_project": "T9",
+      "rule": "compliance_review_missing",
+      "scope": "T9",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "closed delivery project has no Phase-G compliance review",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "T9"
+        }
+      ],
+      "title": "Publish the project's Phase G compliance review"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check contract_missing:tranche-10",
-      "apply_to": "S12",
+      "apply_to": "T5",
       "artefact": "architecture_contract",
       "baseline": {
         "disposition": "rework",
@@ -12929,7 +13697,7 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "key": "contract_missing:tranche-10",
-      "owner_project": "S12",
+      "owner_project": "T5",
       "rule": "contract_missing",
       "scope": "tranche-10",
       "severity": "P1",
@@ -13134,8 +13902,8 @@ window.CONVEYOR_REWORK = {
       "title": "Put the project under an approved architecture contract"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check contract_missing:tranche-2",
-      "apply_to": "PLATFORM",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check contract_missing:tranche-3",
+      "apply_to": "S04",
       "artefact": "architecture_contract",
       "baseline": {
         "disposition": "rework",
@@ -13163,64 +13931,6 @@ window.CONVEYOR_REWORK = {
           "rule": "contract_missing",
           "source": "snapshot",
           "subjects": [
-            "T2"
-          ]
-        }
-      ],
-      "key": "contract_missing:tranche-2",
-      "owner_project": "PLATFORM",
-      "rule": "contract_missing",
-      "scope": "tranche-2",
-      "severity": "P1",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "delivery project has no live architecture contract",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T2"
-        }
-      ],
-      "title": "Put the project under an approved architecture contract"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check contract_missing:tranche-3",
-      "apply_to": "S04",
-      "artefact": "architecture_contract",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 2,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "An architecture_contract exists for the project with a declared kind",
-          "met": false
-        },
-        {
-          "item": "The audit reports no contract_missing gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "architecture.json",
-          "rule": "contract_missing",
-          "source": "snapshot",
-          "subjects": [
-            "T13",
             "T3"
           ]
         }
@@ -13233,18 +13943,8 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.1",
       "standard": "TOGAF",
       "status": "open",
-      "subject_count": 2,
+      "subject_count": 1,
       "subjects": [
-        {
-          "detail": "delivery project has no live architecture contract",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T13"
-        },
         {
           "detail": "delivery project has no live architecture contract",
           "disposition": "rework",
@@ -13260,12 +13960,12 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check contract_missing:tranche-4",
-      "apply_to": "T16",
+      "apply_to": "T14",
       "artefact": "architecture_contract",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 4,
+        "entries": 3,
         "owners": [
           "programme owner"
         ]
@@ -13288,33 +13988,22 @@ window.CONVEYOR_REWORK = {
           "rule": "contract_missing",
           "source": "snapshot",
           "subjects": [
-            "T10",
             "T14",
             "T16",
-            "T4"
+            "T18"
           ]
         }
       ],
       "key": "contract_missing:tranche-4",
-      "owner_project": "T16",
+      "owner_project": "T14",
       "rule": "contract_missing",
       "scope": "tranche-4",
       "severity": "P1",
       "spec": "§8.1",
       "standard": "TOGAF",
       "status": "open",
-      "subject_count": 4,
+      "subject_count": 3,
       "subjects": [
-        {
-          "detail": "delivery project has no live architecture contract",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T10"
-        },
         {
           "detail": "delivery project has no live architecture contract",
           "disposition": "rework",
@@ -13343,7 +14032,7 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "T4"
+          "subject": "T18"
         }
       ],
       "title": "Put the project under an approved architecture contract"
@@ -13576,7 +14265,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check mandatory_artefacts:tranche-10",
-      "apply_to": "S12",
+      "apply_to": "T5",
       "artefact": "phase_artefacts",
       "baseline": {
         "disposition": "rework",
@@ -13842,6 +14531,63 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
+        "entries": 1,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every phase the projects claim has its mandatory artefact set present",
+          "met": false
+        },
+        {
+          "item": "The audit reports no mandatory_artefacts gap for those projects",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "architecture.json",
+          "rule": "mandatory_artefacts",
+          "source": "snapshot",
+          "subjects": [
+            "T2"
+          ]
+        }
+      ],
+      "key": "mandatory_artefacts:tranche-2",
+      "owner_project": "T9",
+      "rule": "mandatory_artefacts",
+      "scope": "tranche-2",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "missing approved artefacts: solution_concept",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "T2"
+        }
+      ],
+      "title": "Complete the mandatory phase artefact sets"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check mandatory_artefacts:tranche-3",
+      "apply_to": "S04",
+      "artefact": "phase_artefacts",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
         "entries": 2,
         "owners": [
           "programme owner"
@@ -13865,76 +14611,7 @@ window.CONVEYOR_REWORK = {
           "rule": "mandatory_artefacts",
           "source": "snapshot",
           "subjects": [
-            "S03",
-            "T2"
-          ]
-        }
-      ],
-      "key": "mandatory_artefacts:tranche-2",
-      "owner_project": "T9",
-      "rule": "mandatory_artefacts",
-      "scope": "tranche-2",
-      "severity": "P1",
-      "spec": "§8.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 2,
-      "subjects": [
-        {
-          "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S03"
-        },
-        {
-          "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T2"
-        }
-      ],
-      "title": "Complete the mandatory phase artefact sets"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check mandatory_artefacts:tranche-3",
-      "apply_to": "S04",
-      "artefact": "phase_artefacts",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 3,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every phase the projects claim has its mandatory artefact set present",
-          "met": false
-        },
-        {
-          "item": "The audit reports no mandatory_artefacts gap for those projects",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "architecture.json",
-          "rule": "mandatory_artefacts",
-          "source": "snapshot",
-          "subjects": [
             "S04",
-            "T13",
             "T3"
           ]
         }
@@ -13947,7 +14624,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.1",
       "standard": "TOGAF",
       "status": "open",
-      "subject_count": 3,
+      "subject_count": 2,
       "subjects": [
         {
           "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
@@ -13967,16 +14644,6 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "T13"
-        },
-        {
-          "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
           "subject": "T3"
         }
       ],
@@ -13984,12 +14651,12 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check mandatory_artefacts:tranche-4",
-      "apply_to": "T16",
+      "apply_to": "T14",
       "artefact": "phase_artefacts",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 8,
+        "entries": 6,
         "owners": [
           "programme owner"
         ]
@@ -14015,11 +14682,9 @@ window.CONVEYOR_REWORK = {
             "S05",
             "S07",
             "S09",
-            "T10",
             "T14",
             "T16",
-            "T4",
-            "T9"
+            "T18"
           ]
         }
       ],
@@ -14031,7 +14696,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.1",
       "standard": "TOGAF",
       "status": "open",
-      "subject_count": 8,
+      "subject_count": 6,
       "subjects": [
         {
           "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
@@ -14071,16 +14736,6 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "T10"
-        },
-        {
-          "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
           "subject": "T14"
         },
         {
@@ -14101,17 +14756,7 @@ window.CONVEYOR_REWORK = {
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "T4"
-        },
-        {
-          "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T9"
+          "subject": "T18"
         }
       ],
       "title": "Complete the mandatory phase artefact sets"
@@ -14222,15 +14867,15 @@ window.CONVEYOR_REWORK = {
       "apply_to": "PLATFORM",
       "artefact": "phase_artefacts",
       "baseline": {
-        "disposition": "mixed",
+        "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 4,
+        "entries": 3,
         "owners": [
           "programme owner"
         ]
       },
       "depends_on": [],
-      "disposition": "mixed",
+      "disposition": "rework",
       "dod": [
         {
           "item": "Every phase the projects claim has its mandatory artefact set present",
@@ -14247,7 +14892,6 @@ window.CONVEYOR_REWORK = {
           "rule": "mandatory_artefacts",
           "source": "snapshot",
           "subjects": [
-            "S06a",
             "S06b",
             "S10",
             "S11"
@@ -14262,18 +14906,8 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.1",
       "standard": "TOGAF",
       "status": "open",
-      "subject_count": 4,
+      "subject_count": 3,
       "subjects": [
-        {
-          "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-          "disposition": "fold",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S06a"
-        },
         {
           "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
           "disposition": "rework",
@@ -14388,7 +15022,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check mandatory_artefacts:tranche-8",
-      "apply_to": "S13",
+      "apply_to": "S19",
       "artefact": "phase_artefacts",
       "baseline": {
         "disposition": "rework",
@@ -14467,7 +15101,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check mandatory_artefacts:tranche-9",
-      "apply_to": "S18",
+      "apply_to": "PLATFORM",
       "artefact": "phase_artefacts",
       "baseline": {
         "disposition": "rework",
@@ -14545,7 +15179,7 @@ window.CONVEYOR_REWORK = {
       "title": "Complete the mandatory phase artefact sets"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-delivery-contract-t9:T9",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-delivery-contract-platform:PLATFORM",
       "apply_to": "PLATFORM",
       "artefact": "delivery-contract",
       "baseline": null,
@@ -14561,7 +15195,7 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-togaf-delivery-contract-t9",
+              "artefact": "std-togaf-delivery-contract-platform",
               "section": "Commitments",
               "snapshot": [
                 [
@@ -14573,7 +15207,7 @@ window.CONVEYOR_REWORK = {
               "source": "artefact"
             },
             {
-              "artefact": "std-togaf-delivery-contract-t9",
+              "artefact": "std-togaf-delivery-contract-platform",
               "section": "Compliance method",
               "snapshot": [
                 [
@@ -14585,7 +15219,7 @@ window.CONVEYOR_REWORK = {
               "source": "artefact"
             },
             {
-              "artefact": "std-togaf-delivery-contract-t9",
+              "artefact": "std-togaf-delivery-contract-platform",
               "section": "Approval",
               "snapshot": [
                 [
@@ -14597,14 +15231,14 @@ window.CONVEYOR_REWORK = {
               "source": "artefact"
             }
           ],
-          "rule": "std-togaf-delivery-contract-t9",
+          "rule": "std-togaf-delivery-contract-platform",
           "source": "audit"
         }
       ],
-      "key": "std-togaf-delivery-contract-t9:T9",
-      "owner_project": "T9",
-      "rule": "std-togaf-delivery-contract-t9",
-      "scope": "T9",
+      "key": "std-togaf-delivery-contract-platform:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-togaf-delivery-contract-platform",
+      "scope": "PLATFORM",
       "severity": "P1",
       "spec": "§8.1",
       "standard": "TOGAF",
@@ -14612,13 +15246,13 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The delivery-contract artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is absent; missing required sections: Commitments, Compliance method, Approval.",
+          "detail": "The delivery-contract artefact for Programme-level unit (plan: docs/plans/development-process-speed.md) is absent; missing required sections: Commitments, Compliance method, Approval.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-togaf-delivery-contract-t9",
+                  "artefact": "std-togaf-delivery-contract-platform",
                   "section": "Commitments",
                   "snapshot": [
                     [
@@ -14630,7 +15264,7 @@ window.CONVEYOR_REWORK = {
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-togaf-delivery-contract-t9",
+                  "artefact": "std-togaf-delivery-contract-platform",
                   "section": "Compliance method",
                   "snapshot": [
                     [
@@ -14642,7 +15276,7 @@ window.CONVEYOR_REWORK = {
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-togaf-delivery-contract-t9",
+                  "artefact": "std-togaf-delivery-contract-platform",
                   "section": "Approval",
                   "snapshot": [
                     [
@@ -14654,7 +15288,1460 @@ window.CONVEYOR_REWORK = {
                   "source": "artefact"
                 }
               ],
-              "rule": "std-togaf-delivery-contract-t9",
+              "rule": "std-togaf-delivery-contract-platform",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "TOGAF artefact absent: delivery-contract"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-delivery-contract-s04:S04",
+      "apply_to": "S04",
+      "artefact": "delivery-contract",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-delivery-contract-s04",
+              "section": "Commitments",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-delivery-contract-s04",
+              "section": "Compliance method",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-delivery-contract-s04",
+              "section": "Approval",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-delivery-contract-s04",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-delivery-contract-s04:S04",
+      "owner_project": "S04",
+      "rule": "std-togaf-delivery-contract-s04",
+      "scope": "S04",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The delivery-contract artefact for Plan: docs/plans/slices/S04-action-registry.md is absent; missing required sections: Commitments, Compliance method, Approval.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-delivery-contract-s04",
+                  "section": "Commitments",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-delivery-contract-s04",
+                  "section": "Compliance method",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-delivery-contract-s04",
+                  "section": "Approval",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-delivery-contract-s04",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "S04"
+        }
+      ],
+      "title": "TOGAF artefact absent: delivery-contract"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-design-publish-e:DESIGN-PUBLISH",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-e",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-e-design-publish-e",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-design-publish-e",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-design-publish-e",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-e-design-publish-e",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-e-design-publish-e:DESIGN-PUBLISH",
+      "owner_project": "DESIGN-PUBLISH",
+      "rule": "std-togaf-phase-e-design-publish-e",
+      "scope": "DESIGN-PUBLISH",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-e artefact for DESIGN-PUBLISH — E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-e-design-publish-e",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-design-publish-e",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-design-publish-e",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-e-design-publish-e",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "DESIGN-PUBLISH"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-p0-e:P0",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-e",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-e-p0-e",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-p0-e",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-p0-e",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-e-p0-e",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-e-p0-e:P0",
+      "owner_project": "P0",
+      "rule": "std-togaf-phase-e-p0-e",
+      "scope": "P0",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-e artefact for P0 — E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-e-p0-e",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-p0-e",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-p0-e",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-e-p0-e",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "P0"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-platform-e:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-e",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-e-platform-e",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-platform-e",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-platform-e",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-e-platform-e",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-e-platform-e:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-togaf-phase-e-platform-e",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-e artefact for PLATFORM — E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-e-platform-e",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-platform-e",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-platform-e",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-e-platform-e",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-s03-e:S03",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-e",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-e-s03-e",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-s03-e",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-s03-e",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-e-s03-e",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-e-s03-e:S03",
+      "owner_project": "S03",
+      "rule": "std-togaf-phase-e-s03-e",
+      "scope": "S03",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-e artefact for S03 — E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-e-s03-e",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-s03-e",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-s03-e",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-e-s03-e",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "S03"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-spec-v2-e:SPEC-V2",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-e",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-e-spec-v2-e",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-spec-v2-e",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-spec-v2-e",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-e-spec-v2-e",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-e-spec-v2-e:SPEC-V2",
+      "owner_project": "SPEC-V2",
+      "rule": "std-togaf-phase-e-spec-v2-e",
+      "scope": "SPEC-V2",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-e artefact for SPEC-V2 — E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-e-spec-v2-e",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-spec-v2-e",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-spec-v2-e",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-e-spec-v2-e",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "SPEC-V2"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-t10-e:T10",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-e",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-e-t10-e",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t10-e",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t10-e",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-e-t10-e",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-e-t10-e:T10",
+      "owner_project": "T10",
+      "rule": "std-togaf-phase-e-t10-e",
+      "scope": "T10",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-e artefact for T10 — E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-e-t10-e",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t10-e",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t10-e",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-e-t10-e",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T10"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-t13-e:T13",
+      "apply_to": "T13",
+      "artefact": "phase-e",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-e-t13-e",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t13-e",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t13-e",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-e-t13-e",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-e-t13-e:T13",
+      "owner_project": "T13",
+      "rule": "std-togaf-phase-e-t13-e",
+      "scope": "T13",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-e artefact for T13 — E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-e-t13-e",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t13-e",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t13-e",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-e-t13-e",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T13"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-t19-e:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-e",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-e-t19-e",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t19-e",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t19-e",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-e-t19-e",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-e-t19-e:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-e-t19-e",
+      "scope": "T19",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-e artefact for T19 — E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-e-t19-e",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t19-e",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t19-e",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-e-t19-e",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-t4-e:T4",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-e",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-e-t4-e",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t4-e",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t4-e",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-e-t4-e",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-e-t4-e:T4",
+      "owner_project": "T4",
+      "rule": "std-togaf-phase-e-t4-e",
+      "scope": "T4",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-e artefact for T4 — E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-e-t4-e",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t4-e",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t4-e",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-e-t4-e",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T4"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-t9-e:T9",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-e",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-e-t9-e",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t9-e",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t9-e",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-e-t9-e",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-e-t9-e:T9",
+      "owner_project": "T9",
+      "rule": "std-togaf-phase-e-t9-e",
+      "scope": "T9",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-e artefact for T9 — E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-e-t9-e",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t9-e",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t9-e",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-e-t9-e",
               "source": "audit"
             }
           ],
@@ -14665,7 +16752,2667 @@ window.CONVEYOR_REWORK = {
           "subject": "T9"
         }
       ],
-      "title": "TOGAF artefact absent: delivery-contract"
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-design-publish-g:DESIGN-PUBLISH",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-g",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-g-design-publish-g",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-design-publish-g",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-design-publish-g",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-g-design-publish-g",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-g-design-publish-g:DESIGN-PUBLISH",
+      "owner_project": "DESIGN-PUBLISH",
+      "rule": "std-togaf-phase-g-design-publish-g",
+      "scope": "DESIGN-PUBLISH",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-g artefact for DESIGN-PUBLISH — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-g-design-publish-g",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-design-publish-g",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-design-publish-g",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-g-design-publish-g",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "DESIGN-PUBLISH"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-p0-g:P0",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-g",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-g-p0-g",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-p0-g",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-p0-g",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-g-p0-g",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-g-p0-g:P0",
+      "owner_project": "P0",
+      "rule": "std-togaf-phase-g-p0-g",
+      "scope": "P0",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-g artefact for P0 — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-g-p0-g",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-p0-g",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-p0-g",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-g-p0-g",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "P0"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-platform-g:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-g",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-g-platform-g",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-platform-g",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-platform-g",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-g-platform-g",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-g-platform-g:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-togaf-phase-g-platform-g",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-g artefact for PLATFORM — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-g-platform-g",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-platform-g",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-platform-g",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-g-platform-g",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-s03-g:S03",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-g",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-g-s03-g",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-s03-g",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-s03-g",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-g-s03-g",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-g-s03-g:S03",
+      "owner_project": "S03",
+      "rule": "std-togaf-phase-g-s03-g",
+      "scope": "S03",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-g artefact for S03 — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-g-s03-g",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-s03-g",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-s03-g",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-g-s03-g",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "S03"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-spec-v2-g:SPEC-V2",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-g",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-g-spec-v2-g",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-spec-v2-g",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-spec-v2-g",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-g-spec-v2-g",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-g-spec-v2-g:SPEC-V2",
+      "owner_project": "SPEC-V2",
+      "rule": "std-togaf-phase-g-spec-v2-g",
+      "scope": "SPEC-V2",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-g artefact for SPEC-V2 — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-g-spec-v2-g",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-spec-v2-g",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-spec-v2-g",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-g-spec-v2-g",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "SPEC-V2"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-t10-g:T10",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-g",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-g-t10-g",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t10-g",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t10-g",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-g-t10-g",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-g-t10-g:T10",
+      "owner_project": "T10",
+      "rule": "std-togaf-phase-g-t10-g",
+      "scope": "T10",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-g artefact for T10 — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-g-t10-g",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t10-g",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t10-g",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-g-t10-g",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T10"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-t13-g:T13",
+      "apply_to": "T13",
+      "artefact": "phase-g",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-g-t13-g",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t13-g",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t13-g",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-g-t13-g",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-g-t13-g:T13",
+      "owner_project": "T13",
+      "rule": "std-togaf-phase-g-t13-g",
+      "scope": "T13",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-g artefact for T13 — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-g-t13-g",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t13-g",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t13-g",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-g-t13-g",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T13"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-t19-g:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-g",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-g-t19-g",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t19-g",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t19-g",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-g-t19-g",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-g-t19-g:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-g-t19-g",
+      "scope": "T19",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-g artefact for T19 — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-g-t19-g",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t19-g",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t19-g",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-g-t19-g",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-t4-g:T4",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-g",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-g-t4-g",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t4-g",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t4-g",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-g-t4-g",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-g-t4-g:T4",
+      "owner_project": "T4",
+      "rule": "std-togaf-phase-g-t4-g",
+      "scope": "T4",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-g artefact for T4 — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-g-t4-g",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t4-g",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t4-g",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-g-t4-g",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T4"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-t9-g:T9",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-g",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-g-t9-g",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t9-g",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t9-g",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-g-t9-g",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-g-t9-g:T9",
+      "owner_project": "T9",
+      "rule": "std-togaf-phase-g-t9-g",
+      "scope": "T9",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-g artefact for T9 — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-g-t9-g",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t9-g",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t9-g",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-g-t9-g",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T9"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-h",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-h-design-publish-h",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-design-publish-h",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-design-publish-h",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-h-design-publish-h",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH",
+      "owner_project": "DESIGN-PUBLISH",
+      "rule": "std-togaf-phase-h-design-publish-h",
+      "scope": "DESIGN-PUBLISH",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-h artefact for DESIGN-PUBLISH — H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-h-design-publish-h",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-design-publish-h",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-design-publish-h",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-h-design-publish-h",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "DESIGN-PUBLISH"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-h"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-p0-h:P0",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-h",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-h-p0-h",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-p0-h",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-p0-h",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-h-p0-h",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-h-p0-h:P0",
+      "owner_project": "P0",
+      "rule": "std-togaf-phase-h-p0-h",
+      "scope": "P0",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-h artefact for P0 — H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-h-p0-h",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-p0-h",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-p0-h",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-h-p0-h",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "P0"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-h"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-platform-h:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-h",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-h-platform-h",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-platform-h",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-platform-h",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-h-platform-h",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-h-platform-h:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-togaf-phase-h-platform-h",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-h artefact for PLATFORM — H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-h-platform-h",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-platform-h",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-platform-h",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-h-platform-h",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-h"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-s03-h:S03",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-h",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-h-s03-h",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-s03-h",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-s03-h",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-h-s03-h",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-h-s03-h:S03",
+      "owner_project": "S03",
+      "rule": "std-togaf-phase-h-s03-h",
+      "scope": "S03",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-h artefact for S03 — H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-h-s03-h",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-s03-h",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-s03-h",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-h-s03-h",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "S03"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-h"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-spec-v2-h:SPEC-V2",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-h",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-h-spec-v2-h",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-spec-v2-h",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-spec-v2-h",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-h-spec-v2-h",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-h-spec-v2-h:SPEC-V2",
+      "owner_project": "SPEC-V2",
+      "rule": "std-togaf-phase-h-spec-v2-h",
+      "scope": "SPEC-V2",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-h artefact for SPEC-V2 — H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-h-spec-v2-h",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-spec-v2-h",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-spec-v2-h",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-h-spec-v2-h",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "SPEC-V2"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-h"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-t10-h:T10",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-h",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-h-t10-h",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t10-h",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t10-h",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-h-t10-h",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-h-t10-h:T10",
+      "owner_project": "T10",
+      "rule": "std-togaf-phase-h-t10-h",
+      "scope": "T10",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-h artefact for T10 — H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-h-t10-h",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t10-h",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t10-h",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-h-t10-h",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T10"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-h"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-t13-h:T13",
+      "apply_to": "T13",
+      "artefact": "phase-h",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-h-t13-h",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t13-h",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t13-h",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-h-t13-h",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-h-t13-h:T13",
+      "owner_project": "T13",
+      "rule": "std-togaf-phase-h-t13-h",
+      "scope": "T13",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-h artefact for T13 — H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-h-t13-h",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t13-h",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t13-h",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-h-t13-h",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T13"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-h"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-t19-h:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-h",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-h-t19-h",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t19-h",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t19-h",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-h-t19-h",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-h-t19-h:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-h-t19-h",
+      "scope": "T19",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-h artefact for T19 — H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-h-t19-h",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t19-h",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t19-h",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-h-t19-h",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-h"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-t4-h:T4",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-h",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-h-t4-h",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t4-h",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t4-h",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-h-t4-h",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-h-t4-h:T4",
+      "owner_project": "T4",
+      "rule": "std-togaf-phase-h-t4-h",
+      "scope": "T4",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-h artefact for T4 — H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-h-t4-h",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t4-h",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t4-h",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-h-t4-h",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T4"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-h"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-t9-h:T9",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-h",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-h-t9-h",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t9-h",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t9-h",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-h-t9-h",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-h-t9-h:T9",
+      "owner_project": "T9",
+      "rule": "std-togaf-phase-h-t9-h",
+      "scope": "T9",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-h artefact for T9 — H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-h-t9-h",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t9-h",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t9-h",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-h-t9-h",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T9"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-h"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p81-4:T9",
@@ -15265,6 +20012,72 @@ window.CONVEYOR_REWORK = {
       "title": "Trace links are optional and not required at creation for architecture-governed work"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:programme",
+      "apply_to": "PLATFORM",
+      "artefact": "tranche_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 2,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The tranche has a recorded continue|pause|stop decision",
+          "met": false
+        },
+        {
+          "item": "The audit reports no project_in_unauthorised_tranche gap for that tranche",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "msp.json",
+          "rule": "project_in_unauthorised_tranche",
+          "source": "snapshot",
+          "subjects": [
+            "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+            "AAA-UI-PROOF-285-2026-11-19T07-4"
+          ]
+        }
+      ],
+      "key": "project_in_unauthorised_tranche:programme",
+      "owner_project": "T12",
+      "rule": "project_in_unauthorised_tranche",
+      "scope": "programme",
+      "severity": "P2",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 2,
+      "subjects": [
+        {
+          "detail": "no tranche is declared",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "AAA-UI-PROOF-285-2026-11-19T07-3-2"
+        },
+        {
+          "detail": "no tranche is declared",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "AAA-UI-PROOF-285-2026-11-19T07-4"
+        }
+      ],
+      "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
       "apply_to": "PLATFORM",
       "artefact": "business-case",
@@ -15511,9 +20324,9 @@ window.CONVEYOR_REWORK = {
       "title": "MSP artefact partial: programme-brief"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
       "apply_to": "PLATFORM",
-      "artefact": "projects-dossier",
+      "artefact": "programme-strategies",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -15527,8 +20340,337 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Delivery risks",
+              "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Information strategy",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "programme-strategies",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Monitoring strategy",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "programme-strategies",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Communications strategy",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "programme-strategies",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Quality strategy",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "programme-strategies",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Resource strategy",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "programme-strategies",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "source": "audit"
+        }
+      ],
+      "key": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The programme-strategies artefact for conveyor buildout is partial; missing required sections: Information strategy, Monitoring strategy, Communications strategy, Quality strategy, Resource strategy.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Information strategy",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "programme-strategies",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Monitoring strategy",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "programme-strategies",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Communications strategy",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "programme-strategies",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Quality strategy",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "programme-strategies",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Resource strategy",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "programme-strategies",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "MSP artefact partial: programme-strategies"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check tranche_plan:tranche-1",
+      "apply_to": "S02",
+      "artefact": "tranche_plan",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every tranche row carries a state, entry criterion, exit criterion and review date",
+          "met": false
+        },
+        {
+          "item": "The audit reports zero tranche_plan gaps",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "msp.json",
+          "rule": "tranche_plan",
+          "source": "snapshot",
+          "subjects": [
+            "tranche 1"
+          ]
+        }
+      ],
+      "key": "tranche_plan:tranche-1",
+      "owner_project": "T12",
+      "rule": "tranche_plan",
+      "scope": "tranche-1",
+      "severity": "P2",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "closed without a review date",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "tranche 1"
+        }
+      ],
+      "title": "Complete the tranche plan"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check tranche_plan:tranche-2",
+      "apply_to": "PLATFORM",
+      "artefact": "tranche_plan",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every tranche row carries a state, entry criterion, exit criterion and review date",
+          "met": false
+        },
+        {
+          "item": "The audit reports zero tranche_plan gaps",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "msp.json",
+          "rule": "tranche_plan",
+          "source": "snapshot",
+          "subjects": [
+            "tranche 2"
+          ]
+        }
+      ],
+      "key": "tranche_plan:tranche-2",
+      "owner_project": "T12",
+      "rule": "tranche_plan",
+      "scope": "tranche-2",
+      "severity": "P2",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "closed without a review date",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "tranche 2"
+        }
+      ],
+      "title": "Complete the tranche plan"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-design-publish:DESIGN-PUBLISH",
+      "apply_to": "PLATFORM",
+      "artefact": "project-registers",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-pmp-project-registers-design-publish",
+              "section": "Risks",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-design-publish",
+              "section": "Issues",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-design-publish",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-design-publish",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-design-publish",
+              "section": "Benefits",
               "snapshot": [
                 [
                   "msp.json",
@@ -15539,29 +20681,77 @@ window.CONVEYOR_REWORK = {
               "source": "artefact"
             }
           ],
-          "rule": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "rule": "std-pmp-project-registers-design-publish",
           "source": "audit"
         }
       ],
-      "key": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-      "scope": "PLATFORM",
+      "key": "std-pmp-project-registers-design-publish:DESIGN-PUBLISH",
+      "owner_project": "DESIGN-PUBLISH",
+      "rule": "std-pmp-project-registers-design-publish",
+      "scope": "DESIGN-PUBLISH",
       "severity": "P2",
-      "spec": "§8.3",
-      "standard": "MSP",
+      "spec": "§8.4",
+      "standard": "PMP",
       "status": "open",
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The projects-dossier artefact for conveyor buildout is partial; missing required sections: Delivery risks.",
+          "detail": "The project-registers artefact for Programme-level unit (plan: docs/design/STUDIO-SPEC.md) is partial; missing required sections: Risks, Issues, Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Delivery risks",
+                  "artefact": "std-pmp-project-registers-design-publish",
+                  "section": "Risks",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-design-publish",
+                  "section": "Issues",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-design-publish",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-design-publish",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-design-publish",
+                  "section": "Benefits",
                   "snapshot": [
                     [
                       "msp.json",
@@ -15572,82 +20762,7 @@ window.CONVEYOR_REWORK = {
                   "source": "artefact"
                 }
               ],
-              "rule": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "MSP artefact partial: projects-dossier"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-design-publish:DESIGN-PUBLISH",
-      "apply_to": "PLATFORM",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-design-publish",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-design-publish",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-design-publish:DESIGN-PUBLISH",
-      "owner_project": "DESIGN-PUBLISH",
-      "rule": "std-pmp-project-brief-design-publish",
-      "scope": "DESIGN-PUBLISH",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for Programme-level unit (plan: docs/design/STUDIO-SPEC.md) is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-design-publish",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-design-publish",
+              "rule": "std-pmp-project-registers-design-publish",
               "source": "audit"
             }
           ],
@@ -15658,12 +20773,12 @@ window.CONVEYOR_REWORK = {
           "subject": "DESIGN-PUBLISH"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-platform:PLATFORM",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-p0:P0",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -15677,25 +20792,196 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-platform",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-p0",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-p0",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-p0",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-p0",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-platform",
+          "rule": "std-pmp-project-registers-p0",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-platform:PLATFORM",
+      "key": "std-pmp-project-registers-p0:P0",
+      "owner_project": "P0",
+      "rule": "std-pmp-project-registers-p0",
+      "scope": "P0",
+      "severity": "P2",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The project-registers artefact for Programme-level unit (plan: docs/plans/P0-programme-definition.md) is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-pmp-project-registers-p0",
+                  "section": "Risks",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-p0",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-p0",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-p0",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-pmp-project-registers-p0",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "P0"
+        }
+      ],
+      "title": "PMP artefact partial: project-registers"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-platform:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "project-registers",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-pmp-project-registers-platform",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-platform",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-platform",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-pmp-project-registers-platform",
+          "source": "audit"
+        }
+      ],
+      "key": "std-pmp-project-registers-platform:PLATFORM",
       "owner_project": "PLATFORM",
-      "rule": "std-pmp-project-brief-platform",
+      "rule": "std-pmp-project-registers-platform",
       "scope": "PLATFORM",
       "severity": "P2",
       "spec": "§8.4",
@@ -15704,25 +20990,49 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Programme-level unit (plan: docs/plans/development-process-speed.md) is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for Programme-level unit (plan: docs/plans/development-process-speed.md) is partial; missing required sections: Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-platform",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-platform",
+                  "section": "Assumptions",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-platform",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-platform",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-platform",
+              "rule": "std-pmp-project-registers-platform",
               "source": "audit"
             }
           ],
@@ -15733,12 +21043,12 @@ window.CONVEYOR_REWORK = {
           "subject": "PLATFORM"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s00:S00",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s00:S00",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -15752,37 +21062,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s00",
-              "section": "Capabilities",
+              "artefact": "std-pmp-project-registers-s00",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s00",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s00",
+              "section": "Issues",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s00",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s00",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s00",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s00",
+          "rule": "std-pmp-project-registers-s00",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s00:S00",
+      "key": "std-pmp-project-registers-s00:S00",
       "owner_project": "S00",
-      "rule": "std-pmp-project-brief-s00",
+      "rule": "std-pmp-project-registers-s00",
       "scope": "S00",
       "severity": "P2",
       "spec": "§8.4",
@@ -15791,37 +21137,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S00-usage-inventory.md is partial; missing required sections: Capabilities, Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S00-usage-inventory.md is partial; missing required sections: Risks, Issues, Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s00",
-                  "section": "Capabilities",
+                  "artefact": "std-pmp-project-registers-s00",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s00",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s00",
+                  "section": "Issues",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s00",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s00",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s00",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s00",
+              "rule": "std-pmp-project-registers-s00",
               "source": "audit"
             }
           ],
@@ -15832,12 +21214,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S00"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s01:S01",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s01:S01",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -15851,25 +21233,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s01",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s01",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s01",
+              "section": "Issues",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s01",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s01",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s01",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s01",
+          "rule": "std-pmp-project-registers-s01",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s01:S01",
+      "key": "std-pmp-project-registers-s01:S01",
       "owner_project": "S01",
-      "rule": "std-pmp-project-brief-s01",
+      "rule": "std-pmp-project-registers-s01",
       "scope": "S01",
       "severity": "P2",
       "spec": "§8.4",
@@ -15878,25 +21308,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S01-ui-spike.md is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S01-ui-spike.md is partial; missing required sections: Risks, Issues, Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s01",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s01",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s01",
+                  "section": "Issues",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s01",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s01",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s01",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s01",
+              "rule": "std-pmp-project-registers-s01",
               "source": "audit"
             }
           ],
@@ -15907,12 +21385,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S01"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s02:S02",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s02:S02",
       "apply_to": "S02",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -15926,25 +21404,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s02",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s02",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s02",
+              "section": "Issues",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s02",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s02",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s02",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s02",
+          "rule": "std-pmp-project-registers-s02",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s02:S02",
+      "key": "std-pmp-project-registers-s02:S02",
       "owner_project": "S02",
-      "rule": "std-pmp-project-brief-s02",
+      "rule": "std-pmp-project-registers-s02",
       "scope": "S02",
       "severity": "P2",
       "spec": "§8.4",
@@ -15953,25 +21479,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S02-skeleton.md is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S02-skeleton.md is partial; missing required sections: Risks, Issues, Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s02",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s02",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s02",
+                  "section": "Issues",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s02",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s02",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s02",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s02",
+              "rule": "std-pmp-project-registers-s02",
               "source": "audit"
             }
           ],
@@ -15982,12 +21556,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S02"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s03:S03",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s03:S03",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -16001,37 +21575,61 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s03",
-              "section": "Capabilities",
+              "artefact": "std-pmp-project-registers-s03",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s03",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s03",
+              "section": "Assumptions",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s03",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s03",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s03",
+          "rule": "std-pmp-project-registers-s03",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s03:S03",
+      "key": "std-pmp-project-registers-s03:S03",
       "owner_project": "S03",
-      "rule": "std-pmp-project-brief-s03",
+      "rule": "std-pmp-project-registers-s03",
       "scope": "S03",
       "severity": "P2",
       "spec": "§8.4",
@@ -16040,37 +21638,61 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S03-domain-schema.md is partial; missing required sections: Capabilities, Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S03-domain-schema.md is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s03",
-                  "section": "Capabilities",
+                  "artefact": "std-pmp-project-registers-s03",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s03",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s03",
+                  "section": "Assumptions",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s03",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s03",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s03",
+              "rule": "std-pmp-project-registers-s03",
               "source": "audit"
             }
           ],
@@ -16081,12 +21703,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S03"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s04:S04",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s04:S04",
       "apply_to": "S04",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -16100,37 +21722,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s04",
-              "section": "Capabilities",
+              "artefact": "std-pmp-project-registers-s04",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s04",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s04",
+              "section": "Issues",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s04",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s04",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s04",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s04",
+          "rule": "std-pmp-project-registers-s04",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s04:S04",
+      "key": "std-pmp-project-registers-s04:S04",
       "owner_project": "S04",
-      "rule": "std-pmp-project-brief-s04",
+      "rule": "std-pmp-project-registers-s04",
       "scope": "S04",
       "severity": "P2",
       "spec": "§8.4",
@@ -16139,37 +21797,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S04-action-registry.md is partial; missing required sections: Capabilities, Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S04-action-registry.md is partial; missing required sections: Risks, Issues, Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s04",
-                  "section": "Capabilities",
+                  "artefact": "std-pmp-project-registers-s04",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s04",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s04",
+                  "section": "Issues",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s04",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s04",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s04",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s04",
+              "rule": "std-pmp-project-registers-s04",
               "source": "audit"
             }
           ],
@@ -16180,12 +21874,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S04"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s05:S05",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s05:S05",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -16199,37 +21893,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s05",
-              "section": "Capabilities",
+              "artefact": "std-pmp-project-registers-s05",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s05",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s05",
+              "section": "Assumptions",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s05",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s05",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s05",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s05",
+          "rule": "std-pmp-project-registers-s05",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s05:S05",
+      "key": "std-pmp-project-registers-s05:S05",
       "owner_project": "S05",
-      "rule": "std-pmp-project-brief-s05",
+      "rule": "std-pmp-project-registers-s05",
       "scope": "S05",
       "severity": "P2",
       "spec": "§8.4",
@@ -16238,37 +21968,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S05-board.md is partial; missing required sections: Capabilities, Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S05-board.md is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s05",
-                  "section": "Capabilities",
+                  "artefact": "std-pmp-project-registers-s05",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s05",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s05",
+                  "section": "Assumptions",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s05",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s05",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s05",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s05",
+              "rule": "std-pmp-project-registers-s05",
               "source": "audit"
             }
           ],
@@ -16279,87 +22045,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S05"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s06:S06",
-      "apply_to": "S06",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-s06",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-s06",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-s06:S06",
-      "owner_project": "S06",
-      "rule": "std-pmp-project-brief-s06",
-      "scope": "S06",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S06-control-plane.md is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-s06",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-s06",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S06"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s06a:S06a",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s06b:S06b",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -16373,124 +22064,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s06a",
-              "section": "Capabilities",
+              "artefact": "std-pmp-project-registers-s06b",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s06a",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s06b",
+              "section": "Assumptions",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s06b",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s06b",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s06b",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s06a",
+          "rule": "std-pmp-project-registers-s06b",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s06a:S06a",
-      "owner_project": "S06a",
-      "rule": "std-pmp-project-brief-s06a",
-      "scope": "S06a",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S06a-mcp-server-channel.md is partial; missing required sections: Capabilities, Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-s06a",
-                  "section": "Capabilities",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-pmp-project-brief-s06a",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-s06a",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S06a"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s06b:S06b",
-      "apply_to": "PLATFORM",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-s06b",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-s06b",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-s06b:S06b",
+      "key": "std-pmp-project-registers-s06b:S06b",
       "owner_project": "S06b",
-      "rule": "std-pmp-project-brief-s06b",
+      "rule": "std-pmp-project-registers-s06b",
       "scope": "S06b",
       "severity": "P2",
       "spec": "§8.4",
@@ -16499,25 +22139,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S06b-agent-direct-interface.md is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S06b-agent-direct-interface.md is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s06b",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s06b",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s06b",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s06b",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s06b",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s06b",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s06b",
+              "rule": "std-pmp-project-registers-s06b",
               "source": "audit"
             }
           ],
@@ -16528,12 +22216,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S06b"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s06c:S06c",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s06c:S06c",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -16547,37 +22235,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s06c",
-              "section": "Capabilities",
+              "artefact": "std-pmp-project-registers-s06c",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s06c",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s06c",
+              "section": "Assumptions",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s06c",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s06c",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s06c",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s06c",
+          "rule": "std-pmp-project-registers-s06c",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s06c:S06c",
+      "key": "std-pmp-project-registers-s06c:S06c",
       "owner_project": "S06c",
-      "rule": "std-pmp-project-brief-s06c",
+      "rule": "std-pmp-project-registers-s06c",
       "scope": "S06c",
       "severity": "P2",
       "spec": "§8.4",
@@ -16586,37 +22310,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S06c-mcp-tasks.md is partial; missing required sections: Capabilities, Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S06c-mcp-tasks.md is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s06c",
-                  "section": "Capabilities",
+                  "artefact": "std-pmp-project-registers-s06c",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s06c",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s06c",
+                  "section": "Assumptions",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s06c",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s06c",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s06c",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s06c",
+              "rule": "std-pmp-project-registers-s06c",
               "source": "audit"
             }
           ],
@@ -16627,12 +22387,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S06c"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s06d:S06d",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s06d:S06d",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -16646,61 +22406,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s06d",
-              "section": "Inception units",
+              "artefact": "std-pmp-project-registers-s06d",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s06d",
+              "artefact": "std-pmp-project-registers-s06d",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s06d",
               "section": "Dependencies",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s06d",
-              "section": "Acceptance",
+              "artefact": "std-pmp-project-registers-s06d",
+              "section": "Benefits",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s06d",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s06d",
+              "section": "Changes",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s06d",
+          "rule": "std-pmp-project-registers-s06d",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s06d:S06d",
+      "key": "std-pmp-project-registers-s06d:S06d",
       "owner_project": "S06d",
-      "rule": "std-pmp-project-brief-s06d",
+      "rule": "std-pmp-project-registers-s06d",
       "scope": "S06d",
       "severity": "P2",
       "spec": "§8.4",
@@ -16709,61 +22481,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S06d-connector-standard.md is partial; missing required sections: Inception units, Dependencies, Acceptance, Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S06d-connector-standard.md is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s06d",
-                  "section": "Inception units",
+                  "artefact": "std-pmp-project-registers-s06d",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s06d",
+                  "artefact": "std-pmp-project-registers-s06d",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s06d",
                   "section": "Dependencies",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s06d",
-                  "section": "Acceptance",
+                  "artefact": "std-pmp-project-registers-s06d",
+                  "section": "Benefits",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s06d",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s06d",
+                  "section": "Changes",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s06d",
+              "rule": "std-pmp-project-registers-s06d",
               "source": "audit"
             }
           ],
@@ -16774,12 +22558,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S06d"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s07:S07",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s07:S07",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -16793,37 +22577,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s07",
-              "section": "Capabilities",
+              "artefact": "std-pmp-project-registers-s07",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s07",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s07",
+              "section": "Assumptions",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s07",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s07",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s07",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s07",
+          "rule": "std-pmp-project-registers-s07",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s07:S07",
+      "key": "std-pmp-project-registers-s07:S07",
       "owner_project": "S07",
-      "rule": "std-pmp-project-brief-s07",
+      "rule": "std-pmp-project-registers-s07",
       "scope": "S07",
       "severity": "P2",
       "spec": "§8.4",
@@ -16832,37 +22652,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S07-requirements-search.md is partial; missing required sections: Capabilities, Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S07-requirements-search.md is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s07",
-                  "section": "Capabilities",
+                  "artefact": "std-pmp-project-registers-s07",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s07",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s07",
+                  "section": "Assumptions",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s07",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s07",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s07",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s07",
+              "rule": "std-pmp-project-registers-s07",
               "source": "audit"
             }
           ],
@@ -16873,12 +22729,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S07"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s08:S08",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s08:S08",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -16892,37 +22748,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s08",
-              "section": "Capabilities",
+              "artefact": "std-pmp-project-registers-s08",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s08",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s08",
+              "section": "Assumptions",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s08",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s08",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s08",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s08",
+          "rule": "std-pmp-project-registers-s08",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s08:S08",
+      "key": "std-pmp-project-registers-s08:S08",
       "owner_project": "S08",
-      "rule": "std-pmp-project-brief-s08",
+      "rule": "std-pmp-project-registers-s08",
       "scope": "S08",
       "severity": "P2",
       "spec": "§8.4",
@@ -16931,37 +22823,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S08-governance-modelling.md is partial; missing required sections: Capabilities, Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S08-governance-modelling.md is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s08",
-                  "section": "Capabilities",
+                  "artefact": "std-pmp-project-registers-s08",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s08",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s08",
+                  "section": "Assumptions",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s08",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s08",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s08",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s08",
+              "rule": "std-pmp-project-registers-s08",
               "source": "audit"
             }
           ],
@@ -16972,12 +22900,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S08"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s09:S09",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s09:S09",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -16991,37 +22919,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s09",
-              "section": "Capabilities",
+              "artefact": "std-pmp-project-registers-s09",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s09",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s09",
+              "section": "Assumptions",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s09",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s09",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s09",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s09",
+          "rule": "std-pmp-project-registers-s09",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s09:S09",
+      "key": "std-pmp-project-registers-s09:S09",
       "owner_project": "S09",
-      "rule": "std-pmp-project-brief-s09",
+      "rule": "std-pmp-project-registers-s09",
       "scope": "S09",
       "severity": "P2",
       "spec": "§8.4",
@@ -17030,37 +22994,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S09-documents-integrations.md is partial; missing required sections: Capabilities, Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S09-documents-integrations.md is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s09",
-                  "section": "Capabilities",
+                  "artefact": "std-pmp-project-registers-s09",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s09",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s09",
+                  "section": "Assumptions",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s09",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s09",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s09",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s09",
+              "rule": "std-pmp-project-registers-s09",
               "source": "audit"
             }
           ],
@@ -17071,12 +23071,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S09"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s10:S10",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s10:S10",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -17090,25 +23090,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s10",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s10",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s10",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s10",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s10",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s10",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s10",
+          "rule": "std-pmp-project-registers-s10",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s10:S10",
+      "key": "std-pmp-project-registers-s10:S10",
       "owner_project": "S10",
-      "rule": "std-pmp-project-brief-s10",
+      "rule": "std-pmp-project-registers-s10",
       "scope": "S10",
       "severity": "P2",
       "spec": "§8.4",
@@ -17117,25 +23165,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S10-copilot-ag-ui.md is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S10-copilot-ag-ui.md is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s10",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s10",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s10",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s10",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s10",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s10",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s10",
+              "rule": "std-pmp-project-registers-s10",
               "source": "audit"
             }
           ],
@@ -17146,12 +23242,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S10"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s11:S11",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s11:S11",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -17165,37 +23261,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s11",
-              "section": "Capabilities",
+              "artefact": "std-pmp-project-registers-s11",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s11",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s11",
+              "section": "Assumptions",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s11",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s11",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s11",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s11",
+          "rule": "std-pmp-project-registers-s11",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s11:S11",
+      "key": "std-pmp-project-registers-s11:S11",
       "owner_project": "S11",
-      "rule": "std-pmp-project-brief-s11",
+      "rule": "std-pmp-project-registers-s11",
       "scope": "S11",
       "severity": "P2",
       "spec": "§8.4",
@@ -17204,37 +23336,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S11-procedures.md is partial; missing required sections: Capabilities, Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S11-procedures.md is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s11",
-                  "section": "Capabilities",
+                  "artefact": "std-pmp-project-registers-s11",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s11",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s11",
+                  "section": "Assumptions",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s11",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s11",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s11",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s11",
+              "rule": "std-pmp-project-registers-s11",
               "source": "audit"
             }
           ],
@@ -17245,210 +23413,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S11"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s12:S12",
-      "apply_to": "S12",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-s12",
-              "section": "Capabilities",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-pmp-project-brief-s12",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-s12",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-s12:S12",
-      "owner_project": "S12",
-      "rule": "std-pmp-project-brief-s12",
-      "scope": "S12",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S12-ui-buildout.md is partial; missing required sections: Capabilities, Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-s12",
-                  "section": "Capabilities",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-pmp-project-brief-s12",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-s12",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S12"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s13:S13",
-      "apply_to": "S13",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-s13",
-              "section": "Capabilities",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-pmp-project-brief-s13",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-s13",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-s13:S13",
-      "owner_project": "S13",
-      "rule": "std-pmp-project-brief-s13",
-      "scope": "S13",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S13-n8n-engine.md is partial; missing required sections: Capabilities, Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-s13",
-                  "section": "Capabilities",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-pmp-project-brief-s13",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-s13",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S13"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s14:S14",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s14:S14",
       "apply_to": "S14",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -17462,37 +23432,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s14",
-              "section": "Capabilities",
+              "artefact": "std-pmp-project-registers-s14",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s14",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s14",
+              "section": "Assumptions",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s14",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s14",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s14",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s14",
+          "rule": "std-pmp-project-registers-s14",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s14:S14",
+      "key": "std-pmp-project-registers-s14:S14",
       "owner_project": "S14",
-      "rule": "std-pmp-project-brief-s14",
+      "rule": "std-pmp-project-registers-s14",
       "scope": "S14",
       "severity": "P2",
       "spec": "§8.4",
@@ -17501,37 +23507,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S14-cutover.md is partial; missing required sections: Capabilities, Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S14-cutover.md is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s14",
-                  "section": "Capabilities",
+                  "artefact": "std-pmp-project-registers-s14",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s14",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s14",
+                  "section": "Assumptions",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s14",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s14",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s14",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s14",
+              "rule": "std-pmp-project-registers-s14",
               "source": "audit"
             }
           ],
@@ -17542,111 +23584,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S14"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s15:S15",
-      "apply_to": "S15",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-s15",
-              "section": "Capabilities",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-pmp-project-brief-s15",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-s15",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-s15:S15",
-      "owner_project": "S15",
-      "rule": "std-pmp-project-brief-s15",
-      "scope": "S15",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S15-capability-knowledge-memory.md is partial; missing required sections: Capabilities, Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-s15",
-                  "section": "Capabilities",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-pmp-project-brief-s15",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-s15",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S15"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s16:S16",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-s16:S16",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -17660,37 +23603,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-s16",
-              "section": "Capabilities",
+              "artefact": "std-pmp-project-registers-s16",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-pmp-project-brief-s16",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-s16",
+              "section": "Assumptions",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s16",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s16",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-s16",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-s16",
+          "rule": "std-pmp-project-registers-s16",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-s16:S16",
+      "key": "std-pmp-project-registers-s16:S16",
       "owner_project": "S16",
-      "rule": "std-pmp-project-brief-s16",
+      "rule": "std-pmp-project-registers-s16",
       "scope": "S16",
       "severity": "P2",
       "spec": "§8.4",
@@ -17699,37 +23678,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S16-inference-audit.md is partial; missing required sections: Capabilities, Plan.",
+          "detail": "The project-registers artefact for Plan: docs/plans/slices/S16-inference-audit.md is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-s16",
-                  "section": "Capabilities",
+                  "artefact": "std-pmp-project-registers-s16",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-pmp-project-brief-s16",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-s16",
+                  "section": "Assumptions",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s16",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s16",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-s16",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-s16",
+              "rule": "std-pmp-project-registers-s16",
               "source": "audit"
             }
           ],
@@ -17740,435 +23755,12 @@ window.CONVEYOR_REWORK = {
           "subject": "S16"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s17:S17",
-      "apply_to": "S17",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-s17",
-              "section": "Capabilities",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-pmp-project-brief-s17",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-s17",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-s17:S17",
-      "owner_project": "S17",
-      "rule": "std-pmp-project-brief-s17",
-      "scope": "S17",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S17-benchmark-harness.md is partial; missing required sections: Capabilities, Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-s17",
-                  "section": "Capabilities",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-pmp-project-brief-s17",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-s17",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S17"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s18:S18",
-      "apply_to": "S18",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-s18",
-              "section": "Capabilities",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-pmp-project-brief-s18",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-s18",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-s18:S18",
-      "owner_project": "S18",
-      "rule": "std-pmp-project-brief-s18",
-      "scope": "S18",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S18-kata-improvement.md is partial; missing required sections: Capabilities, Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-s18",
-                  "section": "Capabilities",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-pmp-project-brief-s18",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-s18",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S18"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s19:S19",
-      "apply_to": "S19",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-s19",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-s19",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-s19:S19",
-      "owner_project": "S19",
-      "rule": "std-pmp-project-brief-s19",
-      "scope": "S19",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S19-eval-builder.md is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-s19",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-s19",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S19"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s20:S20",
-      "apply_to": "S20",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-s20",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-s20",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-s20:S20",
-      "owner_project": "S20",
-      "rule": "std-pmp-project-brief-s20",
-      "scope": "S20",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S20-eval-hillclimb.md is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-s20",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-s20",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S20"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-s21:S21",
-      "apply_to": "S21",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-s21",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-s21",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-s21:S21",
-      "owner_project": "S21",
-      "rule": "std-pmp-project-brief-s21",
-      "scope": "S21",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for Plan: docs/plans/slices/S21-message-construction.md is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-s21",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-s21",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S21"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-spec-v2:SPEC-V2",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-spec-v2:SPEC-V2",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -18182,25 +23774,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-spec-v2",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-spec-v2",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-spec-v2",
+              "section": "Issues",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-spec-v2",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-spec-v2",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-spec-v2",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-spec-v2",
+          "rule": "std-pmp-project-registers-spec-v2",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-spec-v2:SPEC-V2",
+      "key": "std-pmp-project-registers-spec-v2:SPEC-V2",
       "owner_project": "SPEC-V2",
-      "rule": "std-pmp-project-brief-spec-v2",
+      "rule": "std-pmp-project-registers-spec-v2",
       "scope": "SPEC-V2",
       "severity": "P2",
       "spec": "§8.4",
@@ -18209,25 +23849,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for Programme-level unit (plan: docs/SPEC_V2.md) is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for Programme-level unit (plan: docs/SPEC_V2.md) is partial; missing required sections: Risks, Issues, Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-spec-v2",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-spec-v2",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-spec-v2",
+                  "section": "Issues",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-spec-v2",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-spec-v2",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-spec-v2",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-spec-v2",
+              "rule": "std-pmp-project-registers-spec-v2",
               "source": "audit"
             }
           ],
@@ -18238,12 +23926,12 @@ window.CONVEYOR_REWORK = {
           "subject": "SPEC-V2"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t0:T0",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-t0:T0",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -18257,25 +23945,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-t0",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-t0",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t0",
+              "section": "Issues",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t0",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t0",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t0",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-t0",
+          "rule": "std-pmp-project-registers-t0",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-t0:T0",
+      "key": "std-pmp-project-registers-t0:T0",
       "owner_project": "T0",
-      "rule": "std-pmp-project-brief-t0",
+      "rule": "std-pmp-project-registers-t0",
       "scope": "T0",
       "severity": "P2",
       "spec": "§8.4",
@@ -18284,25 +24020,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for SPEC_V2 slice T0 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for SPEC_V2 slice T0 (docs/SPEC_V2.md §12) is partial; missing required sections: Risks, Issues, Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-t0",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-t0",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t0",
+                  "section": "Issues",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t0",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t0",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t0",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-t0",
+              "rule": "std-pmp-project-registers-t0",
               "source": "audit"
             }
           ],
@@ -18313,12 +24097,12 @@ window.CONVEYOR_REWORK = {
           "subject": "T0"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t10:T10",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-t10:T10",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -18332,25 +24116,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-t10",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-t10",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t10",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t10",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t10",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t10",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-t10",
+          "rule": "std-pmp-project-registers-t10",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-t10:T10",
+      "key": "std-pmp-project-registers-t10:T10",
       "owner_project": "T10",
-      "rule": "std-pmp-project-brief-t10",
+      "rule": "std-pmp-project-registers-t10",
       "scope": "T10",
       "severity": "P2",
       "spec": "§8.4",
@@ -18359,25 +24191,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for SPEC_V2 slice T10 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for SPEC_V2 slice T10 (docs/SPEC_V2.md §12) is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-t10",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-t10",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t10",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t10",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t10",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t10",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-t10",
+              "rule": "std-pmp-project-registers-t10",
               "source": "audit"
             }
           ],
@@ -18388,12 +24268,12 @@ window.CONVEYOR_REWORK = {
           "subject": "T10"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t11:T11",
-      "apply_to": "T11",
-      "artefact": "project-brief",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-t11:T11",
+      "apply_to": "PLATFORM",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -18407,25 +24287,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-t11",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-t11",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t11",
+              "section": "Issues",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t11",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t11",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t11",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-t11",
+          "rule": "std-pmp-project-registers-t11",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-t11:T11",
+      "key": "std-pmp-project-registers-t11:T11",
       "owner_project": "T11",
-      "rule": "std-pmp-project-brief-t11",
+      "rule": "std-pmp-project-registers-t11",
       "scope": "T11",
       "severity": "P2",
       "spec": "§8.4",
@@ -18434,25 +24362,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for SPEC_V2 slice T11 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for SPEC_V2 slice T11 (docs/SPEC_V2.md §12) is partial; missing required sections: Risks, Issues, Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-t11",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-t11",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t11",
+                  "section": "Issues",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t11",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t11",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t11",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-t11",
+              "rule": "std-pmp-project-registers-t11",
               "source": "audit"
             }
           ],
@@ -18463,12 +24439,12 @@ window.CONVEYOR_REWORK = {
           "subject": "T11"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t12:T12",
-      "apply_to": "T12",
-      "artefact": "project-brief",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-t13:T13",
+      "apply_to": "T13",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -18482,100 +24458,61 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-t12",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-t13",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t13",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t13",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t13",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-t12",
+          "rule": "std-pmp-project-registers-t13",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-t12:T12",
-      "owner_project": "T12",
-      "rule": "std-pmp-project-brief-t12",
-      "scope": "T12",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for SPEC_V2 slice T12 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-t12",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-t12",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T12"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t13:T13",
-      "apply_to": "PLATFORM",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-t13",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-t13",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-t13:T13",
+      "key": "std-pmp-project-registers-t13:T13",
       "owner_project": "T13",
-      "rule": "std-pmp-project-brief-t13",
+      "rule": "std-pmp-project-registers-t13",
       "scope": "T13",
       "severity": "P2",
       "spec": "§8.4",
@@ -18584,25 +24521,61 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for SPEC_V2 slice T13 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for SPEC_V2 slice T13 (docs/SPEC_V2.md §12) is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-t13",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-t13",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t13",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t13",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t13",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-t13",
+              "rule": "std-pmp-project-registers-t13",
               "source": "audit"
             }
           ],
@@ -18613,12 +24586,12 @@ window.CONVEYOR_REWORK = {
           "subject": "T13"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t14:T14",
-      "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-t14:T14",
+      "apply_to": "T14",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -18632,25 +24605,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-t14",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-t14",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t14",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t14",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t14",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t14",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-t14",
+          "rule": "std-pmp-project-registers-t14",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-t14:T14",
+      "key": "std-pmp-project-registers-t14:T14",
       "owner_project": "T14",
-      "rule": "std-pmp-project-brief-t14",
+      "rule": "std-pmp-project-registers-t14",
       "scope": "T14",
       "severity": "P2",
       "spec": "§8.4",
@@ -18659,25 +24680,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for SPEC_V2 slice T14 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for SPEC_V2 slice T14 (docs/SPEC_V2.md §12) is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-t14",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-t14",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t14",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t14",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t14",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t14",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-t14",
+              "rule": "std-pmp-project-registers-t14",
               "source": "audit"
             }
           ],
@@ -18688,237 +24757,12 @@ window.CONVEYOR_REWORK = {
           "subject": "T14"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t15:T15",
-      "apply_to": "T15",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-t15",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-t15",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-t15:T15",
-      "owner_project": "T15",
-      "rule": "std-pmp-project-brief-t15",
-      "scope": "T15",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for SPEC_V2 slice T15 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-t15",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-t15",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T15"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t16:T16",
-      "apply_to": "T16",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-t16",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-t16",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-t16:T16",
-      "owner_project": "T16",
-      "rule": "std-pmp-project-brief-t16",
-      "scope": "T16",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for SPEC_V2 slice T16 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-t16",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-t16",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T16"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t17:T17",
-      "apply_to": "T17",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-t17",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-t17",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-t17:T17",
-      "owner_project": "T17",
-      "rule": "std-pmp-project-brief-t17",
-      "scope": "T17",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for SPEC_V2 slice T17 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-t17",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-t17",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T17"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t1:T1",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-t1:T1",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -18932,25 +24776,61 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-t1",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-t1",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t1",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t1",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t1",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-t1",
+          "rule": "std-pmp-project-registers-t1",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-t1:T1",
+      "key": "std-pmp-project-registers-t1:T1",
       "owner_project": "T1",
-      "rule": "std-pmp-project-brief-t1",
+      "rule": "std-pmp-project-registers-t1",
       "scope": "T1",
       "severity": "P2",
       "spec": "§8.4",
@@ -18959,25 +24839,61 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for SPEC_V2 slice T1 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for SPEC_V2 slice T1 (docs/SPEC_V2.md §12) is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-t1",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-t1",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t1",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t1",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t1",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-t1",
+              "rule": "std-pmp-project-registers-t1",
               "source": "audit"
             }
           ],
@@ -18988,12 +24904,12 @@ window.CONVEYOR_REWORK = {
           "subject": "T1"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t2:T2",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-t2:T2",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -19007,25 +24923,61 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-t2",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-t2",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t2",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t2",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t2",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-t2",
+          "rule": "std-pmp-project-registers-t2",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-t2:T2",
+      "key": "std-pmp-project-registers-t2:T2",
       "owner_project": "T2",
-      "rule": "std-pmp-project-brief-t2",
+      "rule": "std-pmp-project-registers-t2",
       "scope": "T2",
       "severity": "P2",
       "spec": "§8.4",
@@ -19034,25 +24986,61 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for SPEC_V2 slice T2 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for SPEC_V2 slice T2 (docs/SPEC_V2.md §12) is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-t2",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-t2",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t2",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t2",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t2",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-t2",
+              "rule": "std-pmp-project-registers-t2",
               "source": "audit"
             }
           ],
@@ -19063,12 +25051,12 @@ window.CONVEYOR_REWORK = {
           "subject": "T2"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t3:T3",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-t3:T3",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -19082,25 +25070,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-t3",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-t3",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t3",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t3",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t3",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t3",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-t3",
+          "rule": "std-pmp-project-registers-t3",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-t3:T3",
+      "key": "std-pmp-project-registers-t3:T3",
       "owner_project": "T3",
-      "rule": "std-pmp-project-brief-t3",
+      "rule": "std-pmp-project-registers-t3",
       "scope": "T3",
       "severity": "P2",
       "spec": "§8.4",
@@ -19109,25 +25145,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for SPEC_V2 slice T3 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for SPEC_V2 slice T3 (docs/SPEC_V2.md §12) is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-t3",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-t3",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t3",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t3",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t3",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t3",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-t3",
+              "rule": "std-pmp-project-registers-t3",
               "source": "audit"
             }
           ],
@@ -19138,12 +25222,12 @@ window.CONVEYOR_REWORK = {
           "subject": "T3"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t4:T4",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-t4:T4",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -19157,25 +25241,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-t4",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-t4",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t4",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t4",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t4",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t4",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-t4",
+          "rule": "std-pmp-project-registers-t4",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-t4:T4",
+      "key": "std-pmp-project-registers-t4:T4",
       "owner_project": "T4",
-      "rule": "std-pmp-project-brief-t4",
+      "rule": "std-pmp-project-registers-t4",
       "scope": "T4",
       "severity": "P2",
       "spec": "§8.4",
@@ -19184,25 +25316,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for SPEC_V2 slice T4 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for SPEC_V2 slice T4 (docs/SPEC_V2.md §12) is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-t4",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-t4",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t4",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t4",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t4",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t4",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-t4",
+              "rule": "std-pmp-project-registers-t4",
               "source": "audit"
             }
           ],
@@ -19213,312 +25393,12 @@ window.CONVEYOR_REWORK = {
           "subject": "T4"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t5:T5",
-      "apply_to": "T5",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-t5",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-t5",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-t5:T5",
-      "owner_project": "T5",
-      "rule": "std-pmp-project-brief-t5",
-      "scope": "T5",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for SPEC_V2 slice T5 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-t5",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-t5",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T5"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t6:T6",
-      "apply_to": "T6",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-t6",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-t6",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-t6:T6",
-      "owner_project": "T6",
-      "rule": "std-pmp-project-brief-t6",
-      "scope": "T6",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for SPEC_V2 slice T6 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-t6",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-t6",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T6"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t7:T7",
-      "apply_to": "T7",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-t7",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-t7",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-t7:T7",
-      "owner_project": "T7",
-      "rule": "std-pmp-project-brief-t7",
-      "scope": "T7",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for SPEC_V2 slice T7 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-t7",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-t7",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T7"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t8:T8",
-      "apply_to": "T8",
-      "artefact": "project-brief",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-pmp-project-brief-t8",
-              "section": "Plan",
-              "snapshot": [
-                [
-                  "seed/output-standard.json",
-                  "project-brief",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-pmp-project-brief-t8",
-          "source": "audit"
-        }
-      ],
-      "key": "std-pmp-project-brief-t8:T8",
-      "owner_project": "T8",
-      "rule": "std-pmp-project-brief-t8",
-      "scope": "T8",
-      "severity": "P2",
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The project-brief artefact for SPEC_V2 slice T8 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-pmp-project-brief-t8",
-                  "section": "Plan",
-                  "snapshot": [
-                    [
-                      "seed/output-standard.json",
-                      "project-brief",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-pmp-project-brief-t8",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T8"
-        }
-      ],
-      "title": "PMP artefact partial: project-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-brief-t9:T9",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-t9:T9",
       "apply_to": "PLATFORM",
-      "artefact": "project-brief",
+      "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -19532,25 +25412,73 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-pmp-project-brief-t9",
-              "section": "Plan",
+              "artefact": "std-pmp-project-registers-t9",
+              "section": "Risks",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "project-brief",
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t9",
+              "section": "Assumptions",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t9",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t9",
+              "section": "Benefits",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-pmp-project-registers-t9",
+              "section": "Changes",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-pmp-project-brief-t9",
+          "rule": "std-pmp-project-registers-t9",
           "source": "audit"
         }
       ],
-      "key": "std-pmp-project-brief-t9:T9",
+      "key": "std-pmp-project-registers-t9:T9",
       "owner_project": "T9",
-      "rule": "std-pmp-project-brief-t9",
+      "rule": "std-pmp-project-registers-t9",
       "scope": "T9",
       "severity": "P2",
       "spec": "§8.4",
@@ -19559,25 +25487,73 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The project-brief artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+          "detail": "The project-registers artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is partial; missing required sections: Risks, Assumptions, Dependencies, Benefits, Changes.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-pmp-project-brief-t9",
-                  "section": "Plan",
+                  "artefact": "std-pmp-project-registers-t9",
+                  "section": "Risks",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "project-brief",
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t9",
+                  "section": "Assumptions",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t9",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t9",
+                  "section": "Benefits",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-pmp-project-registers-t9",
+                  "section": "Changes",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-pmp-project-brief-t9",
+              "rule": "std-pmp-project-registers-t9",
               "source": "audit"
             }
           ],
@@ -19588,7 +25564,7 @@ window.CONVEYOR_REWORK = {
           "subject": "T9"
         }
       ],
-      "title": "PMP artefact partial: project-brief"
+      "title": "PMP artefact partial: project-registers"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p83-6:T10",
@@ -19652,204 +25628,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "PMP enforcement is partial: closure requires only the scope baseline"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "safe-art",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Backlog with WSJF",
-              "snapshot": [
-                [
-                  "msp.json",
-                  "/wbs_nodes",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-          "source": "audit"
-        }
-      ],
-      "key": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-      "scope": "PLATFORM",
-      "severity": "P2",
-      "spec": "§8.2",
-      "standard": "SAFe",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The safe-art artefact for conveyor buildout is partial; missing required sections: Backlog with WSJF.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Backlog with WSJF",
-                  "snapshot": [
-                    [
-                      "msp.json",
-                      "/wbs_nodes",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "SAFe artefact partial: safe-art"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "safe-cadence",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "PI plan",
-              "snapshot": [
-                [
-                  "msp.json",
-                  "/cadences",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "System demo",
-              "snapshot": [
-                [
-                  "msp.json",
-                  "/cadences",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Inspect and adapt",
-              "snapshot": [
-                [
-                  "msp.json",
-                  "/cadences",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-          "source": "audit"
-        }
-      ],
-      "key": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-      "scope": "PLATFORM",
-      "severity": "P2",
-      "spec": "§8.2",
-      "standard": "SAFe",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The safe-cadence artefact for conveyor buildout is partial; missing required sections: PI plan, System demo, Inspect and adapt.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "PI plan",
-                  "snapshot": [
-                    [
-                      "msp.json",
-                      "/cadences",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "System demo",
-                  "snapshot": [
-                    [
-                      "msp.json",
-                      "/cadences",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Inspect and adapt",
-                  "snapshot": [
-                    [
-                      "msp.json",
-                      "/cadences",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "SAFe artefact partial: safe-cadence"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p6-6:T4",
@@ -20083,7 +25861,7 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "151 declared dependency edge(s) carry no blocks|needs|supersedes|informs kind",
+          "detail": "163 declared dependency edge(s) carry no blocks|needs|supersedes|informs kind",
           "disposition": "rework",
           "evidence": [],
           "expires": null,
@@ -20149,358 +25927,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "Correct a claim that a stored value is derived when it is not"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check snapshot_schema_stale:programme",
-      "apply_to": "PLATFORM",
-      "artefact": "snapshot_schema",
-      "baseline": {
-        "disposition": "unprovable",
-        "earliest_expires": null,
-        "entries": 3,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "unprovable",
-      "dod": [
-        {
-          "item": "The snapshot manifest schema equals the schema the code writes",
-          "met": false
-        },
-        {
-          "item": "check-data.cjs passes against the regenerated pack",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "snapshot_schema_stale",
-          "source": "snapshot",
-          "subjects": [
-            "architecture.compliance_reviews",
-            "architecture.waivers",
-            "msp.tranches"
-          ]
-        }
-      ],
-      "key": "snapshot_schema_stale:programme",
-      "owner_project": "PLATFORM",
-      "rule": "snapshot_schema_stale",
-      "scope": "programme",
-      "severity": "P2",
-      "spec": "§10.3",
-      "standard": "SPEC",
-      "status": "suppressed",
-      "subject_count": 3,
-      "subjects": [
-        {
-          "detail": "the snapshot predates the compliance-review projection",
-          "disposition": "unprovable",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "architecture.compliance_reviews"
-        },
-        {
-          "detail": "the snapshot predates the waiver projection",
-          "disposition": "unprovable",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "architecture.waivers"
-        },
-        {
-          "detail": "tranche authorisation columns are absent; the snapshot predates the conformance projection",
-          "disposition": "unprovable",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "msp.tranches"
-        }
-      ],
-      "title": "Bring the published snapshot schema up to date"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T12",
-      "apply_to": "T12",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T12"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T12",
-      "owner_project": "T12",
-      "rule": "status_source_drift",
-      "scope": "T12",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T12"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T15",
-      "apply_to": "T15",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T15"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T15",
-      "owner_project": "T15",
-      "rule": "status_source_drift",
-      "scope": "T15",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T15"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T17",
-      "apply_to": "T17",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T17"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T17",
-      "owner_project": "T17",
-      "rule": "status_source_drift",
-      "scope": "T17",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T17"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T5",
-      "apply_to": "T5",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T5"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T5",
-      "owner_project": "T5",
-      "rule": "status_source_drift",
-      "scope": "T5",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T5"
-        }
-      ],
-      "title": "Reconcile the project's status source"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check status_source_drift:T6",
-      "apply_to": "T6",
-      "artefact": "status_source",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The reported status is the live source, not a stale pasted value",
-          "met": false
-        },
-        {
-          "item": "The audit reports no status_source_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "status_source_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T6"
-          ]
-        }
-      ],
-      "key": "status_source_drift:T6",
-      "owner_project": "T6",
-      "rule": "status_source_drift",
-      "scope": "T6",
-      "severity": "P2",
-      "spec": "§5.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "coverage says 'proposed', the register says 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T6"
-        }
-      ],
-      "title": "Reconcile the project's status source"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p102-1:T2",
@@ -20591,7 +26017,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p102-2:T7",
-      "apply_to": "T7",
+      "apply_to": "PLATFORM",
       "artefact": "§10.2",
       "baseline": null,
       "depends_on": [],
@@ -20828,7 +26254,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p118-2:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "§11.8",
       "baseline": null,
       "depends_on": [],
@@ -21140,7 +26566,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p56-1:T16",
-      "apply_to": "T16",
+      "apply_to": "PLATFORM",
       "artefact": "§5.6",
       "baseline": null,
       "depends_on": [],
@@ -21203,7 +26629,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p56-2:T16",
-      "apply_to": "T16",
+      "apply_to": "PLATFORM",
       "artefact": "§5.6",
       "baseline": null,
       "depends_on": [],
@@ -21428,7 +26854,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p75-6:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§7.5",
       "baseline": null,
       "depends_on": [],
@@ -21500,93 +26926,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "Unpriced calls become zero in the billing/reconciliation figure"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p76-2:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "§7.6",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The hot query or recall excludes kind digest; a test consolidates a card and asserts the hot list carries no digest row or body and that the digest is read only from the cold store.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 346,
-              "path": "crates/store/src/memory.rs",
-              "quote": "         VALUES ($1, $2, $3, 'digest', 'system', $4, now(), $5)",
-              "source": "code"
-            },
-            {
-              "line": 229,
-              "path": "crates/store/src/memory.rs",
-              "quote": "          WHERE tenant_id = $1 AND card_id = $2",
-              "source": "code"
-            },
-            {
-              "line": 20,
-              "path": "crates/actions/src/memory/mod.rs",
-              "quote": "/// One memory row as an action returns it. Never carries a digest body: that is read from strata.",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p76-2",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p76-2:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "v1-p76-2",
-      "scope": "PLATFORM",
-      "severity": "P2",
-      "spec": "§7.6",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "§7.6 separates hot rows from the cold digest; consolidation writes the digest into work_package_memory as kind digest and the hot query has no kind filter, so recall returns a derived digest body as a hot row.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 346,
-                  "path": "crates/store/src/memory.rs",
-                  "quote": "         VALUES ($1, $2, $3, 'digest', 'system', $4, now(), $5)",
-                  "source": "code"
-                },
-                {
-                  "line": 229,
-                  "path": "crates/store/src/memory.rs",
-                  "quote": "          WHERE tenant_id = $1 AND card_id = $2",
-                  "source": "code"
-                },
-                {
-                  "line": 20,
-                  "path": "crates/actions/src/memory/mod.rs",
-                  "quote": "/// One memory row as an action returns it. Never carries a digest body: that is read from strata.",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p76-2",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "memory.recall serves the consolidated digest inside the hot rows"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p77-2:PLATFORM",
@@ -21839,7 +27178,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1c-6:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§7.5/§7.6",
       "baseline": null,
       "depends_on": [],
@@ -22199,7 +27538,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w4b-5:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§14/R5",
       "baseline": null,
       "depends_on": [],
@@ -22298,7 +27637,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w4b-6:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "§14/R1",
       "baseline": null,
       "depends_on": [],
@@ -22396,8 +27735,74 @@ window.CONVEYOR_REWORK = {
       "title": "metric_reconciliation is a write-only aggregate with a dead verdict helper"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-0",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:programme",
       "apply_to": "PLATFORM",
+      "artefact": "wbs_node",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 2,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The project has a WBS with at least one work_package node carrying acceptance criteria",
+          "met": false
+        },
+        {
+          "item": "The audit reports no wbs_absent gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "work.json",
+          "rule": "wbs_absent",
+          "source": "snapshot",
+          "subjects": [
+            "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+            "AAA-UI-PROOF-285-2026-11-19T07-4"
+          ]
+        }
+      ],
+      "key": "wbs_absent:programme",
+      "owner_project": "PLATFORM",
+      "rule": "wbs_absent",
+      "scope": "programme",
+      "severity": "P2",
+      "spec": "§5.1",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 2,
+      "subjects": [
+        {
+          "detail": "no WBS node is published for the active project",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "AAA-UI-PROOF-285-2026-11-19T07-3-2"
+        },
+        {
+          "detail": "no WBS node is published for the active project",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "AAA-UI-PROOF-285-2026-11-19T07-4"
+        }
+      ],
+      "title": "Plan the project's WBS"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-10",
+      "apply_to": "T5",
       "artefact": "wbs_node",
       "baseline": {
         "disposition": "rework",
@@ -22423,152 +27828,20 @@ window.CONVEYOR_REWORK = {
           "rule": "wbs_absent",
           "source": "snapshot",
           "subjects": [
-            "PLATFORM"
-          ]
-        }
-      ],
-      "key": "wbs_absent:tranche-0",
-      "owner_project": "PLATFORM",
-      "rule": "wbs_absent",
-      "scope": "tranche-0",
-      "severity": "P2",
-      "spec": "§5.1",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "Plan the project's WBS"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-1",
-      "apply_to": "S02",
-      "artefact": "wbs_node",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 2,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The project has a WBS with at least one work_package node carrying acceptance criteria",
-          "met": false
-        },
-        {
-          "item": "The audit reports no wbs_absent gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "work.json",
-          "rule": "wbs_absent",
-          "source": "snapshot",
-          "subjects": [
-            "S02",
-            "T11"
-          ]
-        }
-      ],
-      "key": "wbs_absent:tranche-1",
-      "owner_project": "S02",
-      "rule": "wbs_absent",
-      "scope": "tranche-1",
-      "severity": "P2",
-      "spec": "§5.1",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 2,
-      "subjects": [
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S02"
-        },
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T11"
-        }
-      ],
-      "title": "Plan the project's WBS"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-10",
-      "apply_to": "S12",
-      "artefact": "wbs_node",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 2,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The project has a WBS with at least one work_package node carrying acceptance criteria",
-          "met": false
-        },
-        {
-          "item": "The audit reports no wbs_absent gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "work.json",
-          "rule": "wbs_absent",
-          "source": "snapshot",
-          "subjects": [
-            "S12",
             "T5"
           ]
         }
       ],
       "key": "wbs_absent:tranche-10",
-      "owner_project": "S12",
+      "owner_project": "T5",
       "rule": "wbs_absent",
       "scope": "tranche-10",
       "severity": "P2",
       "spec": "§5.1",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 2,
+      "subject_count": 1,
       "subjects": [
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S12"
-        },
         {
           "detail": "no WBS node is published for the active project",
           "disposition": "rework",
@@ -22770,68 +28043,13 @@ window.CONVEYOR_REWORK = {
       "title": "Plan the project's WBS"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-3",
-      "apply_to": "S04",
-      "artefact": "wbs_node",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The project has a WBS with at least one work_package node carrying acceptance criteria",
-          "met": false
-        },
-        {
-          "item": "The audit reports no wbs_absent gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "work.json",
-          "rule": "wbs_absent",
-          "source": "snapshot",
-          "subjects": [
-            "S04"
-          ]
-        }
-      ],
-      "key": "wbs_absent:tranche-3",
-      "owner_project": "S04",
-      "rule": "wbs_absent",
-      "scope": "tranche-3",
-      "severity": "P2",
-      "spec": "§5.1",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S04"
-        }
-      ],
-      "title": "Plan the project's WBS"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-4",
-      "apply_to": "T16",
+      "apply_to": "T14",
       "artefact": "wbs_node",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": null,
-        "entries": 1,
+        "entries": 2,
         "owners": []
       },
       "depends_on": [],
@@ -22852,19 +28070,20 @@ window.CONVEYOR_REWORK = {
           "rule": "wbs_absent",
           "source": "snapshot",
           "subjects": [
-            "T16"
+            "T14",
+            "T18"
           ]
         }
       ],
       "key": "wbs_absent:tranche-4",
-      "owner_project": "T16",
+      "owner_project": "T14",
       "rule": "wbs_absent",
       "scope": "tranche-4",
       "severity": "P2",
       "spec": "§5.1",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 1,
+      "subject_count": 2,
       "subjects": [
         {
           "detail": "no WBS node is published for the active project",
@@ -22874,7 +28093,17 @@ window.CONVEYOR_REWORK = {
           "owner": null,
           "reason": null,
           "severity": "P2",
-          "subject": "T16"
+          "subject": "T14"
+        },
+        {
+          "detail": "no WBS node is published for the active project",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T18"
         }
       ],
       "title": "Plan the project's WBS"
@@ -22886,7 +28115,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "rework",
         "earliest_expires": null,
-        "entries": 4,
+        "entries": 2,
         "owners": []
       },
       "depends_on": [],
@@ -22908,9 +28137,7 @@ window.CONVEYOR_REWORK = {
           "source": "snapshot",
           "subjects": [
             "S06",
-            "S17",
-            "T17",
-            "T7"
+            "T17"
           ]
         }
       ],
@@ -22922,7 +28149,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§5.1",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 4,
+      "subject_count": 2,
       "subjects": [
         {
           "detail": "no WBS node is published for the active project",
@@ -22942,27 +28169,7 @@ window.CONVEYOR_REWORK = {
           "owner": null,
           "reason": null,
           "severity": "P2",
-          "subject": "S17"
-        },
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
           "subject": "T17"
-        },
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T7"
         }
       ],
       "title": "Plan the project's WBS"
@@ -23024,12 +28231,12 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-8",
-      "apply_to": "S13",
+      "apply_to": "S19",
       "artefact": "wbs_node",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": null,
-        "entries": 2,
+        "entries": 1,
         "owners": []
       },
       "depends_on": [],
@@ -23050,31 +28257,20 @@ window.CONVEYOR_REWORK = {
           "rule": "wbs_absent",
           "source": "snapshot",
           "subjects": [
-            "S13",
             "S19"
           ]
         }
       ],
       "key": "wbs_absent:tranche-8",
-      "owner_project": "S13",
+      "owner_project": "S19",
       "rule": "wbs_absent",
       "scope": "tranche-8",
       "severity": "P2",
       "spec": "§5.1",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 2,
+      "subject_count": 1,
       "subjects": [
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S13"
-        },
         {
           "detail": "no WBS node is published for the active project",
           "disposition": "rework",
@@ -23089,90 +28285,13 @@ window.CONVEYOR_REWORK = {
       "title": "Plan the project's WBS"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-9",
-      "apply_to": "S18",
-      "artefact": "wbs_node",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 3,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The project has a WBS with at least one work_package node carrying acceptance criteria",
-          "met": false
-        },
-        {
-          "item": "The audit reports no wbs_absent gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "work.json",
-          "rule": "wbs_absent",
-          "source": "snapshot",
-          "subjects": [
-            "S18",
-            "S20",
-            "S21"
-          ]
-        }
-      ],
-      "key": "wbs_absent:tranche-9",
-      "owner_project": "S18",
-      "rule": "wbs_absent",
-      "scope": "tranche-9",
-      "severity": "P2",
-      "spec": "§5.1",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 3,
-      "subjects": [
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S18"
-        },
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S20"
-        },
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S21"
-        }
-      ],
-      "title": "Plan the project's WBS"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check requester_is_approver:programme",
       "apply_to": "PLATFORM",
       "artefact": "architecture_contract",
       "baseline": {
         "disposition": "unprovable",
         "earliest_expires": null,
-        "entries": 1,
+        "entries": 16,
         "owners": []
       },
       "depends_on": [],
@@ -23193,6 +28312,21 @@ window.CONVEYOR_REWORK = {
           "rule": "requester_is_approver",
           "source": "snapshot",
           "subjects": [
+            "T1",
+            "T1",
+            "T10",
+            "T10",
+            "T11",
+            "T11",
+            "T13",
+            "T13",
+            "T19",
+            "T19",
+            "T2",
+            "T2",
+            "T4",
+            "T4",
+            "T9",
             "T9"
           ]
         }
@@ -23205,8 +28339,158 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.1",
       "standard": "TOGAF",
       "status": "suppressed",
-      "subject_count": 1,
+      "subject_count": 16,
       "subjects": [
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T1"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T1"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T10"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T10"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T11"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T11"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T13"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T13"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T2"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T2"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T4"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T4"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T9"
+        },
         {
           "detail": "the snapshot does not carry the contract requester",
           "disposition": "unprovable",
@@ -23219,6 +28503,252 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "Separate the contract requester from its approver"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2:AAA-UI-PROOF-285-2026-11-19T07-3-2",
+      "apply_to": "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+      "artefact": "architecture-artifact",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2",
+              "section": "Metadata",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2",
+              "section": "Entries",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2",
+              "section": "Document",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2:AAA-UI-PROOF-285-2026-11-19T07-3-2",
+      "owner_project": "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+      "rule": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2",
+      "scope": "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The architecture-artifact artefact for current-image UI proof for #285 is partial; missing required sections: Metadata, Entries, Document.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2",
+                  "section": "Metadata",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2",
+                  "section": "Entries",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2",
+                  "section": "Document",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "AAA-UI-PROOF-285-2026-11-19T07-3-2"
+        }
+      ],
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4:AAA-UI-PROOF-285-2026-11-19T07-4",
+      "apply_to": "AAA-UI-PROOF-285-2026-11-19T07-4",
+      "artefact": "architecture-artifact",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4",
+              "section": "Metadata",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4",
+              "section": "Entries",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4",
+              "section": "Document",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4:AAA-UI-PROOF-285-2026-11-19T07-4",
+      "owner_project": "AAA-UI-PROOF-285-2026-11-19T07-4",
+      "rule": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4",
+      "scope": "AAA-UI-PROOF-285-2026-11-19T07-4",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The architecture-artifact artefact for current-image UI proof for #285 is partial; missing required sections: Metadata, Entries, Document.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4",
+                  "section": "Metadata",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4",
+                  "section": "Entries",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4",
+                  "section": "Document",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "AAA-UI-PROOF-285-2026-11-19T07-4"
+        }
+      ],
+      "title": "TOGAF artefact partial: architecture-artifact"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH",
@@ -23236,30 +28766,6 @@ window.CONVEYOR_REWORK = {
       "evidence": [
         {
           "evidence": [
-            {
-              "artefact": "std-togaf-architecture-artifact-design-publish",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-design-publish",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
             {
               "artefact": "std-togaf-architecture-artifact-design-publish",
               "section": "Document",
@@ -23288,35 +28794,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for Programme-level unit (plan: docs/design/STUDIO-SPEC.md) is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for Programme-level unit (plan: docs/design/STUDIO-SPEC.md) is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-design-publish",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-design-publish",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-design-publish",
                   "section": "Document",
@@ -23361,30 +28843,6 @@ window.CONVEYOR_REWORK = {
           "evidence": [
             {
               "artefact": "std-togaf-architecture-artifact-p0",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-p0",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-p0",
               "section": "Document",
               "snapshot": [
                 [
@@ -23411,35 +28869,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for Programme-level unit (plan: docs/plans/P0-programme-definition.md) is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for Programme-level unit (plan: docs/plans/P0-programme-definition.md) is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-p0",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-p0",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-p0",
                   "section": "Document",
@@ -23607,30 +29041,6 @@ window.CONVEYOR_REWORK = {
           "evidence": [
             {
               "artefact": "std-togaf-architecture-artifact-s00",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-s00",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-s00",
               "section": "Document",
               "snapshot": [
                 [
@@ -23657,35 +29067,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for Plan: docs/plans/slices/S00-usage-inventory.md is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for Plan: docs/plans/slices/S00-usage-inventory.md is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-s00",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-s00",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-s00",
                   "section": "Document",
@@ -23730,30 +29116,6 @@ window.CONVEYOR_REWORK = {
           "evidence": [
             {
               "artefact": "std-togaf-architecture-artifact-s01",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-s01",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-s01",
               "section": "Document",
               "snapshot": [
                 [
@@ -23780,35 +29142,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for Plan: docs/plans/slices/S01-ui-spike.md is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for Plan: docs/plans/slices/S01-ui-spike.md is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-s01",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-s01",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-s01",
                   "section": "Document",
@@ -23853,30 +29191,6 @@ window.CONVEYOR_REWORK = {
           "evidence": [
             {
               "artefact": "std-togaf-architecture-artifact-s02",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-s02",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-s02",
               "section": "Document",
               "snapshot": [
                 [
@@ -23903,35 +29217,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for Plan: docs/plans/slices/S02-skeleton.md is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for Plan: docs/plans/slices/S02-skeleton.md is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-s02",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-s02",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-s02",
                   "section": "Document",
@@ -23976,30 +29266,6 @@ window.CONVEYOR_REWORK = {
           "evidence": [
             {
               "artefact": "std-togaf-architecture-artifact-s03",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-s03",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-s03",
               "section": "Document",
               "snapshot": [
                 [
@@ -24026,35 +29292,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for Plan: docs/plans/slices/S03-domain-schema.md is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for Plan: docs/plans/slices/S03-domain-schema.md is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-s03",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-s03",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-s03",
                   "section": "Document",
@@ -24099,30 +29341,6 @@ window.CONVEYOR_REWORK = {
           "evidence": [
             {
               "artefact": "std-togaf-architecture-artifact-s04",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-s04",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-s04",
               "section": "Document",
               "snapshot": [
                 [
@@ -24149,35 +29367,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for Plan: docs/plans/slices/S04-action-registry.md is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for Plan: docs/plans/slices/S04-action-registry.md is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-s04",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-s04",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-s04",
                   "section": "Document",
@@ -25559,7 +30753,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-s12:S12",
-      "apply_to": "S12",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -25682,7 +30876,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-s13:S13",
-      "apply_to": "S13",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -26174,7 +31368,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-s17:S17",
-      "apply_to": "S17",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -26297,7 +31491,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-s18:S18",
-      "apply_to": "S18",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -26543,7 +31737,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-s20:S20",
-      "apply_to": "S20",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -26666,7 +31860,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-s21:S21",
-      "apply_to": "S21",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -26805,30 +31999,6 @@ window.CONVEYOR_REWORK = {
           "evidence": [
             {
               "artefact": "std-togaf-architecture-artifact-spec-v2",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-spec-v2",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-spec-v2",
               "section": "Document",
               "snapshot": [
                 [
@@ -26855,35 +32025,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for Programme-level unit (plan: docs/SPEC_V2.md) is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for Programme-level unit (plan: docs/SPEC_V2.md) is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-spec-v2",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-spec-v2",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-spec-v2",
                   "section": "Document",
@@ -26928,30 +32074,6 @@ window.CONVEYOR_REWORK = {
           "evidence": [
             {
               "artefact": "std-togaf-architecture-artifact-t0",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t0",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t0",
               "section": "Document",
               "snapshot": [
                 [
@@ -26978,35 +32100,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for SPEC_V2 slice T0 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for SPEC_V2 slice T0 (docs/SPEC_V2.md §12) is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-t0",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-t0",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-t0",
                   "section": "Document",
@@ -27051,30 +32149,6 @@ window.CONVEYOR_REWORK = {
           "evidence": [
             {
               "artefact": "std-togaf-architecture-artifact-t10",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t10",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t10",
               "section": "Document",
               "snapshot": [
                 [
@@ -27101,35 +32175,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for SPEC_V2 slice T10 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for SPEC_V2 slice T10 (docs/SPEC_V2.md §12) is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-t10",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-t10",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-t10",
                   "section": "Document",
@@ -27158,7 +32208,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t11:T11",
-      "apply_to": "T11",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -27172,30 +32222,6 @@ window.CONVEYOR_REWORK = {
       "evidence": [
         {
           "evidence": [
-            {
-              "artefact": "std-togaf-architecture-artifact-t11",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t11",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
             {
               "artefact": "std-togaf-architecture-artifact-t11",
               "section": "Document",
@@ -27224,35 +32250,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for SPEC_V2 slice T11 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for SPEC_V2 slice T11 (docs/SPEC_V2.md §12) is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-t11",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-t11",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-t11",
                   "section": "Document",
@@ -27404,7 +32406,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t13:T13",
-      "apply_to": "PLATFORM",
+      "apply_to": "T13",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -27418,30 +32420,6 @@ window.CONVEYOR_REWORK = {
       "evidence": [
         {
           "evidence": [
-            {
-              "artefact": "std-togaf-architecture-artifact-t13",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t13",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
             {
               "artefact": "std-togaf-architecture-artifact-t13",
               "section": "Document",
@@ -27470,35 +32448,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for SPEC_V2 slice T13 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for SPEC_V2 slice T13 (docs/SPEC_V2.md §12) is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-t13",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-t13",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-t13",
                   "section": "Document",
@@ -27527,7 +32481,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t14:T14",
-      "apply_to": "PLATFORM",
+      "apply_to": "T14",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -27773,7 +32727,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t16:T16",
-      "apply_to": "T16",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -28018,6 +32972,129 @@ window.CONVEYOR_REWORK = {
       "title": "TOGAF artefact partial: architecture-artifact"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t18:T18",
+      "apply_to": "T18",
+      "artefact": "architecture-artifact",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-architecture-artifact-t18",
+              "section": "Metadata",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-architecture-artifact-t18",
+              "section": "Entries",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-architecture-artifact-t18",
+              "section": "Document",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-architecture-artifact-t18",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-architecture-artifact-t18:T18",
+      "owner_project": "T18",
+      "rule": "std-togaf-architecture-artifact-t18",
+      "scope": "T18",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The architecture-artifact artefact for SPEC_V2 slice T18 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-architecture-artifact-t18",
+                  "section": "Metadata",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-architecture-artifact-t18",
+                  "section": "Entries",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-architecture-artifact-t18",
+                  "section": "Document",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-architecture-artifact-t18",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T18"
+        }
+      ],
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t1:T1",
       "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
@@ -28033,30 +33110,6 @@ window.CONVEYOR_REWORK = {
       "evidence": [
         {
           "evidence": [
-            {
-              "artefact": "std-togaf-architecture-artifact-t1",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t1",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
             {
               "artefact": "std-togaf-architecture-artifact-t1",
               "section": "Document",
@@ -28085,35 +33138,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for SPEC_V2 slice T1 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for SPEC_V2 slice T1 (docs/SPEC_V2.md §12) is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-t1",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-t1",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-t1",
                   "section": "Document",
@@ -28158,30 +33187,6 @@ window.CONVEYOR_REWORK = {
           "evidence": [
             {
               "artefact": "std-togaf-architecture-artifact-t2",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t2",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t2",
               "section": "Document",
               "snapshot": [
                 [
@@ -28208,35 +33213,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for SPEC_V2 slice T2 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for SPEC_V2 slice T2 (docs/SPEC_V2.md §12) is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-t2",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-t2",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-t2",
                   "section": "Document",
@@ -28404,30 +33385,6 @@ window.CONVEYOR_REWORK = {
           "evidence": [
             {
               "artefact": "std-togaf-architecture-artifact-t4",
-              "section": "Metadata",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t4",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t4",
               "section": "Document",
               "snapshot": [
                 [
@@ -28454,35 +33411,11 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for SPEC_V2 slice T4 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Document.",
+          "detail": "The architecture-artifact artefact for SPEC_V2 slice T4 (docs/SPEC_V2.md §12) is partial; missing required sections: Document.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
-                {
-                  "artefact": "std-togaf-architecture-artifact-t4",
-                  "section": "Metadata",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-t4",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
                 {
                   "artefact": "std-togaf-architecture-artifact-t4",
                   "section": "Document",
@@ -28757,7 +33690,7 @@ window.CONVEYOR_REWORK = {
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t7:T7",
-      "apply_to": "T7",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -29002,9 +33935,9 @@ window.CONVEYOR_REWORK = {
       "title": "TOGAF artefact partial: architecture-artifact"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t9:T9",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-design-publish:DESIGN-PUBLISH",
       "apply_to": "PLATFORM",
-      "artefact": "architecture-artifact",
+      "artefact": "compliance-review",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -29018,38 +33951,26 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-togaf-architecture-artifact-t9",
-              "section": "Metadata",
+              "artefact": "std-togaf-compliance-review-design-publish",
+              "section": "Waivers",
               "snapshot": [
                 [
                   "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t9",
-              "section": "Entries",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
+                  "/waivers",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-togaf-architecture-artifact-t9",
+          "rule": "std-togaf-compliance-review-design-publish",
           "source": "audit"
         }
       ],
-      "key": "std-togaf-architecture-artifact-t9:T9",
-      "owner_project": "T9",
-      "rule": "std-togaf-architecture-artifact-t9",
-      "scope": "T9",
+      "key": "std-togaf-compliance-review-design-publish:DESIGN-PUBLISH",
+      "owner_project": "DESIGN-PUBLISH",
+      "rule": "std-togaf-compliance-review-design-publish",
+      "scope": "DESIGN-PUBLISH",
       "severity": "P2",
       "spec": "§8.1",
       "standard": "TOGAF",
@@ -29057,37 +33978,25 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries.",
+          "detail": "The compliance-review artefact for Programme-level unit (plan: docs/design/STUDIO-SPEC.md) is partial; missing required sections: Waivers.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-togaf-architecture-artifact-t9",
-                  "section": "Metadata",
+                  "artefact": "std-togaf-compliance-review-design-publish",
+                  "section": "Waivers",
                   "snapshot": [
                     [
                       "architecture.json",
-                      "/artifacts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-architecture-artifact-t9",
-                  "section": "Entries",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
+                      "/waivers",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-togaf-architecture-artifact-t9",
+              "rule": "std-togaf-compliance-review-design-publish",
               "source": "audit"
             }
           ],
@@ -29095,15 +34004,15 @@ window.CONVEYOR_REWORK = {
           "owner": null,
           "reason": null,
           "severity": "P2",
-          "subject": "T9"
+          "subject": "DESIGN-PUBLISH"
         }
       ],
-      "title": "TOGAF artefact partial: architecture-artifact"
+      "title": "TOGAF artefact partial: compliance-review"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-a-t9-a:T9",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-p0:P0",
       "apply_to": "PLATFORM",
-      "artefact": "phase-a",
+      "artefact": "compliance-review",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -29117,31 +34026,26 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-togaf-phase-a-t9-a",
-              "section": "Evidence",
+              "artefact": "std-togaf-compliance-review-p0",
+              "section": "Waivers",
               "snapshot": [
                 [
                   "architecture.json",
-                  "/artifacts",
-                  0
-                ],
-                [
-                  "artefacts.json",
-                  "/documents",
+                  "/waivers",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-togaf-phase-a-t9-a",
+          "rule": "std-togaf-compliance-review-p0",
           "source": "audit"
         }
       ],
-      "key": "std-togaf-phase-a-t9-a:T9",
-      "owner_project": "T9",
-      "rule": "std-togaf-phase-a-t9-a",
-      "scope": "T9",
+      "key": "std-togaf-compliance-review-p0:P0",
+      "owner_project": "P0",
+      "rule": "std-togaf-compliance-review-p0",
+      "scope": "P0",
       "severity": "P2",
       "spec": "§8.1",
       "standard": "TOGAF",
@@ -29149,30 +34053,25 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The phase-a artefact for T9 — A is partial; missing required sections: Evidence.",
+          "detail": "The compliance-review artefact for Programme-level unit (plan: docs/plans/P0-programme-definition.md) is partial; missing required sections: Waivers.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-togaf-phase-a-t9-a",
-                  "section": "Evidence",
+                  "artefact": "std-togaf-compliance-review-p0",
+                  "section": "Waivers",
                   "snapshot": [
                     [
                       "architecture.json",
-                      "/artifacts",
-                      0
-                    ],
-                    [
-                      "artefacts.json",
-                      "/documents",
+                      "/waivers",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-togaf-phase-a-t9-a",
+              "rule": "std-togaf-compliance-review-p0",
               "source": "audit"
             }
           ],
@@ -29180,10 +34079,2335 @@ window.CONVEYOR_REWORK = {
           "owner": null,
           "reason": null,
           "severity": "P2",
-          "subject": "T9"
+          "subject": "P0"
         }
       ],
-      "title": "TOGAF artefact partial: phase-a"
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-s00:S00",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-s00",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-s00",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-s00:S00",
+      "owner_project": "S00",
+      "rule": "std-togaf-compliance-review-s00",
+      "scope": "S00",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for Plan: docs/plans/slices/S00-usage-inventory.md is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-s00",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-s00",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S00"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-s01:S01",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-s01",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-s01",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-s01:S01",
+      "owner_project": "S01",
+      "rule": "std-togaf-compliance-review-s01",
+      "scope": "S01",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for Plan: docs/plans/slices/S01-ui-spike.md is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-s01",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-s01",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S01"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-s02:S02",
+      "apply_to": "S02",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-s02",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-s02",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-s02:S02",
+      "owner_project": "S02",
+      "rule": "std-togaf-compliance-review-s02",
+      "scope": "S02",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for Plan: docs/plans/slices/S02-skeleton.md is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-s02",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-s02",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S02"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-s03:S03",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-s03",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-s03",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-s03:S03",
+      "owner_project": "S03",
+      "rule": "std-togaf-compliance-review-s03",
+      "scope": "S03",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for Plan: docs/plans/slices/S03-domain-schema.md is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-s03",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-s03",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S03"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-s04:S04",
+      "apply_to": "S04",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-s04",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-s04",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-s04:S04",
+      "owner_project": "S04",
+      "rule": "std-togaf-compliance-review-s04",
+      "scope": "S04",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for Plan: docs/plans/slices/S04-action-registry.md is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-s04",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-s04",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S04"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-spec-v2:SPEC-V2",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-spec-v2",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-spec-v2",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-spec-v2:SPEC-V2",
+      "owner_project": "SPEC-V2",
+      "rule": "std-togaf-compliance-review-spec-v2",
+      "scope": "SPEC-V2",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for Programme-level unit (plan: docs/SPEC_V2.md) is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-spec-v2",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-spec-v2",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "SPEC-V2"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-t0:T0",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-t0",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-t0",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-t0:T0",
+      "owner_project": "T0",
+      "rule": "std-togaf-compliance-review-t0",
+      "scope": "T0",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for SPEC_V2 slice T0 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-t0",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-t0",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T0"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-t10:T10",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-t10",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-t10",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-t10:T10",
+      "owner_project": "T10",
+      "rule": "std-togaf-compliance-review-t10",
+      "scope": "T10",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for SPEC_V2 slice T10 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-t10",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-t10",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T10"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-t11:T11",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-t11",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-t11",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-t11:T11",
+      "owner_project": "T11",
+      "rule": "std-togaf-compliance-review-t11",
+      "scope": "T11",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for SPEC_V2 slice T11 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-t11",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-t11",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T11"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-t13:T13",
+      "apply_to": "T13",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-t13",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-t13",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-t13:T13",
+      "owner_project": "T13",
+      "rule": "std-togaf-compliance-review-t13",
+      "scope": "T13",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for SPEC_V2 slice T13 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-t13",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-t13",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T13"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-t19:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-t19",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-t19",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-t19:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-compliance-review-t19",
+      "scope": "T19",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for SPEC_V2 slice T19 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-t19",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-t19",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-t1:T1",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-t1",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-t1",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-t1:T1",
+      "owner_project": "T1",
+      "rule": "std-togaf-compliance-review-t1",
+      "scope": "T1",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for SPEC_V2 slice T1 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-t1",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-t1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T1"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-t2:T2",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-t2",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-t2",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-t2:T2",
+      "owner_project": "T2",
+      "rule": "std-togaf-compliance-review-t2",
+      "scope": "T2",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for SPEC_V2 slice T2 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-t2",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-t2",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T2"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-t4:T4",
+      "apply_to": "PLATFORM",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-t4",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-t4",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-t4:T4",
+      "owner_project": "T4",
+      "rule": "std-togaf-compliance-review-t4",
+      "scope": "T4",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for SPEC_V2 slice T4 (docs/SPEC_V2.md §12) is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-t4",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-t4",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T4"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-design-publish-b:DESIGN-PUBLISH",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-design-publish-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-design-publish-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-design-publish-b:DESIGN-PUBLISH",
+      "owner_project": "DESIGN-PUBLISH",
+      "rule": "std-togaf-phase-b-design-publish-b",
+      "scope": "DESIGN-PUBLISH",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for DESIGN-PUBLISH — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-design-publish-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-design-publish-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "DESIGN-PUBLISH"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-p0-b:P0",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-p0-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-p0-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-p0-b:P0",
+      "owner_project": "P0",
+      "rule": "std-togaf-phase-b-p0-b",
+      "scope": "P0",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for P0 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-p0-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-p0-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "P0"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-platform-b:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-platform-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-platform-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-platform-b:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-togaf-phase-b-platform-b",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for PLATFORM — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-platform-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-platform-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-s00-b:S00",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-s00-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-s00-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-s00-b:S00",
+      "owner_project": "S00",
+      "rule": "std-togaf-phase-b-s00-b",
+      "scope": "S00",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for S00 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-s00-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-s00-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S00"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-s01-b:S01",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-s01-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-s01-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-s01-b:S01",
+      "owner_project": "S01",
+      "rule": "std-togaf-phase-b-s01-b",
+      "scope": "S01",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for S01 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-s01-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-s01-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S01"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-s02-b:S02",
+      "apply_to": "S02",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-s02-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-s02-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-s02-b:S02",
+      "owner_project": "S02",
+      "rule": "std-togaf-phase-b-s02-b",
+      "scope": "S02",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for S02 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-s02-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-s02-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S02"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-s03-b:S03",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-s03-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-s03-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-s03-b:S03",
+      "owner_project": "S03",
+      "rule": "std-togaf-phase-b-s03-b",
+      "scope": "S03",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for S03 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-s03-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-s03-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S03"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-s04-b:S04",
+      "apply_to": "S04",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-s04-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-s04-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-s04-b:S04",
+      "owner_project": "S04",
+      "rule": "std-togaf-phase-b-s04-b",
+      "scope": "S04",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for S04 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-s04-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-s04-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S04"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-spec-v2-b:SPEC-V2",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-spec-v2-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-spec-v2-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-spec-v2-b:SPEC-V2",
+      "owner_project": "SPEC-V2",
+      "rule": "std-togaf-phase-b-spec-v2-b",
+      "scope": "SPEC-V2",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for SPEC-V2 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-spec-v2-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-spec-v2-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "SPEC-V2"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-t0-b:T0",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-t0-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-t0-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-t0-b:T0",
+      "owner_project": "T0",
+      "rule": "std-togaf-phase-b-t0-b",
+      "scope": "T0",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for T0 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-t0-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-t0-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T0"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-t1-b:T1",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-t1-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-t1-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-t1-b:T1",
+      "owner_project": "T1",
+      "rule": "std-togaf-phase-b-t1-b",
+      "scope": "T1",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for T1 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-t1-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-t1-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T1"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-t10-b:T10",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-t10-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-t10-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-t10-b:T10",
+      "owner_project": "T10",
+      "rule": "std-togaf-phase-b-t10-b",
+      "scope": "T10",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for T10 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-t10-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-t10-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T10"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-t11-b:T11",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-t11-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-t11-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-t11-b:T11",
+      "owner_project": "T11",
+      "rule": "std-togaf-phase-b-t11-b",
+      "scope": "T11",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for T11 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-t11-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-t11-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T11"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-t13-b:T13",
+      "apply_to": "T13",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-t13-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-t13-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-t13-b:T13",
+      "owner_project": "T13",
+      "rule": "std-togaf-phase-b-t13-b",
+      "scope": "T13",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for T13 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-t13-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-t13-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T13"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-t19-b:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-t19-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-t19-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-t19-b:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-b-t19-b",
+      "scope": "T19",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for T19 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-t19-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-t19-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-t2-b:T2",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-t2-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-t2-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-t2-b:T2",
+      "owner_project": "T2",
+      "rule": "std-togaf-phase-b-t2-b",
+      "scope": "T2",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for T2 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-t2-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-t2-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T2"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-t4-b:T4",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-t4-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-t4-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-t4-b:T4",
+      "owner_project": "T4",
+      "rule": "std-togaf-phase-b-t4-b",
+      "scope": "T4",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for T4 — B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-t4-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-t4-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T4"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-t9-b:T9",
@@ -29212,23 +36436,6 @@ window.CONVEYOR_REWORK = {
                 ]
               ],
               "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-phase-b-t9-b",
-              "section": "Evidence",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ],
-                [
-                  "artefacts.json",
-                  "/documents",
-                  0
-                ]
-              ],
-              "source": "artefact"
             }
           ],
           "rule": "std-togaf-phase-b-t9-b",
@@ -29246,7 +36453,7 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The phase-b artefact for T9 — B is partial; missing required sections: Contract and gate, Evidence.",
+          "detail": "The phase-b artefact for T9 — B is partial; missing required sections: Contract and gate.",
           "disposition": "rework",
           "evidence": [
             {
@@ -29258,23 +36465,6 @@ window.CONVEYOR_REWORK = {
                     [
                       "architecture.json",
                       "/contracts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-phase-b-t9-b",
-                  "section": "Evidence",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ],
-                    [
-                      "artefacts.json",
-                      "/documents",
                       0
                     ]
                   ],
@@ -29293,6 +36483,1281 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-design-publish-c:DESIGN-PUBLISH",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-design-publish-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-design-publish-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-design-publish-c:DESIGN-PUBLISH",
+      "owner_project": "DESIGN-PUBLISH",
+      "rule": "std-togaf-phase-c-design-publish-c",
+      "scope": "DESIGN-PUBLISH",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for DESIGN-PUBLISH — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-design-publish-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-design-publish-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "DESIGN-PUBLISH"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-p0-c:P0",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-p0-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-p0-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-p0-c:P0",
+      "owner_project": "P0",
+      "rule": "std-togaf-phase-c-p0-c",
+      "scope": "P0",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for P0 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-p0-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-p0-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "P0"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-platform-c:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-platform-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-platform-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-platform-c:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-togaf-phase-c-platform-c",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for PLATFORM — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-platform-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-platform-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-s00-c:S00",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-s00-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-s00-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-s00-c:S00",
+      "owner_project": "S00",
+      "rule": "std-togaf-phase-c-s00-c",
+      "scope": "S00",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for S00 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-s00-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-s00-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S00"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-s01-c:S01",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-s01-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-s01-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-s01-c:S01",
+      "owner_project": "S01",
+      "rule": "std-togaf-phase-c-s01-c",
+      "scope": "S01",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for S01 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-s01-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-s01-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S01"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-s02-c:S02",
+      "apply_to": "S02",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-s02-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-s02-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-s02-c:S02",
+      "owner_project": "S02",
+      "rule": "std-togaf-phase-c-s02-c",
+      "scope": "S02",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for S02 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-s02-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-s02-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S02"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-s03-c:S03",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-s03-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-s03-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-s03-c:S03",
+      "owner_project": "S03",
+      "rule": "std-togaf-phase-c-s03-c",
+      "scope": "S03",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for S03 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-s03-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-s03-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S03"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-s04-c:S04",
+      "apply_to": "S04",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-s04-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-s04-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-s04-c:S04",
+      "owner_project": "S04",
+      "rule": "std-togaf-phase-c-s04-c",
+      "scope": "S04",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for S04 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-s04-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-s04-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S04"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-spec-v2-c:SPEC-V2",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-spec-v2-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-spec-v2-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-spec-v2-c:SPEC-V2",
+      "owner_project": "SPEC-V2",
+      "rule": "std-togaf-phase-c-spec-v2-c",
+      "scope": "SPEC-V2",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for SPEC-V2 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-spec-v2-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-spec-v2-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "SPEC-V2"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-t0-c:T0",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-t0-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-t0-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-t0-c:T0",
+      "owner_project": "T0",
+      "rule": "std-togaf-phase-c-t0-c",
+      "scope": "T0",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for T0 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-t0-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-t0-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T0"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-t1-c:T1",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-t1-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-t1-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-t1-c:T1",
+      "owner_project": "T1",
+      "rule": "std-togaf-phase-c-t1-c",
+      "scope": "T1",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for T1 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-t1-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-t1-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T1"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-t10-c:T10",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-t10-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-t10-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-t10-c:T10",
+      "owner_project": "T10",
+      "rule": "std-togaf-phase-c-t10-c",
+      "scope": "T10",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for T10 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-t10-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-t10-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T10"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-t11-c:T11",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-t11-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-t11-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-t11-c:T11",
+      "owner_project": "T11",
+      "rule": "std-togaf-phase-c-t11-c",
+      "scope": "T11",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for T11 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-t11-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-t11-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T11"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-t13-c:T13",
+      "apply_to": "T13",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-t13-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-t13-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-t13-c:T13",
+      "owner_project": "T13",
+      "rule": "std-togaf-phase-c-t13-c",
+      "scope": "T13",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for T13 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-t13-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-t13-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T13"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-t19-c:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-t19-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-t19-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-t19-c:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-c-t19-c",
+      "scope": "T19",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for T19 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-t19-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-t19-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-t2-c:T2",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-t2-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-t2-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-t2-c:T2",
+      "owner_project": "T2",
+      "rule": "std-togaf-phase-c-t2-c",
+      "scope": "T2",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for T2 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-t2-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-t2-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T2"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-t4-c:T4",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-t4-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-t4-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-t4-c:T4",
+      "owner_project": "T4",
+      "rule": "std-togaf-phase-c-t4-c",
+      "scope": "T4",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for T4 — C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-t4-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-t4-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T4"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-t9-c:T9",
@@ -29321,23 +37786,6 @@ window.CONVEYOR_REWORK = {
                 ]
               ],
               "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-phase-c-t9-c",
-              "section": "Evidence",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ],
-                [
-                  "artefacts.json",
-                  "/documents",
-                  0
-                ]
-              ],
-              "source": "artefact"
             }
           ],
           "rule": "std-togaf-phase-c-t9-c",
@@ -29355,7 +37803,7 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The phase-c artefact for T9 — C is partial; missing required sections: Contract and gate, Evidence.",
+          "detail": "The phase-c artefact for T9 — C is partial; missing required sections: Contract and gate.",
           "disposition": "rework",
           "evidence": [
             {
@@ -29367,23 +37815,6 @@ window.CONVEYOR_REWORK = {
                     [
                       "architecture.json",
                       "/contracts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-phase-c-t9-c",
-                  "section": "Evidence",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ],
-                    [
-                      "artefacts.json",
-                      "/documents",
                       0
                     ]
                   ],
@@ -29402,6 +37833,1281 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-design-publish-d:DESIGN-PUBLISH",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-design-publish-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-design-publish-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-design-publish-d:DESIGN-PUBLISH",
+      "owner_project": "DESIGN-PUBLISH",
+      "rule": "std-togaf-phase-d-design-publish-d",
+      "scope": "DESIGN-PUBLISH",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for DESIGN-PUBLISH — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-design-publish-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-design-publish-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "DESIGN-PUBLISH"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-p0-d:P0",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-p0-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-p0-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-p0-d:P0",
+      "owner_project": "P0",
+      "rule": "std-togaf-phase-d-p0-d",
+      "scope": "P0",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for P0 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-p0-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-p0-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "P0"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-platform-d:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-platform-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-platform-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-platform-d:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-togaf-phase-d-platform-d",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for PLATFORM — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-platform-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-platform-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-s00-d:S00",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-s00-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-s00-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-s00-d:S00",
+      "owner_project": "S00",
+      "rule": "std-togaf-phase-d-s00-d",
+      "scope": "S00",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for S00 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-s00-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-s00-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S00"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-s01-d:S01",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-s01-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-s01-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-s01-d:S01",
+      "owner_project": "S01",
+      "rule": "std-togaf-phase-d-s01-d",
+      "scope": "S01",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for S01 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-s01-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-s01-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S01"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-s02-d:S02",
+      "apply_to": "S02",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-s02-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-s02-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-s02-d:S02",
+      "owner_project": "S02",
+      "rule": "std-togaf-phase-d-s02-d",
+      "scope": "S02",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for S02 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-s02-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-s02-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S02"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-s03-d:S03",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-s03-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-s03-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-s03-d:S03",
+      "owner_project": "S03",
+      "rule": "std-togaf-phase-d-s03-d",
+      "scope": "S03",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for S03 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-s03-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-s03-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S03"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-s04-d:S04",
+      "apply_to": "S04",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-s04-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-s04-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-s04-d:S04",
+      "owner_project": "S04",
+      "rule": "std-togaf-phase-d-s04-d",
+      "scope": "S04",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for S04 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-s04-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-s04-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S04"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-spec-v2-d:SPEC-V2",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-spec-v2-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-spec-v2-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-spec-v2-d:SPEC-V2",
+      "owner_project": "SPEC-V2",
+      "rule": "std-togaf-phase-d-spec-v2-d",
+      "scope": "SPEC-V2",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for SPEC-V2 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-spec-v2-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-spec-v2-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "SPEC-V2"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-t0-d:T0",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-t0-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-t0-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-t0-d:T0",
+      "owner_project": "T0",
+      "rule": "std-togaf-phase-d-t0-d",
+      "scope": "T0",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for T0 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-t0-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-t0-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T0"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-t1-d:T1",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-t1-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-t1-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-t1-d:T1",
+      "owner_project": "T1",
+      "rule": "std-togaf-phase-d-t1-d",
+      "scope": "T1",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for T1 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-t1-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-t1-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T1"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-t10-d:T10",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-t10-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-t10-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-t10-d:T10",
+      "owner_project": "T10",
+      "rule": "std-togaf-phase-d-t10-d",
+      "scope": "T10",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for T10 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-t10-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-t10-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T10"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-t11-d:T11",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-t11-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-t11-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-t11-d:T11",
+      "owner_project": "T11",
+      "rule": "std-togaf-phase-d-t11-d",
+      "scope": "T11",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for T11 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-t11-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-t11-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T11"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-t13-d:T13",
+      "apply_to": "T13",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-t13-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-t13-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-t13-d:T13",
+      "owner_project": "T13",
+      "rule": "std-togaf-phase-d-t13-d",
+      "scope": "T13",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for T13 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-t13-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-t13-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T13"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-t19-d:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-t19-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-t19-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-t19-d:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-d-t19-d",
+      "scope": "T19",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for T19 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-t19-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-t19-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-t2-d:T2",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-t2-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-t2-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-t2-d:T2",
+      "owner_project": "T2",
+      "rule": "std-togaf-phase-d-t2-d",
+      "scope": "T2",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for T2 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-t2-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-t2-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T2"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-t4-d:T4",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-t4-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-t4-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-t4-d:T4",
+      "owner_project": "T4",
+      "rule": "std-togaf-phase-d-t4-d",
+      "scope": "T4",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for T4 — D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-t4-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-t4-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T4"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-t9-d:T9",
@@ -29430,23 +39136,6 @@ window.CONVEYOR_REWORK = {
                 ]
               ],
               "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-phase-d-t9-d",
-              "section": "Evidence",
-              "snapshot": [
-                [
-                  "architecture.json",
-                  "/artifacts",
-                  0
-                ],
-                [
-                  "artefacts.json",
-                  "/documents",
-                  0
-                ]
-              ],
-              "source": "artefact"
             }
           ],
           "rule": "std-togaf-phase-d-t9-d",
@@ -29464,7 +39153,7 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The phase-d artefact for T9 — D is partial; missing required sections: Contract and gate, Evidence.",
+          "detail": "The phase-d artefact for T9 — D is partial; missing required sections: Contract and gate.",
           "disposition": "rework",
           "evidence": [
             {
@@ -29476,23 +39165,6 @@ window.CONVEYOR_REWORK = {
                     [
                       "architecture.json",
                       "/contracts",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                },
-                {
-                  "artefact": "std-togaf-phase-d-t9-d",
-                  "section": "Evidence",
-                  "snapshot": [
-                    [
-                      "architecture.json",
-                      "/artifacts",
-                      0
-                    ],
-                    [
-                      "artefacts.json",
-                      "/documents",
                       0
                     ]
                   ],
@@ -29513,9 +39185,9 @@ window.CONVEYOR_REWORK = {
       "title": "TOGAF artefact partial: phase-d"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-design-publish-f:DESIGN-PUBLISH",
       "apply_to": "PLATFORM",
-      "artefact": "requirements-catalog",
+      "artefact": "phase-f",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
@@ -29529,8 +39201,8 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Requirements",
+              "artefact": "std-togaf-phase-f-design-publish-f",
+              "section": "Mandatory artefacts",
               "snapshot": [
                 [
                   null,
@@ -29541,26 +39213,31 @@ window.CONVEYOR_REWORK = {
               "source": "artefact"
             },
             {
-              "artefact": "std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Types",
+              "artefact": "std-togaf-phase-f-design-publish-f",
+              "section": "Evidence",
               "snapshot": [
                 [
-                  null,
-                  null,
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "rule": "std-togaf-phase-f-design-publish-f",
           "source": "audit"
         }
       ],
-      "key": "std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-      "scope": "PLATFORM",
+      "key": "std-togaf-phase-f-design-publish-f:DESIGN-PUBLISH",
+      "owner_project": "DESIGN-PUBLISH",
+      "rule": "std-togaf-phase-f-design-publish-f",
+      "scope": "DESIGN-PUBLISH",
       "severity": "P2",
       "spec": "§8.1",
       "standard": "TOGAF",
@@ -29568,14 +39245,14 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The requirements-catalog artefact for conveyor buildout is partial; missing required sections: Requirements, Types.",
+          "detail": "The phase-f artefact for DESIGN-PUBLISH — F is partial; missing required sections: Mandatory artefacts, Evidence.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Requirements",
+                  "artefact": "std-togaf-phase-f-design-publish-f",
+                  "section": "Mandatory artefacts",
                   "snapshot": [
                     [
                       null,
@@ -29586,8 +39263,105 @@ window.CONVEYOR_REWORK = {
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Types",
+                  "artefact": "std-togaf-phase-f-design-publish-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-design-publish-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "DESIGN-PUBLISH"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-p0-f:P0",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-p0-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-p0-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-p0-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-p0-f:P0",
+      "owner_project": "P0",
+      "rule": "std-togaf-phase-f-p0-f",
+      "scope": "P0",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for P0 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-p0-f",
+                  "section": "Mandatory artefacts",
                   "snapshot": [
                     [
                       null,
@@ -29596,9 +39370,135 @@ window.CONVEYOR_REWORK = {
                     ]
                   ],
                   "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-p0-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
                 }
               ],
-              "rule": "std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "rule": "std-togaf-phase-f-p0-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "P0"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-platform-f:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-platform-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-platform-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-platform-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-platform-f:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-togaf-phase-f-platform-f",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for PLATFORM — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-platform-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-platform-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-platform-f",
               "source": "audit"
             }
           ],
@@ -29609,7 +39509,1642 @@ window.CONVEYOR_REWORK = {
           "subject": "PLATFORM"
         }
       ],
-      "title": "TOGAF artefact partial: requirements-catalog"
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-s00-f:S00",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-s00-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-s00-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-s00-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-s00-f:S00",
+      "owner_project": "S00",
+      "rule": "std-togaf-phase-f-s00-f",
+      "scope": "S00",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for S00 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-s00-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-s00-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-s00-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S00"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-s01-f:S01",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-s01-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-s01-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-s01-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-s01-f:S01",
+      "owner_project": "S01",
+      "rule": "std-togaf-phase-f-s01-f",
+      "scope": "S01",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for S01 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-s01-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-s01-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-s01-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S01"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-s02-f:S02",
+      "apply_to": "S02",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-s02-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-s02-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-s02-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-s02-f:S02",
+      "owner_project": "S02",
+      "rule": "std-togaf-phase-f-s02-f",
+      "scope": "S02",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for S02 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-s02-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-s02-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-s02-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S02"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-s03-f:S03",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-s03-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-s03-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-s03-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-s03-f:S03",
+      "owner_project": "S03",
+      "rule": "std-togaf-phase-f-s03-f",
+      "scope": "S03",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for S03 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-s03-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-s03-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-s03-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S03"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-s04-f:S04",
+      "apply_to": "S04",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-s04-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-s04-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-s04-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-s04-f:S04",
+      "owner_project": "S04",
+      "rule": "std-togaf-phase-f-s04-f",
+      "scope": "S04",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for S04 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-s04-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-s04-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-s04-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S04"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-spec-v2-f:SPEC-V2",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-spec-v2-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-spec-v2-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-spec-v2-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-spec-v2-f:SPEC-V2",
+      "owner_project": "SPEC-V2",
+      "rule": "std-togaf-phase-f-spec-v2-f",
+      "scope": "SPEC-V2",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for SPEC-V2 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-spec-v2-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-spec-v2-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-spec-v2-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "SPEC-V2"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t0-f:T0",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-t0-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-t0-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-t0-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-t0-f:T0",
+      "owner_project": "T0",
+      "rule": "std-togaf-phase-f-t0-f",
+      "scope": "T0",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for T0 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-t0-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-t0-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-t0-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T0"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t1-f:T1",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-t1-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-t1-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-t1-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-t1-f:T1",
+      "owner_project": "T1",
+      "rule": "std-togaf-phase-f-t1-f",
+      "scope": "T1",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for T1 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-t1-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-t1-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-t1-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T1"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t10-f:T10",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-t10-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-t10-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-t10-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-t10-f:T10",
+      "owner_project": "T10",
+      "rule": "std-togaf-phase-f-t10-f",
+      "scope": "T10",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for T10 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-t10-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-t10-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-t10-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T10"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t11-f:T11",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-t11-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-t11-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-t11-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-t11-f:T11",
+      "owner_project": "T11",
+      "rule": "std-togaf-phase-f-t11-f",
+      "scope": "T11",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for T11 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-t11-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-t11-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-t11-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T11"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t13-f:T13",
+      "apply_to": "T13",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-t13-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-t13-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-t13-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-t13-f:T13",
+      "owner_project": "T13",
+      "rule": "std-togaf-phase-f-t13-f",
+      "scope": "T13",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for T13 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-t13-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-t13-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-t13-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T13"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t19-f:T19",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-t19-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-t19-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-t19-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-t19-f:T19",
+      "owner_project": "T19",
+      "rule": "std-togaf-phase-f-t19-f",
+      "scope": "T19",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for T19 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-t19-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-t19-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-t19-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t2-f:T2",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-t2-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-t2-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-t2-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-t2-f:T2",
+      "owner_project": "T2",
+      "rule": "std-togaf-phase-f-t2-f",
+      "scope": "T2",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for T2 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-t2-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-t2-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-t2-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T2"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t4-f:T4",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-t4-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-t4-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-t4-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-t4-f:T4",
+      "owner_project": "T4",
+      "rule": "std-togaf-phase-f-t4-f",
+      "scope": "T4",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for T4 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-t4-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-t4-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-t4-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T4"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t9-f:T9",
+      "apply_to": "PLATFORM",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-t9-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-t9-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-t9-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-t9-f:T9",
+      "owner_project": "T9",
+      "rule": "std-togaf-phase-f-t9-f",
+      "scope": "T9",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for T9 — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-t9-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-t9-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-t9-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T9"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p81-6:T9",
@@ -29790,14 +41325,14 @@ window.CONVEYOR_REWORK = {
   "scorecard": {
     "MSP": {
       "findings": 8,
-      "gaps": 88,
-      "p0": 22,
-      "p1": 65,
-      "p2": 1,
-      "packages": 66,
+      "gaps": 113,
+      "p0": 25,
+      "p1": 83,
+      "p2": 5,
+      "packages": 74,
       "rules": 12,
-      "rules_clean": 4,
-      "rules_with_gaps": 8,
+      "rules_clean": 5,
+      "rules_with_gaps": 7,
       "suppressed": 0
     },
     "PMP": {
@@ -29806,7 +41341,7 @@ window.CONVEYOR_REWORK = {
       "p0": 0,
       "p1": 0,
       "p2": 0,
-      "packages": 49,
+      "packages": 34,
       "rules": 0,
       "rules_clean": 0,
       "rules_with_gaps": 0,
@@ -29814,64 +41349,64 @@ window.CONVEYOR_REWORK = {
     },
     "SAFe": {
       "findings": 13,
-      "gaps": 1,
+      "gaps": 0,
       "p0": 0,
-      "p1": 1,
+      "p1": 0,
       "p2": 0,
-      "packages": 16,
+      "packages": 13,
       "rules": 1,
-      "rules_clean": 0,
-      "rules_with_gaps": 1,
+      "rules_clean": 1,
+      "rules_with_gaps": 0,
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 89,
-      "gaps": 41,
+      "findings": 86,
+      "gaps": 21,
       "p0": 0,
-      "p1": 5,
-      "p2": 36,
-      "packages": 110,
+      "p1": 3,
+      "p2": 18,
+      "packages": 98,
       "rules": 8,
-      "rules_clean": 2,
-      "rules_with_gaps": 6,
+      "rules_clean": 4,
+      "rules_with_gaps": 4,
       "suppressed": 0
     },
     "TOGAF": {
       "findings": 12,
-      "gaps": 62,
-      "p0": 0,
-      "p1": 61,
-      "p2": 1,
-      "packages": 91,
+      "gaps": 73,
+      "p0": 1,
+      "p1": 56,
+      "p2": 16,
+      "packages": 210,
       "rules": 9,
       "rules_clean": 5,
       "rules_with_gaps": 4,
       "suppressed": 0
     }
   },
-  "snapshot": "docs/design/data",
+  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.XOD8UtypLt/data",
   "summary": {
     "by_severity": {
-      "P0": 27,
-      "P1": 150,
-      "P2": 155
+      "P0": 26,
+      "P1": 189,
+      "P2": 214
     },
     "by_standard": {
-      "MSP": 66,
-      "PMP": 49,
-      "SAFe": 16,
-      "SPEC": 110,
-      "TOGAF": 91
+      "MSP": 74,
+      "PMP": 34,
+      "SAFe": 13,
+      "SPEC": 98,
+      "TOGAF": 210
     },
     "by_status": {
-      "open": 329,
-      "suppressed": 3
+      "open": 427,
+      "suppressed": 2
     },
     "duplicates": 0,
-    "open": 329,
-    "packages": 332,
-    "resolved": 11,
-    "subjects": 433,
-    "suppressed": 3
+    "open": 427,
+    "packages": 429,
+    "resolved": 14,
+    "subjects": 544,
+    "suppressed": 2
   }
 };

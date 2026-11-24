@@ -35,7 +35,7 @@ pub mod connectors;
 /// long-lived and unattended, so "an admin may do it" is not a reason to expose it. The
 /// human-only actions (`eval_signoffs.*`, `eval_runs.start|cancel`, `eval_results.label`) and
 /// the held-out reads stay out — see [`crate::spec::ActionSpec::machine_forbidden`].
-pub const MCP_DEFAULT_ACTIONS: [&str; 43] = [
+pub const MCP_DEFAULT_ACTIONS: [&str; 48] = [
     "approvals.decide",
     "approvals.list",
     "approvals.request",
@@ -59,6 +59,11 @@ pub const MCP_DEFAULT_ACTIONS: [&str; 43] = [
     "inference_calls.list",
     "inference_usage.report",
     "knowledge.query",
+    "meetings.agenda_add",
+    "meetings.get",
+    "meetings.list",
+    "meetings.position",
+    "meetings.respond",
     "memory.recall",
     "process_runs.start",
     "processes.create",
@@ -84,13 +89,17 @@ pub const MCP_DEFAULT_ACTIONS: [&str; 43] = [
 /// The operator lifecycle a provisioned text connector may invoke by default: create, run,
 /// approve, answer, close, rerun — and only the reads needed to address them. Everything
 /// administrative is both absent here and refused by the floor.
-pub const CONNECTOR_DEFAULT_ACTIONS: [&str; 18] = [
+pub const CONNECTOR_DEFAULT_ACTIONS: [&str; 22] = [
     "approvals.decide",
     "approvals.list",
     "boards.get",
     "cards.get",
     "cards.list",
     "events.list",
+    "meetings.get",
+    "meetings.list",
+    "meetings.position",
+    "meetings.respond",
     "process_runs.start",
     "processes.get",
     "processes.list",
@@ -143,8 +152,15 @@ pub const MACHINE_DENIED_ACTIONS: [&str; 4] = [
     "boards.set_member",
 ];
 
-/// The one scope whose presence makes an action a person's act (CONTRACT §20).
-pub const MACHINE_DENIED_SCOPE: &str = "evals:approve";
+/// The scopes whose presence makes an action a person's act (CONTRACT §20, D36). Granted to a
+/// machine role or channel, they would let the machine sign off its own work, so the floor
+/// closes the action to every machine whatever a tenant stores.
+pub const MACHINE_DENIED_SCOPES: [&str; 2] = [
+    // S19's eval sign-off.
+    "evals:approve",
+    // T8's lesson review/promotion: D36 requires a person's review.
+    "lessons:review",
+];
 
 /// The compiled default action set for a connector kind.
 ///
@@ -183,6 +199,11 @@ pub fn is_denied_resource(resource: &str) -> bool {
 /// Whether an action is explicitly held out of every machine grant.
 pub fn is_denied_action(action: &str) -> bool {
     MACHINE_DENIED_ACTIONS.contains(&action)
+}
+
+/// Whether a scope marks its action as a person's act — closed to every machine channel.
+pub fn is_denied_scope(scope: &str) -> bool {
+    MACHINE_DENIED_SCOPES.contains(&scope)
 }
 
 #[cfg(test)]

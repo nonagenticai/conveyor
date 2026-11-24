@@ -1,15 +1,2600 @@
 {
   "applied": {
+    "benefit_baseline_placeholder:programme": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:35:04+00:00",
+      "card_id": "01a20ea0-1c60-73e0-a721-bd1393c163d6",
+      "severity": "P1"
+    },
+    "benefit_profile_incomplete:programme": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:35:09+00:00",
+      "card_id": "01a20ea0-2eea-7b38-b02f-d73e1112fd47",
+      "severity": "P1"
+    },
     "closed_without_closure_review:DESIGN-PUBLISH": {
       "apply_to": "PLATFORM",
       "at": "2026-11-21T18:37:12+00:00",
       "card_id": "01a1ff65-ef71-7ccb-96de-373594bc2670",
       "severity": "P0"
+    },
+    "closed_without_closure_review:S05": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:35:14+00:00",
+      "card_id": "01a20ea0-428e-7b36-bdde-5501f8bc065f",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S06b": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:35:19+00:00",
+      "card_id": "01a20ea0-5518-79cb-8428-ea403f75dc48",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S06c": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:35:24+00:00",
+      "card_id": "01a20ea0-68b1-7746-93e1-ec8eb55e51f9",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S06d": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:35:30+00:00",
+      "card_id": "01a20ea0-7dec-79d0-b350-e193e9778941",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S07": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:35:34+00:00",
+      "card_id": "01a20ea0-9042-78e8-9be4-a3842f009cdd",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S08": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:35:38+00:00",
+      "card_id": "01a20ea0-a1e3-7a6a-bf14-6ba2e7a41824",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S09": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:35:43+00:00",
+      "card_id": "01a20ea0-b47b-7938-9982-f833922870ba",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:35:49+00:00",
+      "card_id": "01a20ea0-c9c2-77a1-9baa-806c333bdde7",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:35:53+00:00",
+      "card_id": "01a20ea0-db1e-7b41-a59d-84c5995a0025",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S12": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:35:58+00:00",
+      "card_id": "01a20ea0-ee73-737b-9ac1-c25795f7a4c1",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S13": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:36:03+00:00",
+      "card_id": "01a20ea1-005d-7be4-b7f0-1ce50ef1da1a",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S16": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:36:07+00:00",
+      "card_id": "01a20ea1-11f0-77f2-96b4-695afba6cd6f",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S17": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:36:12+00:00",
+      "card_id": "01a20ea1-2407-79c1-b4e5-1ff61fb193ff",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S18": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:36:16+00:00",
+      "card_id": "01a20ea1-35ca-7216-b651-5536876232c1",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S20": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:36:21+00:00",
+      "card_id": "01a20ea1-4857-7ca8-ba91-331438b029e9",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:S21": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:36:26+00:00",
+      "card_id": "01a20ea1-5b8a-7f59-8170-332863a3f8ab",
+      "severity": "P1"
+    },
+    "closed_without_closure_review:T16": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:20:52+00:00",
+      "card_id": "01a1ffe9-3514-7a53-b44c-118fedc6bd5a",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "closed_without_closure_review:T3": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:20:52+00:00",
+      "card_id": "01a1ffe9-4a90-7c9e-bf88-afb3f1bf68fa",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "closed_without_closure_review:T7": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:20:52+00:00",
+      "card_id": "01a1ffe9-557f-7390-bc56-8d70f35106c5",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "closure_outputs_undeclared:tranche-0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:36:31+00:00",
+      "card_id": "01a20ea1-6f5d-763d-a305-412877bd5215",
+      "severity": "P1"
+    },
+    "closure_outputs_undeclared:tranche-10": {
+      "apply_to": "T5",
+      "at": "2026-11-24T17:36:44+00:00",
+      "card_id": "01a20ea1-a2f8-7899-b483-b8fe7c128eae",
+      "severity": "P1"
+    },
+    "closure_outputs_undeclared:tranche-2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:36:53+00:00",
+      "card_id": "01a20ea1-bffa-7f03-be5b-fd86f67298f9",
+      "severity": "P1"
+    },
+    "closure_outputs_undeclared:tranche-4": {
+      "apply_to": "T14",
+      "at": "2026-11-24T17:37:12+00:00",
+      "card_id": "01a20ea2-0a73-761f-a647-e48376f2e98e",
+      "severity": "P1"
+    },
+    "closure_outputs_undeclared:tranche-5": {
+      "apply_to": "S06",
+      "at": "2026-11-24T17:37:31+00:00",
+      "card_id": "01a20ea2-5537-74ec-8335-4b6a67a99751",
+      "severity": "P1"
+    },
+    "closure_outputs_undeclared:tranche-6": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:37:38+00:00",
+      "card_id": "01a20ea2-7289-7ae0-8ffb-4f1ed82ffb06",
+      "severity": "P1"
+    },
+    "closure_outputs_undeclared:tranche-7": {
+      "apply_to": "S15",
+      "at": "2026-11-24T17:38:00+00:00",
+      "card_id": "01a20ea2-c11a-7726-803c-631b73b814e5",
+      "severity": "P1"
+    },
+    "closure_outputs_undeclared:tranche-8": {
+      "apply_to": "S19",
+      "at": "2026-11-24T17:38:21+00:00",
+      "card_id": "01a20ea3-16d4-7f2b-87f7-7fffa7bb76d8",
+      "severity": "P1"
+    },
+    "closure_outputs_undeclared:tranche-9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:38:29+00:00",
+      "card_id": "01a20ea3-33f8-7a27-af24-3aad4c6ead4b",
+      "severity": "P1"
+    },
+    "compliance_review_missing:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:54:14+00:00",
+      "card_id": "01a20eb1-9522-730e-964c-13ed3f12a251",
+      "severity": "P1"
+    },
+    "compliance_review_missing:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:12:59+00:00",
+      "card_id": "01a20ec2-d15d-72f4-9af1-2550fa957714",
+      "severity": "P1"
+    },
+    "compliance_review_missing:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:54:31+00:00",
+      "card_id": "01a20eb1-e56a-712b-8a46-0dfd64271a43",
+      "severity": "P1"
+    },
+    "compliance_review_missing:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:54:49+00:00",
+      "card_id": "01a20eb2-1fd2-7c48-aa70-65b6cc08f195",
+      "severity": "P1"
+    },
+    "compliance_review_missing:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:31:30+00:00",
+      "card_id": "01a20e94-e189-7c48-8d7f-558a597c3e3d",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "compliance_review_missing:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:55:03+00:00",
+      "card_id": "01a20eb2-5c5d-7293-9ff3-2981d61a4c62",
+      "severity": "P1"
+    },
+    "contract_missing:tranche-10": {
+      "apply_to": "T5",
+      "at": "2026-11-24T17:55:18+00:00",
+      "card_id": "01a20eb2-9362-74f2-a729-35eb979ccf44",
+      "severity": "P1"
+    },
+    "contract_missing:tranche-11": {
+      "apply_to": "S14",
+      "at": "2026-11-24T17:55:28+00:00",
+      "card_id": "01a20eb2-c340-70c0-a8eb-3a46c0150365",
+      "severity": "P1"
+    },
+    "contract_missing:tranche-12": {
+      "apply_to": "T15",
+      "at": "2026-11-24T18:13:10+00:00",
+      "card_id": "01a20ec2-fd82-77d0-aff8-f1c8ceff26da",
+      "severity": "P1"
+    },
+    "contract_missing:tranche-13": {
+      "apply_to": "T12",
+      "at": "2026-11-24T18:13:21+00:00",
+      "card_id": "01a20ec3-275b-7262-99e0-b4839407177b",
+      "severity": "P1"
+    },
+    "contract_missing:tranche-3": {
+      "apply_to": "S04",
+      "at": "2026-11-24T17:55:49+00:00",
+      "card_id": "01a20eb3-17b4-7183-8789-160ae9f422cd",
+      "severity": "P1"
+    },
+    "contract_missing:tranche-4": {
+      "apply_to": "T14",
+      "at": "2026-11-24T17:56:03+00:00",
+      "card_id": "01a20eb3-4f26-799e-b7a3-8ec820edae7a",
+      "severity": "P1"
+    },
+    "contract_missing:tranche-5": {
+      "apply_to": "S06",
+      "at": "2026-11-24T17:56:19+00:00",
+      "card_id": "01a20eb3-8a61-70b6-afeb-49c21029a723",
+      "severity": "P1"
+    },
+    "dependency_untyped:programme": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:17:19+00:00",
+      "card_id": "01a20ec6-c8c2-7235-8ccd-88ee6c92806f",
+      "severity": "P2"
+    },
+    "mandatory_artefacts:tranche-0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:56:29+00:00",
+      "card_id": "01a20eb3-b334-7b52-8f90-bed50382f14d",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-1": {
+      "apply_to": "S02",
+      "at": "2026-11-24T17:57:09+00:00",
+      "card_id": "01a20eb4-4ed6-7064-b979-42a1f4e3ea72",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-10": {
+      "apply_to": "T5",
+      "at": "2026-11-24T17:57:19+00:00",
+      "card_id": "01a20eb4-76fa-7310-9746-d463f5d2f699",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-11": {
+      "apply_to": "S14",
+      "at": "2026-11-24T17:57:34+00:00",
+      "card_id": "01a20eb4-a7aa-741d-81c0-24a3cf7d8d40",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-12": {
+      "apply_to": "T15",
+      "at": "2026-11-24T17:57:47+00:00",
+      "card_id": "01a20eb4-debd-7ddf-9e26-4b23d5d06fdc",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-13": {
+      "apply_to": "T12",
+      "at": "2026-11-24T17:58:02+00:00",
+      "card_id": "01a20eb5-1ceb-7144-a1dc-77e541cea1e1",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:58:16+00:00",
+      "card_id": "01a20eb5-5662-79e4-8e07-ad7b474ed122",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-3": {
+      "apply_to": "S04",
+      "at": "2026-11-24T17:58:33+00:00",
+      "card_id": "01a20eb5-8d90-7a05-a5f8-8ab732d6b780",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-4": {
+      "apply_to": "T14",
+      "at": "2026-11-24T17:58:47+00:00",
+      "card_id": "01a20eb5-bf60-71c8-ab8a-d7fc5a7d1173",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-5": {
+      "apply_to": "S06",
+      "at": "2026-11-24T17:59:01+00:00",
+      "card_id": "01a20eb5-fd3c-7ce4-b0cd-0e27689dd591",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-6": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:59:15+00:00",
+      "card_id": "01a20eb6-324d-73c3-8093-6420223a08a6",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-7": {
+      "apply_to": "S15",
+      "at": "2026-11-24T17:59:29+00:00",
+      "card_id": "01a20eb6-6a2a-7ea7-b115-e147a9a978d5",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-8": {
+      "apply_to": "S19",
+      "at": "2026-11-24T17:59:43+00:00",
+      "card_id": "01a20eb6-a0c1-7f7b-bc73-3b82d2fc1d56",
+      "severity": "P1"
+    },
+    "mandatory_artefacts:tranche-9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:59:59+00:00",
+      "card_id": "01a20eb6-db93-7f7d-ba2a-7dbb6facb3c0",
+      "severity": "P1"
+    },
+    "project_in_unauthorised_tranche:programme": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:13:39+00:00",
+      "card_id": "01a20ec3-6dc5-751c-9b83-503718cd52c5",
+      "severity": "P2"
+    },
+    "project_in_unauthorised_tranche:tranche-10": {
+      "apply_to": "T5",
+      "at": "2026-11-24T17:21:02+00:00",
+      "card_id": "01a1ffe9-803d-7264-b4d3-853dfc66338d",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "project_in_unauthorised_tranche:tranche-11": {
+      "apply_to": "S14",
+      "at": "2026-11-24T17:39:03+00:00",
+      "card_id": "01a20ea3-b7e2-73ed-a0cb-17167a6458fd",
+      "severity": "P1"
+    },
+    "project_in_unauthorised_tranche:tranche-12": {
+      "apply_to": "T15",
+      "at": "2026-11-24T17:39:36+00:00",
+      "card_id": "01a20ea4-3e9f-7b16-81c2-2fef4c78e848",
+      "severity": "P1"
+    },
+    "project_in_unauthorised_tranche:tranche-13": {
+      "apply_to": "T12",
+      "at": "2026-11-24T17:40:02+00:00",
+      "card_id": "01a20ea4-a56c-7ce9-a4ce-cf46ac0d47d1",
+      "severity": "P1"
+    },
+    "project_in_unauthorised_tranche:tranche-4": {
+      "apply_to": "T14",
+      "at": "2026-11-24T17:30:57+00:00",
+      "card_id": "01a20e93-a9df-7e5f-8ef9-02e2acfe7d2c",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "project_in_unauthorised_tranche:tranche-5": {
+      "apply_to": "S06",
+      "at": "2026-11-24T17:31:07+00:00",
+      "card_id": "01a1ffe9-de67-7e7d-802a-7f2e76aae912",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "project_in_unauthorised_tranche:tranche-6": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:21:37+00:00",
+      "card_id": "01a1ffe9-ea22-76cb-9cee-369d1ac8db4f",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "project_in_unauthorised_tranche:tranche-7": {
+      "apply_to": "S15",
+      "at": "2026-11-24T17:21:46+00:00",
+      "card_id": "01a1ffea-1497-7292-a2a7-93aff9094684",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "project_in_unauthorised_tranche:tranche-8": {
+      "apply_to": "S19",
+      "at": "2026-11-24T17:21:54+00:00",
+      "card_id": "01a1ffea-3d79-7ae4-9f9a-423047c00ab8",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "project_in_unauthorised_tranche:tranche-9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:00+00:00",
+      "card_id": "01a20e94-21bc-7154-85e1-e7722875271e",
+      "severity": "P0"
+    },
+    "seed_live_drift:programme": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:44:44+00:00",
+      "card_id": "01a20ea8-f566-7bca-a05b-25cc82b8e677",
+      "severity": "P1"
+    },
+    "std-msp-benefit-transition-b1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:40:10+00:00",
+      "card_id": "01a20ea4-c06c-7076-b213-0943d803c7aa",
+      "severity": "P1"
+    },
+    "std-msp-benefit-transition-b2:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:40:16+00:00",
+      "card_id": "01a20ea4-ddb8-7fac-935d-35b1b9f38e0b",
+      "severity": "P1"
+    },
+    "std-msp-benefit-transition-b3:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:40:25+00:00",
+      "card_id": "01a20ea4-f760-7197-be5d-8fa4c66a0878",
+      "severity": "P1"
+    },
+    "std-msp-benefit-transition-b4:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:40:33+00:00",
+      "card_id": "01a20ea5-1b58-74af-bb8f-58ff2858b376",
+      "severity": "P1"
+    },
+    "std-msp-benefit-transition-b5:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:40:41+00:00",
+      "card_id": "01a20ea5-3d11-7b22-b559-62132086aa43",
+      "severity": "P1"
+    },
+    "std-msp-benefit-transition-b6:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:40:49+00:00",
+      "card_id": "01a20ea5-551d-7341-a706-10ebcd1d9e58",
+      "severity": "P1"
+    },
+    "std-msp-benefit-transition-b7:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:40:56+00:00",
+      "card_id": "01a20ea5-76ff-74c5-a164-88612df8fd84",
+      "severity": "P1"
+    },
+    "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:41:04+00:00",
+      "card_id": "01a20ea5-9280-7e0a-8508-80f3cd9e7182",
+      "severity": "P1"
+    },
+    "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:13:44+00:00",
+      "card_id": "01a20ec3-812f-72fb-84cc-2821e99a2977",
+      "severity": "P2"
+    },
+    "std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:41:14+00:00",
+      "card_id": "01a20ea5-bf0a-7b18-9c51-7f3134cca866",
+      "severity": "P1"
+    },
+    "std-msp-programme-brief-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:13:48+00:00",
+      "card_id": "01a20ec3-9366-7253-861e-4bee81a36a15",
+      "severity": "P2"
+    },
+    "std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:41:21+00:00",
+      "card_id": "01a20ea5-da38-7cef-ba05-f9b6ca2b4531",
+      "severity": "P1"
+    },
+    "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:13:54+00:00",
+      "card_id": "01a20ec3-a755-767c-a85d-d65771c0db5f",
+      "severity": "P2"
+    },
+    "std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:41:26+00:00",
+      "card_id": "01a20ea5-ed79-7569-b955-18676e91c074",
+      "severity": "P1"
+    },
+    "std-pmp-closure-review-p0:P0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:43:41+00:00",
+      "card_id": "01a20ea7-f9c8-7902-9009-aa55c6cd4720",
+      "severity": "P1"
+    },
+    "std-pmp-project-brief-s06a:S06a": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:43:47+00:00",
+      "card_id": "01a20ea8-16be-7411-92d1-a2e3abb1e227",
+      "severity": "P1"
+    },
+    "std-pmp-project-registers-design-publish:DESIGN-PUBLISH": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:14:15+00:00",
+      "card_id": "01a20ec3-f935-79c6-8b96-2efdd43a111b",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-p0:P0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:14:19+00:00",
+      "card_id": "01a20ec4-0a3a-7f5d-a9dc-eb93f3fc0fab",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-platform:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:14:23+00:00",
+      "card_id": "01a20ec4-1b72-7738-9dc5-5e888f51c3bf",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s00:S00": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:14:28+00:00",
+      "card_id": "01a20ec4-2e24-7cbd-9214-3be8ec488e0e",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s01:S01": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:14:33+00:00",
+      "card_id": "01a20ec4-3f65-73f9-9a9c-d204b7c81dc5",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s02:S02": {
+      "apply_to": "S02",
+      "at": "2026-11-24T18:14:37+00:00",
+      "card_id": "01a20ec4-505f-74d0-b00e-24fc328086dc",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s03:S03": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:14:41+00:00",
+      "card_id": "01a20ec4-623a-73fd-baf4-f8d0c08609de",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s04:S04": {
+      "apply_to": "S04",
+      "at": "2026-11-24T18:14:53+00:00",
+      "card_id": "01a20ec4-9013-74b3-9704-0211e180bdd6",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s05:S05": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:14:57+00:00",
+      "card_id": "01a20ec4-a08e-7dae-8ddf-1042c5cd40bd",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s06b:S06b": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:15:02+00:00",
+      "card_id": "01a20ec4-b1a7-7a73-bd5f-4366c08ba15a",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s06c:S06c": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:15:06+00:00",
+      "card_id": "01a20ec4-c256-7f47-94e0-51dfbfb55580",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s06d:S06d": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:15:10+00:00",
+      "card_id": "01a20ec4-d2f2-7dbc-a0c7-417e484a32f0",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s07:S07": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:15:15+00:00",
+      "card_id": "01a20ec4-e3d9-7eb8-aaa8-94a21359b3ff",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s08:S08": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:15:19+00:00",
+      "card_id": "01a20ec4-f4a9-7005-9cca-a040a5fb5244",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s09:S09": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:15:25+00:00",
+      "card_id": "01a20ec5-0b10-7f9f-a442-cfbca305abbb",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s10:S10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:15:30+00:00",
+      "card_id": "01a20ec5-1d5d-797d-875e-d652d438a497",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s11:S11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:15:34+00:00",
+      "card_id": "01a20ec5-2f92-7100-8f38-fb17db6361f7",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s14:S14": {
+      "apply_to": "S14",
+      "at": "2026-11-24T18:15:45+00:00",
+      "card_id": "01a20ec5-5ba2-789a-8a3a-abc1a0a38ba2",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-s16:S16": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:15:50+00:00",
+      "card_id": "01a20ec5-6d4b-7959-b5ff-3573d93a250e",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-spec-v2:SPEC-V2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:15:54+00:00",
+      "card_id": "01a20ec5-7e5d-7876-ae27-0f3ff6974f3d",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-t0:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:16:01+00:00",
+      "card_id": "01a20ec5-994f-797a-b51b-e8af651a35ab",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-t10:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:16:06+00:00",
+      "card_id": "01a20ec5-ac33-7aa2-8b2f-3d4aad38888d",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-t11:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:16:11+00:00",
+      "card_id": "01a20ec5-bee9-763e-995b-512130a4d196",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-t13:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:16:22+00:00",
+      "card_id": "01a20ec5-ebb7-7987-ad2f-94cbae1f629d",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-t14:T14": {
+      "apply_to": "T14",
+      "at": "2026-11-24T18:16:34+00:00",
+      "card_id": "01a20ec6-17e5-7ded-9e31-e4ec265b976d",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-t1:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:16:38+00:00",
+      "card_id": "01a20ec6-2918-7fd1-919c-c24acd0b9e9f",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-t2:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:16:42+00:00",
+      "card_id": "01a20ec6-3a44-70f7-846c-f03511693240",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-t3:T3": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:16:47+00:00",
+      "card_id": "01a20ec6-4bd3-721a-83b0-583890eaf590",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-t4:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:16:52+00:00",
+      "card_id": "01a20ec6-5e8d-75e8-8a95-8f9a0ac9cfb4",
+      "severity": "P2"
+    },
+    "std-pmp-project-registers-t9:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:16:56+00:00",
+      "card_id": "01a20ec6-7051-7732-bfc6-ecb52444c22e",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2:AAA-UI-PROOF-285-2026-11-19T07-3-2": {
+      "apply_to": "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+      "at": "2026-11-24T18:20:52+00:00",
+      "card_id": "01a20eca-0a21-75c8-9085-5b649da57fe5",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4:AAA-UI-PROOF-285-2026-11-19T07-4": {
+      "apply_to": "AAA-UI-PROOF-285-2026-11-19T07-4",
+      "at": "2026-11-24T18:21:07+00:00",
+      "card_id": "01a20eca-4373-7258-9a25-3ed64365ed8f",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:21:11+00:00",
+      "card_id": "01a20eca-541c-71ff-83b0-f7950d20c9db",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-p0:P0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:21:16+00:00",
+      "card_id": "01a20eca-6750-704b-a9d5-cafeb688f899",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-platform:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:21:20+00:00",
+      "card_id": "01a20eca-7872-7021-87d4-a7e99fce13ce",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s00:S00": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:21:25+00:00",
+      "card_id": "01a20eca-891b-7d4b-ba82-383bc7a988b9",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s01:S01": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:21:29+00:00",
+      "card_id": "01a20eca-9a09-7f07-b4c2-59e294ab9012",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s02:S02": {
+      "apply_to": "S02",
+      "at": "2026-11-24T18:21:33+00:00",
+      "card_id": "01a20eca-aa7b-7ece-8f52-89cf69bec713",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s03:S03": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:21:38+00:00",
+      "card_id": "01a20eca-bae1-7f12-a8e7-27404417e52f",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s04:S04": {
+      "apply_to": "S04",
+      "at": "2026-11-24T18:21:42+00:00",
+      "card_id": "01a20eca-cc33-7e5d-9330-e44ca3a9fc0b",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s05:S05": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:21:46+00:00",
+      "card_id": "01a20eca-dcb4-7891-b34e-0ac1dba6e01e",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s06:S06": {
+      "apply_to": "S06",
+      "at": "2026-11-24T18:21:51+00:00",
+      "card_id": "01a20eca-ee53-783e-831b-17a1ac40348c",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s06a:S06a": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:21:55+00:00",
+      "card_id": "01a20eca-ff75-7e50-8391-ffedb2bddad0",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s06b:S06b": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:22:00+00:00",
+      "card_id": "01a20ecb-11a3-7236-bdcf-673ed61d4cd7",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s06c:S06c": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:22:04+00:00",
+      "card_id": "01a20ecb-248e-72b8-a0d8-b91a7d309974",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s06d:S06d": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:22:09+00:00",
+      "card_id": "01a20ecb-350a-7a38-9e7e-a6c5c3613628",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s07:S07": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:22:13+00:00",
+      "card_id": "01a20ecb-4631-74e9-9ed6-5dd3ee42f1a9",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s08:S08": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:22:17+00:00",
+      "card_id": "01a20ecb-5756-784f-a3c1-f143eb9e2360",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s09:S09": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:22:22+00:00",
+      "card_id": "01a20ecb-6986-76da-ab05-e36db94e5c5e",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s10:S10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:22:27+00:00",
+      "card_id": "01a20ecb-7ad0-72fb-8534-7b6d02fc4afe",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s11:S11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:22:31+00:00",
+      "card_id": "01a20ecb-8b62-7079-8afd-fada64a1fd4a",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s12:S12": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:22:35+00:00",
+      "card_id": "01a20ecb-9c93-7897-84b3-aa9404cf69ef",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s13:S13": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:22:41+00:00",
+      "card_id": "01a20ecb-b1a9-7cd7-ac77-815b14ec4838",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s14:S14": {
+      "apply_to": "S14",
+      "at": "2026-11-24T18:22:45+00:00",
+      "card_id": "01a20ecb-c3f4-731e-a617-bd9796b76734",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s15:S15": {
+      "apply_to": "S15",
+      "at": "2026-11-24T18:22:50+00:00",
+      "card_id": "01a20ecb-d4e8-72ed-8224-4512754aff5d",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s16:S16": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:22:54+00:00",
+      "card_id": "01a20ecb-e5e8-7b55-a4ad-295cef787802",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s17:S17": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:22:58+00:00",
+      "card_id": "01a20ecb-f69c-7474-8fc8-e2e0edbbb1ff",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s18:S18": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:23:03+00:00",
+      "card_id": "01a20ecc-0768-7146-bdf0-33c0148ae3b5",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s19:S19": {
+      "apply_to": "S19",
+      "at": "2026-11-24T18:23:07+00:00",
+      "card_id": "01a20ecc-1812-7b33-9f6e-1f5cb78b71a8",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s20:S20": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:23:11+00:00",
+      "card_id": "01a20ecc-29dd-75c9-9588-6625295909c5",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-s21:S21": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:23:16+00:00",
+      "card_id": "01a20ecc-3a76-7211-84f3-0c0474aa1d1b",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-spec-v2:SPEC-V2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:23:20+00:00",
+      "card_id": "01a20ecc-4b72-70c8-ad2c-7226b528a80b",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t0:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:23:24+00:00",
+      "card_id": "01a20ecc-5c1d-7e27-bc49-bdf51d88aa22",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t10:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:23:28+00:00",
+      "card_id": "01a20ecc-6ca2-776b-86b3-032ad1346f71",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t11:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:23:33+00:00",
+      "card_id": "01a20ecc-7d79-7e2f-842a-35ea3a00b83e",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t12:T12": {
+      "apply_to": "T12",
+      "at": "2026-11-24T18:23:37+00:00",
+      "card_id": "01a20ecc-8f4c-7b1d-a9d5-beab357fbbbb",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t13:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:23:42+00:00",
+      "card_id": "01a20ecc-a1cc-74c7-aa57-3cc3d080af1e",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t14:T14": {
+      "apply_to": "T14",
+      "at": "2026-11-24T18:23:46+00:00",
+      "card_id": "01a20ecc-b2a0-75ae-9433-b8d183d9fb4a",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t15:T15": {
+      "apply_to": "T15",
+      "at": "2026-11-24T18:23:51+00:00",
+      "card_id": "01a20ecc-c417-7f7d-b801-1e4f070a3d77",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t16:T16": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:23:55+00:00",
+      "card_id": "01a20ecc-d4f9-7e42-b095-52d1c98c732e",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t17:T17": {
+      "apply_to": "T17",
+      "at": "2026-11-24T18:24:00+00:00",
+      "card_id": "01a20ecc-e5cb-7fe7-97be-3a6dcd83c849",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t18:T18": {
+      "apply_to": "T18",
+      "at": "2026-11-24T18:24:14+00:00",
+      "card_id": "01a20ecd-1e7d-7b54-9628-5a76697c556d",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t1:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:24:19+00:00",
+      "card_id": "01a20ecd-307e-7aed-b74a-8cfc03f2947c",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t2:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:24:23+00:00",
+      "card_id": "01a20ecd-4219-7c35-b1c1-f633f9819c7b",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t3:T3": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:24:27+00:00",
+      "card_id": "01a20ecd-52be-7b22-88f3-c9eb3589309d",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t4:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:24:32+00:00",
+      "card_id": "01a20ecd-63a1-7ff2-9b15-c9aadfbbe490",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t5:T5": {
+      "apply_to": "T5",
+      "at": "2026-11-24T18:24:36+00:00",
+      "card_id": "01a20ecd-752a-78ad-ab2f-669ae43293bf",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t6:T6": {
+      "apply_to": "T6",
+      "at": "2026-11-24T18:24:47+00:00",
+      "card_id": "01a20ecd-a009-7daf-a55e-5ded730a1782",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t7:T7": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:24:53+00:00",
+      "card_id": "01a20ecd-b273-7743-8ab7-1ee1882e7ab8",
+      "severity": "P2"
+    },
+    "std-togaf-architecture-artifact-t8:T8": {
+      "apply_to": "T8",
+      "at": "2026-11-24T18:25:06+00:00",
+      "card_id": "01a20ecd-e8af-70fc-b556-6ee82a8be6a3",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-design-publish:DESIGN-PUBLISH": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:25:10+00:00",
+      "card_id": "01a20ecd-f959-7978-8d3d-68d6d168a218",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-p0:P0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:25:14+00:00",
+      "card_id": "01a20ece-0ad6-78fb-b5fa-c1f7c479371b",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-s00:S00": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:25:19+00:00",
+      "card_id": "01a20ece-1c03-77ef-9fda-5ddfcaaefb9b",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-s01:S01": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:25:23+00:00",
+      "card_id": "01a20ece-2cbf-7bc3-994d-9e9661bfdb05",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-s02:S02": {
+      "apply_to": "S02",
+      "at": "2026-11-24T18:25:28+00:00",
+      "card_id": "01a20ece-3de2-7a26-9330-9a25320e24a9",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-s03:S03": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:25:32+00:00",
+      "card_id": "01a20ece-4f4b-78f6-b30b-7783219433a9",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-s04:S04": {
+      "apply_to": "S04",
+      "at": "2026-11-24T18:25:37+00:00",
+      "card_id": "01a20ece-61cd-7569-ae54-ce60216779fb",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-spec-v2:SPEC-V2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:25:41+00:00",
+      "card_id": "01a20ece-72bd-7f50-9291-8a6b2620f1b3",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-t0:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:25:46+00:00",
+      "card_id": "01a20ece-8483-7030-b945-b2f0f570a3f8",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-t10:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:25:50+00:00",
+      "card_id": "01a20ece-9589-7eb7-82fe-b8d7437e9f5e",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-t11:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:25:54+00:00",
+      "card_id": "01a20ece-a6d9-77a3-8e04-337c22f8c5e8",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-t13:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:25:59+00:00",
+      "card_id": "01a20ece-b81d-762f-a49a-03c98649a579",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-t19:T19": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:26:03+00:00",
+      "card_id": "01a20ece-c903-7ede-b49c-cf92976cbdc7",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-t1:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:26:08+00:00",
+      "card_id": "01a20ece-da0c-7510-a91a-7396edeac212",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-t2:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:26:12+00:00",
+      "card_id": "01a20ece-ebb0-7bdf-9e89-bf4fdf4f8c14",
+      "severity": "P2"
+    },
+    "std-togaf-compliance-review-t4:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:26:16+00:00",
+      "card_id": "01a20ece-fc97-74f4-ba38-e614460a9e88",
+      "severity": "P2"
+    },
+    "std-togaf-delivery-contract-platform:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:00:14+00:00",
+      "card_id": "01a20eb7-1d98-71f8-8fd8-5399e15406fc",
+      "severity": "P1"
+    },
+    "std-togaf-delivery-contract-s04:S04": {
+      "apply_to": "S04",
+      "at": "2026-11-24T18:00:29+00:00",
+      "card_id": "01a20eb7-46f1-7112-a659-8c34b15677f9",
+      "severity": "P1"
+    },
+    "std-togaf-phase-b-design-publish-b:DESIGN-PUBLISH": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:26:21+00:00",
+      "card_id": "01a20ecf-0dd4-710a-aafc-76315a0297eb",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-p0-b:P0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:26:25+00:00",
+      "card_id": "01a20ecf-1fb0-706a-9b94-0e920db1b43c",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-platform-b:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:26:30+00:00",
+      "card_id": "01a20ecf-31ac-7fd4-80da-181178fdc457",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-s00-b:S00": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:26:34+00:00",
+      "card_id": "01a20ecf-4313-7c4b-9363-3c686d2fbe68",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-s01-b:S01": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:26:39+00:00",
+      "card_id": "01a20ecf-546e-77bf-a03a-2ec8a1d518fd",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-s02-b:S02": {
+      "apply_to": "S02",
+      "at": "2026-11-24T18:26:43+00:00",
+      "card_id": "01a20ecf-6642-7a8e-aef3-4d86e99f649a",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-s03-b:S03": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:26:48+00:00",
+      "card_id": "01a20ecf-779d-74b4-b202-ef8f71d3f165",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-s04-b:S04": {
+      "apply_to": "S04",
+      "at": "2026-11-24T18:26:52+00:00",
+      "card_id": "01a20ecf-88cf-7f82-b33b-44f92b585bbc",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-spec-v2-b:SPEC-V2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:26:57+00:00",
+      "card_id": "01a20ecf-9b65-7b8f-8e97-833eb7a7be1f",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-t0-b:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:27:02+00:00",
+      "card_id": "01a20ecf-ad45-7762-a8a5-1f8a99fa1c9d",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-t1-b:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:27:06+00:00",
+      "card_id": "01a20ecf-be95-764d-b215-0a32b4182a63",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-t10-b:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:27:11+00:00",
+      "card_id": "01a20ecf-d070-77f6-bfe4-ae14c5ad442d",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-t11-b:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:27:15+00:00",
+      "card_id": "01a20ecf-e179-7650-9323-cb3ca254f091",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-t13-b:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:27:20+00:00",
+      "card_id": "01a20ecf-f376-7ef9-9dc4-b3a55b9c2127",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-t19-b:T19": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:27:24+00:00",
+      "card_id": "01a20ed0-05ff-73ec-9b53-1efb039345bc",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-t2-b:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:27:29+00:00",
+      "card_id": "01a20ed0-176c-70af-b4e9-5db3f175ca18",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-t4-b:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:27:33+00:00",
+      "card_id": "01a20ed0-2919-7305-9c2c-b8e4ec6427ae",
+      "severity": "P2"
+    },
+    "std-togaf-phase-b-t9-b:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:27:38+00:00",
+      "card_id": "01a20ed0-3b42-725c-8972-720628f23e03",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-design-publish-c:DESIGN-PUBLISH": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:27:42+00:00",
+      "card_id": "01a20ed0-4cbf-7a98-9609-e5c42a923402",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-p0-c:P0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:27:47+00:00",
+      "card_id": "01a20ed0-5dff-7589-ac9a-69d7c7a8d9ce",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-platform-c:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:27:51+00:00",
+      "card_id": "01a20ed0-6fdc-7f9a-b353-c31198bfca60",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-s00-c:S00": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:27:56+00:00",
+      "card_id": "01a20ed0-8110-7263-8eec-a30072b7b90d",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-s01-c:S01": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:28:00+00:00",
+      "card_id": "01a20ed0-9254-7e0d-ae0c-7ee10c2cc01d",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-s02-c:S02": {
+      "apply_to": "S02",
+      "at": "2026-11-24T18:28:05+00:00",
+      "card_id": "01a20ed0-a3ef-7ed7-bfcb-fb19fa79969b",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-s03-c:S03": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:28:09+00:00",
+      "card_id": "01a20ed0-b555-7cb2-a90e-b65e24d1fd8a",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-s04-c:S04": {
+      "apply_to": "S04",
+      "at": "2026-11-24T18:28:14+00:00",
+      "card_id": "01a20ed0-c731-75d1-bdf3-8b0898605c07",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-spec-v2-c:SPEC-V2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:28:18+00:00",
+      "card_id": "01a20ed0-d89d-73c7-b232-e4e426f0a056",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-t0-c:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:28:22+00:00",
+      "card_id": "01a20ed0-e958-707a-9c1d-95642f5586ee",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-t1-c:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:28:27+00:00",
+      "card_id": "01a20ed0-fabe-7f1a-aa2b-91c0ab765f77",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-t10-c:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:28:31+00:00",
+      "card_id": "01a20ed1-0ba5-75f5-992a-7a8be224274b",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-t11-c:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:28:36+00:00",
+      "card_id": "01a20ed1-1ca8-7844-b6c4-c95e401a63ed",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-t13-c:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:28:40+00:00",
+      "card_id": "01a20ed1-2db5-72c7-8133-d734898ff401",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-t19-c:T19": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:28:44+00:00",
+      "card_id": "01a20ed1-3ecd-7701-a10d-dc9ba4759452",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-t2-c:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:28:49+00:00",
+      "card_id": "01a20ed1-504e-7994-aacd-b4a496fcbe58",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-t4-c:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:28:53+00:00",
+      "card_id": "01a20ed1-6205-75bb-9155-b54b1eda4abd",
+      "severity": "P2"
+    },
+    "std-togaf-phase-c-t9-c:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:28:58+00:00",
+      "card_id": "01a20ed1-73a2-7bc6-9d21-34579634ce64",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-design-publish-d:DESIGN-PUBLISH": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:29:02+00:00",
+      "card_id": "01a20ed1-84b5-7ad6-8786-645c8bc11074",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-p0-d:P0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:29:07+00:00",
+      "card_id": "01a20ed1-95f2-7292-adc5-99b719bc5ec9",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-platform-d:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:29:11+00:00",
+      "card_id": "01a20ed1-a80f-745d-9890-6b5da943a1e2",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-s00-d:S00": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:29:16+00:00",
+      "card_id": "01a20ed1-b90c-709e-89cc-a609369b50f3",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-s01-d:S01": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:29:20+00:00",
+      "card_id": "01a20ed1-c9d5-7c9a-a88a-491b25bc98ef",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-s02-d:S02": {
+      "apply_to": "S02",
+      "at": "2026-11-24T18:29:25+00:00",
+      "card_id": "01a20ed1-dba9-795d-b8ac-25d15d8b4ce3",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-s03-d:S03": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:29:29+00:00",
+      "card_id": "01a20ed1-ed7f-7d63-89d2-07877ab67888",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-s04-d:S04": {
+      "apply_to": "S04",
+      "at": "2026-11-24T18:29:33+00:00",
+      "card_id": "01a20ed1-fe8a-73df-84d1-521a5f300fee",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-spec-v2-d:SPEC-V2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:29:38+00:00",
+      "card_id": "01a20ed2-0ff0-716a-b2a2-78d2dc34e789",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-t0-d:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:29:42+00:00",
+      "card_id": "01a20ed2-2137-7015-b7e8-3087c4458399",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-t1-d:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:29:47+00:00",
+      "card_id": "01a20ed2-323a-70e7-9a47-76baa4b4dd97",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-t10-d:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:29:51+00:00",
+      "card_id": "01a20ed2-4364-7908-ae20-0ad5ff3231e2",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-t11-d:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:29:56+00:00",
+      "card_id": "01a20ed2-5480-79cc-b12e-cb8fd822464b",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-t13-d:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:30:00+00:00",
+      "card_id": "01a20ed2-65cd-7a73-a27a-66b044a0b99c",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-t19-d:T19": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:30:04+00:00",
+      "card_id": "01a20ed2-7669-7bd8-8571-b71f5e9a8f49",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-t2-d:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:30:09+00:00",
+      "card_id": "01a20ed2-879b-73fc-bc17-8c8e4048d714",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-t4-d:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:30:13+00:00",
+      "card_id": "01a20ed2-9865-7cf2-b15f-163e542cde40",
+      "severity": "P2"
+    },
+    "std-togaf-phase-d-t9-d:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:30:17+00:00",
+      "card_id": "01a20ed2-a93d-7c36-aaa0-094253a39a27",
+      "severity": "P2"
+    },
+    "std-togaf-phase-e-design-publish-e:DESIGN-PUBLISH": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:00:39+00:00",
+      "card_id": "01a20eb7-7eaf-73c1-bd7b-ec9ec553cf79",
+      "severity": "P1"
+    },
+    "std-togaf-phase-e-p0-e:P0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:00:51+00:00",
+      "card_id": "01a20eb7-aa39-7f63-b4c2-7a3dd13a7812",
+      "severity": "P1"
+    },
+    "std-togaf-phase-e-platform-e:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:01:06+00:00",
+      "card_id": "01a20eb7-e465-732e-8c54-5c7d3b50ebe2",
+      "severity": "P1"
+    },
+    "std-togaf-phase-e-s03-e:S03": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:01:20+00:00",
+      "card_id": "01a20eb8-1ee7-787d-858b-9a278449e551",
+      "severity": "P1"
+    },
+    "std-togaf-phase-e-spec-v2-e:SPEC-V2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:01:32+00:00",
+      "card_id": "01a20eb8-4e77-7c88-a183-786df2565041",
+      "severity": "P1"
+    },
+    "std-togaf-phase-e-t10-e:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:01:59+00:00",
+      "card_id": "01a20eb8-adcd-7245-a3f3-baa4327773da",
+      "severity": "P1"
+    },
+    "std-togaf-phase-e-t13-e:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:02:13+00:00",
+      "card_id": "01a20eb8-ee54-74a2-a8e8-e2a7b28f3b03",
+      "severity": "P1"
+    },
+    "std-togaf-phase-e-t19-e:T19": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:02:29+00:00",
+      "card_id": "01a20eb9-1f3e-75ad-a6a9-5e3b21b14580",
+      "severity": "P1"
+    },
+    "std-togaf-phase-e-t4-e:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:02:45+00:00",
+      "card_id": "01a20eb9-6b7e-7245-8d3a-5c3ddcbd743a",
+      "severity": "P1"
+    },
+    "std-togaf-phase-e-t9-e:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:02:54+00:00",
+      "card_id": "01a20eb9-9288-7b6d-80b9-1781013a6a3e",
+      "severity": "P1"
+    },
+    "std-togaf-phase-f-design-publish-f:DESIGN-PUBLISH": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:30:21+00:00",
+      "card_id": "01a20ed2-b9ed-7a71-920d-0c2014faf2c2",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-p0-f:P0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:30:26+00:00",
+      "card_id": "01a20ed2-cab7-7c73-8ac0-23206f492f7d",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-platform-f:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:30:30+00:00",
+      "card_id": "01a20ed2-db78-7da3-94c3-cf1b8f8dc49c",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-s00-f:S00": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:30:34+00:00",
+      "card_id": "01a20ed2-ec13-70e2-a75c-7a7896294d26",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-s01-f:S01": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:30:38+00:00",
+      "card_id": "01a20ed2-fca0-7f27-b6cf-3e5b0b60575c",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-s02-f:S02": {
+      "apply_to": "S02",
+      "at": "2026-11-24T18:30:43+00:00",
+      "card_id": "01a20ed3-0d56-707e-8bd3-b452d06040ac",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-s03-f:S03": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:30:47+00:00",
+      "card_id": "01a20ed3-1d94-73d3-958b-4d737ad1abf4",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-s04-f:S04": {
+      "apply_to": "S04",
+      "at": "2026-11-24T18:30:51+00:00",
+      "card_id": "01a20ed3-2dde-7329-9726-a1c66eb7bb51",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-spec-v2-f:SPEC-V2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:30:55+00:00",
+      "card_id": "01a20ed3-3e88-7f71-a606-bb18cdb746fb",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-t0-f:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:31:00+00:00",
+      "card_id": "01a20ed3-4ec8-7643-8f10-2e0c655b4a17",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-t1-f:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:31:04+00:00",
+      "card_id": "01a20ed3-5f68-7427-a08e-d4ad02cb001e",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-t10-f:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:31:08+00:00",
+      "card_id": "01a20ed3-70a6-7194-9783-1b7470c7377d",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-t11-f:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:31:13+00:00",
+      "card_id": "01a20ed3-81ba-7da6-8998-cd858e3daa06",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-t13-f:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:31:17+00:00",
+      "card_id": "01a20ed3-9359-711a-a835-0a34b0c6123f",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-t19-f:T19": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:31:22+00:00",
+      "card_id": "01a20ed3-a514-7571-b11b-b438bd6a0284",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-t2-f:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:31:26+00:00",
+      "card_id": "01a20ed3-b6f5-7c85-8992-38c33a5ccc2b",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-t4-f:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:31:31+00:00",
+      "card_id": "01a20ed3-c7fc-7aff-806b-d33ca058d881",
+      "severity": "P2"
+    },
+    "std-togaf-phase-f-t9-f:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:31:35+00:00",
+      "card_id": "01a20ed3-d932-737d-8352-c823d59d0e89",
+      "severity": "P2"
+    },
+    "std-togaf-phase-g-design-publish-g:DESIGN-PUBLISH": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:03:06+00:00",
+      "card_id": "01a20eb9-bce9-7b06-84a8-45dd810cca86",
+      "severity": "P1"
+    },
+    "std-togaf-phase-g-p0-g:P0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:03:19+00:00",
+      "card_id": "01a20eb9-eec8-7b69-92a1-4df55f59d947",
+      "severity": "P1"
+    },
+    "std-togaf-phase-g-platform-g:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:03:44+00:00",
+      "card_id": "01a20eba-4534-7ab1-b638-3a370ca58657",
+      "severity": "P1"
+    },
+    "std-togaf-phase-g-s03-g:S03": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:03:58+00:00",
+      "card_id": "01a20eba-881b-75aa-92c7-a6d326472a36",
+      "severity": "P1"
+    },
+    "std-togaf-phase-g-spec-v2-g:SPEC-V2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:04:13+00:00",
+      "card_id": "01a20eba-c61a-7533-80cc-4affccab3bc1",
+      "severity": "P1"
+    },
+    "std-togaf-phase-g-t10-g:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:13:25+00:00",
+      "card_id": "01a20ec3-388d-7378-b806-24c3968dcc3c",
+      "severity": "P1"
+    },
+    "std-togaf-phase-g-t13-g:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:04:36+00:00",
+      "card_id": "01a20ebb-0337-7449-b48e-cd96f4e4e479",
+      "severity": "P1"
+    },
+    "std-togaf-phase-g-t19-g:T19": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:04:52+00:00",
+      "card_id": "01a20ebb-546e-7aca-9140-cc5f039830d6",
+      "severity": "P1"
+    },
+    "std-togaf-phase-g-t4-g:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:05:05+00:00",
+      "card_id": "01a20ebb-9122-7615-8d77-658edf780b5a",
+      "severity": "P1"
+    },
+    "std-togaf-phase-g-t9-g:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:05:16+00:00",
+      "card_id": "01a20ebb-b87c-78fe-bd82-9f111775a145",
+      "severity": "P1"
+    },
+    "std-togaf-phase-h-design-publish-h:DESIGN-PUBLISH": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:05:30+00:00",
+      "card_id": "01a20ebb-ec72-71d4-aab5-13e95b8281be",
+      "severity": "P1"
+    },
+    "std-togaf-phase-h-p0-h:P0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:05:43+00:00",
+      "card_id": "01a20ebc-2b05-7916-b5bc-13e4a79ef488",
+      "severity": "P1"
+    },
+    "std-togaf-phase-h-platform-h:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:05:53+00:00",
+      "card_id": "01a20ebc-4ce9-7cfe-9a3d-5cda880f75c0",
+      "severity": "P1"
+    },
+    "std-togaf-phase-h-s03-h:S03": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:06:09+00:00",
+      "card_id": "01a20ebc-88f4-74e1-aa50-2a782ac13a5a",
+      "severity": "P1"
+    },
+    "std-togaf-phase-h-spec-v2-h:SPEC-V2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:06:21+00:00",
+      "card_id": "01a20ebc-b8ea-759e-b46b-6b1c07926fee",
+      "severity": "P1"
+    },
+    "std-togaf-phase-h-t10-h:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:06:32+00:00",
+      "card_id": "01a20ebc-e05d-773d-8856-655c7b7a6b15",
+      "severity": "P1"
+    },
+    "std-togaf-phase-h-t13-h:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:06:42+00:00",
+      "card_id": "01a20ebd-05d4-717a-a0f6-0720c82fe9f5",
+      "severity": "P1"
+    },
+    "std-togaf-phase-h-t19-h:T19": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:07:06+00:00",
+      "card_id": "01a20ebd-64c0-7f53-a0ab-2dee8a9f9ac4",
+      "severity": "P1"
+    },
+    "std-togaf-phase-h-t4-h:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:07:19+00:00",
+      "card_id": "01a20ebd-902e-737f-85b8-869bfe261b22",
+      "severity": "P1"
+    },
+    "std-togaf-phase-h-t9-h:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:07:31+00:00",
+      "card_id": "01a20ebd-cc4c-7a26-a1a3-80434b6c737a",
+      "severity": "P1"
+    },
+    "tranche_plan:tranche-1": {
+      "apply_to": "S02",
+      "at": "2026-11-24T18:14:06+00:00",
+      "card_id": "01a20ec3-d55c-7c8b-9ce8-0d05a28fc294",
+      "severity": "P2"
+    },
+    "tranche_plan:tranche-2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:14:10+00:00",
+      "card_id": "01a20ec3-e81c-75e2-ba87-3b00b56d4563",
+      "severity": "P2"
+    },
+    "unpublished_declared_output:tranche-10": {
+      "apply_to": "T5",
+      "at": "2026-11-24T17:41:34+00:00",
+      "card_id": "01a20ea6-0e0f-7860-8e52-05d407be2992",
+      "severity": "P1"
+    },
+    "unpublished_declared_output:tranche-11": {
+      "apply_to": "S14",
+      "at": "2026-11-24T17:41:43+00:00",
+      "card_id": "01a20ea6-32f0-78fa-b0dc-792a8919bc8c",
+      "severity": "P1"
+    },
+    "unpublished_declared_output:tranche-3": {
+      "apply_to": "S04",
+      "at": "2026-11-24T17:42:03+00:00",
+      "card_id": "01a20ea6-7a1f-7689-a94f-c713c7cd2289",
+      "severity": "P1"
+    },
+    "unpublished_declared_output:tranche-4": {
+      "apply_to": "T14",
+      "at": "2026-11-24T17:42:10+00:00",
+      "card_id": "01a20ea6-9666-7540-82b0-49a50618a672",
+      "severity": "P1"
+    },
+    "unpublished_declared_output:tranche-5": {
+      "apply_to": "S06",
+      "at": "2026-11-24T17:42:17+00:00",
+      "card_id": "01a20ea6-b676-716c-9fc6-a12a251f13ba",
+      "severity": "P1"
+    },
+    "unpublished_declared_output:tranche-6": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:42:23+00:00",
+      "card_id": "01a20ea6-ccef-78ca-a032-8ab99ff6b9ac",
+      "severity": "P1"
+    },
+    "unpublished_declared_output:tranche-7": {
+      "apply_to": "S15",
+      "at": "2026-11-24T17:42:32+00:00",
+      "card_id": "01a20ea6-eb3e-702b-8914-914ed2f1f4f7",
+      "severity": "P1"
+    },
+    "unpublished_declared_output:tranche-8": {
+      "apply_to": "S19",
+      "at": "2026-11-24T17:42:39+00:00",
+      "card_id": "01a20ea7-0b1c-73c7-aee7-da6e608322b7",
+      "severity": "P1"
+    },
+    "unpublished_declared_output:tranche-9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:42:46+00:00",
+      "card_id": "01a20ea7-26b6-7917-90cc-d4999a1a3ecd",
+      "severity": "P1"
+    },
+    "v1-p101-1:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:44:51+00:00",
+      "card_id": "01a20ea9-0ef1-757b-b05a-641773353098",
+      "severity": "P1"
+    },
+    "v1-p102-1:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:17:23+00:00",
+      "card_id": "01a20ec6-da35-79f1-9696-2039cfa3f9a9",
+      "severity": "P2"
+    },
+    "v1-p102-2:T7": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:17:28+00:00",
+      "card_id": "01a20ec6-edf8-7ae8-83c8-33de1b701015",
+      "severity": "P2"
+    },
+    "v1-p102-3:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T17:45:07+00:00",
+      "card_id": "01a20ea9-48d4-7558-bb9e-254828849596",
+      "severity": "P1"
+    },
+    "v1-p105-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:45:14+00:00",
+      "card_id": "01a20ea9-6886-7a28-9816-61cb7511464d",
+      "severity": "P1"
+    },
+    "v1-p105-2:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:45:22+00:00",
+      "card_id": "01a20ea9-86ac-7b43-9c57-1ec82e594d10",
+      "severity": "P1"
+    },
+    "v1-p105-3:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:45:28+00:00",
+      "card_id": "01a20ea9-9e98-795d-b63f-62f5686708d0",
+      "severity": "P1"
+    },
+    "v1-p105-4:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:45:33+00:00",
+      "card_id": "01a20ea9-b372-7abb-acff-fd5e35569273",
+      "severity": "P1"
+    },
+    "v1-p105-5:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:45:39+00:00",
+      "card_id": "01a20ea9-c8c1-7c18-a9b8-b518458924f2",
+      "severity": "P1"
+    },
+    "v1-p105-6:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:17:33+00:00",
+      "card_id": "01a20ec6-ff42-7acf-b0df-485530e8ad42",
+      "severity": "P2"
+    },
+    "v1-p111-1:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T17:45:44+00:00",
+      "card_id": "01a20ea9-e04c-78bf-8f58-2eeb4200cf43",
+      "severity": "P1"
+    },
+    "v1-p111-2:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T17:45:50+00:00",
+      "card_id": "01a20ea9-f6be-71a0-8c71-1b1c0a03a529",
+      "severity": "P1"
+    },
+    "v1-p111-3:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T17:45:57+00:00",
+      "card_id": "01a20eaa-0fa2-7e72-a7ff-801517b03458",
+      "severity": "P1"
+    },
+    "v1-p1110-1:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T17:46:02+00:00",
+      "card_id": "01a20eaa-22f4-73e5-80b6-cce2fe2231cd",
+      "severity": "P1"
+    },
+    "v1-p112-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:46:08+00:00",
+      "card_id": "01a20eaa-3c35-76ed-98e4-9239dfa1ad42",
+      "severity": "P1"
+    },
+    "v1-p116-1:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T17:46:21+00:00",
+      "card_id": "01a20eaa-5368-7263-b0ab-158e69a2ab93",
+      "severity": "P1"
+    },
+    "v1-p118-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:17:38+00:00",
+      "card_id": "01a20ec7-1338-7289-a0cf-ab34c3293f26",
+      "severity": "P2"
+    },
+    "v1-p118-2:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:17:43+00:00",
+      "card_id": "01a20ec7-25c1-75d9-99fb-c019696fb682",
+      "severity": "P2"
+    },
+    "v1-p119-1:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T17:47:00+00:00",
+      "card_id": "01a20eaa-b152-77a6-978a-21dcc9cd9715",
+      "severity": "P1"
+    },
+    "v1-p42-1:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:47:18+00:00",
+      "card_id": "01a20eab-423d-78b5-87de-7b1f318bab12",
+      "severity": "P1"
+    },
+    "v1-p44-1:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:47:37+00:00",
+      "card_id": "01a20eab-8b3c-720e-94ae-4e3fdf58cbd5",
+      "severity": "P1"
+    },
+    "v1-p44-2:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:10:11+00:00",
+      "card_id": "01a20ec0-3efc-7922-851a-8263faa09d2b",
+      "severity": "P1"
+    },
+    "v1-p46-1:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:17:47+00:00",
+      "card_id": "01a20ec7-3701-77a1-a04b-454dc3cc2a2c",
+      "severity": "P2"
+    },
+    "v1-p5-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:00+00:00",
+      "card_id": "01a1ffea-85db-765e-8830-fa70cf58acdb",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "v1-p5-2:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:05+00:00",
+      "card_id": "01a20e94-372c-7e8e-8c56-18f2dc1d4eba",
+      "severity": "P0"
+    },
+    "v1-p5-3:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:10:21+00:00",
+      "card_id": "01a20ec0-5e31-7802-8a73-da89890912ac",
+      "severity": "P1"
+    },
+    "v1-p5-4:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:10:27+00:00",
+      "card_id": "01a20ec0-80bb-779b-b681-e3c68052c0a0",
+      "severity": "P1"
+    },
+    "v1-p5-5:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:48:20+00:00",
+      "card_id": "01a20eac-2c67-7493-8fd9-5f223fc25a28",
+      "severity": "P1"
+    },
+    "v1-p5-6:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:17:52+00:00",
+      "card_id": "01a20ec7-48f3-7a78-8ca3-35e6f48eb02e",
+      "severity": "P2"
+    },
+    "v1-p52-1:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:48:33+00:00",
+      "card_id": "01a20eac-6ce3-7086-aeb6-26935c27c1cb",
+      "severity": "P1"
+    },
+    "v1-p54-1:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:10:32+00:00",
+      "card_id": "01a20ec0-91cf-7aeb-9bd4-1bd4ef8fd68e",
+      "severity": "P1"
+    },
+    "v1-p54-2:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:10:37+00:00",
+      "card_id": "01a20ec0-a53a-7a92-b915-b0bec4995022",
+      "severity": "P1"
+    },
+    "v1-p55-1:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:17:56+00:00",
+      "card_id": "01a20ec7-59fb-7b28-9a33-00f533fcf554",
+      "severity": "P2"
+    },
+    "v1-p56-1:T16": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:18:01+00:00",
+      "card_id": "01a20ec7-6cfc-7c43-b815-0430b805fd2b",
+      "severity": "P2"
+    },
+    "v1-p56-2:T16": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:18:05+00:00",
+      "card_id": "01a20ec7-7e05-7233-b274-e31adb206497",
+      "severity": "P2"
+    },
+    "v1-p57-1:T17": {
+      "apply_to": "T17",
+      "at": "2026-11-24T18:18:20+00:00",
+      "card_id": "01a20ec7-b662-791e-989c-8e469efaa02f",
+      "severity": "P2"
+    },
+    "v1-p6-1:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:00+00:00",
+      "card_id": "01a1ffea-6b7c-7b9d-9a97-d747bd6c91ac",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "v1-p6-2:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:43:54+00:00",
+      "card_id": "01a20ea8-2d38-7935-82a1-e8e59f3eba41",
+      "severity": "P1"
+    },
+    "v1-p6-3:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:44:01+00:00",
+      "card_id": "01a20ea8-4758-7f2d-a0d4-3f262ac9143c",
+      "severity": "P1"
+    },
+    "v1-p6-4:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:44:07+00:00",
+      "card_id": "01a20ea8-615f-73f3-ac8e-a76c44abafc8",
+      "severity": "P1"
+    },
+    "v1-p6-5:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:44:13+00:00",
+      "card_id": "01a20ea8-79de-731e-9e97-f2f5686133a1",
+      "severity": "P1"
+    },
+    "v1-p6-6:T4": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:17:05+00:00",
+      "card_id": "01a20ec6-9269-72d1-8a63-6775ac126ba5",
+      "severity": "P2"
+    },
+    "v1-p61-1:T3": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:10:42+00:00",
+      "card_id": "01a20ec0-bba7-7689-afae-f8595f7ed100",
+      "severity": "P1"
+    },
+    "v1-p61-2:T3": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:18:24+00:00",
+      "card_id": "01a20ec7-c91f-789a-9f63-b10314eb7a90",
+      "severity": "P2"
+    },
+    "v1-p66-1:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:10:47+00:00",
+      "card_id": "01a20ec0-cd6a-71ec-be1c-443518b659cc",
+      "severity": "P1"
+    },
+    "v1-p75-1:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:10+00:00",
+      "card_id": "01a20e94-4bbe-7379-a7c5-5624936a1bb2",
+      "severity": "P0"
+    },
+    "v1-p75-2:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:10:52+00:00",
+      "card_id": "01a20ec0-e127-7742-90f0-f0f5e884bd0b",
+      "severity": "P1"
+    },
+    "v1-p75-3:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:10:56+00:00",
+      "card_id": "01a20ec0-f233-7b09-a184-6e6ade841aa0",
+      "severity": "P1"
+    },
+    "v1-p75-4:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:11:00+00:00",
+      "card_id": "01a20ec1-02e9-7868-96f9-6f248d6c7623",
+      "severity": "P1"
+    },
+    "v1-p75-5:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:11:05+00:00",
+      "card_id": "01a20ec1-136e-7e7f-88dd-a03b6bd733fe",
+      "severity": "P1"
+    },
+    "v1-p75-6:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:18:29+00:00",
+      "card_id": "01a20ec7-db33-7acb-a878-0a112c852016",
+      "severity": "P2"
+    },
+    "v1-p76-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:11:09+00:00",
+      "card_id": "01a20ec1-2464-758c-8dc9-313fd07a5c1f",
+      "severity": "P1"
+    },
+    "v1-p77-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:11:13+00:00",
+      "card_id": "01a20ec1-3580-7796-a6d0-2777ce83143e",
+      "severity": "P1"
+    },
+    "v1-p77-2:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:18:34+00:00",
+      "card_id": "01a20ec7-ed7b-7753-b816-50a1defc6c60",
+      "severity": "P2"
+    },
+    "v1-p81-1:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:50+00:00",
+      "card_id": "01a1ffeb-4900-7007-b262-2e7959803552",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "v1-p81-2:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:50+00:00",
+      "card_id": "01a1ffeb-5445-733d-af3b-a320b82fe4d6",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "v1-p81-3:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:50+00:00",
+      "card_id": "01a1ffeb-5fd8-7f91-adfd-fbe5716a699c",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "v1-p81-4:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:07:45+00:00",
+      "card_id": "01a20ebd-ffc5-7e41-a444-fbe77c3695ff",
+      "severity": "P1"
+    },
+    "v1-p81-5:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:07:58+00:00",
+      "card_id": "01a20ebe-3702-7e13-9d41-6769936e7f57",
+      "severity": "P1"
+    },
+    "v1-p81-6:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:31:39+00:00",
+      "card_id": "01a20ed3-eae6-76e5-bc0a-a163b19a3d18",
+      "severity": "P2"
+    },
+    "v1-p82-1:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:00+00:00",
+      "card_id": "01a1ffea-79b1-79e3-bfef-b22726135492",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "v1-p82-2:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:44:21+00:00",
+      "card_id": "01a20ea8-9357-7f3b-9ba6-0b3d35aaf967",
+      "severity": "P1"
+    },
+    "v1-p82-3:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:44:27+00:00",
+      "card_id": "01a20ea8-b135-7150-865d-da3c4004f1fa",
+      "severity": "P1"
+    },
+    "v1-p82-4:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:44:33+00:00",
+      "card_id": "01a20ea8-c850-7f14-a9dc-d59510b51183",
+      "severity": "P1"
+    },
+    "v1-p82-5:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:17:09+00:00",
+      "card_id": "01a20ec6-a3cd-71f3-b03e-4563a87fa055",
+      "severity": "P2"
+    },
+    "v1-p82-6:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:17:14+00:00",
+      "card_id": "01a20ec6-b6ec-71ba-bd7c-bb52f13c5971",
+      "severity": "P2"
+    },
+    "v1-p83-1:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:42:53+00:00",
+      "card_id": "01a20ea7-41c1-74af-bae8-7983a2ae8725",
+      "severity": "P1"
+    },
+    "v1-p83-2:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:43:02+00:00",
+      "card_id": "01a20ea7-6179-704e-be30-8e5b136c75ae",
+      "severity": "P1"
+    },
+    "v1-p83-3:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:43:09+00:00",
+      "card_id": "01a20ea7-7f91-7070-94e8-9a2e535d86bc",
+      "severity": "P1"
+    },
+    "v1-p83-4:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:43:15+00:00",
+      "card_id": "01a20ea7-96cf-7dcc-9d9c-9098b76cb9e6",
+      "severity": "P1"
+    },
+    "v1-p83-5:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:43:21+00:00",
+      "card_id": "01a20ea7-b144-7535-9c21-2f29e66a9fec",
+      "severity": "P1"
+    },
+    "v1-p83-6:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:17:00+00:00",
+      "card_id": "01a20ec6-80ff-71d8-8f20-fc1e63c96932",
+      "severity": "P2"
+    },
+    "v1-p91-1:T6": {
+      "apply_to": "T6",
+      "at": "2026-11-24T18:11:28+00:00",
+      "card_id": "01a20ec1-6ca0-7022-ba82-4dd68e7dfb1f",
+      "severity": "P1"
+    },
+    "v1-p93-1:T5": {
+      "apply_to": "T5",
+      "at": "2026-11-24T18:11:38+00:00",
+      "card_id": "01a20ec1-9760-76f1-9098-a36d992c5374",
+      "severity": "P1"
+    },
+    "v1-p93-2:T6": {
+      "apply_to": "T6",
+      "at": "2026-11-24T18:11:43+00:00",
+      "card_id": "01a20ec1-a846-7c0d-9034-be538f19a36f",
+      "severity": "P1"
+    },
+    "v1-pack-2:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:18:38+00:00",
+      "card_id": "01a20ec7-ff08-7b78-be24-66dbcb534893",
+      "severity": "P2"
+    },
+    "v1-pack-3:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:11:47+00:00",
+      "card_id": "01a20ec1-b93a-7474-a810-ffc035ac2075",
+      "severity": "P1"
+    },
+    "v1-pack-4:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:11:51+00:00",
+      "card_id": "01a20ec1-ca28-74b1-9dd0-bdf569a70a7b",
+      "severity": "P1"
+    },
+    "v1-pack-5:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:11:56+00:00",
+      "card_id": "01a20ec1-db45-760f-b0fb-ca7fb4c51655",
+      "severity": "P1"
+    },
+    "v1-pack-6:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:10+00:00",
+      "card_id": "01a1ffea-e7c0-7e2f-b3c0-ecf72a9eb689",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "v1-w1a-2:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:16+00:00",
+      "card_id": "01a20e94-604c-7d97-8f71-73fabf2fc6f6",
+      "severity": "P0"
+    },
+    "v1-w1a-3:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:12:00+00:00",
+      "card_id": "01a20ec1-ec35-72c9-a621-3b3786011c07",
+      "severity": "P1"
+    },
+    "v1-w1a-4:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:12:05+00:00",
+      "card_id": "01a20ec1-fd22-76c7-9f29-3bb6dae9571a",
+      "severity": "P1"
+    },
+    "v1-w1a-5:T0": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:12:09+00:00",
+      "card_id": "01a20ec2-0d90-7435-b27d-e6927e197f5d",
+      "severity": "P1"
+    },
+    "v1-w1b-3:T5": {
+      "apply_to": "T5",
+      "at": "2026-11-24T17:51:04+00:00",
+      "card_id": "01a20eae-bd03-76c9-afb4-bb4f14b07cef",
+      "severity": "P1"
+    },
+    "v1-w1b-4:T7": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:51:17+00:00",
+      "card_id": "01a20eae-e9f9-702b-b4da-b357cbacba1d",
+      "severity": "P1"
+    },
+    "v1-w1b-5:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:51:33+00:00",
+      "card_id": "01a20eaf-27a0-7e19-b1ee-25b8d036840c",
+      "severity": "P1"
+    },
+    "v1-w1c-3:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:51:46+00:00",
+      "card_id": "01a20eaf-6141-7ee1-ade5-0c5287507f59",
+      "severity": "P1"
+    },
+    "v1-w1c-4:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:51:59+00:00",
+      "card_id": "01a20eaf-9264-7c49-9d38-3fc86700cb39",
+      "severity": "P1"
+    },
+    "v1-w1c-5:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:18:43+00:00",
+      "card_id": "01a20ec8-1215-7ce3-ae56-aaad44fa9d9e",
+      "severity": "P2"
+    },
+    "v1-w1c-6:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:18:48+00:00",
+      "card_id": "01a20ec8-23ef-75e0-aa79-22440c7a2471",
+      "severity": "P2"
+    },
+    "v1-w2a-2:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:08:09+00:00",
+      "card_id": "01a20ebe-5aba-7a32-b4f3-f1e259dcaef0",
+      "severity": "P1"
+    },
+    "v1-w2a-3:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:08:20+00:00",
+      "card_id": "01a20ebe-8868-7bac-b2ca-26b599f628e5",
+      "severity": "P1"
+    },
+    "v1-w2a-4:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:08:38+00:00",
+      "card_id": "01a20ebe-ce7c-7607-89da-935db0042d50",
+      "severity": "P1"
+    },
+    "v1-w2a-6:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:31:44+00:00",
+      "card_id": "01a20ed3-fc54-732e-a47b-34ab8e1a36ad",
+      "severity": "P2"
+    },
+    "v1-w2b-2:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:00+00:00",
+      "card_id": "01a1ffea-48b5-7eb2-ab4f-eb59d2670fac",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "v1-w2b-3:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:43:26+00:00",
+      "card_id": "01a20ea7-c5aa-77c6-9d34-0b9d983ac9f9",
+      "severity": "P1"
+    },
+    "v1-w2b-5:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:43:33+00:00",
+      "card_id": "01a20ea7-df7c-7859-97b6-58c42f972889",
+      "severity": "P1"
+    },
+    "v1-w2c-2:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:44:39+00:00",
+      "card_id": "01a20ea8-e1b6-7727-8f0a-d48ad9ddef45",
+      "severity": "P1"
+    },
+    "v1-w2c-3:T3": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:00+00:00",
+      "card_id": "01a1ffea-53c7-7da2-a240-7d2a6c6fe796",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "v1-w2c-5:S07": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:08:50+00:00",
+      "card_id": "01a20ebe-f762-7bcb-b5f3-646caed3ad36",
+      "severity": "P1"
+    },
+    "v1-w2c-6:S07": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:09:03+00:00",
+      "card_id": "01a20ebf-29ad-7dd3-b6e4-8fedc2f0569f",
+      "severity": "P1"
+    },
+    "v1-w3a-1:T7": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:22:16+00:00",
+      "card_id": "01a1ffeb-c188-7619-bc69-536eccded212",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "v1-w3a-5:T7": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:52:12+00:00",
+      "card_id": "01a20eaf-c65a-7006-947b-c797e02d5664",
+      "severity": "P1"
+    },
+    "v1-w3b-2:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:52:25+00:00",
+      "card_id": "01a20eaf-f459-704f-9b34-b8c507da89cf",
+      "severity": "P1"
+    },
+    "v1-w3b-3:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:52:39+00:00",
+      "card_id": "01a20eb0-2a99-7f16-b3d1-f5918ccc7c04",
+      "severity": "P1"
+    },
+    "v1-w3b-5:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:18:53+00:00",
+      "card_id": "01a20ec8-3681-7833-aaaa-6041d0b85829",
+      "severity": "P2"
+    },
+    "v1-w3b-6:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:18:57+00:00",
+      "card_id": "01a20ec8-4982-75c9-8a20-752d808bb8ad",
+      "severity": "P2"
+    },
+    "v1-w3c-2:T14": {
+      "apply_to": "T14",
+      "at": "2026-11-24T18:12:19+00:00",
+      "card_id": "01a20ec2-3779-7070-9b76-e99875d7d932",
+      "severity": "P1"
+    },
+    "v1-w3c-4:T8": {
+      "apply_to": "T8",
+      "at": "2026-11-24T18:12:34+00:00",
+      "card_id": "01a20ec2-6e97-7069-8f01-bec71048fbe9",
+      "severity": "P1"
+    },
+    "v1-w3c-6:T3": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:19:02+00:00",
+      "card_id": "01a20ec8-5af5-701f-8f44-8de309dfd3b5",
+      "severity": "P2"
+    },
+    "v1-w4a-1:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T17:22:34+00:00",
+      "card_id": "01a20e94-a9b1-78e3-b9d3-5774904ef9b0",
+      "severity": "P0"
+    },
+    "v1-w4a-2:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T17:31:19+00:00",
+      "card_id": "01a20e94-c4bb-78de-a8ea-b733228371b7",
+      "severity": "P0",
+      "source": "existing-card"
+    },
+    "v1-w4a-3:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T17:53:05+00:00",
+      "card_id": "01a20eb0-8d42-7b4e-9cff-71cf4ed75609",
+      "severity": "P1"
+    },
+    "v1-w4a-4:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:12:45+00:00",
+      "card_id": "01a20ec2-9a48-77a6-83ac-1fbad684d6ab",
+      "severity": "P1"
+    },
+    "v1-w4a-5:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:12:49+00:00",
+      "card_id": "01a20ec2-ac4b-746c-843c-41820f95bd48",
+      "severity": "P1"
+    },
+    "v1-w4a-6:T13": {
+      "apply_to": "T13",
+      "at": "2026-11-24T18:12:54+00:00",
+      "card_id": "01a20ec2-bd64-7637-b543-8ebda0871d04",
+      "severity": "P1"
+    },
+    "v1-w4b-3:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:53:41+00:00",
+      "card_id": "01a20eb1-154e-775a-9cbd-1b8f662d5461",
+      "severity": "P1"
+    },
+    "v1-w4b-4:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T17:53:57+00:00",
+      "card_id": "01a20eb1-57ed-7b9a-8553-aed4d3e768b1",
+      "severity": "P1"
+    },
+    "v1-w4b-5:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:19:06+00:00",
+      "card_id": "01a20ec8-6c01-7377-ab2d-3f4483ca0f90",
+      "severity": "P2"
+    },
+    "v1-w4b-6:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:19:10+00:00",
+      "card_id": "01a20ec8-7d10-75eb-8861-8835fb8908fa",
+      "severity": "P2"
+    },
+    "wbs_absent:programme": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-24T18:19:15+00:00",
+      "card_id": "01a20ec8-8eb9-7ec4-b0bf-ea6056048201",
+      "severity": "P2"
+    },
+    "wbs_absent:tranche-10": {
+      "apply_to": "T5",
+      "at": "2026-11-24T18:19:27+00:00",
+      "card_id": "01a20ec8-bc7f-7361-8cbf-c739f632f8de",
+      "severity": "P2"
+    },
+    "wbs_absent:tranche-11": {
+      "apply_to": "S14",
+      "at": "2026-11-24T18:19:32+00:00",
+      "card_id": "01a20ec8-cec4-7bd6-a13e-1eb3c0292a7f",
+      "severity": "P2"
+    },
+    "wbs_absent:tranche-12": {
+      "apply_to": "T15",
+      "at": "2026-11-24T18:19:43+00:00",
+      "card_id": "01a20ec8-fd4e-7600-800b-29eeaebcc2fd",
+      "severity": "P2"
+    },
+    "wbs_absent:tranche-13": {
+      "apply_to": "T12",
+      "at": "2026-11-24T18:19:55+00:00",
+      "card_id": "01a20ec9-2a6e-78d0-a5e2-9be6c594e6ba",
+      "severity": "P2"
+    },
+    "wbs_absent:tranche-4": {
+      "apply_to": "T14",
+      "at": "2026-11-24T18:20:01+00:00",
+      "card_id": "01a20ec9-4017-7c7c-bc47-fe56a42fac17",
+      "severity": "P2"
+    },
+    "wbs_absent:tranche-5": {
+      "apply_to": "S06",
+      "at": "2026-11-24T18:20:12+00:00",
+      "card_id": "01a20ec9-6d56-76b1-94e0-0e142a9fbe38",
+      "severity": "P2"
+    },
+    "wbs_absent:tranche-7": {
+      "apply_to": "S15",
+      "at": "2026-11-24T18:20:24+00:00",
+      "card_id": "01a20ec9-9b7f-7bdf-beda-153ef5c8763a",
+      "severity": "P2"
+    },
+    "wbs_absent:tranche-8": {
+      "apply_to": "S19",
+      "at": "2026-11-24T18:20:36+00:00",
+      "card_id": "01a20ec9-cac1-7857-b1e9-66ec84615d9f",
+      "severity": "P2"
     }
   },
-  "cleared": [],
+  "cleared": [
+    "closed_without_closure_review:DESIGN-PUBLISH"
+  ],
   "failures": [],
   "schema": "conveyor-rework-apply/v1",
   "tenant": "nonagentic",
-  "updated_at": "2026-11-21T18:37:12+00:00"
+  "updated_at": "2026-11-24T18:31:53+00:00"
 }

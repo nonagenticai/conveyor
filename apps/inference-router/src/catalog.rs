@@ -18,6 +18,24 @@ pub enum Protocol {
     Anthropic,
 }
 
+/// How a caller's boolean `enable_reasoning` is spelled for this provider's chat template.
+///
+/// A model's template reads exactly ONE of these vocabularies. A key it does not read is an
+/// undefined Jinja variable, which vLLM passes through and the template silently drops — so the
+/// request falls back to the model's own default. That is how "no reasoning" reached
+/// Inkling-2-Mini as effort 0.9: its template keys on `reasoning_effort` (default 0.9) and has no
+/// `enable_thinking` variable at all. Choosing the spelling per provider is the fix; guessing at
+/// the model name is not.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ReasoningDialect {
+    /// `chat_template_kwargs.enable_thinking = <bool>` — Qwen/Nanbeige-style templates.
+    #[default]
+    EnableThinking,
+    /// `chat_template_kwargs.reasoning_effort = "none" | "high"` — Inkling-2-Mini.
+    ReasoningEffort,
+}
+
 fn default_timeout() -> f64 {
     600.0
 }
@@ -63,6 +81,15 @@ pub struct ProviderEntry {
     pub failover_on_validation_failure: bool,
     #[serde(default)]
     pub force_chat_template_kwargs: bool,
+    /// How `enable_reasoning` is spelled for this upstream; see [`ReasoningDialect`]. Absent means
+    /// the historical `enable_thinking` spelling, so a catalog that does not name it is unchanged.
+    #[serde(default)]
+    pub reasoning_dialect: ReasoningDialect,
+    /// Raise a caller's `max_tokens` to this floor. Raise-only: a cap cannot force generation, it
+    /// only stops a model that spends its budget on reasoning from returning empty content.
+    /// Honoured by the OpenAI-compatible provider — the only one that builds a `max_tokens`.
+    #[serde(default)]
+    pub min_completion_tokens: Option<u32>,
     #[serde(default)]
     pub model_aliases: BTreeMap<String, String>,
 }
@@ -239,12 +266,49 @@ impl Catalog {
         owner
     }
 
+    /// Whether `alias` is chain-shared (declared by two or more enabled providers). Such an alias
+    /// has no single owner, so `alias_owner` returns `None` and it rides `default_chain` by design.
+    pub fn is_shared_alias(&self, alias: &str) -> bool {
+        self.shared_aliases.iter().any(|entry| entry == alias)
+    }
+
+    /// The single enabled provider that advertises `id` as one of its own model ids (its `model`
+    /// or its `models` list). Alias keys are [`Catalog::alias_owner`]'s. `None` when no provider
+    /// serves it or when two do — an ambiguous id must not pin.
+    pub fn model_id_owner(&self, id: &str) -> Option<&str> {
+        let mut owner = None;
+        for provider in self.enabled() {
+            if serves_model_id(provider, id) {
+                if owner.is_some() {
+                    return None;
+                }
+                owner = Some(provider.name.as_str());
+            }
+        }
+        owner
+    }
+
+    /// Whether ANY enabled provider advertises `id` as one of its own model ids.
+    pub fn any_provider_serves_model(&self, id: &str) -> bool {
+        self.enabled().any(|provider| serves_model_id(provider, id))
+    }
+
     /// Whether ANY provider (enabled or not) declares the alias — the distinction between
     /// "unknown name, use the chain" and "a catalog alias nothing can serve now".
     pub fn any_provider_declares(&self, alias: &str) -> bool {
         self.providers
             .iter()
             .any(|provider| provider.model_aliases.contains_key(alias))
+    }
+}
+
+/// Whether `provider` advertises `id` as one of its own model ids (never an alias key — those
+/// auto-pin through [`Catalog::alias_owner`]).
+fn serves_model_id(provider: &ProviderEntry, id: &str) -> bool {
+    if provider.models.is_empty() {
+        provider.model == id
+    } else {
+        provider.models.iter().any(|model| model == id)
     }
 }
 
@@ -362,5 +426,34 @@ default_chain: [paid]
         let catalog = catalog(BASE).expect("valid");
         let pgx = catalog.provider("pgx-local").expect("enabled");
         assert_eq!(pgx.model_ids(), vec!["local-llm", "tier-high"]);
+    }
+
+    #[test]
+    fn an_absent_reasoning_dialect_defaults_to_enable_thinking() {
+        let catalog = catalog(BASE).expect("valid");
+        let pgx = catalog.provider("pgx-local").expect("enabled");
+        assert_eq!(pgx.reasoning_dialect, ReasoningDialect::EnableThinking);
+        assert_eq!(pgx.min_completion_tokens, None);
+    }
+
+    #[test]
+    fn a_catalog_entry_can_select_the_reasoning_effort_dialect_and_a_floor() {
+        let yaml = BASE.replace(
+            "    model: local-llm\n",
+            "    model: local-llm\n    reasoning_dialect: reasoning_effort\n    min_completion_tokens: 256\n",
+        );
+        let catalog = catalog(&yaml).expect("valid");
+        let pgx = catalog.provider("pgx-local").expect("enabled");
+        assert_eq!(pgx.reasoning_dialect, ReasoningDialect::ReasoningEffort);
+        assert_eq!(pgx.min_completion_tokens, Some(256));
+    }
+
+    #[test]
+    fn an_unknown_reasoning_dialect_is_a_load_error() {
+        let yaml = BASE.replace(
+            "    model: local-llm\n",
+            "    model: local-llm\n    reasoning_dialect: mind_reading\n",
+        );
+        assert!(catalog(&yaml).is_err());
     }
 }

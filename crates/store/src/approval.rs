@@ -113,10 +113,17 @@ pub enum ApprovalStoreError {
     /// An eval gate was offered a machine decision (S06d / W1). A sign-off is a person's act.
     #[error("an eval sign-off must be decided by a human, not a machine")]
     HumanOnlyGate,
+    /// An `executor` gate was offered a machine decision (S21 step 5, ADR 0011). It is L3.
+    #[error("an executor gate must be decided by a human, not a machine")]
+    ExecutorGateHumanOnly,
     /// A human decided an eval gate without `evals:approve` (S06d / W1). The generic
     /// `approvals.decide` path must not be a weaker door into the same row.
     #[error("an eval sign-off requires the evals:approve scope")]
     EvalScopeRequired,
+    /// The implementing principal of a development project tried to decide a gate that judges
+    /// its work (SPEC_V2 §5.4, §9.3; T6). The gate stays pending for a different principal.
+    #[error("the implementer cannot decide the gate that judges its own work")]
+    ImplementerCannotDecide,
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -809,6 +816,32 @@ pub async fn approval_meta_tx(
     Ok(row.map(|(meta,)| meta))
 }
 
+/// Whether an approval resolved `approved` with at least one approving decision, and the card it
+/// gates. `None` when the row is absent in the tenant.
+///
+/// The one read behind the L3 checks: `record_decision_tx` uses it to refuse a human decision on a
+/// pending or rejected gate (`rework v1-w1c-2:T2`), and `ladder.apply_draft` re-checks it so a
+/// decision recorded before the rule cannot apply a draft either.
+pub async fn approved_gate_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    approval_id: Uuid,
+) -> Result<Option<(Option<Uuid>, bool)>, sqlx::Error> {
+    sqlx::query_as(
+        "SELECT a.card_id,
+                (a.status = 'approved' AND EXISTS (
+                    SELECT 1 FROM approval_decision d
+                     WHERE d.tenant_id = a.tenant_id AND d.approval_id = a.id
+                       AND d.decision = 'approve'))
+           FROM approval a
+          WHERE a.tenant_id = $1 AND a.id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .fetch_optional(&mut *conn)
+    .await
+}
+
 /// Record one decision and apply it to the gate, in the caller's transaction.
 ///
 /// Order is deliberate: lock the gate, count the approvals that came before, ask the domain
@@ -830,6 +863,19 @@ pub async fn record_decision_tx(
         .fetch_optional(&mut *conn)
         .await?;
     let row = row.ok_or(ApprovalStoreError::NotFound)?;
+    // T6 (SPEC_V2 §5.4, §9.3): a development project's implementing principal can never decide
+    // the review, merge or deploy gate that judges its own work. This is checked before the
+    // generic requester rule because the implementing job is normally the gate's requester too;
+    // the specific rule is the honest refusal (and it holds even if a tenant ever allowed
+    // requester self-approval on the action). The gate is project-scoped and carries
+    // `meta.development_project_id`; every other gate answers `None` and is unchanged. The
+    // refusal is before the insert, so a refused attempt leaves no decision row and the gate
+    // stays pending for a different principal.
+    if crate::development::implementer_for_approval_tx(&mut *conn, tenant, approval_id).await?
+        == Some(decision.approver_id)
+    {
+        return Err(ApprovalStoreError::ImplementerCannotDecide);
+    }
     // T1 P1.3 / SPEC_V2 §5.4: the requester cannot decide the gate that judges their own work.
     // This is the one writer every decision path traverses, so the exclusion lives here rather
     // than in a UI or in `approvals.decide` alone.
@@ -877,6 +923,12 @@ pub async fn record_decision_tx(
         if !eval_authorized {
             return Err(ApprovalStoreError::EvalScopeRequired);
         }
+    }
+    // S21 step 5: an `executor` gate is a person's act (SPEC_V2 §7.1). Like the eval gate, the
+    // refusal lives in the one writer every decision path traverses, so `approvals.decide`, MCP
+    // and a connector reply cannot disagree.
+    if row.kind == "executor" && decision.decided_by_kind != DeciderKind::Human {
+        return Err(ApprovalStoreError::ExecutorGateHumanOnly);
     }
 
     let prior: i64 = sqlx::query_scalar(
@@ -933,6 +985,94 @@ pub async fn record_decision_tx(
     // `approvals` on the returned value counts this decision; the row's stored count does not
     // exist — it is derived from `approval_decision`, which is why it is passed here.
     row.into_approval(next.approvals)
+}
+
+/// One seat's row in a meeting resolution. The participant is exactly one of a human or a job
+/// binding, matching the `approval_decision` extension (0065_meetings.sql).
+pub struct MeetingDecisionRow<'a> {
+    /// `app_user.id` for a human seat; `None` for a job seat.
+    pub approver_id: Option<Uuid>,
+    /// `job_binding.id` for a job seat; `None` for a human seat.
+    pub job_binding_id: Option<Uuid>,
+    /// `human | job`, matching the row's CHECK.
+    pub participant_kind: &'a str,
+    /// `approve | reject`.
+    pub decision: &'a str,
+    pub note: &'a str,
+    /// `{"surface":"meeting","channel":"web|telegram|mcp","meeting_id":"…"}`.
+    pub via: &'a Value,
+    /// `human | agent` — a job seat's decision is agent-kind.
+    pub decided_by_kind: &'a str,
+}
+
+/// Record a meeting's whole seat set and set the gate's status once.
+///
+/// This is deliberately not a loop over [`record_decision_tx`]: that path applies the
+/// single-decider rule (a reject resolves immediately; a decision after resolution is refused),
+/// while a meeting's rule is the forum's — a majority may approve with a recorded dissent. The
+/// insert still honours `(approval_id, participant)` uniqueness, so a seat that already decided
+/// keeps its row (the first decision wins). The caller checks the gate's policy floors (required
+/// decisions, distinct approvers, evidence, P4) under this row lock before calling.
+pub async fn record_meeting_decisions_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    approval_id: Uuid,
+    rows: &[MeetingDecisionRow<'_>],
+    approved: bool,
+) -> Result<Approval, ApprovalStoreError> {
+    let sql = format!("SELECT {COLUMNS} FROM approval WHERE tenant_id = $1 AND id = $2 FOR UPDATE");
+    let row: Option<ApprovalRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(approval_id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    let row = row.ok_or(ApprovalStoreError::NotFound)?;
+    if row.status != "pending" {
+        return Err(ApprovalStoreError::AlreadyDecided);
+    }
+    for seat in rows {
+        sqlx::query(
+            "INSERT INTO approval_decision (tenant_id, approval_id, approver_id, job_binding_id,
+                                            participant_kind, decision, note, decided_by_kind, via)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+             ON CONFLICT DO NOTHING",
+        )
+        .bind(tenant.as_uuid())
+        .bind(approval_id)
+        .bind(seat.approver_id)
+        .bind(seat.job_binding_id)
+        .bind(seat.participant_kind)
+        .bind(seat.decision)
+        .bind(seat.note)
+        .bind(seat.decided_by_kind)
+        .bind(seat.via)
+        .execute(&mut *conn)
+        .await?;
+    }
+    let approvals: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM approval_decision
+          WHERE tenant_id = $1 AND approval_id = $2 AND decision = 'approve'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    let approvals = u16::try_from(approvals).unwrap_or(u16::MAX);
+    let status = if approved { "approved" } else { "rejected" };
+    let sql = format!(
+        "UPDATE approval
+            SET status = $3, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND status = 'pending'
+         RETURNING {COLUMNS}"
+    );
+    let row: Option<ApprovalRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(approval_id)
+        .bind(status)
+        .fetch_optional(&mut *conn)
+        .await?;
+    let row = row.ok_or(ApprovalStoreError::AlreadyDecided)?;
+    row.into_approval(approvals)
 }
 
 fn decider_kind(kind: DeciderKind) -> &'static str {

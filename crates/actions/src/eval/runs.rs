@@ -68,7 +68,10 @@ pub struct RunStartIn {
     /// Only these cases. Absent means every case in the version.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub case_ids: Option<Vec<Uuid>>,
-    /// The spend ceiling a climb sets; recorded, never enforced by this action.
+    /// The spend ceiling, in cents. Enforced as the run's **hard execution ceiling** by
+    /// `run_core::start_or_resume_run_tx`: a run whose own ledger spend reaches it refuses to
+    /// start or resume (`409 cost_ceiling_reached`), and a version that prices no tokens is
+    /// refused outright (`422 ceiling_unpriceable`), because a cents ceiling cannot be measured.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cost_ceiling_cents: Option<i32>,
 }
@@ -182,16 +185,14 @@ async fn eval_runs_start(
         .await
         .map_err(|error| eval_error(error, ctx.action))?;
 
-    if eval.subject_kind == SubjectKind::AgentRun {
-        // Declared so the vocabulary is stable; no action executes one yet (S13/S15).
-        return Err(ActionError::new(
-            409,
-            "subject_not_ready",
-            format!(
-                "{}: an agent_run subject has no executing action yet; use completions, copilot, \
-                 process or external",
-                ctx.action
-            ),
+    if eval.subject_kind == SubjectKind::AgentRun && eval.entry_action != "agent.run" {
+        // The agent_run subject is executed by the agent loop itself, not by an action the
+        // caller names. A version pointing anywhere else would silently measure a different
+        // flow, so the mismatch is refused before a run exists.
+        return Err(invalid(
+            "entry_action",
+            "invalid_value",
+            "an agent_run subject must name agent.run as its entry_action",
         ));
     }
 

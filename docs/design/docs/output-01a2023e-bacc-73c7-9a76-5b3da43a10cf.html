@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Business Capability Map — T1 Plan spine (Phase B) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Business Capability Map — T1 Plan spine (Phase B)</li>
+<li>Phase: b</li>
+<li>Kind: diagram</li>
+<li>Purpose: The capabilities T1 installs and how far each is live at the 2026-11-21 rework.</li>
+<li>Scope: baseline and change control, dual control, prioritisation, portfolio, dependencies, MSP definition and benefit measurement.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Baseline and change control / a promise that does not move; a change that carries its impact</strong> - {"evidence": "project_baseline, project_register_item(kind='change'); P1.1/P1.2 tests; D-T1-2/D-T1-3", "maturity": "live"}</li>
+<li><strong>Dual control / no requester decides the gate judging their work</strong> - {"evidence": "approvals.decide requester/executor exclusion; approval_dual.rs::the_requester_cannot_decide_their_own_gate; programme_baseline.rs::the_taker_cannot_approve_their_own_baseline", "maturity": "live"}</li>
+<li><strong>WSJF prioritisation / priority as arithmetic, recomputed on read</strong> - {"evidence": "crates/domain/src/spine.rs::wsjf; P2.1; no wsjf column", "maturity": "live"}</li>
+<li><strong>In-flight portfolio / the tenant's in-flight set in one read</strong> - {"evidence": "portfolio.in_flight; tenant.settings.portfolio.in_flight; P3.1", "maturity": "live"}</li>
+<li><strong>Dependency graph and cycle refusal / edges that can be read and a graph that stays acyclic</strong> - {"evidence": "project_dependency; recursive reachability query in crates/store/src/spine.rs; P4.1/P4.2", "maturity": "live"}</li>
+<li><strong>Programme definition records / tranches, cadences, stakeholder profiles and programme baselines as rows</strong> - {"evidence": "programme_tranche, programme_cadence, stakeholder_profile, programme_baseline; P5.3 and cadences_and_stakeholder_profiles_are_rows", "maturity": "live"}</li>
+<li><strong>Benefit measurement and map / a benefit is a profile, not a wish; an edge names five levels</strong> - {"evidence": "benefit_profile, benefit_link, benefit_transition; P5.1/P5.2; D-T1-9", "maturity": "live"}</li>
+<li><strong>Tranche review gate / continue, pause or stop on evidence</strong> - {"evidence": "tranches.review; 422 tranche_evidence_missing; live tranche-0 review 01a1ed84-e111-7082-9fa8-7fe77ccc9024", "maturity": "live"}</li>
+<li><strong>Cadence materialisation and PI planning / the rhythm that turns a cadence row into cards</strong> - {"evidence": "T10 owns it; T1 stores the programme_cadence row only", "maturity": "not built here"}</li>
+<li><strong>Benefits-realization procedure / baseline, readiness, enactment, post-measurement, retirement</strong> - {"evidence": "benefit_transition rows and benefit.* actions exist; the procedure is T10", "maturity": "partial"}</li>
+<li><strong>Portfolio and Plan screens / the capability surfaced in the console</strong> - {"evidence": "portfolio.in_flight is live; the WSJF-backlog, cadence and capacity tabs remain fixtures, and the Plan tab's WBS/baseline/register screens are T1 work recorded here, not a T1 console delivery", "maturity": "partial"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Plan spine · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

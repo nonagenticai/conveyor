@@ -339,6 +339,7 @@ fn s08_owns_no_principles_or_decisions_action() {
     // two (`benchmarks:read|write`); S19 added three (`evals:read|write|approve`); S13 added two
     // (`workflows:read|write`); S15 added two (`capabilities:read|write`); T0 added two
     // (`organisation:read|write`); T7 added one (`ops:write`); S21 step 3 added two
-    // (`prompts:read|write`).
-    assert_eq!(conveyor_actions::Scope::ALL.len(), 70);
+    // (`prompts:read|write`); T5 added two (`kata:read|write`); T8 added two
+    // (`lessons:write|review` — propose is a write, review/promote is a person's act).
+    assert_eq!(conveyor_actions::Scope::ALL.len(), 74);
 }

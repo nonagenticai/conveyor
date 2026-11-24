@@ -1707,6 +1707,7 @@
         },
         {
             "id": "v1-w1c-2",
+            "resolved_by": "fixed in #590 before merge; proved by crates/actions/tests/draft_apply.rs and internal_agent_runtime.rs",
             "area": "§7.1/§7.4",
             "standard": "SPEC",
             "spec": "§7.1/§7.4",
@@ -1736,6 +1737,7 @@
         },
         {
             "id": "v1-w1c-3",
+            "resolved_by": "fixed in #656 before merge; proved by crates/actions/tests/ladder_laya.rs — ladder.precheck records the engine's call and ladder.evaluate refuses a caller-supplied verdict",
             "area": "§7.2/§7.3",
             "standard": "SPEC",
             "spec": "§7.2/§7.3",
@@ -1765,6 +1767,7 @@
         },
         {
             "id": "v1-w1c-4",
+            "resolved_by": "fixed in #656 before merge; proved by ladder_laya.rs and decision_option_sets.set|get — options are authored rows, the case is built from them and the answer is checked against them",
             "area": "§7.2",
             "standard": "SPEC",
             "spec": "§7.2",
@@ -1789,6 +1792,7 @@
         },
         {
             "id": "v1-w1c-5",
+            "resolved_by": "fixed in #656 before merge; proved by ladder_laya.rs::an_outage_follows_the_fail_policy and internal_agent_runtime.rs — the fail policy applies to a recorded non-answer and the executor applies it to an outage",
             "area": "§7.2",
             "standard": "SPEC",
             "spec": "§7.2",
@@ -2954,6 +2958,7 @@
         },
         {
             "id": "v1-p45-1",
+            "resolved_by": "fixed in #612 before merge; the Memory source renders the run's prior steps, the card's hot rows and one digest, and a required memory source with nothing to select still refuses by name (crates/domain/tests/prompt_memory.rs, crates/store/tests/prompt_catalogue.rs)",
             "area": "§4.5",
             "standard": "SPEC",
             "spec": "§4.5",
@@ -3455,6 +3460,7 @@
         },
         {
             "id": "v1-p76-2",
+            "resolved_by": "fixed in #612 before merge; hot_for_card_tx excludes digest rows, so memory.recall's hot is the record and the digest is reachable only through the prompt selector's include_digest and the cold read (crates/store/tests/memory.rs)",
             "area": "§7.6",
             "standard": "SPEC",
             "spec": "§7.6",

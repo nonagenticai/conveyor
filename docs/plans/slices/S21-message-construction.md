@@ -4,21 +4,35 @@ title: Message construction (the compiled prompt)
 status: built
 depends_on: [S09, S11, S13, S15, S16, T2, T13]
 spec_sections: ["§3 D27", "§8 S21", "§4.4", "§4.5", "§7.7", "§10.2", "§11.1", "§11.4"]
-adds_tables: [prompt, prompt_section]
-adds_actions: [prompt_recipes.create, prompt_recipes.list, prompt_recipes.get, prompt_recipes.activate, prompt_recipes.retire]
+adds_tables: [prompt, prompt_section, decision_option_set, decision_option_set_option]
+adds_actions: [prompt_recipes.create, prompt_recipes.list, prompt_recipes.get, prompt_recipes.activate, prompt_recipes.retire, cards.assign, ladder.case, ladder.precheck, decision_option_sets.set, decision_option_sets.get]
 adds_modules: [prompt, memory, knowledge, executor]
 parity_ids: PENDING-S0
 ---
 
 # S21 — Message construction (the compiled prompt)
 
-Programme project: S21 · issues #15, #581
+Programme project: S21 · issues #15, #581, #590, #599, #612, #624, #649, #656
 
 **Status:** `plan written 2026-11-09`; the v1 seam is built (D27) and steps 1–2 are built. Step 3
 (the work-package prompt envelope — recipe authoring, memory selection, knowledge content) is
 **built, #574, 2026-11-22**; the design is §12 and the build record is §13. Step 4 (the
 `internal_agent` executor runtime and its dynamic tool grant) is **built, #581, 2026-11-22**; the
-design is §14 and the build record is §15.
+design is §14 and the build record is §15. Step 5 (the applying gate) is **built, #590,
+2026-11-22**; the design is §16 and the receipt is `docs/evidence/S21-APPLY.md`. Step 6 (the work
+package's run — the card's binding, the terminal run's memory and the live proof) is **built and
+merged, #599, 2026-11-23**; the design is §17 and the receipt is `docs/evidence/S21-RUN.md` (the
+live proof is recorded blocked on the estate's caller licence). Step 7 (the run's episodic memory) is
+**built and merged, #612/PR #615, 2026-11-23**; the design is §18, the build record §19, the receipt
+`docs/evidence/S21-MEMORY.md`. Step 8 (the Request source — the declared step in the process section
+and in laya's case input) is **built and merged, #624/PR #627, 2026-11-23**; the design is §20 and the
+receipt is `docs/evidence/S21-REQUEST.md`. Step 9 (the work package's handoff — `cards.assign`
+assigns the binding, records what the receiver must know and starts the bound run) is **built and
+merged, #649/PR #651, 2026-11-24**; the design is §21 and the receipt is
+`docs/evidence/S21-HANDOFF.md`. Step 10 (the L1 laya gate — the ladder builds the case, the engine
+makes the call and the decision cites the recorded exchange) is **open, #656**; the design is §22,
+the decision record ADR 0018 and the receipt `docs/evidence/S21-LAYA.md` (built; the merge is the
+PR's last CI run).
 **Depends on:** S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps),
 S09 (`retrieval.query` / `strata` packs).
 **Owner ruling:** George, 2026-11-09 — *a prompt is a run-time compilation from the procedure and the
@@ -429,9 +443,9 @@ grant — it has no op column to widen it with.
 
 **Out of this step.** No new executor kind; no edit to `crates/domain/src/executor.rs`'s trait
 shape; no broker change; no laya change; no PDDL storage; no second compiler; no external runtime;
-no run-resume worker for a `handover` gate; no mid-loop budget enforcement; no migration. A
-`tool_binding` provisioning action remains a follow-up (tests insert raw rows; a live job needs an
-operator row).
+no run-resume worker for a `handover` gate (step 5, #590, owns it); no mid-loop budget enforcement;
+no migration. A `tool_binding` provisioning action remains a follow-up (tests insert raw rows; a
+live job needs an operator row).
 
 **Acceptance.** `crates/actions/tests/executor_runtime.rs` (new),
 `crates/actions/tests/internal_agent_runtime.rs` (new), extensions to
@@ -479,6 +493,306 @@ compiled identity); coverage measures S21 **built** with **4/4** modules; the do
 regenerated; `served-spec.lock.json` is **539** operations with `agent.run` re-hashed, and the
 refresh absorbed four hashes #573 had already left stale on `main`.
 
-**Next lane.** The applying gate: `ladder.apply_draft` and the approval-resume worker for a
-`handover` gate, so an escalated draft can be decisioned and attached without a human editing the
-card. No PDDL storage, no second compiler, no external runtime.
+**Next lane.** Step 5 (issue #590, §16): the applying gate — `ladder.apply_draft` bound to the
+exact draft and the approval-resume worker for a `handover` gate, so an escalated draft can be
+decisioned and attached without a human editing the card. No PDDL storage, no second compiler, no
+external runtime.
+
+## 16. Build plan — step 5: the applying gate (2026-11-22, issue #590)
+
+**Why this step.** Step 4 generated a draft and, on a `handover`, failed the run and opened a
+card-scoped approval: the run was `failed` before a person could decide it, no worker applied the
+draft, and `ladder.apply_draft` admitted any accepted non-rule decision naming the card. SPEC_V2
+§5.1's `waiting_approval → running` edge, §7.1's L3 human gate and §7.4's "a generated draft applies
+only through a gate" describe the target; rework finding `v1-w1c-2:T2` (P0) names the forgeable
+gate. This step joins them: the handover parks, the person decides, the resume applies.
+
+**P1 — the gate's binding.** A new `gate.draft_apply` kind for the L3 human decision; `ladder.record`
+accepts `rung=human` only from a person and only citing an approved approval with an approve
+decision (enforced in the one store writer); `ladder.apply_draft` accepts only an accepted non-rule
+decision of `gate.precheck` (L1) or `gate.draft_apply` (L3) whose `meta` names this draft
+(`draft_document_id`, and `prompt_sha256`/`run_id` when the document carries them). The apply is one
+`pub(crate)` helper shared with the resume worker; `documents.update` stays closed to generated
+drafts.
+
+**P2 — the handover parks the run.** `decide()` returns a disposition instead of opening a gate in
+its own transaction; the finish transaction opens the `executor` approval with
+`open_gate_with_meta_tx` (`running → waiting_approval`, meta naming the draft, position/attempt,
+threshold, policy and laya config), records the step `succeeded` and its judge, and does not fail
+the run. The draft stays unattached; a retried `run.execute` is a no-op because the run has left
+`queued`.
+
+**P3 — decide, then resume.** An `executor` gate is a person's act (the approval writer enforces
+`decided_by_kind = human`). On approval, `approvals.decide` records the L3 `gate.draft_apply`
+decision bound to the approval and the draft, settles the run `waiting_approval → running`, and
+enqueues `run.resume`. The worker applies the draft through the one helper, finishes the run
+`succeeded` with one `run.succeeded`, and never calls the model. Rejection and expiry cancel the run
+and leave the draft unattached; a reclaimed resume is a no-op.
+
+**Out of this step.** No automatic apply of an L1-accepted draft; no new executor kind; no laya
+change; no second apply path; no PDDL storage; no secondary prompt compiler; no mid-loop budget
+enforcement; no `memory.remember` write-back; no card-driven run creation; no live model or laya
+proof; no migration.
+
+**Acceptance.** `crates/actions/tests/draft_apply.rs` (new), `internal_agent_runtime.rs` (extended
+with the parked/approved/rejected/reclaimed scenarios), the rewritten ladder tests, and
+`apps/server/tests/approval_expire.rs` (stays green). The scenarios are issue #590 P1–P3; the
+receipt is `docs/evidence/S21-APPLY.md`.
+
+**Next lane.** Step 6 (issue #599, §17): the work package's run — a card that names its job
+binding drives the run that inherits it, every terminal root run records one attempt in the
+card's hot memory, and the path is proved live against the real router and laya. No budget
+mechanism (the #526 lane owns `v1-p75-1`), no PDDL storage, no second compiler, no external runtime.
+
+## 17. Build plan — step 6: the work package's run (2026-11-22, issue #599)
+
+**Why this step.** Steps 3–5 built the compiled prompt, the executor and the applying gate, but the
+work package itself is still inert: `card.job_binding_id` (`migrations/0040_organisation.sql:203`)
+has no reader or writer, so a run is bound only because its caller passed a binding, and the
+executor never writes `work_package_memory`, so the prompt's memory section is always empty while
+`memory.consolidate` is already enqueued on every terminal transition
+(`crates/store/src/run.rs:641`). SPEC_V2 §4.4 ("a card names a binding"), §5.1 (card → run),
+§6.6.4 ("memory is written at handoff") and §7.6 (hot rows + derived digest) describe the target;
+rework `v1-p66-1` names the handoff gap. This step joins them.
+
+**Not this step — the budget.** `v1-p75-1` (P0, "budget enforcement is off by default and no
+run/binding declares a budget") is **already resolved on `origin/issue/526-u5a`** (commit
+`8f1e5770`, `crates/actions/tests/tool_budget.rs` 14 passed, an invoke precheck that refuses an
+unbudgeted capturing call, `422 budget_missing` at run start). A second gate here would be a
+duplicate mechanism. The token ceiling (`ReleaseLimits.max_tokens`, still recorded-only) is that
+gate's residual, not this step's.
+
+**P1 — the card names the binding.** `cards.create` and `cards.update` accept `job_binding_id`; the
+binding must resolve in the tenant and be `active` (`422 job_binding_unusable` otherwise); `CardOut`
+exposes it. `runs.create` resolves the card's binding when the request omits one and refuses an
+explicit binding that differs (`422 card_binding_mismatch`); a card with no binding keeps the plain
+run path. The pin and stale checks stay in `insert_run_tx`. `cards.duplicate` leaves the binding
+unset (an assignment is not content).
+
+**P2 — the terminal run writes its memory.** `enqueue_memory_consolidation` becomes
+`record_run_memory`: when a terminal run is card-scoped and a root, it inserts one
+`work_package_memory` row through the existing `store::memory::insert_memory_tx` — kind `attempt`,
+source `system`, `run_id` set, body naming the attempt and its outcome, `meta` carrying the status
+and error class — and then enqueues the existing consolidation job. The row and the terminal status
+commit in one transaction; a child run and a card-less run write none. The one-writer rule is
+amended in CONTRACT §17 to name this runtime writer.
+
+**P3 — the live wire proof.** An `#[ignore]` test in the existing
+`internal_agent_runtime` binary drives one bound run against the estate's real inference-router and
+real laya bridge on a fresh local test database (the `s3_wire.rs` pattern) and asserts the model
+call, the `gate.precheck` decision, the draft, the attempt row and the run's terminal state. It
+refuses when the endpoints or credentials are unset; a stub is not the proof.
+
+**Out of this step.** No budget mechanism (cost, tool spend or token ceiling — `v1-p75-1` is the
+#526 lane's); no automatic apply of an L1-accepted draft; no new `cards.assign` action; no
+auto-start from a claim or lane move; no prior-step memory in the prompt; no UI; no PDDL storage;
+no migration.
+
+**Found and fixed in flight (2026-11-23).** The attempt row was written by
+`transition_run_tx`/`fail_run_tx` only; `cancel_run_tx` and both reap sweeps (`run.execute` and
+`process.step`) moved runs to a terminal state without it. All three now write the row through the
+same `record_run_memory_for_id_tx`, in the same transaction; the store and server tests name each
+path. The process-run clause is therefore no longer out of scope.
+
+**Acceptance.** `crates/actions/tests/card_binding.rs` (new), `crates/store/tests/run_memory.rs`
+(new), `internal_agent_runtime.rs` (extended with the next-run prompt and live scenarios). The
+scenarios are issue #599 P1–P3; the receipt is `docs/evidence/S21-RUN.md`.
+
+**Next lane.** Step 7 (issue #612, §18): the run's episodic memory — the run's own prior steps in
+the compiled prompt, `memory.recall`'s hot/digest separation and the process-attempt proof. No
+migration, no second compiler, no second memory writer.
+
+## 18. Build plan — step 7: the run's episodic memory (2026-11-23, issue #612)
+
+**Why this step.** Step 3 gave the Memory section the card's hot rows and one digest; steps 4–5
+gave the run an executor, a compiled prompt and a gate; step 6 made the work package bind its job
+and record its terminal attempt. SPEC_V2 §4.5 names the Memory source as three classes — the run's
+prior steps, the card's hot memory and the consolidated digest — and only two are read: `read_step`
+(`crates/store/src/prompt.rs:321`) selects position/action/node_id/on_result and nothing queries
+`run_step` for earlier outputs. A multi-step run re-derives context it already produced, and a retry
+cannot see why the previous attempt failed. Rework `v1-p45-1` names the remainder in its acceptance.
+The adjacent defect `v1-p76-2`: `hot_for_card_tx` (`crates/store/src/memory.rs:221`) has no
+`kind <> 'digest'` filter, so a derived digest is served as a hot row by `memory.recall` while the
+prompt selector already filters it. This step joins them.
+
+**P1 — the run's prior steps reach the prompt.** `PromptFacts` gains the prior-step lines; the
+Memory renderer prepends them before the card's rows, each as
+`[step/<status>#<position>.<attempt>] <action> <status>: <body>`. The store reads the run's own
+`run_step` rows: terminal statuses `succeeded`/`failed`, `(position, attempt)` before the current
+step's (so a retry sees its earlier attempt), ordered, bounded by `step_limit`. The selector gains
+`include_steps` (default true) and `step_limit` (default 8, max 32). Bodies render whole; an
+over-budget section refuses with the measurement, never truncates. A child reads only its own rows.
+
+**P2 — `memory.recall` keeps the digest out of hot.** `hot_for_card_tx` filters `kind <> 'digest'`;
+the digest stays reachable through the prompt selector's `include_digest` and the cold read. The
+existing test that pins three hot rows (digest first) flips to two; the selector's digest append
+stays asserted.
+
+**P3 — the process attempt reaches the next prompt (proof).** #599 writes the terminal attempt on
+every path; this step proves a process root run's attempt is read by the next run's prompt and that
+a child writes none. No writer is added.
+
+**Out of this step.** No card-driven run creation (a claim or lane move starting a run); no
+`memory.remember` write-back at handoff; no automatic apply of an L1-accepted draft; no step
+`input_template`/`outputs` as Request; no budget mechanism (the #526 lane's); no parent-run memory
+in a child's prompt; no UI; no PDDL storage; no second compiler; no migration.
+
+**Acceptance.** `crates/domain/tests/prompt_memory.rs` (extended), `crates/store/tests/prompt_catalogue.rs`
+(prior-step selection) and `crates/store/tests/memory.rs` (the digest/hot flip), and
+`crates/actions/tests/process_agent_resolved.rs` / `crates/store/tests/run_memory.rs` (the process
+attempt reaches the next prompt). The scenarios are issue #612 P1–P3; the receipt is
+`docs/evidence/S21-MEMORY.md`.
+
+## 19. Build record — step 7: the run's episodic memory (2026-11-23, issue #612)
+
+**Built and merged.** PR #615 merged as `0617dd60`: the run's own prior steps render in the one
+Memory section before the card's hot rows and the digest
+(`[step/<status>#<position>.<attempt>]`, whole bodies, a measured refusal over budget);
+`memory.recall`'s hot excludes `digest`; the process attempt is proved to reach the next run's
+prompt (the writer is #599's). ADR 0015, CONTRACT §25, DATA-ARCH §2.27; receipt
+`docs/evidence/S21-MEMORY.md`. Measured at the head: domain `prompt_memory` **8**, store
+`prompt_catalogue` **5**, store `memory` **4**, actions `process_agent_resolved` **5**; regressions
+`internal_agent_runtime` 16 (+2 ignored), `prompt_compile` 7, `prompt_recipes` 7,
+`agent_run_resolved` 15, `process_step` 20, `decision_ladder` 7, `draft_apply` 7, `s11_process` 14;
+three reversal proofs fired; `--check-lock` exit 0. Rework `v1-p45-1` and `v1-p76-2` are cleared.
+**No migration.**
+
+## 20. Build plan — step 8: the Request source (2026-11-23, issue #624)
+
+**Why this step.** §4.5's four sources are Knowledge, Memory, Request and Tools; steps 3–7 built
+Knowledge, Memory and Tools, and the **Request is still synthesized rather than declared**.
+`read_step` (`crates/store/src/prompt.rs`) selects position/attempt/action/node_id and joins
+`on_result` only, so the resolved `run_step.input`, the frozen `process_step.outputs` and
+`action_text`, and the step's gate never reach the prompt. The model reads `current step: N
+(agent.run)` and is never told the arguments it must act on or the artifact it must produce; laya's
+case input on the process path sees the resolved input but not the declaration, and on the run-level
+path sees no request at all. This step makes the declared step one **request document** for both
+consumers.
+
+**P1 — the request facts and their render.** `StepFacts` gains `action_text`, `input` (resolved),
+`outputs` (declared) and `gate`; one pure `step_request` builds
+`{step, action, action_text, input, outputs, on_result, gate}` and the process section renders it as
+labelled data after the current-step line. The store reads `run_step.input` and the joined
+`process_step` columns in one read; only a process-driven step contributes them — a synthetic
+run-level `agent.run` step contributes none of its executor envelope and keeps the release
+definition as its request. Whole values; the section budget refuses with the measurement. No
+migration: `run_step.input` is written at claim and `process_step.outputs`/`action_text` exist.
+
+**P2 — the judge receives the same document.** The process judge passes the request document as its
+`case_input` (today only `row.input`), and the run-level `internal_agent` judge gains the release
+request built by one shared helper with `request_facts`. L1 and L2 cannot disagree about what was
+asked.
+
+**P3 — provenance.** The request is inside the compiled text, so `prompt_sha256` covers it; a change
+to the resolved input alone moves the hash and the `inference_call` records it; identical facts
+compile byte-identically.
+
+**Out of this step.** No card-driven run creation; no `memory.remember` write-back; no automatic
+apply of an L1-accepted draft; no budget mechanism (the #526 lane's); no prompt-budget authoring
+(`v1-p77-2`); no NULL-hash guard (`v1-p77-1`); no release pinning (`v1-p42-1`); no workflow-node
+request (a `run_step` with no `process_step_id`); no parent-run memory; no UI; no PDDL storage; no
+second compiler; no migration.
+
+**Acceptance.** New `crates/domain/tests/prompt_request.rs`; extended
+`crates/store/tests/prompt_catalogue.rs`, `crates/actions/tests/process_agent_resolved.rs` and
+`crates/actions/tests/internal_agent_runtime.rs`. The scenarios are issue #624 P1–P3; the receipt is
+`docs/evidence/S21-REQUEST.md`.
+
+## 21. Build plan — step 9: the work package's handoff (2026-11-24, issue #649)
+
+**Why this step.** §5.1's level is card → run → step; steps 3–8 made the card name its binding, the
+run compile the four sources and the judge receive the request, but the level has no entry of its
+own. No card or board action starts a run — `cards.move` and `cards.update` touch no run, and
+`runs.create` starts one only when a caller asks explicitly. SPEC_V2 §6.6.1–5 names the missing
+verb: a job hands a card to another job with an action, **records what the receiver must know as
+memory**, and every card has one live run. `memory.remember` has zero production callers, so
+§6.6.4's handoff note is never written. ADR 0014 deferred exactly this unit ("a dedicated handoff
+verb can come with the card-driven entry unit").
+
+**P1 — the handoff's one transaction.** A new `cards.assign` (scopes `cards:write` + `runs:write`)
+takes `{card_id, job_binding_id?, note, kind?, meta?, correlation_id?}` and presents the card's
+version (If-Match or `_version`, like `cards.update`/`cards.move`), and, in one transaction:
+resolves the target binding (the request's, else the card's), checks it is active and in the tenant,
+refuses a card that already has a live root run (`409 card_has_live_run`), validates the note, sets
+`card.job_binding_id`, writes one hot `work_package_memory` row through the memory writer, and
+starts the bound run through the same helper `runs.create` uses (andon, binding pin, attempt,
+`run.execute` enqueue, `run.created`). Every refusal precedes the first write. `cards.update`'s
+`job_binding_id` stays the plain edit and never starts a run.
+
+**P2 — the note is memory the next prompt reads.** The handoff row is an ordinary hot row, so the
+selector renders it in the next run's Memory section (`[fact/<source>#<id>] …`) and its id is inside
+`prompt_sha256`. One writer: `memory.remember`'s body is extracted and shared. No new writer.
+
+**P3 — the refactors and the proofs.** `runs.create`'s run-creation body is factored into one
+`pub(crate)` helper so the handoff cannot drift from the andon, the pin or the event; its existing
+tests are the regression. The action is registered with both scopes, parity-sampled over HTTP and
+MCP, and the served-spec lock regenerates. Five reversal proofs: the memory insert, the live-run
+read, the binding check, the andon check and the note's source.
+
+**Out of this step.** No auto-start on a bare move or a claim; no claim/renew/release verb; no
+automatic apply of an L1-accepted draft; no budget mechanism (the #526 lane's); no handoff of a
+project-level (card-less) run; no parent-run memory; no new event kind; no typed
+inputs/acceptance-criteria authoring on the handoff; no UI; no PDDL storage; no second memory
+writer; no migration.
+
+**Acceptance.** New `crates/actions/tests/card_handoff.rs`; extended
+`crates/store/tests/prompt_catalogue.rs`, `crates/actions/tests/registry.rs` and
+`crates/actions/tests/parity_http_mcp.rs`; `runs.create`'s existing suites stay unchanged. The
+scenarios are issue #649 P1–P3; the receipt is `docs/evidence/S21-HANDOFF.md`.
+## 22. Build plan — step 10: the L1 laya gate makes its own call (2026-11-24, issue #656)
+
+**Why this step.** §4.5's level hands generation to the internal agent and §7.4 makes every output
+a draft behind a gated action; the gate is the L1 laya decision. The ladder that records it does
+not make it. `ladder.evaluate` reads `answer`, `confidence`, `latency_ms` and `probabilities` from
+the request body and writes `rung = 'laya'` with whatever policy and laya-config versions happen to
+resolve, so a caller with `governance:write` can record a decision with an invented confidence and
+clear any threshold. Options are inline request text written per decision, and `Unavailable` — which
+`conveyor_domain::ladder` already models — is never produced by the action, so an outage cannot
+become `gate_unavailable`. The executor is the one honest caller (it invokes `laya.judge` itself
+and hands the answer over), and even it records the verdict without the call that produced it.
+Rework `v1-w1c-3`, `v1-w1c-4` and `v1-w1c-5` are these three defects.
+
+**P1 — the case is the ladder's, and the decision cites the call.** `ladder.case` (read) returns
+`{case, case_hash, laya_call_key}` built from the effective policy and the tenant's
+`laya_inference_config`; `ladder.precheck` is the external action that performs SPEC_V2 §7.2's
+`POST /v1/systemone` (`governance:write`, bearer `laya.token`, outside any transaction);
+`ladder.evaluate` loses `answer`, `confidence`, `probabilities`, `latency_ms` and `options`, takes
+`laya_call_key`, rebuilds the case itself, and verifies the engine's recorded exchange
+(`store::idempotency::lookup` with the case's request hash must return the stored 2xx response;
+`store::actions::find_invocation_by_key` must name an `ok` invocation). The answer, confidence,
+probabilities and latency come from that exchange; the decision records `meta.laya_call_key`,
+`meta.laya_invocation_id` and `meta.case_hash`. A request carrying a verdict is `422
+caller_supplied_verdict`; an unverifiable key is `422 laya_call_unverified`.
+
+**P2 — options are authored, versioned rows.** Migration `0071` adds `decision_option_set` and
+`decision_option_set_option` (one live set per `(tenant, kind, gate)`, a monotonic version, rows
+with `key`, `label`, `payload.outcome`). `decision_option_sets.set` authors a set — the one row's
+version increments and its children are replaced in the same transaction — and `.get` reads it. A
+policy declares `meta.question_type = "choice"`; the case is then a `choice` over the authored
+labels, and an answer outside the authored keys is `422 laya_answer_not_in_options`. A declared
+choice with no set is `409 option_set_missing` — never free text. `decision_option` stays the
+per-decision record, written from the authored rows. The executor's gate uses the same builder, so
+the authored menu reaches an in-process run, not only an API caller.
+
+**P3 — the fail policy is applied and `fire_when` decides.** Two shapes, one policy. An **outage** —
+laya unreachable, no completed call recorded — leaves no verified exchange, so no decision row is
+written; the executor applies `domain::ladder::unavailable(fail_policy, action)` (closed → refused;
+open → the action's outcome: handover escalates, block refuses, annotate proceeds). A **recorded**
+call that completed without a readable answer is recorded by `ladder.evaluate` as `unavailable` with
+`meta.gate_unavailable = true`, under the same policy. Never a pass. `decision_policy` gains a
+nullable `fire_when` in `0071`, validated at authoring; a case that does not fire is not asked, no
+decision is written, and the step proceeds. The executor makes exactly one laya request per gate.
+
+**P4 — the proofs and the register.** The existing tests that post a verdict are rewritten to go
+through `ladder.case` → `ladder.precheck` → `ladder.evaluate`, never relaxed; new coverage in
+`crates/actions/tests/ladder_laya.rs`; the registry, parity sample and served-spec lock move with
+the new actions; five reversal proofs (the verdict, the case verification, the option check, the
+fail policy, the single call). `v1-w1c-3/4/5` gain `resolved_by`.
+
+**Out of this step.** Automatic apply of an L1-accepted draft (ADR 0011:77, its own unit); auto-start
+on a move or a claim; any budget mechanism (the #526 lane's); release pinning (`v1-p42-1`); the SOP
+judge (`laya.judge` keeps its own question); a second laya client; a job-driven asynchronous
+evaluation; UI; PDDL storage.
+
+**Acceptance.** The issue #656 P1–P4 scenarios at the PR head; `--check-lock` exit 0; the rework
+audit clears `v1-w1c-3/4/5`; the receipt is `docs/evidence/S21-LAYA.md`.

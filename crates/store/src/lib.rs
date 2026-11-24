@@ -54,6 +54,7 @@
 pub mod actions;
 pub mod andon;
 pub mod approval;
+pub mod async_invocation;
 // T9 (SPEC_V2 §8.1, §10.3, D63): the TOGAF ADM store — the artefact repository, the tailored
 // profile, the board, the four contract kinds, the phase gate, compliance and assessments.
 pub mod architecture;
@@ -61,6 +62,8 @@ pub mod architecture;
 // approval at all, and whether its requester may decide it. A missing row is the strict default.
 pub mod approval_policy;
 pub mod audit;
+// T17 (#87, SPEC_V2 §5.7): the authoring intake, draft, review and publish lifecycle.
+pub mod authoring;
 pub mod benchmark;
 pub mod board;
 // S13/CONTRACT §7: the bus cursor — the unpublished `event` rows and the mark that records a
@@ -87,6 +90,15 @@ pub mod interaction;
 pub mod inference;
 pub mod invite;
 pub mod jobs;
+// T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata record, its six Gets and the held-out
+// measurement.
+pub mod kata;
+// T8 (SPEC_V2 §7.6, §10.3, §10.4, §12 T8, D36; issue #79): the lesson lifecycle — independent
+// evidence, a person's review and promotion to a governed-asset source draft.
+pub mod lesson;
+// T6 (SPEC_V2 §5.4, §6.4, §9.1, §9.3; issue #80): the development charter, its immutable step
+// evidence and the closure record.
+pub mod development;
 pub mod label;
 // T2 (SPEC_V2 §7): the decision ladder's policies, refinements, laya configs and decisions.
 pub mod ladder;
@@ -96,6 +108,7 @@ pub mod licence;
 pub mod list;
 pub mod listen;
 // S15: work-package memory — the hot rows and the derived digest.
+pub mod meetings;
 pub mod memory;
 // T11 (SPEC_V2 §7.5, §11.9; issue #84): the metrics read models, the versioned threshold
 // configuration and the reconciliation record — no metric is stored (D37).
@@ -150,6 +163,9 @@ pub mod snapshot;
 pub mod task;
 // T13 (SPEC_V2 §11.8): toolkit/tool/tool_binding resolution and the append-only tool_call ledger.
 pub mod tool;
+// T15 (#86, SPEC_V2 §11.3–§11.6, §11.8): the tool authoring drafts, the registered sources and
+// the immutable publication the broker's registered-destination dispatch resolves.
+pub mod tool_authoring;
 // #160: the tenant's registered inference destination — one row per tenant, read by the executor
 // before it falls back to the platform environment.
 pub mod tenant_inference;
@@ -197,7 +213,7 @@ pub use list::{ListStoreError, NewList};
 pub use listen::{EventListen, ListenError, probe_direct};
 pub use migrate::{
     MIGRATOR, RUNTIME_GRANTS_SQL, RUNTIME_ROLE, StoreMigrateError, apply_runtime_grants,
-    assert_runtime_role, migrate,
+    assert_runtime_role, migrate, runtime_migrator,
 };
 // The model store functions are called through `store::model::`; the import path's
 // head-only writer is re-exported here too because it is the SECOND public freeze entry

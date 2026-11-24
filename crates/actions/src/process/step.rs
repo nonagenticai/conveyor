@@ -1086,6 +1086,7 @@ pub(crate) async fn judge_and_record(
                 tenant,
                 app_key,
                 process,
+                step,
                 row,
                 &output,
                 &sop.acceptance_criteria,
@@ -1196,14 +1197,30 @@ async fn laya_verdict(
     tenant: TenantId,
     app_key: &str,
     process: &ProcessRecord,
+    step: &ProcessStepRecord,
     row: &RunStepRecord,
     output: &Value,
     acceptance_criteria: &Value,
     threshold: Option<f64>,
 ) -> Result<JudgeCall, StepFailure> {
+    // The judge sees the same Request document the prompt rendered (S21 step 8, CONTRACT §26):
+    // the resolved input, the declared outputs, the action text and the gate. One builder
+    // (`StepFacts::request`) serves the prompt and the judge, so L1 and L2 cannot disagree.
+    let facts = conveyor_domain::prompt::StepFacts {
+        position: row.position,
+        attempt: row.attempt,
+        action: row.action.clone(),
+        node_id: None,
+        on_result: Some(step.on_result.clone()),
+        action_text: step.action_text.clone(),
+        input: Some(row.input.clone()),
+        outputs: step.outputs.clone(),
+        gate: step.gate_kind.clone(),
+    };
+    let request_document = facts.request().unwrap_or(Value::Null);
     let request = InvokeRequest {
         action: "laya.judge".to_owned(),
-        input: judge::request(None, output, acceptance_criteria, Some(&row.input)),
+        input: judge::request(None, output, acceptance_criteria, Some(&request_document)),
         precondition: None,
         // No `Idempotency-Key`. A failed call keeps its claim live for the TTL, which would turn
         // an outage into a `409` that cannot clear; and the call decides nothing and changes

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Requirements catalog — SPEC-V2 (retrospective, 2026-11-21) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Requirements catalog — SPEC-V2 (retrospective, 2026-11-21)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: The requirements the delivered model actually meets, typed condition | constraint | assumption | delta (D63).</li>
+<li>Scope: SPEC_V2.md §2–§11 and the owner decisions D28–D63.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>R1 / One record per fact</strong> - {"acceptance": "No concept is stored in two systems; systems join by pinned reference (P1, \u00a710.1).", "priority": "must", "type": "constraint"}</li>
+<li><strong>R2 / No work without a card</strong> - {"acceptance": "No work without a card; no transition without an action; no completion without evidence (P3).", "priority": "must", "type": "constraint"}</li>
+<li><strong>R3 / The executor never approves its own work</strong> - {"acceptance": "Dual control on gates; <code>decided_by_kind</code>; the approver is neither the assignee nor the executor (P4).", "priority": "must", "type": "constraint"}</li>
+<li><strong>R4 / Fail closed on missing configuration</strong> - {"acceptance": "An unresolved binding, pack, prompt source or tool refuses <code>409 *_not_ready</code> with <code>blocking[]</code> before the first model call or action (P8).", "priority": "must", "type": "constraint"}</li>
+<li><strong>R5 / Every model call is ledgered and budgeted</strong> - {"acceptance": "<code>inference_call</code> rows with per-run and per-tenant budgets (P9).", "priority": "must", "type": "constraint"}</li>
+<li><strong>R6 / No speculative aggregates</strong> - {"acceptance": "A table exists because a named procedure uses it and a metric reads it; an unused aggregate is removed, not defended (P10, D40).", "priority": "must", "type": "constraint"}</li>
+<li><strong>R7 / Tenant configuration over code</strong> - {"acceptance": "Every policy, threshold, limit, gate condition and approval kind is a versioned tenant-scoped row with a platform default; code implements mechanisms, never policy values (P11, D50).", "priority": "must", "type": "constraint"}</li>
+<li><strong>R8 / Immutable releases; a stale binding refuses</strong> - {"acceptance": "A binding pins <code>job_key</code> + <code>release_hash</code> + an immutable <code>release_snapshot</code>; a run against a retired binding refuses <code>409 job_binding_stale</code> before any model call (D38).", "priority": "must", "type": "condition"}</li>
+<li><strong>R9 / Tool effects are typed</strong> - {"acceptance": "Every tool declares one of read | write | destructive | spend; a binding's ceiling narrows only; destructive needs a dry-run and the tenant's configured approvals (D45, \u00a711.4).", "priority": "must", "type": "condition"}</li>
+<li><strong>R10 / A benefit is measurable</strong> - {"acceptance": "A benefit without baseline, target, method and owner is refused; the benefits map names output \u2192 capability \u2192 operational outcome \u2192 benefit \u2192 objective (D62, \u00a78.3).", "priority": "must", "type": "condition"}</li>
+<li><strong>R11 / A delivery project needs its governing contract</strong> - {"acceptance": "A delivery project cannot pass design without the live contract that governs it; a Phase-G review records exactly one of the six standard levels (D63, \u00a78.1).", "priority": "must", "type": "condition"}</li>
+<li><strong>R12 / The agent platform is a front end</strong> - {"acceptance": "It is a conversation surface over MCP with its own autonomy configuration \u2014 not a catalogue, an executor or a system of record for conveyor work (D33, D59).", "priority": "must", "type": "assumption"}</li>
+<li><strong>R13 / laya answers inside the seam budget</strong> - {"acceptance": "<code>POST /v1/systemone</code>, 1500 ms default / 3 s hard budget, fail policy per decision policy; a timeout never becomes an LLM decision (\u00a710.2, \u00a77).", "priority": "must", "type": "assumption"}</li>
+<li><strong>R14 / V1 is amended, not replaced</strong> - {"acceptance": "V1 D1\u2013D27 stand except D14 and D22, which V2 amends (D46, D61); no V1 S-slice is re-opened.", "priority": "must", "type": "delta"}</li>
+<li><strong>R15 / Procedural knowledge has no ontology store</strong> - {"acceptance": "Amended 2026-11-19: RDF/OWL/Turtle is imported as a strata knowledge pack named by the procedure's <code>knowledge_pack_ref</code>; the conveyor runs no RDF store, no graph store and no reasoner (D53, \u00a75.6).", "priority": "must", "type": "delta"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SPEC V2 — the organisational operating model · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -2,14 +2,15 @@
 //! S17's run driver and reaper (`benchmark.run.poll`, `benchmark.reap`).
 //!
 //! **One driver, one bounded tick.** `poll` starts at most `concurrency` sandbox Jobs, reads the
-//! state of the ones already running, grades their logs, writes the cases, and re-enqueues the
+//! state of the ones already running, grades their logs, writes the cases, deletes the finished
+//! Jobs and re-enqueues the
 //! next tick as a NEW job (`max_attempts = 1`, per-tick dedupe key). It never loops and never
 //! sleeps: a tick that overran the job lease would be reclaimed and delivered twice.
 //!
-//! **Producers today are the two controls.** `gold` submits the instance's gold patch and `empty`
-//! submits an empty patch; both are grader-adjacent controls whose logs exercise the whole eval
-//! path. The model arms are `baseline` (the `baseline.py` producer port, not built yet) and
-//! `conveyor` (S18); both are refused rather than silently producing nothing.
+//! **Patch sources.** `gold` submits the instance's gold patch and `empty` an empty patch; both are
+//! grader-adjacent controls whose logs exercise the whole eval path. The model arms `baseline` and
+//! `conveyor` are produced by `benchmark.case.produce` (S18) and graded with the patch recorded on
+//! the case; only a produced case that reaches the grader without a patch is refused.
 //!
 //! **Logs are evidence.** A finished Job's log is stored as an S09 document before the case is
 //! finalised; an unconfigured object store is a permanent driver fault, not a reason to record a
@@ -99,23 +100,23 @@ pub async fn poll_with(
     // ── 2. poll the Jobs already running (never hold a transaction across HTTP) ─────────
     let mut completed = 0usize;
     for case in &running {
-        match sandbox.state(&case.sandbox_ref).await {
-            Ok(JobState::Running) => {}
+        let finished = match sandbox.state(&case.sandbox_ref).await {
+            Ok(JobState::Running) => false,
             Ok(JobState::Succeeded) => {
                 let log = sandbox
                     .logs(&case.sandbox_ref)
                     .await
                     .map_err(|error| JobFailure::retryable(format!("sandbox log: {error}")))?;
                 finalise_graded(pool, tenant, &run, case, &log, objects).await?;
-                completed += 1;
+                true
             }
             Ok(JobState::Failed { reason }) => {
                 finalise_infra(pool, tenant, &run, case, &reason).await?;
-                completed += 1;
+                true
             }
             Err(SandboxError::NotFound { .. } | SandboxError::NoPod(_)) => {
                 finalise_infra(pool, tenant, &run, case, "sandbox job disappeared").await?;
-                completed += 1;
+                true
             }
             Err(error) => {
                 return Err(JobFailure::retryable(format!(
@@ -123,6 +124,12 @@ pub async fn poll_with(
                     case.sandbox_ref
                 )));
             }
+        };
+        if finished {
+            completed += 1;
+            // P1.2: the log is stored and the case recorded first, then the pod is removed. A
+            // delete failure is a warning, never a reason to lose a recorded verdict.
+            delete_jobs(sandbox, std::slice::from_ref(&case.sandbox_ref)).await;
         }
     }
 
@@ -148,13 +155,16 @@ pub async fn poll_with(
     tx.commit().await.map_err(db)?;
 
     if !pending.is_empty() {
-        // **A `conveyor` case is produced before it is graded** (S18 step 1). Production is an
-        // `agent.run`, which is bounded but long, so it can never happen inline in a tick; the
-        // driver enqueues one producer job per case and moves on. Every other arm already holds
-        // its patch, so it goes straight to a grading Job.
+        // **A produced case is produced before it is graded** (S18 step 1): the model arms run
+        // an `agent.run`, and the process arm starts a card-scoped process (S18 P3c). Both are
+        // bounded but long, so neither can happen inline in a tick; the driver enqueues one
+        // producer job per case and moves on. Every other arm already holds its patch, so it
+        // goes straight to a grading Job.
+        let produced_arm =
+            matches!(run.arm.as_str(), "conveyor" | "baseline") || run.subject_kind == "process";
         let (to_grade, to_produce): (Vec<_>, Vec<_>) = pending
             .into_iter()
-            .partition(|case| run.arm != "conveyor" || case.produce_status == "ok");
+            .partition(|case| !produced_arm || case.produce_status == "ok");
         if !to_produce.is_empty() {
             let mut tx = store::begin_scoped(pool, tenant).await.map_err(db)?;
             for case in &to_produce {
@@ -217,26 +227,7 @@ pub async fn poll_with(
             let patch = match run.arm.as_str() {
                 "gold" => instance.gold_patch.clone(),
                 "empty" => String::new(),
-                "conveyor" => match &case.patch {
-                    Some(patch) => patch.clone(),
-                    // `to_grade` only carries produced cases, so this is a driver invariant, not
-                    // a model failure: grading a phantom patch would publish a false verdict.
-                    None => {
-                        return Err(JobFailure::permanent(
-                            "a conveyor case reached the grader with no produced patch",
-                        ));
-                    }
-                },
-                "baseline" => {
-                    return Err(JobFailure::permanent(
-                        "the baseline producer (the baseline.py port) is not built yet",
-                    ));
-                }
-                other => {
-                    return Err(JobFailure::permanent(format!(
-                        "unknown benchmark arm {other}"
-                    )));
-                }
+                arm => produced_patch(arm, case.patch.as_deref())?,
             };
             if patch.len() > store::benchmark::MAX_PATCH_BYTES {
                 finalise_infra(
@@ -537,6 +528,25 @@ fn statuses_json(statuses: &TestStatuses) -> Value {
     json!({ "success": statuses.success, "failure": statuses.failure })
 }
 
+/// The patch a produced case is graded with.
+///
+/// `to_grade` only carries a case whose producer recorded `ok`, so a missing patch is a driver
+/// invariant, not a model failure: grading a phantom patch would publish a false verdict. The
+/// refusal names the arm because `baseline` and `conveyor` are produced by the same job but are
+/// diagnosed separately.
+fn produced_patch(arm: &str, patch: Option<&str>) -> Result<String, JobFailure> {
+    match arm {
+        "conveyor" | "baseline" => patch.map(str::to_owned).ok_or_else(|| {
+            JobFailure::permanent(format!(
+                "a {arm} case reached the grader with no produced patch"
+            ))
+        }),
+        other => Err(JobFailure::permanent(format!(
+            "unknown benchmark arm {other}"
+        ))),
+    }
+}
+
 /// `None` for a non-control arm; a control that missed is recorded `false`, never hidden.
 fn control_ok(run: &Run) -> Option<bool> {
     match run.arm.as_str() {
@@ -556,7 +566,7 @@ fn sandbox() -> Result<Sandbox, JobFailure> {
 }
 
 async fn delete_jobs(sandbox: &Sandbox, names: &[String]) {
-    for name in names {
+    for name in names.iter().filter(|name| !name.is_empty()) {
         if let Err(error) = sandbox.delete(name).await {
             tracing::warn!(job = %name, %error, "benchmark: could not delete sandbox job");
         }
@@ -594,4 +604,47 @@ fn want_uuid(payload: &Value, field: &str, kind: &str) -> Result<Uuid, JobFailur
 fn sha256_hex(text: &str) -> String {
     let digest = Sha256::digest(text.as_bytes());
     digest.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::produced_patch;
+
+    #[test]
+    fn the_baseline_produced_patch_is_graded() {
+        // #635: the S18 producer records the baseline's patch on the case. The driver must grade
+        // that patch; the stale S17 refusal made every produced baseline case fail the run.
+        let patch = "diff --git a/x b/x\n--- a/x\n+++ b/x\n";
+        assert_eq!(produced_patch("baseline", Some(patch)).unwrap(), patch);
+    }
+
+    #[test]
+    fn the_conveyor_produced_patch_is_graded() {
+        assert_eq!(
+            produced_patch("conveyor", Some("diff --git a/x b/x\n")).unwrap(),
+            "diff --git a/x b/x\n"
+        );
+    }
+
+    #[test]
+    fn a_produced_arm_without_a_patch_is_refused_by_name() {
+        // `to_grade` only carries produced cases, so this is a driver invariant: fail
+        // permanently and name the arm instead of grading a phantom patch.
+        for arm in ["baseline", "conveyor"] {
+            let error = produced_patch(arm, None).unwrap_err();
+            assert!(error.permanent);
+            assert!(
+                error.message.contains(arm),
+                "refusal did not name {arm}: {}",
+                error.message
+            );
+        }
+    }
+
+    #[test]
+    fn an_unknown_arm_is_refused() {
+        let error = produced_patch("gold", Some("diff")).unwrap_err();
+        assert!(error.permanent);
+        assert!(error.message.contains("gold"), "{}", error.message);
+    }
 }

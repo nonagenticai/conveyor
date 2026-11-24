@@ -20,7 +20,8 @@
 //!
 //! Kinds this build knows: `event.prune`, `job.prune`, `model.prune`, `validation.prune`,
 //! `idempotency.sweep`, `licence.sync`, `webhook.deliver`, the S06-1 run/claim/gate kinds
-//! `run.execute`, `run.reap`, `card.lease_sweep`, `card.claim` and `approval.expire`, the
+//! `run.execute`, S21 step 5's `run.resume` (apply an approved `executor` gate's draft), `run.reap`,
+//! `card.lease_sweep`, `card.claim` and `approval.expire`, the
 //! S06-2 comms kinds `delivery.send` and `approval.closed.emit`, S07's `quality.score`,
 //! S11's `process.step`, and S10's copilot kinds `copilot.turn.reap`,
 //! `copilot.proposal.sweep` and `copilot.proposal.execute`, S16's `prompt_audit.run` and its two
@@ -829,6 +830,7 @@ async fn dispatch(
             );
         }
         "run.execute" => run_execute(pool, tenant, &config.app_key, payload).await?,
+        "run.resume" => run_resume(pool, tenant, &config.app_key, payload).await?,
         "run.reap" => run_reap(pool, tenant).await?,
         "process.step" => process_step(pool, tenant, &config.app_key, payload).await?,
         // S13: one node attempt of a workflow run (the run's single driving tick).
@@ -972,7 +974,7 @@ async fn dispatch(
             return Err(JobFailure::permanent(format!(
                 "unknown job kind {other:?}: this build registers event.prune, job.prune, \
                  model.prune, validation.prune, idempotency.sweep, licence.sync, \
-                 webhook.deliver, run.execute, run.reap, process.step, workflow.node, card.lease_sweep, \
+                 webhook.deliver, run.execute, run.resume, run.reap, process.step, workflow.node, card.lease_sweep, \
                  card.claim, approval.expire, delivery.send, approval.closed.emit, \
                  quality.score, model.validate, copilot.turn.reap, copilot.proposal.sweep, \
                  copilot.proposal.execute, benchmark.run.poll, benchmark.reap, \
@@ -1062,6 +1064,31 @@ async fn run_execute(
         })
 }
 
+/// `run.resume` — apply the draft an approved `executor` gate decided (S21 step 5, ADR 0011).
+///
+/// The approval action already recorded the L3 decision and settled the run `running`; this
+/// handler only applies the draft and finishes the run. It never calls the model. A typed
+/// inconsistency finishes the run `failed`; only a database failure is retried.
+async fn run_resume(
+    pool: &PgPool,
+    tenant: TenantId,
+    app_key: &str,
+    payload: &Value,
+) -> Result<(), JobFailure> {
+    let run_id = want_uuid(payload, "run_id", "run.resume")?;
+    let approval_id = want_uuid(payload, "approval_id", "run.resume")?;
+    let decision_id = want_uuid(payload, "decision_id", "run.resume")?;
+    conveyor_actions::executor::resume_run(pool, tenant, app_key, run_id, approval_id, decision_id)
+        .await
+        .map_err(|failure| {
+            if failure.retryable {
+                JobFailure::retryable(failure.detail)
+            } else {
+                JobFailure::permanent(failure.detail)
+            }
+        })
+}
+
 /// `run.reap` — fail every run whose driving `run.execute` job died.
 ///
 /// The store closes the runs in the caller's transaction and returns `(run_id, job_id)`;
@@ -1072,7 +1099,7 @@ async fn run_reap(pool: &PgPool, tenant: TenantId) -> Result<(), JobFailure> {
     let mut tx = store::begin_scoped(pool, tenant).await.map_err(retryable)?;
     let reaped = store::run::reap_dead_runs_tx(&mut tx, tenant)
         .await
-        .map_err(retryable)?;
+        .map_err(run_failure)?;
     for (run_id, _dead_job_id) in reaped {
         let attempt = match store::run::get_run_tx(&mut tx, tenant, run_id)
             .await
@@ -1107,7 +1134,7 @@ async fn run_reap(pool: &PgPool, tenant: TenantId) -> Result<(), JobFailure> {
     // `running` forever and hold `uq_run_live` on its card.
     let reaped = store::process::reap_dead_process_runs_tx(&mut tx, tenant)
         .await
-        .map_err(retryable)?;
+        .map_err(run_failure)?;
     for reaped in reaped {
         tracing::warn!(
             run = %reaped.run_id,
@@ -2534,6 +2561,12 @@ fn process_gate_failure(failure: conveyor_actions::process::step::StepFailure) -
 fn run_failure(error: store::run::RunStoreError) -> JobFailure {
     match error {
         store::run::RunStoreError::Database(error) => {
+            JobFailure::retryable(format!("database: {error}"))
+        }
+        // The terminal memory insert commits in the same transaction as the terminal status.
+        // A transient database refusal there must retry the whole sweep, not permanently fail
+        // it and strand the run live (holding `uq_run_live`) with no row.
+        store::run::RunStoreError::Memory(store::memory::MemoryStoreError::Database(error)) => {
             JobFailure::retryable(format!("database: {error}"))
         }
         other => JobFailure::permanent(other.to_string()),

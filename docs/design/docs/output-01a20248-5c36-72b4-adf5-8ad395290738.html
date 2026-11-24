@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Technology Standards Catalog — T1 Plan spine (Phase D) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Technology Standards Catalog — T1 Plan spine (Phase D)</li>
+<li>Phase: d</li>
+<li>Kind: catalog</li>
+<li>Purpose: The standards T1's rows and actions fix for every later slice.</li>
+<li>Scope: Postgres, the migration set, the action registry, WSJF arithmetic, the cycle check and the error vocabulary.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>PostgreSQL / 18 with FORCE RLS</strong> - {"usage": "every plan-spine and MSP table carries tenant_id, ENABLE and FORCE ROW LEVEL SECURITY and the tenant_isolation policy; migrations/0044_plan_spine.sql"}</li>
+<li><strong>Rust workspace / edition 2024; forbid(unsafe_code)</strong> - {"usage": "workspace edition 2024 (Cargo.toml); every crate's lib.rs carries #![forbid(unsafe_code)]; the test harness is the repository's real-Postgres integration suite"}</li>
+<li><strong>Migration discipline / forward only, numbered, never edited after a slice closes</strong> - {"usage": "one set, 0044_plan_spine.sql; no V1 table is altered except governed_asset's kind CHECK, which is widened, not forked"}</li>
+<li><strong>ActionSpec / one declaration -&gt; HTTP + MCP + OpenAPI</strong> - {"usage": "wbs.<em>, baselines.</em>, registers.<em>, project_dependencies.</em>, portfolio.in_flight, cadences.<em>, tranches.</em>, benefits.* and stakeholders.profile_* are ordinary actions; no second dispatch path"}</li>
+<li><strong>HTTP API / unversioned /api/&lt;resource&gt;</strong> - {"usage": "no version segment; errors are RFC 9457 application/problem+json"}</li>
+<li><strong>WSJF arithmetic / (business_value + time_criticality + risk_reduction) / job_size</strong> - {"usage": "four non-negative integer inputs; job_size &gt; 0; computed on read; no score column (D-T1-4)"}</li>
+<li><strong>Cycle check / recursive reachability in the creating transaction</strong> - {"usage": "crates/store/src/spine.rs::WITH RECURSIVE reach; a cycle is 409 dependency_cycle and the insert rolls back with no partial row (D-T1-6)"}</li>
+<li><strong>Optimistic concurrency / version + If-Match/ETag on edits</strong> - {"usage": "every row carries version; wbs.update requires the ETag from the read; a stale write is 412 version_mismatch"}</li>
+<li><strong>Error slugs / stable problem types</strong> - {"usage": "409 dependency_cycle, 409 self_approval, 422 change_impact_missing, 422 benefit_profile_incomplete, 422 benefit_map_incomplete, 422 tranche_evidence_missing, 422 self_dependency"}</li>
+<li><strong>Verification / real Postgres, then the GitHub-hosted preflight</strong> - {"usage": "the ten scenarios run against real Postgres 18; the compile/test verdict is preflight.yml; the local gate is cargo fmt --all -- --check and cargo metadata --locked --format-version 1 (docs/plans/03-DELIVERY.md)"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Plan spine · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

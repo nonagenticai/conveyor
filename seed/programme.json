@@ -173,7 +173,8 @@
         "plan": "docs/plans/slices/S06-control-plane.md",
         "track": "v1",
         "issues": [
-          4
+          4,
+          604
         ],
         "depends_on": [
           "S03",
@@ -367,7 +368,7 @@
       "key": "S09",
       "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",
       "description": "Plan: docs/plans/slices/S09-documents-integrations.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S09-documents-integrations.md",
@@ -526,7 +527,9 @@
           7,
           136,
           179,
-          198
+          198,
+          620,
+          626
         ],
         "depends_on": [
           "S03",
@@ -648,13 +651,14 @@
       "key": "S17",
       "name": "Native benchmark harness",
       "description": "Plan: docs/plans/slices/S17-benchmark-harness.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S17-benchmark-harness.md",
         "track": "v1",
         "issues": [
-          11
+          11,
+          635
         ],
         "depends_on": [
           "S02",
@@ -679,7 +683,7 @@
       "key": "S18",
       "name": "Kata continuous improvement",
       "description": "Plan: docs/plans/slices/S18-kata-improvement.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S18-kata-improvement.md",
@@ -746,7 +750,7 @@
       "key": "S20",
       "name": "Eval hillclimb",
       "description": "Plan: docs/plans/slices/S20-eval-hillclimb.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S20-eval-hillclimb.md",
@@ -781,7 +785,13 @@
         "track": "v1",
         "issues": [
           15,
-          581
+          581,
+          590,
+          599,
+          612,
+          624,
+          649,
+          656
         ],
         "depends_on": [
           "S09",
@@ -966,13 +976,14 @@
       "key": "T5",
       "name": "Kata",
       "description": "SPEC_V2 slice T5 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          77
+          77,
+          653
         ],
         "depends_on": [
           "T2",
@@ -985,15 +996,13 @@
         ],
         "plan_status": "draft",
         "status_source": "github issue state > measured coverage > plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 10,
         "expected_outputs": [
           "project-brief",
-          "inception-analysis",
-          "architecture-design"
+          "evidence"
         ],
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "adm_phase": "G",
@@ -1005,7 +1014,7 @@
       "key": "T6",
       "name": "Development project",
       "description": "SPEC_V2 slice T6 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1020,15 +1029,13 @@
         ],
         "plan_status": "draft",
         "status_source": "github issue state > measured coverage > plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 11,
         "expected_outputs": [
           "project-brief",
-          "inception-analysis",
-          "architecture-design"
+          "evidence"
         ],
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "adm_phase": "G",
@@ -1077,7 +1084,7 @@
       "key": "T8",
       "name": "Organisational memory",
       "description": "SPEC_V2 slice T8 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1250,15 +1257,13 @@
         ],
         "plan_status": "draft",
         "status_source": "github issue state > measured coverage > plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 13,
         "expected_outputs": [
           "project-brief",
-          "inception-analysis",
-          "architecture-design"
+          "evidence"
         ],
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "adm_phase": "G",
@@ -1278,7 +1283,8 @@
         "issues": [
           76,
           556,
-          557
+          557,
+          630
         ],
         "depends_on": [
           "T2",
@@ -1339,7 +1345,7 @@
       "key": "T15",
       "name": "Tool authoring and BYO",
       "description": "SPEC_V2 slice T15 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1354,15 +1360,13 @@
         ],
         "plan_status": "draft",
         "status_source": "github issue state > measured coverage > plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 12,
         "expected_outputs": [
           "project-brief",
-          "inception-analysis",
-          "architecture-design"
+          "evidence"
         ],
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "adm_phase": "G",
@@ -1414,7 +1418,9 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          87
+          87,
+          629,
+          655
         ],
         "depends_on": [
           "T16",
@@ -1437,6 +1443,84 @@
         "adm_phase": "G",
         "plateau": "capability",
         "gate": "a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant"
+      }
+    },
+    {
+      "key": "T18",
+      "name": "The real V2 UI",
+      "description": "SPEC_V2 slice T18 (docs/SPEC_V2.md §12)",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [
+          559,
+          562,
+          563,
+          564,
+          565,
+          566
+        ],
+        "depends_on": [
+          "T0",
+          "T1",
+          "T2",
+          "T3",
+          "P0"
+        ],
+        "plan_status": "draft",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 4,
+        "expected_outputs": [
+          "project-brief",
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
+        ],
+        "adm_phase": "G",
+        "plateau": "capability",
+        "gate": "a signed-in tenant drives portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports `exists` only from a real route + spec; no production screen renders a fixture"
+      }
+    },
+    {
+      "key": "T19",
+      "name": "Decision forums (meetings)",
+      "description": "SPEC_V2 slice T19 (docs/SPEC_V2.md §12)",
+      "status": "closed",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [
+          605,
+          606,
+          650
+        ],
+        "depends_on": [
+          "T1",
+          "T2",
+          "T3",
+          "P0"
+        ],
+        "plan_status": "draft",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
+        "measured_status": "built",
+        "tranche": 4,
+        "expected_outputs": [
+          "project-brief",
+          "evidence"
+        ],
+        "closure_outputs": [
+          "closure-review"
+        ],
+        "adm_phase": "G",
+        "plateau": "capability",
+        "gate": "a three-department board meeting decides its agenda items by recorded majority with a recorded dissent; an item missing a required department is deferred `inquorate` and cannot be decided; a meeting cannot lower a linked approval's dual control or waive its evidence; the owner decides one item in the web meeting room and another asynchronously from the agent front end over MCP, both recorded `via='meeting'`; minutes publish behind the chair's gate and every action becomes a card; a forum with no decision over a cycle is flagged"
       }
     },
     {
@@ -1554,16 +1638,9 @@
           435,
           476,
           526,
-          545,
-          559,
-          562,
-          563,
-          564,
-          565,
-          566,
           569,
           572,
-          582
+          660
         ],
         "depends_on": [],
         "plan_status": "active",

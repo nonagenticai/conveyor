@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Standing delegation — retrospective MSP/TOGAF rework · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Standing delegation — retrospective MSP/TOGAF rework</h1>
+<h2>Context</h2>
+<p>On 2026-11-20 the programme owner directed that MSP and TOGAF be applied retroactively to the whole Conveyor buildout: where a project still has a point, its missing artefacts are produced and the project is reworked from start to finish by the book; closure, waiver and retirement are not ways of avoiding the work. The operating record has no human seat to sign a decision — the owner's instruction is the delegation, and this output records it rather than inventing a human actor.</p>
+<h2>Decision</h2>
+<p>The owner delegates to the delegate identity <code>conveyor-approver</code> (<code>01a1e8a7-8b23-76a9-9114-aafb95f7a545</code>), with <code>conveyor-e2e</code> (<code>01a1e607-17d9-77d3-98d3-a43a87c4633d</code>) as executor, until 2027-02-18 or the owner's revocation, the authority to:</p>
+<ul>
+<li>record the 48 project viability verdicts;</li>
+<li>authorise tranche 1 from the existing tranche-0 <code>continue</code> review;</li>
+<li>decide Architecture Board matters and approve the capability-level Preliminary set once;</li>
+<li>take and approve the management, governance and boundary programme baselines;</li>
+<li>accept the 19 out-of-sequence closures as retrospective exceptions;</li>
+<li>accept conformance baseline v2 and re-baseline tranches 9–13 through change control.</li>
+</ul>
+<p>Every act performed under this delegation cites this output's id in its evidence. The executor drafts the record and the evidence; the delegate approves, authorises, waives and closes. No act claims a human actor who did not act, and no act approves its own request.</p>
+<h2>Consequences</h2>
+<ul>
+<li>The authority record is repaired by dated delegated acts, not by rewriting history; the original tranche-0 review and the 19 closures remain as recorded.</li>
+<li>A gate that requires a distinct approver is satisfied by two real identities (<code>conveyor-e2e</code> and <code>conveyor-approver</code>), both active members of the tenant, not by a fabricated signature.</li>
+<li>When the delegation expires or is revoked, the authority to perform these acts ends with it; the records it produced remain.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li>Issue #511 (the approved rework plan and its parts A–D).</li>
+<li>Claim commit <code>26506e41</code> on <code>issue/511-rework-path-authority</code>.</li>
+<li>Tenant members read live at 2026-11-20: <code>conveyor-e2e</code> and <code>conveyor-approver</code> are active admins of <code>nonagentic</code>.</li>
+<li><code>docs/evidence/conformance-gap-register.json</code> at snapshot <code>a33e656</code>: 22 P0 / 131 P1 / 12 P2.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-24T16:30:00Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

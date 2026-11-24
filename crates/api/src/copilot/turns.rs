@@ -12,6 +12,8 @@
 //! the turn `refused` — the refusal names the tool, because the model is the caller's own agent, not
 //! an untrusted third party.
 
+use std::time::Duration;
+
 use axum::Json;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
@@ -581,6 +583,12 @@ async fn run(
 ///
 /// The compiled system prompt is passed in so the ledger row carries the recipe's identity —
 /// key, version and the sha256 of the exact text — rather than a literal name (S16 W7).
+/// How many times one round asks the engine for the model's answer. Each attempt re-claims the
+/// same `(turn, round)` idempotency key; the engine releases that claim when an external call
+/// fails (`invoke.rs::record_failure`), so a retry after a transient failure re-executes rather
+/// than replaying a stale refusal.
+const MODEL_ATTEMPTS: u32 = 3;
+
 async fn call_model(
     state: &AppState,
     caller: &Caller,
@@ -599,51 +607,84 @@ async fn call_model(
         max_tokens: Some(1024),
         response_format: None,
     };
-    let outcome = invoke(
-        &state.pool,
-        registry(),
-        caller.tenant,
-        InvokeRequest {
-            action: "completions.create".to_owned(),
-            input: serde_json::to_value(&input).map_err(ActionError::serialize)?,
-            precondition: None,
-            idempotency_key: Some(format!("turn:{turn_id}:{round}")),
-            approval_id: None,
-            actor_id: caller.principal.user_id.as_uuid(),
-            actor_kind: caller.principal.kind.as_actor_kind().to_owned(),
-            role: caller.role,
-            policy: caller.policy.clone(),
-            authority: Authority::of(caller),
-            request_id: None,
-            trace_id: None,
-            depth: 0,
-            app_key: state.config.app_key.clone(),
-            usage: Some(conveyor_actions::UsageContext {
-                caller_kind: conveyor_domain::inference::CallerKind::Copilot,
-                run_id: None,
-                run_step_id: None,
-                conversation_turn_id: Some(turn_id),
-                eval_run_id: None,
-                prompt_ref: Some(compiled.key.clone()),
-                prompt_version: Some(compiled.version.clone()),
-                prompt_sha256: Some(compiled.sha256.clone()),
-                correlation_id: Some(format!("turn:{turn_id}")),
-            }),
-        },
-    )
-    .await?;
-    parse_answer(&outcome.body)
+    let request = InvokeRequest {
+        action: "completions.create".to_owned(),
+        input: serde_json::to_value(&input).map_err(ActionError::serialize)?,
+        precondition: None,
+        idempotency_key: Some(format!("turn:{turn_id}:{round}")),
+        approval_id: None,
+        actor_id: caller.principal.user_id.as_uuid(),
+        actor_kind: caller.principal.kind.as_actor_kind().to_owned(),
+        role: caller.role,
+        policy: caller.policy.clone(),
+        authority: Authority::of(caller),
+        request_id: None,
+        trace_id: None,
+        depth: 0,
+        app_key: state.config.app_key.clone(),
+        usage: Some(conveyor_actions::UsageContext {
+            caller_kind: conveyor_domain::inference::CallerKind::Copilot,
+            run_id: None,
+            run_step_id: None,
+            conversation_turn_id: Some(turn_id),
+            eval_run_id: None,
+            prompt_ref: Some(compiled.key.clone()),
+            prompt_version: Some(compiled.version.clone()),
+            prompt_sha256: Some(compiled.sha256.clone()),
+            correlation_id: Some(format!("turn:{turn_id}")),
+        }),
+    };
+    // A router that answered a transient failure (a shed slot, an upstream 5xx) is a 502 here;
+    // the turn would otherwise die on a blip. Retry only that: a service that never ANSWERED
+    // (`action-upstream-unreachable`) may already have been served and billed, a timeout (504)
+    // certainly may have, and a 4xx is the request's own fault. The answer is parsed only after
+    // the final attempt, so a paid-for malformed reply is never re-bought.
+    let mut attempt = 1;
+    loop {
+        match invoke(&state.pool, registry(), caller.tenant, request.clone()).await {
+            Ok(outcome) => return parse_answer(&outcome.body),
+            Err(error)
+                if attempt < MODEL_ATTEMPTS
+                    && error.status == 502
+                    && error.code == "action-upstream-failed" =>
+            {
+                tracing::warn!(
+                    attempt,
+                    turn = %turn_id,
+                    round,
+                    "copilot_model_transient_retry"
+                );
+                tokio::time::sleep(Duration::from_millis(250_u64 << (attempt - 1))).await;
+                attempt += 1;
+            }
+            Err(error) => return Err(error),
+        }
+    }
 }
 
 /// Read the router's OpenAI-compatible answer.
 fn parse_answer(body: &Value) -> Result<Answer, ActionError> {
     let output = &body["output"];
-    let message = &output["choices"][0]["message"];
-    if message.is_null() {
+    let choice = &output["choices"][0];
+    // A `length` finish means the body was cut at the token cap. Its visible tail can parse as a
+    // complete-looking answer or a tool call with partial arguments, so this is the only point that
+    // can stop a truncated turn from being delivered as if it were whole. 422, not 5xx: a failed
+    // turn is not retried, while a 5xx would re-buy the same capped call.
+    if choice["finish_reason"].as_str() == Some("length") {
+        return Err(ActionError::new(
+            422,
+            "inference-truncated",
+            "the router's answer was truncated at its token cap (finish_reason \"length\"); \
+             refusing the partial reply"
+                .to_owned(),
+        ));
+    }
+    let message = &choice["message"];
+    if !message.is_object() {
         return Err(ActionError::new(
             502,
             "inference-shape",
-            "the router returned no choices[0].message",
+            "the router returned no choices[0].message".to_owned(),
         ));
     }
     let content = message["content"].as_str().unwrap_or_default().to_owned();
@@ -651,16 +692,46 @@ fn parse_answer(body: &Value) -> Result<Answer, ActionError> {
     let mut tool_calls = Vec::new();
     if let Some(list) = raw_tool_calls.as_array() {
         for call in list {
+            let name = call["function"]["name"].as_str().unwrap_or_default();
+            if name.is_empty() {
+                return Err(ActionError::new(
+                    422,
+                    "inference-bad-tool-call",
+                    "the router returned a tool call with no function.name; refusing it".to_owned(),
+                ));
+            }
+            let arguments = match &call["function"]["arguments"] {
+                Value::String(raw) if raw.trim().is_empty() => "{}".to_owned(),
+                Value::String(raw) => {
+                    serde_json::from_str::<Value>(raw).map_err(|error| {
+                        ActionError::new(
+                            422,
+                            "inference-bad-tool-arguments",
+                            format!(
+                                "the router returned tool call {name} with arguments that are not \
+                                 valid JSON ({error}); refusing to execute fabricated arguments"
+                            ),
+                        )
+                    })?;
+                    raw.clone()
+                }
+                Value::Null => "{}".to_owned(),
+                other if other.is_object() => other.to_string(),
+                _ => {
+                    return Err(ActionError::new(
+                        422,
+                        "inference-bad-tool-arguments",
+                        format!(
+                            "the router returned tool call {name} with arguments that are not a \
+                             JSON string"
+                        ),
+                    ));
+                }
+            };
             tool_calls.push(CalledTool {
                 id: call["id"].as_str().map(str::to_owned),
-                name: call["function"]["name"]
-                    .as_str()
-                    .unwrap_or_default()
-                    .to_owned(),
-                arguments: call["function"]["arguments"]
-                    .as_str()
-                    .unwrap_or("{}")
-                    .to_owned(),
+                name: name.to_owned(),
+                arguments,
             });
         }
     }

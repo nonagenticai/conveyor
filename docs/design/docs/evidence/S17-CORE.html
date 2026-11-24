@@ -330,6 +330,87 @@ EOF</code></pre>
 <li>14:35 — <strong>re-measured after S13 landed its six samples</strong>: the missing list is now exactly S19-B's 7 <code>eval_runs.*</code>/<code>eval_results.*</code>. S13's <code>workflows.*</code> samples are present and the lock is 258 ops (<code>--check-lock</code> 0). The one remaining workspace red is S19-B's fixture work — its own next session (an approved eval with a locked split, and a filled result slot). S17 contributes nothing to it. The last lane to settle owns the final workspace gate and the last <code>--write-lock</code>. S17's own targets above are green; this is the shared-tree cost, not an S17 defect.</li>
 </ol>
 <p><strong>Lock, final state (14:29):</strong> the live spec after the peer registrations is <strong>237 actions</strong>, and I regenerated <code>served-spec.lock.json</code> from it — <strong>258 operations</strong>, <code>--check-lock</code> exit 0, with 8 benchmark, 6 <code>workflows.*</code>, 4 <code>eval_runs.*</code> and 3 <code>eval_results.*</code> operations present. The 245-op figure above is this lane's own 224-action state; 258 is what the tree now holds.</p>
+<h2 id="live-run--hp1-2026-11-22">Live run — hp1 (2026-11-22)</h2>
+<p>The deployment-gated proof <code>apps/server/tests/sandbox_live.rs</code> (<code>#[ignore]</code>) ran against the live strato cluster from m4 through an SSH tunnel to the kube-apiserver. This is the P1 end-to-end receipt: the Job object the API stored, the terminal state, the log, and the delete were observed on a real cluster, not against the stub.</p>
+<table>
+<thead>
+<tr>
+<th>input</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>namespace / identity</td>
+<td><code>swe-bench</code> / ServiceAccount <code>conveyor-bench</code> (Role <code>conveyor-bench-grader</code>), short-lived token</td>
+</tr>
+<tr>
+<td>image</td>
+<td><code>swebench/sweb.eval.x86_64.django_1776_django-16493@sha256:43fbf022eb3ddbbd32edf3cbc325c8dc532b48551f78fef14c2afd1d26dde858</code> (<code>seed/benchmark/images-verified50-v1.lock.json</code>)</td>
+</tr>
+<tr>
+<td>placement</td>
+<td><code>SANDBOX_NODE_SELECTOR=conveyor.ai/grading=hp1</code>; hp1 is untainted, so no toleration was set</td>
+</tr>
+<tr>
+<td>Job</td>
+<td><code>swb-7fa599e09fc0-conveyor-live-proof</code> (recovered from namespace events; the test does not print it)</td>
+</tr>
+<tr>
+<td>pod</td>
+<td><code>swb-7fa599e09fc0-conveyor-live-proof-xjt4m</code>, scheduled to <strong>hp1</strong></td>
+</tr>
+<tr>
+<td>timeout</td>
+<td><code>SANDBOX_LIVE_TIMEOUT_S=900</code></td>
+</tr>
+</tbody>
+</table>
+<pre class="text"><code>test the_live_sandbox_lifecycle_creates_runs_reads_logs_and_deletes ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 244.18s</code></pre>
+<p>The test asserts the stored object (digest image; <code>automountServiceAccountToken: false</code>; <code>enableServiceLinks: false</code>; <code>backoffLimit: 0</code>; a positive <code>activeDeadlineSeconds</code>; <code>ttlSecondsAfterFinished: 3600</code>; the hp1 selector), waits for <code>Succeeded</code>, reads the log and finds the runner's apply marker plus the eval proof <code>conveyor sandbox live proof</code>, then deletes the Job and waits until the Job and its pod are gone. Cluster events corroborate the lifecycle: pod scheduled to hp1, image pulled by digest in 3m4s (1,240,562,520 bytes), container started, and <code>Job completed</code> at 10:02:16Z. After the run <code>kubectl -n swe-bench get jobs,pods</code> was empty (only <code>istio-ca-crl</code>, <code>istio-ca-root-cert</code> and <code>kube-root-ca.crt</code> remained), so the test's own cleanup left nothing behind.</p>
+<p>Run through the sanctioned m4 guard (the token was passed in the environment and never printed):</p>
+<pre class="bash"><code>SANDBOX_NAMESPACE=swe-bench SANDBOX_API_URL=https://127.0.0.1:16443 \
+SANDBOX_TOKEN=&quot;$(cat &quot;$TOKEN_FILE&quot;)&quot; SANDBOX_CA_PATH=&quot;$CA_FILE&quot; \
+SANDBOX_NODE_SELECTOR=conveyor.ai/grading=hp1 \
+SANDBOX_LIVE_IMAGE=&#39;swebench/sweb.eval.x86_64.django_1776_django-16493@sha256:43fbf022eb3ddbbd32edf3cbc325c8dc532b48551f78fef14c2afd1d26dde858&#39; \
+SANDBOX_LIVE_TIMEOUT_S=900 \
+  ~/.claude/scripts/cargo-guard.py test -p conveyor-server --test sandbox_live -- --ignored --nocapture</code></pre>
+<h2 id="p4--the-workspace-suite-2026-11-22">P4 — the workspace suite (2026-11-22)</h2>
+<p>The workspace suite ran in this PR's <code>ci-public</code> on <code>36967ab6</code> (run <a href="https://github.com/nonagenticai/conveyor/actions/runs/45021016396">45021016396</a>). The first <code>checks-shard (1)</code> run hit the load-sensitive <code>wait_for("three dispatches")</code> timeout in <code>apps/server/tests/interaction_dispatch.rs</code>, a file byte-identical to <code>main</code> and untouched by this branch; the re-run of that shard is the verdict.</p>
+<table>
+<thead>
+<tr>
+<th>job</th>
+<th>result</th>
+<th>evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>checks-shard (1)</code> (re-run)</td>
+<td><strong>1914 passed, 0 failed</strong>, 1713 skipped, 348.4 s</td>
+<td><a href="https://github.com/nonagenticai/conveyor/actions/runs/45021016396/job/137380614684">job 137380614684</a></td>
+</tr>
+<tr>
+<td><code>checks-shard (2)</code></td>
+<td><strong>1705 passed, 0 failed</strong>, 1922 skipped, 196.9 s</td>
+<td><a href="https://github.com/nonagenticai/conveyor/actions/runs/45021016396/job/137380616212">job 137380616212</a></td>
+</tr>
+</tbody>
+</table>
+<p>Both shards are green at the same head. The only non-pass check on the PR is the duplicate push-triggered <code>preflight</code> that was cancelled, while the dispatched preflight on the same SHA (run <code>45021016048</code>) succeeded.</p>
+<h2 id="p2p3--the-live-controls-and-the-verification-order">P2/P3 — the live controls and the verification order</h2>
+<p>The empty control passed before the fix: run <code>01a202c4-e8ee-7c99-b5e5-dc21a39116b6</code>, 50/50 graded, 0 resolved, <code>control_ok=true</code>. The pre-fix gold control was 47/50 with <code>control_ok=false</code>; the three misses are the suite's only <code>[pdf]</code>/<code>[eps]</code> instances, refused by Ghostscript 9.55 SAFER. Commit <code>36967ab6</code> adds the scoped <code>/bench-bin/gs</code> shim and mounts it in the sandbox Job.</p>
+<p><strong>Verification order (hold released 2026-11-23).</strong> PR images are not published (<code>publish-service-images</code> skips on a PR), and the cluster runs the digest Flux resolves from <code>:latest</code> on <code>main</code>. The controls therefore run on the deployed service, in this order:</p>
+<ol type="1">
+<li>merge #11; Flux resolves the new digest and <code>kubectl -n conveyor rollout status deploy/conveyor</code> completes;</li>
+<li>re-run the three PDF/EPS instances first (<code>only</code>), then the full gold control and the empty control through <code>conveyor admin action invoke --name benchmark_runs.start</code> in the deployed pod;</li>
+<li>append <code>control_ok</code>, counts and run ids here.</li>
+</ol>
+<p>The previous deployment digest is the rollback. If the gold control is false, the digest is rolled back and #11 is reopened with the failure — the deployment is reversible, the evidence is not negotiable.</p>
+<h2 id="p5--the-ghostscript-shim-measured-in-the-image-2026-11-23">P5 — the Ghostscript shim, measured in the image (2026-11-23)</h2>
+<p>Probe <code>01a20773-06f4-7075-82b0-a56a2ca18a2c</code> (3 instances, <code>only</code>) was 0/3 after the shim merged. Read-only pods in <code>swe-bench</code> on the three failing images (<code>matplotlib-23412</code>, <code>-23476</code>, <code>-24627</code>; digests in <code>seed/benchmark/images-verified50-v1.lock.json</code>) show the shim <strong>is</strong> the resolved <code>gs</code>: <code>command -v gs</code> → <code>/bench-bin/gs</code>, and there is no <code>gs</code> in <code>/opt/miniconda3/envs/testbed/bin</code> to shadow it. The failure is Ghostscript itself: GPL Ghostscript 9.55 refuses every read and write under <code>/testbed</code> (<code>invalidfileaccess</code>, <code>Last OS error: Permission denied</code>) with no permit, with <code>--permit-file-read=/testbed/</code>, <code>--permit-file-write=/testbed/</code>, <code>--permit-file-control=/testbed/</code>, exact-file permits and globs, and with <code>-dNOSAFER</code> (this build ignores it). The same binary reads and writes <code>/tmp</code> normally, and the pod is root writing <code>/testbed</code> from Python. This branch's commit replaces the permit shim with a relay that mirrors the <code>/testbed</code> literals in matplotlib's interactive PostScript stream under a private <code>/tmp</code> root, runs Ghostscript there, and copies the outputs back before it forwards Ghostscript's prompt.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/evidence/S17-CORE.md</code> at build time.</span>

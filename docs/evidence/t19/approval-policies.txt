@@ -1,0 +1,15 @@
+== t19_live_gate_web
+Defaulted container "conveyor" out of: conveyor, migrate (init)
+error: approval_policies.set refused (422): the input does not match the action schema
+command terminated with exit code 1
+FAILED: approval_policies.set: transport exited 1
+== t19_live_gate_mcp
+Defaulted container "conveyor" out of: conveyor, migrate (init)
+error: approval_policies.set refused (422): the input does not match the action schema
+command terminated with exit code 1
+FAILED: approval_policies.set: transport exited 1
+== meeting_minutes
+Defaulted container "conveyor" out of: conveyor, migrate (init)
+error: approval_policies.set refused (422): the input does not match the action schema
+command terminated with exit code 1
+FAILED: approval_policies.set: transport exited 1

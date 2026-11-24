@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data Entity/Data Component Catalog — T1 Plan spine (Phase C) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Data Entity/Data Component Catalog — T1 Plan spine (Phase C)</li>
+<li>Phase: c</li>
+<li>Kind: catalog</li>
+<li>Purpose: The entities T1 adds or extends, each with its owner and its one invariant.</li>
+<li>Scope: migrations/0044_plan_spine.sql and the computed WSJF component.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>wbs_node / the project plan tree</strong> - {"note": "tenant-scoped FORCE RLS; kind phase|deliverable|work_package|milestone; status open|accepted|cancelled; four non-negative WSJF integers; job_size &gt; 0", "owner": "plan spine", "table": "wbs_node"}</li>
+<li><strong>project_baseline / the frozen project promise</strong> - {"note": "kind scope|schedule|cost; snapshot jsonb; append-only; taken_by and approved_by", "owner": "plan spine", "table": "project_baseline"}</li>
+<li><strong>project_register_item / the one six-kind register</strong> - {"note": "risk|issue|assumption|dependency|benefit|change; a change CHECK requires baseline_ref and meta.impact", "owner": "plan spine", "table": "project_register_item"}</li>
+<li><strong>project_dependency / the programme's directed edges</strong> - {"note": "blocks|needs|supersedes|informs; UNIQUE (tenant, from, to, kind); self-edge CHECK; cycle refused by the recursive CTE", "owner": "plan spine", "table": "project_dependency"}</li>
+<li><strong>programme_cadence / the SAFe rhythm row</strong> - {"note": "pi|sprint|demo|retro|refinement; period not blank; T10 materialises the cards", "owner": "programme", "table": "programme_cadence"}</li>
+<li><strong>programme_tranche / the reviewable tranche</strong> - {"note": "number unique per programme; state planned|authorised|in_review|closed|paused|stopped; entry/exit criteria jsonb", "owner": "programme", "table": "programme_tranche"}</li>
+<li><strong>benefit_profile / the benefit measurement record</strong> - {"note": "the six \u00a78.3 field groups; status draft|active|realized|disbenefit|closed; unique reference per programme", "owner": "programme", "table": "benefit_profile"}</li>
+<li><strong>benefit_link / the five-level benefits-map edge</strong> - {"note": "output_ref, capability_ref, operational_outcome and strategic_objective are CHECKed non-blank; kind benefit|disbenefit", "owner": "programme", "table": "benefit_link"}</li>
+<li><strong>benefit_transition / the realization record per benefit</strong> - {"note": "baseline_measured_at, readiness, enacted_at, post_measured_at, retired_at, evidence jsonb", "owner": "programme", "table": "benefit_transition"}</li>
+<li><strong>stakeholder_profile / the MSP stakeholder profile</strong> - {"note": "concerns, sensitivities, importance, influence, interest, exposure, support level/trend, engagement target; distinct from V1's project_stakeholder", "owner": "programme", "table": "stakeholder_profile"}</li>
+<li><strong>programme_baseline / the management/governance/boundary baseline</strong> - {"note": "kind management|governance|boundary; snapshot jsonb; taken_by and approved_by; a tranche is managed against a version", "owner": "programme", "table": "programme_baseline"}</li>
+<li><strong>governed_asset (widened) / the MSP narrative artefacts</strong> - {"note": "the kind CHECK adds mandate, programme_brief, blueprint, business_case, refined_vision, benefits_strategy, benefits_realization_plan and projects_dossier", "owner": "programme", "table": "governed_asset"}</li>
+<li><strong>approvals.decide / the one gate primitive</strong> - {"component": "crates/actions/src/control/approvals.rs; crates/api/tests/approval_dual.rs", "note": "the requester/executor exclusion is in the decision path for every gate", "owner": "control"}</li>
+<li><strong>WSJF / the computed priority score</strong> - {"component": "crates/domain/src/spine.rs::wsjf", "note": "computed on read; never persisted; information_schema has no wsjf column", "owner": "plan spine"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Plan spine · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

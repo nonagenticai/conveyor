@@ -974,6 +974,17 @@ async fn changes_request(
     ctx: HandlerCtx,
     input: ChangeRequestIn,
 ) -> Result<HandlerOutput<ChangeRequestOut>, ActionError> {
+    // A change without a rationale cannot be judged by its gate: the body is the rationale, and
+    // the refusal is the one SPEC_V2 §8.4 / T18's Plan contract names. Input is refused before
+    // the PM binding is resolved.
+    let rationale = input.body.as_deref().map(str::trim).unwrap_or_default();
+    if rationale.is_empty() {
+        return Err(ActionError::new(
+            422,
+            "change_rationale_required",
+            "a change request needs a rationale in `body`",
+        ));
+    }
     assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
     let impact = i32::try_from(input.impact)
         .map_err(|_| ActionError::new(422, "invalid_value", "impact must fit a 32-bit integer"))?;

@@ -206,7 +206,36 @@ pub struct ProjectOut {
     pub description: String,
     pub status: String,
     #[serde(default)]
+    pub programme_id: Option<String>,
+    #[serde(default)]
+    pub project_type_code: Option<String>,
+    #[serde(default)]
+    pub phase_code: Option<String>,
+    #[serde(default)]
+    pub owner_user_id: Option<String>,
+    #[serde(default)]
+    pub repo_url: Option<String>,
+    #[serde(default)]
+    pub meta: Value,
+    #[serde(default)]
     pub version: i64,
+}
+
+/// `programmes.list` — one programme row.
+#[derive(Clone, Debug, Deserialize)]
+pub struct ProgrammeOut {
+    pub id: String,
+    pub name: String,
+    #[serde(default)]
+    pub status: String,
+    #[serde(default)]
+    pub owner_user_id: Option<String>,
+    #[serde(default)]
+    pub version: i64,
+    #[serde(default)]
+    pub created_at: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub updated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -976,6 +1005,9 @@ pub struct EvalClimb {
     pub off_limits: Vec<String>,
     #[serde(default)]
     pub approve_each_round: bool,
+    /// The spend ceiling in cents, when the start form set one.
+    #[serde(default)]
+    pub cost_ceiling_cents: Option<i32>,
     #[serde(default)]
     pub narrative_md: Option<String>,
     #[serde(default)]

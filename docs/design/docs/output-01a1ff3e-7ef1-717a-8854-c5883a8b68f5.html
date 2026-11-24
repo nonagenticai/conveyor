@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — DESIGN-PUBLISH (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Closure review — DESIGN-PUBLISH (retrospective, 2026-11-21)</h1>
+<p>Project: DESIGN-PUBLISH — Publish the SPEC_V2 studio design pack, live · Track: programme · Tranche: 0 · Plan: docs/design/STUDIO-SPEC.md
+Recorded retrospectively on 2026-11-21 under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>. The runtime timestamp of the first close is not carried in the snapshot — not recoverable; the project row's <code>updated_at</code> is 2026-11-21T01:04:58Z.</p>
+<h2>Outcome vs acceptance</h2>
+<p>The acceptance set is the project brief's four criteria plus the project's manifest gate. Evidence is measured against the tree at main@7314a2d0 and the live pack on 2026-11-21.</p>
+<table><thead><tr><th>Criterion</th><th>Evidence</th><th>Verdict</th></tr></thead><tbody>
+<tr><td>The public site renders the programme from Postgres</td><td><code>data/snapshot.js</code> is written from the tenant's rows; the public sidebar names the programme only when the snapshot carries it (#470, 7d4e0d27); <code>/design/data/programme.json</code> returned 48 projects and this project's closed row at 17:36Z</td><td>pass</td></tr>
+<tr><td>A published output appears at its stable URL</td><td>165 committed output pages, every one named by <code>docs/design/docs/outputs.js</code> (check-outputs.cjs, #516); <code>/design/docs/output-01a1e686-6efd-7683-9d5a-27e5b05081de.html</code> returned 200 live</td><td>pass</td></tr>
+<tr><td>Signed out there is no API request and no write control</td><td><code>node docs/design/scripts/check-console.cjs</code> proves a signed-out pack makes zero API requests, a signed-in one sends the actions it renders, and the 401/412 paths are rendered; it is a step of the design-pack job</td><td>pass</td></tr>
+<tr><td>The pack's claims are checked like code</td><td>the design-pack job runs <code>build-coverage.py --check</code>, <code>build-docs.py --check</code>, the conformance audit and the output-standard check, with the six surface checks</td><td>pass</td></tr>
+<tr><td>The manifest gate: the closure review exists and every declared closure output is published; the project re-closes through the one gate</td><td>this document, published by <code>documents.compose</code> and <code>documents.publish</code>; the project declares <code>closure-review</code>; the closure decided by <code>conveyor-approver</code></td><td>pass — this record</td></tr>
+</tbody></table>
+<p>One measured deviation, carried to Open items rather than counted as a pass: the live public window at 2026-11-21T17:36Z names 102 outputs (index generated 17:23:48Z) and not this project's <code>project-brief</code>, so <code>https://conveyor.nonagentic.ai/design/docs/output-01a1e007-1347-7298-8987-ea4c3b739d02.html</code> returns 404 while the committed pack carries the page and names it. The criterion above is satisfied by the evidence output's stable URL; the brief's absence is a state of the publication window.</p>
+<h2>Evidence</h2>
+<ul>
+<li><strong>Units.</strong> #32 (publish the pack at conveyor.nonagentic.ai/design), #33 (live build surface), #36 (the public build surface — sanitation, docs-as-HTML, feedback links), #37 (wipe history, flip the repo public, republish), #89 (the V2 registration true in the index and the seed), #97 (the A5 live engine proof), #103 (measure the plan, derive the tranches, publish the truth), #149 (the work store — expected outputs and the checklist): all closed.</li>
+<li><strong>Commits.</strong> 96a3d47b 2026-11-12 (the pack's first commit); 5cf3d758 2026-11-13 (the authenticated operator surface); 085b11d0 2026-11-15 (the live public window from Postgres); 318fa4d1 2026-11-16 (one output standard and the next-output queue); eebf7c14 2026-11-16 (#149, expected outputs and the project checklist); 0ae39771 2026-11-19 (#97, the A5 live engine proof); 9da8e8c1 2026-11-20 (publish the programme snapshot); 06ba0fe3 2026-11-20 (restore the 165 output pages and refuse the index/pages drift, #515/#516).</li>
+<li><strong>Snapshot</strong> (a33e6562, generated 2026-11-20T11:50:50Z): <code>manifest.json</code> binds 12 data files by sha256; <code>programme.json</code> carries 48 projects and a 235-issue registry; <code>msp.json</code> 6 benefit profiles, 6 links and 14 tranches; <code>architecture.json</code> 3 artefacts, 1 contract and 10 standard types, 78 records; <code>documents.json</code> 112 documents (Plans 57, Evidence 39, Decisions 8, Spec 4, Design 3, Root 1); <code>outputs.js</code> 165 entries against 165 committed pages.</li>
+<li><strong>Coverage.</strong> <code>coverage.json</code> measures the project <code>built</code>, 0 open units, evidence <code>docs/design/README.md</code> and <code>docs/design/studio.html</code>; its recorded gap is "published by PR today; P4 makes it live from the tenant rows".</li>
+<li><strong>Live, 2026-11-21T17:36Z.</strong> <code>/design/</code> 200; <code>/design/data/manifest.json</code> 200 with git_sha a33e6562; <code>/design/data/programme.json</code> 200, generated 17:23:48Z; <code>/design/docs/output-01a1e686-6efd-7683-9d5a-27e5b05081de.html</code> 200; <code>/design/docs/output-01a1e007-1347-7298-8987-ea4c3b739d02.html</code> 404.</li>
+<li><strong>Register.</strong> The MSP/TOGAF/SAFe conformance snapshot 5dfd3fa0 (2026-11-21T11:06:22Z) records this project at 1 P0 (<code>closed_without_closure_review</code>) and 1 P1 (<code>unpublished_declared_output</code>: closure-review), against 149 gaps programme-wide (27 P0, 119 P1, 3 P2).</li>
+<li><strong>Gates.</strong> The design-pack job in <code>.github/workflows/ci-public.yml</code> (20-minute timeout, pinned Playwright 1.62.1) runs the pack's data checks, <code>build-docs.py --check</code> and the six surface checks; <code>acceptance/programme/DESIGN-PUBLISH.toml</code> is the close's own manifest, and <code>scripts/verify-project.py</code> writes its result to <code>docs/evidence/rework/DESIGN-PUBLISH.json</code>.</li>
+</ul>
+<h2>Open items</h2>
+<p>Each gap is carried here with an owner and a next step; none is treated as satisfied.</p>
+<ul>
+<li><strong>The live window is narrower than the committed pack</strong> — 102 live outputs against 165 committed pages at 2026-11-21T17:36Z, and this project's <code>project-brief</code> (01a1e007-1347-7298-8987-ea4c3b739d02) 404s live. Owner: the tenant admin publisher with the design-pack unit. Next step: establish whether the brief was unpublished or the window was regenerated from a narrower row set, then republish or record the unpublish as a decision.</li>
+<li><strong>The committed data lags the tree</strong> — the committed snapshot is generated at a33e6562 while origin/main is 7314a2d0 (2026-11-21); the issue-registry workflow regenerates it on a generated-data PR. Owner: design-pack unit. Next step: confirm the next generated PR carries the current registry.</li>
+<li><strong>The study pages still read the snapshot, not the tenant rows</strong> — the project's own recorded gap, "published by PR today; P4 makes it live from the tenant rows". Owner: P4. Next step: P4's unit replaces the fixture path.</li>
+<li><strong>B1's baseline is unmeasured</strong> — "not measured - no instrument exists (recorded as a kata on the kata project)", and the tranche-0 review names the BCM unstaffed. Owner: B1's owner job with the tranche-1 review. Next step: staff the BCM and take the first decision-row count from the action ledger.</li>
+<li><strong>The assignment's <code>index/v2</code> path does not exist</strong> — no commit on any ref ever added a file under <code>docs/design/index/</code>; the tree carries <code>studio.html</code> (the entry) and <code>v2.js</code> / <code>v2.css</code> (the V2 study), which are the corresponding surfaces. Owner: the rework's content author. Next step: none in the pack; recorded as not recoverable.</li>
+<li><strong>The first close's timestamp is not in the snapshot</strong> — the project row carries <code>updated_at</code> 2026-11-21T01:04:58Z and no closed-at field; the closure date is not recoverable from the pack.</li>
+</ul>
+<h2>Decision</h2>
+<p>Close. The delivery is compliant: the four acceptance criteria and the manifest gate hold on the evidence above, and the two findings that kept the earlier close open — P0 <code>closed_without_closure_review</code> and P1 <code>unpublished_declared_output</code> — are cleared by this published record. The closure decision is taken by <code>conveyor-approver</code>, distinct from the requester <code>conveyor-e2e</code>, under delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>. The open items above are owned and dated; they are not conditions of the close.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Publish the SPEC_V2 studio design pack, live · conveyor output · published 2026-11-24T16:30:00Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

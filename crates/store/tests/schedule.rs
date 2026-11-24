@@ -5,7 +5,7 @@
 #[path = "../../../apps/server/tests/common/mod.rs"]
 mod common;
 
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
 use conveyor_store::schedule::{self, DEFAULT_SCHEDULES};
 use sqlx::PgPool;
@@ -84,11 +84,48 @@ async fn defaults_are_seeded_once_per_tenant_and_are_idempotent() {
     let again = schedule::seed_defaults(pool).await.expect("seed again");
     assert_eq!(again, 0, "a second run inserts nothing");
 
-    // The seeded rows are due in the future, so a materialise at `now` creates nothing.
-    let created = schedule::materialise(pool, tenants[0], Utc::now())
+    // `seed_defaults` stamps `next_run_at` from its OWN clock and `Cron::next_after` starts at
+    // the next whole minute. A fresh `Utc::now()` here is LATER than that clock: when seeding
+    // lands in the last moments of a minute, this call has already crossed the seeded
+    // `* * * * *` boundary and the rows are legitimately due. That straddle is the flake seen
+    // on the #604 merge. Derive the boundary from the seeded rows instead, so the scenario is
+    // about schedule semantics rather than about where the wall clock sits inside a minute.
+    let earliest: DateTime<Utc> =
+        sqlx::query_scalar("SELECT min(next_run_at) FROM schedule WHERE tenant_id = $1")
+            .bind(tenants[0].as_uuid())
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("earliest seeded schedule");
+
+    let created = schedule::materialise(pool, tenants[0], earliest - chrono::Duration::seconds(1))
         .await
         .expect("materialise");
-    assert!(created.is_empty(), "future schedules create no job");
+    assert!(
+        created.is_empty(),
+        "no schedule is due before its earliest next_run_at {earliest}"
+    );
+
+    // The other half of the same boundary: exactly the rows stamped at or before it are due.
+    let due_at_boundary: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM schedule WHERE tenant_id = $1 AND enabled AND next_run_at <= $2",
+    )
+    .bind(tenants[0].as_uuid())
+    .bind(earliest)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("count schedules due at the boundary");
+    assert!(
+        due_at_boundary > 0,
+        "the earliest row is due at its own boundary"
+    );
+    let created = schedule::materialise(pool, tenants[0], earliest)
+        .await
+        .expect("materialise at the boundary");
+    assert_eq!(
+        created.len() as i64,
+        due_at_boundary,
+        "exactly the schedules due at {earliest} materialise"
+    );
 }
 
 #[tokio::test]

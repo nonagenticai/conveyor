@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-11-24T16:30:00Z",
+  "incidents": [
+    {
+      "board_id": "01a1d3e7-9cc7-76aa-9e23-898fab034b6f",
+      "created_at": "2026-11-20T08:04:51.913389+00:00",
+      "detected_at": "2026-11-20T08:04:52.083616224+00:00",
+      "id": "01a1f7fc-a653-7545-8fc3-0a5157569a12",
+      "mitigated_at": "2026-11-20T08:06:14.380171361+00:00",
+      "name": "Incident: injected pod failure in the tenant ops namespace",
+      "postmortem_asset_id": "01a1f7fe-072c-740d-8391-309b4cb643d1",
+      "postmortem_title": "Postmortem: injected crash loop in nonagentic-ops",
+      "resolved_at": "2026-11-20T08:06:24.725001914+00:00",
+      "runbook_key": "ops.crash-loop.runbook",
+      "runbook_procedure_id": "01a1f7f4-73c9-7048-b522-a456390a7434",
+      "runbook_title": "Crash-loop runbook",
+      "service": "ops-proof",
+      "severity": "sev2",
+      "triaged_at": "2026-11-20T08:04:59.250786162+00:00",
+      "updated_at": "2026-11-20T08:06:24.556902+00:00"
+    }
+  ],
+  "schema": "design-snapshot/v1"
+}

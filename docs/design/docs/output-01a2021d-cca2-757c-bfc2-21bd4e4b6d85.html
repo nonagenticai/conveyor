@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Owner decision - the assistant provides the conveyor build&#39;s approvals (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Context</h2>
+<p>The conveyor programme's gates each require a deciding actor. The owner directed on 2026-11-22 that the approvals for the conveyor's own build are provided by the assistant, so the build is not blocked on the owner's interactive sign-in at every gate. The product's human gate exists so a machine cannot grade its own homework; this delegation is therefore recorded truthfully as a rule acting under this published decision, never as a human decision.</p>
+<h2>Decision</h2>
+<p>The owner delegates the approvals for the conveyor build to the assistant for the duration of this build. Scope: all gates in this build. Every decision taken under this delegation is recorded as decided_by_kind='rule' with via.delegation_ref naming this document. The delegation expires on 2027-02-18.</p>
+<h2>Consequences</h2>
+<ul>
+<li>A delegated decision is visibly a rule decision, not a human one; the audit can separate the two.</li>
+<li>A gate that requires a person accepts a rule decision only by this named, published delegation; a rule decision with no reference, an unpublished reference, or an agent/service decision remains refused.</li>
+<li>After 2027-02-18 the delegation expires and the gates require a fresh decision.</li>
+<li>The human gate's evidence standard is unchanged: every decision still records its approver, note and the delegation reference.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li>This decision document is the delegation; its id is the delegation_ref.</li>
+<li>The directive: the owner's 2026-11-22 message to the retrospective-rework session ("you approve! and continue"), recorded in issue #526.</li>
+<li>The mechanism: crates/actions/src/control/approvals.rs validates the delegation and records decided_by_kind='rule'; crates/actions/src/spine/mod.rs lets tranches.resume accept a rule decision under a published decision; spine_gates 18/18.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>CI, runners and platform · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

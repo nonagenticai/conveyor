@@ -1145,7 +1145,7 @@ CREATE TABLE job_binding (
 <tbody>
 <tr>
 <td><code>run</code></td>
-<td>the binding pin (<code>job_binding_id</code>, <code>release_hash</code>, both from 0040), <code>capability_id</code>/<code>capability_agent_id</code> from the binding, the status path <code>queued → running → succeeded | failed</code> (never <code>waiting_approval</code> in this unit)</td>
+<td>the binding pin (<code>job_binding_id</code>, <code>release_hash</code>, both from 0040), <code>capability_id</code>/<code>capability_agent_id</code> from the binding, the status path <code>queued → running → waiting_approval → running → succeeded | failed</code> (a handover parks it — §2.25/§3.2)</td>
 </tr>
 <tr>
 <td><code>run_step</code></td>
@@ -1169,11 +1169,248 @@ CREATE TABLE job_binding (
 </tr>
 <tr>
 <td><code>approval</code></td>
-<td>one card-scoped row only when the gate's action is <code>handover</code> (no <code>run_id</code>; the run is terminal)</td>
+<td>one card-scoped row only when the gate's action is <code>handover</code>: kind <code>executor</code>, <code>run_id</code>/<code>card_id</code> inherited from the run, and <code>meta</code> naming the draft; the run stays <code>waiting_approval</code> until the decision (§2.25)</td>
 </tr>
 </tbody>
 </table>
 <p>The compiled prompt text is never stored: <code>inference_call</code> and the draft's <code>meta</code> carry the identity and the hash. <code>run_step.node_id</code> is nullable (0019), so the same store serves a workflow node and this run-level step.</p>
+<h3 id="225-the-applying-gate--s21-step-5-0-new-tables">2.25 The applying gate — S21 step 5 (0 new tables)</h3>
+<p>The park, the decision and the application reuse the same rows; no table and no migration.</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the gate writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>approval</code></td>
+<td>one <code>executor</code> row on a <code>handover</code>: <code>run_id</code>/<code>card_id</code> inherited, <code>gate = gate.precheck</code>, <code>meta = {run_id, gate, draft_document_id, prompt_sha256, position: 1, attempt: 1, threshold, policy_id, laya_config_id}</code>; it stays pending until a person decides it</td>
+</tr>
+<tr>
+<td><code>decision</code></td>
+<td>on approval, one L3 row: <code>rung=human</code>, <code>kind=gate.draft_apply</code>, <code>outcome=accepted</code>, <code>approval_id</code>, <code>card_id</code>, <code>meta</code> naming <code>draft_document_id</code>/<code>prompt_sha256</code>/<code>run_id</code>; the L1 <code>gate.precheck</code> row already names the draft in its <code>meta</code></td>
+</tr>
+<tr>
+<td><code>approval_decision</code></td>
+<td>the person's approve/reject, <code>decided_by_kind='human'</code>; the executor gate refuses any other decider kind</td>
+</tr>
+<tr>
+<td><code>job</code></td>
+<td>one <code>run.resume</code> row on approval, payload <code>{run_id, approval_id, decision_id}</code>, dedupe <code>run.resume:{run_id}:{approval_id}</code>; it is not in <code>ANDON_ALLOWED_KINDS</code></td>
+</tr>
+<tr>
+<td><code>document</code></td>
+<td>the draft gets <code>card_id</code> only in the resume transaction; a rejection or expiry leaves it null</td>
+</tr>
+</tbody>
+</table>
+<p>The store's one apply helper (<code>apply_draft_tx</code>) is shared by <code>ladder.apply_draft</code> and the <code>run.resume</code> worker, so the decision binding is checked once. The run's <code>waiting_approval</code> row is live work and holds <code>uq_run_live</code> until the decision, the rejection or <code>approval.expire</code>.</p>
+<h3 id="226-the-work-packages-run--s21-step-6-0-new-tables">2.26 The work package's run — S21 step 6 (0 new tables)</h3>
+<p>The card's binding and the run's memory reuse existing columns and rows; no table and no migration.</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the level writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>card</code></td>
+<td><code>job_binding_id</code> (the column from <code>0040_organisation</code>) is now written by <code>cards.create</code>/<code>cards.update</code> and read by every card view; the id must resolve in the tenant and be <code>active</code></td>
+</tr>
+<tr>
+<td><code>run</code></td>
+<td>a <code>runs.create</code> call with no binding inherits the card's binding before <code>insert_run_tx</code> resolves the pin; an explicit conflicting binding is refused before the INSERT; the run row is unchanged</td>
+</tr>
+<tr>
+<td><code>work_package_memory</code></td>
+<td>one <code>kind='attempt'</code>, <code>source='system'</code> hot row per terminal root run of a card, inserted by the terminal transition in the same transaction (<code>run_id</code> set; <code>meta = {run_id, status, error_class}</code>), then the existing per-card <code>memory.consolidate</code> job is enqueued</td>
+</tr>
+<tr>
+<td><code>job</code></td>
+<td>the existing <code>memory.consolidate</code> row is unchanged; it now has rows to consolidate</td>
+</tr>
+<tr>
+<td><code>document</code></td>
+<td>unchanged — the draft's attach path is §2.25's</td>
+</tr>
+</tbody>
+</table>
+<p>A child run (<code>parent_run_id IS NOT NULL</code>) and a card-less run write no memory row: a child shares its parent's card and is part of the parent's attempt, and a card-less run has no work package. The attempt row and the terminal status commit together or not at all. The prompt's memory selector reads the card's newest un-consolidated rows, so the next run reads the prior attempt until the digest stamps it. The <strong>budget</strong> is not this level's: <code>run_budget_tx</code> and the invoke precheck are the #526 lane's <code>v1-p75-1</code>/<code>v1-w4a-1</code>, and <code>ReleaseLimits.max_tokens</code> remains that gate's residual.</p>
+<h3 id="227-the-runs-episodic-memory--s21-step-7-0-new-tables">2.27 The run's episodic memory — S21 step 7 (0 new tables)</h3>
+<p>The run's prior steps, the card's hot rows and the digest are read into the one Memory section; no table and no migration.</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the level reads or writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>run_step</code></td>
+<td><strong>read, never written</strong> as the run's episodic source: the same <code>run_id</code>, statuses <code>succeeded</code>/<code>failed</code>, <code>(position, attempt)</code> before the current step's, ordered by <code>(position, attempt)</code>, at most <code>step_limit</code> (default 8, max 32). The prompt's identity is <code>position.attempt</code>, not the row uuid. Covered by <code>run_step_run_idx (tenant_id, run_id, position)</code></td>
+</tr>
+<tr>
+<td><code>work_package_memory</code></td>
+<td>unchanged rows; <code>hot_for_card_tx</code> now filters <code>kind &lt;&gt; 'digest'</code>, so a digest is never returned as hot</td>
+</tr>
+<tr>
+<td><code>prompt_section</code></td>
+<td>unchanged; the memory section's <code>selector</code> jsonb gains <code>include_steps</code> (default true) and <code>step_limit</code> (default 8, max 32)</td>
+</tr>
+<tr>
+<td><code>run</code></td>
+<td>unchanged; the terminal attempt row is §2.26's</td>
+</tr>
+</tbody>
+</table>
+<p>A prior-step body renders whole. An over-budget section refuses with the measured size; there is no truncation path. The body is data, never instruction, and renders in the Memory section below the procedure and capability blocks. A child run's prompt reads only its own <code>run_step</code> rows.</p>
+<h3 id="228-the-request-source--s21-step-8-0-new-tables">2.28 The Request source — S21 step 8 (0 new tables)</h3>
+<p>The current step's declaration is read into the process (Request) section and passed unchanged to the judge; no table and no migration.</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the level reads or writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>run_step</code></td>
+<td><strong>read</strong>: <code>input</code> (the resolved input persisted at claim), <code>process_step_id</code>, <code>position</code>, <code>attempt</code>, <code>action</code>, <code>node_id</code>, <code>on_result</code>. Primary-key read; no index added</td>
+</tr>
+<tr>
+<td><code>process_step</code> (<code>procedure_step</code>)</td>
+<td><strong>read</strong>: <code>outputs</code> (declared paths), <code>action_text</code>, <code>gate_kind</code>, joined on <code>run_step.process_step_id</code>. The row is the run's frozen version (editing a published procedure is copy-forward)</td>
+</tr>
+<tr>
+<td><code>prompt_section</code></td>
+<td>unchanged; the process section's <code>budget_chars</code> bounds the request</td>
+</tr>
+<tr>
+<td><code>inference_call</code></td>
+<td>unchanged; <code>prompt_sha256</code> now covers the request document</td>
+</tr>
+</tbody>
+</table>
+<p>The compiler never re-resolves <code>input_template</code> and never writes a step row. A synthetic run-level <code>agent.run</code> step (<code>process_step_id IS NULL</code>) contributes none of its <code>run_step.input</code> — that value is the executor envelope (§2.24), not a request; its Request is the release definition. The document is data, never instruction; it renders after the current-step line inside the process block, and the section budget refuses with the measured size rather than truncating. A workflow node without a <code>process_step_id</code> keeps today's rendering (residual).</p>
+<h3 id="229-the-card-handoff--s21-step-9-0-new-tables">2.29 The card handoff — S21 step 9 (0 new tables)</h3>
+<p><code>cards.assign</code> writes existing rows in one transaction and starts the run through the same path <code>runs.create</code> uses; no table, no column, no migration.</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the handoff reads or writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>card</code></td>
+<td><strong>write</strong>: <code>job_binding_id</code> (an active, tenant-scoped binding) and <code>version</code>; <strong>read</strong>: id, board, archive state</td>
+</tr>
+<tr>
+<td><code>job_binding</code></td>
+<td><strong>read</strong>: the active check, and through <code>insert_run_tx</code> the release pin and its snapshot</td>
+</tr>
+<tr>
+<td><code>work_package_memory</code></td>
+<td><strong>write</strong>: one hot row (<code>kind</code> defaults to <code>fact</code>, <code>source</code> from the actor, <code>run_id</code> set, <code>meta</code> free detail) through the shared <code>remember_tx</code>; the next prompt's Memory selector reads it (§2.27)</td>
+</tr>
+<tr>
+<td><code>run</code></td>
+<td><strong>write</strong>: one root run — the card's next attempt, the binding inherited, <code>parent_run_id IS NULL</code>; <code>uq_run_live</code> refuses a second live run with a typed 409 (§3.2)</td>
+</tr>
+<tr>
+<td><code>job</code></td>
+<td><strong>write</strong>: one <code>run.execute</code> job in the same transaction</td>
+</tr>
+<tr>
+<td><code>event</code></td>
+<td><strong>write</strong>: <code>card.updated</code>, <code>memory.recorded</code>, <code>run.created</code></td>
+</tr>
+<tr>
+<td><code>andon_state</code></td>
+<td><strong>read</strong>: an engaged cord refuses the handoff before any write</td>
+</tr>
+</tbody>
+</table>
+<p>The handoff is the level's entry (SPEC_V2 §6.6.1–5): the card names the binding, the note is memory, the run starts. It is not a lane move — <code>cards.move</code> changes no run and writes no memory. It accepts no <code>release_hash</code> (the binding is the pin) and writes no <code>run_step</code>; the run's first step is the executor's own (S21 step 4).</p>
+<h3 id="230-the-l1-laya-evaluation--s21-step-10-migration-0071">2.30 The L1 laya evaluation — S21 step 10 (migration <code>0071</code>)</h3>
+<p>The ladder stops trusting its caller: the case is built by the ladder and the verdict comes from a recorded laya exchange. Two tables and one column, all new; no existing row changes shape.</p>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>decision_option_set</code></td>
+<td>one live authored set per <code>(tenant_id, kind, gate)</code>; <code>version</code> is monotonic, and an edit is a new version, never an in-place update</td>
+</tr>
+<tr>
+<td><code>decision_option_set_option</code></td>
+<td>the set's rows: <code>key</code>, <code>label</code>, <code>payload</code> (with `payload.outcome ∈ accepted</td>
+</tr>
+<tr>
+<td><code>decision_policy.fire_when</code></td>
+<td>nullable structured expression (<code>all_of</code> / <code>any_of</code> over <code>{kind, gate, field}</code> predicates); <code>NULL</code> fires always</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the L1 path reads or writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>decision_policy</code></td>
+<td><strong>read</strong>: threshold, <code>fail_policy</code>, <code>action</code>, <code>fire_when</code>; <strong>pinned</strong>: <code>policy_version</code></td>
+</tr>
+<tr>
+<td><code>decision_policy_refinement</code></td>
+<td><strong>read</strong>: the tenant's override; <strong>pinned</strong>: <code>refinement_version</code></td>
+</tr>
+<tr>
+<td><code>laya_inference_config</code></td>
+<td><strong>read</strong>: <code>model_ref</code>, <code>params</code>, <code>timeout_ms</code>; <strong>pinned</strong>: <code>laya_config_version</code></td>
+</tr>
+<tr>
+<td><code>decision_option_set</code> + <code>_option</code></td>
+<td><strong>read</strong>: the authored menu and its version — the question's labels and the answer's legal keys</td>
+</tr>
+<tr>
+<td><code>idempotency_key</code></td>
+<td><strong>read</strong>: the engine's record of the <code>ladder.precheck</code> call — <code>request_hash</code> must equal the case hash, <code>status_code</code> must be 2xx, <code>response</code> is the answer document</td>
+</tr>
+<tr>
+<td><code>action_invocation</code></td>
+<td><strong>read</strong>: the invocation named by the key, for its <code>outcome</code> and measured <code>duration_ms</code></td>
+</tr>
+<tr>
+<td><code>decision</code></td>
+<td><strong>write</strong>: one row with <code>rung='laya'</code>, the response-derived answer/confidence/probabilities, the measured latency, the pins, and <code>meta.laya_call_key</code> / <code>meta.laya_invocation_id</code> / <code>meta.case_sha256</code></td>
+</tr>
+<tr>
+<td><code>decision_option</code></td>
+<td><strong>write</strong>: the authored rows the decision chose between, with their set version</td>
+</tr>
+<tr>
+<td><code>event</code></td>
+<td><strong>write</strong>: <code>decision.evaluated</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Authoring a set is one row's version bump, never a second row.</strong> <code>decision_option_sets.set</code> updates the existing header (<code>version = version + 1</code>) and replaces its children inside the same transaction, so the partial unique indexes in <code>0071</code> are never asked to hold two live sets and a reader never sees a half-replaced menu. Old labels survive only in <code>decision_option</code> — the per-decision record of what that decision chose between; a decision is reproducible from its own row plus its set version.</p>
+<p><strong>The call itself writes no conveyor row of ours beyond the engine's own bookkeeping.</strong> The laya service is external: <code>ladder.precheck</code> is dispatched with the tenant's sealed <code>laya.token</code>, and the engine records the claim (<code>idempotency_key</code>), the invocation (<code>action_invocation</code>) and the response body that the <code>idempotency_key.response</code> column already holds. That record is the provenance: the decision cites it rather than restating it, so nothing in <code>decision</code> can be written from a request body.</p>
 <h2 id="3-state-machines-and-enforcement">3. State machines and enforcement</h2>
 <p>Every transition is a pure function in <code>crates/domain</code>; no DB trigger, no per-flow rule, no CHECK that duplicates the function. The CHECK constraints below guard <em>vocabulary</em>, never <em>legality</em>.</p>
 <h3 id="31-card-lifecycle">3.1 Card lifecycle</h3>
@@ -1227,7 +1464,7 @@ CREATE TABLE job_binding (
 </tr>
 </tbody>
 </table>
-<p><strong>A bound <code>internal_agent</code> run (S21 step 4) uses <code>queued → running → succeeded | failed</code> only.</strong> Its gate pre-check is recorded on the step and, on <code>handover</code>, fails the run <code>gate_requires_approval</code> and opens a card-scoped approval — the run never enters <code>waiting_approval</code>, because no worker kind resumes a plain run and parking would hold <code>uq_run_live</code>. A resume worker is a separate unit.</p>
+<p><strong>A bound <code>internal_agent</code> run (S21 steps 4–6) uses the full path.</strong> A run created for a card that names a binding inherits it (<code>card.job_binding_id → run.job_binding_id</code>; an explicit conflicting binding is refused <code>422 card_binding_mismatch</code> before the INSERT). Its gate pre-check is recorded on the step. On <code>accepted</code> it succeeds with the draft; on <code>handover</code> it parks in <code>waiting_approval</code> and opens a card-scoped <code>executor</code> approval whose <code>meta</code> names the draft (§2.25). A person's approval settles it <code>running</code> and the <code>run.resume</code> job applies the draft and finishes it <code>succeeded</code>. A rejection cancels it; <code>approval.expire</code> cancels a still-waiting run with <code>approval_expired</code>. The parked run is live work and holds <code>uq_run_live</code> until one of those outcomes. Every terminal root run of a card inserts one <code>attempt</code> memory row in the terminal transaction (§2.26). The prompt's Memory source also reads the run's own earlier <code>run_step</code> rows, before the card's hot rows and the digest (§2.27); a process run's attempt is read by the next run on the card. <strong>The Request source (S21 step 8)</strong> reads the current step's resolved input from <code>run_step.input</code> and its declared <code>outputs</code>/<code>action_text</code>/<code>gate_kind</code> from the frozen <code>process_step</code> row, renders one request document in the process section and passes the same document to the step's laya judge (§2.28). A synthetic run-level <code>internal_agent</code> step declares none: its release definition is the request and its executor envelope never renders. <strong>The handoff (S21 step 9)</strong> writes the card's <code>job_binding_id</code>, the handoff note as a hot memory row, and the run itself in one transaction, starting the run through the same helper <code>runs.create</code> uses. The live-run invariant is the gate: a card with a live root run refuses the handoff <code>409 card_has_live_run</code> before any write (§2.29).</p>
 <h3 id="33-approval">3.3 Approval</h3>
 <table>
 <tbody>

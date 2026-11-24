@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Conformance baseline v6 — acceptance (2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Conformance baseline v6 — acceptance (2026-11-21)</h1>
+<h2>Context</h2>
+<p>The merged instrument at <code>2a1ff31d</code> carries the #543 standards pipeline and the rework register,
+the seven SAFe rules from U5a/U5b, and the U5a strict acceptance-header gate. A fresh read-only
+snapshot of the live record was taken at <code>2a1ff31df668b8fc456dcac2640f29f44cafcf16</code>, generated
+<code>2026-11-21T20:52:01.734068+00:00</code>, 131 published outputs, manifest sha256
+<code>a3ca2620c69a086c7432b85731d1c17aad0b13e6331679af5a423c6dfec604be</code>.</p>
+<p>The audit reports <strong>214 gaps — 26 P0 / 164 P1 / 24 P2</strong>, and the standards generator resolves
+431 mandatory artefacts (176 evidenced, 125 partial, 130 absent) into <strong>145 artefact findings —
+22 P1 / 123 P2</strong>. The merged register carries <strong>353 packages — 29 P0 / 165 P1 / 159 P2</strong>, 352
+open and one suppressed.</p>
+<p>The rise from v5's 182 entries is the true live record, not a new defect count: the merged
+standard adds main's five rules (<code>cadence_absent</code>, <code>dependency_cycle</code>, <code>dependency_unknown_target</code>,
+<code>dependency_untyped</code>, <code>wbs_absent</code>) and the seven SAFe rules (<code>pi_plan_missing</code>,
+<code>pi_cadence_missing</code>, <code>pi_objectives_missing</code>, <code>demo_credit_missing</code>, <code>retro_lesson_missing</code>,
+<code>wsjf_inputs_missing</code>, <code>backlog_refinement_missing</code>), and the live snapshot still carries 38
+projects that have not been through the retrospective lifecycle. The v1 code ledger carries 106
+findings — 17 P0 / 64 P1 / 25 P2, 11 resolved — and one P0, <code>v1-view-1</code>, is resolved by #530's
+observed-window fallback.</p>
+<h2>Decision</h2>
+<p><code>conveyor-approver</code> accepts baseline v6 under the U5 delegation
+<code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>, with <code>conveyor-e2e</code> as executor. Every entry carries the
+<code>rework</code> disposition, the programme owner and an expiry of 2027-02-18. A batch that fixes an
+entry deletes it; an entry is never re-dated. The baseline is a ratchet: strict refuses a new or
+worsened P0/P1, an expired entry, an entry without an owner, and a header without its acceptance
+and snapshot fields.</p>
+<h2>Consequences</h2>
+<p>The strict audit is green against v6. The programme rework starts from these 214 gaps; the
+tranche batches burn down the programme entries, and the code packages execute the 16 open P0
+findings plus the P1 findings whose mechanism belongs to a built slice. The V2 acceptance
+(#88 / T12) remains open and is recorded as an owned programme risk; this baseline does not claim
+it.</p>
+<h2>Evidence</h2>
+<ul>
+<li>Snapshot <code>2a1ff31df668b8fc456dcac2640f29f44cafcf16</code>, generated
+<code>2026-11-21T20:52:01.734068+00:00</code>, manifest sha256
+<code>a3ca2620c69a086c7432b85731d1c17aad0b13e6331679af5a423c6dfec604be</code>, 131 published outputs.</li>
+<li><code>docs/evidence/conformance-baseline.json</code> (version 6), every entry with an owner and an expiry.</li>
+<li><code>docs/evidence/v1-conformance-findings.json</code> at the same SHA: 106 findings, 11 resolved,
+<code>verify-findings.py</code> green.</li>
+<li>The merged auditor self-test: the SAFe rules, the register, the strict header and owner
+refusals, and the rework check.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>conveyor output · published 2026-11-24T16:30:00Z · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

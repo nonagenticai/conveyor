@@ -71,3 +71,18 @@ REVOKE UPDATE, DELETE ON tool_call FROM conveyor_runtime;
 -- never erased (the card and the interruption carry the history). UPDATE and DELETE are withheld
 -- from the runtime role, so an application bug cannot rewrite what the coach decided.
 REVOKE UPDATE, DELETE ON coach_remedy FROM conveyor_runtime;
+
+-- T5 (0066): the six Gets and the held-out measurement are the kata's evidence. A Get is written
+-- once and the measurement is the number a person adopts against; UPDATE and DELETE are withheld
+-- so an application bug cannot rewrite either (the `kata` row carries the mutable stage).
+REVOKE UPDATE, DELETE ON kata_get, kata_measurement FROM conveyor_runtime;
+
+-- T5 P2/P3 (0067): the revert and the adoption are append-only evidence — a regression's reason
+-- and a person's decision are never edited or erased.
+REVOKE UPDATE, DELETE ON kata_revert, kata_adoption FROM conveyor_runtime;
+
+-- T6 (0068): a development project's step evidence and closure record are the audit trail the
+-- self-development path is judged on. A step is written once (the unique key says so) and the
+-- closure links what was delivered; UPDATE and DELETE are withheld so an application bug cannot
+-- rewrite either. The `development_project` charter row stays mutable for its status.
+REVOKE UPDATE, DELETE ON development_step, development_closure FROM conveyor_runtime;

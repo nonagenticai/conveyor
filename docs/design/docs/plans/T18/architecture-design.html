@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Architecture design — T18, the real V2 UI · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18/architecture-design.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="architecture-design--t18-the-real-v2-ui">Architecture design — T18, the real V2 UI</h1>
+<h2 id="context-and-boundary">Context and boundary</h2>
+<p>The UI is a client of the conveyor's action registry, not a second system. <code>apps/web</code> owns the routes, screens, navigation and states; the API owns reads and writes; Postgres owns the rows; the design pack owns the public programme site. One image serves both surfaces: the app at <code>/</code>, the pack at <code>/design/</code>. The boundary this design must not cross: the app never reads the published snapshot as its data source, never renders a fixture, and never calls a backend except through a registered action or a documented read <code>GET</code>.</p>
+<p>The blueprint it fits is SPEC_V2 §10.5 (the real-UI specification) and the action families in §10.4. The V1 routes stand and are linked, not re-implemented.</p>
+<h2 id="aggregates-tables-and-actions">Aggregates, tables and actions</h2>
+<p><strong>No new table, action or event.</strong> The destination contracts name the existing families they read and write; where a family is absent, the destination is <code>acceptance-blocked-by</code> its owning slice and renders <strong>not yet live</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Destination</th>
+<th>Read</th>
+<th>Write</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Organisation</td>
+<td><code>industries.list</code>, <code>departments.list</code>, <code>jobs.*</code>, <code>job_releases.*</code>, <code>job_bindings.*</code>, <code>approval_policies.*</code>, <code>decision_policies.*</code>, <code>refinements.*</code>, <code>laya_configs.*</code>, <code>ladder.list</code></td>
+<td>the create/update/release/retire verbs of those families</td>
+</tr>
+<tr>
+<td>Procedures</td>
+<td><code>procedures.list|get</code>, <code>capabilities.list|get</code>, <code>processes.list|get</code>, <code>approvals.list</code>, the process map, the published pack</td>
+<td><code>procedures.create|update|publish|retire</code>, <code>procedures.ingest_sop|ingest_process|ingest_rdf</code>, <code>procedures.validate|review_source</code>, <code>approvals.request|decide</code> for the two publication gates; <code>capabilities.design|publish</code> are not registered (T16's ingest creates the capability)</td>
+</tr>
+<tr>
+<td>Authoring</td>
+<td><code>authoring.assets</code>, the draft queue, dependency status</td>
+<td><code>authoring.intake|draft|review|publish</code></td>
+</tr>
+<tr>
+<td>Portfolio</td>
+<td>the computed project/programme set, <code>programme_config.*</code>, <code>project_dependencies.*</code>, <code>cadences.*</code>, <code>metrics.programme</code></td>
+<td><code>programmes.update</code>, <code>project_dependencies.*</code>, <code>wbs.*</code>/<code>baselines.*</code> where Plan owns them</td>
+</tr>
+<tr>
+<td>Programme</td>
+<td><code>programmes.*</code>, <code>benefits.*</code>, <code>tranches.*</code>, <code>stakeholders.*</code>, <code>cadences.*</code></td>
+<td>the create/update/transition/review verbs</td>
+</tr>
+<tr>
+<td>Architecture</td>
+<td><code>architecture.artifacts_*</code>, <code>repository_search</code>, <code>contracts_list</code>, <code>profile_get</code></td>
+<td><code>artifacts_create|update|approve|supersede|link</code>, <code>contracts_request|approve</code>, <code>phases_advance</code>, <code>reviews_record|waive</code>, <code>board_*</code></td>
+</tr>
+<tr>
+<td>Plan</td>
+<td><code>wbs.*</code>, <code>baselines.list</code>, <code>registers.*</code>, <code>project_dependencies.list</code></td>
+<td><code>wbs.*</code>, <code>baselines.take</code>, <code>registers.*</code></td>
+</tr>
+<tr>
+<td>Improve</td>
+<td>the coach queue, <code>kata.*</code>, <code>lessons.*</code></td>
+<td><code>coach.triage|remedy|escalate</code>, <code>kata.*</code>, <code>lessons.propose|review|promote</code></td>
+</tr>
+<tr>
+<td>Operations</td>
+<td>incidents, runbooks, on-call, the ops read actions</td>
+<td><code>ops.incident|triage|mitigate|resolve|postmortem</code>, the gated <code>ops.k8s_*</code> set</td>
+</tr>
+<tr>
+<td>Tools</td>
+<td><code>tools.*</code>, <code>toolkits.*</code>, <code>tool_bindings.*</code>, <code>tool_calls.*</code></td>
+<td><code>tools.probe|call|publish|retire</code>, <code>toolkits.*</code>, <code>tool_bindings.*</code>, <code>tool_authoring.*</code></td>
+</tr>
+</tbody>
+</table>
+<p>The read model for the delivery view is the existing <code>programme</code>/<code>work</code>/<code>measure</code> derivation at four levels (portfolio, programme, project, work package), exposed through the owning actions. The SSE topics are the existing <code>board:{id}</code>, <code>card:{id}</code>, <code>run:{id}</code> and <code>approval:{id}</code>; a screen without a topic polls explicitly.</p>
+<p>The <strong>Execution</strong> surface reads <code>runs.list|get</code> and writes nothing; the executor kind, <code>job_binding_id</code> and <code>release_hash</code> are not exposed by that read model (T0/T4/S21), and the tools panel waits on <code>tool_calls.list</code> (T13). The screen names both gaps and carries the step's input, output and judge as the provenance. The PKO workspace is not restored: the owner decision of 2026-11-19 replaced it with the knowledge-pack pairing (SPEC_V2 §5.6).</p>
+<h2 id="decisions">Decisions</h2>
+<ul>
+<li><strong>D64</strong> — the real UI is the app; the pack is the public site and the reviewed reference.</li>
+<li><strong>D65</strong> — the V2 coverage instrument measures <code>apps/web/src/app.rs</code> and the named specs; <code>exists</code> requires both.</li>
+<li><strong>ADR 0009</strong> — CSR stays (ADR 0001), action-only writes, no fixture data, the e2e harness is the verification.</li>
+<li><strong>Routes and nav</strong> — the §10.5 table is the route contract; the seven nav groups are the mock's, trimmed to destinations that exist and gated by <code>has_action</code>.</li>
+<li><strong>The single-writer router</strong> — the five units are sequenced on <code>apps/web/src/app.rs</code> and <code>screens/mod.rs</code>; a slice never opens a second PR against the same file.</li>
+</ul>
+<h2 id="acceptance">Acceptance</h2>
+<ul>
+<li>The SPEC_V2 §12 T18 gate: every destination route exists with its spec; a signed-in tenant drives the portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; the coverage record reports <code>exists</code> only from a real route and its spec, and a <code>*Gate</code> view is <code>extend</code> naming its owner even when its gate spec exists; no production screen renders a fixture.</li>
+<li>Each destination's Playwright spec asserts empty, error, happy and one refusal.</li>
+<li>The T12 organisation loop, driven from the UI, is the final spec.</li>
+</ul>
+<h2 id="architecture-artefacts">Architecture artefacts</h2>
+<p>The architecture to be registered in the live repository is described here; the rows are the owner's/live-publish step, <code>acceptance-blocked-by</code> #545, and are not fabricated by a PR.</p>
+<ul>
+<li><strong>Catalogue</strong> — the route/destination catalogue in SPEC_V2 §10.5 and this plan: every destination, its route(s), owning slice and spec. Owner: the T18 lane. Reviewer: the programme owner. Review date: the T18 closure.</li>
+<li><strong>Matrix</strong> — the destination × action-family matrix above: what each screen reads and writes, and the refusal code that proves the gate.</li>
+<li><strong>Diagram</strong> — the real-route map: the seven nav groups and the ten destinations, derived from the route table; the pack's UI map remains the design reference.</li>
+<li>The typed rows (<code>architecture.artifacts_create</code>) enter the live repository with the contract and compliance review when the live record is published; this document is their source.</li>
+</ul>
+<h2 id="migration-and-rollout">Migration and rollout</h2>
+<p>No migration: the routes are additive, the schema and the action registry are unchanged. The rollout is the kickoff (#559) then T18-1…5 in order; each unit's <code>web.yml</code> is the gate and its PR is the one browser run. Rollback is the unit's revert; the V1 routes are untouched.</p>
+<h2 id="links">Links</h2>
+<p>Issue #559 · SPEC_V2 §10.5, §12 T18, D64/D65 · <code>docs/plans/T18-real-v2-ui.md</code> · <code>docs/decisions/0013-real-v2-ui.md</code> · <code>docs/design/STUDIO-SPEC.md</code> (design reference).</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T18/architecture-design.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

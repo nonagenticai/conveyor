@@ -343,19 +343,37 @@ async fn stub_laya(score: Option<f64>) -> (String, Arc<Mutex<usize>>) {
 
 /// Seal the tenant's `laya.token`, so `laya.judge` reaches the stub instead of failing closed.
 async fn seal_laya_token(pg: &support::Pg, seeded: &support::Seeded) {
+    seal_laya_token_with(pg, seeded, b"test-laya-token").await;
+}
+
+/// Seal a specific token; the live proof seals the estate's real one.
+async fn seal_laya_token_with(pg: &support::Pg, seeded: &support::Seeded, token: &[u8]) {
+    let mut tx = conveyor_store::begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scoped tx");
+    conveyor_store::secret::create_secret_tx(&mut tx, seeded.tenant, "laya.token", token, "tenant")
+        .await
+        .expect("seal the laya token");
+    tx.commit().await.expect("commit the laya token");
+}
+
+/// Seal the inference-router bearer. `inference.token` is the name the inference client resolves
+/// (`crates/actions/src/integrations/inference.rs:37`); sealing only `laya.token` leaves the
+/// model leg unauthenticated.
+async fn seal_inference_token_with(pg: &support::Pg, seeded: &support::Seeded, token: &[u8]) {
     let mut tx = conveyor_store::begin_scoped(&pg.runtime, seeded.tenant)
         .await
         .expect("scoped tx");
     conveyor_store::secret::create_secret_tx(
         &mut tx,
         seeded.tenant,
-        "laya.token",
-        b"test-laya-token",
+        "inference.token",
+        token,
         "tenant",
     )
     .await
-    .expect("seal the laya token");
-    tx.commit().await.expect("commit the laya token");
+    .expect("seal the inference token");
+    tx.commit().await.expect("commit the inference token");
 }
 
 async fn seed_policy(
@@ -707,8 +725,83 @@ async fn an_unavailable_judge_fails_closed() {
     );
 }
 
+/// One run state read: `(status, error_class)`.
+async fn run_state(pg: &support::Pg, tenant: TenantId, run: Uuid) -> (String, Option<String>) {
+    let mut tx = begin_scoped(&pg.runtime, tenant).await.expect("scope");
+    let row =
+        sqlx::query_as("SELECT status, error_class FROM run WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(run)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("run");
+    tx.commit().await.expect("commit");
+    row
+}
+
+/// How many ladder decisions cite one approval.
+async fn decisions_for_approval(pg: &support::Pg, tenant: TenantId, approval: Uuid) -> i64 {
+    let mut tx = begin_scoped(&pg.runtime, tenant).await.expect("scope");
+    let count = sqlx::query_scalar(
+        "SELECT count(*) FROM decision WHERE tenant_id = $1 AND approval_id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("decisions");
+    tx.commit().await.expect("commit");
+    count
+}
+
+/// The attached card of one document, or `None` while it is unattached.
+async fn document_card(pg: &support::Pg, tenant: TenantId, document: Uuid) -> Option<Uuid> {
+    let mut tx = begin_scoped(&pg.runtime, tenant).await.expect("scope");
+    let card = sqlx::query_scalar("SELECT card_id FROM document WHERE tenant_id = $1 AND id = $2")
+        .bind(tenant.as_uuid())
+        .bind(document)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("document");
+    tx.commit().await.expect("commit");
+    card
+}
+
+/// Park one handover run and return `(run, card, approval)`.
+///
+/// The caller has already installed the stubs, the sealed laya token and a `handover` policy.
+async fn park_handover(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    running: &support::Running,
+    key: &str,
+) -> (Uuid, String, Uuid) {
+    let (capability, agent) = seed_agent(pg, seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        pg,
+        seeded,
+        key,
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release"}),
+    )
+    .await;
+    let binding = bind(pg, seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(running).await;
+    let card = create_card(running, &board, &lane).await;
+    let run = start_run(running, &card, binding).await;
+    execute(pg, seeded, run).await;
+    let approval: Uuid = scalar(
+        pg,
+        seeded.tenant,
+        "SELECT id FROM approval WHERE tenant_id = $1 AND kind = 'executor' AND run_id = $2",
+        run,
+    )
+    .await;
+    (run, card, approval)
+}
+
 #[tokio::test]
-async fn a_handover_gate_fails_the_run_and_opens_an_approval() {
+async fn a_handover_gate_parks_the_run_and_opens_an_approval() {
     let _guard = STUBS.lock().await;
     let (pg, seeded, running) = fixture().await;
     let (router, _models) = stub_router().await;
@@ -717,47 +810,276 @@ async fn a_handover_gate_fails_the_run_and_opens_an_approval() {
     support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
     seal_laya_token(&pg, &seeded).await;
     seed_policy(&pg, &seeded, 0.5, "closed", "handover").await;
-    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
-    let (job, release) = seed_job(
+    let (run, _card, approval) = park_handover(&pg, &seeded, &running, "handover_job").await;
+
+    let (status, class) = run_state(&pg, seeded.tenant, run).await;
+    assert_eq!(status, "waiting_approval", "the handover parks the run");
+    assert_eq!(class, None, "a parked run is not a failed one");
+
+    let meta: Value = scalar(
         &pg,
-        &seeded,
-        "handover_job",
-        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
-               "model_ref": "router/release"}),
+        seeded.tenant,
+        "SELECT meta FROM approval WHERE tenant_id = $1 AND id = $2",
+        approval,
     )
     .await;
-    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
-    let (board, lane) = board_and_lane(&running).await;
-    let card = create_card(&running, &board, &lane).await;
-    let run = start_run(&running, &card, binding).await;
+    let document_id = meta["draft_document_id"]
+        .as_str()
+        .expect("the approval names its draft");
+    assert_eq!(
+        meta["prompt_sha256"].as_str().map(str::len),
+        Some(64),
+        "the approval names the compiled prompt: {meta}"
+    );
+    assert_eq!(
+        document_card(
+            &pg,
+            seeded.tenant,
+            Uuid::parse_str(document_id).expect("uuid")
+        )
+        .await,
+        None,
+        "the draft is unattached until the person's approval applies it"
+    );
 
-    execute(&pg, &seeded, run).await;
-
-    let (status, class): (String, Option<String>) = {
+    let (step_status, output): (String, Value) = {
         let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
             .await
             .expect("scope");
-        let row =
-            sqlx::query_as("SELECT status, error_class FROM run WHERE tenant_id = $1 AND id = $2")
-                .bind(seeded.tenant.as_uuid())
-                .bind(run)
-                .fetch_one(&mut *tx)
-                .await
-                .expect("run");
+        let row = sqlx::query_as(
+            "SELECT status, output FROM run_step
+              WHERE tenant_id = $1 AND run_id = $2 AND position = 1 AND attempt = 1",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(run)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("step");
         tx.commit().await.expect("commit");
         row
     };
-    assert_eq!(status, "failed");
-    assert_eq!(class.as_deref(), Some("gate_requires_approval"));
-    let approvals: i64 = scalar(
+    assert_eq!(step_status, "succeeded", "the generation step succeeded");
+    assert_eq!(
+        output["draft_document_id"].as_str(),
+        Some(document_id),
+        "the step names the same draft"
+    );
+    let calls: i64 = scalar(
         &pg,
         seeded.tenant,
-        "SELECT count(*) FROM approval WHERE tenant_id = $1 AND kind = 'executor' \
-         AND run_id = $2",
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
         run,
     )
     .await;
-    assert_eq!(approvals, 1, "the handover opens one card-scoped approval");
+    assert_eq!(calls, 1, "the model was called once");
+}
+
+#[tokio::test]
+async fn an_approved_handover_applies_the_draft_and_finishes_the_run() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    let (laya, _hits) = stub_laya(Some(0.1)).await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+    seal_laya_token(&pg, &seeded).await;
+    seed_policy(&pg, &seeded, 0.5, "closed", "handover").await;
+    let (run, card, approval) = park_handover(&pg, &seeded, &running, "approve_job").await;
+    let card = Uuid::parse_str(&card).expect("uuid");
+
+    let (status, approved) = running
+        .invoke(
+            "approvals.decide",
+            support::REVIEWER,
+            json!({"approval_id": approval, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{approved}");
+    assert_eq!(
+        run_state(&pg, seeded.tenant, run).await.0,
+        "running",
+        "approval settles the parked run"
+    );
+    let job: Value = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT payload FROM job WHERE tenant_id = $1 AND kind = 'run.resume' \
+         AND payload->>'run_id' = $2::text ORDER BY created_at DESC LIMIT 1",
+        run,
+    )
+    .await;
+    let decision_id = Uuid::parse_str(
+        job["decision_id"]
+            .as_str()
+            .expect("the resume job names its decision"),
+    )
+    .expect("uuid");
+
+    conveyor_actions::executor::resume_run(
+        &pg.runtime,
+        seeded.tenant,
+        APP_KEY,
+        run,
+        approval,
+        decision_id,
+    )
+    .await
+    .expect("the resume applies the draft");
+
+    let (status, class) = run_state(&pg, seeded.tenant, run).await;
+    assert_eq!(status, "succeeded", "{class:?}");
+    let original: Value = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT output FROM run_step WHERE tenant_id = $1 AND run_id = $2 \
+         AND position = 1 AND attempt = 1",
+        run,
+    )
+    .await;
+    let document = Uuid::parse_str(
+        original["draft_document_id"]
+            .as_str()
+            .expect("the step names the draft"),
+    )
+    .expect("uuid");
+    assert_eq!(
+        document_card(&pg, seeded.tenant, document).await,
+        Some(card),
+        "the approved draft is attached to the run's card"
+    );
+    let decisions: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM decision WHERE tenant_id = $1 AND card_id = \
+         (SELECT card_id FROM run WHERE tenant_id = $1 AND id = $2) \
+         AND kind = 'gate.draft_apply' AND outcome = 'accepted'",
+        run,
+    )
+    .await;
+    assert_eq!(decisions, 1, "one L3 decision gates the apply");
+    let calls: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(calls, 1, "the resume never calls the model again");
+    let succeeded: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM event WHERE tenant_id = $1 AND aggregate_id = $2 \
+         AND type = 'run.succeeded'",
+        run,
+    )
+    .await;
+    assert_eq!(succeeded, 1, "one run.succeeded");
+}
+
+#[tokio::test]
+async fn a_rejected_handover_cancels_the_run_and_leaves_the_draft() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    let (laya, _hits) = stub_laya(Some(0.1)).await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+    seal_laya_token(&pg, &seeded).await;
+    seed_policy(&pg, &seeded, 0.5, "closed", "handover").await;
+    let (run, _card, approval) = park_handover(&pg, &seeded, &running, "reject_job").await;
+
+    let (status, rejected) = running
+        .invoke(
+            "approvals.decide",
+            support::REVIEWER,
+            json!({"approval_id": approval, "decision": "reject"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{rejected}");
+    assert_eq!(
+        run_state(&pg, seeded.tenant, run).await.0,
+        "cancelled",
+        "a rejection cancels the parked run"
+    );
+    let meta: Value = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT meta FROM approval WHERE tenant_id = $1 AND id = $2",
+        approval,
+    )
+    .await;
+    let document =
+        Uuid::parse_str(meta["draft_document_id"].as_str().expect("draft")).expect("uuid");
+    assert_eq!(
+        document_card(&pg, seeded.tenant, document).await,
+        None,
+        "a rejection applies nothing"
+    );
+    assert_eq!(
+        decisions_for_approval(&pg, seeded.tenant, approval).await,
+        0,
+        "a rejection records no ladder decision"
+    );
+}
+
+#[tokio::test]
+async fn a_reclaimed_resume_is_a_no_op() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    let (laya, _hits) = stub_laya(Some(0.1)).await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+    seal_laya_token(&pg, &seeded).await;
+    seed_policy(&pg, &seeded, 0.5, "closed", "handover").await;
+    let (run, _card, approval) = park_handover(&pg, &seeded, &running, "reclaim_job").await;
+    let (status, approved) = running
+        .invoke(
+            "approvals.decide",
+            support::REVIEWER,
+            json!({"approval_id": approval, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{approved}");
+    let job: Value = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT payload FROM job WHERE tenant_id = $1 AND kind = 'run.resume' \
+         AND payload->>'run_id' = $2::text ORDER BY created_at DESC LIMIT 1",
+        run,
+    )
+    .await;
+    let decision_id =
+        Uuid::parse_str(job["decision_id"].as_str().expect("decision")).expect("uuid");
+    for _ in 0..2 {
+        conveyor_actions::executor::resume_run(
+            &pg.runtime,
+            seeded.tenant,
+            APP_KEY,
+            run,
+            approval,
+            decision_id,
+        )
+        .await
+        .expect("a reclaimed resume is a no-op");
+    }
+    let calls: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(calls, 1, "the reclaim did not buy a second model call");
 }
 
 // ── the release grant (P4) ──────────────────────────────────────────────────────────────────
@@ -1099,5 +1421,498 @@ async fn a_grant_op_with_no_binding_refuses_before_a_model_call() {
     assert!(
         models.lock().expect("models").is_empty(),
         "the grant is proved before the model is called"
+    );
+}
+
+/// A router stub that records every request body, so a test can read the compiled prompt.
+async fn stub_router_capturing() -> (String, Arc<Mutex<Vec<Value>>>) {
+    let requests: Arc<Mutex<Vec<Value>>> = Arc::new(Mutex::new(Vec::new()));
+    let state = requests.clone();
+    let app = axum::Router::new().route(
+        "/api/chat/completions",
+        axum::routing::post(move |axum::Json(body): axum::Json<Value>| {
+            let state = state.clone();
+            async move {
+                state.lock().expect("requests").push(body);
+                axum::Json(json!({
+                    "id": "chatcmpl-memory",
+                    "choices": [{
+                        "index": 0,
+                        "message": {"role": "assistant", "content": "the memory draft"},
+                        "finish_reason": "stop"
+                    }],
+                    "usage": {"total_tokens": 7}
+                }))
+            }
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind router stub");
+    let base = format!("http://{}", listener.local_addr().expect("addr"));
+    tokio::spawn(async move {
+        let _ = axum::serve(listener, app).await;
+    });
+    (base, requests)
+}
+
+/// S21 step 6, P2.4: the run's terminal attempt row reaches the next run's compiled prompt.
+///
+/// Without the write-back this is the silent failure ADR 0013 describes: the memory section
+/// renders nothing, and the second run re-derives context the first run already recorded.
+#[tokio::test]
+async fn the_next_run_prompt_reads_the_prior_attempt() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, requests) = stub_router_capturing().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "memory_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release", "title": "Memory job", "charter": "write a draft"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+
+    // First run: it finishes and records its attempt.
+    let first = start_run(&running, &card, binding).await;
+    execute(&pg, &seeded, first).await;
+    let attempts: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM work_package_memory
+          WHERE tenant_id = $1 AND run_id = $2 AND kind = 'attempt'",
+        first,
+    )
+    .await;
+    assert_eq!(attempts, 1, "the terminal run recorded its attempt");
+
+    // Second run on the same card: the compiled prompt carries the prior attempt.
+    let second = start_run(&running, &card, binding).await;
+    execute(&pg, &seeded, second).await;
+
+    let captured = requests.lock().expect("requests");
+    assert_eq!(captured.len(), 2, "one model call per run");
+    let system = captured[1]["messages"][0]["content"]
+        .as_str()
+        .unwrap_or_else(|| panic!("no system message in {}", captured[1]));
+    assert!(
+        system.contains("[attempt/system#"),
+        "the memory section renders the prior attempt: {system}"
+    );
+    assert!(
+        system.contains(&first.to_string()),
+        "the prior run is named in the prompt: {system}"
+    );
+}
+
+/// The live wire (S21 step 6, P3.1): one bound run against the estate's **real** inference-router
+/// and **real** laya bridge, on a fresh local test database.
+///
+/// Ignored because it needs the live endpoints and a real laya token. It refuses to run when they
+/// are unset — a stub agreeing with itself is not this proof.
+///
+/// ```text
+/// CONVEYOR_EXTERNAL_INFERENCE_URL=… CONVEYOR_EXTERNAL_LAYA_URL=… \
+/// CONVEYOR_LIVE_INFERENCE_TOKEN=… CONVEYOR_LIVE_LAYA_TOKEN=… CONVEYOR_LIVE_MODEL=… \
+/// cargo test -p conveyor-actions --test internal_agent_runtime -- --ignored
+/// ```
+#[tokio::test]
+#[ignore = "needs the estate's real inference-router and laya bridge"]
+async fn the_live_run_executes_against_the_real_router_and_laya() {
+    let _guard = STUBS.lock().await;
+    let router = std::env::var("CONVEYOR_EXTERNAL_INFERENCE_URL")
+        .expect("CONVEYOR_EXTERNAL_INFERENCE_URL must point at the real inference-router");
+    let laya = std::env::var("CONVEYOR_EXTERNAL_LAYA_URL")
+        .expect("CONVEYOR_EXTERNAL_LAYA_URL must point at the real laya bridge");
+    let token = std::env::var("CONVEYOR_LIVE_LAYA_TOKEN")
+        .expect("CONVEYOR_LIVE_LAYA_TOKEN must carry the real laya token");
+    let inference_token = std::env::var("CONVEYOR_LIVE_INFERENCE_TOKEN")
+        .expect("CONVEYOR_LIVE_INFERENCE_TOKEN must carry the real inference-router bearer");
+    let model = std::env::var("CONVEYOR_LIVE_MODEL").unwrap_or_else(|_| "router/medium".to_owned());
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+
+    let (pg, seeded, running) = fixture().await;
+    seal_laya_token_with(&pg, &seeded, token.as_bytes()).await;
+    seal_inference_token_with(&pg, &seeded, inference_token.as_bytes()).await;
+    // Threshold 0.0 with `annotate` accepts any score; the proof is that the gate ran and a
+    // decision was recorded, not that the real laya happened to score a particular way.
+    seed_policy(&pg, &seeded, 0.0, "closed", "annotate").await;
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), &model).await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "live_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": model, "title": "Live job",
+               "charter": "write one short paragraph about the conveyor"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let run = start_run(&running, &card, binding).await;
+
+    execute(&pg, &seeded, run).await;
+
+    let status: String = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT status FROM run WHERE tenant_id = $1 AND id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(
+        status, "succeeded",
+        "the live run finished on its draft's gate"
+    );
+    let calls: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(calls, 1, "one real model call");
+    let hash: Option<String> = {
+        let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+            .await
+            .expect("scope");
+        let row: (Option<String>,) = sqlx::query_as(
+            "SELECT prompt_sha256 FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(run)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("inference call");
+        tx.commit().await.expect("commit");
+        row.0
+    };
+    assert!(
+        hash.as_deref().is_some_and(|hash| hash.len() == 64),
+        "the compiled prompt's hash is recorded"
+    );
+    let decisions: i64 = {
+        let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+            .await
+            .expect("scope");
+        let count = sqlx::query_scalar(
+            "SELECT count(*) FROM decision
+              WHERE tenant_id = $1 AND card_id = $2 AND kind = 'gate.precheck'",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(Uuid::parse_str(&card).expect("card id"))
+        .fetch_one(&mut *tx)
+        .await
+        .expect("count the gate decisions");
+        tx.commit().await.expect("commit");
+        count
+    };
+    assert_eq!(decisions, 1, "one real laya gate decision");
+    let drafts: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM document WHERE tenant_id = $1 AND meta->>'run_id' = $2",
+        run,
+    )
+    .await;
+    assert_eq!(drafts, 1, "one draft document");
+    let attempts: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM work_package_memory WHERE tenant_id = $1 AND run_id = $2 AND kind = 'attempt'",
+        run,
+    )
+    .await;
+    assert_eq!(attempts, 1, "the terminal run recorded its attempt");
+}
+
+/// P3.1a — the live **model** leg: the compiled prompt reaches the estate's real inference-router,
+/// the reply becomes a draft, and the terminal run records its attempt. No gate policy is seeded,
+/// so no laya call is made (the gate leg is `the_live_run_executes_against_the_real_router_and_laya`).
+///
+/// Ignored because it needs the real router. It refuses when the URL or model is unset.
+///
+/// ```text
+/// CONVEYOR_EXTERNAL_INFERENCE_URL=http://127.0.0.1:8150 CONVEYOR_LIVE_MODEL=router/medium \
+/// CONVEYOR_LIVE_INFERENCE_TOKEN=… \
+/// cargo test -p conveyor-actions --test internal_agent_runtime -- --ignored the_live_model
+/// ```
+#[tokio::test]
+#[ignore = "needs the estate's real inference-router"]
+async fn the_live_model_executes_the_compiled_prompt() {
+    let _guard = STUBS.lock().await;
+    let router = std::env::var("CONVEYOR_EXTERNAL_INFERENCE_URL")
+        .expect("CONVEYOR_EXTERNAL_INFERENCE_URL must point at the real inference-router");
+    let inference_token = std::env::var("CONVEYOR_LIVE_INFERENCE_TOKEN")
+        .expect("CONVEYOR_LIVE_INFERENCE_TOKEN must carry the real inference-router bearer");
+    let model = std::env::var("CONVEYOR_LIVE_MODEL").unwrap_or_else(|_| "router/medium".to_owned());
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+
+    let (pg, seeded, running) = fixture().await;
+    seal_inference_token_with(&pg, &seeded, inference_token.as_bytes()).await;
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), &model).await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "live_model_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": model, "title": "Live model job",
+               "charter": "write one short sentence about the conveyor"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let run = start_run(&running, &card, binding).await;
+
+    execute(&pg, &seeded, run).await;
+
+    let status: String = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT status FROM run WHERE tenant_id = $1 AND id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(
+        status, "succeeded",
+        "the live model produced an applicable draft"
+    );
+    let (calls, tokens, hash): (i64, i64, Option<String>) = {
+        let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+            .await
+            .expect("scope");
+        let row = sqlx::query_as(
+            "SELECT count(*) OVER (), coalesce(sum(total_tokens) OVER (), 0)::bigint,
+                    max(prompt_sha256) OVER ()
+               FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(run)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("inference call");
+        tx.commit().await.expect("commit");
+        row
+    };
+    assert_eq!(calls, 1, "one real model call");
+    assert!(tokens > 0, "the router reported usage");
+    assert!(
+        hash.as_deref().is_some_and(|hash| hash.len() == 64),
+        "the compiled prompt's hash is recorded"
+    );
+    let drafts: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM document WHERE tenant_id = $1 AND meta->>'run_id' = $2",
+        run,
+    )
+    .await;
+    assert_eq!(drafts, 1, "one draft document");
+    let attempts: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM work_package_memory WHERE tenant_id = $1 AND run_id = $2 AND kind = 'attempt'",
+        run,
+    )
+    .await;
+    assert_eq!(attempts, 1, "the terminal run recorded its attempt");
+}
+
+/// A laya stub answering one accepted score and recording every request body.
+async fn stub_laya_recording() -> (String, Arc<Mutex<Vec<Value>>>) {
+    let bodies: Arc<Mutex<Vec<Value>>> = Arc::new(Mutex::new(Vec::new()));
+    let state = bodies.clone();
+    let app = axum::Router::new().route(
+        "/v1/systemone",
+        axum::routing::post(move |axum::Json(body): axum::Json<Value>| {
+            let state = state.clone();
+            async move {
+                state.lock().expect("laya bodies").push(body);
+                axum::Json(json!({
+                    "answers": {"accept": {"score": 0.9, "reason": "the request is met"}}
+                }))
+            }
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind laya stub");
+    let base = format!("http://{}", listener.local_addr().expect("addr"));
+    tokio::spawn(async move {
+        let _ = axum::serve(listener, app).await;
+    });
+    (base, bodies)
+}
+
+/// The run-level prompt's Request is the release definition, never the executor envelope
+/// (S21 step 8, ADR 0016). The recompile equals the call the ledger recorded.
+#[tokio::test]
+async fn the_release_request_renders_and_the_envelope_does_not() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "request_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release", "job_key": "request_job",
+               "title": "Draft job", "charter": "write a draft"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let run = start_run(&running, &card, binding).await;
+
+    execute(&pg, &seeded, run).await;
+
+    let (step_id, ledger_hash): (Uuid, Option<String>) = {
+        let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+            .await
+            .expect("scope");
+        let step_id: Uuid = sqlx::query_scalar(
+            "SELECT id FROM run_step
+              WHERE tenant_id = $1 AND run_id = $2 AND position = 1 AND attempt = 1",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(run)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("run step");
+        let hash: Option<String> = sqlx::query_scalar(
+            "SELECT prompt_sha256 FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(run)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("inference call");
+        tx.commit().await.expect("commit");
+        (step_id, hash)
+    };
+    // The run's terminal transition wrote this run's attempt memory row (S21 step 6), so a
+    // post-run recompile would read it and legitimately differ. Reconstruct the pre-run facts:
+    // assert the row existed, then clear the card's post-run memory. What remains is exactly the
+    // facts the executor compiled — the same technique as the process-agent test.
+    let attempts: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM work_package_memory WHERE tenant_id = $1 AND run_id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(attempts, 1, "the terminal run recorded its attempt");
+    sqlx::query("DELETE FROM work_package_memory WHERE tenant_id = $1 AND card_id = $2")
+        .bind(seeded.tenant.as_uuid())
+        .bind(Uuid::parse_str(&card).expect("card id"))
+        .execute(&pg.super_pool)
+        .await
+        .expect("clear the post-run memory");
+    // Compile with the SAME pins the executor used: the binding's release anatomy, not the live
+    // capability row (the release's model and caps win over the row).
+    let anatomy = {
+        let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+            .await
+            .expect("scope");
+        let snapshot: Value = sqlx::query_scalar(
+            "SELECT release_snapshot FROM job_binding WHERE tenant_id = $1 AND id = $2",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(binding)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("the binding's snapshot");
+        tx.commit().await.expect("commit");
+        conveyor_domain::organisation::parse_release_anatomy(&snapshot)
+            .expect("the release anatomy")
+    };
+    let compiled = conveyor_actions::prompt::compile_for_run_with_pins(
+        &pg.runtime,
+        seeded.tenant,
+        run,
+        Some(step_id),
+        "agent@1",
+        Some(&anatomy),
+    )
+    .await
+    .expect("recompile");
+    assert_eq!(
+        compiled.sha256.as_str(),
+        ledger_hash.as_deref().expect("the ledger's hash"),
+        "the recompile is the call the ledger recorded"
+    );
+    assert!(
+        compiled.text.contains("title: Draft job"),
+        "the release's title is the request: {}",
+        compiled.text
+    );
+    assert!(
+        compiled.text.contains("description: write a draft"),
+        "the release's charter is the request: {}",
+        compiled.text
+    );
+    for absent in ["job_binding_id", "release_hash", "budget_usd"] {
+        assert!(
+            !compiled.text.contains(absent),
+            "the executor envelope's {absent} must never render: {}",
+            compiled.text
+        );
+    }
+}
+
+/// The run-level judge sees the release Request the prompt rendered (S21 step 8, CONTRACT §26).
+#[tokio::test]
+async fn the_judge_state_carries_the_release_request() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    let (laya, laya_bodies) = stub_laya_recording().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+    seal_laya_token(&pg, &seeded).await;
+    seed_policy(&pg, &seeded, 0.5, "closed", "annotate").await;
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "gated_request_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release", "job_key": "gated_request_job",
+               "title": "Gated request job", "charter": "write the gated draft"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let run = start_run(&running, &card, binding).await;
+
+    execute(&pg, &seeded, run).await;
+
+    let sent = laya_bodies.lock().expect("laya bodies").clone();
+    assert_eq!(sent.len(), 1, "one laya call: {sent:?}");
+    let state = sent[0]["state"].as_str().expect("the laya state");
+    assert!(
+        state.contains("\"job_key\":\"gated_request_job\""),
+        "the judge sees the job: {state}"
+    );
+    assert!(
+        state.contains("\"title\":\"Gated request job\""),
+        "the judge sees the title: {state}"
+    );
+    assert!(
+        state.contains("\"charter\":\"write the gated draft\""),
+        "the judge sees the charter: {state}"
     );
 }

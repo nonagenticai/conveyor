@@ -223,6 +223,28 @@
       }
     },
     {
+      "code": "benchmark",
+      "label": "Benchmark",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [
+          "instance_id",
+          "base_commit"
+        ],
+        "outputs": [
+          "patch"
+        ],
+        "acceptance": [
+          "READY: instance_id_and_base_commit_pinned",
+          "DOING: patch_is_one_unified_diff_against_the_base_commit",
+          "DONE: patch_collected"
+        ],
+        "human_task": false
+      }
+    },
+    {
       "code": "bug_analysis",
       "label": "Bug analysis",
       "definition": {
@@ -1856,6 +1878,47 @@
           "QA: resolution_cites_its_evidence"
         ],
         "human_task": false
+      }
+    },
+    {
+      "code": "meeting",
+      "label": "Meeting",
+      "definition": {
+        "rules": [],
+        "inputs": [],
+        "outputs": [
+          "meeting_id",
+          "minutes_asset_id"
+        ],
+        "acceptance": [
+          "READY: agenda_has_evidence",
+          "DOING: positions_recorded_per_seat",
+          "QA: every_agenda_item_closed_with_an_outcome",
+          "DONE: minutes_published"
+        ],
+        "human_task": true,
+        "definition_of_done": "agenda_closed_and_minutes_published"
+      }
+    },
+    {
+      "code": "meeting_action",
+      "label": "Meeting action",
+      "definition": {
+        "rules": [],
+        "inputs": [
+          "meeting_id",
+          "agenda_item_id"
+        ],
+        "outputs": [
+          "card_id"
+        ],
+        "acceptance": [
+          "READY: owner_and_due_named",
+          "QA: closed_with_evidence",
+          "DONE: card_closed"
+        ],
+        "human_task": true,
+        "definition_of_done": "card_closed"
       }
     }
   ],

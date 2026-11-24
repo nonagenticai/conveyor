@@ -490,10 +490,13 @@ kind (`mcp` for the agent's licence principal), never a hard-coded name list.
   `409 capability_not_ready` with `blocking[]`, **before** the first step. `knowledge_degraded` remains the mid-run
   equivalent for a pack that disappears after start. `capabilities.get` returns the same `{ready, blocking[]}`
   projection.
-- **One memory writer.** `memory.remember` is the only **action** that writes `work_package_memory`; the
-  `memory.consolidate` job may append one `kind='digest'` row and stamp `consolidated_at`, and nothing else. A copilot
-  turn or an `agent.run` step records what it learned through `memory.remember`, never by SQL. Hot rows are the
-  record; the digest is derived.
+- **One memory writer, with one sanctioned runtime exception.** `memory.remember` is the only **action** that
+  writes `work_package_memory`; the `memory.consolidate` job may append one `kind='digest'` row and stamp
+  `consolidated_at`; and the run's terminal transition may append one `kind='attempt'`, `source='system'` row for a
+  terminal root run of a card (the runtime's record of the attempt, written through
+  `store::memory::insert_memory_tx` in the same transaction — S21 step 6, CONTRACT §24). Nothing else writes SQL. A
+  copilot turn or an `agent.run` step records what it learned through `memory.remember`, never by SQL. Hot rows are
+  the record; the digest is derived.
 - **The copilot is not a work executor.** S10's turn runner is an interactive, user-scoped loop over the same action
   surface. It uses the tenant default model via `completions.create`, records model/tool calls on
   `conversation_turn.meta`, and needs no `capability_agent`. A card-scoped turn may read the card's capability for
@@ -809,18 +812,18 @@ process, so the release's `job_key`, title, charter, `procedure_ref` and authori
 Request source in the existing `process` section; a missing required section refuses
 `capability_not_ready` naming it, before the call. The generation output is an unattached
 `document` with `meta.generated = true`; `documents.update` refuses to re-attach it and
-`ladder.apply_draft` with an accepted decision is the only apply path. Generation never moves a
-card.
+`ladder.apply_draft` with an accepted decision bound to that draft (§23) is the only apply path.
+Generation never moves a card.
 
 **The gate.** The effective kind-wide `gate.precheck` policy is the one question set. No policy →
 no laya call, `run_step.judge = no_policy`, the run succeeds with the draft. A policy → one
 `laya.judge` with the draft as `state` and the policy's authored question/criteria, then one
 `decision` row through `ladder.evaluate` pinning the option-set, policy, refinement and laya-config
 versions, the answer, confidence, latency and input hash. `accepted` → succeed; `refused` →
-`laya_refused`; below threshold per the policy's action (`block`, `annotate`, `handover` →
-`gate_requires_approval` plus a card-scoped approval). An outage follows `fail_policy` through
-`ladder::unavailable` and never records a counterfactual decision; unavailable is never a pass on a
-closed gate.
+`laya_refused`; below threshold per the policy's action (`block`, `annotate`, `handover` → the run
+parks `waiting_approval` and a card-scoped `executor` approval naming the draft is opened, §23). An
+outage follows `fail_policy` through `ladder::unavailable` and never records a counterfactual
+decision; unavailable is never a pass on a closed gate.
 
 **The grant.** The release's `anatomy.grants` is the typed operation allowlist
 `{op, variant, max_side_effect, enabled}`, parsed and refused `422 release.anatomy_invalid` at
@@ -835,3 +838,261 @@ has no op column and cannot widen the grant; the release carries no tool content
 prefix (`turn{N}`, `tool{N}`, `draft`, `judge`, `decision`); every typed refusal is recorded on the
 run and finishes the job. A failure emits one `run.failed` and enqueues the existing `err.card`
 trigger; a success emits one `run.succeeded`.
+
+## 23. The applying gate (added 2026-11-22; S21 step 5, issue #590)
+
+**A handover parks, it does not fail.** The `gate.precheck` handover opens its `executor` approval
+in the same transaction that finishes the step: the run moves `running → waiting_approval` through
+`store::approval::open_gate_with_meta_tx`, the step is `succeeded` with the draft output and its
+judge, and the draft stays unattached. The approval inherits the run's `card_id` and `project_id`
+and carries `meta = {run_id, gate, draft_document_id, prompt_sha256, position, attempt, threshold,
+policy_id, laya_config_id}`. A retried `run.execute` is a no-op: the run has left `queued`.
+
+**An `executor` gate is a person's act.** The one approval writer (`record_decision_tx`) refuses a
+non-human `decided_by_kind` for `approval.kind = 'executor'`, exactly as it does for an eval gate.
+On approval it records one ladder decision in the same transaction: `rung=human`,
+`kind=gate.draft_apply`, `answer="approved"`, `outcome=accepted`, `approval_id`, the run's
+`card_id`, and `meta` naming the same draft. The decision and the `approval_decision` commit
+together or not at all.
+
+**The apply gate.** `ladder.record` refuses `rung=human` unless the actor is a person
+(`actor_kind = "user"`) and, when an approval is cited, that approval is `approved` and has an
+approve `approval_decision`. `ladder.apply_draft` accepts only a generated draft, an accepted
+non-rule decision of `gate.precheck` (L1) or `gate.draft_apply` (L3), and a decision whose `meta`
+names this exact draft (`draft_document_id`; `prompt_sha256` and `run_id` must match when the
+document carries them). A generic accepted decision on the card is refused
+`422 draft_requires_gate`. `documents.update` remains closed to generated drafts, so there is no
+second path.
+
+**The resume.** Approval settles `waiting_approval → running` and enqueues the `run.resume` job
+(`{run_id, approval_id, decision_id}`, dedupe `run.resume:{run_id}:{approval_id}`). The worker calls
+the same `apply_draft_tx` the action uses, attaches the draft to the run's card, finishes the run
+`succeeded`, and emits one `run.succeeded`. It never calls the model: the step already holds the
+draft, the inference call and the hash. A terminal run or a non-approved approval is a quiet no-op;
+inconsistent stored state finishes the run `failed` with `draft_apply_invalid`. A rejection cancels
+the run through the generic approval path; expiry cancels a still-`waiting_approval` run with
+`approval_expired`. Neither records a ladder decision.
+
+## 24. The work package's run (added 2026-11-22; S21 step 6, issue #599; implements SPEC_V2 §4.4, §5.1, §6.6.4, §7.6)
+
+**The card names its binding.** `card.job_binding_id` (the column from `0040_organisation`) is the
+work package's assignment. `cards.create` and `cards.update` accept it: the id must resolve in the
+caller's tenant and be `active`, or the write is refused `422 job_binding_unusable`. `CardOut` and
+every card read expose it. `cards.duplicate` does not copy it — an assignment is not content.
+
+**A run inherits the card's binding.** `runs.create` uses the request's `job_binding_id` when it is
+present; when it is absent and the card names one, the card's binding is used. A request naming a
+different binding than the card's is refused `422 card_binding_mismatch` before the INSERT. A card
+with no binding keeps the plain-run path, and `projects.execute` (card-less) is untouched. The
+retired-binding and stale-pin checks stay in `insert_run_tx`, the one writer — inheritance adds no
+second check path.
+
+**The terminal root run records its memory.** When a run reaches a terminal state and is
+card-scoped and a root (`parent_run_id IS NULL`), the terminal transition inserts exactly one
+`work_package_memory` row in the same transaction: `kind='attempt'`, `source='system'`, `run_id`
+set, the body naming the attempt and its outcome, and `meta` carrying the status and error class.
+The existing `memory.consolidate` job is then enqueued per card, so the digest is built from real
+hot rows. A child run and a card-less run write none: a child shares its parent's card and is part
+of the parent's attempt, and a card-less run has no work package. This is the sanctioned runtime
+writer named in §17; `memory.remember` remains the one **action** that writes memory.
+
+**What a card's run reads back.** The prompt's memory source selects the card's newest
+un-consolidated hot rows, so the next run's compiled prompt contains the prior attempt
+(`[attempt/system#<id>] …`) until consolidation stamps it. The compiled text is never stored; the
+row ids are part of the prompt hash, and the digest is derived, never the record.
+
+**Every terminal path records it.** A process run (`process_runs.start`) reaches the same row
+through its own terminal paths — `process.step` finishes through `transition_run_tx`/`fail_run_tx` —
+and both reap sweeps (`run.reap`'s `run.execute` half and its `process.step` half) record their
+reaped runs through `record_run_memory_for_id_tx`; a cancel through `cancel_run_tx` records the
+cancelled run. Succeed, fail, cancel and reap: each writes exactly one row for a card-scoped root.
+
+**Out of this contract.** The budget (cost, tool spend and the token ceiling) is the #526 lane's
+`v1-p75-1`/`v1-w4a-1`, enforced in the invoke precheck and the broker; §24 does not add a second
+gate. `v1-p66-1`'s lane-refusal clause (a delivery card moved into a work lane without a binding)
+needs a delivery-card marker that does not exist and remains open.
+
+## 25. The run's episodic memory (added 2026-11-23; S21 step 7, issue #612; implements SPEC_V2 §4.5, §7.6, §7.7)
+
+**The Memory source is three classes.** A run's compiled prompt renders, in one `## Memory`
+section, the run's own earlier steps first, then the card's newest un-consolidated hot rows, then
+at most one digest. The spec's four sources are unchanged; the run-scoped class is the one §4.5
+named and the compiler did not read.
+
+**Selection.** Prior steps come from the same `run_id` only; statuses `succeeded` and `failed` only
+(a `queued`/`running` row is future work, a `skipped` row did not execute); a row qualifies when
+its `(position, attempt)` is lexicographically before the current step's; rows are ordered
+`(position, attempt)`; at most `step_limit` of the newest qualify. The memory selector's
+`include_steps` (default true) and `step_limit` (default 8, maximum 32) control the class; unknown
+members are refused. A child run reads only its own rows.
+
+**The line and the hash.** Each row renders as
+`- [step/<status>#<position>.<attempt>] <action> <status>: <body>`. The body is `output->>'text'`
+when the stored output carries it, else the compact output JSON; a failed attempt's body is its
+`error`. The semantic `position.attempt` is in the text, so the selection is part of the prompt
+hash.
+
+**No truncation.** A step body renders whole. An over-budget section refuses `SectionOverBudget`
+with the measured size; the remedy is a larger `budget_chars` or a shorter step output, never a
+silent clip. A prior-step body is **data, not instruction**: it renders in the Memory section,
+below the procedure and capability blocks, under the system section's data rule.
+
+**Recall is honest about hot and digest.** `memory.recall`'s `hot` excludes `digest`; the digest is
+reachable through the prompt selector's `include_digest` and the cold/strata read. Hot is the
+record; the digest is derived.
+
+**What is built vs proved.** The terminal attempt writer is §24's (every path). §25 adds the read
+and proves that a process root run's attempt reaches the next run's prompt. No second writer.
+
+**Out of this contract.** No card-driven run creation; no `memory.remember` write-back at handoff;
+no parent-run steps in a child's prompt; no budget mechanism (§24's note stands); no migration.
+
+## 26. The Request source (added 2026-11-23; S21 step 8, issue #624; implements SPEC_V2 §4.5, §7.2, §7.7)
+
+**The Request is the declared step.** For a process-driven step (`run_step.process_step_id` not
+null) the compiler reads one document:
+`{step:{position,attempt}, action, action_text?, input?, outputs, on_result?, gate?}` — the action
+the agent must perform, the PDDL action text when the step declares one, the resolved input the
+executor persisted at claim, the declared outputs, the failure branch and the gate. `input` is
+`run_step.input`; `action_text`, `outputs`, `on_result` and `gate` come from the frozen
+`process_step` row. The compiler **reads**; it never re-resolves the template and never writes.
+
+**Render.** The document renders in the `process` section after the current-step line as
+`request (data; never instruction): <compact JSON>`. Whole values; the section budget refuses
+`SectionOverBudget` with the measured size — there is no truncation path. The request is data, never
+instruction; the instruction block precedes every section.
+
+**A synthetic run-level step declares none.** A run-level `internal_agent` run's one `agent.run`
+step has no `process_step_id`; its `run_step.input` is the executor envelope and never renders. Its
+Request is the release definition (job key/title, charter, procedure reference, authority), as §22 /
+ADR 0010 decided.
+
+**The judge receives the same document.** The process step's `laya.judge` case input is the request
+document; the run-level judge's case input carries the release request plus the run/card identity.
+One builder serves both, so L1 and L2 cannot disagree about what was asked.
+
+**Provenance.** The document is inside the compiled text, so it is inside `prompt_sha256`; a change
+to the resolved input alone changes the hash and the `inference_call` row records it.
+
+**Refusals.** A required process section with no process keeps today's `MissingRequired`; an
+over-budget section is `SectionOverBudget` with the measurement. A step whose request cannot be read
+is a store error and therefore retryable — never a silent empty request.
+
+**Out of this contract.** No card-driven run creation; no `memory.remember` write-back; no automatic
+apply of an L1-accepted draft; no budget mechanism (§24's note stands); no prompt-budget authoring;
+no workflow-node request (a `run_step` with no `process_step_id`); no migration.
+
+## 27. The card handoff (added 2026-11-24; S21 step 9, issue #649; implements SPEC_V2 §6.6.1–6.6.5, §4.4, §5.1)
+
+**A handoff is one action.** `cards.assign` takes `{card_id, job_binding_id?, note, kind?, meta?,
+correlation_id?}` and does three things in one transaction: it names the card's job binding, records
+what the receiver must know as memory, and starts the bound run. It is not a lane move and not a
+claim; a bare `cards.move` starts nothing.
+
+**The binding.** The target is the request's `job_binding_id` when present, else the card's; with
+neither, the handoff is refused `422 card_unassigned`. The id must resolve in the caller's tenant
+and be `active` (`422 job_binding_unusable`) — the same check `cards.update` applies. The write sets
+`card.job_binding_id` and emits `card.updated`.
+
+**The note.** One hot `work_package_memory` row: `kind` defaults to `fact`, `source` comes from the
+actor kind (`agent | human | system`), the body is the trimmed note under the existing memory-body
+rules, `run_id` is the started run, and `meta` is free detail. It is written through the same
+`remember_tx` body `memory.remember` uses, in the handoff's transaction, and emits
+`memory.recorded`. The next compiled prompt therefore renders it in the Memory section with its row
+id inside `prompt_sha256` (§25).
+
+**The run.** The bound run starts through the one run-creation path `runs.create` uses: the card
+resolves first (a foreign id is a 404), the tenant's andon is consulted (`409 andon-engaged`), the
+attempt number continues the card's history, `insert_run_tx` applies the binding's pin (a retired
+binding or a stale pin is `409` before the INSERT), the `run.execute` job is enqueued and
+`run.created` is emitted. No `release_hash` is accepted: the binding is the pin. The executor kind
+is the binding's.
+
+**One live run.** A card has at most one live root run (`uq_run_live`: `queued | running |
+waiting_approval`, `parent_run_id IS NULL`). The handoff reads the live run first and refuses `409
+card_has_live_run` naming it, before any write; the unique index is the race backstop and its
+violation is a typed 409, never a 500. A re-handoff after a terminal run is the next attempt.
+
+**Refusal order.** 404 foreign card → 409 archived → 412 a stale card (the handoff presents the
+card's version, If-Match or `_version`, like `cards.update` and `cards.move`) → the binding (`422
+card_unassigned` / `422 job_binding_unusable`) → 409 `card_has_live_run` → 422 `invalid_input` (the
+note) → 409 `andon-engaged`. Every refusal precedes the first write; a store error anywhere rolls the
+whole handoff back.
+
+**Scopes.** `cards:write` **and** `runs:write`: the action both edits the card's assignment and
+starts compute, and the registry requires every declared scope. It is agent-reachable — SPEC_V2
+§6.6.1 makes a handoff the sanctioned way a job asks another job for work — and the release grant
+still bounds an executor's surface.
+
+**Out of this contract.** No auto-start on a bare move or a claim; no claim/renew/release verb; no
+automatic apply of an L1-accepted draft; no budget mechanism (§24's note stands); no handoff of a
+project-level (card-less) run; no parent-run memory; no new event kind; no migration.
+`cards.update`'s `job_binding_id` remains a plain edit: it never starts a run, writes no memory, and
+is not live-run guarded (ADR 0017 decision 7).
+## 28. The L1 laya evaluation (added 2026-11-24; S21 step 10, issue #656; implements SPEC_V2 §7.2, §7.3, §4.5)
+
+**The ladder owns the case.** A laya case is `{model, state, questions}` (SPEC_V2 §7.2). The ladder
+builds all three: `model` from the tenant's `laya_inference_config`, `state` from the caller's
+declared facts, and each `questions.<qid>` as `{type, instructions, criteria}` from the effective
+`decision_policy` and the authored option set. `ladder.case` returns the exact
+`{case, case_hash, laya_call_key}` a caller must post; in-process callers use the same builder.
+A caller supplies facts, never a verdict: `ladder.evaluate` has no `answer`, `confidence`,
+`probabilities`, `latency_ms` or `options`, and a request carrying one is `422
+caller_supplied_verdict`.
+
+**The engine makes the call.** `ladder.precheck` is an external action — `POST /v1/systemone`,
+service `laya`, bearer from the sealed `laya.token`, `governance:write`, tenant-scoped, effect
+`read`, `captures_usage` off. It runs outside any transaction: a handler holds one, and no
+transaction here spans an HTTP request. `laya.judge` stays the SOP step judge (CONTRACT §21); the
+two actions ask different questions and answer to different callers.
+
+**Only a verified exchange becomes a decision.** `ladder.evaluate` takes `{kind, gate, project_id?,
+card_id?, question?, output, criteria, facts?, call_key, meta?}` and rebuilds the case from the same
+facts. It
+records a decision only when the engine's record of the call proves all of:
+
+- `idempotency_key` for `(tenant, scope='ladder.precheck', key)` exists, its `request_hash` equals
+  `store::idempotency::request_hash(case)` (a key naming another body is `422
+  laya_call_unverified`), and its stored `status_code` is 2xx;
+- `action_invocation` names the call (`store::actions::find_invocation_by_key`) with `outcome='ok'`.
+
+The answer, confidence and probabilities are parsed from the stored response; latency is the
+invocation's measured `duration_ms`. The decision records `meta.laya_call_key`,
+`meta.laya_invocation_id`, `meta.case_sha256` and the option-set version, so §7.2's "a decision is
+reproducible from the row" holds. A missing, in-flight, expired or mismatched key is `422
+laya_call_unverified` and writes nothing.
+
+**Options are authored, versioned rows.** One live option set per `(tenant, kind, gate)`, versioned;
+each row carries `key`, `label`, `payload` and `payload.outcome ∈ accepted | refused | escalated`.
+`decision_option_sets.set` authors a set (the one row's version increments and its children are
+replaced in the same transaction); `decision_option_sets.get` reads it. A policy declares
+`meta.question_type = "choice"` (absent means the SOP judge's `score`); a `choice` question's
+criteria are the authored keys and its instructions list `key — label`. An answer outside the set is
+`422 laya_answer_not_in_options`; a declared choice with no authored set is `409 option_set_missing`.
+Inline options are `422 invalid_input`. `decision_option` remains the per-decision record and is
+written from the authored rows.
+
+**`Unavailable` follows the fail policy.** An outage — the service unreachable, the call never
+completed — leaves no recorded exchange, so `ladder.evaluate` writes no decision and the caller (the
+executor) applies `domain::ladder::unavailable(fail_policy, action)`: `closed` refuses; `open` applies
+the policy's action (`handover` escalates, `block` refuses, `annotate` proceeds with the note). A
+*recorded* call that completed without a readable answer is the one case the action records: the
+decision is `unavailable` with `meta.gate_unavailable = true`, following the same policy. It is never
+a pass and never a silent refusal — the mapping is `domain::ladder::unavailable`, the same function
+every caller reads.
+
+**`fire_when` decides whether the case is asked.** A policy's nullable `fire_when` is evaluated when
+the case resolves; when it does not hold, no request is made, no decision is written, and the step
+proceeds. The expression is structured (`all_of` / `any_of` over `{kind, gate, field}` predicates),
+where `field` names a member of the case's fact document `{output, criteria, facts}` that must be
+present and non-null; an unparseable policy is refused at authoring time (`422
+invalid_fire_when`), not at evaluation.
+
+**The executor is a client of this path.** `internal_agent`'s `gate.precheck` builds the case with
+the shared builder, invokes `ladder.precheck`, then `ladder.evaluate` with the returned key. It
+makes exactly one laya request per gate and consumes the decision's outcome; it no longer parses a
+verdict nor re-derives the fail policy.
+
+**Refusal order.** `422 caller_supplied_verdict` (a verdict in the request) → `409
+option_set_missing` → `422 laya_call_unverified` → `422 laya_answer_not_in_options`. Every refusal
+precedes the decision write.

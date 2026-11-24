@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data Entity / Data Component Catalog — S02 Skeleton (retrospective, 2026-11-21) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Data Entity / Data Component Catalog — S02 Skeleton (retrospective, 2026-11-21)</li>
+<li>Phase: c</li>
+<li>Kind: catalog</li>
+<li>Purpose: Catalogue the eleven S02 platform tables with their keys and tenancy treatment, so later migrations extend the model without reopening it.</li>
+<li>Scope: migrations/0001_platform.sql as delivered by S02; recorded retrospectively on 2026-11-21.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>tenant / no RLS — root aggregate</strong> - {"key": "id uuid PK (uuidv7); slug unique", "notes": "status active|suspended|closed; settings jsonb; the only table with no tenant_id"}</li>
+<li><strong>app_user / no RLS — global principal</strong> - {"key": "id uuid PK; oidc_subject unique where not null", "notes": "kind human|agent|service; reached per tenant through membership"}</li>
+<li><strong>department / FORCE RLS — tenant_isolation</strong> - {"key": "unique (tenant_id, name); parent_not_self", "notes": "parent_id FK to department; ordered departments per tenant"}</li>
+<li><strong>membership / FORCE RLS + membership_self_read</strong> - {"key": "unique (tenant_id, user_id)", "notes": "role owner|admin|member|viewer; the one role store per tenant; the SELECT-only self-read policy lets login resolve the pair"}</li>
+<li><strong>event / FORCE RLS — tenant_isolation</strong> - {"key": "seq bigserial PK; id unique", "notes": "topic/type/aggregate_type/aggregate_id/payload; indexes (tenant_id, seq), (topic, seq), (aggregate_type, aggregate_id, seq); the SSE and outbox source"}</li>
+<li><strong>job / FORCE RLS — tenant_isolation</strong> - {"key": "live dedupe unique (tenant_id, kind, dedupe_key) where status is pending|running", "notes": "status pending|running|succeeded|failed|dead; lease_until/lease_token pair CHECK; attempts/max_attempts"}</li>
+<li><strong>schedule / FORCE RLS — tenant_isolation</strong> - {"key": "unique (tenant_id, kind); next_run_at where enabled", "notes": "cron, timezone UTC, payload, last_run_at; materialised under the advisory lock"}</li>
+<li><strong>audit_event / FORCE RLS — append-only by GRANT</strong> - {"key": "id uuid PK; indexes (tenant_id, created_at desc) and (tenant_id, resource_type, resource_id, created_at desc)", "notes": "action regex; status ok|refused|error; details &lt;= 8192 bytes"}</li>
+<li><strong>action_invocation / FORCE RLS — tenant_isolation</strong> - {"key": "id uuid PK; indexes (tenant_id, action, created_at desc) and (tenant_id, trace_id)", "notes": "outcome ok|refused|error|timeout; input_hash; duration_ms"}</li>
+<li><strong>idempotency_key / FORCE RLS — tenant_isolation</strong> - {"key": "PRIMARY KEY (tenant_id, scope, key)", "notes": "request_hash, status_code, response jsonb, expires_at"}</li>
+<li><strong>app_licence / FORCE RLS — tenant_isolation</strong> - {"key": "PRIMARY KEY (tenant_id, app_key)", "notes": "app_key default conveyor; status active|expired|revoked|unknown; checked_at, expires_at, raw"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -18,8 +18,9 @@
 //!   and refuses `422 test_transcript_in_round` if any belongs to a `test`-split case.
 //! - **One round is one hypothesis.** The prediction must name the climb's target metric; a round
 //!   that predicts two things is stacking.
-//! - **Spend is summed, never stored.** `get` prices the result rows at read time; the ceiling is
-//!   checked against that sum, so it cannot drift from what it counts.
+//! - **Spend is summed, never stored.** `get` prices each round's inference ledger at read time
+//!   (subject, judge and billed failures alike); the ceiling is checked against that sum, so it
+//!   cannot drift from what it counts.
 
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
@@ -43,6 +44,7 @@ use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 use crate::views::Page;
 
+use super::cost::{ledger_spend_tx, price_usage, price_usage_available, tokens_of};
 use super::run_core::{RunRequest, all_results, start_or_resume_run_tx};
 use super::{EVAL_CLIMB_CHANGED, EVAL_CLIMB_ROUND_COMPLETED, emit, eval_error, not_ready};
 
@@ -215,8 +217,8 @@ pub struct ClimbView {
     pub best_test_score: Option<f64>,
     /// `planned | running | plateaued | stopped`.
     pub status: String,
-    /// Cumulative spend, summed from the result rows at read time. `null` on `list`, which does
-    /// not read them.
+    /// Cumulative spend, summed from the rounds' inference ledger at read time. `null` on
+    /// `list`, which does not read them.
     pub spend_cents: Option<f64>,
     /// `cents` when the version prices its tokens, `tokens` when it does not.
     pub spend_unit: String,
@@ -342,57 +344,14 @@ fn as_decimal(value: f64) -> Result<Decimal, ActionError> {
     })
 }
 
-// ── pricing ─────────────────────────────────────────────────────────────────────────────
-
-/// Price one result's `usage` against the version's `prices`, in cents.
-///
-/// `prices` is the version's free-form jsonb; the two keys this understands are `input` and
-/// `output`, US dollars per million tokens (the shape `eval_version.prices` carries in the
-/// domain's own tests). Anything else — no prices, a missing rate, a usage object that names no
-/// token counts — returns `None`, and the climb then reports **tokens** instead of cents rather
-/// than inventing a rate.
-pub(crate) fn price_usage(usage: &Value, prices: &Value) -> Option<f64> {
-    let input_rate = prices.get("input").and_then(Value::as_f64)?;
-    let output_rate = prices.get("output").and_then(Value::as_f64)?;
-    let input = usage
-        .get("prompt_tokens")
-        .or_else(|| usage.get("input_tokens"))
-        .and_then(Value::as_f64)?;
-    let output = usage
-        .get("completion_tokens")
-        .or_else(|| usage.get("output_tokens"))
-        .and_then(Value::as_f64)
-        .unwrap_or(0.0);
-    // Cents: (tokens / 1e6) dollars * 100.
-    Some((input * input_rate + output * output_rate) / 10_000.0)
-}
-
-/// The unpriced fallback: how many tokens a result cost.
-pub(crate) fn tokens_of(usage: &Value) -> f64 {
-    usage
-        .get("total_tokens")
-        .and_then(Value::as_f64)
-        .unwrap_or_else(|| {
-            let input = usage
-                .get("prompt_tokens")
-                .or_else(|| usage.get("input_tokens"))
-                .and_then(Value::as_f64)
-                .unwrap_or(0.0);
-            let output = usage
-                .get("completion_tokens")
-                .or_else(|| usage.get("output_tokens"))
-                .and_then(Value::as_f64)
-                .unwrap_or(0.0);
-            input + output
-        })
-}
-
 // ── reading a run ───────────────────────────────────────────────────────────────────────
 
-/// One run's numbers, computed in Rust from its result rows (never a SQL aggregate).
+/// One run's numbers: its quality means computed in Rust from its result rows (never a SQL
+/// aggregate), and its spend summed from the same inference ledger the report reads.
 struct RunNumbers {
     outcome: RoundOutcome,
-    /// Cumulative spend for this run, in the unit [`Pricing::unit`] names.
+    /// Cumulative spend for this run, in the unit [`Pricing::unit`] names, including the judge's
+    /// calls and billed failed attempts.
     spend: f64,
     /// How many rows were left out of every mean (not `ok`, or ungraded).
     excluded: usize,
@@ -431,7 +390,8 @@ async fn run_numbers(
             "cents" => price_usage(&row.usage, &pricing.prices).unwrap_or_default(),
             _ => tokens_of(&row.usage),
         };
-        // A result counts towards *something* even when ungraded: its spend is real money.
+        // A non-`ok` row is not scorable. Any spend it incurred is still priced, from the
+        // ledger below — which is why this only excludes it from the means.
         if row.status != "ok" {
             excluded += 1;
             continue;
@@ -483,13 +443,23 @@ async fn run_numbers(
             }
         })
         .collect();
-    let spend = rows
-        .iter()
-        .map(|row| match pricing.unit {
-            "cents" => price_usage(&row.usage, &pricing.prices).unwrap_or_default(),
-            _ => tokens_of(&row.usage),
-        })
-        .sum();
+    // ⛔ Spend is **not** summed from these rows. The rows carry the subject's copied `usage`
+    // only, so they omit the judge's calls and every billed failed attempt; the ledger carries
+    // all three. Both this and the report read the same rows through the same model, and a
+    // regrade's rows stay empty of subject tokens (they were billed on the source run), so no
+    // call is charged twice.
+    let spend = ledger_spend_tx(
+        &mut *tx,
+        tenant,
+        run_id,
+        &pricing.prices,
+        pricing.unit == "cents",
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "read the run's inference ledger");
+        ActionError::internal()
+    })?;
 
     Ok(RunNumbers {
         outcome: RoundOutcome {
@@ -572,6 +542,9 @@ struct Settled {
     round: i32,
     run_id: Uuid,
     outcome: RoundOutcome,
+    /// The round's spend, summed from its inference ledger — the same sum the climb's total and
+    /// the report are built from. The narrative states this, never a score column.
+    spend: f64,
     /// The held-out mean of the run this one was measured against (the previous round, or the
     /// baseline for round 1). Kept so the recorded delta is the comparison that was actually made.
     base_test: f64,
@@ -662,6 +635,7 @@ async fn settle(
             round: row.round,
             run_id: row.run_id,
             outcome: numbers.outcome,
+            spend: numbers.spend,
             base_test: base_outcome.test,
             excluded: numbers.excluded,
             pattern,
@@ -795,6 +769,37 @@ async fn eval_climbs_start(
     let version_id = eval
         .current_version_id
         .ok_or_else(|| not_ready(ctx.action, "the eval has no version to climb"))?;
+
+    // ── the ceiling must be enforceable before the climb accepts it ───────────────────
+    //
+    // A ceiling is cents; a version without `prices` measures spend in tokens, so a ceiling
+    // accepted on it would never fire. Refuse here rather than run a climb whose budget is a
+    // number nobody compares against anything.
+    if let Some(ceiling) = input.cost_ceiling_cents {
+        if ceiling < 0 {
+            return Err(invalid(
+                "cost_ceiling_cents",
+                "invalid_value",
+                "a spend ceiling cannot be negative",
+            ));
+        }
+        let version = store::eval::get_version_tx(&mut *tx, ctx.tenant, version_id)
+            .await
+            .map_err(|error| eval_error(error, ctx.action))?;
+        if !price_usage_available(&version.prices) {
+            return Err(ActionError::new(
+                422,
+                "ceiling_unpriceable",
+                format!(
+                    "{}: the climb's spend ceiling of {ceiling} cents cannot be enforced — the \
+                     version prices no tokens, so spend is counted in tokens and no comparison \
+                     with cents can fire. Set the version's `prices` (input/output per million \
+                     tokens) before asking for a ceiling",
+                    ctx.action
+                ),
+            ));
+        }
+    }
 
     let facts = store::eval::eval_readiness_tx(&mut *tx, ctx.tenant, eval.id, version_id)
         .await
@@ -1060,16 +1065,7 @@ async fn pricing_of(
     let version = store::eval::get_version_tx(&mut *tx, tenant, version_id)
         .await
         .map_err(|error| eval_error(error, action))?;
-    let priced = version
-        .prices
-        .get("input")
-        .and_then(Value::as_f64)
-        .is_some()
-        && version
-            .prices
-            .get("output")
-            .and_then(Value::as_f64)
-            .is_some();
+    let priced = price_usage_available(&version.prices);
     Ok(Pricing {
         unit: if priced { "cents" } else { "tokens" },
         prices: version.prices.clone(),
@@ -1128,7 +1124,15 @@ async fn eval_climbs_stop(
             json!({"reason": reason, "at": chrono::Utc::now().to_rfc3339()}),
         );
     }
-    let report = build_report(&climb, &rounds, &state, best_round, best_score, reason);
+    let report = build_report(
+        &climb,
+        &goal,
+        &rounds,
+        &state,
+        (best_round, best_score),
+        reason,
+        pricing.unit,
+    );
     let best_test_score = match best_score {
         Some(score) => Some(as_decimal(score)?),
         None => None,
@@ -1502,19 +1506,28 @@ async fn eval_climbs_round(
             }
         }
     }
+    // ── the round-admission threshold, distinct from the hard execution ceiling ───────
+    //
+    // This check asks whether the climb may CREATE another round, from spend already accounted
+    // across its rounds; the run's own `cost_ceiling_cents` is enforced at the execution
+    // boundary (`run_core::start_or_resume_run_tx`, refusal `cost_ceiling_reached`), where a run
+    // that reached its own budget refuses to execute more work. Two different questions, two
+    // labels: conflating them makes "the run refused" and "the climb refused" indistinguishable.
+    // The cents comparison is only meaningful when the version prices in cents; a climb sets a
+    // ceiling only under that condition (`eval_climbs.start` refuses `ceiling_unpriceable`).
     if let Some(ceiling) = climb.cost_ceiling_cents
+        && pricing.unit == "cents"
         && state.spend >= ceiling as f64
     {
-        {
-            return Err(ActionError::new(
-                409,
-                "cost_ceiling_reached",
-                format!(
-                    "{}: the climb has spent {:.2} against a ceiling of {}",
-                    ctx.action, state.spend, ceiling
-                ),
-            ));
-        }
+        return Err(ActionError::new(
+            409,
+            "round_admission_ceiling",
+            format!(
+                "{}: the round-admission threshold is reached — the climb has spent {:.2} cents \
+                 across its rounds against its ceiling of {ceiling}; no further round is admitted",
+                ctx.action, state.spend
+            ),
+        ));
     }
 
     // ── the analyzer never reads the held-out half ─────────────────────────────────────
@@ -2025,14 +2038,47 @@ fn movement_name(movement: Movement) -> &'static str {
     }
 }
 
+/// A spend figure in the version's unit, as the narrative states it.
+fn spend_text(spend: f64, unit: &str) -> String {
+    format!("{spend:.2} {unit}")
+}
+
+/// A round's quality as the declared model states it: every hold the plan registered with its
+/// floor, or — for a quality goal — the target metric's held-out mean the decision was taken on.
+/// A cost round with no registered hold has no quality reading, never a zero from a score column.
+fn quality_text(goal: &Goal, outcome: &RoundOutcome) -> String {
+    if !outcome.holds.is_empty() {
+        return outcome
+            .holds
+            .iter()
+            .map(|hold| format!("{} {:.4} (floor {:.4})", hold.metric, hold.value, hold.min))
+            .collect::<Vec<_>>()
+            .join("; ");
+    }
+    if goal.is_cost() {
+        "—".to_owned()
+    } else {
+        format!("{} {:.4} held-out", goal.target, outcome.test)
+    }
+}
+
 /// The status table plus the four-part summary.
+///
+/// **Cost and quality come from the one ledger-derived model**, not from a train/test score
+/// table (S19 P5, audit W12). A round's spend is the same `inference_call` sum `eval_runs.report`
+/// prices — subject, judge and billed failed calls — and its quality is the registered hold with
+/// its floor, or the target metric's held-out mean the decision used. A cost climb therefore
+/// names its **cheapest kept** round and its spend, never the zeroes a `cost_usd` grade would
+/// print in a score column. `best` is [`best_of`]'s winner: `(kept round, the number the goal
+/// ranks it by)`.
 fn build_report(
     climb: &Climb,
+    goal: &Goal,
     rounds: &[RoundRow],
     state: &SettleState,
-    best_round: Option<i32>,
-    best_score: Option<f64>,
+    best: (Option<i32>, Option<f64>),
     reason: &str,
+    unit: &str,
 ) -> String {
     let mut out = String::new();
     out.push_str("# Eval climb report\n\n");
@@ -2048,27 +2094,22 @@ fn build_report(
         state.settled.len(),
         reason
     ));
-    out.push_str("| round | variant | train | test | Δ test | decision | reason |\n");
-    out.push_str("|---|---|---|---|---|---|---|\n");
-    let mut previous: Option<f64> = None;
+    out.push_str("| round | variant | spend | quality | decision | reason |\n");
+    out.push_str("|---|---|---|---|---|---|\n");
     for round in rounds {
         let settled = state.settled.iter().find(|row| row.round == round.round);
-        let train = settled.map(|row| row.outcome.train);
-        let test = settled.map(|row| row.outcome.test);
-        let delta = match (test, previous) {
-            (Some(test), Some(previous)) => format!("{:+.4}", test - previous),
-            _ => "—".to_owned(),
-        };
+        let spend = settled
+            .map(|row| spend_text(row.spend, unit))
+            .unwrap_or_else(|| "—".to_owned());
+        let quality = settled
+            .map(|row| quality_text(goal, &row.outcome))
+            .unwrap_or_else(|| "—".to_owned());
         out.push_str(&format!(
-            "| {} | {} | {} | {} | {} | {} | {} |\n",
+            "| {} | {} | {} | {} | {} | {} |\n",
             round.round,
             round.variant,
-            train
-                .map(|value| format!("{value:.4}"))
-                .unwrap_or_else(|| "—".to_owned()),
-            test.map(|value| format!("{value:.4}"))
-                .unwrap_or_else(|| "—".to_owned()),
-            delta,
+            spend,
+            quality,
             settled.map(|row| row.decision.as_str()).unwrap_or("—"),
             settled
                 .and_then(|row| match row.decision {
@@ -2077,10 +2118,12 @@ fn build_report(
                 })
                 .unwrap_or("—"),
         ));
-        if let Some(test) = test {
-            previous = Some(test);
-        }
     }
+    out.push_str(&format!(
+        "\nTotal spend: {} — the sum of every round's inference ledger (subject, judge and \
+         billed failed calls), the same rows `eval_runs.report` prices.\n",
+        spend_text(state.spend, unit)
+    ));
 
     out.push_str("\n## What moved\n\n");
     let kept: Vec<&Settled> = state
@@ -2089,12 +2132,14 @@ fn build_report(
         .filter(|round| round.decision == Decision::Keep)
         .collect();
     if kept.is_empty() {
-        out.push_str("No round was kept: every change was reverted on the held-out number.\n");
+        out.push_str("No round was kept: every change was reverted.\n");
     } else {
         for round in &kept {
             out.push_str(&format!(
-                "- round {}: held-out {:.4} (train {:.4})\n",
-                round.round, round.outcome.test, round.outcome.train
+                "- round {}: {}; {}\n",
+                round.round,
+                spend_text(round.spend, unit),
+                quality_text(goal, &round.outcome)
             ));
         }
     }
@@ -2124,15 +2169,33 @@ fn build_report(
              triage round named are the material to work from.\n",
             state.flat_streak
         ));
+    } else if goal.is_cost() {
+        out.push_str(
+            "Each decision above compared a round's spend — summed from the inference ledger — \
+             with the quality floor the plan registered before round 1.\n",
+        );
     } else {
         out.push_str(
-            "Each decision above was taken on the held-out split, with the train split as \
-             corroboration. The split is the version's and was never redrawn.\n",
+            "Each decision above was taken on the version's held-out split, which was never \
+             redrawn.\n",
         );
     }
 
     out.push_str("\n## What to do next\n\n");
-    match (best_round, best_score) {
+    match best {
+        (Some(round), _) if goal.is_cost() => {
+            let spend = state
+                .settled
+                .iter()
+                .find(|settled| settled.round == round)
+                .map(|settled| spend_text(settled.spend, unit))
+                .unwrap_or_else(|| "—".to_owned());
+            out.push_str(&format!(
+                "**Cheapest kept round: round {round}**, {spend}. Applying it to the live process \
+                 is a person's `processes.update`; this climb names the version and ships the \
+                 patch, it never rewrites a published process.\n"
+            ));
+        }
         (Some(round), Some(score)) => out.push_str(&format!(
             "**Winner: round {round}**, held-out {score:.4}. Applying it to the live process is \
              a person's `processes.update`; this climb names the version and ships the patch, it \

@@ -12,20 +12,30 @@ use crate::api::{ApiError, Manifest};
 use crate::auth;
 use crate::palette::Palette;
 use crate::screens::admin::AdminScreen;
+use crate::screens::agents::AgentsScreen;
 use crate::screens::approvals::Approvals;
 use crate::screens::architecture::ArchitectureScreen;
+use crate::screens::authoring::Authoring;
 use crate::screens::benchmarks::{BenchmarkRunDetail, Benchmarks};
 use crate::screens::boards::{BoardIndex, BoardScreen};
 use crate::screens::cockpit::Cockpit;
 use crate::screens::copilot::CopilotScreen;
+use crate::screens::decision_inbox::DecisionInboxScreen;
 use crate::screens::evals::{EvalDetail, Evals};
+use crate::screens::execution::ExecutionScreen;
 use crate::screens::improvement::Improvement;
 use crate::screens::inference::InferenceEndpoint;
+use crate::screens::jobs::JobsScreen;
+use crate::screens::meetings::{MeetingRoomScreen, MeetingsScreen};
 use crate::screens::members::Members;
 use crate::screens::models::{ModelDetail, ModelsScreen};
+use crate::screens::organisation::OrganisationScreen;
+use crate::screens::plan::PlanScreen;
 use crate::screens::platform::Platform;
+use crate::screens::procedures::ProceduresScreen;
 use crate::screens::process_map::{ProcessMapDetail, ProcessMapList};
 use crate::screens::processes::{ProcessDetail, ProcessesScreen};
+use crate::screens::project_types::ProjectTypesScreen;
 use crate::screens::prompt_audit::PromptAuditScreen;
 use crate::screens::requirements::{RequirementDetail, RequirementsScreen};
 use crate::screens::roles::Roles;
@@ -35,6 +45,11 @@ use crate::screens::search::SearchScreen;
 use crate::screens::sign_in::SignIn;
 use crate::screens::today::Today;
 use crate::screens::usage::Usage;
+use crate::screens::v2::{
+    AdmGate, ImproveGate, KnowledgeGate, OperationsGate, PortfolioScreen, ProgrammeScreen,
+    ToolsGate,
+};
+use crate::screens::validation::ValidationScreen;
 use crate::state::AppCtx;
 
 async fn run_boot(ctx: AppCtx) -> Result<(), ApiError> {
@@ -167,6 +182,26 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/settings/admin") view=AdminScreen/>
                             <Route path=path!("/copilot") view=CopilotScreen/>
                             <Route path=path!("/platform") view=Platform/>
+                            <Route path=path!("/portfolio") view=PortfolioScreen/>
+                            <Route path=path!("/portfolio/:programme_id") view=PortfolioScreen/>
+                            <Route path=path!("/programme") view=ProgrammeScreen/>
+                            <Route path=path!("/organisation") view=OrganisationScreen/>
+                            <Route path=path!("/jobs") view=JobsScreen/>
+                            <Route path=path!("/agents") view=AgentsScreen/>
+                            <Route path=path!("/decisions") view=DecisionInboxScreen/>
+                            <Route path=path!("/project-types") view=ProjectTypesScreen/>
+                            <Route path=path!("/procedures") view=ProceduresScreen/>
+                            <Route path=path!("/execution") view=ExecutionScreen/>
+                            <Route path=path!("/authoring") view=Authoring/>
+                            <Route path=path!("/plan") view=PlanScreen/>
+                            <Route path=path!("/meetings") view=MeetingsScreen/>
+                            <Route path=path!("/meetings/:id") view=MeetingRoomScreen/>
+                            <Route path=path!("/validation") view=ValidationScreen/>
+                            <Route path=path!("/improve") view=ImproveGate/>
+                            <Route path=path!("/operations") view=OperationsGate/>
+                            <Route path=path!("/tools") view=ToolsGate/>
+                            <Route path=path!("/design/adm") view=AdmGate/>
+                            <Route path=path!("/knowledge") view=KnowledgeGate/>
                         </Routes>
                     </main>
                 </div>
@@ -265,29 +300,36 @@ fn Sidebar() -> impl IntoView {
     let role = move || ctx.role().unwrap_or_else(|| "member".to_owned());
     view! {
         <nav class="rail" aria-label="Destinations">
+            <div class="grp">"Portfolio & plan"</div>
             <ul class="rail-list">
                 <li><A href="/" exact=true><span class="nav-item">"Today"</span></A></li>
+                <li><A href="/portfolio"><span class="nav-item">"Portfolio"</span></A></li>
+                {move || ctx.has_action("programmes.list").then(|| view! {
+                    <li><A href="/programme"><span class="nav-item">"Programme"</span></A></li>
+                })}
                 <li><A href="/boards"><span class="nav-item">"Board"</span></A></li>
                 <li><A href="/runs"><span class="nav-item">"Runs"</span></A></li>
+                {move || ctx.has_action("runs.list").then(|| view! {
+                    <li><A href="/execution"><span class="nav-item">"Execution room"</span></A></li>
+                })}
                 {move || ctx.has_action("approvals.list").then(|| view! {
                     <li><A href="/approvals"><span class="nav-item">"Approvals"</span></A></li>
                 })}
-                {move || ctx.has_action("processes.list").then(|| view! {
-                    <li><A href="/build/processes"><span class="nav-item">"Build"</span></A></li>
+                {move || ctx.has_action("wbs.list").then(|| view! {
+                    <li><A href="/plan"><span class="nav-item">"Plan"</span></A></li>
                 })}
-                {move || ctx.has_action("process_maps.list").then(|| view! {
-                    <li><A href="/build/process-map"><span class="nav-item">"Process map"</span></A></li>
+                {move || ctx.has_action("meetings.list").then(|| view! {
+                    <li><A href="/meetings"><span class="nav-item">"Meetings"</span></A></li>
                 })}
-                {move || ctx.has_action("requirements.list").then(|| view! {
-                    <li><A href="/design/requirements"><span class="nav-item">"Requirements"</span></A></li>
+            </ul>
+            <div class="grp">"Organisation"</div>
+            <ul class="rail-list">
+                {move || ctx.has_action("jobs.list").then(|| view! {
+                    <li><A href="/organisation"><span class="nav-item">"Organisation"</span></A></li>
                 })}
-                {move || ctx.has_action("models.list").then(|| view! {
-                    <li><A href="/design/models"><span class="nav-item">"Architecture"</span></A></li>
+                {move || ctx.has_action("tools.list").then(|| view! {
+                    <li><A href="/tools"><span class="nav-item">"Tools"</span></A></li>
                 })}
-                {move || ctx.has_action("architecture.profile_get").then(|| view! {
-                    <li><A href="/architecture"><span class="nav-item">"ADM"</span></A></li>
-                })}
-                <li><A href="/search"><span class="nav-item">"Search"</span></A></li>
                 {move || ctx.has_action("members.list").then(|| view! {
                     <li><A href="/settings/members"><span class="nav-item">"Members"</span></A></li>
                 })}
@@ -296,6 +338,52 @@ fn Sidebar() -> impl IntoView {
                 })}
                 {move || ctx.has_action("inference_endpoint.set").then(|| view! {
                     <li><A href="/settings/inference"><span class="nav-item">"Inference endpoint"</span></A></li>
+                })}
+            </ul>
+            <div class="grp">"Procedures & authoring"</div>
+            <ul class="rail-list">
+                {move || ctx.has_action("processes.list").then(|| view! {
+                    <li><A href="/build/processes"><span class="nav-item">"Build"</span></A></li>
+                })}
+                {move || ctx.has_action("process_maps.list").then(|| view! {
+                    <li><A href="/build/process-map"><span class="nav-item">"Process map"</span></A></li>
+                })}
+                {move || ctx.has_action("procedures.list").then(|| view! {
+                    <li><A href="/procedures"><span class="nav-item">"Procedures"</span></A></li>
+                })}
+                {move || ctx.has_action("authoring.assets").then(|| view! {
+                    <li><A href="/authoring"><span class="nav-item">"Authoring"</span></A></li>
+                })}
+            </ul>
+            <div class="grp">"Govern & design"</div>
+            <ul class="rail-list">
+                {move || ctx.has_action("requirements.list").then(|| view! {
+                    <li><A href="/design/requirements"><span class="nav-item">"Requirements"</span></A></li>
+                })}
+                {move || ctx.has_action("models.list").then(|| view! {
+                    <li><A href="/design/models"><span class="nav-item">"Architecture"</span></A></li>
+                })}
+                {move || ctx.has_action("architecture.profile_get").then(|| view! {
+                    <li><A href="/design/adm"><span class="nav-item">"Architecture capability"</span></A></li>
+                })}
+                {move || ctx.has_action("architecture.profile_get").then(|| view! {
+                    <li><A href="/architecture"><span class="nav-item">"System architecture"</span></A></li>
+                })}
+                {move || ctx.has_action("actions.list").then(|| view! {
+                    <li><A href="/settings/admin"><span class="nav-item">"Admin"</span></A></li>
+                })}
+            </ul>
+            <div class="grp">"Knowledge & memory"</div>
+            <ul class="rail-list">
+                <li><A href="/search"><span class="nav-item">"Search"</span></A></li>
+                {move || ctx.has_action("lessons.list").then(|| view! {
+                    <li><A href="/knowledge"><span class="nav-item">"Knowledge"</span></A></li>
+                })}
+            </ul>
+            <div class="grp">"Measure & improve"</div>
+            <ul class="rail-list">
+                {move || (ctx.has_action("coach.triage") || ctx.has_action("kata.open")).then(|| view! {
+                    <li><A href="/improve"><span class="nav-item">"Improve"</span></A></li>
                 })}
                 {move || (ctx.has_action("inference_usage.report")
                     && ctx.has_action("inference_calls.list")).then(|| view! {
@@ -314,8 +402,11 @@ fn Sidebar() -> impl IntoView {
                     <li><A href="/evals"><span class="nav-item">"Evals"</span></A></li>
                 })}
                 <li><A href="/copilot"><span class="nav-item">"Copilot"</span></A></li>
-                {move || ctx.has_action("actions.list").then(|| view! {
-                    <li><A href="/settings/admin"><span class="nav-item">"Admin"</span></A></li>
+            </ul>
+            <div class="grp">"Operations"</div>
+            <ul class="rail-list">
+                {move || ctx.has_action("ops.incident").then(|| view! {
+                    <li><A href="/operations"><span class="nav-item">"Operations"</span></A></li>
                 })}
                 {move || ctx.is_super_admin().then(|| view! {
                     <li><A href="/platform"><span class="nav-item">"Platform"</span></A></li>

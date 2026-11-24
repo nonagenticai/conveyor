@@ -9,7 +9,7 @@
 //! two enqueue paths that drift, and widening the round's scope to `evals:approve` would have
 //! made the plan sign-off meaningless — so the core was extracted instead.
 //!
-//! Three behaviours are the ones a caller must keep:
+//! Four behaviours are the ones a caller must keep:
 //!
 //! - **A start is a resume.** `eval_run_variant_unique (tenant, eval, variant)` means a second
 //!   writer of the same variant widens the existing row rather than inserting a second one; the
@@ -18,6 +18,10 @@
 //!   the caller gets `409 run_terminal` rather than a silent no-op.
 //! - **One `job` per `(case, rep)`**, `dedupe_key = <run>:<case>:<rep>`, enqueued inside the same
 //!   transaction as the run row. A run that exists with no jobs waits forever.
+//! - **A ceiling is a hard execution ceiling.** A run carrying `cost_ceiling_cents` refuses to
+//!   start or resume once its own ledger spend reaches it (`409 cost_ceiling_reached`), and a
+//!   version that prices no tokens cannot carry one (`422 ceiling_unpriceable`). The climb's
+//!   round-admission threshold is a different check with its own refusal code.
 
 use conveyor_domain::eval::{RunMode, RunStatus, Variant};
 use conveyor_store as store;
@@ -28,6 +32,7 @@ use uuid::Uuid;
 
 use crate::invoke::{ActionError, HandlerCtx};
 
+use super::cost::{ledger_spend_tx, price_usage_available};
 use super::{EVAL_RUN_CHANGED, emit, eval_error};
 
 /// What to measure, and under which variant.
@@ -126,6 +131,56 @@ pub(crate) async fn start_or_resume_run_tx(
         run = store::eval::transition_run_tx(&mut *tx, ctx.tenant, run.id, RunStatus::Running)
             .await
             .map_err(|error| eval_error(error, ctx.action))?;
+    }
+
+    // ── the hard execution ceiling ─────────────────────────────────────────────────────
+    //
+    // The run's own `cost_ceiling_cents` (a climb copies its ceiling onto every round it
+    // creates) is a HARD EXECUTION ceiling: once this run's ledger spend reaches it, the run
+    // refuses to start, resume or enqueue more work. It is deliberately not the climb's
+    // round-admission threshold (`eval_climbs.round`, refusal `round_admission_ceiling`), which
+    // asks whether the climb may CREATE another round from spend accounted across rounds. The
+    // two boundaries answer different questions and carry different refusal codes, so "the run
+    // refused" and "the climb refused" are never the same answer.
+    //
+    // A ceiling is cents; when the version prices no tokens the ceiling cannot be measured (or
+    // enforced) and the run is refused rather than allowed to execute unguarded.
+    if let Some(ceiling) = run.cost_ceiling_cents {
+        let version = store::eval::get_version_tx(&mut *tx, ctx.tenant, run.version_id)
+            .await
+            .map_err(|error| eval_error(error, ctx.action))?;
+        if !price_usage_available(&version.prices) {
+            return Err(ActionError::new(
+                422,
+                "ceiling_unpriceable",
+                format!(
+                    "{}: the {} run carries a spend ceiling of {ceiling} cents, but the version \
+                     prices no tokens; a ceiling that cannot be measured in cents cannot be \
+                     enforced, so the run may not execute",
+                    ctx.action,
+                    run.variant.as_str()
+                ),
+            ));
+        }
+        let spent = ledger_spend_tx(&mut *tx, ctx.tenant, run.id, &version.prices, true)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "read the run's inference ledger");
+                ActionError::internal()
+            })?;
+        if spent >= ceiling as f64 {
+            return Err(ActionError::new(
+                409,
+                "cost_ceiling_reached",
+                format!(
+                    "{}: the hard execution ceiling is reached — the {} run has spent {:.2} \
+                     cents against its ceiling of {ceiling}; it refuses to execute more work",
+                    ctx.action,
+                    run.variant.as_str(),
+                    spent
+                ),
+            ));
+        }
     }
 
     let (queued_jobs, skipped_slots) = if request.enqueue {

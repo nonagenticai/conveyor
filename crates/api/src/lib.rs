@@ -20,7 +20,9 @@ pub mod design;
 pub mod documents;
 pub mod error;
 pub mod extract;
+pub mod invocations;
 pub mod job_routes;
+pub mod meetings;
 pub mod metrics;
 pub mod models;
 pub mod request_id;
@@ -148,7 +150,12 @@ pub fn app(state: AppState) -> Router {
         .route(
             "/api/actions/{name}/invocations",
             post(actions::invoke_http),
-        );
+        )
+        // The poll half of the async invocation surface (#579). `spec_exempt`: it is a REST
+        // endpoint over an engine record, not an action, and it is not in the registry.
+        .route("/api/invocations/{id}", get(invocations::get))
+        // T19 (#606): the calendar read of attendance; derived, read-only, not an action.
+        .route("/api/meetings/{id}/ics", get(meetings::ics));
 
     // One literal route per registered action. Static segments win over `{name}`, so the
     // fallback only ever sees a name that is not in the registry.
@@ -407,9 +414,20 @@ mod tests {
     fn every_action_has_a_documented_operation() {
         let spec = openapi();
         let registry = conveyor_actions::registry();
+        // T17 (#87) adds the five `authoring.*` actions: 513 -> 518.
+        // T19 (#606) adds the twelve `meetings.*` actions: 518 -> 530.
+        // T5 (#77) adds eight internal kata actions: 530 -> 538; external stays 18.
+        // S21 step 9 (#649) adds `cards.assign`: 538 -> 539.
+        // T6 (#80) adds nine internal `development_projects.*` actions: 539 -> 548.
+        // T8 (#79) adds three internal `lessons.*` actions: 548 -> 551.
+        // T15 (#86) adds ten internal authoring/BYO actions: 551 -> 561.
+        // T12 (#88) adds three internal kata Gets: 561 -> 564.
+        // #655 (T17b) adds one internal read (`authoring.intakes`): 564 -> 565.
+        // S21 step 10 (#656) adds `ladder.case`, `decision_option_sets.get|set` and
+        // `ladder.precheck`: 565 -> 569.
         assert_eq!(
             registry.len(),
-            508,
+            569,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -438,7 +456,13 @@ mod tests {
              rework-path actions (programmes.baseline|baseline_approve|baselines_list, \
              projects.charter, projects.reopen) (502) + #524's closure-request action \
              (projects.close_request) (503) + #15's five prompt_recipes actions
-             (create, get, list, activate, retire) (508). \
+             (create, get, list, activate, retire) (508) + #560's five scientific read actions \
+             (scientific_stats.meta_analysis|confidence_interval|trend, \
+             scientific_formal.translate|verify) (513) + T15's ten authoring/BYO actions \
+             (toolkits.import_openapi|register_mcp|discover_mcp, \
+             tool_authoring.draft|validate|test|review|publish|promote, tools.dispatch) — the \
+             registry total is 569 with the T6, T8, T12, #655 and S21-step-10 increments above
+             it. \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
         );

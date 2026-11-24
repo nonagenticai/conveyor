@@ -74,9 +74,11 @@ pub struct RunCreateIn {
     /// Links the run to the trigger that created it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub correlation_id: Option<Uuid>,
-    /// The organisation binding the run executes under (T0, SPEC_V2 §4.4). When present, the
-    /// run records the binding and the release it pins; a retired binding or a stale pin is
-    /// refused `409 job_binding_stale` before the run is written.
+    /// The organisation binding the run executes under (T0, SPEC_V2 §4.4). When absent, the
+    /// card's own `job_binding_id` is used; naming a binding that differs from the card's is
+    /// refused `422 card_binding_mismatch`. When present (or inherited), the run records the
+    /// binding and the release it pins; a retired binding or a stale pin is refused
+    /// `409 job_binding_stale` before the run is written.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub job_binding_id: Option<Uuid>,
     /// The release the caller expects the binding to pin. Must equal the binding's pin; omit to
@@ -155,6 +157,16 @@ pub struct RunOut {
     pub workflow_step_id: Option<String>,
     /// When the run row was created.
     pub created_at: DateTime<Utc>,
+    /// The run's declared outputs, keyed by the process's `outputs` names (S18 P3b).
+    ///
+    /// `runs.get` composes it from the terminal step's stored output: each declared name resolves
+    /// against `steps.<n>.output`, and an `agent.run` step's unresolved name is its answer
+    /// `steps.<n>.output.output` (the `AgentRunOut.output`) — the `swebench-fix` mapping
+    /// `patch → steps.<n>.output.output`. A declared name that resolves to nothing is `null`, never
+    /// invented; a run with no declared outputs (or no process) is `null`, not `{}`. Every other
+    /// run action returns `null`, because only the detail read loads the trace.
+    #[serde(default)]
+    pub output: Value,
 }
 
 /// `runs.get` — the run to read.
@@ -807,7 +819,7 @@ pub struct ChannelPolicyResetIn {
     pub channel_kind: String,
 }
 
-/// One action's gating policy as `approval_policies.*` returns it (#282).
+/// One action's gating policy as `approval_policies.*` returns it (#282, extended by T6).
 ///
 /// A policy the tenant never set still has an answer here: the strict default, so a reader never
 /// has to interpret an absent row as a decision.
@@ -819,6 +831,15 @@ pub struct ApprovalPolicyOut {
     pub approval: String,
     /// `forbidden` — the requester cannot decide its own gate (§5.4); `allowed` — they may.
     pub self_approval: String,
+    /// `human` — a person decides the gate (the default); `auto` — the tenant's earned
+    /// auto-merge policy decides when its conditions hold (§6.4).
+    pub approver_kind: String,
+    /// The typed conditions an auto policy carries; empty for a human policy.
+    pub conditions: Value,
+    /// When an auto policy stops applying; `null` for a human policy.
+    pub expires_at: Option<DateTime<Utc>>,
+    /// How many decisions the gate needs (1 by default; `≥2` is dual control).
+    pub required_decisions: u16,
 }
 
 /// `approval_policies.get` input.
@@ -832,14 +853,30 @@ pub struct ApprovalPolicyGetIn {
 /// `approval_policies.set` input — the complete decision for one action.
 ///
 /// Both settings are required: a `set` replaces the whole policy, so leaving one out would mean
-/// silently resetting it to the default rather than leaving it alone.
+/// silently resetting it to the default rather than leaving it alone. The three auto-merge
+/// fields are optional; omitting them records the strict human default.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ApprovalPolicySetIn {
-    /// The destructive action whose gating this decides.
+    /// The action whose gating this decides.
     pub action: String,
     /// `required` or `waived`.
     pub approval: String,
     /// `forbidden` or `allowed`.
     pub self_approval: String,
+    /// `human` (default) or `auto`. `auto` is accepted only for a development gate and requires
+    /// typed conditions and a future expiry.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub approver_kind: Option<String>,
+    /// The typed auto-merge conditions (consecutive green runs, revert count, path scope,
+    /// independent-reviewer requirement).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conditions: Option<Value>,
+    /// When the auto policy expires. Required for `auto`, absent for `human`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<DateTime<Utc>>,
+    /// The quorum the gate requires (1 by default; `≥2` is dual control). An `auto` policy
+    /// carries 1 — a rule is not a second approver.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub required_decisions: Option<u16>,
 }

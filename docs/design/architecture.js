@@ -88,16 +88,24 @@ window.ArchitecturePack = (function () {
   participant BR as Tool broker
   participant G as Approval gate
   participant EV as Evidence
-  P->>API: start a run for a card and binding
+  alt explicit runs.create
+    P->>API: start a run for a card
+  else cards.assign — the handoff (S21 step 9)
+    P->>API: hand off a card: the binding and what the receiver must know
+    API->>KM: the note becomes one hot memory row, same transaction
+    API-->>P: 409 card_has_live_run when the card already has a live root run
+  end
+  API->>B: inherit the card's job_binding_id (or refuse a conflict)
   API->>WF: enqueue the run
   WF->>B: check the pinned release_hash
   alt retired binding, stale pin or unknown kind
     B-->>WF: 409 job_binding_stale / unknown_executor_kind
     WF-->>P: refused before any model call
   else pinned release
-    WF->>PC: compile the step
-    PC->>KM: knowledge pins and episodic memory
-    KM-->>PC: selected sources and prompt_sha256
+    WF->>PC: compile the step with its declaration (action, action_text, resolved input, outputs, gate)
+    PC->>KM: knowledge pins, the run's prior steps, then the card's hot rows and one digest
+    KM-->>PC: selected sources, their ids and prompt_sha256
+    Note over PC,KM: the Request is one document, rendered after the current step and passed<br/>unchanged to laya — prior steps render with whole bodies, a measured refusal over budget
     opt procedure executor
       PC-->>WF: PDDL action
       WF->>BR: tools.call when the step names a tool
@@ -106,13 +114,21 @@ window.ArchitecturePack = (function () {
     opt internal_agent executor
       PC-->>R: generation over the compiled envelope
       R-->>WF: unattached draft artefact
-      WF->>L: gate.precheck over the draft
+      WF->>L: gate.precheck over the draft, with the same request document as case input
       L-->>WF: answer and confidence
     end
     opt gate requires approval
-      WF->>G: request the gate
-      G-->>WF: approval and approval_decision
+      WF->>G: park the run (waiting_approval) and request the gate
+      G-->>P: pending approval naming the draft
+      P->>G: approve or reject
+      alt approved
+        G->>WF: record the L3 decision and enqueue run.resume
+        WF->>WF: apply the draft, no second model call
+      else rejected or expired
+        G->>WF: cancel the run, draft unattached
+      end
     end
+    WF->>KM: one attempt hot row, in the terminal transaction (root card runs)
     WF->>EV: run, step, tool_call and inference_call rows
     WF-->>P: terminal result
   end`,
@@ -161,14 +177,28 @@ window.ArchitecturePack = (function () {
   note right of running: one live run per card (uq_run_live); a retry is an attempt`,
     "decision-ladder": `flowchart TD
   L0["L0 - Rule: deterministic Rust"]:::rule
+  P["decision_policy and the authored option set"]:::row
+  F{"fire_when holds?"}:::rule
+  S["not fired: no call, no decision, the step proceeds"]:::row
+  C["the case: model, state, typed questions"]
+  K["ladder.precheck - POST /v1/systemone, no transaction held"]:::laya
+  U["outage: no recorded call, the caller applies fail_policy"]:::rule
+  V[("the engine's record: request_hash, 2xx, response")]:::row
   L1["L1 - Laya: calibrated choice, score or noul"]:::laya
   L2["L2 - Generation: LLM text, code, plans"]:::gen
   L3["L3 - Human: approval, override, irreversible action"]:::human
   R0[("row and action_invocation")]:::row
-  R1[("decision row: answer and confidence")]:::row
+  R1[("decision row: answer, confidence, call id, case sha256")]:::row
   R2[("inference_call and draft artefact")]:::row
   R3[("approval and approval_decision")]:::row
   L0 --> R0
+  P --> F
+  F -->|no| S
+  F -->|yes| C
+  C --> K
+  K -.->|no completed call| U
+  K --> V
+  V --> L1
   L1 --> R1
   L2 --> R2
   L3 --> R3
@@ -481,6 +511,7 @@ window.ArchitecturePack = (function () {
     ["Plan & WBS", "plan", "wbs_node · project_baseline · register · change control", "§5.3–§5.5", "P"],
     ["Validation", "validation", "Measured coverage · tranche · units · gap list · the gate", "§12, coverage.json", "R"],
     ["Execution room", "execution", "Run · prompt compiler · tool panel · explain context", "§7.7, §10.5", "R + P"],
+    ["Meetings", "meetings", "meeting_type · meeting · agenda item · attendance · position · approval_decision (participant) · minutes", "§6.8, D66, T19", "P"],
     ["Decision inbox", "decisions", "Approval · gate · dual control · decided_by_kind", "§5.4", "R"],
     ["Run history", "runs", "Run · step · attempt · two executor kinds", "§4.5, §5.1", "R"],
     ["Organisation", "organisation", "Authority matrix · approval policies · decision ladder · laya config", "§6, §7, D50", "P"],

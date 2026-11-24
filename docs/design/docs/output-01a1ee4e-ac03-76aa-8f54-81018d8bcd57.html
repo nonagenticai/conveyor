@@ -26,7 +26,21 @@
     <main class="doc-body"><h1>T6 — Inception analysis</h1>
 <p>Project: T6 — Development project · Track: v2 · Tranche: 11 · Plan: docs/SPEC_V2.md §12
 Unit: #80 (this document is dependency-shaping work; blocked-by T5, T13 and P0)
-Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T5", "T13", "P0"]</p>
+Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-18; citations re-verified at this baseline) · Project row: active, meta.depends_on = ["T5", "T13", "P0"]</p>
+<ul>
+<li><strong>Status:</strong> published</li>
+<li><strong>Version:</strong> 1.0</li>
+<li><strong>Author / date:</strong> conveyor programme session / 2026-11-21</li>
+<li><strong>Reviewer / review date:</strong> #347 independent review / 2026-11-18; owner publication / 2026-11-21</li>
+<li><strong>Related project:</strong> T6 — Development project · issue #80 · live document <code>01a1ee4e-ac03-76aa-8f54-81018d8bcd57</code></li>
+<li><strong>Rationale:</strong> Establish what exists and what is reused for Development project: current state, build-vs-reuse decisions and the risks the architecture must answer.</li>
+<li><strong>Published document:</strong> <code>01a1ee4e-ac03-76aa-8f54-81018d8bcd57</code> — published 2026-11-21</li>
+<li><strong>Contract:</strong> pending</li>
+<li><strong>ADM phase / plateau:</strong> A / PSA for the artefact (project row: G / capability)</li>
+<li><strong>Entries:</strong> current-state rows, reuse sources, build-vs-reuse decisions, risks, open questions.</li>
+<li><strong>Derivation / realization / reuse / dependency:</strong> derived from SPEC_V2 §6.4, §9.1, §12 T6 and P0 §5; realized by #80; reuse sources cited below; project dependencies T5, T13, P0.</li>
+<li><strong>Links:</strong> issue #80; SPEC_V2 §12; the sibling inception document; <code>seed/programme.json</code>.</li>
+</ul>
 <h2>Current state</h2>
 <p><strong>Work primitives — <code>built</code>.</strong> <code>project_type_code</code> exists (<code>migrations/0002_domain.sql:project_type_code</code>); so do the plan spine (<code>migrations/0044_plan_spine.sql:wbs_node</code>) and the PM job: <code>crates/actions/src/pm/mod.rs:PM_JOB_KEY</code> guards every <code>pm.*</code> action, <code>resolve_evidence</code> refuses a gate with a missing evidence ref, and the store refuses a requester's decision.</p>
 <p><strong>Project types — <code>partial</code>.</strong> A type is a <code>catalogue_entry(kind='project_type')</code> bound to a process (<code>migrations/0035_process_tree.sql:process_map</code>). Seven are seeded (<code>seed/catalogue.json:project_type</code>); none is <code>development</code>. The <code>development</code> capability (<code>seed/capability.json:development</code>, <code>seed/processes/named.yaml:cap.development.create</code>) groups card types, not a phase template. §5.2's type is <code>absent</code>.</p>
@@ -82,7 +96,7 @@ Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on =
 </ul>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Development project · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Development project · conveyor output · published 2026-11-24T16:30:00Z · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

@@ -304,11 +304,26 @@ pub enum Scope {
     OrganisationRead,
     /// Create and change industries, jobs, releases and bindings.
     OrganisationWrite,
+    // T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata. A read is open; a write is work on the
+    // tenant's own improvement record (a member's and the kata executor's), not platform
+    // administration — adoption is P3's separate, human-only gate.
+    /// Read a kata, its six Gets and its measurement.
+    KataRead,
+    /// Open a kata and record its Gets and its held-out measurement.
+    KataWrite,
+    // T8 (SPEC_V2 §7.6, §10.3, §10.4, §12 T8, D36; issue #79): organisational memory. A job's
+    // executor proposes a lesson (`lessons:write`); only a person may review or promote it
+    // (`lessons:review`, granted to the two human roles literally — never the machine
+    // `kata_executor`).
+    /// Propose a lesson with its independent evidence references.
+    LessonsWrite,
+    /// Review a lesson and promote it to a knowledge-source draft — a person's act.
+    LessonsReview,
 }
 
 impl Scope {
     /// Every scope this build knows.
-    pub const ALL: [Scope; 70] = [
+    pub const ALL: [Scope; 74] = [
         Scope::ActionsRead,
         Scope::ActionsWrite,
         Scope::MeRead,
@@ -378,6 +393,10 @@ impl Scope {
         Scope::CapabilitiesWrite,
         Scope::OrganisationRead,
         Scope::OrganisationWrite,
+        Scope::KataRead,
+        Scope::KataWrite,
+        Scope::LessonsWrite,
+        Scope::LessonsReview,
         Scope::OpsWrite,
     ];
 
@@ -454,6 +473,10 @@ impl Scope {
             Self::CapabilitiesWrite => "capabilities:write",
             Self::OrganisationRead => "organisation:read",
             Self::OrganisationWrite => "organisation:write",
+            Self::KataRead => "kata:read",
+            Self::KataWrite => "kata:write",
+            Self::LessonsWrite => "lessons:write",
+            Self::LessonsReview => "lessons:review",
         }
     }
 
@@ -511,7 +534,8 @@ impl Scope {
             | Self::WorkflowsRead
             | Self::CapabilitiesRead
             | Self::ToolsRead
-            | Self::OrganisationRead => true,
+            | Self::OrganisationRead
+            | Self::KataRead => true,
             Self::RunsWrite
             | Self::ApprovalsWrite
             | Self::AndonWrite
@@ -530,7 +554,9 @@ impl Scope {
             | Self::EvalsRead
             | Self::EvalsWrite
             | Self::WorkflowsWrite
-            | Self::CapabilitiesWrite => member,
+            | Self::CapabilitiesWrite
+            | Self::KataWrite
+            | Self::LessonsWrite => member,
             Self::ChannelsWrite
             | Self::CataloguesWrite
             | Self::ActionsWrite
@@ -550,6 +576,10 @@ impl Scope {
             // ⛔ NOT the `admin` predicate: that includes `Role::KataExecutor`, a machine
             // role, and a scope a machine holds cannot be a sign-off (CONTRACT §20 trap 1).
             Self::EvalsApprove => matches!(role, Role::Admin),
+            // D36's person's review, likewise literal: `admin` and `member` are the two roles a
+            // human can hold. `kata_executor` is machine-only, so a job's executor can propose
+            // (`lessons:write`) but never review or promote its own lesson.
+            Self::LessonsReview => matches!(role, Role::Admin | Role::Member),
         }
     }
 }
@@ -654,6 +684,11 @@ pub enum HandlerRef {
     /// resolved tool's effect is **data on the version row**, so this static spec declares the
     /// dispatcher's own effect and the broker enforces the real ceiling and destructive gate.
     Broker,
+    /// A registered tool destination (T15, SPEC_V2 §11.3 step 5, §11.5). `tools.dispatch`
+    /// resolves the `tool_source` row the broker pinned and calls it — the URL comes from the
+    /// reviewed registration, never from the call. Reachable only with
+    /// [`crate::invoke::Authority::Internal`]; a direct HTTP/MCP caller is refused.
+    ToolDestination,
 }
 
 impl std::fmt::Debug for HandlerRef {
@@ -668,6 +703,7 @@ impl std::fmt::Debug for HandlerRef {
             } => write!(f, "HandlerRef::External({service} {method} {path})"),
             Self::Workflow => write!(f, "HandlerRef::Workflow"),
             Self::Broker => write!(f, "HandlerRef::Broker"),
+            Self::ToolDestination => write!(f, "HandlerRef::ToolDestination"),
         }
     }
 }
@@ -908,7 +944,7 @@ impl ActionSpec {
     pub fn machine_forbidden(&self) -> bool {
         self.scopes
             .iter()
-            .any(|scope| scope.as_str() == crate::channel::MACHINE_DENIED_SCOPE)
+            .any(|scope| crate::channel::is_denied_scope(scope.as_str()))
             || crate::channel::is_denied_action(self.name)
             || crate::channel::is_denied_resource(crate::channel::resource_of(self.name))
     }
@@ -1056,8 +1092,12 @@ mod tests {
         assert_eq!(Scope::CapabilitiesWrite.as_str(), "capabilities:write");
         assert_eq!(Scope::OrganisationRead.as_str(), "organisation:read");
         assert_eq!(Scope::OrganisationWrite.as_str(), "organisation:write");
+        assert_eq!(Scope::KataRead.as_str(), "kata:read");
+        assert_eq!(Scope::KataWrite.as_str(), "kata:write");
+        assert_eq!(Scope::LessonsWrite.as_str(), "lessons:write");
+        assert_eq!(Scope::LessonsReview.as_str(), "lessons:review");
         assert_eq!(Scope::OpsWrite.as_str(), "ops:write");
-        assert_eq!(Scope::ALL.len(), 70);
+        assert_eq!(Scope::ALL.len(), 74);
     }
 
     #[test]
@@ -1229,10 +1269,10 @@ pub struct FieldError {
 /// The validator reads the SAME `Schema` value the OpenAPI operation and MCP tool embed,
 /// so a refusal here and the published contract cannot disagree. It deliberately covers
 /// the JSON-Schema subset schemars emits for our documents: `$ref` into `$defs`,
-/// `allOf` (a flattened shared envelope), `anyOf`/`oneOf` (an `Option<T>`),
-/// `required`, `properties`, `additionalProperties`, `type` and `enum`. Anything outside
-/// that subset is accepted rather than guessed — the typed deserialization after this is
-/// the second belt.
+/// `allOf` (a flattened shared envelope), `anyOf`/`oneOf` (an `Option<T>`, and a closed
+/// enum's `oneOf` of `const` branches), `required`, `properties`, `additionalProperties`,
+/// `type`, `enum` and `const`. Anything outside that subset is accepted rather than
+/// guessed — the typed deserialization after this is the second belt.
 pub fn validate_input(schema: &Value, value: &Value) -> Vec<FieldError> {
     let mut errors = Vec::new();
     validate_at(schema, schema, value, "", &mut errors);
@@ -1391,6 +1431,23 @@ fn validate_at(
             },
             code: "invalid_value".into(),
             detail: format!("must be one of {choices:?}"),
+        });
+        return;
+    }
+
+    // `const`: schemars renders an enum of unit variants as a `oneOf` of `const` branches, so a
+    // validator that ignored `const` accepted any string for a closed enum's field.
+    if let Some(expected) = schema.get("const")
+        && expected != value
+    {
+        errors.push(FieldError {
+            field: if path.is_empty() {
+                "body".into()
+            } else {
+                path.to_owned()
+            },
+            code: "invalid_value".into(),
+            detail: format!("must be {expected}"),
         });
         return;
     }

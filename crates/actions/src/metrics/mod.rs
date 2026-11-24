@@ -540,6 +540,8 @@ pub struct UsageRowOut {
     pub priced_calls: i64,
     pub unpriced_calls: i64,
     pub runs: i64,
+    /// Accepted attendance × closed duration (the third D52 source, T19).
+    pub participant_hours: f64,
 }
 
 /// The level's rows; the sum of the child level equals its parent.
@@ -597,6 +599,7 @@ fn usage_row_out(row: store::metrics::UsageRow) -> UsageRowOut {
         priced_calls: row.priced_calls,
         unpriced_calls: row.unpriced_calls,
         runs: row.runs,
+        participant_hours: row.participant_hours,
     }
 }
 
@@ -994,6 +997,7 @@ async fn metrics_reconcile(
                 card_type_code: "incident".to_owned(),
                 due_at: None,
                 parent_card_id: None,
+                job_binding_id: None,
                 meta: Some(serde_json::json!({
                     "period_start": input.period_start.to_string(),
                     "period_end": input.period_end.to_string(),

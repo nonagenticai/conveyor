@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Technology Standards Catalog — T2 Decision ladder (Phase D) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Technology Standards Catalog — T2 Decision ladder (Phase D)</li>
+<li>Phase: d</li>
+<li>Kind: catalog</li>
+<li>Purpose: The standards T2's rows and actions fix for every later slice, including the standards it fails to meet.</li>
+<li>Scope: Postgres and RLS, the migration set, the action registry, HTTP and errors, concurrency, the laya contract, the generation split and verification.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>PostgreSQL / 18 with FORCE RLS</strong> - {"usage": "the five decision tables are tenant-scoped with ENABLE and FORCE ROW LEVEL SECURITY from <code>migrations/0040_organisation.sql</code>; 0046 only alters <code>decision</code> and adds tenant-leading indexes"}</li>
+<li><strong>Rust workspace / edition 2024; forbid(unsafe_code)</strong> - {"usage": "<code>crates/actions/src/ladder/mod.rs</code> carries <code>#![forbid(unsafe_code)]</code> and declares every action with the workspace's <code>#[action]</code> macro; the tests run against real Postgres 18"}</li>
+<li><strong>Migration discipline / forward only, numbered, never edited after a slice closes</strong> - {"usage": "one set, <code>0046_decision_ladder.sql</code>; it adds columns to T0's <code>decision</code> table and does not reshape <code>decision_policy</code> to add the missing question, fire_when or min_confidence (v1-t2-4)"}</li>
+<li><strong>ActionSpec / one declaration -&gt; HTTP + MCP + OpenAPI</strong> - {"usage": "<code>ladder.record|evaluate|list|apply_draft</code>, <code>decision_policies.create|update|list</code>, <code>refinements.publish|list</code> and <code>laya_configs.create|list</code> are ordinary actions; the family name is <code>ladder.*</code> because the ADR board owns <code>decisions.*</code> (SPEC_V2 \u00a710.4 amendment)"}</li>
+<li><strong>HTTP API / unversioned /api/&lt;resource&gt;</strong> - {"usage": "no version segment; errors are RFC 9457 <code>application/problem+json</code> with stable slugs such as <code>pins_incomplete</code>, <code>approval_missing</code>, <code>draft_requires_gate</code> and <code>policy_exists</code>"}</li>
+<li><strong>Optimistic concurrency / version + If-Match/ETag</strong> - {"usage": "policies, refinements and laya configs return an ETag; a stale update is <code>412 version_mismatch</code>, and a human decision row is append-only"}</li>
+<li><strong>Laya contract / POST /v1/systemone with questions keyed by qid</strong> - {"usage": "the contract's types are noul|choice|score and answers are <code>answers.&lt;qid&gt;</code>; <code>laya_configs</code> pins model_ref, params and timeout_ms. T2 does not call it (v1-t2-2), so the contract is recorded but unexercised"}</li>
+<li><strong>Generation split / an inference_call plus a draft; no transition</strong> - {"usage": "<code>decision_rung_check</code> admits only rule|laya|human; the <code>compile_fail</code> doctest in <code>conveyor_domain::ladder</code> makes the generated result type unusable by any transition, and <code>ladder.apply_draft</code> is the only gated apply"}</li>
+<li><strong>Budget refusal / 429 budget_exceeded before the next call</strong> - {"usage": "NOT MET \u2014 v1-t2-5: no inference budget is enforced; the only budget refusal in the tree is <code>429 tool_budget_exceeded</code> in <code>crates/actions/src/invoke.rs</code> and <code>crates/actions/src/broker.rs</code> (#526), not the \u00a77.5 spelling"}</li>
+<li><strong>Human gate / a person, an approved approval, the same card</strong> - {"usage": "<code>ladder.record</code> requires <code>actor_kind = user</code> and an approved approval with a human <code>approve</code> decision; gate identity is missing (v1-t2-6) and only <code>ladder.apply_draft</code> enforces <code>draft.apply</code>"}</li>
+<li><strong>Verification / real Postgres, then the GitHub-hosted preflight</strong> - {"usage": "<code>crates/actions/tests/decision_ladder.rs</code> and <code>crates/actions/tests/ladder_human_gate.rs</code> run against real Postgres 18; the compile/test verdict is <code>preflight.yml</code>; the local gate is <code>cargo fmt --all -- --check</code> and <code>cargo metadata --locked --format-version 1</code> (<code>docs/plans/03-DELIVERY.md</code>)"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision ladder · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

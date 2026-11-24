@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data Entity/Data Component Catalog — T2 Decision ladder (Phase C) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Data Entity/Data Component Catalog — T2 Decision ladder (Phase C)</li>
+<li>Phase: c</li>
+<li>Kind: catalog</li>
+<li>Purpose: The entities T2 adds or extends, each with its owner and its one invariant.</li>
+<li>Scope: the five T0 decision tables as written by T2, the 0046 columns and indexes, the approval and inference ledgers, and the draft document.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>decision / the one ladder row</strong> - {"note": "0046 adds rung, answer, option_set_version, policy_version, refinement_version, laya_config_version, actor_kind, actor_id, approval_id; rung CHECK rule|laya|human; actor CHECK system|user|agent|service; approval FK; the three version CHECKs require a positive version when pinned", "owner": "decision ladder", "table": "decision"}</li>
+<li><strong>decision_option / the option written with a decision</strong> - {"note": "T0 table; T2 inserts the request's inline option array and stamps <code>option_set_version</code> (default 1 when options are present); there is no tenant-authored option-set row (v1-t2-4)", "owner": "decision ladder", "table": "decision_option"}</li>
+<li><strong>decision_policy / the case definition</strong> - {"note": "kind, optional gate, threshold, fail_policy, action, meta; unique <code>decision_policy_case</code> on (tenant_id, kind, coalesce(gate, '')); a second create is 409 <code>policy_exists</code>", "owner": "decision ladder", "table": "decision_policy"}</li>
+<li><strong>decision_policy_refinement / the tenant's live override</strong> - {"note": "threshold_override, rule_override, fail_action, laya_config_id, version; unique <code>decision_policy_refinement_one_per_policy</code> on (tenant_id, policy_id); publish bumps the version", "owner": "decision ladder", "table": "decision_policy_refinement"}</li>
+<li><strong>laya_inference_config / the tenant's laya pin</strong> - {"note": "model_ref, params, timeout_ms; created through <code>laya_configs.create</code> with a 30000 ms default; every L1 decision pins its version when one applies", "owner": "decision ladder", "table": "laya_inference_config"}</li>
+<li><strong>approval / approval_decision / the L3 gate</strong> - {"note": "the human decision cites an approved approval with at least one human approve decision; <code>decision_approval_fk</code> keeps the citation honest; the requester/executor exclusion is T1's", "owner": "control", "table": "approval, approval_decision"}</li>
+<li><strong>inference_call / the L2 ledger row</strong> - {"note": "the generation call's prompt identity and usage; never a rung and never a transition input; the result is bound to a draft document", "owner": "generation", "table": "inference_call"}</li>
+<li><strong>document (draft artefact) / the generated draft</strong> - {"note": "<code>documents.compose</code> creates the draft with <code>meta.generated</code> and an optional <code>card_id</code>; <code>documents.update</code> refuses the generated class; <code>ladder.apply_draft</code> is the gated attach", "owner": "documents", "table": "document"}</li>
+<li><strong>outbox event / the audit trace</strong> - {"note": "<code>decision.changed</code> with topic <code>&lt;entity&gt;:&lt;id&gt;</code> and payload <code>{entity, id, op}</code> is appended in the caller's transaction for every ladder mutation", "owner": "event store", "table": "event"}</li>
+<li><strong>decision indexes / the two ladder reads</strong> - {"index": "decision_kind_idx, decision_rung_idx", "note": "both lead with <code>tenant_id</code> and order by <code>created_at DESC</code>; the audit reads by case kind and by rung", "owner": "decision ladder"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision ladder · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

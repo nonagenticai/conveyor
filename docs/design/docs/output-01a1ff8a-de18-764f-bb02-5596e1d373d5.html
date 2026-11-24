@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T1 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Closure review — T1 Plan spine (retrospective, 2026-11-21)</h1>
+<h2>Outcome vs acceptance</h2>
+<p>The SPEC_V2 §12 gate, clause by clause, with the ten issue-#72 scenarios that prove it:</p>
+<ul>
+<li><strong>One project with a baseline.</strong> Pass. <code>plan_spine.rs::a_baseline_does_not_move_when_rows_change</code> takes the baseline, edits the WBS row directly and reads the frozen snapshot unchanged. The live project had no baseline row at the 2026-11-21T18:51:39Z snapshot; this rework takes the scope baseline from the one WBS deliverable.</li>
+<li><strong>A change request.</strong> Pass. <code>plan_spine.rs::a_change_request_without_impact_is_refused</code> refuses a change with no impact block or baseline (<code>422 change_impact_missing</code>) and accepts one carrying both.</li>
+<li><strong>A refused self-approval.</strong> Pass. <code>approval_dual.rs::the_requester_cannot_decide_their_own_gate</code> returns 409, writes no <code>approval_decision</code> row, and a distinct approver then succeeds; <code>programme_baseline.rs::the_taker_cannot_approve_their_own_baseline</code> returns 409 <code>self_approval</code>.</li>
+<li><strong>WSJF recomputes from inputs.</strong> Pass. <code>plan_spine.rs::wsjf_recomputes_when_an_input_changes</code> moves the read score from 3.0 to 4.5 after editing the four inputs, and <code>information_schema</code> has no <code>wsjf</code> column.</li>
+<li><strong>The portfolio view lists the in-flight set.</strong> Pass. <code>plan_spine.rs::the_portfolio_lists_only_the_in_flight_set</code> lists active and paused, excludes closed and archived, and the status set is read from tenant configuration with default <code>active,paused</code>.</li>
+<li><strong>A dependency cycle is refused.</strong> Pass. <code>plan_spine.rs::a_two_node_dependency_cycle_is_refused</code> returns 409 <code>dependency_cycle</code>; <code>::a_deep_dependency_cycle_leaves_no_row</code> refuses a four-node diamond plus D→A and leaves the edge list unchanged.</li>
+<li><strong>A benefit profile without baseline, target, method or owner is refused.</strong> Pass. <code>plan_spine.rs::a_benefit_without_baseline_target_method_or_owner_is_refused</code> returns 422 <code>benefit_profile_incomplete</code> and leaves no row.</li>
+<li><strong>A benefit-map edge names its five levels.</strong> Pass. <code>plan_spine.rs::a_benefit_map_edge_names_its_five_levels</code> refuses an edge missing its strategic objective (422 <code>benefit_map_incomplete</code>) and stores a complete edge.</li>
+<li><strong>Additional issue-#72 scenario: a tranche review needs evidence.</strong> Pass. <code>plan_spine.rs::a_tranche_review_without_evidence_is_refused</code> returns 422 <code>tranche_evidence_missing</code> without baselines, benefit status and the risk register; with them the review records <code>continue</code> and the tranche state becomes <code>closed</code>.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li>Delivery commit <code>e3d7c4eb2bc1b0b4ee2a1b7ba561bf119d75a002</code> (2026-11-17 06:30:42 +0100), "plan spine: T1 — the rows, the actions and the ten scenarios (#72) (#250)"; issue #72 CLOSED, GitHub updatedAt 2026-11-17T05:31:04Z.</li>
+<li>Schema <code>migrations/0044_plan_spine.sql</code>: the eleven plan-spine and MSP tables plus the widened <code>governed_asset</code> kind CHECK; every table tenant-scoped with FORCE RLS.</li>
+<li>Tests: the ten named functions above in <code>crates/actions/tests/plan_spine.rs</code>, <code>crates/api/tests/approval_dual.rs</code> and <code>crates/actions/tests/programme_baseline.rs</code>.</li>
+<li>Published inception analysis <code>01a1e683-1569-7742-bfcb-4c8ed08c0e51</code> (2026-11-16T22:38:46.994966Z) and architecture design <code>01a1e683-33ff-75ab-ba17-a7d75400afc6</code> (2026-11-16T22:38:49.104890Z), both measured at main@cc88052.</li>
+<li>Tranche 1 <code>01a1e9e0-d787-7f5c-b5ed-15b05f3dc531</code>, state <code>authorised</code> from 2026-11-21T01:11:46Z by the tranche-0 <code>continue</code> review <code>01a1ed84-e111-7082-9fa8-7fe77ccc9024</code>; the live register records the earlier out-of-sequence closure as the accepted P0 issue <code>U3-EXC-T1</code> (<code>01a1fbac-713e-7d4f-b114-e02378152d3a</code>).</li>
+<li>This rework records the charter, the Statement of Architecture Work, the delivery contract, the seven A–D artefacts, the scope baseline, this Phase-G review and this closure review; it declares the closure output <code>closure-review</code> and publishes the expected outputs <code>project-brief</code> and <code>evidence</code>.</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li><strong>Original governance record: not recoverable.</strong> No charter, Statement of Architecture Work, delivery contract, Phase-G review or closure review was authored before the 2026-11-17 close. The records in this set are retrospective.</li>
+<li><strong>Out-of-sequence closure.</strong> T1 closed on 2026-11-17, before tranche 1 was authorised on 2026-11-21; the live register carries the accepted P0 issue <code>U3-EXC-T1</code> describing the retrospective exception. This review re-closes the project under the standing delegation and does not claim the original close met the tranche entry criteria.</li>
+<li><strong>The baseline is recorded by the rework.</strong> The gate clause "one project with a baseline" was proved by P1.1 but the live project had no baseline row at the snapshot; the rework takes the scope baseline from the one WBS deliverable.</li>
+<li><strong>T10 deferrals.</strong> Cadence materialisation, PI planning and the benefits-realization procedure are T10. T1 stores the rows and the refusals; the Portfolio page's WSJF-backlog, cadence and capacity tabs remain fixtures, and only <code>portfolio.in_flight</code> is live.</li>
+<li><strong>Manifest result not asserted.</strong> <code>acceptance/programme/T1.toml</code> is the rework's acceptance instrument; this retrospective review does not assert a manifest run that the facts do not record.</li>
+</ul>
+<h2>Decision</h2>
+<p>Record the compliance level <strong>compliant</strong>. Close the <code>mandatory_artefacts</code> gap: the seven Phase A–D artefacts, the Statement of Architecture Work, the delivery contract and the Phase-G review are published. Re-close T1 through the one gate with the closure output <code>closure-review</code> and the expected outputs <code>project-brief</code> and <code>evidence</code>, decided by an approver other than the requester, against the T1 acceptance instrument. This is a retrospective record under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>; it states the evidence that exists and does not claim a contemporaneous review that was never written.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Plan spine · conveyor output · published 2026-11-24T16:30:00Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

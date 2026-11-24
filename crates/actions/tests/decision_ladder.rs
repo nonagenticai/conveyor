@@ -24,6 +24,21 @@ async fn fixture() -> (support::Pg, support::Running, support::Seeded) {
         .await
         .expect("the catalogue seed");
     let running = support::Running::start(&pg).await;
+    // `ladder.precheck` authenticates with the tenant's sealed `laya.token`; the L1 path cannot
+    // reach the stub without it.
+    let mut tx = conveyor_store::begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scoped tx");
+    conveyor_store::secret::create_secret_tx(
+        &mut tx,
+        seeded.tenant,
+        "laya.token",
+        b"test-laya-token",
+        "tenant",
+    )
+    .await
+    .expect("seal the laya token");
+    tx.commit().await.expect("commit the laya token");
     (pg, running, seeded)
 }
 
@@ -82,30 +97,81 @@ async fn create_laya_config(running: &support::Running) -> String {
     id_of(output(&body), "id")
 }
 
-async fn evaluate(running: &support::Running, confidence: f64) -> (u16, Value) {
-    running
+/// The verified L1 path: build the case, ask laya through the engine (the stub answers `score`),
+/// then evaluate the claim. Each call starts its own stub, so the caller holds
+/// [`support::LAYA_ENV`] for the calls' lifetime.
+async fn evaluate(running: &support::Running, score: f64) -> (u16, Value) {
+    evaluate_with(running, score, None, None).await
+}
+
+/// [`evaluate`] with the card and metadata a draft gate's decision carries.
+async fn evaluate_with(
+    running: &support::Running,
+    score: f64,
+    card_id: Option<&str>,
+    meta: Option<Value>,
+) -> (u16, Value) {
+    let stub = support::LayaStub::start(json!({
+        "answers": {"accept": {"score": score, "reason": "the stub's verdict"}}
+    }))
+    .await;
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &stub.base);
+    // A distinct draft per verdict: two evaluations of the *same* case would share the claim and
+    // the engine would replay the first exchange — that is the verification working, not a test
+    // fixture detail.
+    let case_output = json!({"draft": format!("the ladder's case at {score}")});
+    let criteria = json!([{"criterion": "names the change"}]);
+    let (status, body) = running
         .invoke(
-            "ladder.evaluate",
+            "ladder.case",
             "dev:alice",
             json!({
                 "kind": "gate.precheck",
                 "gate": "capability_ready",
-                "question": "Is the capability ready for the gate?",
-                "answer": "pass",
-                "confidence": confidence,
-                "latency_ms": 17,
-                "input": {"card": "card-1", "pin": "knowledge@7"}
+                "output": case_output,
+                "criteria": criteria
             }),
             None,
             None,
             None,
         )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let case = output(&body).clone();
+    assert_eq!(case["fires"], json!(true), "{case}");
+    let (status, body) = running
+        .invoke(
+            "ladder.precheck",
+            "dev:alice",
+            case["case"].clone(),
+            None,
+            case["call_key"].as_str(),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let mut input = json!({
+        "kind": "gate.precheck",
+        "gate": "capability_ready",
+        "output": case_output,
+        "criteria": criteria,
+        "call_key": case["call_key"]
+    });
+    if let Some(card_id) = card_id {
+        input["card_id"] = json!(card_id);
+    }
+    if let Some(meta) = meta {
+        input["meta"] = meta;
+    }
+    running
+        .invoke("ladder.evaluate", "dev:alice", input, None, None, None)
         .await
 }
 
 /// P1.1 — a rule, a laya and a human decision share one audit shape.
 #[tokio::test(flavor = "multi_thread")]
 async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
+    let _guard = support::LAYA_ENV.lock().await;
     let (_pg, running, _seeded) = fixture().await;
     create_policy(
         &running,
@@ -173,6 +239,19 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
         .await;
     assert_eq!(status, 200, "{approval}");
     let approval_id = id_of(output(&approval), "id");
+    // A human decision must cite an approval that actually resolved in its favour; the
+    // requester cannot decide their own gate, so the fixture's second admin approves it.
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            support::REVIEWER,
+            json!({"approval_id": approval_id, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
     let (status, human) = running
         .invoke(
             "ladder.record",
@@ -268,6 +347,7 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
 /// P2.1 — a tenant refinement changes the threshold with no code change.
 #[tokio::test(flavor = "multi_thread")]
 async fn a_refinement_changes_a_threshold_without_a_code_change() {
+    let _guard = support::LAYA_ENV.lock().await;
     let (_pg, running, _seeded) = fixture().await;
     let (policy_id, _etag) = create_policy(
         &running,
@@ -318,6 +398,7 @@ async fn a_refinement_changes_a_threshold_without_a_code_change() {
 /// P3.1 — every decision pins the versions it read; a later change does not rewrite the row.
 #[tokio::test(flavor = "multi_thread")]
 async fn every_decision_pins_the_refinement_and_laya_config_versions() {
+    let _guard = support::LAYA_ENV.lock().await;
     let (pg, running, _seeded) = fixture().await;
     let (policy_id, etag) = create_policy(
         &running,
@@ -394,6 +475,7 @@ async fn every_decision_pins_the_refinement_and_laya_config_versions() {
 /// draft reaches a card, and the ordinary edit path refuses the generated class outright.
 #[tokio::test(flavor = "multi_thread")]
 async fn a_generated_draft_cannot_transition_a_card() {
+    let _guard = support::LAYA_ENV.lock().await;
     let (_pg, running, _seeded) = fixture().await;
     create_policy(
         &running,
@@ -468,23 +550,7 @@ async fn a_generated_draft_cannot_transition_a_card() {
     let card_id = id_of(output(&card), "id");
 
     // A below-threshold decision: the gate refuses, and it cannot apply a draft.
-    let (status, refused) = running
-        .invoke(
-            "ladder.evaluate",
-            "dev:alice",
-            json!({
-                "kind": "gate.precheck",
-                "gate": "capability_ready",
-                "card_id": card_id,
-                "answer": "pass",
-                "confidence": 0.4,
-                "latency_ms": 5
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
+    let (status, refused) = evaluate_with(&running, 0.4, Some(&card_id), None).await;
     assert_eq!(status, 201, "{refused}");
     assert_eq!(output(&refused)["outcome"], "refused", "{refused}");
 
@@ -525,23 +591,13 @@ async fn a_generated_draft_cannot_transition_a_card() {
     assert_eq!(status, 422, "{refused_apply}");
 
     // An accepted L1 decision is the gate.
-    let (status, accepted) = running
-        .invoke(
-            "ladder.evaluate",
-            "dev:alice",
-            json!({
-                "kind": "gate.precheck",
-                "gate": "capability_ready",
-                "card_id": card_id,
-                "answer": "pass",
-                "confidence": 0.9,
-                "latency_ms": 5
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
+    let (status, accepted) = evaluate_with(
+        &running,
+        0.9,
+        Some(&card_id),
+        Some(json!({"draft_document_id": document_id})),
+    )
+    .await;
     assert_eq!(status, 201, "{accepted}");
     assert_eq!(output(&accepted)["outcome"], "accepted", "{accepted}");
     let decision_id = id_of(output(&accepted), "id");

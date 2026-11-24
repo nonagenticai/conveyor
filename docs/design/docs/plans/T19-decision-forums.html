@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19 — Decision forums (meetings) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19-decision-forums.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19--decision-forums-meetings">T19 — Decision forums (meetings)</h1>
+<p>Programme project: T19 · issue #606 · close-out #650</p>
+<p><strong>Gate (SPEC_V2 §12 T19):</strong> a three-department board meeting decides its agenda items by recorded majority with a recorded dissent; an item missing a required department is deferred <code>inquorate</code> and cannot be decided; a meeting cannot lower a linked approval's dual control or waive its evidence; the owner decides one item in the web meeting room and another asynchronously from the agent front end over MCP, both recorded <code>via='meeting'</code>; minutes publish behind the chair's gate and every action becomes a card; a forum with no decision over a cycle is flagged.</p>
+<h2 id="1-objective">1. Objective</h2>
+<p>The conveyor records the decision <em>and</em> the deliberation. High-level work — programme management, architecture, analysis, project management — happens in meetings between positions from different departments; today only the resulting <code>approval</code> row survives. T19 makes the meeting a first-class <strong>card</strong> whose agenda items resolve existing approvals, whose participants are job bindings or humans holding typed positions, and whose outcomes are derived by arithmetic over those positions and the linked approval's stricter policy. The record is rows, not a transcript: the meeting adds the cross-department positions, conditions, commitments and dissent, and never creates a second decision store.</p>
+<h2 id="2-starting-state-measured-at-mainb9a6e293-on-2026-11-23">2. Starting state (measured at <code>main@b9a6e293</code> on 2026-11-23)</h2>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>State</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Meeting tables and actions</td>
+<td>ABSENT</td>
+<td><code>git grep -n 'meeting_type|meeting_position|meetings\.' -- migrations crates apps</code> → 0</td>
+</tr>
+<tr>
+<td><code>approval_decision</code> participant model</td>
+<td>PARTIAL</td>
+<td><code>migrations/0002_domain.sql:231-248</code>: <code>approver_id → app_user</code> is human-only; <code>via jsonb</code> exists; <code>decision ∈ approve|reject</code></td>
+</tr>
+<tr>
+<td><code>governed_asset(kind='minutes')</code></td>
+<td>ABSENT</td>
+<td><code>migrations/0044_plan_spine.sql:411-419</code> kind CHECK has no <code>minutes</code></td>
+</tr>
+<tr>
+<td>Meeting card type / console route</td>
+<td>ABSENT</td>
+<td><code>seed/catalogue.json</code> has no <code>meeting</code>; <code>apps/web/src</code> has no <code>/meetings</code></td>
+</tr>
+<tr>
+<td>Approvals, cards, runs, <code>app_user</code></td>
+<td>DONE, reused</td>
+<td><code>migrations/0002_domain.sql</code>; <code>approval_decision.via</code> is the surface record</td>
+</tr>
+<tr>
+<td><code>project_dependency</code></td>
+<td>DONE (T1)</td>
+<td><code>migrations/0044_plan_spine.sql</code></td>
+</tr>
+<tr>
+<td><code>governance_body</code></td>
+<td>DONE (T9)</td>
+<td><code>migrations/0054_architecture.sql</code>; #81 closed</td>
+</tr>
+<tr>
+<td><code>programme_cadence</code></td>
+<td>DONE (T10)</td>
+<td><code>migrations/0056_cadence_tranche.sql</code>; #82 closed</td>
+</tr>
+<tr>
+<td>T18 UI lane</td>
+<td>IN FLIGHT, separate</td>
+<td>#562–#566, PR #603; T19 does not touch it</td>
+</tr>
+<tr>
+<td>T19 plan/programme artefacts</td>
+<td>ABSENT</td>
+<td>this unit (#605) creates them</td>
+</tr>
+</tbody>
+</table>
+<p>The two measured gaps that change the shape of the build: <code>approval_decision</code> has no job-binding participant (§4.1), and <code>minutes</code> is not a governed-asset kind (§6).</p>
+<h2 id="3-scope">3. Scope</h2>
+<p><strong>IN</strong> — <code>meeting_type</code> policy and versioning; <code>meeting</code> as a card with its DoD; agenda items over <code>approval | register_item | asset | cadence</code>; attendance for <code>job_binding | app_user</code>; one live position per participant per item; quorum, required departments and the three decision rules; <code>close_item</code>'s per-seat <code>approval_decision</code> rows and stricter-wins arithmetic; the closed outcome set; commitments as <code>project_dependency</code> or cards; actions as cards; minutes as a chaired <code>governed_asset</code>; the human seat (including the owner) live in the web room and asynchronously over web/Telegram/MCP; participant-hours metering; the never-decided forum flag; the <code>/meetings</code> console destination; the <code>meeting</code> card type and seed; the T9 <code>governance_body</code> and T10 <code>programme_cadence</code> consumer seams.</p>
+<p><strong>OUT</strong> — a chat system, a transcript store or an AV product; a calendar dependency (ICS is a read of attendance); an LLM that selects items, decides, infers a position or marks attendance; a second decision store; a rebuild of T9's board, T10's cadence or the approval primitive; the T18 UI lane; ArchiMate-style rendering of the minutes.</p>
+<p><strong>UI surface declared for the console:</strong> the <strong>Meetings</strong> destination (§10.5) with the invitation list, the room (agenda, evidence, participants by department/seat, live positions and the running outcome), the asynchronous decision queue, minutes/actions, and history/latency/load. The route <code>/meetings</code> and <code>/meetings/:id</code> are declared in the spec; T18's shell lists the destination, T19 owns the screen and its <code>meetings.spec.ts</code>.</p>
+<h2 id="4-the-model">4. The model</h2>
+<h3 id="41-the-meeting-the-card-and-the-participant-extension">4.1 The meeting, the card and the participant extension</h3>
+<p>A meeting is a <code>card</code> (its chair owns it, WIP limits and DoD apply) plus a <code>meeting</code> row. Its DoD is every agenda item closed with an outcome and the minutes published. The convener is a <code>governance_body</code>, a <code>job_binding</code> or an <code>app_user</code>; one live meeting exists per cadence slot (<code>uq_meeting_live</code>).</p>
+<p>The approval primitive's decision row is human-only today: <code>approval_decision.approver_id uuid NOT NULL REFERENCES app_user(id)</code>. §6.8 requires one decision row per qualifying <strong>seat</strong>, and seats are both humans and job bindings. T19 therefore extends the primitive rather than inventing a second decision record:</p>
+<ul>
+<li><code>approver_id</code> becomes nullable; add <code>job_binding_id uuid REFERENCES job_binding(id)</code>;</li>
+<li>add <code>participant_kind text NOT NULL DEFAULT 'human' CHECK (participant_kind IN ('human','job'))</code>;</li>
+<li>a CHECK requires exactly one of <code>approver_id</code>, <code>job_binding_id</code>;</li>
+<li>the existing unique <code>(approval_id, approver_id)</code> stays; add a partial unique <code>(approval_id, job_binding_id) WHERE job_binding_id IS NOT NULL</code>;</li>
+<li>existing rows backfill <code>participant_kind='human'</code>; <code>decided_by_kind='agent'</code> for job seats.</li>
+</ul>
+<p>The alteration is additive and tenant-scoped like the existing table. It is the one core-table change in this slice; the alternative — writing a meeting decision into the L1 <code>decision</code> table — would create the second decision store §6.8 forbids.</p>
+<h3 id="42-policy-and-convening">4.2 Policy and convening</h3>
+<p><code>meeting_type</code> is the forum policy: purpose, <code>agenda_sources[]</code>, required participation (departments and positions with minimum counts), quorum, decision rule (<code>unanimous | majority | chair</code>), evidence minimum, decision window, timebox and allowed outcomes. It is tenant-scoped and versioned (P11): a meeting pins the type version it was opened under, so a policy change never rewrites an in-flight forum. Who may convene is an authority row, not code.</p>
+<h3 id="43-the-agenda-is-an-l0-query">4.3 The agenda is an L0 query</h3>
+<p>The item set is L0 over <code>agenda_sources[]</code> — open approvals for the body, register items of named kinds, dependency slips, cadence slots — plus explicit <code>meetings.agenda_add</code>. A deciding item names exactly one pre-opened <code>approval</code> with its evidence and policy; there is no implicit approval. An item without the type's evidence minimum is refused <code>422 item_evidence_missing</code>. The LLM drafts wording and the pre-read pack; the chair adopts the agenda. It never selects.</p>
+<h3 id="44-attendance-and-positions">4.4 Attendance and positions</h3>
+<p><code>meeting_attendance</code> holds the participant (<code>job_binding</code> or <code>app_user</code>), seat (<code>chair | member | presenter | observer | delegate</code>), department and invitation/response state; delegation is allowed only where the type permits it. <code>meeting_position</code> is one live row per participant per item: stance (<code>approve | approve_with_conditions | reject | abstain | request_evidence</code>), rationale, conditions, optional commitment, surface and time. The position is immutable once the item closes. An observer's position is recorded and never counts.</p>
+<p><code>approval_decision.decision</code> admits only <code>approve | reject</code>; a position of <code>approve_with_conditions</code> writes an <code>approve</code> decision row and the conditions stay in the position, the approval's <code>meta</code> and the minutes. The derived item outcome can still be "approved with conditions" because it is computed from the positions, not copied from the decision column.</p>
+<h3 id="45-the-outcome-arithmetic">4.5 The outcome arithmetic</h3>
+<p><code>close_item</code> derives the item outcome in this order:</p>
+<ol type="1">
+<li>the attendance quorum over the type's required participation; a missing required department defers the item <code>inquorate</code>;</li>
+<li>the meeting's rule over the cast positions: a majority counts cast positions, abstentions count toward quorum only, a tie defers, <code>chair</code> carries once quorum exists and every required department has stated a position;</li>
+<li>the linked approval's policy: required decisions, distinct approvers, evidence minimum, P4 conflict exclusion and dual control;</li>
+<li>the stricter result wins. The meeting never lowers dual control, never waives evidence and never bypasses P4. An observer never counts. A participant whose own work the item judges is excluded by the same conflict rule.</li>
+</ol>
+<p>On a deciding close, one <code>approval_decision</code> row per qualifying seat is written with <code>via = {"surface":"meeting","channel":"web|telegram|mcp","meeting_id":...}</code> (the JSON <code>via</code> column already exists). <code>meeting_position</code> is never a decision row.</p>
+<h3 id="46-outcomes-commitments-actions-and-minutes">4.6 Outcomes, commitments, actions and minutes</h3>
+<p>The closed set is <code>decision | commitment | action | information | deferred</code>. A decision is the linked approval's recorded result, derived from the decision rows. A commitment names the committing position, beneficiary, what, by when and its condition, and becomes a <code>project_dependency</code> edge or a card; no owner or date = refused. An action becomes a card (§6.6). An information item is typed and counted. No outcome = cannot close. Minutes are a <code>governed_asset(kind='minutes')</code> drafted from the rows and published behind the chair's approval; the rows remain the record, and a minute line that does not match a row is a defect.</p>
+<h3 id="47-the-human-seat-live-and-asynchronous">4.7 The human seat, live and asynchronous</h3>
+<p>Any human, including the owner, holds an ordinary <code>app_user</code> attendance row in any seat. Every deciding item is also an approval with a decision window, answerable from the web room, the web UI, Telegram or the agent front end over MCP. <code>via</code> records the surface; the first decision across surfaces counts and later ones are refused by the existing <code>(approval_id, approver_id)</code> unique rule. No calendar system is depended on: <code>meeting_attendance</code> is the record, and an ICS feed is a read of it. Absence is recorded as absence, never invented as an approval. A conversational room over MCP is the agent front end's surface; the conveyor supplies the items and records the positions, so the record does not depend on the room.</p>
+<h3 id="48-metering-and-retirement">4.8 Metering and retirement</h3>
+<p>Participant-hours derive from attendance × duration and enter D52's roll-up as a third source beside <code>inference_call</code> and <code>tool_call</code>, at tenant/department/programme/project/job grain. The instruments are decision latency, agenda conversion, quorum-miss rate, commitment slippage, action closure, person-hours per decision and decisions per meeting. A <code>meeting_type</code> whose instances produce no decision over a cadence cycle is flagged and retired, exactly as a never-refused gate is flagged (P10).</p>
+<h2 id="5-deliverables">5. Deliverables</h2>
+<h3 id="d1--policy-convening-and-the-participant-extension">D1 — Policy, convening and the participant extension</h3>
+<p><code>meeting_type</code> (versioned, tenant-scoped), <code>meeting</code>, the <code>approval_decision</code> participant extension, <code>meetings.schedule/open/invite/respond</code>, one live meeting per cadence slot, the meeting card and its DoD.</p>
+<ul>
+<li>Given a <code>meeting_type</code>, when a second live meeting is opened in the same cadence slot, then it is refused <code>409</code> and the first remains. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_policy a_second_live_meeting_in_a_slot_is_refused</code></li>
+<li>Given a meeting, when it is opened, then it is a card with the meeting DoD and a <code>meeting.opened</code> event. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_policy a_meeting_is_a_card_with_its_dod</code></li>
+<li>Given a job-binding seat, when it decides an item, then the approval_decision row carries <code>job_binding_id</code> and <code>participant_kind='job'</code>; a human seat carries <code>approver_id</code> and <code>participant_kind='human'</code>. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_policy a_job_seat_writes_a_participant_decision</code></li>
+</ul>
+<h3 id="d2--the-agenda-is-a-query">D2 — The agenda is a query</h3>
+<p>L0 over <code>agenda_sources[]</code>, <code>meetings.agenda_add</code>, the four resolved object kinds, the evidence minimum, <code>422 item_evidence_missing</code>, chair adoption.</p>
+<ul>
+<li>Given open approvals and named register kinds, when the agenda is materialised, then every item is a row from the L0 query and no item is selected by a model. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_agenda the_item_set_is_l0_over_the_sources</code></li>
+<li>Given a deciding item with no evidence ref, when it is added, then <code>422 item_evidence_missing</code> and no item row. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_agenda an_item_without_evidence_is_refused</code></li>
+<li>Given an item naming two approvals, when it is added, then it is refused: exactly one approval. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_agenda an_item_names_exactly_one_approval</code></li>
+</ul>
+<h3 id="d3--attendance-positions-and-quorum">D3 — Attendance, positions and quorum</h3>
+<p><code>meeting_attendance</code>, delegation policy, <code>meetings.position</code>, one live position per participant per item, immutable after close, required departments and <code>inquorate</code>.</p>
+<ul>
+<li>Given two positions from one participant on one item, when the second is recorded, then the first is superseded or refused; one live row remains. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_attendance one_live_position_per_participant</code></li>
+<li>Given a required department with no attendance, when the item closes, then it is deferred <code>inquorate</code> and no decision row is written. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_attendance a_missing_department_defers_inquorate</code></li>
+<li>Given a closed item, when a position is edited, then the edit is refused. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_attendance a_closed_item_position_is_immutable</code></li>
+</ul>
+<h3 id="d4--the-outcome-arithmetic">D4 — The outcome arithmetic</h3>
+<p><code>meetings.close_item</code>, per-seat decision rows, majority/unanimous/chair, abstentions, ties, observer exclusion, stricter-wins against dual control/evidence/P4.</p>
+<ul>
+<li>Given three departments and a majority rule, when the item closes, then each qualifying seat is one decision row <code>via-&gt;&gt;'surface'='meeting'</code> and the dissent is kept. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_decision majority_records_each_seat_and_keeps_dissent</code></li>
+<li>Given a linked approval with dual control, when the meeting rule would need fewer decisions, then the approval's stricter requirement wins and the item is refused. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_decision a_meeting_never_lowers_dual_control</code></li>
+<li>Given an even split, when the item closes, then it defers; an observer's position never counts. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_decision a_tie_defers_and_observers_do_not_count</code></li>
+<li>Given a participant whose own work the item judges, when positions are counted, then that seat is excluded by P4. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_decision the_conflict_rule_excludes_the_judged_seat</code></li>
+</ul>
+<h3 id="d5--outcomes-commitments-actions-and-minutes">D5 — Outcomes, commitments, actions and minutes</h3>
+<p>The closed outcome set, <code>meetings.defer/close</code>, owner+date commitments, dependency/card creation, action cards, the <code>minutes</code> kind, <code>meetings.minutes_publish</code> behind the chair's approval, the minute-line check.</p>
+<ul>
+<li>Given a commitment without owner or date, when it is recorded, then it is refused. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_outcomes a_commitment_needs_owner_and_date</code></li>
+<li>Given an action outcome, when the item closes, then a card exists and is linked from the item. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_outcomes an_action_becomes_a_card</code></li>
+<li>Given minutes, when publication is requested without the chair's approval, then it is refused; with it, the governed asset is published and every line matches a row. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_outcomes minutes_need_the_chair_and_match_the_rows</code></li>
+</ul>
+<h3 id="d6--the-human-seat-across-surfaces">D6 — The human seat across surfaces</h3>
+<p><code>app_user</code> seats in every role, the live web room, asynchronous web/Telegram/MCP, <code>via</code> surface, first-decision-wins, ICS read, draft-only LLM.</p>
+<ul>
+<li>Given one deciding item, when the owner decides in the web room and over MCP, then exactly one decision row exists and it records the first surface. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_human_seat the_first_decision_across_surfaces_counts</code></li>
+<li>Given the web room, when the owner opens it, then the agenda, evidence, participants, positions and running outcome render, and the async queue offers the same deciding items. <code>Verify:</code> <code>npx playwright test apps/web/e2e/meetings.spec.ts --grep 'owner seat'</code></li>
+<li>Given an ICS request, when it is read, then it is derived from attendance and writes nothing. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_human_seat an_ics_feed_is_a_read</code></li>
+</ul>
+<h3 id="d7--metering-and-retirement">D7 — Metering and retirement</h3>
+<p>Participant-hours as the third D52 source; the seven instruments; the never-decided retirement flag.</p>
+<ul>
+<li>Given attendance and duration, when the roll-up is read, then participant-hours recompute from rows and attribute to the programme/project/job. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_metering participant_hours_enter_the_rollup</code></li>
+<li>Given a forum with no decision over a cadence cycle, when metrics run, then it is flagged and eligible for retirement. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_metering a_forum_with_no_decision_is_flagged</code></li>
+</ul>
+<h3 id="d8--the-console-destination-and-the-seams">D8 — The console destination and the seams</h3>
+<p><code>/meetings</code> and <code>/meetings/:id</code>, the five screens, the <code>meeting</code> card type and seed, the <code>governance_body</code> convener, the cadence-slot agenda source.</p>
+<ul>
+<li>Given a <code>governance_body</code>, when its standing meeting opens, then the body is the convener and the meeting type is the standing one, with no second decision path. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_console a_governance_body_convenes_its_standing_meeting</code></li>
+<li>Given a <code>programme_cadence</code> slot, when it materialises, then its items resolve to a meeting instance. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_console a_cadence_slot_resolves_to_a_meeting</code></li>
+<li>Given the console, when the Meetings destination opens, then every screen renders empty, error, happy and one refusal state. <code>Verify:</code> <code>npx playwright test apps/web/e2e/meetings.spec.ts</code></li>
+</ul>
+<h2 id="6-data-model">6. Data model</h2>
+<p>Five new tables, all tenant-scoped, <code>ENABLE</code>+<code>FORCE RLS</code>, with <code>created_at</code>/<code>updated_at</code>/<code>version</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Columns and constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>meeting_type</code></td>
+<td><code>key</code>, <code>name</code>, <code>purpose</code>, <code>agenda_sources jsonb</code>, <code>required_participation jsonb</code>, <code>quorum int</code>, <code>decision_rule text CHECK (unanimous|majority|chair)</code>, <code>evidence_minimum int</code>, <code>decision_window interval</code>, <code>timebox interval</code>, <code>allowed_outcomes text[]</code>, <code>status</code>, <code>version</code>; unique <code>(tenant_id, key, version)</code>; a version is immutable once a meeting pins it</td>
+</tr>
+<tr>
+<td><code>meeting</code></td>
+<td><code>card_id</code>, <code>convener_kind CHECK (governance_body|job_binding|app_user)</code>, <code>convener_id</code>, <code>meeting_type_id</code>, <code>meeting_type_version</code>, <code>opens_at</code>, <code>decision_window_end</code>, <code>cadence_slot</code>; partial unique <code>(tenant_id, meeting_type_id, cadence_slot) WHERE status='live'</code></td>
+</tr>
+<tr>
+<td><code>meeting_agenda_item</code></td>
+<td><code>meeting_id</code>, <code>sequence</code>, <code>resolved_kind CHECK (approval|register_item|asset|cadence)</code>, <code>resolved_id</code>, <code>participating_departments uuid[]</code>, <code>evidence_refs jsonb</code>, <code>outcome text CHECK (decision|commitment|action|information|deferred)</code>, <code>defer_reason</code>; unique <code>(meeting_id, sequence)</code></td>
+</tr>
+<tr>
+<td><code>meeting_attendance</code></td>
+<td><code>meeting_id</code>, <code>participant_kind CHECK (job_binding|app_user)</code>, <code>participant_id</code>, <code>seat CHECK (chair|member|presenter|observer|delegate)</code>, <code>department_id</code>, <code>invitation_state</code>, <code>response_state</code>, <code>delegated_from</code>; unique <code>(meeting_id, participant_kind, participant_id)</code></td>
+</tr>
+<tr>
+<td><code>meeting_position</code></td>
+<td><code>meeting_id</code>, <code>agenda_item_id</code>, <code>participant_kind</code>, <code>participant_id</code>, <code>stance CHECK (approve|approve_with_conditions|reject|abstain|request_evidence)</code>, <code>rationale</code>, <code>conditions jsonb</code>, <code>commitment jsonb</code>, <code>surface CHECK (web|telegram|mcp)</code>, <code>recorded_at</code>; partial unique <code>(agenda_item_id, participant_kind, participant_id) WHERE superseded_at IS NULL</code>; immutable once the item closes</td>
+</tr>
+</tbody>
+</table>
+<p>Two alterations, both additive:</p>
+<ol type="1">
+<li><code>approval_decision</code>: nullable <code>approver_id</code>; add <code>job_binding_id uuid REFERENCES job_binding(id)</code> and <code>participant_kind text NOT NULL DEFAULT 'human' CHECK (participant_kind IN ('human','job'))</code>; CHECK exactly one participant; partial unique <code>(approval_id, job_binding_id) WHERE job_binding_id IS NOT NULL</code>; existing rows keep <code>participant_kind='human'</code>.</li>
+<li><code>governed_asset_kind_check</code>: widen with <code>minutes</code>.</li>
+</ol>
+<p><code>approval_decision.via</code> is already <code>jsonb</code>; a meeting decision writes <code>{"surface":"meeting","channel":"web|telegram|mcp","meeting_id":"&lt;uuid&gt;"}</code>. No other V1 table is altered. <code>card.job_binding_id</code> exists (T0); <code>project_dependency</code> (T1), <code>governance_body</code> (T9) and <code>programme_cadence</code> (T10) are reused.</p>
+<h2 id="7-actions-and-events">7. Actions and events</h2>
+<p>Every action is an <code>ActionSpec</code> with one declaration → HTTP + MCP + OpenAPI + generated client. The family is <code>meetings.&lt;noun&gt;_&lt;verb&gt;</code> because the registry requires exactly one dot:</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Effect</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>meetings.schedule</code></td>
+<td>write</td>
+<td>creates the meeting card + <code>meeting</code> in <code>scheduled</code>; policy-version pinned</td>
+</tr>
+<tr>
+<td><code>meetings.open</code></td>
+<td>write</td>
+<td><code>scheduled → live</code>; emits <code>meeting.opened</code> in one transaction</td>
+</tr>
+<tr>
+<td><code>meetings.invite</code></td>
+<td>write</td>
+<td>creates/updates attendance; authority-checked</td>
+</tr>
+<tr>
+<td><code>meetings.respond</code></td>
+<td>write</td>
+<td>invitation response; never invents a position</td>
+</tr>
+<tr>
+<td><code>meetings.agenda_add</code></td>
+<td>write</td>
+<td>explicit item; evidence minimum; exactly one approval</td>
+</tr>
+<tr>
+<td><code>meetings.position</code></td>
+<td>write</td>
+<td>one live position per participant/item; draft-only LLM cannot call it</td>
+</tr>
+<tr>
+<td><code>meetings.defer</code></td>
+<td>write</td>
+<td>deferred outcome with a reason (<code>inquorate</code> included)</td>
+</tr>
+<tr>
+<td><code>meetings.close_item</code></td>
+<td>write</td>
+<td>writes per-seat <code>approval_decision</code> rows; derives the outcome; emits <code>meeting_item.closed</code></td>
+</tr>
+<tr>
+<td><code>meetings.close</code></td>
+<td>write</td>
+<td>closes the meeting; refuses while an item has no outcome</td>
+</tr>
+<tr>
+<td><code>meetings.minutes_publish</code></td>
+<td>write</td>
+<td>publishes the governed asset behind the chair's approval; emits <code>meeting_minutes.published</code></td>
+</tr>
+<tr>
+<td><code>meetings.list</code> / <code>meetings.get</code></td>
+<td>read</td>
+<td>invitations, room, history, instruments</td>
+</tr>
+</tbody>
+</table>
+<p>Events are one subject and one verb; the writing action and its event commit in one transaction. <code>architecture.board_open|get|decide</code> remain T9's macros over these actions and add no decision path.</p>
+<h2 id="8-the-programme">8. The programme</h2>
+<p>T19 is a programme project at tranche 4. The MSP record is <code>docs/plans/T19/msp-profile.md</code>: benefit <strong>B7 — Deliberated cross-department decisions</strong>, the benefits-map edge, risk <strong>R20</strong>, the stakeholder profiles and the tranche-4 evidence. The TOGAF record is <code>docs/plans/T19/architecture-design.md</code>: the PSA set (principles, requirements, stakeholders, drivers/goals, solution concept) and the HLD set (business, data, application and technology views, migration), each artefact with the standard's common metadata and links; the Statement of Architecture Work and the compliance approach close it. The SAFe record is <code>docs/plans/T19/safe-epic.md</code>: the epic hypothesis, features F1–F8, enablers E1–E6, WSJF inputs and the PI objectives for tranche 4. <code>docs/plans/T19/artifact-register.md</code> is the typed catalogue of those artefacts. The programme doc's "decision forums" subsection names each framework's procedures as meeting types (programme board, tranche review, Architecture/Design Board, PI planning, system demo, inspect &amp; adapt, incident review).</p>
+<h2 id="9-dependencies">9. Dependencies</h2>
+<table>
+<thead>
+<tr>
+<th>Relation</th>
+<th>Issue</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>blocked-by</td>
+<td>#72 (T1)</td>
+<td><code>seed/programme.json</code> T19 <code>meta.depends_on</code>; plan spine, registers, dependencies</td>
+</tr>
+<tr>
+<td>blocked-by</td>
+<td>#73 (T2)</td>
+<td>the L3 ladder and policy evaluation the approval arithmetic sits on</td>
+</tr>
+<tr>
+<td>blocked-by</td>
+<td>#74 (T3)</td>
+<td>the PM's gate routing and the card/closure path</td>
+</tr>
+<tr>
+<td>blocked-by</td>
+<td>#120 (P0)</td>
+<td>every delivery slice is P0-gated; the brief and inception standard</td>
+</tr>
+<tr>
+<td>related</td>
+<td>#81 (T9)</td>
+<td>built; <code>governance_body</code> is the convener seam, not a rebuild</td>
+</tr>
+<tr>
+<td>related</td>
+<td>#82 (T10)</td>
+<td>built; <code>programme_cadence</code> is the cadence-slot seam, not a rebuild</td>
+</tr>
+<tr>
+<td>related</td>
+<td>#562–#566</td>
+<td>the T18 UI lane; no ordering, different files</td>
+</tr>
+<tr>
+<td>blocks</td>
+<td>#606</td>
+<td>the T19 implementation issue carries D1–D8</td>
+</tr>
+</tbody>
+</table>
+<p>T9 and T10 are measured <code>built</code>. Their board/cadence <strong>binding</strong> to T19's meeting types is a follow-up integration unit; it is not a <code>blocked-by</code> on a built slice and does not freeze T19.</p>
+<h2 id="10-acceptance-and-definition-of-done">10. Acceptance and definition of done</h2>
+<p>Every D-scenario passes at the PR head with a row in <code>Evidence at completion</code>; the repo gate is green at the exact head (<code>rbuild --gate</code>); migrations and the ledger pass <code>--check-lock</code>; the console check and the design/docs/coverage gates pass; one PR <code>Closes #606</code> merged. The five new tables and two alterations are in the migration ledger; <code>check-coverage</code> reports T19 <code>built</code> only when every declared table, action and module exists. The live gate is the owner deciding one item in the web room and one over MCP, both <code>via-&gt;&gt;'surface'='meeting'</code>.</p>
+<h2 id="11-not-claimed">11. Not claimed</h2>
+<p>No chat or transcript store, no AV integration, no calendar dependency, no LLM that selects, decides, infers a position or marks attendance, no second decision store, no rebuild of the approval primitive beyond the participant extension, no ArchiMate rendering of minutes, no full-suite replacement of T9's board or T10's cadence.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T19-decision-forums.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

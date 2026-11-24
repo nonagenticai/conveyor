@@ -279,6 +279,14 @@
 <li><strong>Group state</strong>: <code>gh issue view &lt;n&gt; --json state</code> for the executor, analysis and deck units.</li>
 </ul>
 <p>If a count disagrees with this document, the document is stale — correct it in the same PR that changes the count, not later.</p>
+<h2 id="7-corrections-measured-2026-11-22-558">7. Corrections measured 2026-11-22 (#558)</h2>
+<p>The measurements in §§1–4 are dated 2026-11-15. Three claims are now stale and are corrected here, in the PR that measured them:</p>
+<ul>
+<li><code>produce.script</code> is registered; the production family is not "zero <code>produce.*</code> actions".</li>
+<li>The deck action is <code>decks.render</code> (<code>crates/deck</code>), not the planned <code>produce.deck</code>.</li>
+<li><code>analyse.site</code> and <code>analyse.video</code> are registered; the analysis library is on <code>main</code>, not "in flight".</li>
+</ul>
+<p>The machine-readable capability diff and its gate are <code>seed/tool_provenance.json</code>, <code>crates/actions/tests/tool_provenance.rs</code> and <code>docs/plans/06-TOOL-PROVENANCE.md</code>.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/plans/05-W2V-ABSORPTION.md</code> at build time.</span>

@@ -13,6 +13,14 @@
 //! `CONVEYOR_EXTERNAL_TTS_URL` and `CONVEYOR_EXTERNAL_ASR_URL`, no default. An unset value is a
 //! visible `unconfigured` refusal, never a guessable host.
 //!
+//! **The licence credential.** Both hosts run an armed licence gate that resolves the tenant from
+//! a licence token (`POST /license/introspect`) and refuses an anonymous call: speech answers
+//! `503 license_unavailable`, transcription `401 INVALID_TOKEN` (`token_not_found`) — measured
+//! 2026-11-19 (#410). The tenant's own token is sealed under [`LICENCE_TOKEN_SECRET`]; the engine
+//! opens it under the caller's tenant and sends it as the bearer. An unsealed tenant is refused
+//! before any call, and a token the gate rejects becomes a typed conveyor refusal (never the
+//! host's raw 401/503 passed through as an upstream fault).
+//!
 //! **Why the legacy narration route for speech.** `/api/tts/synthesize` answers the JSON envelope
 //! when the request asks for JSON and raw `audio/wav` otherwise. It is the route that carries the
 //! loudness premaster and the per-sentence pacing the narration pipeline depends on, and it is the
@@ -39,6 +47,14 @@ pub const SPEECH_SERVICE: &str = "tts";
 
 /// The transcription service key: `CONVEYOR_EXTERNAL_ASR_URL`.
 pub const TRANSCRIBE_SERVICE: &str = "asr";
+
+/// The per-tenant sealed secret carrying the tenant's licence token.
+///
+/// Both mini2 gates resolve the tenant **from the token itself**, so the token — not the bare
+/// tenant id every other external call carries — is the credential that entitles the call. A
+/// tenant seals its own under this name (the licences API mints the JSON envelope that
+/// `bearer_from_secret` unwraps); there is no platform token.
+pub const LICENCE_TOKEN_SECRET: &str = "licence.token";
 
 /// The envelope member the narration route puts the WAV bytes in, base64.
 const SPEECH_ARTEFACT_FIELD: &str = "audio_base64";
@@ -220,7 +236,8 @@ fn speech() -> ActionSpec {
             service: SPEECH_SERVICE,
             method: "POST",
             path: "/api/tts/synthesize",
-            auth: None,
+            // The host's licence gate is armed: an anonymous call is `503 license_unavailable`.
+            auth: Some(LICENCE_TOKEN_SECRET),
             auth_optional: false,
             upload: None,
         },
@@ -263,7 +280,8 @@ fn transcribe() -> ActionSpec {
             service: TRANSCRIBE_SERVICE,
             method: "POST",
             path: "/v1/audio/transcriptions",
-            auth: None,
+            // The host rejects a request with no licence token: `401 INVALID_TOKEN`.
+            auth: Some(LICENCE_TOKEN_SECRET),
             auth_optional: false,
             upload: Some(Upload {
                 input: "document",
@@ -309,15 +327,29 @@ mod tests {
                 service,
                 method,
                 path,
+                auth,
+                auth_optional,
                 upload,
                 ..
             } => {
                 assert_eq!(service, "tts");
                 assert_eq!(method, "POST");
                 assert_eq!(path, "/api/tts/synthesize");
+                assert_eq!(
+                    auth,
+                    Some(LICENCE_TOKEN_SECRET),
+                    "the host's licence gate is armed (#410)"
+                );
+                assert!(
+                    !auth_optional,
+                    "an unsealed tenant must be refused, not sent anonymously"
+                );
                 assert!(upload.is_none(), "speech sends JSON, not a file");
             }
-            HandlerRef::Internal(_) | HandlerRef::Workflow | HandlerRef::Broker => {
+            HandlerRef::Internal(_)
+            | HandlerRef::Workflow
+            | HandlerRef::Broker
+            | HandlerRef::ToolDestination => {
                 panic!("produce.speech must be a declared external action")
             }
         }
@@ -337,16 +369,30 @@ mod tests {
             HandlerRef::External {
                 service,
                 path,
+                auth,
+                auth_optional,
                 upload,
                 ..
             } => {
                 assert_eq!(service, "asr");
                 assert_eq!(path, "/v1/audio/transcriptions");
+                assert_eq!(
+                    auth,
+                    Some(LICENCE_TOKEN_SECRET),
+                    "the host rejects a request with no licence token (#410)"
+                );
+                assert!(
+                    !auth_optional,
+                    "an unsealed tenant must be refused, not sent anonymously"
+                );
                 let upload = upload.expect("transcription is a multipart upload");
                 assert_eq!(upload.input, "document");
                 assert_eq!(upload.field, "file");
             }
-            HandlerRef::Internal(_) | HandlerRef::Workflow | HandlerRef::Broker => {
+            HandlerRef::Internal(_)
+            | HandlerRef::Workflow
+            | HandlerRef::Broker
+            | HandlerRef::ToolDestination => {
                 panic!("media.transcribe must be a declared external action")
             }
         }

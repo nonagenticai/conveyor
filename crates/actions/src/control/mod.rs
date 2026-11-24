@@ -31,6 +31,7 @@ pub mod channels;
 pub mod messages;
 // #282: the tenant's decision about how one destructive action is gated.
 pub mod policies;
+pub mod run_create;
 pub mod runs;
 pub mod views;
 
@@ -185,6 +186,12 @@ pub fn run_error(error: store::RunStoreError, action: &str) -> ActionError {
             tracing::error!(%error, action, "the run's step bookkeeping failed");
             ActionError::internal()
         }
+        // S21 step 6: the terminal attempt row could not be written; the whole transition rolls
+        // back with it (one transaction), so this is a database failure, not a business refusal.
+        store::RunStoreError::Memory(error) => {
+            tracing::error!(%error, action, "the run's terminal memory row failed");
+            ActionError::internal()
+        }
         store::RunStoreError::Database(error) => store_error(error, action),
     }
 }
@@ -226,12 +233,26 @@ pub fn approval_error(error: store::ApprovalStoreError, action: &str) -> ActionE
             "signoff_requires_human",
             format!("{action:?}: an eval sign-off must be decided by a person"),
         ),
+        store::ApprovalStoreError::ExecutorGateHumanOnly => ActionError::new(
+            403,
+            "executor_gate_requires_human",
+            format!("{action:?}: an executor gate must be decided by a person"),
+        ),
         store::ApprovalStoreError::EvalScopeRequired => ActionError::new(
             403,
             "eval_signoff_scope_required",
             format!(
                 "{action:?}: deciding an eval sign-off requires the evals:approve scope, \
                  not approvals:write alone"
+            ),
+        ),
+        store::ApprovalStoreError::ImplementerCannotDecide => ActionError::new(
+            403,
+            "implementer_cannot_decide",
+            format!(
+                "{action:?}: the implementing principal of a development project cannot decide \
+                 the gate that judges its own work (SPEC_V2 §5.4); the gate stays pending for a \
+                 different principal"
             ),
         ),
         store::ApprovalStoreError::Database(error) => store_error(error, action),

@@ -131,16 +131,98 @@
 </ul>
 <p>The <strong>phase rail A–H</strong> then produces typed artefacts: vision and stakeholders at A; the business architecture at B; the information-systems architectures at C; the technology architecture at D; opportunities, solutions and the work packages at E; the migration plan at F; implementation governance at G; and change management at H, which records exactly one change or kata. A phase cannot close while a mandatory artefact is still draft, and a delivery project's design gate is refused when it has no live architecture contract. Reviews record one compliance level; a waiver names its accepting owner and its review date.</p>
 <p>The capability is a <strong>tailored ADM profile</strong> for software delivery, not a claim of TOGAF certification or full conformance; what is claimed is testable: the artefacts and gates the organisation uses are rows, the process runs, and a deviation is a decision record rather than a silent fork.</p>
-<h2 id="5-the-buildout-under-its-own-capability--measured-2026-11-19">5. The buildout under its own capability — measured 2026-11-19</h2>
+<h2 id="5-the-buildout-under-its-own-capability--measured-2026-11-24">5. The buildout under its own capability — measured 2026-11-24</h2>
 <p>The programme does not only describe MSP and TOGAF; it runs under them. Measured on the live programme at the stated date:</p>
 <ul>
 <li><strong>P0's definition set is published</strong> — 27 of 27 outputs, so the tranche-0 review could be taken on evidence.</li>
 <li><strong>Tranche 0 is closed and its review decision is <code>continue</code></strong>, authorised by the programme owner on 2026-11-17; tranches 1–13 are planned. Tranche 1's exit set is S02, T1 and T11.</li>
 <li><strong>The delivery projects carry published briefs and inception outputs</strong>; the inception gate refuses a build run until a project's analysis and architecture are published.</li>
-<li><strong>The six live benefit profiles (B1–B6) are <code>draft</code>, with their baselines <code>not measured</code></strong> and a measurement method recorded; the tranche-0 review evidence lists them unmeasured and records that the BCM is unstaffed as a risk. That is the honest state, not a zero.</li>
-<li><strong>Architecture contracts are the largest open gap.</strong> Only T9's project has a contract row, and it is not yet approved; the other delivery projects have none. The board's approval is the authority act, and it is tracked separately from this study.</li>
+<li><strong>The benefit profiles are <code>draft</code>, with their baselines <code>not measured</code></strong> and a measurement method recorded; the tranche-0 review evidence lists them unmeasured and records that the BCM is unstaffed as a risk. That is the honest state, not a zero. The exception is <strong>B7 Deliberated cross-department decisions</strong> (T19), whose baseline is now a measurement record — zero deliberated decision rows before T19 — with the programme-manager job as its benefit owner. The seed carries <strong>seven</strong> profiles: B1–B6 and B7; the snapshot regenerated with this study exports all seven.</li>
+<li><strong>T19 (decision forums) is built and closed at tranche 4</strong> — the plan and programme artefacts landed at #605, the implementation at #606, and the close-out at #650: the five tables, the twelve <code>meetings.*</code> actions, the <code>approval_decision</code> participant extension, the <code>/meetings</code> destination and the participant-hours roll-up are measured present, and the slice's evidence is <code>docs/plans/T19/evidence.md</code>. The live gate ran on the deployed revision on 2026-11-24: the human seat decided one agenda item in the web room and one over MCP, both <code>via='meeting'</code>, and the meeting closed on its published minutes; the same 15-check gate passes again on the current deployment <code>7e617673</code>. The gate exposed and closed two deployment defects in the MCP surface (the public host allowlist and per-session pod affinity), both in <code>gitops-production</code>. The published snapshot now carries T19, its board and B7. T19's own TOGAF chain is live and approved: seven typed artefacts (<code>requirements_catalog</code>, <code>stakeholder_map</code>, <code>driver_goal_objective</code>, <code>solution_concept</code>, <code>business_capability_map</code>, <code>data_entity_catalog</code>, <code>technology_standards</code>), their links, a live Statement of Architecture Work (<code>01a20ce0-5183-776c-84bd-327f2301b19b</code>, board decision <code>01a20ce0-644d-7340-a696-1af10fa8c61e</code>), a live phase-F delivery contract (<code>01a20cea-91bb-77f4-a880-044c90bb5f0e</code>), a Phase-G compliance review on each contract (level <code>conformant</code>), and a published <code>architecture-artifact</code> output (<code>01a20ce4-73e4-7009-9ec7-eb2265e9e84e</code>); <code>scripts/t19-governance-chain.py --check</code> reads all 16 assertions back. The approvals were performed by the tenant's <code>conveyor-approver</code> seat under the standing delegation, not by the owner personally. <code>docs/plans/T19/closure-review.md</code> records the decision; the one remaining T19-labelled audit finding is the programme's tranche-4 authorisation (P0), which belongs to the #526 retrospective chain; the <code>meeting_type</code> authoring route and the T9/T10 binding remain follow-ups. The T18 UI lane (#562–#566) is in flight and independent.</li>
+<li><strong>Architecture contracts remain a large open gap, one project smaller.</strong> Twelve delivery projects (T3, T5–T8, T12, T14–T19) had no live contract at the last audit; T19 now carries one, live and board-approved, so the count is eleven. The board's approval is the authority act, and the remaining contract requests are tracked by the #526 programme-rework lane.</li>
 </ul>
 <p>The units that close the gaps are themselves rows in the programme: T11's metrics (merged 2026-11-19, #404) measure realization; the seed of the buildout's own definition — its benefits, map, tranches and per-project ADM phase/plateau — is a pending unit; the board's contract approvals are a pending unit; and the closure and retirement gates (#302, #303) make a project's close and a profile's retirement evidence-bound.</p>
+<h3 id="51-decision-forums--where-msp-togaf-and-safe-meet">5.1 Decision forums — where MSP, TOGAF and SAFe meet</h3>
+<p>The meeting is the one mechanism all three frameworks name. A programme board and a tranche review are MSP's decision and review forums; the Architecture Board and the Design Board are TOGAF's governing bodies; PI planning, the system demo and inspect &amp; adapt are SAFe's cadence events. V2 models each as a <code>meeting_type</code> over the same rows — the convener supplies the schedule, the meeting supplies the record (D66).</p>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Named procedure</th>
+<th>Convener</th>
+<th>Agenda sources</th>
+<th>Decision rule</th>
+<th>Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MSP</td>
+<td>programme board</td>
+<td>sponsoring group / SRO</td>
+<td>programme register, benefit-at-risk, tranche decisions</td>
+<td>chair (type policy)</td>
+<td>decision / commitment</td>
+</tr>
+<tr>
+<td>MSP</td>
+<td>tranche review</td>
+<td>sponsoring group</td>
+<td>baselines, benefit status, risk register</td>
+<td>unanimous or chair (type policy)</td>
+<td>continue / pause / stop</td>
+</tr>
+<tr>
+<td>TOGAF</td>
+<td>Architecture Board sitting</td>
+<td><code>governance_body</code></td>
+<td>architecture contracts, compliance reviews, waivers, change requests</td>
+<td>majority</td>
+<td>decision / action</td>
+</tr>
+<tr>
+<td>TOGAF</td>
+<td>Design Board sitting</td>
+<td><code>governance_body</code></td>
+<td>solution designs, design gate, deviations</td>
+<td>majority</td>
+<td>decision / action</td>
+</tr>
+<tr>
+<td>SAFe</td>
+<td>PI planning</td>
+<td>programme manager</td>
+<td>backlog by WSJF, capacity, plan approval</td>
+<td>majority</td>
+<td>decision / commitment</td>
+</tr>
+<tr>
+<td>SAFe</td>
+<td>system demo</td>
+<td>programme manager</td>
+<td>completed deliverables and evidence</td>
+<td>chair</td>
+<td>information / decision</td>
+</tr>
+<tr>
+<td>SAFe</td>
+<td>inspect &amp; adapt</td>
+<td>coach</td>
+<td>retro findings, lessons, kata candidates</td>
+<td>majority</td>
+<td>action / commitment</td>
+</tr>
+<tr>
+<td>Operations</td>
+<td>incident review</td>
+<td>incident commander</td>
+<td>incident, postmortem, runbook findings</td>
+<td>chair</td>
+<td>decision / action</td>
+</tr>
+</tbody>
+</table>
+<p>T19's set is the executable form of this table: <code>docs/plans/T19-decision-forums.md</code> (the delivery plan), <code>docs/plans/T19/project-brief.md</code> and <code>inception-analysis.md</code> (the project's inception), <code>docs/plans/T19/architecture-design.md</code> (the PSA and HLD set), <code>docs/plans/T19/msp-profile.md</code> (B7, R20 and the tranche-4 evidence), <code>docs/plans/T19/safe-epic.md</code> (features, enablers, WSJF and PI objectives) and <code>docs/plans/T19/artifact-register.md</code> (the typed catalogue). The <code>governance_body</code> and <code>programme_cadence</code> rows are the consumer seams; their binding to T19's meeting types follows the slice.</p>
 <h2 id="6-the-measurement-and-refusal-discipline">6. The measurement and refusal discipline</h2>
 <p>The programme's claims rest on four rules that are enforced in code, not prose:</p>
 <ul>

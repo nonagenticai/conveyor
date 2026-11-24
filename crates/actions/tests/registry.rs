@@ -114,7 +114,28 @@ use serde_json::{Value, json};
 /// authorises). 500 → **502**.
 /// **#15 (S21 step 3) adds 5 internal**: the `prompt_recipes.create|get|list|activate|retire`
 /// catalogue surface. 503 → **508**.
-const EXPECTED: [&str; 515] = [
+/// **T17 (#87) adds 5 internal**: `authoring.intake|draft|review|publish|assets` — the tenant
+/// asset authoring family. 513 → 518. **T19 (#606) adds 12 internal**: the meetings family
+/// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
+/// `minutes_publish|list|get`) — 518 → **530**.
+/// **S21 step 9 (#649) adds 1 internal**: `cards.assign`, the card handoff (binding + note +
+/// bound run start). 530 → **531**. **T5 (#77) adds 8 internal**: P1's
+/// `kata.open|get|observe|analyse|hypothesise|propose|measure` and P2–P4's `kata.adopt` —
+/// 531 → **539**. **T6 (#80) adds 9 internal**: `development_projects.charter|record_step|`
+/// `review_gate|merge_gate|deploy_gate|close|get|rollback|change_judging_surface` — the
+/// self-development path and its gates, the earned auto-merge read and the closure record.
+/// 539 → **548**. **T8 (#79) adds 3 internal**: `lessons.propose|review|promote` — the
+/// organisational-memory lifecycle. 548 → **551**. **T15 (#86) adds 10 internal**:
+/// `toolkits.import_openapi|register_mcp|discover_mcp`, `tool_authoring.draft|validate|test|`
+/// `review|publish|promote` and the broker's registered-destination dispatch `tools.dispatch`
+/// — 551 → **561**; T12 (#88) adds the three remaining kata Gets → **564**; #655 (T17b) adds
+/// `authoring.intakes` → **565**. **S21 step 10 (#656) adds 4**: `ladder.case` and
+/// `decision_option_sets.get|set` (internal) and `ladder.precheck` (external) — 565 → **569**,
+/// internal 547 → 550, external 18 → 19.
+/// **#557 adds 8 internal**: `tool_bindings.create|update|retire|list`, `tools.list|get`,
+/// `toolkits.list` and `tool_calls.list` — 569 → **577**, internal 550 → 558, external
+/// stays 19.
+const EXPECTED: [&str; 577] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -162,6 +183,12 @@ const EXPECTED: [&str; 515] = [
     "architecture.skills_list",
     "artifacts.list",
     "audit.list",
+    "authoring.assets",
+    "authoring.draft",
+    "authoring.intake",
+    "authoring.intakes",
+    "authoring.publish",
+    "authoring.review",
     "baselines.get",
     "baselines.list",
     "baselines.take",
@@ -202,6 +229,7 @@ const EXPECTED: [&str; 515] = [
     "card_types.list",
     "cards.add_label",
     "cards.archive",
+    "cards.assign",
     "cards.claim",
     "cards.comment",
     "cards.create",
@@ -248,11 +276,22 @@ const EXPECTED: [&str; 515] = [
     "decisions.transition",
     "decisions.update",
     "decks.render",
+    "decision_option_sets.get",
+    "decision_option_sets.set",
     "decision_policies.create",
     "decision_policies.list",
     "decision_policies.update",
     "departments.create",
     "departments.list",
+    "development_projects.change_judging_surface",
+    "development_projects.charter",
+    "development_projects.close",
+    "development_projects.deploy_gate",
+    "development_projects.get",
+    "development_projects.merge_gate",
+    "development_projects.record_step",
+    "development_projects.review_gate",
+    "development_projects.rollback",
     "documents.compose",
     "documents.create",
     "documents.delete",
@@ -341,17 +380,35 @@ const EXPECTED: [&str; 515] = [
     "job_releases.retire",
     "jobs.list",
     "jobs.retry",
+    "kata.adopt",
+    "kata.analyse",
+    "kata.get",
+    "kata.hypothesise",
+    "kata.measure",
+    "kata.observe",
+    "kata.open",
+    "kata.propose",
+    "kata.standardise",
+    "kata.stretch",
+    "kata.sustain",
     "knowledge.query",
     "labels.create",
     "labels.delete",
     "labels.update",
     "ladder.apply_draft",
+    "ladder.case",
     "ladder.evaluate",
     "ladder.list",
+    "ladder.precheck",
     "ladder.record",
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
+    // T8 (#79): the organisational-memory lifecycle — propose with independent evidence,
+    // a person's review, and promotion to a governed-asset source draft.
+    "lessons.promote",
+    "lessons.propose",
+    "lessons.review",
     "licences.get",
     "lists.create",
     "lists.move",
@@ -374,6 +431,18 @@ const EXPECTED: [&str; 515] = [
     "members.list",
     "members.remove",
     "members.set_role",
+    "meetings.agenda_add",
+    "meetings.close",
+    "meetings.close_item",
+    "meetings.defer",
+    "meetings.get",
+    "meetings.invite",
+    "meetings.list",
+    "meetings.minutes_publish",
+    "meetings.open",
+    "meetings.position",
+    "meetings.respond",
+    "meetings.schedule",
     "memory.recall",
     "memory.remember",
     "metrics.flow",
@@ -551,6 +620,11 @@ const EXPECTED: [&str; 515] = [
     "runs.start",
     "schedules.list",
     "schedules.upsert",
+    "scientific_formal.translate",
+    "scientific_formal.verify",
+    "scientific_stats.confidence_interval",
+    "scientific_stats.meta_analysis",
+    "scientific_stats.trend",
     "search.query",
     "secrets.create",
     "secrets.delete",
@@ -577,13 +651,24 @@ const EXPECTED: [&str; 515] = [
     "tasks.update",
     "tenants.get",
     "tenants.update_settings",
+    "tool_authoring.draft",
+    "tool_authoring.promote",
+    "tool_authoring.publish",
+    "tool_authoring.review",
+    "tool_authoring.test",
+    "tool_authoring.validate",
     "tool_bindings.create",
+    "tool_bindings.list",
     "tool_bindings.retire",
     "tool_bindings.update",
     "tool_calls.list",
+    "toolkits.discover_mcp",
+    "toolkits.import_openapi",
     "toolkits.list",
     "toolkits.publish",
+    "toolkits.register_mcp",
     "tools.call",
+    "tools.dispatch",
     "tools.get",
     "tools.list",
     "tools.probe",
@@ -722,9 +807,33 @@ fn the_registry_is_exactly_the_declared_set() {
     // request that opens the closure gate): 489 -> 490; external stays 13.
     // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
     // 490 -> 495; external stays 13.
-    // #557 adds seven internal actions (`tool_bindings.create|update|retire`, `tools.list|get`,
-    // `toolkits.list`, `tool_calls.list`): 495 -> 502; external stays 13.
-    assert_eq!((internal, external), (502, 13));
+    // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
+    // `trend` and `scientific_formal.translate|verify`: internal stays 495, external 13 -> 18.
+    // T17 (#87) adds five internal actions (`authoring.intake|draft|review|publish|assets`):
+    // 495 -> 500; external stays 18. T19 (#606) adds twelve internal meetings actions:
+    // 500 -> 512; external stays 18.
+    // T5 (#77) adds eight internal actions — P1's `kata.open|get|observe|analyse|hypothesise|`
+    // `propose|measure` and P2–P4's `kata.adopt`: internal 512 -> 520. S21 step 9 (#649) adds
+    // one internal (`cards.assign`): 520 -> 521; external stays 18.
+    // T6 (#80) adds nine internal actions (`development_projects.*`): internal 521 -> 530;
+    // external stays 18 — the evidence is rows on this tenant's own database.
+    // T8 (#79) adds three internal actions (`lessons.propose|review|promote`): internal
+    // 530 -> 533; external stays 18 — a promotion writes this tenant's own source draft and
+    // calls no model.
+    // T15 (#86) adds ten internal actions (`toolkits.import_openapi|register_mcp|discover_mcp`,
+    // `tool_authoring.draft|validate|test|review|publish|promote`, `tools.dispatch`):
+    // internal 533 -> 543; external stays 18 — an authored tool dispatches through the broker's
+    // registered-destination arm, not a new external declaration.
+    // T12 (#88) adds three internal kata Gets (`kata.standardise|sustain|stretch`):
+    // internal 543 -> 546; external stays 18.
+    // #655 (T17b) adds one internal read (`authoring.intakes`): internal 546 -> 547;
+    // external stays 18 — the queue reads this tenant's own intake rows.
+    // S21 step 10 (#656) adds three internal actions (`ladder.case`, `decision_option_sets.get|set`)
+    // and one external (`ladder.precheck`): internal 547 -> 550, external 18 -> 19.
+    // #557 adds eight internal actions (`tool_bindings.create|update|retire|list`,
+    // `tools.list|get`, `toolkits.list`, `tool_calls.list`): internal 550 -> 558;
+    // external stays 19.
+    assert_eq!((internal, external), (558, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
@@ -1137,9 +1246,8 @@ fn no_eval_signoff_or_answer_key_action_is_machine_reachable() {
 
     assert_eq!(
         conveyor_actions::channel::MCP_DEFAULT_ACTIONS.len(),
-        43,
-        "34 before S15, plus knowledge.query and memory.recall, plus S15 step 5's four capability \
-         reads, plus S19 Part C's report, audits.get and findings.list"
+        48,
+        "43 before T19, plus the five meeting reads/writes the agent front end needs"
     );
 }
 

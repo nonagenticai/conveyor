@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Principle realization — principles to the code and gates that enforce them - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Principle realization — principles to the code and gates that enforce them</li>
+<li>Phase: preliminary</li>
+<li>Kind: diagram</li>
+<li>Purpose: Show, per principle, the code or gate that enforces it; a principle with no realization is a slogan.</li>
+<li>Scope: The ten principles of PF-1 against the merged code at main@f14b7d36.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>P1 / implementation</strong> - {"evidence": "crates/actions/src/lib.rs \u2014 the one compiled registry; crates/actions/tests/registry.rs asserts its exact set", "relation": "realization"}</li>
+<li><strong>P2 / implementation</strong> - {"evidence": "crates/actions/src/invoke.rs \u2014 dispatch, precondition, RFC 9457 errors", "relation": "realization"}</li>
+<li><strong>P3 / implementation</strong> - {"evidence": "crates/store/src/scope.rs and the tenant_isolation policies in every migration", "relation": "realization"}</li>
+<li><strong>P4 / implementation</strong> - {"evidence": "crates/actions/src/documents/revisions.rs (documents.publish) and crates/render/src/markdown.rs", "relation": "realization"}</li>
+<li><strong>P5 / implementation</strong> - {"evidence": "migrations/0042_document_workflow.sql and crates/store/src/document.rs", "relation": "realization"}</li>
+<li><strong>P6 / implementation</strong> - {"evidence": "scripts/build-coverage.py, scripts/build-programme-seed.py, scripts/check-output-standard.py", "relation": "realization"}</li>
+<li><strong>P7 / implementation</strong> - {"evidence": "crates/actions/tests/authoring_standard.rs and the programme gates in crates/actions/src/programme.rs", "relation": "realization"}</li>
+<li><strong>P8 / implementation</strong> - {"evidence": "migrations/0044_plan_spine.sql and crates/actions/tests/plan_spine.rs", "relation": "realization"}</li>
+<li><strong>P9 / implementation</strong> - {"evidence": "crates/actions/src/documents/secrets.rs and scripts/ci/no-private-refs.sh", "relation": "realization"}</li>
+<li><strong>P10 / implementation</strong> - {"evidence": "docs/decisions/0005-absorption-sequence-and-repo-scope.md and the absorbed modules under crates/", "relation": "realization"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>CI, runners and platform · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -15,13 +15,27 @@ use serde_json::{Map, Value, json};
 use tokio::sync::Semaphore;
 use uuid::Uuid;
 
-use crate::catalog::ProviderEntry;
+use crate::catalog::{ProviderEntry, ReasoningDialect};
 use crate::contract::schemas::{
     ChatCompletionRequest, ChatCompletionResponse, ChatMessage, Choice, ResponseFormatType, Role,
     ToolCall, Usage,
 };
 
 use super::{BoxFuture, BuildError, Provider, UpstreamBodies, UpstreamError, UpstreamResponse};
+
+/// The per-provider knobs that shape the upstream body. One value, so `chat_payload` stays a
+/// four-argument function and its two call sites (streaming and not) cannot drift apart.
+#[derive(Debug, Clone, Default)]
+pub(crate) struct RenderOptions {
+    /// `json_object` downgrades a `json_schema` request (an upstream with no guided JSON).
+    pub response_format_mode: Option<String>,
+    /// Send `chat_template_kwargs` at all.
+    pub force_chat_template_kwargs: bool,
+    /// How a boolean `enable_reasoning` is spelled for this upstream.
+    pub reasoning_dialect: ReasoningDialect,
+    /// Raise-only floor for `max_tokens`.
+    pub min_completion_tokens: Option<u32>,
+}
 
 /// One OpenAI-compatible provider.
 pub struct OpenAiProvider {
@@ -33,8 +47,7 @@ pub struct OpenAiProvider {
     pub(super) timeout: Duration,
     pub(super) slot: Option<Arc<Semaphore>>,
     pub(super) slot_wait: Duration,
-    pub(super) response_format_mode: Option<String>,
-    pub(super) force_chat_template_kwargs: bool,
+    pub(super) render: RenderOptions,
 }
 
 impl OpenAiProvider {
@@ -73,8 +86,12 @@ impl OpenAiProvider {
                 .max_concurrent
                 .map(|slots| Arc::new(Semaphore::new(slots))),
             slot_wait,
-            response_format_mode: entry.response_format_mode.clone(),
-            force_chat_template_kwargs: entry.force_chat_template_kwargs,
+            render: RenderOptions {
+                response_format_mode: entry.response_format_mode.clone(),
+                force_chat_template_kwargs: entry.force_chat_template_kwargs,
+                reasoning_dialect: entry.reasoning_dialect,
+                min_completion_tokens: entry.min_completion_tokens,
+            },
         })
     }
 }
@@ -91,13 +108,7 @@ impl Provider for OpenAiProvider {
     ) -> BoxFuture<'a, Result<UpstreamResponse, UpstreamError>> {
         Box::pin(async move {
             let model = model_override.unwrap_or(&self.model_id);
-            let payload = chat_payload(
-                request,
-                model,
-                false,
-                self.response_format_mode.as_deref(),
-                self.force_chat_template_kwargs,
-            );
+            let payload = chat_payload(request, model, false, &self.render);
             let body = serde_json::to_string(&payload).expect("the payload serializes");
 
             // The slot wait is OUTSIDE the HTTP timeout, exactly as the live service has it: a
@@ -137,6 +148,7 @@ impl Provider for OpenAiProvider {
                 })?;
 
             let status = response.status();
+            let retry_after = retry_after_secs(response.headers());
             let text = response
                 .text()
                 .await
@@ -155,6 +167,7 @@ impl Provider for OpenAiProvider {
                     provider: self.name.clone(),
                     status: status.as_u16(),
                     body: text,
+                    retry_after,
                 });
             }
 
@@ -181,13 +194,7 @@ impl Provider for OpenAiProvider {
     ) -> BoxFuture<'a, Result<super::ChunkStream, UpstreamError>> {
         Box::pin(async move {
             let model = model_override.unwrap_or(&self.model_id);
-            let payload = chat_payload(
-                request,
-                model,
-                true,
-                self.response_format_mode.as_deref(),
-                self.force_chat_template_kwargs,
-            );
+            let payload = chat_payload(request, model, true, &self.render);
             let body = serde_json::to_string(&payload).expect("the payload serializes");
 
             // The slot is held for the whole stream, not just the open: dropping the permit
@@ -230,6 +237,7 @@ impl Provider for OpenAiProvider {
 
             let status = response.status();
             if !status.is_success() {
+                let retry_after = retry_after_secs(response.headers());
                 let text = response.text().await.unwrap_or_default();
                 if status.as_u16() == 400 {
                     return Err(UpstreamError::BadRequest {
@@ -241,6 +249,7 @@ impl Provider for OpenAiProvider {
                     provider: self.name.clone(),
                     status: status.as_u16(),
                     body: text,
+                    retry_after,
                 });
             }
 
@@ -401,6 +410,23 @@ impl SseState {
     }
 }
 
+/// The reasoning fragment in one message or delta, whichever spelling the upstream uses.
+///
+/// `reasoning_content` is the OpenAI-compatible name; `reasoning` is what vLLM streams and is
+/// the only one the Inkling build emits. A null or empty first key must not shadow a populated
+/// second — `.or_else` on the key alone would — and an empty fragment is treated as absent:
+/// emitting `"reasoning_content":""` would stop an inert frame being byte-identical to the
+/// parity oracle's captured stream.
+fn reasoning_text(object: &Value) -> Option<String> {
+    ["reasoning_content", "reasoning"].iter().find_map(|key| {
+        object
+            .get(*key)
+            .and_then(Value::as_str)
+            .filter(|text| !text.is_empty())
+            .map(str::to_owned)
+    })
+}
+
 /// Parse one upstream chunk dict, with the reference's own rules.
 ///
 /// `model` is the REQUESTED model (what the caller named); `served_model` and
@@ -429,6 +455,10 @@ fn parse_openai_chunk(
                                 .get("content")
                                 .and_then(Value::as_str)
                                 .map(str::to_owned),
+                            // vLLM's Inkling build streams the trace under `reasoning`; the
+                            // OpenAI-compatible spelling is `reasoning_content`. Both land on
+                            // one field, exactly as the non-streamed message already does.
+                            reasoning_content: reasoning_text(&delta),
                             tool_calls: delta.get("tool_calls").and_then(Value::as_array).map(
                                 |calls| {
                                     calls
@@ -523,6 +553,22 @@ fn describe_reqwest(error: &reqwest::Error) -> String {
     }
 }
 
+/// The upstream's `Retry-After` in whole seconds: a delay-seconds value or an HTTP-date
+/// (IMF-fixdate, which `parse_from_rfc2822` accepts). A date in the past is zero.
+fn retry_after_secs(headers: &reqwest::header::HeaderMap) -> Option<u64> {
+    let value = headers
+        .get(reqwest::header::RETRY_AFTER)?
+        .to_str()
+        .ok()?
+        .trim();
+    if let Ok(seconds) = value.parse::<u64>() {
+        return Some(seconds);
+    }
+    let when = chrono::DateTime::parse_from_rfc2822(value).ok()?;
+    let wait = when.with_timezone(&chrono::Utc) - chrono::Utc::now();
+    Some(wait.num_seconds().max(0) as u64)
+}
+
 /// The upstream's own reason for a 400, from its OpenAI envelope when it has one.
 fn upstream_message(body: &str) -> String {
     serde_json::from_str::<Value>(body)
@@ -551,17 +597,21 @@ pub(crate) fn chat_payload(
     request: &ChatCompletionRequest,
     model: &str,
     stream: bool,
-    response_format_mode: Option<&str>,
-    force_chat_template_kwargs: bool,
+    render: &RenderOptions,
 ) -> Value {
     let mut payload = Map::new();
     payload.insert("model".to_owned(), json!(model));
-    payload.insert(
-        "messages".to_owned(),
-        serde_json::to_value(&request.messages).expect("messages serialize"),
-    );
+    payload.insert("messages".to_owned(), normalise_messages(&request.messages));
     payload.insert("temperature".to_owned(), json!(request.temperature));
-    payload.insert("max_tokens".to_owned(), json!(request.max_tokens));
+    // Raise-only floor: the caller's cap is honoured unless it cannot possibly produce content
+    // (Inkling-2-Mini spends ~130 reasoning tokens even at effort `none`, so a 64-token budget
+    // returns an empty answer). Raising a cap never forces generation — the model still stops at
+    // EOS — it only stops the answer being cut off.
+    let max_tokens = match (request.max_tokens, render.min_completion_tokens) {
+        (Some(requested), Some(floor)) => Some(requested.max(floor)),
+        (requested, _) => requested,
+    };
+    payload.insert("max_tokens".to_owned(), json!(max_tokens));
     if let Some(seed) = request.seed {
         payload.insert("seed".to_owned(), json!(seed));
     }
@@ -571,13 +621,25 @@ pub(crate) fn chat_payload(
     if let Some(penalty) = request.frequency_penalty {
         payload.insert("frequency_penalty".to_owned(), json!(penalty));
     }
+    if let Some(penalty) = request.presence_penalty {
+        payload.insert("presence_penalty".to_owned(), json!(penalty));
+    }
+    if let Some(top_p) = request.top_p {
+        payload.insert("top_p".to_owned(), json!(top_p));
+    }
+    if let Some(stop) = request.stop.as_ref().filter(|stop| !stop.is_null()) {
+        payload.insert("stop".to_owned(), stop.clone());
+    }
+    if let Some(parallel) = request.parallel_tool_calls {
+        payload.insert("parallel_tool_calls".to_owned(), json!(parallel));
+    }
     if stream {
         payload.insert("stream".to_owned(), json!(true));
         payload.insert("stream_options".to_owned(), json!({"include_usage": true}));
     }
 
     if let Some(format) = &request.response_format {
-        if response_format_mode == Some("json_object")
+        if render.response_format_mode.as_deref() == Some("json_object")
             && format.r#type == ResponseFormatType::JsonSchema
         {
             // The upstream cannot do guided JSON: basic JSON mode plus the schema in-prompt.
@@ -630,13 +692,57 @@ pub(crate) fn chat_payload(
     if !request.tool_choice.is_null() {
         payload.insert("tool_choice".to_owned(), request.tool_choice.clone());
     }
-    if force_chat_template_kwargs {
+    // The caller's chat-template kwargs pass through; a provider whose entry forces them overrides
+    // only the keys its dialect speaks (`enable_thinking` / `reasoning_effort`), never the rest.
+    let mut template_kwargs = request
+        .chat_template_kwargs
+        .as_ref()
+        .map(|kwargs| kwargs.0.clone())
+        .unwrap_or_default();
+    if render.force_chat_template_kwargs
+        && let Value::Object(forced) =
+            chat_template_kwargs(render.reasoning_dialect, request.enable_reasoning)
+    {
+        for (key, value) in forced {
+            template_kwargs.insert(key, value);
+        }
+    }
+    if !template_kwargs.is_empty() {
         payload.insert(
             "chat_template_kwargs".to_owned(),
-            json!({"enable_thinking": request.enable_reasoning}),
+            serde_json::to_value(template_kwargs).expect("chat template kwargs serialize"),
         );
     }
     Value::Object(payload)
+}
+
+/// The messages as the upstream sees them: an assistant replay may carry `content: null` (an
+/// OpenAI client's tool-call turn), and vLLM's templates expect the empty string there.
+fn normalise_messages(messages: &[ChatMessage]) -> Value {
+    let mut value = serde_json::to_value(messages).expect("messages serialize");
+    if let Value::Array(items) = &mut value {
+        for item in items {
+            if let Value::Object(fields) = item
+                && fields.get("content").is_some_and(Value::is_null)
+            {
+                fields.insert("content".to_owned(), json!(""));
+            }
+        }
+    }
+    value
+}
+
+/// The `chat_template_kwargs` object for one dialect. The two spellings are mutually exclusive: a
+/// template that reads one treats the other as an undefined variable and drops it, which is how a
+/// request for "no reasoning" reached Inkling-2-Mini as effort 0.9. `high` is that model's own
+/// default (0.9), so opting IN keeps the behaviour it has had since the swap.
+fn chat_template_kwargs(dialect: ReasoningDialect, enable_reasoning: bool) -> Value {
+    match dialect {
+        ReasoningDialect::EnableThinking => json!({"enable_thinking": enable_reasoning}),
+        ReasoningDialect::ReasoningEffort => json!({
+            "reasoning_effort": if enable_reasoning { "high" } else { "none" },
+        }),
+    }
 }
 
 fn inject_schema_prompt(payload: &mut Map<String, Value>, schema_json: &str) {
@@ -669,11 +775,7 @@ fn parse_openai_response(
             let content = message.get("content").cloned().unwrap_or(Value::Null);
             // vLLM's reasoning parser emits the trace under either `reasoning_content` or
             // `reasoning`; a reasoning-only answer becomes the content.
-            let reasoning = message
-                .get("reasoning_content")
-                .or_else(|| message.get("reasoning"))
-                .cloned()
-                .filter(|value| !value.is_null());
+            let reasoning = reasoning_text(&message);
             let tool_calls = message
                 .get("tool_calls")
                 .cloned()
@@ -681,7 +783,7 @@ fn parse_openai_response(
 
             let content = if content.is_null() {
                 match &reasoning {
-                    Some(reasoning) if tool_calls.is_none() => reasoning.clone(),
+                    Some(reasoning) if tool_calls.is_none() => Value::String(reasoning.clone()),
                     // Tool-call replies keep content null so callers can branch on tool_calls.
                     _ if tool_calls.is_some() => Value::Null,
                     _ => json!(""),
@@ -705,7 +807,7 @@ fn parse_openai_response(
                     })?),
                     None => None,
                 };
-            let reasoning_content = reasoning.and_then(|value| value.as_str().map(str::to_owned));
+            let reasoning_content = reasoning_text(&message);
 
             choices.push(Choice {
                 index: index as i64,
@@ -807,6 +909,7 @@ mod tests {
     use tokio::sync::Mutex;
 
     use super::*;
+    use crate::contract::schemas::AnyObject;
 
     struct Stub {
         status: u16,
@@ -852,8 +955,7 @@ mod tests {
             timeout: Duration::from_secs(10),
             slot: None,
             slot_wait: Duration::from_secs(1),
-            response_format_mode: None,
-            force_chat_template_kwargs: false,
+            render: RenderOptions::default(),
         }
     }
 
@@ -861,6 +963,11 @@ mod tests {
         ChatCompletionRequest {
             enable_reasoning: false,
             frequency_penalty: None,
+            presence_penalty: None,
+            stop: None,
+            parallel_tool_calls: None,
+            chat_template_kwargs: None,
+            top_p: None,
             max_tokens: Some(16),
             messages: vec![ChatMessage {
                 content: json!("hello"),
@@ -1013,7 +1120,7 @@ mod tests {
             }),
             r#type: ResponseFormatType::JsonSchema,
         });
-        let payload = chat_payload(&request, "m", false, None, false);
+        let payload = chat_payload(&request, "m", false, &RenderOptions::default());
         assert_eq!(payload["response_format"]["type"], "json_schema");
         assert_eq!(
             payload["response_format"]["json_schema"]["schema"]["type"],
@@ -1030,5 +1137,291 @@ mod tests {
                 .is_none()
         );
         assert!(payload.get("tools").is_none());
+    }
+
+    #[test]
+    fn the_openai_knobs_are_forwarded_verbatim() {
+        let mut request = request("m");
+        request.top_p = Some(0.9);
+        request.presence_penalty = Some(-0.5);
+        request.stop = Some(json!(["</answer>", "\n\n"]));
+        request.parallel_tool_calls = Some(false);
+        request.chat_template_kwargs = Some(AnyObject(
+            [
+                ("min_p".to_owned(), json!(0.05)),
+                ("enable_thinking".to_owned(), json!(false)),
+            ]
+            .into(),
+        ));
+        let payload = chat_payload(&request, "m", false, &RenderOptions::default());
+        assert_eq!(payload["top_p"], 0.9);
+        assert_eq!(payload["presence_penalty"], -0.5);
+        assert_eq!(payload["stop"], json!(["</answer>", "\n\n"]));
+        assert_eq!(payload["parallel_tool_calls"], false);
+        assert_eq!(
+            payload["chat_template_kwargs"],
+            json!({"min_p": 0.05, "enable_thinking": false})
+        );
+    }
+
+    #[test]
+    fn a_stop_string_is_accepted_too() {
+        let request: ChatCompletionRequest = serde_json::from_value(json!({
+            "model": "m",
+            "messages": [{"role": "user", "content": "hi"}],
+            "stop": "END",
+        }))
+        .expect("a stop string decodes");
+        let payload = chat_payload(&request, "m", false, &RenderOptions::default());
+        assert_eq!(payload["stop"], "END");
+    }
+
+    #[test]
+    fn the_forced_dialect_key_wins_and_the_callers_other_keys_survive() {
+        let mut request = request("m");
+        request.chat_template_kwargs = Some(AnyObject(
+            [
+                ("enable_thinking".to_owned(), json!(true)),
+                ("min_p".to_owned(), json!(0.05)),
+            ]
+            .into(),
+        ));
+        // enable_reasoning is false, so the provider's forced dialect says "no thinking".
+        let payload = chat_payload(
+            &request,
+            "m",
+            false,
+            &render(ReasoningDialect::EnableThinking, None),
+        );
+        assert_eq!(
+            payload["chat_template_kwargs"],
+            json!({"enable_thinking": false, "min_p": 0.05})
+        );
+    }
+
+    #[test]
+    fn a_null_or_absent_message_content_reaches_the_upstream_as_empty() {
+        // An OpenAI client replaying an assistant tool call may omit `content` or send null; the
+        // vLLM template expects the empty string in that slot (gh #620's sibling on this side).
+        let request: ChatCompletionRequest = serde_json::from_value(json!({
+            "model": "m",
+            "messages": [
+                {"role": "user", "content": "hi"},
+                {"role": "assistant", "tool_calls": [{
+                    "id": "c1",
+                    "type": "function",
+                    "function": {"name": "get_weather", "arguments": "{\"city\":\"Amsterdam\"}"}
+                }]},
+                {"role": "tool", "content": "12C", "tool_call_id": "c1"},
+                {"role": "assistant", "content": null}
+            ],
+        }))
+        .expect("a message without content decodes");
+        let payload = chat_payload(&request, "m", false, &RenderOptions::default());
+        assert_eq!(payload["messages"][1]["content"], "");
+        assert_eq!(payload["messages"][3]["content"], "");
+    }
+
+    #[test]
+    fn a_numeric_retry_after_is_whole_seconds() {
+        let mut headers = reqwest::header::HeaderMap::new();
+        headers.insert(reqwest::header::RETRY_AFTER, "30".parse().expect("value"));
+        assert_eq!(retry_after_secs(&headers), Some(30));
+    }
+
+    #[test]
+    fn an_http_date_retry_after_is_converted_to_seconds() {
+        let when = chrono::Utc::now() + chrono::Duration::seconds(60);
+        let mut headers = reqwest::header::HeaderMap::new();
+        headers.insert(
+            reqwest::header::RETRY_AFTER,
+            when.to_rfc2822().parse().expect("value"),
+        );
+        let seconds = retry_after_secs(&headers).expect("a date parses");
+        assert!((55..=60).contains(&seconds), "got {seconds}");
+    }
+
+    fn render(dialect: ReasoningDialect, floor: Option<u32>) -> RenderOptions {
+        RenderOptions {
+            force_chat_template_kwargs: true,
+            reasoning_dialect: dialect,
+            min_completion_tokens: floor,
+            ..RenderOptions::default()
+        }
+    }
+
+    #[test]
+    fn the_default_dialect_keeps_the_enable_thinking_kwarg() {
+        let mut request = request("m");
+        request.enable_reasoning = true;
+        let payload = chat_payload(
+            &request,
+            "m",
+            false,
+            &render(ReasoningDialect::EnableThinking, None),
+        );
+        assert_eq!(
+            payload["chat_template_kwargs"],
+            json!({"enable_thinking": true})
+        );
+    }
+
+    #[test]
+    fn the_reasoning_effort_dialect_spells_off_as_none() {
+        let payload = chat_payload(
+            &request("m"),
+            "m",
+            false,
+            &render(ReasoningDialect::ReasoningEffort, None),
+        );
+        assert_eq!(
+            payload["chat_template_kwargs"],
+            json!({"reasoning_effort": "none"})
+        );
+    }
+
+    #[test]
+    fn the_reasoning_effort_dialect_spells_on_as_high() {
+        let mut request = request("m");
+        request.enable_reasoning = true;
+        let payload = chat_payload(
+            &request,
+            "m",
+            false,
+            &render(ReasoningDialect::ReasoningEffort, None),
+        );
+        assert_eq!(
+            payload["chat_template_kwargs"],
+            json!({"reasoning_effort": "high"})
+        );
+    }
+
+    #[test]
+    fn no_chat_template_kwargs_are_sent_when_the_flag_is_false() {
+        let options = RenderOptions {
+            reasoning_dialect: ReasoningDialect::ReasoningEffort,
+            ..RenderOptions::default()
+        };
+        let payload = chat_payload(&request("m"), "m", false, &options);
+        assert!(payload.get("chat_template_kwargs").is_none());
+    }
+
+    #[test]
+    fn the_completion_floor_raises_a_budget_that_cannot_produce_content() {
+        let mut request = request("m");
+        request.max_tokens = Some(64);
+        let payload = chat_payload(
+            &request,
+            "m",
+            false,
+            &render(ReasoningDialect::EnableThinking, Some(256)),
+        );
+        assert_eq!(payload["max_tokens"], 256);
+    }
+
+    #[test]
+    fn the_completion_floor_leaves_a_larger_budget_alone() {
+        let mut request = request("m");
+        request.max_tokens = Some(1024);
+        let payload = chat_payload(
+            &request,
+            "m",
+            false,
+            &render(ReasoningDialect::EnableThinking, Some(256)),
+        );
+        assert_eq!(payload["max_tokens"], 1024);
+    }
+
+    #[test]
+    fn the_completion_floor_leaves_an_absent_budget_as_an_explicit_null() {
+        let mut request = request("m");
+        request.max_tokens = None;
+        let payload = chat_payload(
+            &request,
+            "m",
+            false,
+            &render(ReasoningDialect::EnableThinking, Some(256)),
+        );
+        // The payload contract is "always present, null when unset" — asserting only `is_null`
+        // would also pass on a MISSING key, which is a different body.
+        assert!(payload.get("max_tokens").is_some_and(Value::is_null));
+    }
+
+    #[test]
+    fn an_upstream_reasoning_delta_surfaces_as_reasoning_content() {
+        let chunk = parse_openai_chunk(
+            &json!({
+                "id": "chatcmpl-1",
+                "created": 5,
+                "choices": [{"index": 0, "delta": {"reasoning": "The user asks"}}],
+            }),
+            "alias",
+            "local-llm",
+        )
+        .expect("parses");
+        assert_eq!(
+            chunk.choices[0].delta.reasoning_content.as_deref(),
+            Some("The user asks")
+        );
+        let frame = chunk.to_sse();
+        let body: Value =
+            serde_json::from_str(frame.trim_start_matches("data: ").trim()).expect("json frame");
+        assert_eq!(
+            body["choices"][0]["delta"]["reasoning_content"],
+            "The user asks"
+        );
+        // The upstream's own spelling must not leak into the contract.
+        assert!(body["choices"][0]["delta"].get("reasoning").is_none());
+    }
+
+    #[test]
+    fn a_content_only_frame_omits_the_reasoning_key() {
+        let chunk = parse_openai_chunk(
+            &json!({
+                "id": "chatcmpl-1",
+                "created": 5,
+                "choices": [{"index": 0, "delta": {"role": "assistant", "content": ""}}],
+            }),
+            "alias",
+            "local-llm",
+        )
+        .expect("parses");
+        let frame = chunk.to_sse();
+        let body: Value =
+            serde_json::from_str(frame.trim_start_matches("data: ").trim()).expect("json frame");
+        // Parity: the oracle's captured stream has no such key, so an inert chunk must not
+        // gain one. Presence here would diff every frame of every non-reasoning stream.
+        assert!(
+            body["choices"][0]["delta"]
+                .get("reasoning_content")
+                .is_none()
+        );
+        assert_eq!(body["choices"][0]["delta"]["content"], "");
+    }
+
+    #[test]
+    fn a_null_reasoning_content_does_not_shadow_a_populated_reasoning() {
+        // `.or_else` on the key alone would take the null and lose the text beside it.
+        let text = reasoning_text(&json!({"reasoning_content": null, "reasoning": "text"}));
+        assert_eq!(text.as_deref(), Some("text"));
+    }
+
+    #[test]
+    fn an_empty_reasoning_fragment_is_absent_not_present_but_empty() {
+        assert_eq!(reasoning_text(&json!({"reasoning": ""})), None);
+        let chunk = parse_openai_chunk(
+            &json!({"id": "c1", "created": 1, "choices": [{"index": 0, "delta": {"reasoning": ""}}]}),
+            "alias",
+            "local-llm",
+        )
+        .expect("parses");
+        let frame = chunk.to_sse();
+        let body: Value =
+            serde_json::from_str(frame.trim_start_matches("data: ").trim()).expect("json frame");
+        assert!(
+            body["choices"][0]["delta"]
+                .get("reasoning_content")
+                .is_none()
+        );
     }
 }

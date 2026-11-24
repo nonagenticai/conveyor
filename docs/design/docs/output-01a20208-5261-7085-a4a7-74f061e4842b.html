@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Owner decision - S14 cutover residual (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Context</h2>
+<p>The S14 cutover finding <code>v1-s14-1</code> requires the R1, R2, R4 and R6 rehearsal receipts. Those
+rehearsals predate the record and cannot be reconstructed honestly. The owner directed on
+2026-11-22 that the residual be accepted against the surviving evidence, rather than fabricating
+receipts. The direction was relayed to the lane by the retrospective-rework session.</p>
+<h2>Decision</h2>
+<p>The S14 cutover residual is accepted. The surviving evidence is the native SWE-bench harness and
+the live deployment. The register row <code>U5-RESIDUAL-S14</code> (01a20208-0c30-7f4f-a3b7-ab1b467e2b46) records the decision and its
+scope. No receipt is invented; the missing receipts stay NOT PROVEN.</p>
+<h2>Consequences</h2>
+<ul>
+<li>The cutover-receipt finding <code>v1-s14-1</code> is disposed of by this decision; it is not marked
+executed by a receipt that does not exist.</li>
+<li>S14 remains active in tranche 11 and closes through its own lifecycle gates.</li>
+<li>R1, R2, R4 and R6 remain <strong>NOT PROVEN</strong> in the record.</li>
+<li>S06b remains an open environment gap: the external agent app is still absent.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li>The native SWE-bench harness, as delivered by S14 and exercised by the live service.</li>
+<li>The live deployment of the conveyor service.</li>
+<li>The register row <code>U5-RESIDUAL-S14</code> (01a20208-0c30-7f4f-a3b7-ab1b467e2b46).</li>
+</ul>
+<h2>Not proven</h2>
+<p>R1, R2, R4 and R6 are <strong>NOT PROVEN</strong> receipts. They are not reconstructed and not claimed.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Cutover — deploy, seed, rehearse, decommission fr / RM / Planka · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

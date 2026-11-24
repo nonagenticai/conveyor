@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S04 Stakeholder Map - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: S04 Stakeholder Map</li>
+<li>Phase: a</li>
+<li>Purpose: Identify the consumers, sources, operators, external services and dependent slices whose needs and constraints shape S04.</li>
+<li>Scope: S04's direct stakeholders; later slices are listed only where the plan makes them a dependency or boundary.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Consumer / S12/S13/S14 gates</strong> - {"detail": "The manifest shape is fixed so consumer gates can read it; S13 supplies kind: workflow and S06-alpha supplies the signed mcp_server channel.", "objective": "Assert .actions[] from ActionManifest without guessing."}</li>
+<li><strong>Source / fr registry</strong> - {"detail": "Carry derive-{openapi,mcp,router}.ts, registry.ts, the closed effect/confirm/tenancy vocabularies, assertRegistryConsistent, served-spec.lock.json and specExempt; do not carry Zod, legacyHandler or frozen.", "objective": "Carry the Capability field set and its generation approach."}</li>
+<li><strong>Source / agent runtime catalog</strong> - {"detail": "One catalogue; a compiled row beats a stored one. Do not carry OpSource::Template.", "objective": "Carry OpDef, PinnedCatalog::from_rows, effective_level and outputs."}</li>
+<li><strong>Operator / Platform operator</strong> - {"detail": "Runs the migrate subcommand twice cleanly, --print-openapi --check-lock, and approves breaking ingest with conveyor admin actions approve.", "objective": "Run migrations and guard the contract in CI."}</li>
+<li><strong>External / External services</strong> - {"detail": "The four fixture services are unauthenticated because a real service's credential is S09's.", "objective": "Describe themselves through openapi.json."}</li>
+<li><strong>Tenant / Tenant users and roles</strong> - {"detail": "MCP credentials fail closed: an unresolvable tenant is 401 and a JWT-shaped bearer that fails verification is never retried as a licence token.", "objective": "Receive only tools their scopes permit."}</li>
+<li><strong>Gateway / nonagenticai_mcp_server</strong> - {"detail": "The conveyor sits behind it through S06-alpha's HMAC channel (SPEC section 4.5); it is not this server.", "objective": "Recognise the agent gateway as a separate server."}</li>
+<li><strong>Delivery / S05-S11 slices</strong> - {"detail": "They own cards.move and peers and add their own event in the same transaction; S04 declares no events.", "objective": "Add domain actions without adding a surface."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-24T16:30:00Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

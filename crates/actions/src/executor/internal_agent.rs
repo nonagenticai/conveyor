@@ -86,6 +86,18 @@ struct Gate {
     judge: Value,
     /// `None` to proceed, or the typed class and detail that fail the run.
     refusal: Option<Refusal>,
+    /// A `handover`: park the run and open the approval that applies the draft.
+    escalation: Option<Escalation>,
+}
+
+/// The facts the `executor` approval needs when a gate hands the draft to a person.
+struct Escalation {
+    /// The policy threshold the answer missed.
+    threshold: f64,
+    /// The policy that produced the decision.
+    policy_id: Uuid,
+    /// The laya config the policy pinned.
+    laya_config_id: Uuid,
 }
 
 async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
@@ -447,8 +459,8 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
     store::process::record_run_step_judge_tx(&mut tx, tenant, step_id, &gate.judge)
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
-    match gate.refusal {
-        Some(refusal) => {
+    match (gate.refusal, gate.escalation) {
+        (Some(refusal), _) => {
             finish_failed(
                 &mut tx,
                 tenant,
@@ -459,7 +471,74 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
             )
             .await?;
         }
-        None => finish_succeeded(&mut tx, tenant, app_key, run_id).await?,
+        (None, Some(escalation)) => {
+            let Some(document) = document_id.as_deref() else {
+                // `documents.compose` succeeded, so a handover without a draft is a runtime bug;
+                // record it as a terminal refusal rather than parking an empty gate.
+                finish_failed(
+                    &mut tx,
+                    tenant,
+                    app_key,
+                    run_id,
+                    "gate_requires_approval",
+                    "the gate handed over no draft",
+                )
+                .await?;
+                tx.commit()
+                    .await
+                    .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
+                return Ok(());
+            };
+            let meta = json!({
+                "run_id": run_id,
+                "gate": GATE_KIND,
+                "draft_document_id": document,
+                "prompt_sha256": out.prompt_sha256,
+                "position": 1,
+                "attempt": 1,
+                "threshold": escalation.threshold,
+                "policy_id": escalation.policy_id,
+                "laya_config_id": escalation.laya_config_id,
+            });
+            store::approval::open_gate_with_meta_tx(
+                &mut tx,
+                tenant,
+                run_id,
+                GATE_KIND,
+                "executor",
+                1,
+                None,
+                Some(actor_id),
+                meta,
+            )
+            .await
+            .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
+            let ctx = service_ctx(tenant, Some(actor_id), app_key, "run.execute");
+            crate::board::events::append_raw_event(
+                &mut tx,
+                &ctx,
+                &crate::board::events::RawEvent {
+                    topic: format!("run:{run_id}"),
+                    board_id: None,
+                    aggregate_type: "approval",
+                    aggregate_id: run_id,
+                    event_type: "approval.requested",
+                    payload: json!({
+                        "run_id": run_id,
+                        "gate": GATE_KIND,
+                        "kind": "executor",
+                        "draft_document_id": document,
+                        "threshold": escalation.threshold,
+                    }),
+                    data: Value::Null,
+                    prev_data: Value::Null,
+                },
+            )
+            .await
+            .map_err(|error| ExecutorFailure::retryable(error.detail))?;
+            // The run stays `waiting_approval`; the step is already `succeeded` with the draft.
+        }
+        (None, None) => finish_succeeded(&mut tx, tenant, app_key, run_id).await?,
     }
     tx.commit()
         .await
@@ -533,6 +612,24 @@ async fn decide(
         store::ladder::effective_policy_tx(&mut tx, tenant, GATE_KIND, anatomy.gate.as_deref())
             .await
             .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
+    // A declared `choice` gate answers from the authored menu; read it in the same transaction as
+    // the policy so the case the executor posts and the one the evaluator rebuilds use one set.
+    let option_set = match &policy {
+        Some(policy) if crate::ladder::case::question_is_choice(&policy.policy.meta) => Some(
+            store::ladder::effective_option_set_tx(
+                &mut tx,
+                tenant,
+                GATE_KIND,
+                anatomy.gate.as_deref(),
+            )
+            .await
+            .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?
+            .ok_or_else(|| {
+                ExecutorFailure::permanent("a choice gate policy has no authored option set")
+            })?,
+        ),
+        _ => None,
+    };
     tx.commit()
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
@@ -540,6 +637,7 @@ async fn decide(
         return Ok(Gate {
             judge: json!({ "decision": "no_policy", "kind": GATE_KIND }),
             refusal: None,
+            escalation: None,
         });
     };
     // Readiness proved both of these above; re-reading them here cannot fail.
@@ -573,28 +671,65 @@ async fn decide(
         .get("criteria")
         .cloned()
         .unwrap_or_else(|| json!("the draft satisfies the request"));
+    // The judge sees the same release Request the prompt rendered (S21 step 8, CONTRACT §26):
+    // one builder (`release_request`) feeds both, so L1 and L2 cannot disagree.
     let case_input = json!({
+        "request": conveyor_domain::prompt::release_request(anatomy),
         "run_id": run.id,
         "card_id": run.card_id,
-        "job_key": anatomy.job_key,
         "release_hash": binding.release_hash,
     });
-    let request = judge::request(
+    let case_output = json!({ "output": out.output, "turns": out.turns });
+
+    // `fire_when` decides whether the gate is asked at all. Not fired: no call, no decision, and
+    // the step proceeds — the policy said this case is not its business.
+    let facts = crate::ladder::case_facts(&case_output, &criteria, Some(&case_input));
+    let fires = match &policy.policy.fire_when {
+        None => true,
+        Some(value) => conveyor_domain::ladder::FireWhen::parse(value)
+            .map_err(|error| {
+                ExecutorFailure::permanent(format!(
+                    "the gate policy's fire_when is invalid: {error}"
+                ))
+            })?
+            .is_none_or(|expression| expression.fires(GATE_KIND, anatomy.gate.as_deref(), &facts)),
+    };
+    if !fires {
+        return Ok(Gate {
+            judge: json!({
+                "decision": "not_required",
+                "kind": GATE_KIND,
+                "fire_when": "does not hold",
+            }),
+            refusal: None,
+            escalation: None,
+        });
+    }
+
+    // One builder (`crate::ladder::case::build`) makes the body the executor posts, its claim and
+    // the body `ladder.evaluate` re-derives — one authored menu, one case, one call.
+    let built = crate::ladder::case::build(
+        tenant,
+        GATE_KIND,
+        anatomy.gate.as_deref(),
         Some(&laya_config.model_ref),
-        &json!({ "output": out.output, "turns": out.turns }),
+        &case_output,
         &criteria,
         Some(&case_input),
+        option_set.as_ref().map(|set| set.options.as_slice()),
     );
+    let request = built.body;
+    let call_key = built.call_key;
     let started = std::time::Instant::now();
     let judged = invoke(
         pool,
         registry(),
         tenant,
         InvokeRequest {
-            action: "laya.judge".to_owned(),
+            action: "ladder.precheck".to_owned(),
             input: request,
             precondition: None,
-            idempotency_key: Some(format!("{prefix}:judge")),
+            idempotency_key: Some(call_key.clone()),
             approval_id: None,
             actor_id,
             actor_kind: "service".to_owned(),
@@ -641,14 +776,24 @@ async fn decide(
             "laya_config_id": laya_config.id.to_string(),
             "latency_ms": latency_ms,
         });
+        // An open gate whose configured action is handover parks the draft for a person; a
+        // refused outcome (closed, or block) fails closed with `gate_unavailable`.
+        let escalation = matches!(outcome, Outcome::Escalated).then_some(Escalation {
+            threshold,
+            policy_id: policy.policy.id,
+            laya_config_id: laya_config.id,
+        });
         return Ok(Gate {
             judge: judge_doc,
-            refusal: refusal_for(outcome, "gate_unavailable", "the laya judge did not decide"),
+            refusal: if escalation.is_some() {
+                None
+            } else {
+                refusal_for(outcome, "gate_unavailable", "the laya judge did not decide")
+            },
+            escalation,
         });
     };
 
-    let answer = if verdict.accepted { "accept" } else { "refuse" };
-    let confidence = verdict.score.unwrap_or(0.0);
     let evaluated = invoke(
         pool,
         registry(),
@@ -661,13 +806,10 @@ async fn decide(
                 "project_id": run.project_id,
                 "card_id": run.card_id,
                 "question": judge::JUDGE_QUESTION,
-                "answer": answer,
-                "confidence": confidence,
-                "input": {
-                    "output": out.output,
-                    "release_hash": binding.release_hash,
-                },
-                "latency_ms": latency_ms,
+                "output": case_output,
+                "criteria": criteria,
+                "facts": case_input,
+                "call_key": call_key,
                 "meta": {
                     "run_id": run.id,
                     "job_binding_id": binding.id,
@@ -694,7 +836,7 @@ async fn decide(
         },
     )
     .await;
-    let (decision_id, outcome) = match evaluated {
+    let (decision_id, outcome, recorded_answer, recorded_confidence) = match evaluated {
         Ok(outcome) => {
             let output = outcome.body.get("output").cloned().unwrap_or(Value::Null);
             let decision_id = output.get("id").and_then(Value::as_str).map(str::to_owned);
@@ -702,7 +844,16 @@ async fn decide(
                 .get("outcome")
                 .and_then(Value::as_str)
                 .map(str::to_owned);
-            (decision_id, recorded)
+            let recorded_answer = output
+                .get("answer")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned();
+            let recorded_confidence = output
+                .get("confidence")
+                .and_then(Value::as_f64)
+                .unwrap_or(0.0);
+            (decision_id, recorded, recorded_answer, recorded_confidence)
         }
         Err(error) => {
             // The verdict was readable but the ladder refused to record it: an infrastructure
@@ -726,8 +877,8 @@ async fn decide(
     let judge_doc = json!({
         "decision": outcome_str(outcome),
         "decision_id": decision_id,
-        "answer": answer,
-        "confidence": confidence,
+        "answer": recorded_answer,
+        "confidence": recorded_confidence,
         "threshold": threshold,
         "reason": verdict.reason,
         "policy_id": policy.policy.id.to_string(),
@@ -739,73 +890,21 @@ async fn decide(
         Outcome::Refused => Some(Refusal {
             class: "laya_refused".to_owned(),
             detail: format!(
-                "the gate refused the draft (confidence {confidence:.3} < threshold {threshold:.3})"
+                "the gate refused the draft (confidence {recorded_confidence:.3} < threshold {threshold:.3})"
             ),
         }),
-        Outcome::Escalated => {
-            open_handover(pool, tenant, app_key, run, actor_id, &threshold).await?;
-            Some(Refusal {
-                class: "gate_requires_approval".to_owned(),
-                detail: "the gate handed the draft to a person".to_owned(),
-            })
-        }
+        Outcome::Escalated => None,
     };
+    let escalation = matches!(outcome, Outcome::Escalated).then_some(Escalation {
+        threshold,
+        policy_id: policy.policy.id,
+        laya_config_id: laya_config.id,
+    });
     Ok(Gate {
         judge: judge_doc,
         refusal,
+        escalation,
     })
-}
-
-/// Open the card-scoped approval a `handover` gate escalates to.
-async fn open_handover(
-    pool: &PgPool,
-    tenant: TenantId,
-    app_key: &str,
-    run: &store::run::RunContext,
-    actor_id: Uuid,
-    threshold: &f64,
-) -> Result<(), ExecutorFailure> {
-    let mut tx = store::begin_scoped(pool, tenant)
-        .await
-        .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
-    let ctx = service_ctx(tenant, Some(actor_id), app_key, "run.execute");
-    store::approval::open_gate_tx(
-        &mut tx,
-        tenant,
-        run.id,
-        "gate.precheck",
-        "executor",
-        1,
-        None,
-        Some(actor_id),
-    )
-    .await
-    .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
-    crate::board::events::append_raw_event(
-        &mut tx,
-        &ctx,
-        &crate::board::events::RawEvent {
-            topic: format!("run:{}", run.id),
-            board_id: None,
-            aggregate_type: "approval",
-            aggregate_id: run.id,
-            event_type: "approval.requested",
-            payload: json!({
-                "run_id": run.id,
-                "gate": "gate.precheck",
-                "kind": "executor",
-                "threshold": threshold,
-            }),
-            data: Value::Null,
-            prev_data: Value::Null,
-        },
-    )
-    .await
-    .map_err(|error| ExecutorFailure::retryable(error.detail))?;
-    tx.commit()
-        .await
-        .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
-    Ok(())
 }
 
 fn outcome_str(outcome: Outcome) -> &'static str {

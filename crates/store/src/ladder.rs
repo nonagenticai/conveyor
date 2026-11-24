@@ -49,6 +49,15 @@ pub enum LadderStoreError {
     /// The domain refused the write.
     #[error(transparent)]
     Illegal(#[from] LadderError),
+    /// A human decision was recorded by a non-person actor.
+    #[error("a human decision must be recorded by a person")]
+    HumanRequiresPerson,
+    /// The approval a human decision cites is not approved with an approve decision.
+    #[error("the cited approval is not approved with an approve decision")]
+    ApprovalNotAccepted,
+    /// The approval a human decision cites belongs to another card.
+    #[error("the cited approval belongs to another card")]
+    ApprovalWrongCard,
     /// A stored vocabulary value no longer parses.
     #[error("the database holds {what} = {value:?}, which the domain does not know")]
     Vocabulary {
@@ -81,6 +90,8 @@ pub struct PolicyRecord {
     pub action: String,
     /// Free-form metadata.
     pub meta: Value,
+    /// Whether this case is asked at all; `None` fires always.
+    pub fire_when: Option<Value>,
     /// The If-Match version.
     pub version: i64,
     /// Creation time.
@@ -90,7 +101,7 @@ pub struct PolicyRecord {
 }
 
 const POLICY_COLUMNS: &str = "id, kind, gate, threshold::float8 AS threshold, fail_policy, action, \
-                              meta, version, created_at, updated_at";
+                              meta, fire_when, version, created_at, updated_at";
 
 /// A policy to create.
 #[derive(Clone, Debug)]
@@ -107,6 +118,8 @@ pub struct NewPolicy {
     pub action: String,
     /// Free-form metadata.
     pub meta: Value,
+    /// Whether this case is asked at all; `None` fires always.
+    pub fire_when: Option<Value>,
 }
 
 impl NewPolicy {
@@ -130,6 +143,9 @@ impl NewPolicy {
         }
         if let Some(threshold) = self.threshold {
             conveyor_domain::ladder::in_unit_interval("threshold", threshold)?;
+        }
+        if let Some(fire_when) = &self.fire_when {
+            conveyor_domain::ladder::FireWhen::parse(fire_when)?;
         }
         Ok(())
     }
@@ -160,8 +176,9 @@ pub async fn insert_policy_tx(
         });
     }
     let sql = format!(
-        "INSERT INTO decision_policy (tenant_id, kind, gate, threshold, fail_policy, action, meta)
-         VALUES ($1, $2, $3, $4::float8::numeric, $5, $6, $7)
+        "INSERT INTO decision_policy
+             (tenant_id, kind, gate, threshold, fail_policy, action, meta, fire_when)
+         VALUES ($1, $2, $3, $4::float8::numeric, $5, $6, $7, $8)
          RETURNING {POLICY_COLUMNS}"
     );
     let row = sqlx::query_as(AssertSqlSafe(sql))
@@ -172,6 +189,7 @@ pub async fn insert_policy_tx(
         .bind(&new.fail_policy)
         .bind(&new.action)
         .bind(&new.meta)
+        .bind(&new.fire_when)
         .fetch_one(&mut *conn)
         .await?;
     Ok(row)
@@ -203,6 +221,8 @@ pub struct PolicyPatch {
     pub action: Option<String>,
     /// The replacement metadata.
     pub meta: Option<Value>,
+    /// `Some(None)` clears the expression; `None` keeps it.
+    pub fire_when: Option<Option<Value>>,
 }
 
 /// Change a policy's threshold, fail behaviour or action. A policy change is a new version;
@@ -231,6 +251,9 @@ pub async fn update_policy_tx(
             value: value.to_owned(),
         }));
     }
+    if let Some(Some(fire_when)) = &patch.fire_when {
+        conveyor_domain::ladder::FireWhen::parse(fire_when)?;
+    }
     let current =
         get_policy_tx(&mut *conn, tenant, id)
             .await?
@@ -245,10 +268,14 @@ pub async fn update_policy_tx(
     let sql = format!(
         "UPDATE decision_policy
          SET threshold = $3::float8::numeric, fail_policy = $4, action = $5, meta = $6,
-             version = version + 1, updated_at = now()
+             fire_when = $7, version = version + 1, updated_at = now()
          WHERE tenant_id = $1 AND id = $2
          RETURNING {POLICY_COLUMNS}"
     );
+    let fire_when = match &patch.fire_when {
+        None => current.fire_when.clone(),
+        Some(value) => value.clone(),
+    };
     let row = sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(id)
@@ -256,6 +283,7 @@ pub async fn update_policy_tx(
         .bind(patch.fail_policy.as_deref().unwrap_or(&current.fail_policy))
         .bind(patch.action.as_deref().unwrap_or(&current.action))
         .bind(patch.meta.as_ref().unwrap_or(&current.meta))
+        .bind(&fire_when)
         .fetch_one(&mut *conn)
         .await?;
     Ok(row)
@@ -277,6 +305,236 @@ pub async fn list_policies_tx(
         .bind(kind)
         .fetch_all(&mut *conn)
         .await?)
+}
+
+// ── authored option sets ─────────────────────────────────────────────────────────────────
+
+/// One row of an authored option set: the menu a `choice` case answers from.
+#[derive(Clone, Debug, PartialEq)]
+pub struct OptionSetOption {
+    /// The key the answer must name.
+    pub key: String,
+    /// The human label the question shows.
+    pub label: String,
+    /// The option's meaning; `payload.outcome` is `accepted | refused | escalated`.
+    pub payload: Value,
+    /// The menu order.
+    pub position: i32,
+}
+
+/// The tenant's authored option set for one case.
+#[derive(Clone, Debug, PartialEq)]
+pub struct OptionSetRecord {
+    /// The header id.
+    pub id: Uuid,
+    /// The case kind.
+    pub kind: String,
+    /// The gate, when the set is gate-specific.
+    pub gate: Option<String>,
+    /// The monotonic version; every decision records the one it used.
+    pub version: i64,
+    /// The menu, in position order.
+    pub options: Vec<OptionSetOption>,
+}
+
+impl OptionSetRecord {
+    /// Whether `key` is one of the authored options.
+    pub fn contains(&self, key: &str) -> bool {
+        self.options.iter().any(|option| option.key == key)
+    }
+
+    /// The authored outcome of `key`, when the key is one of the set's.
+    pub fn outcome(&self, key: &str) -> Option<&str> {
+        self.options
+            .iter()
+            .find(|option| option.key == key)
+            .and_then(|option| option.payload.get("outcome"))
+            .and_then(Value::as_str)
+    }
+}
+
+/// Resolve the authored set for a case, preferring a gate-specific one.
+pub async fn effective_option_set_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kind: &str,
+    gate: Option<&str>,
+) -> Result<Option<OptionSetRecord>, LadderStoreError> {
+    let header: Option<(Uuid, String, Option<String>, i64)> = sqlx::query_as(
+        "SELECT id, kind, gate, version FROM decision_option_set
+         WHERE tenant_id = $1 AND kind = $2 AND (gate = $3::text OR gate IS NULL)
+         ORDER BY (gate = $3::text) DESC NULLS LAST, updated_at DESC
+         LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(kind)
+    .bind(gate)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let Some((id, kind, gate, version)) = header else {
+        return Ok(None);
+    };
+    let options: Vec<(String, String, Value, i32)> = sqlx::query_as(
+        "SELECT key, label, payload, position FROM decision_option_set_option
+         WHERE tenant_id = $1 AND set_id = $2
+         ORDER BY position, key",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .fetch_all(&mut *conn)
+    .await?;
+    Ok(Some(OptionSetRecord {
+        id,
+        kind,
+        gate,
+        version,
+        options: options
+            .into_iter()
+            .map(|(key, label, payload, position)| OptionSetOption {
+                key,
+                label,
+                payload,
+                position,
+            })
+            .collect(),
+    }))
+}
+
+/// Author a new version of the set for `(kind, gate)`.
+///
+/// One row per case (the `0068` partial unique indexes): authoring bumps the header's version and
+/// replaces its children in the caller's transaction, so the index never sees a second row and a
+/// reader never sees a half-replaced menu.
+pub async fn author_option_set_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kind: &str,
+    gate: Option<&str>,
+    options: &[OptionSetOption],
+) -> Result<OptionSetRecord, LadderStoreError> {
+    if kind.trim().is_empty() {
+        return Err(LadderStoreError::Illegal(LadderError::FieldMissing {
+            field: "kind",
+            rung: "option set",
+        }));
+    }
+    validate_options(options)?;
+    let existing: Option<(Uuid, i64)> = sqlx::query_as(
+        "SELECT id, version FROM decision_option_set
+         WHERE tenant_id = $1 AND kind = $2 AND gate IS NOT DISTINCT FROM $3
+         FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(kind)
+    .bind(gate)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (id, version) = match existing {
+        Some((id, version)) => {
+            sqlx::query(
+                "UPDATE decision_option_set SET version = version + 1, updated_at = now()
+                 WHERE id = $1",
+            )
+            .bind(id)
+            .execute(&mut *conn)
+            .await?;
+            (id, version + 1)
+        }
+        None => {
+            let row: (Uuid, i64) = sqlx::query_as(
+                "INSERT INTO decision_option_set (tenant_id, kind, gate, version)
+                 VALUES ($1, $2, $3, 1)
+                 RETURNING id, version",
+            )
+            .bind(tenant.as_uuid())
+            .bind(kind)
+            .bind(gate)
+            .fetch_one(&mut *conn)
+            .await
+            .map_err(|error| match error.as_database_error() {
+                Some(database) if database.is_unique_violation() => LadderStoreError::Conflict {
+                    what: "decision_option_set",
+                },
+                _ => LadderStoreError::Database(error),
+            })?;
+            row
+        }
+    };
+    sqlx::query("DELETE FROM decision_option_set_option WHERE set_id = $1")
+        .bind(id)
+        .execute(&mut *conn)
+        .await?;
+    for option in options {
+        sqlx::query(
+            "INSERT INTO decision_option_set_option
+                 (set_id, tenant_id, key, label, payload, position)
+             VALUES ($1, $2, $3, $4, $5, $6)",
+        )
+        .bind(id)
+        .bind(tenant.as_uuid())
+        .bind(option.key.trim())
+        .bind(&option.label)
+        .bind(&option.payload)
+        .bind(option.position)
+        .execute(&mut *conn)
+        .await?;
+    }
+    Ok(OptionSetRecord {
+        id,
+        kind: kind.to_owned(),
+        gate: gate.map(str::to_owned),
+        version,
+        options: options.to_vec(),
+    })
+}
+
+/// Validate an authored menu before it reaches the migration's CHECKs.
+fn validate_options(options: &[OptionSetOption]) -> Result<(), LadderError> {
+    if options.len() < 2 {
+        return Err(LadderError::OptionSetInvalid {
+            detail: "a choice needs at least two options".to_owned(),
+        });
+    }
+    if options.len() > 64 {
+        return Err(LadderError::OptionSetInvalid {
+            detail: "at most 64 options are allowed".to_owned(),
+        });
+    }
+    let mut seen = std::collections::BTreeSet::new();
+    for option in options {
+        let key = option.key.trim();
+        if key.is_empty() {
+            return Err(LadderError::OptionSetInvalid {
+                detail: "an option key must not be blank".to_owned(),
+            });
+        }
+        if !seen.insert(key) {
+            return Err(LadderError::OptionSetInvalid {
+                detail: format!("{key:?} is used twice"),
+            });
+        }
+        if option.position < 0 {
+            return Err(LadderError::OptionSetInvalid {
+                detail: format!("{key:?} has a negative position"),
+            });
+        }
+        match option.payload.get("outcome").and_then(Value::as_str) {
+            Some("accepted" | "refused" | "escalated") => {}
+            Some(other) => {
+                return Err(LadderError::OptionSetInvalid {
+                    detail: format!(
+                        "{key:?} has outcome {other:?}, not accepted|refused|escalated"
+                    ),
+                });
+            }
+            None => {
+                return Err(LadderError::OptionSetInvalid {
+                    detail: format!("{key:?} must carry payload.outcome"),
+                });
+            }
+        }
+    }
+    Ok(())
 }
 
 // ── refinements ──────────────────────────────────────────────────────────────────────────
@@ -809,6 +1067,31 @@ pub async fn record_decision_tx(
     ensure_optional_parent_tx(&mut *conn, tenant, Parent::Approval, new.approval_id)
         .await
         .map_err(LadderStoreError::Parent)?;
+
+    // The L3 human rung is a person's act, and the approval it cites must actually have resolved
+    // in its favour. This lives in the one writer every decision path traverses, so
+    // `ladder.record`, the `approvals.decide` path and a later caller cannot disagree
+    // (SPEC_V2 §7.1; rework `v1-w1c-2:T2`).
+    if new.rung == Rung::Human {
+        if new.actor_kind != "user" {
+            return Err(LadderStoreError::HumanRequiresPerson);
+        }
+        if let Some(approval_id) = new.approval_id {
+            let Some((approval_card, approved)) =
+                crate::approval::approved_gate_tx(&mut *conn, tenant, approval_id).await?
+            else {
+                return Err(LadderStoreError::NotFound { what: "approval" });
+            };
+            if !approved {
+                return Err(LadderStoreError::ApprovalNotAccepted);
+            }
+            if let (Some(decision_card), Some(approval_card)) = (new.card_id, approval_card)
+                && decision_card != approval_card
+            {
+                return Err(LadderStoreError::ApprovalWrongCard);
+            }
+        }
+    }
 
     let sql = format!(
         "INSERT INTO decision

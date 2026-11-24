@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — T13 (retrospective, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project brief — T13 Tool platform (retrospective, 2026-11-22)</h1>
+<h2>Outcome</h2>
+<p>Every conveyor-internal run reaches a job backend through <code>tools.call</code> under a binding row's authority, with effect, budget and schema decided before any network call and exactly one <code>tool_call</code> row and one <code>tool.called</code> event per call.</p>
+<h2>Boundary</h2>
+<p>Out of scope: the catalogue actions and the estate import (T14); the agent platform gateway <code>nonagenticai_mcp_server</code> (D44/D59); the BYO publication surface (v1-w4a-6); live MinIO wiring (v1-p1110-1); a production <code>tool_binding</code> writer (v1-p111-1). The slice must not fork T2's run/queue or T14's import.</p>
+<h2>Reuse sources</h2>
+<ul>
+<li><code>conveyor_store::secret::create_secret_tx</code> — sealed credentials, reused rather than rebuilt (§11.8).</li>
+<li><code>event</code> and <code>audit_event</code> — the call event and audit trail (§11.3 step 7).</li>
+<li><code>governed_asset(kind='tool_draft')</code> — the publication lifecycle (§11.6).</li>
+<li>T2's run and durable queue — <code>tool_binding.run_id</code> targets a run (§12).</li>
+</ul>
+<h2>Inception units</h2>
+<p>The analysis T13 starts with is SPEC_V2 §11.1–§11.10 and the §12 T13 row; both are the basis of every artefact in this record.</p>
+<h2>Dependencies</h2>
+<ul>
+<li>blocked-by: T2 (run and queue context).</li>
+<li>related: T14 (estate import, out of this slice), P0 (constitution and gates).</li>
+</ul>
+<h2>Acceptance</h2>
+<p>The §12 gate: a development job calls coding through the broker; a <code>tool_call</code> is recorded; a destructive call without approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed object; the compiled prompt carries no S3 key — proved by six named tests, re-run for this record (tool_platform 17/17 passed at lane head 582e2dc6 (2026-11-22), against a fresh Postgres 18 and a counting HTTP stub).</p>
+<h2>Capabilities</h2>
+<p>Broker dispatch, effect-class and budget gating, closed-schema input enforcement, credential-alias brokerage, the call ledger, and tenant-separated object storage, as the Phase-B capability map records.</p>
+<h2>Plan</h2>
+<p>The WBS deliverable "the tool platform — one governed call path, the call ledger, the schema and effect gates, and tenant-prefixed storage", accepted with this record; the open items are carried to the tranche review.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-24T16:30:00Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

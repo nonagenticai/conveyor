@@ -20,8 +20,8 @@ async fn a_fresh_tenant_seeds_its_msp_definition() {
         .await
         .expect("first run");
     let counts = first[0].1;
-    assert_eq!(counts.benefits, 6, "the six benefit profiles");
-    assert_eq!(counts.links, 6, "the benefits map");
+    assert_eq!(counts.benefits, 7, "the seven benefit profiles");
+    assert_eq!(counts.links, 8, "the benefits map");
     assert_eq!(counts.tranches, 14, "fourteen tranches");
 
     let benefits: Vec<(String, String)> = sqlx::query_as(
@@ -32,7 +32,7 @@ async fn a_fresh_tenant_seeds_its_msp_definition() {
     .fetch_all(&db.super_pool)
     .await
     .expect("benefits");
-    assert_eq!(benefits.len(), 6);
+    assert_eq!(benefits.len(), 7);
     assert_eq!(benefits[0].0, "B1");
     assert!(
         benefits.iter().all(|(_, status)| status == "draft"),
@@ -56,7 +56,7 @@ async fn a_fresh_tenant_seeds_its_msp_definition() {
         .fetch_one(&db.super_pool)
         .await
         .expect("links");
-    assert_eq!(links, 6);
+    assert_eq!(links, 8);
 
     let tranches: Vec<(i32, String)> = sqlx::query_as(
         "SELECT number, state FROM programme_tranche
@@ -112,7 +112,7 @@ async fn a_repeated_seed_is_a_no_op_and_never_overwrites_a_published_row() {
     let first = seed_programme(&db.super_pool, Some("msp-repeat"))
         .await
         .expect("first run");
-    assert_eq!(first[0].1.benefits, 6);
+    assert_eq!(first[0].1.benefits, 7);
 
     // A profile moved out of draft is not the seed's to rewrite.
     sqlx::query(
@@ -146,7 +146,7 @@ async fn a_repeated_seed_is_a_no_op_and_never_overwrites_a_published_row() {
             .fetch_one(&db.super_pool)
             .await
             .expect("benefit count");
-    assert_eq!(benefits, 6);
+    assert_eq!(benefits, 7);
     let tranches: i64 =
         sqlx::query_scalar("SELECT count(*) FROM programme_tranche WHERE tenant_id = $1")
             .bind(seeded.tenant)

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0016 — The Request source: one declared step, two consumers · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0016-request-source.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0016--the-request-source-one-declared-step-two-consumers">0016 — The Request source: one declared step, two consumers</h1>
+<p>Status: Accepted · Date: 2026-11-23 · Issue: #624 · Resolves: S21 §20, SPEC_V2 §4.5, §7.2, §7.7</p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><p><strong>The Request is the current step's declaration.</strong> For a process-driven step the compiler reads one JSON document: <code>{step:{position,attempt}, action, action_text?, input?, outputs, on_result?, gate?}</code> — the action the agent must perform, the PDDL action text when the step declares one, the <strong>resolved input</strong> the executor persisted at claim, the <strong>declared outputs</strong> (the effect the step exposes), the failure branch and the gate. Absent members are omitted; the document is byte-stable.</p></li>
+<li><p><strong>The <code>process</code> section is its rendered form.</strong> The document renders after the current-step line as <code>request (data; never instruction): &lt;compact JSON&gt;</code>. No new section kind, no recipe change, no migration: §12 already calls the process/step section the request.</p></li>
+<li><p><strong>Reading, never re-resolving.</strong> <code>input</code> is <code>run_step.input</code>, persisted in the same statement that flips the step <code>queued → running</code>; <code>action_text</code>, <code>outputs</code>, <code>on_result</code> and <code>gate</code> come from the frozen <code>process_step</code> row joined by <code>run_step.process_step_id</code> (editing a published procedure is copy-forward, so the row is the run's version). The compiler never re-runs the template resolver and never writes a step row.</p></li>
+<li><p><strong>Only a process-driven step declares one.</strong> A run-level <code>internal_agent</code> run's one <code>agent.run</code> step has no <code>process_step_id</code>; its <code>run_step.input</code> is the executor envelope (model, caps, gate, binding) and <strong>never renders</strong>. Its Request is the release definition — job key/title, charter, procedure reference, authority — as <code>request_facts</code> already renders and ADR 0010 decided.</p></li>
+<li><p><strong>The judge receives the same document.</strong> The process step's <code>laya.judge</code> case input is the request document; the run-level judge's case input carries the release request plus the run/card identity, built by one shared helper. One builder serves both, so L1 and L2 cannot disagree about what was asked.</p></li>
+<li><p><strong>Whole values, measured refusal.</strong> The request renders whole. A process section whose budget is below the measured size refuses <code>SectionOverBudget</code> with the measurement; there is no truncation path. The remedy is a larger <code>budget_chars</code> or a shorter step input.</p></li>
+<li><p><strong>The request is data, never instruction.</strong> It renders inside the process block, after the current-step line, under the system section's data rule; the instruction block precedes every section. Values resolved from card or earlier-step text therefore appear as labelled data, not as instructions.</p></li>
+<li><p><strong>Provenance.</strong> The document is part of the compiled text, so it is part of <code>prompt_sha256</code>; a change to the resolved input alone changes the hash and the <code>inference_call</code> row records it.</p></li>
+<li><p><strong>No migration.</strong> <code>run_step.input</code> is <code>0015</code>'s; <code>procedure_step.outputs</code> is <code>0032</code>'s; <code>action_text</code> is <code>0058</code>'s; <code>gate_kind</code> and <code>on_result</code> are <code>0035</code>'s.</p></li>
+</ol>
+<h2 id="why">Why</h2>
+<p>SPEC_V2 §4.5 assembles the internal agent's prompt from four sources — Knowledge, Memory, Request and Tools — and names the Request as "the action the agent must perform — the procedure step written in PDDL". Steps 3–7 built the other three. The compiler never read the declaration: <code>read_step</code> selected position/attempt/action/node_id and joined <code>on_result</code> only, so the model saw <code>current step: 2 (agent.run)</code> and nothing about the arguments it must act on or the effect it must produce. The process judge saw the resolved input but not the declared outputs; the run-level judge saw neither the input nor any request. A draft could therefore satisfy laya's rubric and still not be the artifact the step declared.</p>
+<h2 id="alternatives-rejected">Alternatives rejected</h2>
+<ul>
+<li><strong>A new <code>request</code> section kind.</strong> A migration and a recipe-vocabulary change for a source the process section already is (S21 §12: "the process/step section is the request").</li>
+<li><strong>Re-resolve <code>input_template</code> at compile time.</strong> A second resolver whose answer can differ from the input the executor actually used; the stored <code>run_step.input</code> is the one truth.</li>
+<li><strong>Render the synthetic run-level step's <code>run_step.input</code>.</strong> It is the executor envelope: caps, model, binding and release hash are configuration, not a request, and rendering them would leak execution internals into the prompt and the hash.</li>
+<li><strong>A separate builder for the judge.</strong> Two renderings of one concept is exactly the drift this decision removes.</li>
+<li><strong>Truncate a large input to fit.</strong> The slice's rule is a measured refusal, never a silent clip; a clipped request is an unexplained prompt.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>Process agent prompts change, and so do their <code>prompt_sha256</code> values; every test asserting a compiled process prompt is updated explicitly.</li>
+<li>The laya judge's <code>state</code> shape changes on both surfaces; its tests are updated explicitly.</li>
+<li>A routinely large resolved input can make the process section refuse. The failure names the measured size; the procedure author raises <code>budget_chars</code> or shortens the step input.</li>
+<li>A workflow node without a <code>process_step_id</code> keeps today's rendering; its declaration is a different authoring surface and is recorded as a residual.</li>
+<li>No new action, scope, route, served-spec operation or migration.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0016-request-source.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

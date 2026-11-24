@@ -585,6 +585,33 @@ async fn seed_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     .await
 }
 
+/// A chartered development project for the `development_projects.*` samples (T6, #80).
+///
+/// Each round gets its own project + charter, and the implementer is the fixture's alice (a
+/// member), so every sample reaches the rule it is sampling rather than a membership refusal.
+/// The gates then assert their own precondition (`ci_missing`, `merge_missing`, `steps_missing`);
+/// the successful delivery path has its own suite (`development_project.rs`).
+async fn seed_parity_development_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let project = seed_project(pg, ctx).await;
+    let lane = format!("issue/parity-{}", Uuid::now_v7().simple());
+    scoped(pg, ctx, async |conn| {
+        sqlx::query_scalar(
+            "INSERT INTO development_project
+                 (tenant_id, project_id, repo, lane, implementer_id, acceptance_command)
+             VALUES ($1, $2, 'nonagenticai/conveyor', $3, $4, 'cargo test')
+             RETURNING id",
+        )
+        .bind(ctx.tenant_id)
+        .bind(project)
+        .bind(lane)
+        .bind(ctx.alice_user)
+        .fetch_one(&mut *conn)
+        .await
+        .expect("prepared development project")
+    })
+    .await
+}
+
 /// A CLOSED project carrying the retrospective's `rework` verdict, for `projects.reopen`:
 /// each round gets its own row, so the reopen is a real transition in both rounds.
 async fn seed_reopenable_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
@@ -1869,15 +1896,17 @@ async fn seed_parity_laya(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     id
 }
 
-/// Seed an accepted L1 decision for the draft-application sample.
-async fn seed_parity_decision(pg: &support::Pg, ctx: &Ctx, card: Uuid) -> Uuid {
+/// Seed an accepted L1 decision bound to the draft the sample applies.
+async fn seed_parity_decision(pg: &support::Pg, ctx: &Ctx, card: Uuid, document: Uuid) -> Uuid {
     let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
     let id: Uuid = sqlx::query_scalar(
-        "INSERT INTO decision (tenant_id, kind, rung, actor_kind, card_id, outcome)
-         VALUES ($1, 'parity.case', 'laya', 'system', $2, 'accepted') RETURNING id",
+        "INSERT INTO decision (tenant_id, kind, rung, actor_kind, card_id, outcome, meta)
+         VALUES ($1, 'gate.precheck', 'laya', 'system', $2, 'accepted',
+                 jsonb_build_object('draft_document_id', $3::text)) RETURNING id",
     )
     .bind(ctx.tenant_id)
     .bind(card)
+    .bind(document.to_string())
     .fetch_one(&mut *tx)
     .await
     .expect("insert decision");
@@ -2060,8 +2089,154 @@ async fn seed_arch_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     project
 }
 
+/// Seed one valid tool draft (T15's parity fixtures): one closed read operation.
+async fn seed_tool_draft(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let key = format!("parity_tool_{}", Uuid::now_v7().simple());
+    let meta = json!({
+        "toolkit": {
+            "key": key,
+            "title": "Parity tool",
+            "service": key,
+            "owner": "tenant",
+            "auth_adapter": "bearer",
+            "catalog": "tenant"
+        },
+        "source": {
+            "kind": "openapi",
+            "key": key,
+            "base_url": "http://127.0.0.1:9",
+            "credential_alias": null,
+            "egress": ["127.0.0.1"]
+        },
+        "source_id": null,
+        "operations": [{
+            "key": "ping",
+            "method": "POST",
+            "path": "/ping",
+            "mcp_tool": null,
+            "summary": "",
+            "input_schema": {
+                "type": "object",
+                "properties": {"message": {"type": "string"}},
+                "required": ["message"],
+                "additionalProperties": false
+            },
+            "output_schema": null,
+            "effect": null,
+            "idempotency": null,
+            "timeout_secs": 30,
+            "redact": [],
+            "egress": []
+        }]
+    });
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant)
+        .await
+        .expect("scope the tool draft");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO governed_asset (tenant_id, kind, key, title, body, status, meta)
+         VALUES ($1, 'tool_draft', $2, 'Parity tool draft', '', 'draft', $3) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(&key)
+    .bind(meta)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("seed the tool draft");
+    tx.commit().await.expect("commit the tool draft");
+    id
+}
+
+/// Seed a registered OpenAPI source — what an MCP discovery refuses by kind.
+async fn seed_openapi_source(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let key = format!("parity_source_{}", Uuid::now_v7().simple());
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant)
+        .await
+        .expect("scope the source");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO tool_source (tenant_id, key, title, kind, base_url, auth_adapter, egress)
+         VALUES ($1, $2, 'Parity source', 'openapi', 'http://127.0.0.1:9', 'none',
+                 '[\"127.0.0.1\"]'::jsonb)
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(&key)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("seed the source");
+    tx.commit().await.expect("commit the source");
+    id
+}
+
+/// Seed a published tenant toolkit and a development project with an approved review.
+async fn seed_promotion_fixture(pg: &support::Pg, ctx: &Ctx) -> (Uuid, Uuid) {
+    let key = format!("parity_promote_{}", Uuid::now_v7().simple());
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant)
+        .await
+        .expect("scope the promotion fixture");
+    let project: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name) VALUES ($1, $2, 'Parity promotion')
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(format!("PAR-{}", Uuid::now_v7().simple()))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("seed the project");
+    let development: Uuid = sqlx::query_scalar(
+        "INSERT INTO development_project (tenant_id, project_id, repo, lane, implementer_id,
+                                          acceptance_command)
+         VALUES ($1, $2, 'nonagenticai/conveyor', 'issue/parity', $3, 'cargo test') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(project)
+    .bind(ctx.alice_user)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("seed the development project");
+    sqlx::query(
+        "INSERT INTO approval (tenant_id, project_id, gate, kind, status, required_decisions, meta)
+         VALUES ($1, $2, 'development_projects.review', 'development', 'approved', 1, $3)",
+    )
+    .bind(ctx.tenant_id)
+    .bind(project)
+    .bind(json!({"development_project_id": development.to_string()}))
+    .execute(&mut *tx)
+    .await
+    .expect("seed the review gate");
+    let toolkit: Uuid = sqlx::query_scalar(
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, owner, status, meta)
+         VALUES ($1, $2, 1, 'Parity tenant toolkit', $3, 'tenant', 'published', $4) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(&key)
+    .bind(&key)
+    .bind(json!({"catalog": "tenant"}))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("seed the toolkit");
+    tx.commit().await.expect("commit the promotion fixture");
+    (toolkit, development)
+}
+
 async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
     match sample.name {
+        // ── T15: tool authoring and BYO ───────────────────────────────────────────────────
+        "tool_authoring.validate"
+        | "tool_authoring.test"
+        | "tool_authoring.review"
+        | "tool_authoring.publish" => {
+            let draft = seed_tool_draft(pg, ctx).await;
+            ctx.push(sample.name, draft);
+        }
+        "tool_authoring.promote" => {
+            let (toolkit, development) = seed_promotion_fixture(pg, ctx).await;
+            ctx.push("toolkit_id", toolkit);
+            ctx.push("development_project_id", development);
+        }
+        "toolkits.discover_mcp" => {
+            let source = seed_openapi_source(pg, ctx).await;
+            ctx.push(sample.name, source);
+        }
         // ── T1 plan spine ─────────────────────────────────────────────────────────────────
         "wbs.create" => {
             let p = seed_parity_project(pg, ctx).await;
@@ -2261,14 +2436,19 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             ctx.push("ladder.evaluate.policy", policy);
             seed_parity_laya(pg, ctx).await;
         }
+        "ladder.case" => {
+            let policy = seed_parity_policy(pg, ctx, "parity.case", "parity_gate").await;
+            ctx.push("ladder.case.policy", policy);
+            seed_parity_laya(pg, ctx).await;
+        }
         "ladder.record" => {
             let policy = seed_parity_policy(pg, ctx, "parity.record", "parity_gate").await;
             ctx.push("ladder.record.policy", policy);
         }
         "ladder.apply_draft" => {
             let card = seed_card(pg, ctx, "active").await;
-            let decision = seed_parity_decision(pg, ctx, card).await;
             let document = seed_parity_document(pg, ctx).await;
+            let decision = seed_parity_decision(pg, ctx, card, document).await;
             ctx.push("ladder.apply_draft.card", card);
             ctx.push("ladder.apply_draft.decision", decision);
             ctx.push("ladder.apply_draft.document", document);
@@ -2352,6 +2532,181 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             .expect("prepare a binding");
             tx.commit().await.expect("commit");
             ctx.push(sample.name, binding_id);
+        }
+        // T5 (#77): each kata step gets a kata already at the stage it requires. The measurement
+        // sample's instrument has no locked split, so its refusal is the held-out gate itself —
+        // the successful held-out number is `crates/actions/tests/kata_measure.rs`.
+        "kata.open" => {
+            let instrument = seed_locked_eval_version(pg, ctx).await;
+            ctx.push("kata.open.instrument", instrument);
+        }
+        "kata.get" | "kata.observe" => {
+            let kata = seed_parity_kata(pg, ctx, "open", &[], None).await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.analyse" => {
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "observed",
+                &[("observe", json!({"observation": "parity observation"}))],
+                None,
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.hypothesise" => {
+            let instrument = seed_locked_eval_version(pg, ctx).await;
+            ctx.push("kata.instrument", instrument);
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "analysed",
+                &[("observe", json!({})), ("analyse", json!({}))],
+                None,
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.propose" => {
+            let instrument = seed_locked_eval_version(pg, ctx).await;
+            let hypothesis = json!({
+                "prediction": "parity prediction",
+                "instrument_version_id": instrument,
+            });
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "hypothesised",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("hypothesis", hypothesis),
+                ],
+                Some(instrument),
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.measure" => {
+            let instrument = seed_unlocked_eval_version(pg, ctx).await;
+            let hypothesis = json!({
+                "prediction": "parity prediction",
+                "instrument_version_id": instrument,
+            });
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "proposed",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("hypothesis", hypothesis),
+                    ("solution", json!({"candidate_ref": "process:parity:v2"})),
+                ],
+                Some(instrument),
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        // T12 (#88): the kata's last three Gets are recorded after the person's adoption.
+        "kata.standardise" => {
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "adopted",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("solution", json!({"candidate_ref": "process:parity:v2"})),
+                ],
+                None,
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.sustain" => {
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "adopted",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("solution", json!({"candidate_ref": "process:parity:v2"})),
+                    (
+                        "standardisation",
+                        json!({"standard_ref": "process:parity:v2"}),
+                    ),
+                ],
+                None,
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.stretch" => {
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "adopted",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("solution", json!({"candidate_ref": "process:parity:v2"})),
+                    (
+                        "standardisation",
+                        json!({"standard_ref": "process:parity:v2"}),
+                    ),
+                    (
+                        "sustainability",
+                        json!({"monitoring": "the eval each cycle"}),
+                    ),
+                ],
+                None,
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        // T8 (#79): a proposal needs TWO independent objects, so each round gets a fresh failed
+        // run beside the stable anchor card; review/promote get a lesson already at the stage
+        // the action requires.
+        "lessons.propose" => {
+            let card = Uuid::parse_str(&ctx.anchor_card).expect("anchor card uuid");
+            let project = Uuid::parse_str(&ctx.project_id).expect("project uuid");
+            let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+            let run: Uuid = sqlx::query_scalar(
+                "INSERT INTO run (tenant_id, card_id, project_id, status, error_class)
+                 VALUES ($1, $2, $3, 'failed', 'tool_error') RETURNING id",
+            )
+            .bind(ctx.tenant_id)
+            .bind(card)
+            .bind(project)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("prepare a failed run");
+            tx.commit().await.expect("commit");
+            ctx.push(sample.name, run);
+        }
+        "lessons.review" | "lessons.promote" => {
+            let state = if sample.name == "lessons.review" {
+                "proposed"
+            } else {
+                "reviewed"
+            };
+            let lesson = seed_parity_lesson(pg, ctx, state).await;
+            ctx.push(sample.name, lesson);
+        }
+        // T6 (#80): each development-project sample gets its own chartered project per round.
+        "development_projects.get"
+        | "development_projects.record_step"
+        | "development_projects.review_gate"
+        | "development_projects.merge_gate"
+        | "development_projects.deploy_gate"
+        | "development_projects.close"
+        | "development_projects.change_judging_surface"
+        | "development_projects.rollback" => {
+            let development_project = seed_parity_development_project(pg, ctx).await;
+            ctx.push(sample.name, development_project);
         }
         "invites.revoke" => {
             let id = seed_invite(pg, ctx).await;
@@ -2444,7 +2799,8 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let id = seed_list(pg, ctx).await;
             ctx.push(sample.name, id);
         }
-        "cards.update" | "cards.move" | "cards.archive" | "cards.duplicate" | "cards.comment" => {
+        "cards.update" | "cards.move" | "cards.archive" | "cards.duplicate" | "cards.comment"
+        | "cards.assign" => {
             let id = seed_card(pg, ctx, "active").await;
             ctx.push(sample.name, id);
         }
@@ -3165,11 +3521,174 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let project = seed_parity_project(pg, ctx).await;
             ctx.push("architecture.maturity_plan", project);
         }
+        // ── tenant-asset authoring (SPEC_V2 §5.7, T17 #87) ─────────────────────────────
+        "authoring.draft" => {
+            let intake = seed_parity_authoring_intake(pg, ctx).await;
+            ctx.push("authoring.draft", intake);
+        }
+        "authoring.review" => {
+            let (asset, approval) = seed_parity_authoring_draft(pg, ctx).await;
+            ctx.push("authoring.review.asset", asset);
+            ctx.push("authoring.review.approval", approval);
+        }
+        "authoring.publish" => {
+            let (asset, approval) = seed_parity_authoring_draft(pg, ctx).await;
+            scoped(pg, ctx, async move |conn| {
+                store::authoring::asset_review_tx(conn, ctx.tenant, asset, approval)
+                    .await
+                    .expect("review the prepared asset");
+            })
+            .await;
+            ctx.push("authoring.publish.asset", asset);
+        }
         _ => {}
     }
 }
 
 // ── the samples ──────────────────────────────────────────────────────────────────────
+
+/// T5 (#77): one kata at `status`, with the Gets it has already recorded.
+///
+/// `instrument` satisfies the hypothesis pair when the row is past `analysed`; the release hash
+/// is a shape-valid literal because the binding check is the action's, not this fixture's.
+/// A lesson row at the stage a `lessons.review`/`lessons.promote` parity sample needs. Direct
+/// SQL is the fixture's right here: the action under test is the transition, not the proposal
+/// path (which has its own sample and its own suite).
+async fn seed_parity_lesson(pg: &support::Pg, ctx: &Ctx, state: &str) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let evidence = json!([
+        {"kind": "card", "id": ctx.anchor_card},
+        {"kind": "run", "id": Uuid::now_v7()},
+    ]);
+    let reviewed_by = if state == "reviewed" {
+        Some(ctx.alice_user)
+    } else {
+        None
+    };
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO lesson
+             (tenant_id, statement, evidence, independent_count, state, source, proposer_id,
+              reviewed_by, reviewed_at)
+         VALUES ($1, $2, $3, 2, $4, 'propose', $5, $6,
+                 CASE WHEN $6::uuid IS NULL THEN NULL ELSE now() END)
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(format!("parity lesson {}", Uuid::now_v7()))
+    .bind(&evidence)
+    .bind(state)
+    .bind(ctx.bob_user)
+    .bind(reviewed_by)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare a lesson");
+    tx.commit().await.expect("commit");
+    id
+}
+
+async fn seed_parity_kata(
+    pg: &support::Pg,
+    ctx: &Ctx,
+    status: &str,
+    gets: &[(&str, Value)],
+    instrument: Option<Uuid>,
+) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let kata_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO kata
+             (tenant_id, job_binding_id, release_hash, signature, title, target_surface,
+              target_ref, status, instrument_version_id, prediction, threshold)
+         VALUES ($1, $2, $3, $4, 'Parity kata', 'procedure', 'process:parity', $5, $6, $7, 0.05)
+         RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(ctx.org_binding_id)
+    .bind("a".repeat(64))
+    .bind(format!("parity-kata-{}", Uuid::now_v7()))
+    .bind(status)
+    .bind(instrument)
+    .bind(instrument.map(|_| "parity prediction"))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare a kata");
+    for (get_key, content) in gets {
+        sqlx::query(
+            "INSERT INTO kata_get (tenant_id, kata_id, get_key, content)
+             VALUES ($1, $2, $3, $4)",
+        )
+        .bind(ctx.tenant_id)
+        .bind(kata_id)
+        .bind(*get_key)
+        .bind(content)
+        .execute(&mut *tx)
+        .await
+        .expect("prepare the kata's Gets");
+    }
+    tx.commit().await.expect("commit");
+    kata_id
+}
+
+/// A fresh eval version with a LOCKED split and one quality metric — the hypothesis sample's
+/// pre-registration target. The stable eval fixture's version has no drawn split, so a kata
+/// cannot pre-register it.
+async fn seed_locked_eval_version(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let eval_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO eval (tenant_id, name, subject_kind, entry_action)
+         VALUES ($1, 'Parity kata instrument', 'process', 'eval_runs.start') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare an eval");
+    let version_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO eval_version
+             (tenant_id, eval_id, version, digest, split_sha256, split_locked_at)
+         VALUES ($1, $2, 1, 'parity', $3, now()) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(eval_id)
+    .bind("a".repeat(64))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare an eval version");
+    sqlx::query(
+        "INSERT INTO eval_metric
+             (tenant_id, version_id, key, role, kind, better, label, grader_kind, ordinal)
+         VALUES ($1, $2, 'pass', 'quality', 'binary', 'higher', 'pass', 'programmatic', 0)",
+    )
+    .bind(ctx.tenant_id)
+    .bind(version_id)
+    .execute(&mut *tx)
+    .await
+    .expect("prepare the instrument's metric");
+    tx.commit().await.expect("commit");
+    version_id
+}
+
+/// A fresh eval version with no drawn split — the `kata.measure` sample's refusal.
+async fn seed_unlocked_eval_version(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let eval_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO eval (tenant_id, name, subject_kind, entry_action)
+         VALUES ($1, 'Parity kata instrument', 'process', 'eval_runs.start') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare an eval");
+    let version_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO eval_version (tenant_id, eval_id, version, digest)
+         VALUES ($1, $2, 1, 'parity') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(eval_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("prepare an eval version");
+    tx.commit().await.expect("commit");
+    version_id
+}
 
 fn samples(ctx: &Ctx) -> Vec<Sample> {
     let alice = serde_json::to_value(ctx.alice_user).expect("uuid");
@@ -3310,6 +3829,263 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             let mut sample = plain("job_releases.retire", json!({}), None);
             sample.input = Box::new(|ctx: &Ctx| json!({"id": ctx.org_release_id}));
             sample
+        },
+        // ── T5: the kata on the spine (#77) ──────────────────────────────────────────────
+        {
+            let mut sample = plain("kata.open", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "job_binding_id": ctx.org_binding_id,
+                    "signature": format!("parity-kata-{}", Uuid::now_v7()),
+                    "title": "Parity kata",
+                    "target_surface": "procedure",
+                    "target_ref": "process:parity",
+                    "instrument_version_id": ctx.pop("kata.open.instrument"),
+                    "threshold": 0.05,
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("kata.get", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"id": ctx.pop("kata.get")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.observe", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"kata_id": ctx.pop("kata.observe"), "observation": "the parity work"}),
+            );
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.analyse", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.analyse"),
+                    "problem_statement": "the parity problem, with data",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.hypothesise", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.hypothesise"),
+                    "prediction": "the held-out mean rises",
+                    "instrument_version_id": ctx.pop("kata.instrument"),
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.propose", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"kata_id": ctx.pop("kata.propose"), "candidate_ref": "process:parity:v2"}),
+            );
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.measure", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.measure"),
+                    "candidate_run_id": Uuid::now_v7(),
+                    "baseline_run_id": Uuid::now_v7(),
+                })
+            });
+            expecting(sample, 422)
+        },
+        {
+            // P3's adoption gate: a person's act. The sample names an absent kata, so both
+            // transports return the same 404; the human-only refusal has its own suite
+            // (`kata_adopt.rs`).
+            let mut sample = plain("kata.adopt", json!({}), None);
+            sample.input = Box::new(|_ctx: &Ctx| json!({"kata_id": Uuid::nil(), "note": "parity"}));
+            expecting(sample, 404)
+        },
+        // ── T12 (#88): the last three Gets ───────────────────────────────────────────────
+        {
+            let mut sample = plain("kata.standardise", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.standardise"),
+                    "standard_ref": "process:parity:v2",
+                    "description": "parity standardisation",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.sustain", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.sustain"),
+                    "monitoring": "the held-out eval each cadence cycle",
+                    "regression_guard": "the eval regression reopens the kata",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.stretch", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.stretch"),
+                    "targets": ["delivery", "operations"],
+                })
+            });
+            expecting(sample, 200)
+        },
+        // ── T8: organisational memory (#79) ──────────────────────────────────────────────
+        // The proposal names the stable anchor card plus a fresh failed run each round: two
+        // distinct referenced objects, and a statement unique to this execution.
+        {
+            let mut sample = plain("lessons.propose", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "statement": format!("parity lesson {}", Uuid::now_v7()),
+                    "evidence": [
+                        {"kind": "card", "id": ctx.anchor_card},
+                        {"kind": "run", "id": ctx.pop("lessons.propose")},
+                    ],
+                })
+            });
+            expecting(sample, 201)
+        },
+        // A person (alice, admin) approves a lesson proposed by bob: promotion to a source draft.
+        {
+            let mut sample = plain("lessons.review", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "lesson_id": ctx.pop("lessons.review"),
+                    "decision": "approve",
+                    "note": "parity review",
+                })
+            });
+            expecting(sample, 200)
+        },
+        // The explicit promotion of an already-reviewed lesson; idempotent on the promoted row.
+        {
+            let mut sample = plain("lessons.promote", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"lesson_id": ctx.pop("lessons.promote")}));
+            expecting(sample, 200)
+        },
+        // ── T6: the development project (#80) ────────────────────────────────────────────
+        {
+            // A real charter: the implementer is the fixture's alice, and the title/lane carry
+            // a fresh UUID so the derived project key cannot collide across the two rounds.
+            let mut sample = plain("development_projects.charter", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "title": format!("Parity development {}", Uuid::now_v7().simple()),
+                    "repo": "nonagenticai/conveyor",
+                    "lane": format!("issue/parity-{}", Uuid::now_v7().simple()),
+                    "implementer_id": ctx.alice_user,
+                    "acceptance_command": "cargo test -p conveyor-actions --test development_project",
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("development_projects.get", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.get")}),
+            );
+            expecting(sample, 200)
+        },
+        {
+            // The first step has no predecessor, so this is a real write on both transports.
+            let mut sample = plain("development_projects.record_step", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "development_project_id": ctx.pop("development_projects.record_step"),
+                    "step": "branch",
+                    "evidence": {"name": "issue/parity", "base": "main"},
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("development_projects.review_gate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.review_gate")}),
+            );
+            expecting(sample, 409)
+        },
+        {
+            let mut sample = plain("development_projects.merge_gate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.merge_gate")}),
+            );
+            expecting(sample, 409)
+        },
+        {
+            let mut sample = plain("development_projects.deploy_gate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.deploy_gate")}),
+            );
+            expecting(sample, 409)
+        },
+        {
+            let mut sample = plain("development_projects.close", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"development_project_id": ctx.pop("development_projects.close")}),
+            );
+            expecting(sample, 409)
+        },
+        {
+            // The project's own attempt to change the gates that judge it: the refusal is the
+            // feature, and it is the same body over both transports.
+            let mut sample = plain(
+                "development_projects.change_judging_surface",
+                json!({}),
+                None,
+            );
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "development_project_id": ctx.pop("development_projects.change_judging_surface"),
+                    "surface": "gate_set",
+                    "change": {"value": "parity"},
+                })
+            });
+            expecting(sample, 403)
+        },
+        {
+            let mut sample = plain("development_projects.rollback", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "development_project_id": ctx.pop("development_projects.rollback"),
+                    "deployed_digest": "sha256:parity-deployed",
+                    "restored_digest": "sha256:parity-restored",
+                    "migration_generation": 70,
+                    "health_status": 200,
+                    "evidence": ["parity rollback evidence"],
+                })
+            });
+            expecting(sample, 409)
         },
         plain("departments.create", json!({"name": "engineering"}), None),
         plain("audit.list", json!({"limit": 10}), None),
@@ -3508,6 +4284,21 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample
         },
         on_prepared("cards.update", Some("\"1\"")),
+        {
+            // S21 step 9: the handoff binds a fresh card to the active org binding, records
+            // its note and starts the bound run — one execution per round, replayed by the
+            // other transport under the same key.
+            let binding = ctx.org_binding_id;
+            let mut sample = on_prepared("cards.assign", Some("\"1\""));
+            sample.input = Box::new(move |ctx: &Ctx| {
+                json!({
+                    "card_id": ctx.pop("cards.assign"),
+                    "job_binding_id": binding,
+                    "note": "the parity handoff",
+                })
+            });
+            expecting(sample, 201)
+        },
         on_prepared("cards.archive", Some("\"1\"")),
         on_prepared("cards.unarchive", Some("\"1\"")),
         on_prepared("cards.duplicate", None),
@@ -4373,6 +5164,14 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("coding_jobs.create", json!({}), None),
         plain("coding_jobs.get", json!({}), None),
         plain("retrieval.query", json!({}), None),
+        // T14 (#560): the scientific reads. An empty body is refused by the closed input schema on
+        // both transports (422 / `isError`), which is the parity property a declared external has
+        // when its service is a draft and no call should leave the process.
+        plain("scientific_stats.meta_analysis", json!({}), None),
+        plain("scientific_stats.confidence_interval", json!({}), None),
+        plain("scientific_stats.trend", json!({}), None),
+        plain("scientific_formal.translate", json!({}), None),
+        plain("scientific_formal.verify", json!({}), None),
         // S10: the copilot's model call. The stub's catch-all answers the router's path, so the two
         // transports receive the same document — this proves the declaration, not a model.
         plain(
@@ -5160,6 +5959,21 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("eval_grades.create", json!({}), None),
         plain("eval_grades.get", json!({}), None),
         plain("laya.judge", json!({}), None),
+        plain(
+            "ladder.precheck",
+            json!({
+                "model": "system-1",
+                "state": "parity",
+                "questions": {
+                    "accept": {
+                        "type": "score",
+                        "instructions": "parity",
+                        "criteria": ["rejected", "accepted"]
+                    }
+                }
+            }),
+            None,
+        ),
         // ── S15's capability/memory surface ────────────────────────────────────────────────
         {
             // The anchor capability binds no packs, so this is a deterministic empty-hit read
@@ -5746,6 +6560,158 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             404,
         ),
+        // ── T15 (#86): tool authoring and BYO ──────────────────────────────────────────────
+        // The import and the manual draft are closed read operations against a destination
+        // that is registered but never called here; both are writes whose rows are unique per
+        // tenant. The prepared samples read a draft (or a promotion fixture) written before
+        // each round, so a replay and an execution compare the same shape.
+        expecting(
+            plain(
+                "toolkits.import_openapi",
+                json!({
+                    "key": "parity_import",
+                    "title": "Parity import",
+                    "base_url": "http://127.0.0.1:9",
+                    "document": {
+                        "openapi": "3.1.0",
+                        "info": {"title": "parity", "version": "1.0.0"},
+                        "paths": {
+                            "/ping": {
+                                "post": {
+                                    "operationId": "ping",
+                                    "requestBody": {
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "type": "object",
+                                                    "properties": {"message": {"type": "string"}},
+                                                    "required": ["message"],
+                                                    "additionalProperties": false
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "responses": {"200": {"description": "ok"}}
+                                }
+                            }
+                        }
+                    }
+                }),
+                None,
+            ),
+            201,
+        ),
+        expecting(
+            plain(
+                "toolkits.register_mcp",
+                json!({
+                    "key": "parity_mcp",
+                    "title": "Parity MCP",
+                    "url": "http://127.0.0.1:9/mcp",
+                    "auth_adapter": "none"
+                }),
+                None,
+            ),
+            201,
+        ),
+        // A registered OpenAPI source is not an MCP endpoint: discovery is a typed refusal.
+        expecting(
+            prepared_field("toolkits.discover_mcp", "source_id", None),
+            422,
+        ),
+        expecting(
+            plain(
+                "tool_authoring.draft",
+                json!({
+                    "key": "parity_manual",
+                    "title": "Parity manual",
+                    "source": {
+                        "kind": "openapi",
+                        "key": "parity_manual",
+                        "base_url": "http://127.0.0.1:9"
+                    },
+                    "operations": [{
+                        "key": "ping",
+                        "method": "POST",
+                        "path": "/ping",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {"message": {"type": "string"}},
+                            "required": ["message"],
+                            "additionalProperties": false
+                        }
+                    }]
+                }),
+                None,
+            ),
+            201,
+        ),
+        expecting(
+            prepared_field("tool_authoring.validate", "draft_id", None),
+            200,
+        ),
+        {
+            let mut sample = plain("tool_authoring.test", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "draft_id": ctx.pop("tool_authoring.test"),
+                    "replay": {
+                        "operation": "ping",
+                        "request": {"message": "hello"},
+                        "response": {"status": 200, "body": {}}
+                    }
+                })
+            });
+            sample.prepare = true;
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("tool_authoring.review", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "draft_id": ctx.pop("tool_authoring.review"),
+                    "decision": "approve"
+                })
+            });
+            sample.prepare = true;
+            expecting(sample, 200)
+        },
+        // The default policy opens one human gate; round B opens one for its own fresh draft.
+        {
+            let mut sample = plain("tool_authoring.publish", json!({}), None);
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"draft_id": ctx.pop("tool_authoring.publish")}));
+            sample.prepare = true;
+            expecting(sample, 200)
+        },
+        // A promotion names a development project with an approved review; the fixture writes
+        // both before each round.
+        {
+            let mut sample = plain("tool_authoring.promote", json!({}), None);
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "toolkit_id": ctx.pop("toolkit_id"),
+                    "development_project_id": ctx.pop("development_project_id")
+                })
+            });
+            sample.prepare = true;
+            expecting(sample, 200)
+        },
+        // The registered-destination dispatch is the broker's arm: a direct caller is refused.
+        expecting(
+            plain(
+                "tools.dispatch",
+                json!({
+                    "source_id": "00000000-0000-0000-0000-000000000000",
+                    "toolkit_key": "parity",
+                    "tool_key": "ping",
+                    "destination": {"kind": "openapi", "method": "POST", "path": "/ping"},
+                    "arguments": {}
+                }),
+                None,
+            ),
+            403,
+        ),
         // ── T9: the architecture capability (#81) ─────────────────────────────────────────
         // Reads anchored on rows the fixture/prepare writes; writes on a fresh row per round.
         expecting(plain("architecture.artifacts_list", json!({}), None), 200),
@@ -5961,11 +6927,145 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             201,
         ),
+        // ── T19 (#606): the meetings family ────────────────────────────────────────────────
+        // An unknown id is the deterministic refusal on both transports; the meeting tests own
+        // the aggregate's lifecycle. `schedule` refuses before the list lookup because the type
+        // has no policy to create.
+        expecting(plain("meetings.list", json!({"limit": 5}), None), 200),
+        expecting(
+            plain(
+                "meetings.get",
+                json!({"meeting_id": uuid::Uuid::nil()}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.open",
+                json!({"meeting_id": uuid::Uuid::nil()}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.invite",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "participant_kind": "app_user",
+                    "participant_id": alice,
+                    "seat": "member"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.respond",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "participant_kind": "app_user",
+                    "participant_id": alice,
+                    "response": "accepted"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.agenda_add",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "resolved_kind": "approval",
+                    "resolved_id": uuid::Uuid::nil(),
+                    "evidence_refs": []
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.position",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "agenda_item_id": uuid::Uuid::nil(),
+                    "participant_kind": "app_user",
+                    "participant_id": alice,
+                    "stance": "approve",
+                    "surface": "web"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.defer",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "agenda_item_id": uuid::Uuid::nil(),
+                    "reason": "parity"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.close_item",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "agenda_item_id": uuid::Uuid::nil()
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.close",
+                json!({"meeting_id": uuid::Uuid::nil()}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.minutes_publish",
+                json!({
+                    "meeting_id": uuid::Uuid::nil(),
+                    "approval_id": uuid::Uuid::nil(),
+                    "title": "Parity",
+                    "lines": []
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "meetings.schedule",
+                json!({
+                    "title": "Parity",
+                    "list_id": uuid::Uuid::nil(),
+                    "meeting_type_key": "parity_unknown",
+                    "convener_kind": "app_user",
+                    "convener_id": alice
+                }),
+                None,
+            ),
+            422,
+        ),
     ];
 
     out.extend(spine_samples());
     out.extend(ladder_samples());
     out.extend(pm_samples());
+    out.extend(authoring_samples());
 
     for sample in &mut out {
         if matches!(
@@ -6155,6 +7255,7 @@ fn pm_samples() -> Vec<Sample> {
                     "project_id": ctx.pop("changes.request"),
                     "baseline_id": ctx.pop("changes.request.baseline"),
                     "title": "Parity change",
+                    "body": "Parity change rationale",
                     "impact": 3,
                 })
             });
@@ -6165,6 +7266,132 @@ fn pm_samples() -> Vec<Sample> {
 
 /// T2's decision-ladder samples, in their own frame for the same stack reason as
 /// [`spine_samples`]. The sample contract is unchanged.
+/// A T17 authoring intake for the parity samples.
+async fn seed_parity_authoring_intake(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    scoped(pg, ctx, async |conn| {
+        store::authoring::intake_create_tx(
+            conn,
+            ctx.tenant,
+            ctx.alice_user,
+            "Parity authoring intake",
+            &json!([]),
+        )
+        .await
+        .expect("authoring intake")
+        .id
+    })
+    .await
+}
+
+/// A draft department and the approved human `authoring.review` gate naming it.
+async fn seed_parity_authoring_draft(pg: &support::Pg, ctx: &Ctx) -> (Uuid, Uuid) {
+    let intake = seed_parity_authoring_intake(pg, ctx).await;
+    let asset = scoped(pg, ctx, async move |conn| {
+        store::authoring::asset_draft_tx(
+            conn,
+            ctx.tenant,
+            ctx.alice_user,
+            intake,
+            "department",
+            &format!("parity-dept-{}", Uuid::now_v7().simple()),
+            &json!({"name": "Parity department"}),
+            &[],
+        )
+        .await
+        .expect("authoring draft")
+        .id
+    })
+    .await;
+    let approval = scoped(pg, ctx, async move |conn| {
+        let approval = store::approval::insert_approval_tx(
+            conn,
+            ctx.tenant,
+            &store::approval::NewApproval {
+                run_id: None,
+                card_id: None,
+                project_id: None,
+                eval_id: None,
+                gate: "authoring.review".to_owned(),
+                kind: "gate".to_owned(),
+                required_decisions: 1,
+                requested_by: None,
+                expires_at: None,
+                callback_url: None,
+                correlation_id: None,
+                meta: json!({"target": asset.to_string()}),
+            },
+        )
+        .await
+        .expect("authoring.review gate");
+        store::approval::record_decision_tx(
+            conn,
+            ctx.tenant,
+            approval.id,
+            &conveyor_domain::Decision::approve(ctx.alice_user),
+            false,
+        )
+        .await
+        .expect("approve the authoring.review gate");
+        approval.id
+    })
+    .await;
+    (asset, approval)
+}
+
+/// The tenant-asset authoring family (SPEC_V2 §5.7/§10.4, T17 #87): intake → draft → review →
+/// publish, plus the asset read. Each prepare builds its own rows per round; the review gate is
+/// a fixture, its identity is what the action reads (the refusal paths live in
+/// `crates/actions/tests/authoring.rs` and `asset_review.rs`).
+fn authoring_samples() -> Vec<Sample> {
+    vec![
+        expecting(
+            plain(
+                "authoring.intake",
+                json!({"brief": "Parity intake: publish one department"}),
+                None,
+            ),
+            201,
+        ),
+        expecting(plain("authoring.intakes", json!({"limit": 50}), None), 200),
+        {
+            let mut sample = plain("authoring.draft", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "intake_id": ctx.pop("authoring.draft"),
+                    "kind": "department",
+                    "key": format!("parity-dept-{}", Uuid::now_v7().simple()),
+                    "payload": {"name": "Parity department"},
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("authoring.review", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "asset_id": ctx.pop("authoring.review.asset"),
+                    "approval_id": ctx.pop("authoring.review.approval"),
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("authoring.publish", json!({}), None);
+            sample.prepare = true;
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"asset_id": ctx.pop("authoring.publish.asset")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("authoring.assets", json!({"limit": 50}), None);
+            sample.prepare = true;
+            expecting(sample, 200)
+        },
+    ]
+}
+
 fn ladder_samples() -> Vec<Sample> {
     vec![
         // ── T2 decision ladder (SPEC_V2 §7, §10.3–§10.4) ────────────────────────────────
@@ -6213,6 +7440,9 @@ fn ladder_samples() -> Vec<Sample> {
         ),
         expecting(plain("laya_configs.list", json!({}), None), 200),
         {
+            // A claim no engine call backs: both transports must refuse it identically. The
+            // verified happy path is `crates/actions/tests/ladder_laya.rs`'s, not a parity
+            // sample — a parity sample cannot make an external call to a real laya.
             let mut sample = plain("ladder.evaluate", json!({}), None);
             sample.prepare = true;
             sample.input = Box::new(|ctx: &Ctx| {
@@ -6220,12 +7450,53 @@ fn ladder_samples() -> Vec<Sample> {
                 json!({
                     "kind": format!("parity.evaluate.{}", policy.as_str().unwrap_or_default()),
                     "gate": "parity_gate",
-                    "answer": "pass",
-                    "confidence": 0.9,
-                    "input": {"subject": "parity"}
+                    "output": {"draft": "parity"},
+                    "criteria": [{"criterion": "names the change"}],
+                    "call_key": "parity-unverified-claim"
                 })
             });
-            expecting(sample, 201)
+            expecting(sample, 422)
+        },
+        expecting(
+            plain(
+                "decision_option_sets.set",
+                json!({
+                    "kind": "parity.options.set",
+                    "gate": "parity_gate",
+                    "options": [
+                        {"key": "accept", "label": "Accept", "payload": {"outcome": "accepted"}},
+                        {"key": "refuse", "label": "Refuse", "payload": {"outcome": "refused"}}
+                    ]
+                }),
+                None,
+            ),
+            200,
+        ),
+        {
+            // The set was authored by the sample above, earlier in this round: both transports
+            // read the same row. A deterministic sample cannot use `prepare` — that branch of the
+            // harness runs no prepare at all.
+            let mut sample = plain(
+                "decision_option_sets.get",
+                json!({"kind": "parity.options.set", "gate": "parity_gate"}),
+                None,
+            );
+            sample.deterministic = true;
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("ladder.case", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                let policy = ctx.pop("ladder.case.policy");
+                json!({
+                    "kind": format!("parity.case.{}", policy.as_str().unwrap_or_default()),
+                    "gate": "parity_gate",
+                    "output": {"draft": "parity"},
+                    "criteria": [{"criterion": "names the change"}]
+                })
+            });
+            expecting(sample, 200)
         },
         {
             let mut sample = plain("ladder.record", json!({}), None);

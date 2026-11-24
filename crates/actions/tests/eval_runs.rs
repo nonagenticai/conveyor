@@ -435,3 +435,88 @@ async fn start_is_refused_to_the_machine_role() {
     assert_eq!(status, 403, "{body}");
     assert_eq!(body["type"], "action-forbidden", "{body}");
 }
+
+/// S18 W11 / #12 P4 — `agent_run` is a live subject, and only `agent.run` may execute it.
+#[tokio::test]
+async fn an_agent_run_eval_reaches_the_readiness_gate_not_the_subject_refusal() {
+    let pg = support::Pg::fresh().await;
+    let _seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let running = support::Running::start(&pg).await;
+
+    let (status, body) = running
+        .invoke(
+            "evals.create",
+            TOKEN,
+            json!({
+                "name": "agent subject",
+                "purpose": "the loop is the subject",
+                "subject_kind": "agent_run",
+                "entry_action": "agent.run",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let eval_id = body["output"]["id"].as_str().expect("eval id").to_owned();
+    let (status, body) = running
+        .invoke(
+            "eval_versions.create",
+            TOKEN,
+            json!({ "eval_id": eval_id }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+
+    let (status, body) = running
+        .invoke(
+            "eval_runs.start",
+            TOKEN,
+            json!({ "eval_id": eval_id }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(
+        body["type"], "eval_not_ready",
+        "an agent_run subject reaches the readiness gate, not subject_not_ready: {body}"
+    );
+
+    // A version that names any other action would silently measure a different flow.
+    let (status, body) = running
+        .invoke(
+            "evals.create",
+            TOKEN,
+            json!({
+                "name": "misconfigured agent subject",
+                "purpose": "the entry action must be agent.run",
+                "subject_kind": "agent_run",
+                "entry_action": "completions.create",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let misconfigured = body["output"]["id"].as_str().expect("eval id").to_owned();
+    let (status, body) = running
+        .invoke(
+            "eval_runs.start",
+            TOKEN,
+            json!({ "eval_id": misconfigured }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], "action-invalid-input", "{body}");
+    assert_eq!(body["errors"][0]["field"], "entry_action", "{body}");
+}
