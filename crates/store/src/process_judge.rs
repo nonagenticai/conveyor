@@ -15,9 +15,12 @@
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
+use conveyor_domain::ladder::{LadderError, Pins, Rung, is_input_hash, missing_pins_for_kind};
 use serde_json::{Value, json};
 use sqlx::PgConnection;
 use uuid::Uuid;
+
+use crate::ladder::{LadderStoreError, NewDecision};
 
 /// The dedupe tag of an eval park: the attempt waits for its one-shot `eval_grade` row.
 pub const JUDGE_GRADE_TAG: &str = "grade";
@@ -73,6 +76,147 @@ pub async fn set_verdict_tx(
     .execute(&mut *conn)
     .await?;
     Ok(())
+}
+
+/// Record one step judge's verdict as a `decision` row linked to its run step (v1-p101-1).
+///
+/// This is the ladder's audit shape — the same [`NewDecision`] document and the same `decision`
+/// columns as [`crate::ladder::record_decision_tx`] — with the two things that writer cannot
+/// express for a step judge: the row carries `run_id`/`run_step_id`, and a `process.step.` kind
+/// is exempt from the ladder's per-rung policy pins. A step judge enforces the SOP's
+/// inspection, not a `decision_policy` row, so it pins the SOP version and the `laya.judge`
+/// invocation that decided; [`missing_pins_for_kind`] owns that exemption, scoped to the prefix.
+///
+/// The write shares the caller's transaction with `run_step.judge` and the run's chain: a
+/// verdict cannot be recorded in one store and not the other. A database failure is the
+/// caller's 500 `database`, never a silent skip.
+pub async fn record_step_decision_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: &NewDecision,
+    run_id: Uuid,
+    run_step_id: Uuid,
+) -> Result<Uuid, LadderStoreError> {
+    if new.answer.trim().is_empty() {
+        return Err(LadderStoreError::Illegal(LadderError::AnswerMissing));
+    }
+    if let Some(confidence) = new.confidence {
+        conveyor_domain::ladder::in_unit_interval("confidence", confidence)?;
+    }
+    // A step verdict offers no authored options: the question is the SOP's inspection, and the
+    // answer is its accept/reject.
+    if !new.options.is_empty() {
+        return Err(LadderStoreError::Illegal(LadderError::FieldMissing {
+            field: "options",
+            rung: new.rung.as_str(),
+        }));
+    }
+    let pins = Pins {
+        policy_version: new.policy_version,
+        refinement_version: new.refinement_version,
+        laya_config_version: new.laya_config_version,
+        laya_invocation_id: new.laya_invocation_id,
+    };
+    let missing = missing_pins_for_kind(&new.kind, new.rung, &pins, new.approval_id);
+    if !missing.is_empty() {
+        return Err(LadderStoreError::Illegal(LadderError::PinsIncomplete {
+            rung: new.rung.as_str(),
+            missing,
+        }));
+    }
+    if new.rung.requires_reproducibility() {
+        let Some(hash) = new.input_hash.as_deref() else {
+            return Err(LadderStoreError::Illegal(LadderError::FieldMissing {
+                field: "input_hash",
+                rung: new.rung.as_str(),
+            }));
+        };
+        if !is_input_hash(hash) {
+            return Err(LadderStoreError::Illegal(LadderError::InputHashShape));
+        }
+    } else if let Some(hash) = new.input_hash.as_deref()
+        && !is_input_hash(hash)
+    {
+        return Err(LadderStoreError::Illegal(LadderError::InputHashShape));
+    }
+    // A laya verdict is not the row's own arithmetic: it is the answer of a recorded
+    // `laya.judge` invocation, and the row pins that call and the hashes it was verified
+    // against, exactly as the ladder's Laya rung does.
+    if matches!(new.rung, Rung::Laya) {
+        if new.laya_invocation_id.is_none() {
+            return Err(LadderStoreError::Illegal(LadderError::FieldMissing {
+                field: "laya_invocation_id",
+                rung: new.rung.as_str(),
+            }));
+        }
+        if new
+            .laya_request_hash
+            .as_deref()
+            .is_none_or(|hash| hash.trim().is_empty())
+        {
+            return Err(LadderStoreError::Illegal(LadderError::FieldMissing {
+                field: "laya_request_hash",
+                rung: new.rung.as_str(),
+            }));
+        }
+        let Some(response_hash) = new.laya_response_hash.as_deref() else {
+            return Err(LadderStoreError::Illegal(LadderError::FieldMissing {
+                field: "laya_response_hash",
+                rung: new.rung.as_str(),
+            }));
+        };
+        if !is_input_hash(response_hash) {
+            return Err(LadderStoreError::Illegal(LadderError::InputHashShape));
+        }
+    }
+
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO decision
+            (tenant_id, kind, rung, project_id, card_id, question, answer, option_set_id,
+             option_set_version, option_set_hash, option_refinement_hashes, probabilities,
+             confidence, policy_id, policy_version, policy_refinement_id, refinement_version,
+             laya_config_id, laya_config_version, laya_invocation_id, laya_request_hash,
+             laya_response_hash, actor_kind, actor_id, approval_id, input_hash, latency_ms,
+             outcome, decided_at, meta, run_id, run_step_id)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::float8::numeric,$14,$15,$16,$17,
+                 $18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32)
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(&new.kind)
+    .bind(new.rung.as_str())
+    .bind(new.project_id)
+    .bind(new.card_id)
+    .bind(&new.question)
+    .bind(&new.answer)
+    .bind(new.option_set_id)
+    .bind(new.option_set_version)
+    .bind(&new.option_set_hash)
+    .bind(new.option_refinement_hashes.clone())
+    .bind(&new.probabilities)
+    .bind(new.confidence)
+    .bind(new.policy_id)
+    .bind(new.policy_version)
+    .bind(new.policy_refinement_id)
+    .bind(new.refinement_version)
+    .bind(new.laya_config_id)
+    .bind(new.laya_config_version)
+    .bind(new.laya_invocation_id)
+    .bind(&new.laya_request_hash)
+    .bind(&new.laya_response_hash)
+    .bind(&new.actor_kind)
+    .bind(new.actor_id)
+    .bind(new.approval_id)
+    .bind(&new.input_hash)
+    .bind(new.latency_ms)
+    .bind(new.outcome.as_str())
+    .bind(new.decided_at)
+    .bind(&new.meta)
+    .bind(run_id)
+    .bind(run_step_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    Ok(id)
 }
 
 /// The dedupe key of the job that re-judges one parked attempt: the step's own key with a
