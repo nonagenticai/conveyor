@@ -72,6 +72,11 @@ async fn board_and_lane(running: &support::Running) -> (String, String) {
         .await;
     assert_eq!(status, 200, "{view}");
     let board_id = text(&output(&view)["boards"][0], "id");
+    (board_id, lane_of_kind(running, &board_id, "active").await)
+}
+
+/// One lane of a board, by kind.
+async fn lane_of_kind(running: &support::Running, board_id: &str, kind: &str) -> String {
     let (status, board) = running
         .invoke(
             "boards.get",
@@ -87,9 +92,9 @@ async fn board_and_lane(running: &support::Running) -> (String, String) {
         .as_array()
         .expect("lists")
         .iter()
-        .find(|row| row["list"]["kind"] == "active")
-        .unwrap_or_else(|| panic!("no active lane in {board}"));
-    (board_id, text(&lane["list"], "id"))
+        .find(|row| row["list"]["kind"] == kind)
+        .unwrap_or_else(|| panic!("no {kind} lane in {board}"));
+    text(&lane["list"], "id")
 }
 
 /// One binding on a fresh job/release, as the product creates it.
@@ -210,6 +215,34 @@ async fn seed_artifact(pg: &support::Pg, tenant: TenantId) -> Uuid {
     .expect("artefact");
     tx.commit().await.expect("commit");
     id
+}
+
+/// A `delivery` card type, plus the matrix row that lets it move `intake → active`.
+///
+/// The dev catalogue seeds only `feature`/`bug`; the lane guard keys on the card type's code,
+/// so the fixture owns both the type and the project-type row that permits the move.
+async fn seed_delivery_card_type(pg: &support::Pg, tenant: TenantId) {
+    let mut tx = begin_scoped(&pg.runtime, tenant).await.expect("scope");
+    sqlx::query(
+        "INSERT INTO card_type (tenant_id, code, label)
+         VALUES ($1, 'delivery', 'Delivery')
+         ON CONFLICT (tenant_id, code) DO NOTHING",
+    )
+    .bind(tenant.as_uuid())
+    .execute(&mut *tx)
+    .await
+    .expect("delivery card type");
+    sqlx::query(
+        "UPDATE catalogue_entry
+            SET meta = jsonb_set(meta, '{matrix,delivery}',
+                                 '{\"intake\": [\"active\"], \"active\": [\"done\"]}'::jsonb)
+          WHERE tenant_id = $1 AND kind = 'project_type' AND code = 'delivery'",
+    )
+    .bind(tenant.as_uuid())
+    .execute(&mut *tx)
+    .await
+    .expect("delivery matrix");
+    tx.commit().await.expect("commit");
 }
 
 async fn create_card(
@@ -1006,4 +1039,53 @@ async fn a_stale_card_is_refused() {
     let (stored_binding, runs, jobs, memories) = stored(&pg, seeded.tenant, card_id).await;
     assert_eq!(stored_binding, None, "the card is not bound");
     assert_eq!((runs, jobs, memories), (0, 0, 0), "nothing was written");
+}
+
+#[tokio::test]
+async fn moving_an_unbound_delivery_card_into_active_is_refused() {
+    let (pg, seeded, running) = fixture().await;
+    let (board, active) = board_and_lane(&running).await;
+    seed_delivery_card_type(&pg, seeded.tenant).await;
+    conveyor_actions::board::matrix::clear_cache_for(seeded.tenant);
+    let intake = lane_of_kind(&running, &board, "intake").await;
+
+    let (status, card) = running
+        .invoke(
+            "cards.create",
+            TOKEN,
+            json!({
+                "board_id": board,
+                "list_id": intake,
+                "name": format!("Delivery card {}", Uuid::now_v7().simple()),
+                "card_type_code": "delivery",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{card}");
+    let card_id = Uuid::parse_str(&text(output(&card), "id")).expect("card id");
+    let etag = etag_of_card(&running, card_id).await;
+
+    let (status, body) = running
+        .invoke(
+            "cards.move",
+            TOKEN,
+            json!({"id": card_id, "list_id": active}),
+            Some(&etag),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], "card_unassigned", "{body}");
+
+    // The refusal precedes the write: the card is still in intake at its first version.
+    let (status, view) = running
+        .invoke("cards.get", TOKEN, json!({"id": card_id}), None, None, None)
+        .await;
+    assert_eq!(status, 200, "{view}");
+    assert_eq!(output(&view)["card"]["list_id"], intake.as_str(), "{view}");
+    assert_eq!(output(&view)["card"]["version"], 1, "{view}");
 }

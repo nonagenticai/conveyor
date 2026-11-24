@@ -36,6 +36,11 @@ use crate::views::Page;
 
 use super::CARD_DONE_GATE;
 
+/// The card type code that marks a handoff card: a `delivery` card enters a work lane only
+/// with a job binding (v1-p66-1). The marker is the card type's code, never the project type —
+/// a process's computed move runs on a delivery project's board and must not be caught here.
+const DELIVERY_CARD_TYPE: &str = "delivery";
+
 /// A card may enter a `done` lane only through an approved `card_done` gate.
 ///
 /// The card type's `definition.acceptance` is the Definition of Done; a type that declares no
@@ -477,6 +482,24 @@ async fn cards_move(
                 .ok_or_else(|| ActionError::resource_not_found("card type"))?;
         let rules = matrix::rules_tx(&mut *tx, ctx.tenant, &card_type, &project_type_code).await?;
         matrix::ensure_move(&current.card, from.list.kind, to.list.kind, &rules)?;
+        // A handoff card enters a work lane only with the job binding it was handed to: with
+        // no binding, nobody was asked to do the work, so the lane would accept a card no job
+        // owns (v1-p66-1). A kind change is the only way into `active`, so this is the entry
+        // point; a reorder inside an active lane has already entered.
+        if to.list.kind == ListKind::Active
+            && card_type.code.as_str() == DELIVERY_CARD_TYPE
+            && current.job_binding_id.is_none()
+        {
+            return Err(ActionError::new(
+                422,
+                "card_unassigned",
+                format!(
+                    "card {} is a delivery card and names no job binding; bind it with \
+                     cards.assign before it enters a work lane",
+                    current.card.id
+                ),
+            ));
+        }
         if to.list.kind == ListKind::Done {
             assert_card_done_tx(&mut *tx, ctx.tenant, &current.card, &card_type).await?;
         }
