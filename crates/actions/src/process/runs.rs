@@ -467,6 +467,8 @@ pub(crate) async fn process_runs_start(
         depth: 0,
         // The run pins the process version it executes (CONTRACT §21).
         process_version: process.version,
+        // A process run is typed as such: it may be bound (T16) or run unbound.
+        kind: store::run::RunKind::Process,
         // T16: the caller may pin the run to its organisation binding. The store resolves the
         // pin (a retired/draft binding or a stale hash refuses before the INSERT); the handler
         // has already required that the binding names THIS published process.

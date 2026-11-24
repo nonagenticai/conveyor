@@ -242,6 +242,8 @@ pub async fn start_published_tx(
         workflow_step_id: None,
         depth: 0,
         process_version: 1,
+        // A workflow run is typed as such; a child copies its parent's kind in the store.
+        kind: store::run::RunKind::Workflow,
         // Workflow runs carry no organisation pin of their own (T0); a child inherits its
         // parent's pin inside `insert_child_run_tx`.
         job_binding_id: None,

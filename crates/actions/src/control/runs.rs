@@ -188,6 +188,11 @@ pub(crate) async fn void_run_approvals(
 
 /// Create a queued run for a card and enqueue its driving job.
 ///
+/// The run's kind comes from its claim (SPEC_V2 §4.4, v1-w1a-5): a request that names or
+/// inherits a binding, or claims a release pin, is a job run; a plain request is the typed
+/// project run and keeps the plain-run path. An unbound card cannot mint a job run by claiming
+/// a release — the store refuses `422 binding_required` before the INSERT.
+///
 /// Order matters: the card resolves in-tenant first (a foreign id is a `404`, never an FK
 /// acceptance — CONTRACT §2), its board supplies `project_id`, and only then is the andon
 /// consulted, because the refusal is about *this* tenant's work existing at all. The attempt
