@@ -1,0 +1,23 @@
+{
+ "_version": 1,
+ "change_id": "01a20ae2-1d0a-7eb7-8302-e7a5850919e2",
+ "evidence": [
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/ops_host.rs",
+   "ref": "ops_host::an_unregistered_host_refuses"
+  },
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/ops.rs",
+   "ref": "ops::a_systemic_finding_opens_exactly_one_kata"
+  },
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/ops_read.rs",
+   "ref": "ops_read::the_live_read_returns_the_pod_list (skipped: harness env)"
+  }
+ ],
+ "id": "01a20ae2-1b5a-794b-a6be-dae78cbd52cf",
+ "status": "accepted"
+}

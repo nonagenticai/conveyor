@@ -60,7 +60,9 @@ DEFAULT_SNAPSHOT = ROOT / "docs" / "design" / "data"
 MANIFEST_DIR = ROOT / "acceptance" / "programme"
 DEFAULT_EVIDENCE = ROOT / "docs" / "evidence" / "rework"
 PLACEHOLDER = re.compile(
-    r"(not measured|no instrument|unknown|tbd|to be determined|n/?a|placeholder|none)",
+    r"(?<![A-Za-z0-9])"
+    r"(not measured|no instrument|unknown|tbd|to be determined|n/?a|placeholder|none)"
+    r"(?![A-Za-z0-9])",
     re.IGNORECASE,
 )
 SEVERITY = ("P0", "P1", "P2")
@@ -1290,6 +1292,13 @@ def run_project(
 
 
 def self_test() -> int:
+    # A placeholder is a token, never a substring: `n/?a` inside `tenant` is an ordinary word,
+    # and flagging it refused a real demo credit carrying `the_tenant_policy_sets_the_quorum`
+    # (measured 2026-11-24).
+    if PLACEHOLDER.search("a destructive call on the tenant is refused"):
+        raise AssertionError("PLACEHOLDER matches inside 'tenant'")
+    if not PLACEHOLDER.search("TBD"):
+        raise AssertionError("PLACEHOLDER misses a standalone TBD")
     workdir = Path(tempfile.mkdtemp(prefix="verify-project-selftest-"))
     snapshot = workdir / "snapshot"
     (snapshot / "data").mkdir(parents=True)

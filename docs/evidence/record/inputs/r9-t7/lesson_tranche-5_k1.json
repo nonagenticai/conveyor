@@ -1,0 +1,11 @@
+{
+ "cadence_id": "01a20ae1-e0fc-79f9-a1e4-0319cb549829",
+ "evidence": [
+  "/tmp/u5a-r9/evidence/T7-acceptance.md",
+  "acceptance/programme/T7.toml",
+  "docs/evidence/record/journal.jsonl"
+ ],
+ "finding_key": "k1",
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "statement": "An operations record whose acceptance exists only as a passing suite is not the same as one whose live proof ran: name the live proof's prerequisites (the deployed operator CLI) in the plan, so its absence is a measured item and never a silent gap."
+}

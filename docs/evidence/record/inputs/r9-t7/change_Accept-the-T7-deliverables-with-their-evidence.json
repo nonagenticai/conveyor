@@ -1,0 +1,9 @@
+{
+ "baseline_id": "01a20ae2-1b5d-7803-bc27-05d305344f70",
+ "body": "The six T7 deliverables are complete against the frozen scope baseline. This change authorises recording their acceptance and evidence on the WBS rows.",
+ "impact": {
+  "scope": "WBS deliverables 1-6: status accepted, evidence refs, no scope change"
+ },
+ "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+ "title": "Accept the T7 deliverables with their evidence"
+}

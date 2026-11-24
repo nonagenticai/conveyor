@@ -1,0 +1,16 @@
+{
+ "body": {
+  "acceptance_criteria": "SPEC_V2 \u00a712 T7: triage, an approved mitigation with a read-back, resolution with a linked postmortem, a destructive call without the tenant's approvals refused, restart/scale/rollback/flag-flip callable. Proven by the executed suite with the transcript.",
+  "assignment": "The T7 slice (SPEC_V2 \u00a712) under the programme's architecture governance: operate the estate through one governed action surface.",
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "delivery_contract_id": "01a20ae2-30eb-7f69-812e-e98009182041",
+  "recorded_on": "2026-11-24",
+  "responsibilities": "The operator job requests and acts; the approver job decides every gate and is never its requester; the programme architect owns the contract and the Phase-G review.",
+  "retrospective": true,
+  "scope": "incidents and triage, the four write verbs, the tenant approval policy and quorum, mitigation and resolution with a postmortem, host registration and the k8s reads, and the systemic-finding loop."
+ },
+ "kind": "statement_of_architecture_work",
+ "phase_code": "a",
+ "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+ "title": "T7 \u2014 Statement of Architecture Work"
+}

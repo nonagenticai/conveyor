@@ -1,0 +1,20 @@
+{
+ "action": "projects.close",
+ "description": "Close T7 against its approved baseline, live contract, compliant Phase-G review and published closure review",
+ "evidence": [
+  {
+   "id": "01a20ae2-5a9b-763b-82fe-b022dc851bd2",
+   "kind": "governed_asset"
+  }
+ ],
+ "gate": "projects.close",
+ "input": {
+  "id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e"
+ },
+ "kind": "action",
+ "project_id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+ "proposed_input": {
+  "id": "01a1d039-0d34-7f89-a0be-f3de3c9f540e",
+  "reason": "Close T7 after the retrospective record completed against its manifest"
+ }
+}

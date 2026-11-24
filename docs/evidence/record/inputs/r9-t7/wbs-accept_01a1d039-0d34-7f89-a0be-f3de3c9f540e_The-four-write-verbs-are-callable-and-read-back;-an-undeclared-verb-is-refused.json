@@ -1,0 +1,23 @@
+{
+ "_version": 1,
+ "change_id": "01a20ae2-1d0a-7eb7-8302-e7a5850919e2",
+ "evidence": [
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/ops.rs",
+   "ref": "ops::the_four_write_verbs_are_callable_and_read_back"
+  },
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/ops.rs",
+   "ref": "ops::an_undeclared_verb_is_refused"
+  },
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/ops_write.rs",
+   "ref": "ops_write::the_write_reads_back"
+  }
+ ],
+ "id": "01a20ae2-1b57-7dd2-bd38-9254084f7ad9",
+ "status": "accepted"
+}
