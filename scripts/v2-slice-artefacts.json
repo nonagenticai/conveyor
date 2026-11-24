@@ -111,7 +111,8 @@
       ],
       "evidence": [
         "docs/SPEC_V2.md",
-        "migrations/0057_coach.sql"
+        "migrations/0057_coach.sql",
+        "docs/evidence/rework/T4-coach-gate.json"
       ],
       "gap": null
     },
