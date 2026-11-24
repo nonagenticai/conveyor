@@ -114,7 +114,9 @@ use serde_json::{Value, json};
 /// authorises). 500 → **502**.
 /// **#15 (S21 step 3) adds 5 internal**: the `prompt_recipes.create|get|list|activate|retire`
 /// catalogue surface. 503 → **508**.
-const EXPECTED: [&str; 513] = [
+/// **T17 (#87) adds 5 internal**: `authoring.intake|draft|review|publish|assets` — the tenant
+/// asset authoring family. 513 → **518**.
+const EXPECTED: [&str; 518] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -162,6 +164,11 @@ const EXPECTED: [&str; 513] = [
     "architecture.skills_list",
     "artifacts.list",
     "audit.list",
+    "authoring.assets",
+    "authoring.draft",
+    "authoring.intake",
+    "authoring.publish",
+    "authoring.review",
     "baselines.get",
     "baselines.list",
     "baselines.take",
@@ -722,7 +729,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // 490 -> 495; external stays 13.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
     // `trend` and `scientific_formal.translate|verify`: internal stays 495, external 13 -> 18.
-    assert_eq!((internal, external), (495, 18));
+    // T17 (#87) adds five internal actions (`authoring.intake|draft|review|publish|assets`):
+    // 495 -> 500; external stays 18.
+    assert_eq!((internal, external), (500, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

@@ -251,7 +251,10 @@ mod tests {
                 // #579: the async invocation record, so a caller behind the CDN's ~100 s cap
                 // can submit and poll instead of holding one response open
                 // (0063_async_invocation.sql).
-                (63, "async invocation".to_owned())
+                (63, "async invocation".to_owned()),
+                // T17 (#87): the tenant asset authoring intake, drafts, review gate and the
+                // one-published-row-per-(kind, key) catalogue (0064_authoring.sql, SPEC_V2 §5.7).
+                (64, "authoring".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

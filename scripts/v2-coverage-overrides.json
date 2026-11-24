@@ -21,7 +21,7 @@
       "note": "The real /procedures screen reads the tenant's procedures, processes and capabilities and operates the T16 intake, source review and both publication gates. The V1 /build/processes and /build/process-map remain the executable's editor and map. The PKO editor was ruled out on 2026-11-19 and is replaced by the knowledge-pack pairing."
     },
     "destination:Authoring": {
-      "note": "The /authoring route renders the honest gate naming T17; no authoring.* action is registered yet, so the live intake/draft/review/publish screen is T17's, not T18's."
+      "note": "The /authoring route renders the live authored-asset catalogue: `authoring.assets` is the read, the draft/review/publish gates are governed actions, and the dependency order is T17 (#87)."
     },
     "destination:Portfolio": {
       "note": "The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10."

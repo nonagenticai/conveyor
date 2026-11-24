@@ -37,17 +37,17 @@
 <tr>
 <td><code>exists</code></td>
 <td>the real route and its Playwright spec exist</td>
-<td>49</td>
+<td>51</td>
 </tr>
 <tr>
 <td><code>extend</code></td>
 <td>a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner</td>
-<td>9</td>
+<td>8</td>
 </tr>
 <tr>
 <td><code>new</code></td>
 <td>neither the route nor an ancestor exists</td>
-<td>11</td>
+<td>10</td>
 </tr>
 </tbody>
 </table>
@@ -421,8 +421,8 @@
 <td>§10.4</td>
 <td>actions</td>
 <td>authoring</td>
-<td><code>new</code></td>
-<td>actions: authoring.* absent</td>
+<td><code>exists</code></td>
+<td>actions: authoring.* found (authoring.assets, authoring.draft, authoring.intake…)</td>
 </tr>
 <tr>
 <td><code>actions:approvals</code></td>
@@ -549,8 +549,8 @@
 <td>§10.5</td>
 <td>destination</td>
 <td>Authoring</td>
-<td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/authoring' found<br>apps/web/e2e/authoring.spec.ts: present<br>docs/design/v2.js: page 'authoring' — design reference, not implementation<br>apps/web/src/app.rs: route '/authoring' renders AuthoringGate (a gate; owner: T17)<br><em>The /authoring route renders the honest gate naming T17; no authoring.</em> action is registered yet, so the live intake/draft/review/publish screen is T17's, not T18's.*</td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/authoring' found<br>apps/web/e2e/authoring.spec.ts: present<br>docs/design/v2.js: page 'authoring' — design reference, not implementation<br><em>The /authoring route renders the live authored-asset catalogue: <code>authoring.assets</code> is the read, the draft/review/publish gates are governed actions, and the dependency order is T17 (#87).</em></td>
 </tr>
 <tr>
 <td><code>destination:Portfolio</code></td>

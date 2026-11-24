@@ -22,6 +22,8 @@ pub mod agent_surface;
 pub mod analysis;
 // T9 (SPEC_V2 §8.1, §10.3, §10.4, D63): the TOGAF ADM action family.
 pub mod architecture;
+// T17 (#87, SPEC_V2 §5.7, §10.4): the tenant asset authoring family.
+pub mod authoring;
 // S17: the benchmark harness — suites, runs, cases.
 pub mod benchmark;
 pub mod board;
