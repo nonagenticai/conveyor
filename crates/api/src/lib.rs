@@ -420,9 +420,10 @@ mod tests {
         // S21 step 9 (#649) adds `cards.assign`: 538 -> 539.
         // T6 (#80) adds nine internal `development_projects.*` actions: 539 -> 548.
         // T8 (#79) adds three internal `lessons.*` actions: 548 -> 551.
+        // T15 (#86) adds ten internal authoring/BYO actions: 551 -> 561.
         assert_eq!(
             registry.len(),
-            551,
+            561,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -453,7 +454,10 @@ mod tests {
              (projects.close_request) (503) + #15's five prompt_recipes actions
              (create, get, list, activate, retire) (508) + #560's five scientific read actions \
              (scientific_stats.meta_analysis|confidence_interval|trend, \
-             scientific_formal.translate|verify) (513). \
+             scientific_formal.translate|verify) (513) + T15's ten authoring/BYO actions \
+             (toolkits.import_openapi|register_mcp|discover_mcp, \
+             tool_authoring.draft|validate|test|review|publish|promote, tools.dispatch) — the \
+             registry total is 561 with the T6 and T8 increments above it. \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
         );
