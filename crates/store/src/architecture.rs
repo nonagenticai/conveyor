@@ -513,7 +513,7 @@ pub async fn seed_standard_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
 ) -> Result<u64, ArchitectureStoreError> {
-    let rows: [(&str, &str, &str, &str, &str, bool); 10] = [
+    let rows: [(&str, &str, &str, &str, &str, bool); 18] = [
         (
             "principles_catalog",
             "Principles Catalog",
@@ -591,6 +591,74 @@ pub async fn seed_standard_tx(
             "Technology Standards Catalog",
             "catalog",
             "d",
+            "hld",
+            true,
+        ),
+        // E–H: the adopted profile names these phases and their contract kinds; the standard
+        // must supply their types or a phase requirement can never resolve. Delivery projects
+        // are held to Preliminary, A–D and the Phase-G review; the programme (architecture)
+        // track also carries E–H (owner decision 2026-11-24, migration 0102).
+        (
+            "gap_analysis",
+            "Gap Analysis Matrix",
+            "matrix",
+            "e",
+            "hld",
+            true,
+        ),
+        (
+            "candidate_solutions",
+            "Candidate Solutions Catalog",
+            "catalog",
+            "e",
+            "hld",
+            true,
+        ),
+        (
+            "project_context_diagram",
+            "Project Context Diagram",
+            "diagram",
+            "e",
+            "hld",
+            true,
+        ),
+        (
+            "benefits_diagram",
+            "Benefits Diagram",
+            "diagram",
+            "e",
+            "hld",
+            true,
+        ),
+        (
+            "implementation_migration_plan",
+            "Implementation and Migration Plan",
+            "catalog",
+            "f",
+            "hld",
+            true,
+        ),
+        (
+            "compliance_review",
+            "Phase-G Compliance Review",
+            "catalog",
+            "g",
+            "hld",
+            true,
+        ),
+        (
+            "architecture_change_request",
+            "Architecture Change Request",
+            "catalog",
+            "h",
+            "hld",
+            true,
+        ),
+        (
+            "architecture_requirement",
+            "Architecture Requirement",
+            "catalog",
+            "h",
             "hld",
             true,
         ),

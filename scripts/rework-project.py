@@ -48,6 +48,18 @@ ARTEFACT_KEYS = [
     "data_entity_catalog",
     "technology_standards",
 ]
+# The programme (architecture) track also carries E–H (owner tailoring 2026-11-24; migration
+# 0102). They follow the seven A–D artefacts in the standard's seeded order.
+ARCHITECTURE_ARTEFACT_KEYS = [
+    "gap_analysis",
+    "candidate_solutions",
+    "project_context_diagram",
+    "benefits_diagram",
+    "implementation_migration_plan",
+    "compliance_review",
+    "architecture_change_request",
+    "architecture_requirement",
+]
 BIN = os.environ.get("PROGRAMME_RECORD_BIN", "")
 E2E = os.environ.get("CONVEYOR_E2E", "01a1e607-17d9-77d3-98d3-a43a87c4633d")
 APPROVER = os.environ.get("CONVEYOR_APPROVER", "01a1e8a7-8b23-76a9-9114-aafb95f7a545")
@@ -246,6 +258,28 @@ class Runner:
     def snapshot_json(self, name: str) -> dict:
         return json.loads((Path(self.snapshot) / name).read_text(encoding="utf-8"))
 
+    def artefact_keys(self) -> list[str]:
+        """The project's artefact set: A–D for delivery, A–H for the architecture track.
+
+        Same rule as the generator and the audit: `meta.adm_profile` wins when it names an
+        architecture profile; otherwise `meta.track == "programme"` (owner tailoring 2026-11-24).
+        """
+        keys = list(ARTEFACT_KEYS)
+        for row in self.snapshot_json("programme.json").get("projects") or []:
+            if row.get("key") != self.project:
+                continue
+            meta = row.get("meta") or {}
+            named = str(meta.get("adm_profile") or "").strip().lower()
+            architecture = (
+                "architecture" in named or named in {"programme", "a-h", "ah"}
+                if named
+                else str(meta.get("track") or "").strip().lower() == "programme"
+            )
+            if architecture:
+                keys += ARCHITECTURE_ARTEFACT_KEYS
+            break
+        return keys
+
     # ── lifecycle ───────────────────────────────────────────────────────────────────
 
     def project_row(self) -> dict:
@@ -349,7 +383,7 @@ class Runner:
         else:
             print("  SoAW: already live")
 
-        # 5. the A–D artefacts
+        # 5. the project's artefacts (A–D; plus E–H on the architecture track)
         existing = self._read(
             "architecture.artifacts_list", {"project_id": self.project_id}
         ).get("items", [])
@@ -362,11 +396,12 @@ class Runner:
             row.get("key"): row.get("id")
             for row in (self.snapshot_json("architecture.json").get("standard") or [])
         }
-        required = len(ARTEFACT_KEYS)
+        artefact_keys = self.artefact_keys()
+        required = len(artefact_keys)
         if len(self.content["artifacts"]) != required:
-            fail(f"the content must carry the {required} A–D artefacts in the standard order")
+            fail(f"the content must carry the {required} artefacts in the standard order")
         for index, artefact in enumerate(self.content["artifacts"]):
-            key = ARTEFACT_KEYS[index]
+            key = artefact_keys[index]
             if artefact["title"] in titles:
                 row = titles[artefact["title"]]
                 meta = dict(row.get("meta") or {})

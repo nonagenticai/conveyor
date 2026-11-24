@@ -68,6 +68,29 @@ TOGAF_PROJECT_CATEGORIES = {
     # set so a project without them produces an honest absent artefact, not silence.
     "candidate-solutions", "project-context-diagram", "benefits-diagram", "gap-analysis",
 }
+# The E–H artefacts are the architecture track's. Owner decision 2026-11-24 tailors the ADM:
+# every delivery project carries Preliminary, A–D and the Phase-G review; the programme
+# (architecture) track also carries E–H. Applying E–H to a delivery project is the old
+# over-instancing that made 14 projects "miss" artefacts their tailoring does not require.
+ARCHITECTURE_TRACK_CATEGORIES = {
+    "gap-analysis", "candidate-solutions", "project-context-diagram", "benefits-diagram",
+    "implementation-migration-plan", "request-for-architecture-work",
+}
+
+
+def architecture_track(subject: dict[str, Any]) -> bool:
+    """The programme (architecture) track, from the live meta — never a guess.
+
+    `meta.adm_profile` wins when it names an architecture profile; otherwise the programme seed's
+    `meta.track == "programme"` is the mapping measured in the 2026-11-24 snapshot (four projects:
+    P0, PLATFORM, DESIGN-PUBLISH, SPEC-V2). v1/v2 delivery projects are not the architecture
+    track, and a project that declares an E–H output still gets it (the declared check is first).
+    """
+    meta = subject.get("meta") or {}
+    named = str(meta.get("adm_profile") or "").strip().lower()
+    if named:
+        return "architecture" in named or named in {"programme", "a-h", "ah"}
+    return str(meta.get("track") or "").strip().lower() == "programme"
 # A data-gap rule already owns this defect. The artefact record still reports the honest status,
 # but the package is the gap rule's: one defect, one package. A partial artefact is NOT covered,
 # because a published document that lacks a required heading is a section-level finding the gap
@@ -1468,8 +1491,12 @@ def applies(
     if subject["kind"] in {"programme", "capability", "tranche", "benefit"}:
         return True
     if subject["kind"] == "phase":
-        # A phase document is the record of that phase, not a copy in every other phase.
-        return category == f"phase-{subject['phase']}"
+        # A phase document is the record of that phase, not a copy in every other phase. The
+        # E/F/H phase records are the architecture track's (owner tailoring 2026-11-24); the
+        # Phase-G review is every delivery project's gate.
+        if category != f"phase-{subject['phase']}":
+            return False
+        return subject["phase"] not in {"e", "f", "h"} or architecture_track(subject)
     if subject["kind"] == "artifact":
         # The typed page for one architecture artefact; the category names the instance.
         return category == "architecture-artifact-instance"
@@ -1489,6 +1516,8 @@ def applies(
         declared = category in (meta.get("expected_outputs") or []) or category in (meta.get("closure_outputs") or [])
         if declared:
             return True
+        if category in ARCHITECTURE_TRACK_CATEGORIES and not architecture_track(subject):
+            return False
         # PMP's artefacts are every project's artefacts, and TOGAF's contract and its Phase-G
         # compliance review are what a delivery project cannot pass design without. Instancing
         # them only when evidence already exists hid the very gaps the programme must rework.
