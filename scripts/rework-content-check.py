@@ -53,6 +53,20 @@ ARCHITECTURE_ARTEFACTS = [
     ("h", "hld", "catalog"),
 ]
 LEVELS = {"irrelevant", "consistent", "compliant", "conformant", "fully_conformant", "non_conformant"}
+# Owner decision 2026-11-24: every artefact document is authored. A body that is a template
+# skeleton, a bare source citation or a one-line placeholder is not authored prose, so the
+# checker refuses it before the factory can publish it.
+SUBSTANCE_MIN = 120
+OBJECT_FIELDS = 3
+OBJECT_MIN = 80
+BOILERPLATE = (
+    "the heading is evidenced by",
+    "the facts carry the document reference",
+    "no further fields",
+    "carries no separate",
+    "derived from the record or explicitly absent",
+    "one standards artefact, derived",
+)
 
 
 def fail(message: str) -> "NoReturn":  # noqa: F821 - a deliberate abort
@@ -66,6 +80,51 @@ def headings(body: str) -> set[str]:
         for line in body.splitlines()
         if line.startswith("## ")
     }
+
+
+def sections(body: str) -> dict[str, str]:
+    """The markdown body's `## ` sections and the prose under each."""
+    out: dict[str, list[str]] = {}
+    current: str | None = None
+    for line in body.splitlines():
+        if line.startswith("## "):
+            current = line[3:].strip()
+            out[current] = []
+        elif current is not None:
+            out[current].append(line)
+    return {name: "\n".join(lines).strip() for name, lines in out.items()}
+
+
+def check_authored(body: str, required: list[str], label: str, problems: list[str]) -> None:
+    """Refuse a body whose required sections are missing, thin or a source-citation stub."""
+    found = sections(body)
+    for name in required:
+        prose = found.get(name, "")
+        if len(prose) < SUBSTANCE_MIN:
+            problems.append(
+                f"{label} section {name!r} is not authored prose "
+                f"(at least {SUBSTANCE_MIN} characters)"
+            )
+    lowered = body.lower()
+    for phrase in BOILERPLATE:
+        if phrase in lowered:
+            problems.append(f"{label} carries a template stub: {phrase!r}")
+
+
+def substantive_fields(body: dict, label: str, problems: list[str]) -> None:
+    """An object body (SoAW, delivery contract) needs authored fields, not one-line pointers."""
+    values = [value for value in body.values() if isinstance(value, str) and value.strip()]
+    long_enough = [value for value in values if len(value.strip()) >= OBJECT_MIN]
+    if len(values) < OBJECT_FIELDS or len(long_enough) < 2:
+        problems.append(
+            f"{label} needs at least {OBJECT_FIELDS} authored fields and two of "
+            f"at least {OBJECT_MIN} characters"
+        )
+    for value in values:
+        lowered = value.lower()
+        for phrase in BOILERPLATE:
+            if phrase in lowered:
+                problems.append(f"{label} carries a template stub: {phrase!r}")
 
 
 def all_ids(value: Any, found: set[str]) -> None:
@@ -90,9 +149,15 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
 
     expect(isinstance(content.get("charter"), str) and len(content["charter"]) > 200,
            "charter must be a markdown string of substance")
+    if isinstance(content.get("charter"), str):
+        for phrase in BOILERPLATE:
+            if phrase in content["charter"].lower():
+                problems.append(f"charter carries a template stub: {phrase!r}")
     soaw = content.get("soaw") or {}
     expect(isinstance(soaw.get("title"), str) and isinstance(soaw.get("body"), dict),
            "soaw must be {title, body: object}")
+    if isinstance(soaw.get("body"), dict):
+        substantive_fields(soaw["body"], "soaw body", problems)
 
     artefacts = content.get("artifacts") or []
     expected = REQUIRED_ARTEFACTS + (ARCHITECTURE_ARTEFACTS if architecture else [])
@@ -104,10 +169,21 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
            "every artefact needs a title")
     expect(all(isinstance(a.get("entries"), list) and a["entries"] for a in artefacts),
            "every artefact needs at least one entry")
+    art_required = ((template_standard.get("templates") or {}).get("architecture-artifact")
+                    or {}).get("required") or ["Metadata", "Entries", "Links", "Document"]
+    for artefact in artefacts:
+        label = f"artefact {artefact.get('title')!r}"
+        body = artefact.get("body")
+        expect(isinstance(body, str) and bool(body.strip()),
+               f"{label} needs an authored body")
+        if isinstance(body, str) and body.strip():
+            check_authored(body, art_required, label, problems)
 
     contract = content.get("delivery_contract") or {}
     expect(isinstance(contract.get("title"), str) and isinstance(contract.get("body"), dict),
            "delivery_contract must be {title, body: object}")
+    if isinstance(contract.get("body"), dict):
+        substantive_fields(contract["body"], "delivery_contract body", problems)
 
     wbs = content.get("wbs_deliverable") or {}
     got = tuple(wbs.get(key) for key in
@@ -123,12 +199,14 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
 
     templates = template_standard.get("templates") or {}
     for key in ("project_brief_output", "evidence_output"):
-        if key not in content:
-            continue
         category = key.replace("_output", "").replace("_", "-")
         required = (templates.get(category) or {}).get("required") or []
-        missing = [name for name in required if name not in headings(content[key] or "")]
-        expect(not missing, f"{key} is missing required sections: {', '.join(missing)}")
+        body = content.get(key)
+        expect(isinstance(body, str) and bool(body.strip()), f"{key} must be authored")
+        if isinstance(body, str) and body.strip():
+            missing = [name for name in required if name not in headings(body)]
+            expect(not missing, f"{key} is missing required sections: {', '.join(missing)}")
+            check_authored(body, required, key, problems)
 
     if closes:
         closure = content.get("closure")
@@ -137,10 +215,16 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
                "closure must be a markdown string of substance")
         expect(isinstance(closure_review, str) and len(closure_review) > 100,
                "closure_review must be a markdown string of substance")
+        if isinstance(closure, str):
+            for phrase in BOILERPLATE:
+                if phrase in closure.lower():
+                    problems.append(f"closure carries a template stub: {phrase!r}")
         required = (templates.get("closure-review") or {}).get("required") or []
         body = closure_review if isinstance(closure_review, str) else ""
         missing = [name for name in required if name not in headings(body)]
         expect(not missing, f"closure_review is missing required sections: {', '.join(missing)}")
+        if body.strip():
+            check_authored(body, required, "closure_review", problems)
     else:
         expect("closure" not in content and "closure_review" not in content,
                "a project that stays active must carry no closure keys")
@@ -198,17 +282,28 @@ def self_test() -> None:
 
     def body_for(category: str) -> str:
         required = (templates.get(category) or {}).get("required") or ["Body"]
-        return "\n\n".join(f"## {name}\n\ntext" for name in required)
+        return "\n\n".join(
+            f"## {name}\n\n" + (f"Authored prose for {name}. " * 6) for name in required
+        )
 
     good = {
         "charter": "# Charter\n\n" + "A grounded charter statement. " * 12,
-        "soaw": {"title": "SoAW", "body": {"assignment": "x", "retrospective": True}},
+        "soaw": {"title": "SoAW", "body": {
+            "assignment": "Authored assignment statement. " * 4,
+            "scope": "Authored scope statement. " * 4,
+            "acceptance_criteria": "Authored acceptance criteria. " * 4,
+        }},
         "artifacts": [
             {"title": f"Artefact {index}", "phase_code": phase, "plateau": plateau,
-             "artifact_kind": kind, "entries": [{"axis_a": "a", "axis_b": "b", "value": "v"}]}
+             "artifact_kind": kind, "entries": [{"axis_a": "a", "axis_b": "b", "value": "v"}],
+             "body": body_for("architecture-artifact")}
             for index, (phase, plateau, kind) in enumerate(REQUIRED_ARTEFACTS)
         ],
-        "delivery_contract": {"title": "Contract", "body": {"compliance": "manifest"}},
+        "delivery_contract": {"title": "Contract", "body": {
+            "compliance": "Authored compliance method. " * 4,
+            "acceptance": "Authored acceptance statement. " * 4,
+            "approval": "Authored approval statement. " * 4,
+        }},
         "wbs_deliverable": {"title": "Deliverable", "business_value": 5,
                             "time_criticality": 5, "risk_reduction": 3, "job_size": 12},
         "review": {"level": "compliant", "findings": [{"code": "X-1", "note": "n"}],
@@ -236,6 +331,24 @@ def self_test() -> None:
                    "nowhere in the snapshot"):
         if not any(needle in problem for problem in problems):
             raise SystemExit(f"self-test: the mutant did not trip {needle!r}: {problems}")
+
+    # The authored-prose gate: a thin artefact body and a source-citation stub are refused.
+    thin = json.loads(json.dumps(good))
+    thin["artifacts"][0]["body"] = "## Metadata\n\ntext"
+    problems = check(thin, standard, ids, wsjf, True)
+    if not any("authored prose" in problem for problem in problems):
+        raise SystemExit("self-test: a thin artefact body was not refused")
+    stub = json.loads(json.dumps(good))
+    stub["project_brief_output"] = body_for("project-brief").replace(
+        "Authored prose for Outcome.", "The heading is evidenced by a source.")
+    problems = check(stub, standard, ids, wsjf, True)
+    if not any("template stub" in problem for problem in problems):
+        raise SystemExit("self-test: a source-citation stub was not refused")
+    thin_soaw = json.loads(json.dumps(good))
+    thin_soaw["soaw"]["body"] = {"assignment": "x"}
+    problems = check(thin_soaw, standard, ids, wsjf, True)
+    if not any("soaw body" in problem for problem in problems):
+        raise SystemExit("self-test: a thin SoAW body was not refused")
 
     active = json.loads(json.dumps(good))
     del active["closure"], active["closure_review"]
