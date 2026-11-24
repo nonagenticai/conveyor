@@ -265,7 +265,10 @@ mod tests {
                 // T5 P2–P4 (#77): the open-time measurability gate, the pinned pre-kata
                 // procedure version, and the append-only revert and adoption evidence
                 // (0067_kata_gate.sql).
-                (67, "kata gate".to_owned())
+                (67, "kata gate".to_owned()),
+                // S21 step 10 (#656): the authored, versioned option set a case is built from,
+                // and the policy's `fire_when` (0068_ladder_option_sets.sql, SPEC_V2 §7.2).
+                (68, "ladder option sets".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
