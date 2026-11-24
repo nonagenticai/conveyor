@@ -17,6 +17,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 
 use axum::extract::State;
+use axum::response::{IntoResponse, Response};
 use axum::routing::post;
 use axum::{Json, Router};
 use serde_json::{Value, json};
@@ -28,32 +29,60 @@ pub struct Model {
     pub base: String,
     queue: Arc<Mutex<VecDeque<Value>>>,
     hits: Arc<AtomicUsize>,
-    task: tokio::task::JoinHandle<()>,
+    /// How many of the NEXT calls answer 502 instead of popping the queue.
+    failures: Arc<AtomicUsize>,
+    /// The stub's own OS thread (gh #476: a tokio task in the test's runtime is starved under
+    /// load and the client sees a transport error that is not the stub's answer).
+    _task: std::thread::JoinHandle<()>,
 }
 
-type ModelState = (Arc<Mutex<VecDeque<Value>>>, Arc<AtomicUsize>);
+type ModelState = (
+    Arc<Mutex<VecDeque<Value>>>,
+    Arc<AtomicUsize>,
+    Arc<AtomicUsize>,
+);
 
 impl Model {
     /// Start the stub on an ephemeral port.
     pub async fn start() -> Model {
         let queue: Arc<Mutex<VecDeque<Value>>> = Arc::new(Mutex::new(VecDeque::new()));
         let hits = Arc::new(AtomicUsize::new(0));
+        let failures = Arc::new(AtomicUsize::new(0));
         let app = Router::new()
             .route("/api/chat/completions", post(answer))
-            .with_state((queue.clone(), hits.clone()));
-        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
-            .await
-            .expect("bind the model stub");
-        let addr = listener.local_addr().expect("model stub addr");
-        let task = tokio::spawn(async move {
-            let _ = axum::serve(listener, app).await;
+            .with_state((queue.clone(), hits.clone(), failures.clone()));
+        // Its own runtime on its own thread: CPU saturation in the test's runtime cannot starve
+        // the accept/serve path, which is what made this stub nondeterministic (#476).
+        let (ready, address) = std::sync::mpsc::channel();
+        let task = std::thread::spawn(move || {
+            let runtime = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .expect("the stub's runtime");
+            runtime.block_on(async move {
+                let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+                    .await
+                    .expect("bind the model stub");
+                ready
+                    .send(listener.local_addr().expect("model stub addr"))
+                    .expect("report the stub address");
+                let _ = axum::serve(listener, app).await;
+            });
         });
+        let addr = address.recv().expect("the stub address");
         Model {
             base: format!("http://{addr}"),
             queue,
             hits,
-            task,
+            failures,
+            _task: task,
         }
+    }
+
+    /// Make the next `times` calls answer 502 (the router's upstream-failure envelope), without
+    /// consuming the answer queue.
+    pub fn fail_next(&self, times: usize) {
+        self.failures.store(times, Ordering::SeqCst);
     }
 
     /// Queue one raw answer document.
@@ -94,14 +123,22 @@ impl Model {
     }
 }
 
-impl Drop for Model {
-    fn drop(&mut self) {
-        self.task.abort();
-    }
-}
+// No `Drop`: the stub thread is detached and ends with the test process (the JoinHandle's own
+// drop would only detach it, which is what we want). Aborting a std thread is not possible, and
+// the harness never needs the thread stopped mid-test.
 
-async fn answer(State((queue, hits)): State<ModelState>) -> Json<Value> {
+async fn answer(State((queue, hits, failures)): State<ModelState>) -> Response {
     hits.fetch_add(1, Ordering::SeqCst);
+    if failures.load(Ordering::SeqCst) > 0 {
+        failures.fetch_sub(1, Ordering::SeqCst);
+        return (
+            axum::http::StatusCode::BAD_GATEWAY,
+            Json(json!({
+                "error": {"message": "the provider is shedding load", "type": "upstream_failure"},
+            })),
+        )
+            .into_response();
+    }
     let next = queue.lock().expect("model queue").pop_front();
     Json(next.unwrap_or_else(|| {
         json!({
@@ -109,6 +146,7 @@ async fn answer(State((queue, hits)): State<ModelState>) -> Json<Value> {
             "choices": [{"message": {"role": "assistant", "content": ""}}],
         })
     }))
+    .into_response()
 }
 
 /// Boot the API against `pg`, pointing `completions.create` at `model`.

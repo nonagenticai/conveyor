@@ -148,6 +148,7 @@ impl Provider for OpenAiProvider {
                 })?;
 
             let status = response.status();
+            let retry_after = retry_after_secs(response.headers());
             let text = response
                 .text()
                 .await
@@ -166,6 +167,7 @@ impl Provider for OpenAiProvider {
                     provider: self.name.clone(),
                     status: status.as_u16(),
                     body: text,
+                    retry_after,
                 });
             }
 
@@ -235,6 +237,7 @@ impl Provider for OpenAiProvider {
 
             let status = response.status();
             if !status.is_success() {
+                let retry_after = retry_after_secs(response.headers());
                 let text = response.text().await.unwrap_or_default();
                 if status.as_u16() == 400 {
                     return Err(UpstreamError::BadRequest {
@@ -246,6 +249,7 @@ impl Provider for OpenAiProvider {
                     provider: self.name.clone(),
                     status: status.as_u16(),
                     body: text,
+                    retry_after,
                 });
             }
 
@@ -549,6 +553,22 @@ fn describe_reqwest(error: &reqwest::Error) -> String {
     }
 }
 
+/// The upstream's `Retry-After` in whole seconds: a delay-seconds value or an HTTP-date
+/// (IMF-fixdate, which `parse_from_rfc2822` accepts). A date in the past is zero.
+fn retry_after_secs(headers: &reqwest::header::HeaderMap) -> Option<u64> {
+    let value = headers
+        .get(reqwest::header::RETRY_AFTER)?
+        .to_str()
+        .ok()?
+        .trim();
+    if let Ok(seconds) = value.parse::<u64>() {
+        return Some(seconds);
+    }
+    let when = chrono::DateTime::parse_from_rfc2822(value).ok()?;
+    let wait = when.with_timezone(&chrono::Utc) - chrono::Utc::now();
+    Some(wait.num_seconds().max(0) as u64)
+}
+
 /// The upstream's own reason for a 400, from its OpenAI envelope when it has one.
 fn upstream_message(body: &str) -> String {
     serde_json::from_str::<Value>(body)
@@ -581,10 +601,7 @@ pub(crate) fn chat_payload(
 ) -> Value {
     let mut payload = Map::new();
     payload.insert("model".to_owned(), json!(model));
-    payload.insert(
-        "messages".to_owned(),
-        serde_json::to_value(&request.messages).expect("messages serialize"),
-    );
+    payload.insert("messages".to_owned(), normalise_messages(&request.messages));
     payload.insert("temperature".to_owned(), json!(request.temperature));
     // Raise-only floor: the caller's cap is honoured unless it cannot possibly produce content
     // (Inkling-2-Mini spends ~130 reasoning tokens even at effort `none`, so a 64-token budget
@@ -603,6 +620,18 @@ pub(crate) fn chat_payload(
     }
     if let Some(penalty) = request.frequency_penalty {
         payload.insert("frequency_penalty".to_owned(), json!(penalty));
+    }
+    if let Some(penalty) = request.presence_penalty {
+        payload.insert("presence_penalty".to_owned(), json!(penalty));
+    }
+    if let Some(top_p) = request.top_p {
+        payload.insert("top_p".to_owned(), json!(top_p));
+    }
+    if let Some(stop) = request.stop.as_ref().filter(|stop| !stop.is_null()) {
+        payload.insert("stop".to_owned(), stop.clone());
+    }
+    if let Some(parallel) = request.parallel_tool_calls {
+        payload.insert("parallel_tool_calls".to_owned(), json!(parallel));
     }
     if stream {
         payload.insert("stream".to_owned(), json!(true));
@@ -663,13 +692,44 @@ pub(crate) fn chat_payload(
     if !request.tool_choice.is_null() {
         payload.insert("tool_choice".to_owned(), request.tool_choice.clone());
     }
-    if render.force_chat_template_kwargs {
+    // The caller's chat-template kwargs pass through; a provider whose entry forces them overrides
+    // only the keys its dialect speaks (`enable_thinking` / `reasoning_effort`), never the rest.
+    let mut template_kwargs = request
+        .chat_template_kwargs
+        .as_ref()
+        .map(|kwargs| kwargs.0.clone())
+        .unwrap_or_default();
+    if render.force_chat_template_kwargs
+        && let Value::Object(forced) =
+            chat_template_kwargs(render.reasoning_dialect, request.enable_reasoning)
+    {
+        for (key, value) in forced {
+            template_kwargs.insert(key, value);
+        }
+    }
+    if !template_kwargs.is_empty() {
         payload.insert(
             "chat_template_kwargs".to_owned(),
-            chat_template_kwargs(render.reasoning_dialect, request.enable_reasoning),
+            serde_json::to_value(template_kwargs).expect("chat template kwargs serialize"),
         );
     }
     Value::Object(payload)
+}
+
+/// The messages as the upstream sees them: an assistant replay may carry `content: null` (an
+/// OpenAI client's tool-call turn), and vLLM's templates expect the empty string there.
+fn normalise_messages(messages: &[ChatMessage]) -> Value {
+    let mut value = serde_json::to_value(messages).expect("messages serialize");
+    if let Value::Array(items) = &mut value {
+        for item in items {
+            if let Value::Object(fields) = item
+                && fields.get("content").is_some_and(Value::is_null)
+            {
+                fields.insert("content".to_owned(), json!(""));
+            }
+        }
+    }
+    value
 }
 
 /// The `chat_template_kwargs` object for one dialect. The two spellings are mutually exclusive: a
@@ -849,6 +909,7 @@ mod tests {
     use tokio::sync::Mutex;
 
     use super::*;
+    use crate::contract::schemas::AnyObject;
 
     struct Stub {
         status: u16,
@@ -902,6 +963,11 @@ mod tests {
         ChatCompletionRequest {
             enable_reasoning: false,
             frequency_penalty: None,
+            presence_penalty: None,
+            stop: None,
+            parallel_tool_calls: None,
+            chat_template_kwargs: None,
+            top_p: None,
             max_tokens: Some(16),
             messages: vec![ChatMessage {
                 content: json!("hello"),
@@ -1071,6 +1137,108 @@ mod tests {
                 .is_none()
         );
         assert!(payload.get("tools").is_none());
+    }
+
+    #[test]
+    fn the_openai_knobs_are_forwarded_verbatim() {
+        let mut request = request("m");
+        request.top_p = Some(0.9);
+        request.presence_penalty = Some(-0.5);
+        request.stop = Some(json!(["</answer>", "\n\n"]));
+        request.parallel_tool_calls = Some(false);
+        request.chat_template_kwargs = Some(AnyObject(
+            [
+                ("min_p".to_owned(), json!(0.05)),
+                ("enable_thinking".to_owned(), json!(false)),
+            ]
+            .into(),
+        ));
+        let payload = chat_payload(&request, "m", false, &RenderOptions::default());
+        assert_eq!(payload["top_p"], 0.9);
+        assert_eq!(payload["presence_penalty"], -0.5);
+        assert_eq!(payload["stop"], json!(["</answer>", "\n\n"]));
+        assert_eq!(payload["parallel_tool_calls"], false);
+        assert_eq!(
+            payload["chat_template_kwargs"],
+            json!({"min_p": 0.05, "enable_thinking": false})
+        );
+    }
+
+    #[test]
+    fn a_stop_string_is_accepted_too() {
+        let request: ChatCompletionRequest = serde_json::from_value(json!({
+            "model": "m",
+            "messages": [{"role": "user", "content": "hi"}],
+            "stop": "END",
+        }))
+        .expect("a stop string decodes");
+        let payload = chat_payload(&request, "m", false, &RenderOptions::default());
+        assert_eq!(payload["stop"], "END");
+    }
+
+    #[test]
+    fn the_forced_dialect_key_wins_and_the_callers_other_keys_survive() {
+        let mut request = request("m");
+        request.chat_template_kwargs = Some(AnyObject(
+            [
+                ("enable_thinking".to_owned(), json!(true)),
+                ("min_p".to_owned(), json!(0.05)),
+            ]
+            .into(),
+        ));
+        // enable_reasoning is false, so the provider's forced dialect says "no thinking".
+        let payload = chat_payload(
+            &request,
+            "m",
+            false,
+            &render(ReasoningDialect::EnableThinking, None),
+        );
+        assert_eq!(
+            payload["chat_template_kwargs"],
+            json!({"enable_thinking": false, "min_p": 0.05})
+        );
+    }
+
+    #[test]
+    fn a_null_or_absent_message_content_reaches_the_upstream_as_empty() {
+        // An OpenAI client replaying an assistant tool call may omit `content` or send null; the
+        // vLLM template expects the empty string in that slot (gh #620's sibling on this side).
+        let request: ChatCompletionRequest = serde_json::from_value(json!({
+            "model": "m",
+            "messages": [
+                {"role": "user", "content": "hi"},
+                {"role": "assistant", "tool_calls": [{
+                    "id": "c1",
+                    "type": "function",
+                    "function": {"name": "get_weather", "arguments": "{\"city\":\"Amsterdam\"}"}
+                }]},
+                {"role": "tool", "content": "12C", "tool_call_id": "c1"},
+                {"role": "assistant", "content": null}
+            ],
+        }))
+        .expect("a message without content decodes");
+        let payload = chat_payload(&request, "m", false, &RenderOptions::default());
+        assert_eq!(payload["messages"][1]["content"], "");
+        assert_eq!(payload["messages"][3]["content"], "");
+    }
+
+    #[test]
+    fn a_numeric_retry_after_is_whole_seconds() {
+        let mut headers = reqwest::header::HeaderMap::new();
+        headers.insert(reqwest::header::RETRY_AFTER, "30".parse().expect("value"));
+        assert_eq!(retry_after_secs(&headers), Some(30));
+    }
+
+    #[test]
+    fn an_http_date_retry_after_is_converted_to_seconds() {
+        let when = chrono::Utc::now() + chrono::Duration::seconds(60);
+        let mut headers = reqwest::header::HeaderMap::new();
+        headers.insert(
+            reqwest::header::RETRY_AFTER,
+            when.to_rfc2822().parse().expect("value"),
+        );
+        let seconds = retry_after_secs(&headers).expect("a date parses");
+        assert!((55..=60).contains(&seconds), "got {seconds}");
     }
 
     fn render(dialect: ReasoningDialect, floor: Option<u32>) -> RenderOptions {

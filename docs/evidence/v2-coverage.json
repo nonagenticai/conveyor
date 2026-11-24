@@ -10,12 +10,12 @@
   ],
   "verdicts": {
     "exists": "the real route and its Playwright spec exist",
-    "extend": "a V1 ancestor route exists, or the V2 route exists without its spec",
+    "extend": "a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner",
     "new": "neither the route nor an ancestor exists"
   },
   "counts": {
-    "exists": 50,
-    "extend": 9,
+    "exists": 51,
+    "extend": 8,
     "new": 10
   },
   "rows": [
@@ -645,14 +645,14 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Procedures",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "apps/web/src/app.rs: route '/procedures' found",
-        "apps/web/e2e/procedures.spec.ts: absent",
+        "apps/web/e2e/procedures.spec.ts: present",
         "apps/web/src/app.rs: V1 ancestor '/build/processes', '/build/process-map' found",
         "docs/design/v2.js: page 'procedures' — design reference, not implementation"
       ],
-      "note": "V1 has the process list/detail and the process map at /build/processes and /build/process-map; V2 adds SOP/RDF/OWL/BPMN intake, PDDL/PKO and the publish gates (T16)."
+      "note": "The real /procedures screen reads the tenant's procedures, processes and capabilities and operates the T16 intake, source review and both publication gates. The V1 /build/processes and /build/process-map remain the executable's editor and map. The PKO editor was ruled out on 2026-11-19 and is replaced by the knowledge-pack pairing."
     },
     {
       "id": "destination:Authoring",
@@ -665,7 +665,7 @@
         "apps/web/e2e/authoring.spec.ts: present",
         "docs/design/v2.js: page 'authoring' — design reference, not implementation"
       ],
-      "note": "The intake queue, the reviewed draft catalogue and the per-asset dependency status land with T17 (#87); `authoring.assets` is the read."
+      "note": "The /authoring route renders the live authored-asset catalogue: `authoring.assets` is the read, the draft/review/publish gates are governed actions, and the dependency order is T17 (#87)."
     },
     {
       "id": "destination:Portfolio",
@@ -715,7 +715,8 @@
       "evidence": [
         "apps/web/src/app.rs: route '/design/adm' found",
         "apps/web/e2e/adm.spec.ts: absent",
-        "docs/design/v2.js: page 'adm' — design reference, not implementation"
+        "docs/design/v2.js: page 'adm' — design reference, not implementation",
+        "apps/web/src/app.rs: route '/design/adm' renders AdmGate (a gate; owner: T9)"
       ],
       "note": "V1 /architecture is the system map; the ADM capability at /design/adm and its actions are T9."
     },
@@ -743,7 +744,8 @@
         "apps/web/src/app.rs: route '/improve' found",
         "apps/web/e2e/improve.spec.ts: absent",
         "apps/web/src/app.rs: V1 ancestor '/evals/improvement' found",
-        "docs/design/v2.js: page 'improve' — design reference, not implementation"
+        "docs/design/v2.js: page 'improve' — design reference, not implementation",
+        "apps/web/src/app.rs: route '/improve' renders ImproveGate (a gate; owner: T4, T5)"
       ],
       "note": "V1 /evals/improvement carries the improvement campaigns; the coach/kata/lessons path is T4/T5."
     },
@@ -756,7 +758,8 @@
       "evidence": [
         "apps/web/src/app.rs: route '/operations' found",
         "apps/web/e2e/operations.spec.ts: absent",
-        "docs/design/v2.js: page 'operations' — design reference, not implementation"
+        "docs/design/v2.js: page 'operations' — design reference, not implementation",
+        "apps/web/src/app.rs: route '/operations' renders OperationsGate (a gate; owner: T7)"
       ],
       "note": "No route and no operations actions; the incident/runbook/postmortem path is T7."
     },
@@ -769,7 +772,8 @@
       "evidence": [
         "apps/web/src/app.rs: route '/tools' found",
         "apps/web/e2e/tools.spec.ts: absent",
-        "docs/design/v2.js: page 'toolkits' — design reference, not implementation"
+        "docs/design/v2.js: page 'toolkits' — design reference, not implementation",
+        "apps/web/src/app.rs: route '/tools' renders ToolsGate (a gate; owner: T13–T15)"
       ],
       "note": "V1 /tools is a legacy coding-action catalogue; the tool/toolkit/binding/call rows are T13–T15."
     }
