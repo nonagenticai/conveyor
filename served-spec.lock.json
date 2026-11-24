@@ -172,7 +172,7 @@
     "POST /api/actions/development_projects.merge_gate/invocations": "5e07b0bf88c02f7cbc288697b142f57ab2fd106728925f315ab7f48dacb99a14",
     "POST /api/actions/development_projects.record_step/invocations": "55a6197cbc0fbe3bc56630c313bed0acd8b9df8e6c1e335071a1abe3344a7e43",
     "POST /api/actions/development_projects.review_gate/invocations": "6304907e856a0b1341d4662e911a54163c2e03b96e85153c03e6754cf2d7915f",
-    "POST /api/actions/development_projects.rollback/invocations": "ec9e82bbeade3700e0ba054b9451c5b875ec28182e1199f876e56bb6e5dc373c",
+    "POST /api/actions/development_projects.rollback/invocations": "0e68c1f61b4ff08e2889bcff1cfde78f9e0fd371651b28fbaaebb2ade843db2b",
     "POST /api/actions/documents.compose/invocations": "4e0d89f4c294b665abba95fda44751fc999bf53830b409e81700a2bb9a4948ee",
     "POST /api/actions/documents.create/invocations": "9c0bd1f1a029f95355818da2e8ae4377a0fa5a1a568d2832f25896958be76dea",
     "POST /api/actions/documents.delete/invocations": "9da414d5fdb5700c2106e9a20417e61a6ee2510c2d36f535551ea307907df1b6",
