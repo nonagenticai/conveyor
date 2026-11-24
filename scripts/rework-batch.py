@@ -130,8 +130,35 @@ def demo_cadence(msp: dict, number: int) -> str:
     raise Refused(f"tranche {number} has no demo cadence; the tranche readiness step is missing")
 
 
-def wsjf_for(msp: dict, project_id: str) -> tuple[int, int, int, int]:
-    """The PI plan's four integers for the project's deliverable, read from the committed WBS."""
+def wsjf_for(msp: dict, project: dict, number: int) -> tuple[int, int, int, int]:
+    """The PI's four integers: the tranche refinement's re-estimate, else the committed WBS.
+
+    The refinement cadence is the PI's re-estimate of record; the WBS deliverable is created
+    from the content pack by the factory, so a member may not have one before its chain runs.
+    Reading only the WBS refused every member whose deliverable the plan had not materialised
+    yet (five of tranche 4's ten). The refinement wins when it names the project; the WBS is
+    the fallback for a tranche that has no refinement row.
+    """
+    key = str(project.get("key") or "")
+    project_id = str(project.get("id") or "")
+    for cadence in msp.get("cadences") or []:
+        meta = cadence.get("meta") or {}
+        if cadence.get("kind") != "refinement" or meta.get("tranche_number") != number:
+            continue
+        inputs = ((meta.get("refinement") or {}).get("wsjf_inputs") or {}).get(key)
+        if not inputs:
+            continue
+        try:
+            return (
+                int(inputs["business_value"]),
+                int(inputs["time_criticality"]),
+                int(inputs["risk_reduction"]),
+                int(inputs["job_size"]),
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            raise Refused(
+                f"the tranche {number} refinement for {key} has no WSJF: {error}"
+            ) from error
     for node in msp.get("wbs_nodes") or []:
         if node.get("project_id") != project_id or node.get("kind") != "deliverable":
             continue
@@ -144,7 +171,10 @@ def wsjf_for(msp: dict, project_id: str) -> tuple[int, int, int, int]:
             )
         except (KeyError, TypeError, ValueError) as error:
             raise Refused(f"the WBS deliverable for {project_id} has no WSJF: {error}") from error
-    raise Refused(f"the PI plan has no WBS deliverable for project {project_id}")
+    raise Refused(
+        f"neither the tranche {number} refinement nor the WBS has a WSJF for "
+        f"project {key or project_id}"
+    )
 
 
 def content_path(content_dir: Path, key: str) -> Path | None:
@@ -306,23 +336,24 @@ def verify_member(key: str, snapshot: Path, dry_run: bool) -> tuple[str, list[di
     return "RECEIPT_RED", gaps
 
 
-def plan_member(project: dict, msp: dict, content_dir: Path, number: int) -> dict:
+def plan_member(project: dict, msp: dict, content_dir: Path, number: int,
+                states: dict[int, str]) -> dict:
     key = str(project.get("key"))
-    meta = project.get("meta") or {}
     path = content_path(content_dir, key)
+    closes = closes_project(project, states)
     plan = {
         "key": key,
         "status": project.get("status"),
         "tranche": number,
         "content": str(path) if path else None,
-        "closes": project.get("status") == "closed" and not (meta.get("issues") or []),
+        "closes": closes,
     }
     if not path:
         plan["blocked"] = "no content pack"
         return plan
-    wsjf = wsjf_for(msp, str(project.get("id")))
+    wsjf = wsjf_for(msp, project, number)
     plan["wsjf"] = list(wsjf)
-    if project.get("status") == "active" or meta.get("issues"):
+    if not closes:
         plan["keep_active"] = True
         plan["closes"] = False
     return plan
@@ -408,6 +439,40 @@ def load_snapshot_sha(snapshot: Path) -> str:
     return sha
 
 
+def issue_states(snapshot: Path) -> dict[int, str]:
+    """The linked issues' states at the snapshot's own sha, never today's registry."""
+    sha = load_snapshot_sha(snapshot)
+    data: dict = {}
+    try:
+        shown = subprocess.run(
+            ["git", "-C", str(ROOT), "show", f"{sha}:docs/design/data/issues.json"],
+            capture_output=True, text=True, check=True,
+        ).stdout
+        data = json.loads(shown)
+    except (subprocess.CalledProcessError, json.JSONDecodeError):
+        path = ROOT / "docs" / "design" / "data" / "issues.json"
+        if path.exists():
+            data = load_json(path)
+    states: dict[int, str] = {}
+    for issue in data.get("issues") or []:
+        number = issue.get("number")
+        if number is not None:
+            states[int(number)] = str(issue.get("state") or "").upper()
+    return states
+
+
+def closes_project(project: dict, states: dict[int, str]) -> bool:
+    """A closed project closes again only when every linked issue is closed.
+
+    `meta.issues` lists linked numbers, not states. Treating the list's presence as "open" kept
+    four closed tranche-4 members active and would fail their own `project` check.
+    """
+    if project.get("status") != "closed":
+        return False
+    numbers = (project.get("meta") or {}).get("issues") or []
+    return all(states.get(int(number)) == "CLOSED" for number in numbers)
+
+
 def execute(args: argparse.Namespace) -> int:
     snapshot = Path(args.snapshot)
     projects = snapshot_projects(snapshot)
@@ -434,7 +499,11 @@ def execute(args: argparse.Namespace) -> int:
     try:
         latest = journal_entries(journal)
         pending = members if args.repair else resume_set(members, latest, sha)
-        plan = [plan_member(project, msp, Path(args.content_dir), args.tranche) for project in pending]
+        states = issue_states(snapshot)
+        plan = [
+            plan_member(project, msp, Path(args.content_dir), args.tranche, states)
+            for project in pending
+        ]
         plan = preflight(plan, snapshot, args.dry_run)
 
         for member in plan:
@@ -542,17 +611,26 @@ def self_test() -> None:
                         {"number": 5, "state": "planned"},
                     ],
                     "cadences": [
-                        {"id": "d4", "kind": "demo", "meta": {"tranche_number": 4}}
+                        {"id": "d4", "kind": "demo", "meta": {"tranche_number": 4}},
+                        {
+                            "id": "r4",
+                            "kind": "refinement",
+                            "meta": {
+                                "tranche_number": 4,
+                                "refinement": {
+                                    "wsjf_inputs": {
+                                        "A": {
+                                            "business_value": 7,
+                                            "time_criticality": 6,
+                                            "risk_reduction": 4,
+                                            "job_size": 9,
+                                        }
+                                    }
+                                },
+                            },
+                        },
                     ],
                     "wbs_nodes": [
-                        {
-                            "project_id": "pa",
-                            "kind": "deliverable",
-                            "business_value": 8,
-                            "time_criticality": 5,
-                            "risk_reduction": 3,
-                            "job_size": 8,
-                        },
                         {
                             "project_id": "pb",
                             "kind": "deliverable",
@@ -574,7 +652,19 @@ def self_test() -> None:
         else:
             raise SystemExit("self-test: a planned tranche was not refused")
         assert demo_cadence(load_json(snapshot / "msp.json"), 4) == "d4"
-        assert wsjf_for(load_json(snapshot / "msp.json"), "pa") == (8, 5, 3, 8)
+        msp = load_json(snapshot / "msp.json")
+        assert wsjf_for(msp, {"key": "A", "id": "pa"}, 4) == (7, 6, 4, 9)
+        assert wsjf_for(msp, {"key": "B", "id": "pb"}, 4) == (5, 5, 5, 13)
+        try:
+            wsjf_for(msp, {"key": "Z", "id": "pz"}, 4)
+        except Refused:
+            pass
+        else:
+            raise SystemExit("self-test: a member with no WSJF was not refused")
+        assert closes_project({"status": "closed", "meta": {"issues": [1]}}, {1: "CLOSED"})
+        assert not closes_project({"status": "closed", "meta": {"issues": [2]}}, {2: "OPEN"})
+        assert not closes_project({"status": "closed", "meta": {"issues": [3]}}, {})
+        assert not closes_project({"status": "active", "meta": {"issues": []}}, {})
 
         journal = root / "run.jsonl"
         for entry in (
@@ -623,6 +713,7 @@ def self_test() -> None:
             load_json(snapshot / "msp.json"),
             root / "empty",
             4,
+            {},
         )
         assert missing.get("blocked") == "no content pack"
     print("rework-batch: self-test ok — roster, refusal, resume, classification, lock")

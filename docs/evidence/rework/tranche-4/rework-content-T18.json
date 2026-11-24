@@ -1,0 +1,654 @@
+{
+ "charter": "# Charter — T18 The real V2 UI (retrospective, 2026-11-24)\n\n- **Project:** T18 'The real V2 UI', track v2, ADM phase G, capability plateau, tranche 4, project `01a20c80-b734-748a-b299-879ea19be681`, programme `01a1d039-0d24-7d16-ae52-4841e96ccfac`, plan `docs/plans/T18-real-v2-ui.md` (SPEC_V2 §10.5 and §12 T18). At the rework snapshot the project row is `status: active` (version 1, created 2026-11-24T07:41:22Z) with `meta.measured_status: proposed`, `meta.plan_status: draft`, `meta.issues: [559, 562, 563, 564, 565, 566]`, `meta.tranche: 4` and `meta.plateau: capability`.\n- **Tranche and governance:** tranche 4 (`01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce`, state authorised) was authorised at 2026-11-24T17:04:34Z by the tranche-3 review `01a20e84-325b-7fef-8f40-50b5e53550e9` (decision continue); the tranche-4 refinement `01a202a2-2705-7392-a2d1-03ca2b3a174e` records the WSJF inputs 9/7/10/5, and the tranche-4 PI cadence `01a202a1-dbb9-7e49-b64a-cf97c3fab095` lists T18 in its capacity. This charter is written by the 2026-11-24 retrospective rework under the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n- **Mandate:** make every V2 destination a real route in `apps/web` — the one Leptos CSR/WASM application served by the same binary on port 8930 — with its screen module, read/write contract, honest empty, error, happy and refusal states and a Playwright spec, while the design pack remains the public programme site at `/design/` and the reviewed reference (D64/D65).\n- **Scope:** the shell, route registry and navigation; the ten V2 destinations of SPEC_V2 §10.5 (organisation, procedures, authoring, portfolio, programme, architecture, plan, improve, operations, tools) and the execution room; the L1–L4 delivery view; the V2 coverage instrument measured from real routes and specs; the T12 organisation loop. Out of scope: new tables, actions, events or ports; SSR; a second router or frontend; a mobile app; retiring the V1 routes or the design pack; and any production fixture.\n- **Expected outputs:** `project-brief`, `inception-analysis` and `architecture-design`; the closure outputs `evidence` and `closure-review` remain unwritten because the project stays active.\n- **What this retrospective does NOT attest:** contemporaneous intent, or that a Phase A–D set existed when construction started; that the SPEC_V2 §12 T18 gate is met; that T18-4 (issue #565) or T18-5 (issue #566) are delivered; that the V2 coverage record is current — it is stale and `build-v2-coverage.py --check` exits 1; that a project baseline, delivery contract, Phase-G compliance review or published output existed before this rework; or any closure — this pack closes nothing.",
+ "soaw": {
+  "title": "Statement of Architecture Work — T18 The real V2 UI (retrospective, 2026-11-24)",
+  "body": {
+   "assignment": "Rework the V2 delivery slice T18 (SPEC_V2 §10.5 and §12 T18) by the reconstituted TOGAF/MSP lifecycle: author and publish the seven mandatory Phase A–D artefacts, the charter, the Statement of Architecture Work and the delivery contract, take the scope baseline with the one WBS deliverable, record the retrospective Phase-G compliance review, publish the expected outputs project-brief, inception-analysis and architecture-design plus the evidence output, and leave the project active because T18-4 and T18-5 are not delivered. The work is retrospective: it reconstructs the governance record from the project row, the plan, the route table and the issue registry, and it attests no contemporaneous intent.",
+   "scope": "the shell, route registry and navigation; the ten V2 destinations of SPEC_V2 §10.5 and the execution room; the L1–L4 delivery view; one Playwright spec per destination; the V2 coverage instrument measured from apps/web/src/app.rs and the named specs; and the T12 organisation loop as the final acceptance. Out of scope: new tables, actions, events or ports; SSR, a second router or frontend, or a mobile app; retiring or rebuilding the design pack; the V1 routes, which are linked rather than re-implemented; and any production fixture or live tenant write inside the retrospective.",
+   "responsibilities": "The T18 lane under the programme architect (conveyor-e2e) is responsible for the route table, the screen modules, the specs and the coverage instrument. The Architecture Board (conveyor-architecture-board) approves the Phase A–D artefacts and the delivery contract. The sponsoring group is accountable for the tranche-4 authorisation and for keeping the project active. The owning slices T4, T5, T7, T9, T10, T11, T13, T16 and T17 are responsible for the actions each destination calls, and T12 owns the final organisation loop.",
+   "acceptance_criteria": "The SPEC_V2 §12 T18 gate, judged by the fifteen checks of acceptance/programme/T18.toml: every destination route exists with its spec, each spec asserts empty, error, happy and one refusal, the coverage record reports exists only from a real route and a present spec with a *Gate reported as extend naming its owner, no production screen renders a fixture, and a signed-in tenant drives portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem and the ADM phase rail from the app, with the T12 loop as the final spec.",
+   "contract": "The delivery contract record is requested and approved live by scripts/rework-project.py under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 and is titled 'Delivery contract — T18 The real V2 UI (retrospective, 2026-11-24)'. It commits the lane to the §12 gate and to the two open units as typed dependencies, and it records that this retrospective neither closes the project nor waives any check. The contract's approval is retrospective; the historical snapshot has no live contract, which is one of the failed checks in the prior acceptance record.",
+   "retrospective": true
+  }
+ },
+ "artifacts": [
+  {
+   "title": "Stakeholder Map — T18 The real V2 UI (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "matrix",
+   "purpose": "Who is affected by the V2 UI, what each needs from it, and how the retrospective engages them.",
+   "scope": "the shell and route registry, the ten SPEC_V2 §10.5 destinations, the execution room, the delivery view and the coverage instrument.",
+   "stakeholders": {
+    "owner": "the T18 lane under the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group and the SRO",
+     "tenant operators who drive the app",
+     "the owning slices T4, T5, T7, T9, T10, T11, T13, T16 and T17",
+     "the T18 delivery units and the T12 acceptance owner",
+     "the design-pack maintainers"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "Sponsoring group",
+     "axis_b": "tranche-4 authorisation, the red acceptance record and the decision to keep T18 active",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "decide"
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "SRO",
+     "axis_b": "accountable for the V2 UI capability and the tranche outcome",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "accountable"
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "Programme architect (conveyor-e2e)",
+     "axis_b": "owns the slice, the route table and the Phase A–D set",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "responsible"
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "Architecture Board",
+     "axis_b": "approves the Phase A–D set and the delivery contract",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "approve"
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "Tenant operator",
+     "axis_b": "signs in and drives every destination; the user the coverage instrument measures",
+     "value": {
+      "influence": "medium",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "Owning slices T4, T5, T7, T9, T10, T11, T13, T16 and T17",
+     "axis_b": "supply the read and write actions each destination calls; the UI adds none",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 6
+    },
+    {
+     "axis_a": "T18 delivery units (issues #562–#566, #629, #630)",
+     "axis_b": "build the shell, screens and specs on the single-writer router",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "responsible"
+     },
+     "position": 7
+    },
+    {
+     "axis_a": "Design-pack maintainers",
+     "axis_b": "keep /design/ as the public programme site and the reviewed reference (D64)",
+     "value": {
+      "influence": "medium",
+      "interest": "medium",
+      "engagement": "inform"
+     },
+     "position": 8
+    },
+    {
+     "axis_a": "T12 acceptance owner",
+     "axis_b": "runs the organisation loop from the UI as the final spec",
+     "value": {
+      "influence": "high",
+      "interest": "high",
+      "engagement": "consult"
+     },
+     "position": 9
+    }
+   ],
+   "body": "# Stakeholder Map — T18 The real V2 UI (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; owner the T18 lane under the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b734-748a-b299-879ea19be681; tranche 4 id 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The artefact is proposed: its typed row enters the live repository through architecture.artifacts_create when this pack is published, and it does not claim that the stakeholder set was consulted contemporaneously.\n\n## Entries\n\nNine stakeholders on the influence, interest and engagement axes. The sponsoring group decides the tranche and the project's continuation; the SRO is accountable for the capability and the tranche outcome; the programme architect is responsible for the slice and the artefact set; the Architecture Board approves the artefacts and the contract. Tenant operators are the measured users, the owning slices supply the actions the destinations call, the delivery units build under the single-writer router, the design-pack maintainers keep the public site, and the T12 owner runs the final loop.\n\n## Links\n\nDerives from SPEC_V2 §10.5 (the destination table), §10.4 (the action registry) and §12 T18 (the gate), plus docs/plans/T18-real-v2-ui.md, docs/plans/T18/inception-analysis.md and docs/decisions/0013-real-v2-ui.md. Reuses the apps/web shell and e2e harness, and cites docs/design/v2.js as the reviewed design reference (D64), never as evidence of implementation (D65). Depends on the tranche-4 authorisation 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce and on issues #559, #562–#566, #629 and #630 for the work and its owners.\n\n## Document\n\nThe governance document this artefact sits under is the T18 retrospective pack of 2026-11-24, whose live records are created by scripts/rework-project.py with acceptance/programme/T18.toml as the manifest. The pack records the Statement of Architecture Work, the delivery contract, the seven Phase A–D artefacts and the Phase-G review, and it closes nothing because the project stays active. The stakeholder map is the engagement record for that publish and for the five delivery units whose router seam is single-writer. Project id 01a20c80-b734-748a-b299-879ea19be681.\n"
+  },
+  {
+   "title": "Driver/Goal/Objective Catalog — T18 The real V2 UI (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "The drivers that forced a real V2 UI, the goals that answer them and the measurable objectives the retrospective can check.",
+   "scope": "the measurement defect in the V2 coverage record, the absent routes in apps/web, the action-only write rule, the single-writer router and the honest-gate pattern.",
+   "stakeholders": {
+    "owner": "the T18 lane under the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group and the SRO",
+     "tenant operators who drive the app",
+     "the owning slices T4, T5, T7, T9, T10, T11, T13, T16 and T17",
+     "the T18 delivery units and the T12 acceptance owner",
+     "the design-pack maintainers"
+    ]
+   },
+   "entries": [
+    {
+     "axis_a": "D1 The design mock is credited as the real UI",
+     "axis_b": "G1 Measure the application, never the pack",
+     "value": {
+      "objective": "build-v2-coverage.py resolves each §10.5 destination against apps/web/src/app.rs and its named Playwright spec; exists requires both, and a *Gate view is extend naming its owner (D65)."
+     },
+     "position": 1
+    },
+    {
+     "axis_a": "D2 No V2 route exists in apps/web at main@490ad555",
+     "axis_b": "G2 Every §10.5 destination is a route in the one application",
+     "value": {
+      "objective": "the ten destinations and the execution room are registered in the single Router and served by the same binary on port 8930, each with a screen module."
+     },
+     "position": 2
+    },
+    {
+     "axis_a": "D3 Backend families belong to other slices and may be absent",
+     "axis_b": "G3 The UI never reaches around the action registry",
+     "value": {
+      "objective": "a destination without its slice renders not yet live and names the missing action or slice; ToolsGate, AdmGate and KnowledgeGate are the realised pattern, and no local fetch or fixture is invented."
+     },
+     "position": 3
+    },
+    {
+     "axis_a": "D4 app.rs and screens/mod.rs are single-writer files",
+     "axis_b": "G4 Sequence the delivery units rather than parallelise them",
+     "value": {
+      "objective": "T18-1 to T18-5 are issues #562–#566, with #629 and #630 as follow-ons, and each unit is blocked on its predecessor's merge."
+     },
+     "position": 4
+    },
+    {
+     "axis_a": "D5 Signed-out and forbidden deep links are distinct states",
+     "axis_b": "G5 Honest gates, each asserted in a spec",
+     "value": {
+      "objective": "a signed-out V2 route renders the sign-in gate, a forbidden route the permission gate, and the sidebar hides an item the principal cannot act on through has_action."
+     },
+     "position": 5
+    },
+    {
+     "axis_a": "D6 The app produces no acceptance evidence for the programme",
+     "axis_b": "G6 Drive the T12 organisation loop from the UI",
+     "value": {
+      "objective": "the final destination spec runs request → PM → delivery → coach → kata → development → deploy → incident → lesson from the app; it is not delivered at this snapshot."
+     },
+     "position": 6
+    }
+   ],
+   "body": "# Driver/Goal/Objective Catalog — T18 The real V2 UI (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the T18 lane under the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b734-748a-b299-879ea19be681; tranche 4 id 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The catalog is reconstructed from the plan's objective, the inception analysis and the measured starting state, and its objectives are stated so that the coverage instrument or a spec can falsify them.\n\n## Entries\n\nSix driver, goal and objective rows. D1 and G1 correct the measurement defect that credited the mock pages; D2 and G2 require real routes in the one application; D3 and G3 forbid fixtures and ad-hoc fetches; D4 and G4 sequence the five units on the single-writer router; D5 and G5 make the auth and tenancy gates explicit; D6 and G6 name the T12 loop as the final evidence. Each objective names the instrument that can test it, and the T12 objective is marked undelivered rather than assumed.\n\n## Links\n\nDerives from SPEC_V2 §10.5, §10.4 and §12 T18, docs/plans/T18-real-v2-ui.md, docs/plans/T18/inception-analysis.md and docs/decisions/0013-real-v2-ui.md (D64/D65, ADR 0009). Links the coverage instrument scripts/build-v2-coverage.py and docs/evidence/v2-coverage.json, the route table apps/web/src/app.rs, the e2e specs, acceptance/programme/T18.toml and issues #559, #562–#566, #629 and #630. The design pack is cited only as reference.\n\n## Document\n\nThe document this catalog sits under is the T18 retrospective pack of 2026-11-24, whose live records are created by scripts/rework-project.py. The catalog supports the Statement of Architecture Work's acceptance criteria: the §12 gate is the objective set, the coverage instrument and the destination specs are the verifiers, and the two open delivery units are the remaining objectives. It records the drivers as reconstructed rationale, not as minutes of a contemporaneous workshop. Project id 01a20c80-b734-748a-b299-879ea19be681.\n"
+  },
+  {
+   "title": "Requirements Catalog — T18 The real V2 UI (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "catalog",
+   "purpose": "The requirements the V2 UI must satisfy, each with an owner and a verification the retrospective can run.",
+   "scope": "the shell and navigation, the route table, destination read and write contracts, the four states per spec, the coverage rule and the T12 final spec.",
+   "stakeholders": {
+    "owner": "the T18 lane under the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group and the SRO",
+     "tenant operators who drive the app",
+     "the owning slices T4, T5, T7, T9, T10, T11, T13, T16 and T17",
+     "the T18 delivery units and the T12 acceptance owner",
+     "the design-pack maintainers"
+    ]
+   },
+   "entries": [
+    {
+     "id": "R1",
+     "requirement": "One shell: a single Router, sidebar and top bar; seven nav groups trimmed to destinations that exist and gated by has_action.",
+     "owner": "T18-1 (issue #562)",
+     "verification": "apps/web/src/app.rs and shell.spec.ts"
+    },
+    {
+     "id": "R2",
+     "requirement": "Every SPEC_V2 §10.5 destination has a real V2 route and screen module; a gate route is not a destination.",
+     "owner": "T18-1 to T18-5",
+     "verification": "route table plus build-v2-coverage.py"
+    },
+    {
+     "id": "R3",
+     "requirement": "Each destination names its read path and write path from the existing action families; T18 adds no table, action or event.",
+     "owner": "the owning slices and T18",
+     "verification": "docs/plans/T18/architecture-design.md and the action registry"
+    },
+    {
+     "id": "R4",
+     "requirement": "Each destination spec asserts empty, error, happy and one refusal.",
+     "owner": "each delivery unit",
+     "verification": "apps/web/e2e/*.spec.ts under web.yml"
+    },
+    {
+     "id": "R5",
+     "requirement": "The V2 coverage record reports exists only from a real route and a present spec; a *Gate is extend naming its owner.",
+     "owner": "scripts/build-v2-coverage.py",
+     "verification": "build-v2-coverage.py --check"
+    },
+    {
+     "id": "R6",
+     "requirement": "No production screen renders a fixture; reads are live rows and writes go through the action registry.",
+     "owner": "every screen module",
+     "verification": "spec review plus the coverage record's fixture rule"
+    },
+    {
+     "id": "R7",
+     "requirement": "A destination whose owning slice is absent renders not yet live, names the missing action or slice, and keeps its route.",
+     "owner": "the destination screen",
+     "verification": "ToolsGate, AdmGate and KnowledgeGate specs"
+    },
+    {
+     "id": "R8",
+     "requirement": "The delivery view reads one model at L1 portfolio, L2 programme, L3 project and L4 work package; spend is ledger tokens plus the pinned price, never a fabricated zero.",
+     "owner": "T18-1 with T1 and T10",
+     "verification": "portfolio.spec.ts and the published programme/work/measure sections"
+    },
+    {
+     "id": "R9",
+     "requirement": "The T12 organisation loop is driven from the UI as the final destination spec.",
+     "owner": "T18-5 (issue #566) with T12",
+     "verification": "the final spec; not present at this snapshot"
+    },
+    {
+     "id": "R10",
+     "requirement": "No new backend surface for the UI: a missing capability is a typed dependency, not a local fetch or a second router.",
+     "owner": "the T18 lane",
+     "verification": "ADR 0013 and the destination contracts"
+    }
+   ],
+   "body": "# Requirements Catalog — T18 The real V2 UI (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the T18 lane under the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b734-748a-b299-879ea19be681; tranche 4 id 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The requirements are reconstructed from SPEC_V2 §10.5, the plan's scope and acceptance sections, ADR 0013 and the measured starting state; each carries an owner and a verification rather than an assertion.\n\n## Entries\n\nTen requirements. R1 fixes the shell and nav gate; R2 makes the route table normative; R3 forbids a new backend surface; R4 fixes the four-state spec contract; R5 makes the coverage record honest; R6 bans production fixtures; R7 defines the honest wait; R8 fixes the L1–L4 delivery view and its spend rule; R9 names the T12 loop; R10 binds the whole to the action registry. R9 is explicitly not satisfied at this snapshot, and R2 is satisfied only in part because Tools and Architecture still render gates.\n\n## Links\n\nDerives from SPEC_V2 §10.5, §10.4 and §12 T18; docs/plans/T18-real-v2-ui.md §§3–8; docs/plans/T18/inception-analysis.md; docs/decisions/0013-real-v2-ui.md; and the action registry. Verifiers are apps/web/src/app.rs, apps/web/e2e/*.spec.ts, scripts/build-v2-coverage.py and acceptance/programme/T18.toml. Depends on the tranche-4 authorisation 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce and on the owning slices named in each requirement.\n\n## Document\n\nThe document this catalog sits under is the T18 retrospective pack of 2026-11-24, published by scripts/rework-project.py, with acceptance/programme/T18.toml as the manifest that judges the §12 gate. The catalog is the trace from the charter's mandate to the destination contracts: every requirement names the route, screen, spec or instrument that can verify it, and the two open delivery units are recorded as unmet requirements rather than waived ones. Project id 01a20c80-b734-748a-b299-879ea19be681.\n"
+  },
+  {
+   "title": "Solution Concept Diagram — T18 The real V2 UI (Phase A)",
+   "phase_code": "a",
+   "plateau": "psa",
+   "artifact_kind": "diagram",
+   "purpose": "The shape of the solution: one application shell, one route registry, one action registry and one measurement instrument, with the design pack outside the production path.",
+   "scope": "the browser client, the Leptos Router and shell, the screen modules, the API and action registry, the owning slices' rows, the e2e harness and the coverage instrument.",
+   "stakeholders": {
+    "owner": "the T18 lane under the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group and the SRO",
+     "tenant operators who drive the app",
+     "the owning slices T4, T5, T7, T9, T10, T11, T13, T16 and T17",
+     "the T18 delivery units and the T12 acceptance owner",
+     "the design-pack maintainers"
+    ]
+   },
+   "entries": [
+    {
+     "element": "Browser client",
+     "viewpoint": "user",
+     "relation": "loads the Leptos CSR/WASM application from the one binary on port 8930; the design pack is a separate static site at /design/ and is not the operator surface."
+    },
+    {
+     "element": "Router and shell in app.rs",
+     "viewpoint": "application",
+     "relation": "owns the route table, the seven nav groups, the tenant switcher and the has_action gate; the single-writer seam of the five delivery units."
+    },
+    {
+     "element": "Destination screen modules",
+     "viewpoint": "application",
+     "relation": "render empty, error, happy and refusal states; an unwired destination renders not yet live and names its owning slice."
+    },
+    {
+     "element": "api.rs action client",
+     "viewpoint": "integration",
+     "relation": "sends writes as POST /api/actions/{name}/invocations with If-Match, Idempotency-Key and the approval id; reads are literal GETs."
+    },
+    {
+     "element": "Action registry and owning slices",
+     "viewpoint": "service",
+     "relation": "T0–T17 own the action families and their rows; T18 adds no table, action or event and calls only registered actions."
+    },
+    {
+     "element": "Postgres rows",
+     "viewpoint": "data",
+     "relation": "the single source of live tenant data; the app never reads the published snapshot as its data source."
+    },
+    {
+     "element": "Design pack",
+     "viewpoint": "reference",
+     "relation": "the public programme site and reviewed design reference (D64); a mock page is evidence of intent, never of implementation (D65)."
+    },
+    {
+     "element": "Playwright specs and web.yml",
+     "viewpoint": "verification",
+     "relation": "one spec per destination asserting empty, error, happy and one refusal; the repository workflow is the browser gate."
+    },
+    {
+     "element": "build-v2-coverage.py",
+     "viewpoint": "measurement",
+     "relation": "resolves each destination against the route table and its spec; exists requires both, and a gate is extend naming its owner."
+    }
+   ],
+   "body": "# Solution Concept Diagram — T18 The real V2 UI (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; owner the T18 lane under the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b734-748a-b299-879ea19be681; tranche 4 id 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The diagram is a textual element/viewpoint set because the published artefact body is markdown; the live typed row enters through architecture.artifacts_create when the pack is published.\n\n## Entries\n\nNine elements across the user, application, integration, service, data, reference, verification and measurement viewpoints. The client reaches one shell; the shell routes to screen modules; screens read by literal GET and write only through the action client into the registry; the registry owns the rows in Postgres. The design pack sits outside the production path as the reviewed reference, and two instruments close the loop: the Playwright specs are the browser gate and the coverage script measures the routes and specs the programme reports.\n\n## Links\n\nDerives from SPEC_V2 §10.5 (routes and shell), §10.4 (action registry) and §12 T18; docs/plans/T18-real-v2-ui.md §4 and §6; docs/plans/T18/architecture-design.md; docs/decisions/0013-real-v2-ui.md; and ADR 0009. Links apps/web/src/app.rs, apps/web/e2e, scripts/build-v2-coverage.py, acceptance/programme/T18.toml and issues #559, #562–#566, #629 and #630. The design pack is linked as reference only.\n\n## Document\n\nThe document this diagram sits under is the T18 retrospective pack of 2026-11-24, published by scripts/rework-project.py. It is the Phase A concept for the delivery: one app, one shell, one registry, one browser gate and one measurement instrument, with the design pack deliberately outside the production path. The concept does not assert that every element is live: Tools and Architecture remain gates, and the T12 loop is not yet proved. Project id 01a20c80-b734-748a-b299-879ea19be681.\n"
+  },
+  {
+   "title": "Business Capability Map — T18 The real V2 UI (Phase B)",
+   "phase_code": "b",
+   "plateau": "hld",
+   "artifact_kind": "diagram",
+   "purpose": "The business capabilities the V2 UI exposes, their owning slices and their measured state at the retrospective snapshot.",
+   "scope": "portfolio and delivery, programme and benefits, organisation and release, authoring and procedures, execution, improvement, operations, tools and architecture.",
+   "stakeholders": {
+    "owner": "the T18 lane under the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group and the SRO",
+     "tenant operators who drive the app",
+     "the owning slices T4, T5, T7, T9, T10, T11, T13, T16 and T17",
+     "the T18 delivery units and the T12 acceptance owner",
+     "the design-pack maintainers"
+    ]
+   },
+   "entries": [
+    {
+     "capability": "Operate the portfolio and the L1–L4 delivery view",
+     "owner_slice": "T1, T10",
+     "destination": "/portfolio, /portfolio/:programme_id",
+     "state": "exists",
+     "evidence": "portfolio.spec.ts present; delivery view derived from programme/work/measure"
+    },
+    {
+     "capability": "Govern the programme, tranches and benefits",
+     "owner_slice": "T10",
+     "destination": "/programme",
+     "state": "exists",
+     "evidence": "programme.spec.ts present"
+    },
+    {
+     "capability": "Configure the organisation, releases and bindings",
+     "owner_slice": "T0, T2",
+     "destination": "/organisation",
+     "state": "exists",
+     "evidence": "organisation.spec.ts present; authority matrix and binding staleness are spec cases"
+    },
+    {
+     "capability": "Author and publish procedures and tenant assets",
+     "owner_slice": "T16, T17",
+     "destination": "/procedures, /authoring",
+     "state": "exists",
+     "evidence": "procedures.spec.ts and authoring.spec.ts present; the two publication gates are exercised"
+    },
+    {
+     "capability": "Execute jobs and read the run provenance",
+     "owner_slice": "T0, T4, T13, S21",
+     "destination": "/execution",
+     "state": "partial",
+     "evidence": "execution.spec.ts present; executor kind, binding pin and tool ledger are named gaps on the screen"
+    },
+    {
+     "capability": "Improve with coach, kata and lessons",
+     "owner_slice": "T4, T5",
+     "destination": "/improve",
+     "state": "exists",
+     "evidence": "improve.spec.ts present; the coverage record still reports extend until regenerated"
+    },
+    {
+     "capability": "Operate incidents, runbooks and postmortems",
+     "owner_slice": "T7",
+     "destination": "/operations",
+     "state": "exists",
+     "evidence": "operations.spec.ts present; gated writes wait on T7's mechanism"
+    },
+    {
+     "capability": "Administer tools and the architecture practice",
+     "owner_slice": "T13–T15, T9",
+     "destination": "/tools, /design/adm",
+     "state": "gate",
+     "evidence": "ToolsGate and AdmGate; no tools.spec.ts or admin destination spec; coverage reports extend"
+    },
+    {
+     "capability": "Run the T12 organisation loop from the app",
+     "owner_slice": "T12",
+     "destination": "the final acceptance spec",
+     "state": "absent",
+     "evidence": "no spec; issue #566 open and blocked"
+    }
+   ],
+   "body": "# Business Capability Map — T18 The real V2 UI (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; owner the T18 lane under the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b734-748a-b299-879ea19be681; tranche 4 id 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The map is reconstructed from the route table, the e2e directory and the destination rows of docs/evidence/v2-coverage.json; its states are measured, and a stale coverage record is called out rather than smoothed.\n\n## Entries\n\nNine capabilities. Portfolio and delivery, programme and benefits, organisation and release, procedures and authoring, improve and operations each have a real route and a present spec and are marked exists, with the caveat that the published coverage record predates some of those merges and still reports extend for Improve and Operations. Execution is partial because the run read model does not expose the executor kind, binding pin or tool ledger. Tools and Architecture are gates, not destinations. The T12 organisation loop is absent; it is the final acceptance and remains acceptance-blocked-by T12.\n\n## Links\n\nDerives from SPEC_V2 §10.5 and §12 T18, docs/plans/T18-real-v2-ui.md §§4–6 and 9, and docs/plans/T18/architecture-design.md. Measures apps/web/src/app.rs, apps/web/e2e/*.spec.ts and docs/evidence/v2-coverage.json. Links the owning issues #562–#566, #629 and #630 and the tranche-4 authorisation 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; the design pack remains the reviewed reference and is not a capability source.\n\n## Document\n\nThe document this map sits under is the T18 retrospective pack of 2026-11-24, published by scripts/rework-project.py with acceptance/programme/T18.toml as the manifest. The map is the Phase B bridge from the Phase A requirements to the Phase C data and the Phase D standards: each capability names the destination, the owning slice and the evidence that exists or is missing, so the Phase-G review can judge the gap without re-measuring it. Project id 01a20c80-b734-748a-b299-879ea19be681.\n"
+  },
+  {
+   "title": "Data Entity/Data Component Catalog — T18 The real V2 UI (Phase C)",
+   "phase_code": "c",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "The data entities the UI reads and the application components that render them, with the explicit statement that T18 adds no table.",
+   "scope": "the route table, screen modules, client modules and e2e harness, plus the read entities owned by T0–T17 that each destination consumes.",
+   "stakeholders": {
+    "owner": "the T18 lane under the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group and the SRO",
+     "tenant operators who drive the app",
+     "the owning slices T4, T5, T7, T9, T10, T11, T13, T16 and T17",
+     "the T18 delivery units and the T12 acceptance owner",
+     "the design-pack maintainers"
+    ]
+   },
+   "entries": [
+    {
+     "entity_or_component": "project, programme, tranche",
+     "kind": "entity (read)",
+     "owner": "T1, T10",
+     "use": "portfolio and programme screens; the L1/L2 delivery levels",
+     "new_in_t18": false
+    },
+    {
+     "entity_or_component": "wbs_node, project_baseline, project_register_item",
+     "kind": "entity (read/write)",
+     "owner": "T1",
+     "use": "the /plan screen and its change control",
+     "new_in_t18": false
+    },
+    {
+     "entity_or_component": "department, job_catalogue, job_release, job_binding, approval_policy, decision, laya_inference_config",
+     "kind": "entity (read/write)",
+     "owner": "T0, T2",
+     "use": "the /organisation authority matrix, catalogue, release and binding staleness",
+     "new_in_t18": false
+    },
+    {
+     "entity_or_component": "procedure, process, capability, authoring asset and source",
+     "kind": "entity (read/write)",
+     "owner": "T16, T17",
+     "use": "the /procedures and /authoring screens and their publication gates",
+     "new_in_t18": false
+    },
+    {
+     "entity_or_component": "run, run_step, tool, toolkit, tool_binding, tool_call",
+     "kind": "entity (read)",
+     "owner": "T0, T4, T13, S21",
+     "use": "the /execution room, the tools panel and the named read-model gaps",
+     "new_in_t18": false
+    },
+    {
+     "entity_or_component": "card, board, list, comment, kata, lesson, incident, runbook",
+     "kind": "entity (read/write)",
+     "owner": "T4, T5, T7, S05",
+     "use": "the work-package board, the /improve path and the /operations path",
+     "new_in_t18": false
+    },
+    {
+     "entity_or_component": "architecture artifact, contract, compliance review, waiver",
+     "kind": "entity (read/write)",
+     "owner": "T9",
+     "use": "the /design/adm phase rail; currently a gate",
+     "new_in_t18": false
+    },
+    {
+     "entity_or_component": "app.rs route registry and shell",
+     "kind": "component",
+     "owner": "T18",
+     "use": "one Router, sidebar, top bar and has_action gate",
+     "new_in_t18": true
+    },
+    {
+     "entity_or_component": "apps/web/src/screens/*.rs",
+     "kind": "component",
+     "owner": "T18",
+     "use": "one module per destination plus the execution room",
+     "new_in_t18": true
+    },
+    {
+     "entity_or_component": "api.rs, auth.rs, state.rs, sse.rs, components.rs",
+     "kind": "component",
+     "owner": "V1, reused by T18",
+     "use": "action writes, OIDC PKCE, tenant/me/manifest signals, SSE and shared UI",
+     "new_in_t18": false
+    },
+    {
+     "entity_or_component": "apps/web/e2e/*.spec.ts and fixture.ts",
+     "kind": "component",
+     "owner": "T18 with V1",
+     "use": "one spec per destination, empty/error/happy/refusal under web.yml",
+     "new_in_t18": true
+    },
+    {
+     "entity_or_component": "scripts/build-v2-coverage.py and docs/evidence/v2-coverage.json",
+     "kind": "component",
+     "owner": "programme measurement",
+     "use": "route plus spec resolution; exists versus extend versus new",
+     "new_in_t18": false
+    }
+   ],
+   "body": "# Data Entity/Data Component Catalog — T18 The real V2 UI (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; owner the T18 lane under the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b734-748a-b299-879ea19be681; tranche 4 id 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The catalog records the data entities the UI consumes and the application components it adds; the decisive entry is that T18 adds no migration, table, action or event, so the data architecture is unchanged.\n\n## Entries\n\nTwelve rows: seven entity groups owned by T0–T17 and five component groups in apps/web and the measurement scripts. The entity rows name who owns the writes and which destination reads them; the component rows distinguish what T18 adds (the route registry, screen modules, specs) from what it reuses (the api, auth, state, SSE and shared components). No entity is new in T18, and the architecture rows are read-only from the UI while /design/adm remains a gate. The run and tool rows are the read-model gap the execution room names.\n\n## Links\n\nDerives from docs/plans/T18/architecture-design.md (aggregates, tables and actions), the SPEC_V2 §10.3 data model and §10.4 action registry, and the migration tree that T18 does not extend. Links apps/web/src/app.rs, apps/web/src/screens, apps/web/e2e, scripts/build-v2-coverage.py, docs/evidence/v2-coverage.json and acceptance/programme/T18.toml. The design pack is not a component of the production path.\n\n## Document\n\nThe document this catalog sits under is the T18 retrospective pack of 2026-11-24, published by scripts/rework-project.py. It is the Phase C counterpart to the Phase A solution concept: the UI is a client of the registry and the rows, not a second store, and the catalogue shows that the project's data footprint is zero new entities. The dirty evidence is recorded: the coverage record is stale and the run read model does not yet expose the executor kind, binding pin or tool ledger. Project id 01a20c80-b734-748a-b299-879ea19be681.\n"
+  },
+  {
+   "title": "Technology Standards Catalog — T18 The real V2 UI (Phase D)",
+   "phase_code": "d",
+   "plateau": "hld",
+   "artifact_kind": "catalog",
+   "purpose": "The technology standards the V2 UI must follow and the verifier for each.",
+   "scope": "the client stack, the action-only write protocol, authentication, the browser gate, the coverage instrument, the design-pack boundary and the no-fixture rule.",
+   "stakeholders": {
+    "owner": "the T18 lane under the programme architect (conveyor-e2e)",
+    "reviewer": "the Architecture Board (conveyor-architecture-board)",
+    "consumers": [
+     "the sponsoring group and the SRO",
+     "tenant operators who drive the app",
+     "the owning slices T4, T5, T7, T9, T10, T11, T13, T16 and T17",
+     "the T18 delivery units and the T12 acceptance owner",
+     "the design-pack maintainers"
+    ]
+   },
+   "entries": [
+    {
+     "standard": "Leptos CSR/WASM in one Rust binary served on port 8930",
+     "rule_or_version": "ADR 0001 and ADR 0009; no SSR, no second frontend",
+     "owner": "T18 lane",
+     "verifier": "web.yml and the binary build"
+    },
+    {
+     "standard": "Action-only writes",
+     "rule_or_version": "POST /api/actions/{name}/invocations with If-Match, Idempotency-Key and the approval id where the action is gated (SPEC_V2 §10.5.4)",
+     "owner": "api.rs and every write screen",
+     "verifier": "destination specs and the refusal cases"
+    },
+    {
+     "standard": "Literal-GET reads",
+     "rule_or_version": "reads are documented GETs; the app never reads docs/evidence as its data source and never invents a server function",
+     "owner": "every read screen",
+     "verifier": "api.rs review and the e2e specs"
+    },
+    {
+     "standard": "OIDC PKCE with an in-memory token",
+     "rule_or_version": "auth.rs; signed-out deep link is a sign-in gate and a forbidden route is a permission gate",
+     "owner": "V1 auth, reused",
+     "verifier": "shell.spec.ts and the destination specs"
+    },
+    {
+     "standard": "One Playwright spec per destination",
+     "rule_or_version": "each spec asserts empty, error, happy and one refusal",
+     "owner": "each delivery unit",
+     "verifier": "apps/web/e2e under web.yml"
+    },
+    {
+     "standard": "web.yml is the browser gate",
+     "rule_or_version": "the workflow runs on apps/web/**; a local compile is not the verdict",
+     "owner": "repository CI",
+     "verifier": "the pull request's workflow run"
+    },
+    {
+     "standard": "Coverage instrument",
+     "rule_or_version": "scripts/build-v2-coverage.py: exists requires a route in app.rs and a present spec; a *Gate is extend naming its owner",
+     "owner": "programme measurement",
+     "verifier": "build-v2-coverage.py --check"
+    },
+    {
+     "standard": "Design-pack boundary",
+     "rule_or_version": "docs/design remains the public programme site at /design/ and the reviewed reference (D64); it is never the operator surface",
+     "owner": "design-pack maintainers",
+     "verifier": "the coverage record's reference-only citation"
+    },
+    {
+     "standard": "No production fixtures",
+     "rule_or_version": "no screen renders mock data; an unwired destination says not yet live and names its slice",
+     "owner": "every screen module",
+     "verifier": "spec review and the honest-gate specs"
+    },
+    {
+     "standard": "Bundle and render budget",
+     "rule_or_version": "route-level rendering and the web.yml budget are the guard; the V2 screens add WASM and table weight",
+     "owner": "T18 lane",
+     "verifier": "web.yml budget job"
+    }
+   ],
+   "body": "# Technology Standards Catalog — T18 The real V2 UI (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the T18 lane under the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b734-748a-b299-879ea19be681; tranche 4 id 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The standards are reconstructed from ADR 0001, ADR 0009, ADR 0013, SPEC_V2 §10.5.4 and the plan's verification section; each names an owner and a verifier that exists in the repository.\n\n## Entries\n\nTen standards. The client stack stays Leptos CSR/WASM in the one binary; writes are action-only with the concurrency and approval headers; reads are literal GETs; auth is OIDC PKCE with an in-memory token; each destination has one four-state Playwright spec and web.yml is the browser gate; the coverage script is the measurement rule; the design pack is outside production; fixtures are banned; and the bundle budget is the render guard. The standards are the same ones the V1 application already follows, so T18 adds no technology choice.\n\n## Links\n\nDerives from ADR 0001, ADR 0009, ADR 0013, SPEC_V2 §10.5.4 and §12 T18, and docs/plans/T18-real-v2-ui.md §§5, 8 and 10. Verifiers are apps/web/src/api.rs, apps/web/src/auth.rs, apps/web/e2e, .github/workflows/web.yml, scripts/build-v2-coverage.py and acceptance/programme/T18.toml. Links the owning slices and issues #562–#566, #629 and #630; the design pack is a reference, not a standard for production code.\n\n## Document\n\nThe document this catalog sits under is the T18 retrospective pack of 2026-11-24, published by scripts/rework-project.py. It records the Phase D standards that make the Phase B capabilities testable: the four-state spec, the action-only write, the literal-GET read and the coverage rule are the enforcement points the Phase-G review cites. It does not claim that every standard is currently green: the coverage check is red on stale output, and Tools and Architecture are gates. Project id 01a20c80-b734-748a-b299-879ea19be681.\n"
+  }
+ ],
+ "delivery_contract": {
+  "title": "Delivery contract — T18 The real V2 UI (retrospective, 2026-11-24)",
+  "body": {
+   "commitments": "The T18 lane commits to the SPEC_V2 §12 T18 gate: every destination route with its screen module and Playwright spec; each spec asserting empty, error, happy and one refusal; the V2 coverage record reporting exists only from a real route and a present spec, with a *Gate reported as extend naming its owner; no production screen rendering a fixture; and a signed-in tenant driving the portfolio, programme, project and work package, organisation, release and binding, procedures intake and publish, tools call and ledger, improve, kata and adoption, operations incident and postmortem, and the ADM phase rail from the app.",
+   "scope_baseline": "The scope baseline is the seven Phase A–D artefacts of this pack, the one WBS deliverable with WSJF inputs 9/7/10/5, and the route table of SPEC_V2 §10.5 with the execution room. The baseline explicitly leaves T18-4 (issue #565) and T18-5 (issue #566) undelivered and records T18-3c (issue #630) as blocked; it does not include a new table, action, event, port, router, SSR mode, mobile app or design-pack rebuild.",
+   "compliance_method": "Compliance is judged by the fifteen checks of acceptance/programme/T18.toml, whose P0 checks cover the active project, the approved baseline, the live contract, the Phase-G review under the standing delegation, waivers, the PI cadence, plan and objectives, the typed WSJF inputs, demo credits, product findings, the V2 coverage record, the artefact standard and rework resolution; the lessons check is P1. The destination Playwright specs under web.yml are the browser gate, and scripts/build-v2-coverage.py --check is the measurement gate.",
+   "acceptance_at": "Acceptance is recorded at acceptance/programme/T18.toml and at the destination specs in apps/web/e2e. The project-acceptance record docs/evidence/rework/T18.json generated 2026-11-24T21:07:28Z is red with nine failed checks: baseline, contract, review, WSJF, demo credits, product findings, coverage, artefact-standard and rework resolution. This retrospective supplies the missing governance rows; it does not turn the red record green, and the coverage check still exits 1 on stale output.",
+   "approval": "The contract is approved retrospectively by the Architecture Board under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 when scripts/rework-project.py requests and approves it. No contemporaneous board approval exists in the snapshot; the historical absence of a live contract is one of the failed checks the rework records. The approval is not a waiver of any check and does not close the project.",
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+   "retrospective": true
+  }
+ },
+ "wbs_deliverable": {
+  "title": "T18 The real V2 UI — the route-and-spec delivery of every V2 destination",
+  "business_value": 9,
+  "time_criticality": 7,
+  "risk_reduction": 10,
+  "job_size": 5
+ },
+ "review": {
+  "level": "consistent",
+  "findings": "This retrospective Phase-G review records the level consistent for T18 under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. The project has no prior Phase-G review row in the snapshot, so the old verdict is the project-acceptance record docs/evidence/rework/T18.json generated 2026-11-24T21:07:28Z, verdict red: its fifteen-check manifest acceptance/programme/T18.toml failed on the baseline, contract, review, WSJF, demo-credit, product-finding, coverage, artefact-standard and rework-resolution checks and passed only the project-active, waiver, PI-cadence, PI-plan, PI-objective and lessons checks. That red record measures the pre-rework state and is the reason this pack exists; it is not evidence that the delivered screens are wrong. The delivered construction is real: apps/web/src/app.rs registers /portfolio, /portfolio/:programme_id, /programme, /organisation, /procedures, /authoring, /plan, /improve, /operations, /execution, /design/adm and /tools, with /tools and /design/adm rendering ToolsGate and AdmGate; apps/web/e2e carries shell, portfolio, programme, organisation, procedures, authoring, plan, improve, operations, execution and admin specs; and issues #559, #562, #563, #564 and #629 are closed. The remaining limits are explicit: issue #565 (T18-4) and issue #566 (T18-5) are open and issue #630 (T18-3c) is blocked; Tools has no destination spec and the architecture destination has no `adm.spec.ts` (the existing `admin.spec.ts` covers /settings/admin, not the ADM rail); docs/evidence/v2-coverage.json is stale, reporting seven destination rows as exists and four as extend (Architecture, Improve, Operations, Tools) while build-v2-coverage.py --check exits 1; the T12 organisation loop has no spec; and no project baseline, delivery contract, Phase-G review, project-brief, inception-analysis, architecture-design or evidence output was published before this pack. The level is consistent, not compliant or conformant: the evidence supports that the project is active and its construction has advanced, but it does not support the §12 gate, which is why this pack supplies the governance record and closes nothing.",
+  "evidence": {
+   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+   "acceptance_manifest": "acceptance/programme/T18.toml",
+   "old_review": "docs/evidence/rework/T18.json (verdict red, generated 2026-11-24T21:07:28Z)",
+   "coverage_record": "docs/evidence/v2-coverage.json (stale; build-v2-coverage.py --check exits 1)",
+   "route_table": "apps/web/src/app.rs",
+   "e2e_specs": "apps/web/e2e/",
+   "snapshot": "/tmp/conv526-w1-snap/data"
+  }
+ },
+ "project_brief_output": "# Project brief — T18 The real V2 UI (retrospective, 2026-11-24)\n\n## Outcome\n\nAfter T18 a signed-in tenant drives every V2 destination from the conveyor's own application — portfolio, programme, project and work package; organisation, release and binding; procedures intake and publish; tools call and ledger; improve, kata and adoption; operations incident and postmortem; and the ADM phase rail — while the programme measures those screens from the app's real route table and Playwright specs instead of the static design mock. At the snapshot the construction is partial: eight of the ten V2 destination routes render real screens, tools and architecture remain honest gates, and the SPEC_V2 §12 gate is not yet met.\n\n## Boundary\n\nIn scope: the application shell and navigation, the route registry, the V2 destinations of SPEC_V2 §10.5 plus the execution room, the L1–L4 delivery view, one Playwright spec per destination, and the V2 coverage instrument measured from real routes. Out of scope: new tables, actions, events or ports; SSR, a mobile app or a second router; retiring or redesigning the design pack, which stays the public programme site at `/design/` and the reviewed reference (D64); the V1 routes, which are linked and not re-implemented; and any live tenant write or production fixture inside a pull request.\n\n## Reuse sources\n\nReuse `apps/web/src/app.rs` (router, sidebar and top bar), `api.rs` (If-Match, Idempotency-Key and approval-id request shapes), `auth.rs` (OIDC PKCE with an in-memory token), `state.rs` (tenant, me and manifest signals), `sse.rs`, `components.rs` and `palette.rs`; the existing screen modules and V1 specs; the e2e harness (`fixture.ts`, `dev-server.mjs`, `playwright.config.ts`) and `web.yml`; the compiled action registry of SPEC_V2 §10.4; `docs/design/v2.js` and `STUDIO-SPEC.md` as the reviewed design reference; and the programme, work and measure read models exposed by the owning slices.\n\n## Inception units\n\nThe project starts from the inception analysis at `docs/plans/T18/inception-analysis.md` and the architecture design at `docs/plans/T18/architecture-design.md`. The analysis measures the starting state at `main@490ad555`: 31 routes, 25 screen modules and 31 specs, all V1, and no `/portfolio`, `/programme`, `/organisation`, `/procedures`, `/authoring`, `/plan`, `/improve`, `/operations`, `/tools` or `/design/adm` route. The design fixes the destination read and write contracts, the D64/D65 decisions, the single-writer router constraint and the rule that a missing backend capability is a typed dependency, not a local fetch.\n\n## Dependencies\n\nConstruction is blocked-by T0, T1, T2, T3 and P0 — the model and contracts, the plan spine, the decision ladder, the PM job and the programme definition. Acceptance is blocked-by T4, T5, T7, T9, T10, T11, T13, T16 and T17, because each destination's live scenarios wait on its owning slice, and by T12, whose organisation loop is driven from the UI as the final spec. Issue #526 is related: its generated record is rebased and regenerated, never hand-merged. While a slice is absent the destination renders not yet live and names the owner rather than inventing a fetch.\n\n## Acceptance\n\nThe SPEC_V2 §12 T18 gate requires that every destination route exists with its Playwright spec; that a signed-in tenant drives the portfolio → programme → project → work-package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem and ADM phase-rail paths from the app; that every destination spec asserts empty, error, happy and one refusal; that the V2 coverage record reports exists only from a real route and its spec; and that no production screen renders a fixture. `acceptance/programme/T18.toml` carries the fifteen gate checks, including project, baseline, contract, review, WSJF, demo credits, coverage, artefact-standard and rework resolution.\n\n## Capabilities\n\nThe tenant operator who runs the portfolio, programme, plan, organisation, procedures, authoring, tools, improve, operations and architecture surfaces owns the outcome, with the PM, kanban-coach, kata, development and operations jobs those destinations serve. The UI is their surface, not a new job: it exposes the action families that T0–T17 own, and the seven nav groups are trimmed to destinations that exist and gated by `has_action`. The delivery view gives the sponsoring group and the SRO one L1–L4 line from portfolio to work package, with spend read from the ledger rather than fabricated.\n\n## Plan\n\nThe project is held to `docs/plans/T18-real-v2-ui.md`, SPEC_V2 §10.5 (the real-UI route table) and §12 T18 (the gate), with ADR 0013 recording that the real UI is the app and not the design pack. The five sequenced units are issues #562 (shell, route registry, portfolio, programme and the delivery view), #563 (organisation, jobs, agents, decisions, project types, plan and validation), #564 (procedures, capabilities, authoring, execution and run history), #565 (tools, metering, operations and improve) and #566 (architecture, system architecture, knowledge, measure and the T12 acceptance). #565 and #566 remain open at this snapshot.\n",
+ "evidence_output": "# Evidence — T18 The real V2 UI (retrospective, 2026-11-24)\n\n## Claim\n\nT18's retrospective record is consistent with the construction actually present in `apps/web`: the shell, portfolio, programme, organisation, procedures, authoring, plan, improve, operations and execution surfaces are real routes with screen modules and Playwright specs, while tools and the ADM phase rail remain honest gates, two delivery units are still open, and the SPEC_V2 §12 T18 gate is therefore not met. This pack supplies the missing Phase A–D artefacts, the Statement of Architecture Work, the delivery contract and the retrospective Phase-G review; it closes nothing and leaves the project active.\n\n## Evidence\n\nMeasured in the worktree on 2026-11-24: `apps/web/src/app.rs` registers `/portfolio`, `/portfolio/:programme_id`, `/programme`, `/organisation`, `/procedures`, `/authoring`, `/plan`, `/improve`, `/operations`, `/execution`, `/design/adm` and `/tools`, with `/tools` and `/design/adm` rendering `ToolsGate` and `AdmGate`. `apps/web/e2e` carries `shell.spec.ts`, `portfolio.spec.ts`, `programme.spec.ts`, `organisation.spec.ts`, `procedures.spec.ts`, `authoring.spec.ts`, `plan.spec.ts`, `improve.spec.ts`, `operations.spec.ts`, `execution.spec.ts` and `admin.spec.ts`. Issues #559, #562, #563, #564 and #629 are closed; #565 (T18-4) and #566 (T18-5) are open and #630 (T18-3c) is blocked. The project-acceptance record `docs/evidence/rework/T18.json` (2026-11-24T21:07:28Z) is red with nine failed checks, and `docs/evidence/v2-coverage.json` is stale: it reports seven destination rows `exists` and four `extend` (Architecture, Improve, Operations, Tools).\n\n## Verification\n\nAn independent reader can repeat the check. Run `grep -n 'path!' apps/web/src/app.rs` to see the route table; run `ls apps/web/e2e/*.spec.ts` to see the destination specs; run `python3 scripts/build-v2-coverage.py --check`, which currently exits 1 on stale output and must be regenerated before the coverage claim can be green; run `python3 scripts/acceptance.py --manifest acceptance/programme/T18.toml` to reproduce the project-acceptance result; and run `python3 scripts/rework-content-check.py --project T18 --content docs/evidence/rework/tranche-4/rework-content-T18.json --snapshot /tmp/conv526-w1-snap/data --wsjf 9,7,10,5 --closes false` to verify this pack before publication. Each command reads the repository or the retained snapshot and makes no governance write.\n\n## Links\n\nSPEC_V2 §10.5 and §12 T18; `docs/plans/T18-real-v2-ui.md`; `docs/plans/T18/project-brief.md`, `inception-analysis.md` and `architecture-design.md`; `docs/decisions/0013-real-v2-ui.md`; `acceptance/programme/T18.toml`; `docs/evidence/rework/T18.json`; `docs/evidence/v2-coverage.json`; issues #559 and #562–#566; the tranche-4 authorisation `01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce` and the tranche-3 review `01a20e84-325b-7fef-8f40-50b5e53550e9`; the standing delegation `01a1ff1f-e4ba-72dc-9c1a-13049933cf14`.\n\n## Gap\n\nNot evidenced: that the SPEC_V2 §12 T18 gate is met; that T18-4 and T18-5 are delivered; that the T12 organisation loop runs from the UI; that the coverage record is current — it is stale and the check is red; that a project baseline, delivery contract, Phase-G review or published output existed before this retrospective; and any closure. Tools and the ADM rail are gates without destination specs, the project row remains `status: active` with `measured_status: proposed`, and the two open delivery units are acceptance-blocked-by their owning slices. The metering destination has no route at this snapshot, and the execution room names the executor-kind, binding-pin and tool-ledger gaps rather than hiding them.\n"
+}
