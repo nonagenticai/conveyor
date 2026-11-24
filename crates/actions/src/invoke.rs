@@ -891,6 +891,23 @@ pub async fn invoke(
         return crate::broker::invoke_broker(pool, spec, ctx, input, &request).await;
     }
 
+    // T15 (SPEC_V2 §11.3 step 5): a registered tool destination is the broker's arm. The
+    // broker passes `Authority::Internal`; a direct HTTP/MCP caller is refused before the
+    // source row is even read, so `tools.dispatch` is never a second call surface.
+    if matches!(spec.handler, HandlerRef::ToolDestination) {
+        if !matches!(request.authority, Authority::Internal) {
+            return Err(ActionError::new(
+                403,
+                "internal_action",
+                format!(
+                    "{} is dispatched by the broker and is not directly callable",
+                    spec.name
+                ),
+            ));
+        }
+        return crate::tool_authoring::invoke_destination(pool, spec, ctx, input, &request).await;
+    }
+
     match spec.kind {
         ActionKind::Internal => invoke_internal(pool, spec, ctx, input, input_hash, &request).await,
         ActionKind::External => invoke_external(pool, spec, ctx, input, input_hash, &request).await,

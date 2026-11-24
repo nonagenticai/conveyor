@@ -667,6 +667,11 @@ pub enum HandlerRef {
     /// resolved tool's effect is **data on the version row**, so this static spec declares the
     /// dispatcher's own effect and the broker enforces the real ceiling and destructive gate.
     Broker,
+    /// A registered tool destination (T15, SPEC_V2 §11.3 step 5, §11.5). `tools.dispatch`
+    /// resolves the `tool_source` row the broker pinned and calls it — the URL comes from the
+    /// reviewed registration, never from the call. Reachable only with
+    /// [`crate::invoke::Authority::Internal`]; a direct HTTP/MCP caller is refused.
+    ToolDestination,
 }
 
 impl std::fmt::Debug for HandlerRef {
@@ -681,6 +686,7 @@ impl std::fmt::Debug for HandlerRef {
             } => write!(f, "HandlerRef::External({service} {method} {path})"),
             Self::Workflow => write!(f, "HandlerRef::Workflow"),
             Self::Broker => write!(f, "HandlerRef::Broker"),
+            Self::ToolDestination => write!(f, "HandlerRef::ToolDestination"),
         }
     }
 }
