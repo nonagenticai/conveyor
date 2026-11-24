@@ -93,7 +93,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a20fba-ccfe-7e9a-81f3-c8e89cf78ac9 carries a statement and evidence from the tranche-4 retro",
       "id": "T18-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -162,16 +162,16 @@
     "gate (P0): the gate check 'T18-baseline' did not pass; the gate check 'T18-contract' did not pass; the gate check 'T18-review' did not pass; the gate check 'T18-wsjf' did not pass; the gate check 'T18-demo-credits' did not pass; the gate check 'T18-product' did not pass; the gate check 'T18-coverage' did not pass; the gate check 'T18-artefact-standard' did not pass; the gate check 'T18-rework' did not pass"
   ],
   "gate": "a signed-in tenant drives portfolio \u2192 programme \u2192 project \u2192 work package, organisation \u2192 release \u2192 binding, procedures intake \u2192 publish, tools call \u2192 ledger, improve \u2192 kata \u2192 adoption, operations incident \u2192 postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports exists only from a real route and a present spec; no production screen renders a fixture",
-  "generated_at": "2026-11-24T21:07:28.037408+00:00",
+  "generated_at": "2026-11-24T22:51:49.128280+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T18.toml",
   "name": "The real V2 UI",
   "project": "T18",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T18:25:22.625551+00:00",
-    "git_sha": "86f5da93480fa1b163dd4ee35085cd72882f9b01",
-    "path": "retained-snapshot/86f5da93480fa1b163dd4ee35085cd72882f9b01"
+    "generated_at": "2026-11-24T22:44:10.403624+00:00",
+    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
+    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
   },
   "verdict": "red",
   "warnings": []

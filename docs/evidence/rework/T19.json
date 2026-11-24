@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a20c80-b9b8-7214-abc6-f2c4f75a1fc1\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
       "exit": 1,
       "id": "T19-charter",
       "kind": "command",
       "result": "fail",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
       "stdout": ""
     },
     {
@@ -124,7 +124,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a20fba-ccfe-7e9a-81f3-c8e89cf78ac9 carries a statement and evidence from the tranche-4 retro",
       "id": "T19-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -178,7 +178,7 @@
   ],
   "failures": [
     "T19-baseline (P0): no project baseline",
-    "T19-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "T19-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
     "T19-closure-gate (P0): no approved closure gate for the project",
     "T19-wsjf (P0): no WBS deliverable carries the plan",
     "T19-demo-credits (P0): no accepted deliverable to demo",
@@ -189,16 +189,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "the meeting is a card plus a typed record: an agenda item that decides names one approval, each qualifying seat records one position, close_item derives the item's outcome by arithmetic over the positions and the linked approval's stricter policy (quorum, required departments, dual control, evidence, conflict exclusion), an observer never counts, a human who requested the gate is always excluded (P4), a quorum miss defers with reason inquorate, an item with no outcome cannot close, and no transcript or chat is a decision; the eight meetings suites and the web room spec pass",
-  "generated_at": "2026-11-24T21:07:28.111367+00:00",
+  "generated_at": "2026-11-24T22:51:49.278438+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T19.toml",
   "name": "Decision forums (meetings)",
   "project": "T19",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T18:25:22.625551+00:00",
-    "git_sha": "86f5da93480fa1b163dd4ee35085cd72882f9b01",
-    "path": "retained-snapshot/86f5da93480fa1b163dd4ee35085cd72882f9b01"
+    "generated_at": "2026-11-24T22:44:10.403624+00:00",
+    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
+    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
   },
   "verdict": "red",
   "warnings": []

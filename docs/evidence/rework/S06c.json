@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d2b-7542-9574-e961ffd1b597\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
       "exit": 1,
       "id": "S06c-charter",
       "kind": "command",
       "result": "fail",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
       "stdout": ""
     },
     {
@@ -178,7 +178,7 @@
   ],
   "failures": [
     "S06c-baseline (P0): no project baseline",
-    "S06c-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "S06c-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
     "S06c-closure-outputs (P0): the project declares no closure_outputs",
     "S06c-contract (P0): no live board-approved delivery contract",
     "S06c-review (P0): no Phase-G compliance review for the project's live contract",
@@ -195,16 +195,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "At the end, an MCP client that declares `io.modelcontextprotocol/tasks` calls `projects.execute`, receives `resultType:\"task\"`, polls `tasks/get` through a project that waits on an approval, answers it with `tasks/update`, and reads a terminal result \u2014 with no Python service in the path and no new table.",
-  "generated_at": "2026-11-24T21:07:25.950808+00:00",
+  "generated_at": "2026-11-24T22:51:45.321979+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S06c.toml",
   "name": "MCP tasks \u2014 a long-running project asks for input",
   "project": "S06c",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T18:25:22.625551+00:00",
-    "git_sha": "86f5da93480fa1b163dd4ee35085cd72882f9b01",
-    "path": "retained-snapshot/86f5da93480fa1b163dd4ee35085cd72882f9b01"
+    "generated_at": "2026-11-24T22:44:10.403624+00:00",
+    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
+    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
   },
   "verdict": "red",
   "warnings": []
