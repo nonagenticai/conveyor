@@ -1,0 +1,15 @@
+{
+  "blocked": 1,
+  "generated_at": "2026-11-24T22:52:20+00:00",
+  "green": 0,
+  "members": [
+    {
+      "gaps": [],
+      "key": "T9",
+      "state": "BLOCKED"
+    }
+  ],
+  "red": 0,
+  "snapshot_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
+  "tranche": 4
+}
