@@ -74,6 +74,7 @@ struct Form {
     credential: RwSignal<String>,
     rate_limit: RwSignal<String>,
     binding_version: RwSignal<String>,
+    enabled: RwSignal<bool>,
     // contract lookup
     contract_toolkit: RwSignal<String>,
     contract_tool: RwSignal<String>,
@@ -106,6 +107,7 @@ impl Form {
             credential: RwSignal::new(String::new()),
             rate_limit: RwSignal::new(String::new()),
             binding_version: RwSignal::new(String::new()),
+            enabled: RwSignal::new(true),
             contract_toolkit: RwSignal::new(String::new()),
             contract_tool: RwSignal::new(String::new()),
             contract_version: RwSignal::new(String::new()),
@@ -533,8 +535,7 @@ fn bindings_panel(
             notice.set(Some("Name the grant to update".to_owned()));
             return;
         }
-        let mut payload =
-            json!({ "id": id, "effect_ceiling": form.ceiling.get(), "enabled": true });
+        let mut payload = json!({ "id": id, "effect_ceiling": form.ceiling.get(), "enabled": form.enabled.get() });
         let credential = form.credential.get().trim().to_owned();
         payload["credential_alias"] = Value::String(credential);
         let version = form.binding_version.get().trim().to_owned();
@@ -584,10 +585,12 @@ fn bindings_panel(
                     view! {
                         <div class="tablewrap">
                             <table class="table">
-                                <thead><tr><th>"Grant"</th><th>"Job binding"</th><th>"Run"</th><th class="n">"Toolkit"</th><th>"Ceiling"</th><th>"Credential"</th><th>"Enabled"</th><th class="n">"Version"</th></tr></thead>
+                                <thead><tr><th>"Grant"</th><th>"Job binding"</th><th>"Run"</th><th class="n">"Toolkit"</th><th>"Ceiling"</th><th>"Credential"</th><th>"Enabled"</th><th class="n">"Version"</th><th></th></tr></thead>
                                 <tbody>
                                     {data.bindings.iter().map(|row| {
                                         let enabled = row.get("enabled").and_then(Value::as_bool).unwrap_or(false);
+                                        let full_id = row.get("id").and_then(Value::as_str).unwrap_or_default().to_owned();
+                                        let row_version = row.get("version").and_then(Value::as_i64).unwrap_or(0);
                                         view! {
                                             <tr>
                                                 <td class="mono">{short_id(row.get("id").and_then(Value::as_str))}</td>
@@ -598,6 +601,10 @@ fn bindings_panel(
                                                 <td class="mono">{text(row, "credential_alias")}</td>
                                                 <td><StatusPill status=(if enabled { "active" } else { "disabled" }).to_owned()/></td>
                                                 <td class="n">{int(row, "version").to_string()}</td>
+                                                <td><button class="btn small" on:click=move |_| {
+                                                    form.binding_id.set(full_id.clone());
+                                                    form.binding_version.set(row_version.to_string());
+                                                }>"Select"</button></td>
                                             </tr>
                                         }
                                     }).collect_view()}
@@ -652,6 +659,12 @@ fn bindings_panel(
                         <input class="inp" aria-label="Grant version" prop:value=move || form.binding_version.get()
                             on:input=move |event| form.binding_version.set(input_value(&event))/></label>
                 </div>
+                <label class="field"><span>"Live?"</span>
+                    <select aria-label="Grant enabled" prop:value=move || form.enabled.get().to_string()
+                        on:change=move |event| form.enabled.set(select_value(&event) == "true")>
+                        <option value="true">"live"</option>
+                        <option value="false">"disabled"</option>
+                    </select></label>
                 <div class="filterbar">
                     <button class="btn small" on:click=update>"Update the grant"</button>
                     <button class="btn small" on:click=retire>"Retire the grant"</button>
