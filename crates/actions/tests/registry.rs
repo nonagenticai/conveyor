@@ -133,9 +133,10 @@ use serde_json::{Value, json};
 /// (`meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|`
 /// **S21 step 9 (#649) adds `cards.assign`**, **T5 (#77) `kata.hypothesise`**, **T6 (#80)
 /// the development-project family**, **T8 (#79) the `lessons.*` lifecycle**, **T15 (#86)**
-/// ten authoring/BYO actions, and the lane adds its own families. The merged registry is
-/// **596: 577 internal, 19 external**.
-const EXPECTED: [&str; 596] = [
+/// ten authoring/BYO actions, the lane's own families, and **#526 U5.1c's two
+/// `job_authorities.get|set` actions**. The merged registry is
+/// **598: 579 internal, 19 external**.
+const EXPECTED: [&str; 598] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -377,6 +378,8 @@ const EXPECTED: [&str; 596] = [
     "invites.create",
     "invites.list",
     "invites.revoke",
+    "job_authorities.get",
+    "job_authorities.set",
     "job_bindings.create",
     "job_bindings.get",
     "job_bindings.list",
@@ -824,12 +827,12 @@ fn the_registry_is_exactly_the_declared_set() {
     // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
     // 520 -> 525; external stays 14.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
-    // The merged registry is 596: 577 internal (the lane's 553 + main's 13 new kata/T6/T8
+    // The merged registry is 598: 579 internal (the lane's 553 + main's 13 new kata/T6/T8
     // actions + `programme_lessons.propose`, the lane's programme register which the union
-    // renamed out of SPEC §D36's `lessons.*` family + T15's ten authoring/BYO actions), 19
-    // external. T5's kata names are one family: main's eight implementations plus the lane's
-    // `kata.list`/`propagate`/`close`.
-    assert_eq!((internal, external), (577, 19));
+    // renamed out of SPEC §D36's `lessons.*` family + T15's ten authoring/BYO actions +
+    // #526 U5.1c's two `job_authorities.*` actions), 19 external. T5's kata names are one
+    // family: main's eight implementations plus the lane's `kata.list`/`propagate`/`close`.
+    assert_eq!((internal, external), (579, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
@@ -1263,6 +1266,29 @@ fn no_prompt_action_holds_processes_write() {
             spec.name
         );
     }
+}
+
+/// The tenant's meta-role × action matrix (SPEC_V2 §6.7) is tenant data behind the
+/// organisation scopes: a read is `organisation:read`, the governance write is
+/// `organisation:write`, and neither is destructive. The write follows the module's own
+/// convention — no approval gate — because the matrix decides authority, it does not act.
+#[test]
+fn job_authority_actions_hold_the_organisation_scopes() {
+    let registry = registry();
+
+    let get = registry
+        .get("job_authorities.get")
+        .expect("job_authorities.get is registered");
+    assert_eq!(get.scope_names(), vec!["organisation:read"]);
+    assert_eq!(get.kind, ActionKind::Internal);
+    assert_eq!(get.effect, conveyor_actions::Effect::Read);
+
+    let set = registry
+        .get("job_authorities.set")
+        .expect("job_authorities.set is registered");
+    assert_eq!(set.scope_names(), vec!["organisation:write"]);
+    assert_eq!(set.kind, ActionKind::Internal);
+    assert_eq!(set.effect, conveyor_actions::Effect::Write);
 }
 
 /// The coverage gate reads `docs/design/data/actions.json`, never a source grep: a spec built
