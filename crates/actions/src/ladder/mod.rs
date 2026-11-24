@@ -214,6 +214,16 @@ fn ladder_error(error: LadderStoreError, action: &str) -> ActionError {
             "too_few_options",
             format!("a question keeps at least two visible options; {visible} would remain"),
         ),
+        LadderStoreError::Illegal(LadderError::OptionSetInvalid { detail }) => invalid(
+            "options",
+            "invalid_option_set",
+            format!("the authored option set is invalid: {detail}"),
+        ),
+        LadderStoreError::Illegal(LadderError::InvalidFireWhen { detail }) => invalid(
+            "fire_when",
+            "invalid_fire_when",
+            format!("the policy's fire_when is invalid: {detail}"),
+        ),
         LadderStoreError::HumanRequiresPerson => invalid(
             "rung",
             "human_requires_person",
