@@ -118,3 +118,36 @@ ALTER TABLE kata_measurement
         REFERENCES kata_candidate (id),
     ADD CONSTRAINT kata_measurement_union_instrument_kind
         CHECK (instrument_kind IS NULL OR instrument_kind IN ('eval', 'benchmark'));
+
+-- ── the benchmark instrument (SPEC_V2 §6.3, D-T5-2; finding F-T5-1) ─────────────────────
+-- main's measurement row names an eval version and two eval runs. A benchmark instrument has
+-- neither: its held-out guarantee is the suite's locked dataset (`benchmark_suite.seed_sha256`,
+-- pinned as the kata's `split_sha256` at open), and its numbers come from two COMPLETE
+-- `benchmark_run` rows of that suite — the candidate on the `conveyor` arm, the baseline on the
+-- `baseline` arm. The eval columns become nullable; exactly one instrument shape is stored.
+ALTER TABLE kata_measurement
+    ALTER COLUMN instrument_version_id DROP NOT NULL,
+    ALTER COLUMN metric_key DROP NOT NULL,
+    ALTER COLUMN candidate_run_id DROP NOT NULL,
+    ALTER COLUMN baseline_run_id DROP NOT NULL,
+    ADD COLUMN candidate_benchmark_run_id uuid,
+    ADD COLUMN baseline_benchmark_run_id  uuid;
+
+ALTER TABLE kata_measurement
+    ADD CONSTRAINT kata_measurement_candidate_benchmark_fk
+        FOREIGN KEY (candidate_benchmark_run_id) REFERENCES benchmark_run (id),
+    ADD CONSTRAINT kata_measurement_baseline_benchmark_fk
+        FOREIGN KEY (baseline_benchmark_run_id) REFERENCES benchmark_run (id),
+    ADD CONSTRAINT kata_measurement_instrument_shape CHECK (
+        (instrument_kind = 'benchmark'
+             AND instrument_id IS NOT NULL
+             AND split_sha256 IS NOT NULL
+             AND candidate_benchmark_run_id IS NOT NULL
+             AND baseline_benchmark_run_id IS NOT NULL)
+        OR
+        (coalesce(instrument_kind, 'eval') = 'eval'
+             AND instrument_version_id IS NOT NULL
+             AND metric_key IS NOT NULL
+             AND candidate_run_id IS NOT NULL
+             AND baseline_run_id IS NOT NULL)
+    );

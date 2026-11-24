@@ -64,16 +64,28 @@ pub struct KataGetView {
 pub struct KataMeasurementView {
     /// Row id.
     pub id: String,
-    /// The pre-registered eval version.
-    pub instrument_version_id: String,
+    /// The pre-registered eval version (absent on a benchmark measurement).
+    pub instrument_version_id: Option<String>,
+    /// `eval` or `benchmark`; absent on main's eval-only rows.
+    pub instrument_kind: Option<String>,
+    /// The pinned benchmark suite, on a benchmark measurement.
+    pub instrument_id: Option<String>,
+    /// The suite's dataset revision, on a benchmark measurement.
+    pub instrument_version: Option<String>,
+    /// The split's locking sha (the suite's seed hash, on a benchmark measurement).
+    pub split_sha256: Option<String>,
     /// Always `test` — the held-out side of the locked split.
     pub split: String,
-    /// The quality metric that moved.
-    pub metric_key: String,
+    /// The quality metric that moved (the resolved rate, on a benchmark measurement).
+    pub metric_key: Option<String>,
     /// The candidate run.
-    pub candidate_run_id: String,
+    pub candidate_run_id: Option<String>,
     /// The baseline run.
-    pub baseline_run_id: String,
+    pub baseline_run_id: Option<String>,
+    /// The candidate's benchmark run, on a benchmark measurement.
+    pub candidate_benchmark_run_id: Option<String>,
+    /// The baseline's benchmark run, on a benchmark measurement.
+    pub baseline_benchmark_run_id: Option<String>,
     /// Distinct held-out cases on the candidate side.
     pub candidate_cases: i64,
     /// Distinct held-out cases on the baseline side.
@@ -185,11 +197,17 @@ fn get_view(row: &KataGetRow) -> KataGetView {
 fn measurement_view(row: &KataMeasurementRow) -> KataMeasurementView {
     KataMeasurementView {
         id: hex(row.id),
-        instrument_version_id: hex(row.instrument_version_id),
+        instrument_version_id: row.instrument_version_id.map(hex),
+        instrument_kind: row.instrument_kind.clone(),
+        instrument_id: row.instrument_id.map(hex),
+        instrument_version: row.instrument_version.clone(),
+        split_sha256: row.split_sha256.clone(),
         split: row.split.clone(),
         metric_key: row.metric_key.clone(),
-        candidate_run_id: hex(row.candidate_run_id),
-        baseline_run_id: hex(row.baseline_run_id),
+        candidate_run_id: row.candidate_run_id.map(hex),
+        baseline_run_id: row.baseline_run_id.map(hex),
+        candidate_benchmark_run_id: row.candidate_benchmark_run_id.map(hex),
+        baseline_benchmark_run_id: row.baseline_benchmark_run_id.map(hex),
         candidate_cases: i64::from(row.candidate_cases),
         baseline_cases: i64::from(row.baseline_cases),
         candidate_score: row.candidate_score,
@@ -366,6 +384,16 @@ fn kata_error(error: KataStoreError, action: &str) -> ActionError {
             "kata_revert_missing",
             "a reverted close must name the version it restored",
         ),
+        KataStoreError::BenchmarkMismatch(detail) => ActionError::new(
+            409,
+            "benchmark_instrument_mismatch",
+            format!("{action}: {detail}"),
+        ),
+        KataStoreError::BenchmarkRunRefused { run_id, detail } => ActionError::new(
+            422,
+            "benchmark_run_not_measurable",
+            format!("{action}: benchmark run {run_id}: {detail}"),
+        ),
     }
 }
 
@@ -390,6 +418,28 @@ pub struct KataOpenIn {
     /// The success threshold (P4: without one, no kata opens; P2 reads it at measure).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub threshold: Option<f64>,
+    // ── the union's second instrument shape (D-T5-2, F-T5-1) ─────────────────────────────
+    /// `eval` (default) or `benchmark`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instrument_kind: Option<String>,
+    /// The benchmark suite that will measure the change (`instrument_kind = "benchmark"`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instrument_id: Option<Uuid>,
+    /// The suite's dataset revision, recorded as the instrument's version.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instrument_version: Option<String>,
+    /// The held-out split; a benchmark instrument's is always `test`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub split: Option<String>,
+    /// The locked split's sha — a benchmark suite's `seed_sha256`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub split_sha256: Option<String>,
+    /// The pre-registered prediction payload (the lane's record; an object).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prediction: Option<Value>,
+    /// The target version the kata measures against.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub base_ref: Option<Value>,
 }
 
 /// `kata.adopt` — a person's adoption of a measured improvement.
@@ -434,8 +484,10 @@ pub struct KataHypothesiseIn {
     pub kata_id: Uuid,
     /// The falsifiable prediction the measurement will test.
     pub prediction: String,
-    /// The locked eval version that will measure it.
-    pub instrument_version_id: Uuid,
+    /// The locked eval version that will measure it. Omitted when the kata itself pinned the
+    /// instrument at open (an eval version or a benchmark suite).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instrument_version_id: Option<Uuid>,
 }
 
 /// `kata.propose` — Get to Solution.
@@ -504,27 +556,147 @@ async fn kata_open(
     };
 
     // P4: a kata that cannot name an instrument and a success threshold is not opened. The
-    // refusal names every missing piece, because "unmeasurable" is the whole answer.
-    let mut missing = Vec::new();
-    if input.instrument_version_id.is_none() {
-        missing.push("instrument_version_id (the named instrument)");
-    }
-    if input.threshold.is_none() {
-        missing.push("threshold (the success threshold)");
-    }
-    if !missing.is_empty() {
-        return Err(ActionError::new(
-            422,
-            "kata_not_measurable",
-            format!(
-                "kata.open: a kata opens only with a named instrument and a success threshold; \
-                 missing {}",
-                missing.join(" and ")
-            ),
+    // refusal names every missing piece, because "unmeasurable" is the whole answer. Two
+    // instrument shapes exist (D-T5-2): an eval version (main's) and a benchmark suite (the
+    // union's), and each carries its own pre-registration.
+    let kind = input.instrument_kind.as_deref().unwrap_or("eval");
+    let mut benchmark: Option<(Uuid, String, String, String, Value)> = None;
+    let (instrument_version_id, threshold) = match kind {
+        "eval" => {
+            let mut missing = Vec::new();
+            if input.instrument_version_id.is_none() {
+                missing.push("instrument_version_id (the named instrument)");
+            }
+            if input.threshold.is_none() {
+                missing.push("threshold (the success threshold)");
+            }
+            if !missing.is_empty() {
+                return Err(ActionError::new(
+                    422,
+                    "kata_not_measurable",
+                    format!(
+                        "kata.open: a kata opens only with a named instrument and a success \
+                         threshold; missing {}",
+                        missing.join(" and ")
+                    ),
+                ));
+            }
+            let instrument_version_id = input.instrument_version_id.expect("checked above");
+            // The named instrument must exist and its split must already be locked: the kata
+            // opens against a held-out instrument, never a split that can still be drawn.
+            store::kata::instrument_tx(&mut *tx, ctx.tenant, instrument_version_id, None)
+                .await
+                .map_err(|error| kata_error(error, "kata.open"))?;
+            (Some(instrument_version_id), input.threshold)
+        }
+        "benchmark" => {
+            let Some(suite_id) = input.instrument_id else {
+                return Err(invalid(
+                    "instrument_id",
+                    "kata_not_measurable",
+                    "a benchmark kata names its suite in instrument_id",
+                ));
+            };
+            let version = input
+                .instrument_version
+                .as_deref()
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .ok_or_else(|| {
+                    invalid(
+                        "instrument_version",
+                        "required",
+                        "a benchmark kata records the suite's dataset revision",
+                    )
+                })?
+                .to_owned();
+            if input.split.as_deref().unwrap_or("test") != "test" {
+                return Err(invalid(
+                    "split",
+                    "invalid_value",
+                    "a benchmark measurement is the suite's held-out number; split must be test",
+                ));
+            }
+            let sha = input
+                .split_sha256
+                .as_deref()
+                .map(str::trim)
+                .filter(|value| value.len() == 64 && value.chars().all(|c| c.is_ascii_hexdigit()))
+                .ok_or_else(|| {
+                    invalid(
+                        "split_sha256",
+                        "invalid_value",
+                        "a benchmark kata pins the suite's locked seed (64 hex characters)",
+                    )
+                })?
+                .to_lowercase();
+            let prediction = input
+                .prediction
+                .clone()
+                .filter(Value::is_object)
+                .ok_or_else(|| {
+                    invalid(
+                        "prediction",
+                        "kata_not_measurable",
+                        "a benchmark kata pre-registers its prediction as an object",
+                    )
+                })?;
+            let threshold = input
+                .threshold
+                .or_else(|| prediction.get("threshold").and_then(Value::as_f64));
+            let Some(threshold) = threshold else {
+                return Err(ActionError::new(
+                    422,
+                    "kata_not_measurable",
+                    "kata.open: a benchmark kata needs a success threshold (in the input or the \
+                     prediction payload)",
+                ));
+            };
+            // The suite must exist and its locked dataset IS the held-out wall: the kata's
+            // pinned sha is the suite's seed hash, so later a swapped dataset cannot measure it.
+            let seed: Option<String> = sqlx::query_scalar(
+                "SELECT seed_sha256 FROM benchmark_suite WHERE tenant_id = $1 AND id = $2",
+            )
+            .bind(ctx.tenant.as_uuid())
+            .bind(suite_id)
+            .fetch_optional(&mut *tx)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "kata.open: read the benchmark suite");
+                ActionError::internal()
+            })?;
+            let Some(seed) = seed else {
+                return Err(invalid(
+                    "instrument_id",
+                    "not_found",
+                    "no benchmark suite with that id in this tenant",
+                ));
+            };
+            if seed != sha {
+                return Err(invalid(
+                    "split_sha256",
+                    "invalid_value",
+                    "the pinned sha is not the suite's locked seed hash",
+                ));
+            }
+            benchmark = Some((suite_id, version, "test".to_owned(), sha, prediction));
+            (None, Some(threshold))
+        }
+        other => {
+            return Err(invalid(
+                "instrument_kind",
+                "invalid_value",
+                format!("must be `eval` or `benchmark`, not {other:?}"),
+            ));
+        }
+    };
+    let Some(threshold) = threshold else {
+        return Err(invalid(
+            "threshold",
+            "required",
+            "a kata needs a success threshold",
         ));
-    }
-    let instrument_version_id = input.instrument_version_id.expect("checked above");
-    let threshold = input.threshold.expect("checked above");
+    };
     if !(threshold.is_finite() && threshold >= 0.0) {
         return Err(invalid(
             "threshold",
@@ -532,11 +704,6 @@ async fn kata_open(
             "must be a finite number >= 0",
         ));
     }
-    // The named instrument must exist and its split must already be locked: the kata opens
-    // against a held-out instrument, never a split that can still be drawn.
-    store::kata::instrument_tx(&mut *tx, ctx.tenant, instrument_version_id, None)
-        .await
-        .map_err(|error| kata_error(error, "kata.open"))?;
 
     // P2: pin the procedure version that is live now, so a measured regression restores
     // exactly the pre-kata state. A non-procedure surface (or a free-form target reference)
@@ -606,17 +773,17 @@ async fn kata_open(
             target_surface: surface.as_str().to_owned(),
             target_ref: target_ref.to_owned(),
             threshold: Some(threshold),
-            instrument_version_id: Some(instrument_version_id),
+            instrument_version_id,
             baseline_version_id,
             created_by: Some(ctx.actor_id),
             project_id: None,
-            instrument_kind: None,
-            instrument_id: None,
-            instrument_version: None,
-            split: None,
-            split_sha256: None,
-            prediction_payload: None,
-            base_ref: None,
+            instrument_kind: benchmark.as_ref().map(|_| "benchmark".to_owned()),
+            instrument_id: benchmark.as_ref().map(|benchmark| benchmark.0),
+            instrument_version: benchmark.as_ref().map(|benchmark| benchmark.1.clone()),
+            split: benchmark.as_ref().map(|benchmark| benchmark.2.clone()),
+            split_sha256: benchmark.as_ref().map(|benchmark| benchmark.3.clone()),
+            prediction_payload: benchmark.as_ref().map(|benchmark| benchmark.4.clone()),
+            base_ref: input.base_ref.clone(),
         },
     )
     .await
@@ -741,38 +908,72 @@ async fn kata_hypothesise(
     if prediction.is_empty() {
         return Err(invalid("prediction", "required", "must not be empty"));
     }
-    // The instrument must exist AND its split must be locked: a pre-registration against a
-    // split that can still be drawn is not a held-out pre-registration.
-    store::kata::instrument_tx(&mut *tx, ctx.tenant, input.instrument_version_id, None)
-        .await
-        .map_err(|error| kata_error(error, "kata.hypothesise"))?;
     // P4 pinned the instrument at open. The hypothesis may only confirm it: an instrument
     // chosen after the kata opened is not the one the kata was opened to test.
     let kata = store::kata::get_tx(&mut *tx, ctx.tenant, input.kata_id)
         .await
         .map_err(|error| kata_error(error, "kata.hypothesise"))?;
-    if let Some(pinned) = kata.instrument_version_id
-        && pinned != input.instrument_version_id
-    {
-        return Err(ActionError::new(
-            409,
-            "instrument_mismatch",
-            format!(
-                "kata.hypothesise: the kata opened against instrument {pinned}, but the \
-                 hypothesis names {}; the instrument is the one the kata was opened with",
-                input.instrument_version_id
-            ),
-        ));
+    let benchmark = kata.instrument_kind.as_deref() == Some("benchmark");
+    let instrument_version_id = match (
+        benchmark,
+        input.instrument_version_id,
+        kata.instrument_version_id,
+    ) {
+        (true, Some(named), _) => {
+            return Err(ActionError::new(
+                409,
+                "instrument_mismatch",
+                format!(
+                    "kata.hypothesise: the kata opened against a benchmark suite, but the \
+                     hypothesis names eval version {named}; the instrument is the one the kata \
+                     was opened with"
+                ),
+            ));
+        }
+        (true, None, _) => None,
+        // A version named here must exist with a locked split, and confirm the pinned one.
+        (false, Some(named), pinned) => {
+            store::kata::instrument_tx(&mut *tx, ctx.tenant, named, None)
+                .await
+                .map_err(|error| kata_error(error, "kata.hypothesise"))?;
+            if let Some(pinned) = pinned
+                && pinned != named
+            {
+                return Err(ActionError::new(
+                    409,
+                    "instrument_mismatch",
+                    format!(
+                        "kata.hypothesise: the kata opened against instrument {pinned}, but \
+                         the hypothesis names {named}; the instrument is the one the kata was \
+                         opened with"
+                    ),
+                ));
+            }
+            Some(named)
+        }
+        // Omitted: the version pinned at open is the one being confirmed.
+        (false, None, Some(pinned)) => Some(pinned),
+        (false, None, None) => {
+            return Err(invalid(
+                "instrument_version_id",
+                "required",
+                "a hypothesis must name the locked instrument that will measure it",
+            ));
+        }
+    };
+    let mut content = json!({ "prediction": prediction });
+    if let Some(id) = instrument_version_id {
+        content["instrument_version_id"] = json!(id);
+    }
+    if benchmark {
+        content["instrument_kind"] = json!("benchmark");
     }
     let row = store::kata::record_get_tx(
         &mut *tx,
         ctx.tenant,
         input.kata_id,
         Get::Hypothesis,
-        json!({
-            "prediction": prediction,
-            "instrument_version_id": input.instrument_version_id,
-        }),
+        content,
         Some(ctx.actor_id),
     )
     .await
@@ -838,11 +1039,18 @@ async fn kata_measure(
         .await
         .map_err(|error| kata_error(error, "kata.measure"))?;
 
+    // The union's second instrument shape: a benchmark suite is measured from two complete
+    // benchmark runs of that suite (F-T5-1), not from an eval split.
+    if kata.instrument_kind.as_deref() == Some("benchmark") {
+        return benchmark_measure(&mut *tx, &ctx, kata, input).await;
+    }
+
     // P1.1's ordering, refused with its own code: there is no measurement without a
-    // pre-registered prediction and instrument.
+    // pre-registered prediction and instrument. The prediction may be main's text column or
+    // the lane's payload (the coach pre-registers the object at open).
     let Some(version_id) = kata
         .instrument_version_id
-        .filter(|_| kata.prediction.is_some())
+        .filter(|_| kata.prediction.is_some() || kata.prediction_payload.is_some())
     else {
         return Err(ActionError::new(
             409,
@@ -1053,6 +1261,222 @@ async fn kata_measure(
     .map_err(|error| kata_error(error, "kata.measure"))?;
     let view = view_tx(&mut *tx, ctx.tenant, row).await?;
     Ok(HandlerOutput::ok(view))
+}
+
+/// Measure a benchmark-instrument kata from two COMPLETE runs of its suite.
+///
+/// The wall is the suite's locked dataset: the store re-checks the pinned seed and both runs'
+/// suite/arm/status before it writes, and this function reads the same rows first only to
+/// compute the number and the verdict. The candidate is the `conveyor` arm, the baseline the
+/// `baseline` arm; the metric is each run's resolved rate over its graded cases.
+async fn benchmark_measure(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    kata: store::kata::KataRow,
+    input: KataMeasureIn,
+) -> Result<HandlerOutput<KataView>, ActionError> {
+    let action = "kata.measure";
+    let Some(threshold) = kata.threshold else {
+        return Err(ActionError::new(
+            409,
+            "threshold_missing",
+            format!("{action}: kata {} has no success threshold", kata.id),
+        ));
+    };
+    if kata.prediction.is_none() && kata.prediction_payload.is_none() {
+        return Err(ActionError::new(
+            409,
+            "prediction_missing",
+            format!(
+                "{action}: kata {} has no pre-registered prediction; complete the hypothesis \
+                 Get first",
+                kata.id
+            ),
+        ));
+    }
+    if kata.status != "proposed" {
+        return Err(ActionError::new(
+            409,
+            "get_out_of_order",
+            format!(
+                "{action}: the kata is {}; a measurement requires a proposed candidate",
+                kata.status
+            ),
+        ));
+    }
+    let Some(suite_id) = kata.instrument_id else {
+        return Err(ActionError::new(
+            409,
+            "benchmark_instrument_mismatch",
+            format!("{action}: the kata names no benchmark suite"),
+        ));
+    };
+    let mut scores = [0f64; 2];
+    let mut cases = [0i32; 2];
+    for (index, (run_id, arm)) in [
+        (input.candidate_run_id, "conveyor"),
+        (input.baseline_run_id, "baseline"),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let run = store::kata::benchmark_run_score_tx(&mut *tx, ctx.tenant, run_id)
+            .await
+            .map_err(|error| kata_error(error, action))?;
+        let Some(run) = run else {
+            return Err(benchmark_run_refused(
+                run_id,
+                "no such benchmark run in this tenant",
+            ));
+        };
+        if run.suite_id != suite_id {
+            return Err(benchmark_run_refused(
+                run_id,
+                "the run measured another suite",
+            ));
+        }
+        if run.status != "succeeded" {
+            return Err(benchmark_run_refused(
+                run_id,
+                &format!(
+                    "the run is {}; a measurement reads a complete run",
+                    run.status
+                ),
+            ));
+        }
+        if run.arm != arm {
+            return Err(benchmark_run_refused(
+                run_id,
+                &format!(
+                    "the run is the {:?} arm; this side of the measurement is the {arm:?} arm",
+                    run.arm
+                ),
+            ));
+        }
+        if run.n_graded <= 0 {
+            return Err(benchmark_run_refused(run_id, "the run graded no case"));
+        }
+        cases[index] = run.n_graded;
+        scores[index] = f64::from(run.n_resolved) / f64::from(run.n_graded);
+    }
+    let delta = scores[0] - scores[1];
+    let verdict = verdict(delta, threshold);
+    let result = json!({
+        "split": "test",
+        "instrument_kind": "benchmark",
+        "instrument_id": suite_id,
+        "instrument_version": kata.instrument_version,
+        "metric_key": "resolved_rate",
+        "better": "higher",
+        "threshold": threshold,
+        "candidate": {
+            "run_id": input.candidate_run_id,
+            "cases": cases[0],
+            "score": scores[0],
+        },
+        "baseline": {
+            "run_id": input.baseline_run_id,
+            "cases": cases[1],
+            "score": scores[1],
+        },
+        "delta": delta,
+        "directed_delta": delta,
+        "verdict": verdict.as_str(),
+    });
+    let (row, _measurement) = store::kata::benchmark_measurement_tx(
+        &mut *tx,
+        ctx.tenant,
+        store::kata::NewBenchmarkMeasurement {
+            kata_id: kata.id,
+            candidate_run_id: input.candidate_run_id,
+            baseline_run_id: input.baseline_run_id,
+            candidate_cases: cases[0],
+            baseline_cases: cases[1],
+            candidate_score: scores[0],
+            baseline_score: scores[1],
+            delta,
+            result,
+        },
+    )
+    .await
+    .map_err(|error| kata_error(error, action))?;
+    if verdict != Verdict::Regressed {
+        let view = view_tx(&mut *tx, ctx.tenant, row).await?;
+        return Ok(HandlerOutput::ok(view));
+    }
+    // P2's regression rule reaches the benchmark too. A procedure surface restores its pinned
+    // version; any other surface records the revert as not restored, exactly like the eval path.
+    let reason = format!(
+        "the benchmark resolved rate moved {delta:+.4} against the recorded threshold \
+         {threshold:.4}; the candidate regressed past the threshold and was reverted"
+    );
+    let evidence = json!({
+        "metric_key": "resolved_rate",
+        "better": "higher",
+        "delta": delta,
+        "directed_delta": delta,
+        "threshold": threshold,
+        "candidate_score": scores[0],
+        "baseline_score": scores[1],
+    });
+    let mut baseline_version_id = None;
+    let mut candidate_version_id = None;
+    let mut restored = false;
+    if kata.target_surface == Surface::Procedure.as_str() {
+        let candidate_ref = store::kata::candidate_ref_tx(&mut *tx, ctx.tenant, kata.id)
+            .await
+            .map_err(|error| kata_error(error, action))?;
+        let candidate = candidate_ref
+            .as_deref()
+            .and_then(|raw| Uuid::parse_str(raw).ok());
+        match (kata.baseline_version_id, candidate) {
+            (Some(baseline), Some(candidate)) => {
+                store::kata::restore_procedure_tx(&mut *tx, ctx.tenant, baseline, candidate)
+                    .await
+                    .map_err(|error| kata_error(error, action))?;
+                baseline_version_id = Some(baseline);
+                candidate_version_id = Some(candidate);
+                restored = true;
+            }
+            _ => {
+                return Err(kata_error(
+                    store::kata::KataStoreError::RevertTarget(format!(
+                        "the procedure surface needs the pre-kata version pinned at open and a \
+                         candidate version in the solution Get; kata baseline={:?}, \
+                         candidate_ref={:?}",
+                        kata.baseline_version_id, candidate_ref
+                    )),
+                    action,
+                ));
+            }
+        }
+    }
+    let (row, _revert) = store::kata::revert_tx(
+        &mut *tx,
+        ctx.tenant,
+        kata.id,
+        store::kata::NewRevert {
+            reason,
+            baseline_version_id,
+            candidate_version_id,
+            restored,
+            evidence,
+            reverted_by: Some(ctx.actor_id),
+        },
+    )
+    .await
+    .map_err(|error| kata_error(error, action))?;
+    let view = view_tx(&mut *tx, ctx.tenant, row).await?;
+    Ok(HandlerOutput::ok(view))
+}
+
+/// The typed refusal for a benchmark run that cannot measure the kata's suite.
+fn benchmark_run_refused(run_id: Uuid, detail: &str) -> ActionError {
+    invalid(
+        "run_id",
+        "benchmark_run_not_measurable",
+        format!("benchmark run {run_id}: {detail}"),
+    )
 }
 
 /// Adopt a measured improvement — a person's gate (P3, §9.3, D31/D45).
