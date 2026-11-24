@@ -474,6 +474,10 @@ jobs:
     if: ${{ always() && !github.event.repository.private }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
+      # The timing step reads this run's own created_at/run_started_at (#17 P4).
+      actions: read
     steps:
       - name: every shard passed
         env:
@@ -496,6 +500,41 @@ jobs:
             exit 1
           fi
           echo "every shard passed"
+
+      # #17 P4: the queue wait and the wall clock are READ from this run's own record and
+      # written to the job summary — never inferred from `gh run list`'s rounded fields. The
+      # step runs even when the shard failed (`always()`), so every completed run carries the
+      # measurement; an unreadable API answer is written as such, never as a number.
+      - name: record the run's time and queue wait
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          created="$(gh api "repos/${REPO}/actions/runs/${RUN_ID}" --jq .created_at || true)"
+          started="$(gh api "repos/${REPO}/actions/runs/${RUN_ID}" --jq .run_started_at || true)"
+          now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          {
+            echo "### CI timing"
+            echo ""
+            echo "| field | value |"
+            echo "|---|---|"
+            echo "| event | ${EVENT_NAME} |"
+            echo "| run | https://github.com/${REPO}/actions/runs/${RUN_ID} |"
+            if [ -n "${created}" ] && [ -n "${started}" ] && [ "${started}" != "null" ]; then
+              echo "| queue wait | $(( $(date -d "${started}" +%s) - $(date -d "${created}" +%s) )) s |"
+            else
+              echo "| queue wait | unreadable (created_at=${created:-empty} run_started_at=${started:-empty}) |"
+            fi
+            if [ -n "${created}" ]; then
+              echo "| wall time so far | $(( $(date -u +%s) - $(date -d "${created}" +%s) )) s (at ${now}) |"
+            else
+              echo "| wall time so far | unreadable (created_at empty) |"
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
 
   # The image that deploys. On a PR this is a build+smoke check only (fork tokens are read-only).
   # On main it also pushes to ghcr.io with the automatic token — no stored credential.
