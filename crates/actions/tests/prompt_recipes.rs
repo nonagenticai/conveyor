@@ -334,6 +334,62 @@ async fn the_write_scope_is_admin_only_and_another_tenant_cannot_read_the_recipe
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn whole_prompt_budget_round_trips() {
+    let (_pg, running, _seeded) = fixture().await;
+
+    let mut body = recipe("agent_budget", "Budgeted agent");
+    body["budget_chars"] = json!(4096);
+    let created = create(&running, body).await;
+    assert_eq!(created["budget_chars"], 4096, "{created}");
+
+    let (status, response) = running
+        .invoke(
+            "prompt_recipes.get",
+            TOKEN,
+            json!({"key": "agent_budget", "version": 1}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{response}");
+    assert_eq!(output(&response)["budget_chars"], 4096, "{response}");
+
+    // A version is immutable: changing the ceiling is the next version, not an edit in place.
+    let mut body = recipe("agent_budget", "Budgeted agent v2");
+    body["budget_chars"] = json!(1024);
+    let updated = create(&running, body).await;
+    assert_eq!(updated["version"], 2);
+    assert_eq!(updated["budget_chars"], 1024, "{updated}");
+    let (status, response) = running
+        .invoke(
+            "prompt_recipes.get",
+            TOKEN,
+            json!({"key": "agent_budget", "version": 2}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{response}");
+    assert_eq!(output(&response)["budget_chars"], 1024, "{response}");
+
+    // A ceiling of zero is a client fault, not a stored unbounded recipe.
+    let mut body = recipe("agent_budget_zero", "Zero budget");
+    body["budget_chars"] = json!(0);
+    let (status, response) = running
+        .invoke("prompt_recipes.create", TOKEN, body, None, None, None)
+        .await;
+    assert_eq!(status, 422, "{response}");
+    assert!(
+        response["errors"].as_array().is_some_and(|rows| rows
+            .iter()
+            .any(|row| row["field"] == "budget_chars" && row["code"] == "invalid_value")),
+        "{response}"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_selector_is_validated_for_its_source_and_unknown_members_are_refused() {
     let (_pg, running, _seeded) = fixture().await;
     let mut body = recipe("agent_selector", "Selector");
