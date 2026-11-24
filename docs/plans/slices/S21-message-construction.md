@@ -5,14 +5,14 @@ status: built
 depends_on: [S09, S11, S13, S15, S16, T2, T13]
 spec_sections: ["§3 D27", "§8 S21", "§4.4", "§4.5", "§7.7", "§10.2", "§11.1", "§11.4"]
 adds_tables: [prompt, prompt_section]
-adds_actions: [prompt_recipes.create, prompt_recipes.list, prompt_recipes.get, prompt_recipes.activate, prompt_recipes.retire]
+adds_actions: [prompt_recipes.create, prompt_recipes.list, prompt_recipes.get, prompt_recipes.activate, prompt_recipes.retire, cards.assign]
 adds_modules: [prompt, memory, knowledge, executor]
 parity_ids: PENDING-S0
 ---
 
 # S21 — Message construction (the compiled prompt)
 
-Programme project: S21 · issues #15, #581, #590, #599, #612
+Programme project: S21 · issues #15, #581, #590, #599, #612, #624, #649
 
 **Status:** `plan written 2026-11-09`; the v1 seam is built (D27) and steps 1–2 are built. Step 3
 (the work-package prompt envelope — recipe authoring, memory selection, knowledge content) is
@@ -22,9 +22,13 @@ design is §14 and the build record is §15. Step 5 (the applying gate) is **bui
 2026-11-22**; the design is §16 and the receipt is `docs/evidence/S21-APPLY.md`. Step 6 (the work
 package's run — the card's binding, the terminal run's memory and the live proof) is **built and
 merged, #599, 2026-11-23**; the design is §17 and the receipt is `docs/evidence/S21-RUN.md` (the
-live proof is recorded blocked on the estate's caller licence). Step 7 (the run's episodic memory —
-the run's prior steps in the compiled prompt, `memory.recall`'s hot/digest separation and the
-process-attempt proof) is **open, #612**; the design is §18.
+live proof is recorded blocked on the estate's caller licence). Step 7 (the run's episodic memory) is
+**built and merged, #612/PR #615, 2026-11-23**; the design is §18, the build record §19, the receipt
+`docs/evidence/S21-MEMORY.md`. Step 8 (the Request source — the declared step in the process section
+and in laya's case input) is **built and merged, #624/PR #627, 2026-11-23**; the design is §20 and the
+receipt is `docs/evidence/S21-REQUEST.md`. Step 9 (the work package's handoff — `cards.assign`
+assigns the binding, records what the receiver must know and starts the bound run) is **open, #649**;
+the design is §21.
 **Depends on:** S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps),
 S09 (`retrieval.query` / `strata` packs).
 **Owner ruling:** George, 2026-11-09 — *a prompt is a run-time compilation from the procedure and the
@@ -689,3 +693,45 @@ second compiler; no migration.
 `crates/store/tests/prompt_catalogue.rs`, `crates/actions/tests/process_agent_resolved.rs` and
 `crates/actions/tests/internal_agent_runtime.rs`. The scenarios are issue #624 P1–P3; the receipt is
 `docs/evidence/S21-REQUEST.md`.
+
+## 21. Build plan — step 9: the work package's handoff (2026-11-24, issue #649)
+
+**Why this step.** §5.1's level is card → run → step; steps 3–8 made the card name its binding, the
+run compile the four sources and the judge receive the request, but the level has no entry of its
+own. No card or board action starts a run — `cards.move` and `cards.update` touch no run, and
+`runs.create` starts one only when a caller asks explicitly. SPEC_V2 §6.6.1–5 names the missing
+verb: a job hands a card to another job with an action, **records what the receiver must know as
+memory**, and every card has one live run. `memory.remember` has zero production callers, so
+§6.6.4's handoff note is never written. ADR 0014 deferred exactly this unit ("a dedicated handoff
+verb can come with the card-driven entry unit").
+
+**P1 — the handoff's one transaction.** A new `cards.assign` (scopes `cards:write` + `runs:write`)
+takes `{card_id, job_binding_id?, note, kind?, meta?, correlation_id?}` and presents the card's
+version (If-Match or `_version`, like `cards.update`/`cards.move`), and, in one transaction:
+resolves the target binding (the request's, else the card's), checks it is active and in the tenant,
+refuses a card that already has a live root run (`409 card_has_live_run`), validates the note, sets
+`card.job_binding_id`, writes one hot `work_package_memory` row through the memory writer, and
+starts the bound run through the same helper `runs.create` uses (andon, binding pin, attempt,
+`run.execute` enqueue, `run.created`). Every refusal precedes the first write. `cards.update`'s
+`job_binding_id` stays the plain edit and never starts a run.
+
+**P2 — the note is memory the next prompt reads.** The handoff row is an ordinary hot row, so the
+selector renders it in the next run's Memory section (`[fact/<source>#<id>] …`) and its id is inside
+`prompt_sha256`. One writer: `memory.remember`'s body is extracted and shared. No new writer.
+
+**P3 — the refactors and the proofs.** `runs.create`'s run-creation body is factored into one
+`pub(crate)` helper so the handoff cannot drift from the andon, the pin or the event; its existing
+tests are the regression. The action is registered with both scopes, parity-sampled over HTTP and
+MCP, and the served-spec lock regenerates. Five reversal proofs: the memory insert, the live-run
+read, the binding check, the andon check and the note's source.
+
+**Out of this step.** No auto-start on a bare move or a claim; no claim/renew/release verb; no
+automatic apply of an L1-accepted draft; no budget mechanism (the #526 lane's); no handoff of a
+project-level (card-less) run; no parent-run memory; no new event kind; no typed
+inputs/acceptance-criteria authoring on the handoff; no UI; no PDDL storage; no second memory
+writer; no migration.
+
+**Acceptance.** New `crates/actions/tests/card_handoff.rs`; extended
+`crates/store/tests/prompt_catalogue.rs`, `crates/actions/tests/registry.rs` and
+`crates/actions/tests/parity_http_mcp.rs`; `runs.create`'s existing suites stay unchanged. The
+scenarios are issue #649 P1–P3; the receipt is `docs/evidence/S21-HANDOFF.md`.

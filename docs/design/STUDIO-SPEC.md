@@ -36,7 +36,7 @@ only when its screen reads real rows; until then the mock's `V2 · PROPOSED` bad
 | Procedures | `/procedures` | `apps/web/src/screens/procedures.rs` | `procedures.list` |
 | Authoring | `/authoring` | `apps/web/src/screens/authoring.rs` | `authoring.assets` (writes are the governed `authoring.intake\|draft\|review\|publish`) |
 | Portfolio | `/portfolio` | `apps/web/src/screens/portfolio.rs` | `portfolio.in_flight` |
-| Programme | `/programme` | `apps/web/src/screens/programme.rs` | `programmes.list`, `tranches.list`, `cadences.list`, `benefits.list`, `lessons.list` |
+| Programme | `/programme` | `apps/web/src/screens/programme.rs` | `programmes.list`, `tranches.list`, `cadences.list`, `benefits.list`, `programme_lessons.list` |
 | Plan | `/plan` | `apps/web/src/screens/plan.rs` | `projects.list`, `wbs.list`, `baselines.list`, `registers.list`, `project_dependencies.list` |
 | Improve | `/improve` | `apps/web/src/screens/improve.rs` | `metrics.flow`, `kata.list` |
 | Operations | `/operations` | `apps/web/src/screens/operations.rs` | `workers.list`, `providers.list`, `ops.pods`, `ops.deployments` |

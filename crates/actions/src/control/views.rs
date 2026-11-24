@@ -283,8 +283,6 @@ pub struct ApprovalDecideIn {
     /// Per-item decisions, when the gate covers several items.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub item_decisions: Option<Value>,
-    /// The published owner decision that delegates this approval.
-    ///
     /// A delegated decision is recorded as `decided_by_kind='rule'` with the reference in
     /// `via`, never as a human decision: the audit says a policy acted under a named decision,
     /// and a gate that requires a person accepts it only by naming its delegation.
@@ -316,13 +314,6 @@ pub struct ApprovalRequestIn {
     /// The run the question belongs to.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub run_id: Option<Uuid>,
-    /// The change request this gate decides (the `change` gate).
-    ///
-    /// Stored in `meta.change_id`; `approved_change_for_baseline_tx` joins an approved gate to
-    /// the change it authorises by this key. Without it a change gate can never be read as the
-    /// approval for a baseline, a benefit measurement or a WBS mutation (v1-change-1).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub change_id: Option<Uuid>,
     /// The gate name.
     pub gate: String,
     /// The gate's kind.
@@ -333,10 +324,10 @@ pub struct ApprovalRequestIn {
     /// The answer the requester proposes; stored in `meta.proposed_answer`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub proposed_answer: Option<String>,
-    /// Whether a decision must carry an answer in its note.
-    ///
-    /// A free-text question sets this; a yes/no gate does not. The decision writer refuses an
-    /// empty note on such a gate, on every channel, so the answer cannot be lost.
+    /// The change request this gate decides (the `change` gate), stored in `meta.change_id`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
+    /// A free-text question sets this; the decision writer refuses an empty note on such a gate.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub requires_answer: Option<bool>,
     /// The decisions a responder may give; stored in `meta.allowed_decisions`.
@@ -381,17 +372,10 @@ pub struct ApprovalRequestIn {
     #[serde(default)]
     pub evidence: Vec<crate::pm::EvidenceRef>,
     /// Refuse an empty evidence list when true.
-    ///
-    /// A caller can only **add** this requirement. A gate for a destructive action (one with an
-    /// `approval_policy` row) requires evidence whatever this says; `false` cannot remove it.
     #[serde(default)]
     pub require_evidence: bool,
-    /// Why this gate carries no evidence — the explicit §5.4 override.
-    ///
-    /// Ignored when the gate does not require evidence or when `evidence` is non-empty. A reason
-    /// that is non-empty after trim opens an evidence-less gate and is stored in
-    /// `meta.evidence_waiver`; an empty or whitespace-only reason is not a waiver, so a gate that
-    /// requires evidence is refused (`422 gate_evidence_missing`).
+    /// A non-empty reason opens an evidence-less gate (stored in `meta.evidence_waiver`); an
+    /// empty reason is not a waiver, so a gate that requires evidence is refused.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub evidence_waiver_reason: Option<String>,
 }
@@ -458,9 +442,6 @@ pub struct ApprovalOut {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub proposed_answer: Option<String>,
     /// Whether a decision must carry an answer in its note (`meta.requires_answer`).
-    ///
-    /// A free-text question sets it, and the decision writer refuses an empty note on such a
-    /// gate, so the approvals screen renders an answer box instead of a bare approve/reject.
     #[serde(default)]
     pub requires_answer: bool,
     /// The decisions a responder may give (`meta.allowed_decisions`).
@@ -856,7 +837,7 @@ pub struct ChannelPolicyResetIn {
     pub channel_kind: String,
 }
 
-/// One action's gating policy as `approval_policies.*` returns it (#282).
+/// One action's gating policy as `approval_policies.*` returns it (#282, extended by T6).
 ///
 /// A policy the tenant never set still has an answer here: the strict default, so a reader never
 /// has to interpret an absent row as a decision.
@@ -866,12 +847,16 @@ pub struct ApprovalPolicyOut {
     pub action: String,
     /// `required` — an approved approval naming the exact target is needed; `waived` — it is not.
     pub approval: String,
-    /// **Always `forbidden`.** SPEC_V2 §5.4 makes the requester's exclusion an invariant; a
-    /// historical `allowed` row still reads, but this answer is the invariant (ledger v1-w4b-4).
+    /// `forbidden` — the requester cannot decide its own gate (§5.4); `allowed` — they may.
     pub self_approval: String,
-    /// `human` — a person decides the gate (§5.4's default); a non-human kind is this tenant's
-    /// explicit non-governance declaration for the gate.
+    /// `human` — a person decides the gate (the default); `auto` — the tenant's earned
+    /// auto-merge policy decides when its conditions hold (§6.4); or the lane's explicit
+    /// non-governance kinds `triage_agent`, `rule`, `agent`, `service` (§5.4).
     pub approver_kind: String,
+    /// The typed conditions an auto policy carries; empty for a human policy.
+    pub conditions: Value,
+    /// When an auto policy stops applying; `null` for a human policy.
+    pub expires_at: Option<DateTime<Utc>>,
 }
 
 /// `approval_policies.get` input.
@@ -882,28 +867,30 @@ pub struct ApprovalPolicyGetIn {
     pub action: String,
 }
 
-/// The approver a gate gets when the tenant names none: `human`, SPEC_V2 §5.4's default.
-fn default_approver_kind() -> String {
-    "human".to_owned()
-}
-
 /// `approval_policies.set` input — the complete decision for one action.
 ///
-/// `approval` and `self_approval` are required: a `set` replaces the whole policy, so leaving one
-/// out would silently reset it. `self_approval` accepts only `forbidden`; `allowed` is refused
-/// 422 because §5.4 is an invariant (ledger v1-w4b-4). `approver_kind` defaults to `human`, the
-/// strict §5.4 rule.
+/// Both settings are required: a `set` replaces the whole policy, so leaving one out would mean
+/// silently resetting it to the default rather than leaving it alone. The three auto-merge
+/// fields are optional; omitting them records the strict human default.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ApprovalPolicySetIn {
-    /// The destructive action whose gating this decides.
+    /// The action whose gating this decides.
     pub action: String,
     /// `required` or `waived`.
     pub approval: String,
-    /// `forbidden` only: `allowed` is refused 422 (SPEC_V2 §5.4, ledger v1-w4b-4).
+    /// `forbidden` or `allowed`.
     pub self_approval: String,
-    /// `human` (the default) or the non-human kind this tenant authorises for the gate:
-    /// `triage_agent`, `rule`, `agent` or `service`.
-    #[serde(default = "default_approver_kind")]
-    pub approver_kind: String,
+    /// `human` (default), `auto`, or the explicit non-governance kinds `triage_agent`, `rule`,
+    /// `agent`, `service`. `auto` is accepted only for a development gate and requires typed
+    /// conditions and a future expiry.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub approver_kind: Option<String>,
+    /// The typed auto-merge conditions (consecutive green runs, revert count, path scope,
+    /// independent-reviewer requirement).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conditions: Option<Value>,
+    /// When the auto policy expires. Required for `auto`, absent for `human`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<DateTime<Utc>>,
 }

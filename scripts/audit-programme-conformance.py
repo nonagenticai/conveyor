@@ -1935,7 +1935,7 @@ DEEP_REVIEW_KINDS = {
     "standard": "STANDARD",
 }
 # `record+code` names a finding whose code capability may already exist. At this head
-# `programmes.update` accepts `shared_config` and `lessons.propose`/`retros.*` exist, so the
+# `programmes.update` accepts `shared_config` and `programme_lessons.propose`/`retros.*` exist, so the
 # blocker is the record write, not new code. The override is per finding and evidence-backed;
 # it never widens an unknown kind.
 DEEP_REVIEW_KIND_OVERRIDES = {

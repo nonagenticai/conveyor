@@ -35,6 +35,17 @@ pub struct Config {
     /// How long a request waits for a per-provider concurrency slot before it is shed as
     /// `queue_rejected` (`PROVIDER_SLOT_WAIT_TIMEOUT`, default 30 s).
     pub provider_slot_wait_seconds: f64,
+    /// How long the streaming handler waits for the upstream stream to open before it flushes
+    /// the SSE response head and starts keepalives (`INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS`,
+    /// default 35 000, or the provider slot wait when that is larger). `0` disables the early
+    /// flush and restores the baseline behaviour; a non-zero value must at least cover the
+    /// provider slot wait, otherwise a slow shed would surface as a mid-stream error instead of
+    /// its HTTP status.
+    pub stream_headers_grace_ms: u64,
+    /// The keepalive-comment cadence while a stream waits for its upstream
+    /// (`INFERENCE_ROUTER_STREAM_KEEPALIVE_MS`, default 10 000). Must stay below every caller's
+    /// stream-idle budget.
+    pub stream_keepalive_ms: u64,
     /// `INFERENCE_ROUTER_INTROSPECT_MODE` (`off` | `observe` | `enforce`); when unset, `enforce`
     /// iff `INFERENCE_ROUTER_REQUIRE_CALLER_LICENSE` is true, else `off`.
     pub introspect_mode: Mode,
@@ -152,6 +163,12 @@ pub enum ConfigError {
     InvalidMetricsPort(String),
     #[error("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT is not a positive number of seconds: {0}")]
     InvalidSlotWait(String),
+    #[error("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS is not a number of milliseconds: {0}")]
+    InvalidStreamGrace(String),
+    #[error("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS is unusable: {0}")]
+    StreamGraceTooShort(String),
+    #[error("INFERENCE_ROUTER_STREAM_KEEPALIVE_MS is not a positive number of milliseconds: {0}")]
+    InvalidStreamKeepalive(String),
     #[error("INFERENCE_ROUTER_INTROSPECT_MODE is not one of off/observe/enforce: {0}")]
     InvalidIntrospectMode(String),
     #[error("INFERENCE_ROUTER_LICENSE_INTROSPECT_TIMEOUT is not a number of seconds: {0}")]
@@ -236,6 +253,35 @@ impl Config {
             return Err(ConfigError::InvalidSlotWait(
                 provider_slot_wait_seconds.to_string(),
             ));
+        }
+
+        let stream_headers_grace_ms: u64 =
+            match non_empty(lookup("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS")) {
+                Some(raw) => raw
+                    .parse()
+                    .map_err(|_| ConfigError::InvalidStreamGrace(raw.clone()))?,
+                // The default adapts to a raised slot wait; only an EXPLICIT too-short value
+                // is an error, so a fleet tuning the slot wait does not also have to tune this.
+                None => (provider_slot_wait_seconds * 1000.0).ceil().max(35_000.0) as u64,
+            };
+        let stream_keepalive_ms: u64 =
+            match non_empty(lookup("INFERENCE_ROUTER_STREAM_KEEPALIVE_MS")) {
+                Some(raw) => raw
+                    .parse()
+                    .map_err(|_| ConfigError::InvalidStreamKeepalive(raw.clone()))?,
+                None => 10_000,
+            };
+        if stream_keepalive_ms == 0 {
+            return Err(ConfigError::InvalidStreamKeepalive(
+                stream_keepalive_ms.to_string(),
+            ));
+        }
+        let slot_wait_ms = provider_slot_wait_seconds * 1000.0;
+        if stream_headers_grace_ms != 0 && (stream_headers_grace_ms as f64) < slot_wait_ms {
+            return Err(ConfigError::StreamGraceTooShort(format!(
+                "{stream_headers_grace_ms} ms is below the {slot_wait_ms} ms provider slot wait; \
+                 set 0 to disable the early flush"
+            )));
         }
 
         let require_caller_license = non_empty(lookup("INFERENCE_ROUTER_REQUIRE_CALLER_LICENSE"))
@@ -381,6 +427,8 @@ impl Config {
             environment,
             docs_enabled,
             provider_slot_wait_seconds,
+            stream_headers_grace_ms,
+            stream_keepalive_ms,
             introspect_mode,
             introspect_url,
             introspect_timeout_seconds,
@@ -459,6 +507,44 @@ mod tests {
         assert_eq!(config.environment, "production");
         assert!(!config.docs_enabled);
         assert_eq!(config.provider_slot_wait_seconds, 30.0);
+        assert_eq!(config.stream_headers_grace_ms, 35_000);
+        assert_eq!(config.stream_keepalive_ms, 10_000);
+    }
+
+    #[test]
+    fn the_stream_grace_default_follows_a_raised_slot_wait() {
+        let config = parse(&[("INFERENCE_ROUTER_PROVIDER_SLOT_WAIT_TIMEOUT", "45")])
+            .expect("a raised slot wait must not require tuning a second knob");
+        assert_eq!(config.stream_headers_grace_ms, 45_000);
+    }
+
+    #[test]
+    fn a_short_stream_grace_is_rejected() {
+        let error = parse(&[("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS", "1000")])
+            .expect_err("a grace below the provider slot wait must not load");
+        assert!(matches!(error, ConfigError::StreamGraceTooShort(_)));
+        assert!(error.to_string().contains("30000"));
+    }
+
+    #[test]
+    fn the_stream_grace_may_disable_the_early_flush() {
+        let config = parse(&[("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS", "0")])
+            .expect("0 is the documented off switch");
+        assert_eq!(config.stream_headers_grace_ms, 0);
+    }
+
+    #[test]
+    fn a_zero_stream_keepalive_is_rejected() {
+        let error = parse(&[("INFERENCE_ROUTER_STREAM_KEEPALIVE_MS", "0")])
+            .expect_err("a zero cadence would panic the interval");
+        assert!(matches!(error, ConfigError::InvalidStreamKeepalive(_)));
+    }
+
+    #[test]
+    fn a_stream_grace_equal_to_the_slot_wait_is_accepted() {
+        let config = parse(&[("INFERENCE_ROUTER_STREAM_HEADERS_GRACE_MS", "30000")])
+            .expect("the slot wait itself is the minimum");
+        assert_eq!(config.stream_headers_grace_ms, 30_000);
     }
 
     #[test]

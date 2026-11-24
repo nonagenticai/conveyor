@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19 close-out — live write evidence · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/live-write-evidence.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19-close-out--live-write-evidence">T19 close-out — live write evidence</h1>
+<p>Every write listed here is invoked through <code>scripts/programme-record.py</code> against the deployed engine (<code>a8f67c3e</code>, tenant <code>nonagentic</code>), with a read-back action and a non-zero exit on an unverified claim. The write outputs are captured beside this file under <code>docs/evidence/t19/</code>.</p>
+<p>The human seat is exercised by the tenant's admin identity <code>FR Test</code> (<code>app_user 01a1cf1e-09dd-7580-99cc-de395f3e86cc</code>), supplied by the owner for this live proof. The evidence records that identity exactly; it does not claim the owner's personal account.</p>
+<p>Writes: <code>approvals.request</code> ×3 (two deciding items, one minutes gate), <code>meetings.schedule</code>, <code>meetings.open</code>, <code>meetings.invite</code>, <code>meetings.agenda_add</code> ×2, <code>meetings.minutes_publish</code>, <code>meetings.close</code>. The owner's positions and the minutes decision are taken in the signed-in browser (web room) and through the MCP transport, not through this recorder.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19/live-write-evidence.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

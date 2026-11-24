@@ -390,7 +390,7 @@ fn Sidebar() -> impl IntoView {
             <div class="grp">"Knowledge & memory"</div>
             <ul class="rail-list">
                 <li><A href="/search"><span class="nav-item">"Search"</span></A></li>
-                {move || ctx.has_action("lessons.list").then(|| view! {
+                {move || ctx.has_action("lessons.promote").then(|| view! {
                     <li><A href="/knowledge"><span class="nav-item">"Knowledge"</span></A></li>
                 })}
             </ul>

@@ -1303,7 +1303,7 @@ in §11.8.
 | decision | `ladder.record\|evaluate\|list\|apply_draft` (the ladder's verbs; a human answer is `approvals.decide` and an escalation opens an approval, not a ladder action), `decision_options.*`, `decision_policies.*`, `refinements.publish\|list`, `laya_configs.*`. ⚠️ `decisions.*` is the **ADR family** (`governance/assets.rs`); the ladder does not reuse it, so the §7 record and an ADR cannot be confused |
 | PM | `pm.charter`, `pm.plan`, `pm.baseline`, `pm.close` |
 | coach | `coach.interrupt`, `coach.triage`, `coach.remedy`, `coach.escalate` |
-| kata | `kata.open\|observe\|analyse\|propose\|measure\|adopt\|propagate\|close` |
+| kata | `kata.open\|observe\|analyse\|hypothesise\|propose\|measure\|adopt\|propagate\|close`, `kata.get` |
 | development | `dev.open\|implement\|verify\|merge\|release\|rollback` (composes coding/git/CI actions) |
 | operations | `ops.incident\|triage\|mitigate\|resolve\|postmortem`, `ops.k8s_*`, `ops.git_*`, `ops.host_*` (§10.4.1) |
 | analysis | `analyse.site`, `analyse.app`, `analyse.video`, `analyse.brand`, `analyse.content`, `analyse.report` |
@@ -1388,7 +1388,11 @@ path (literal `GET`s or read actions), its write path (`POST /api/actions/{name}
 the permission scope each control needs, its empty/partial/error/denied states, and its Playwright
 spec. The action families are §10.4's; the UI adds none. A destination whose owning slice is not
 built renders **not yet live**, names the missing action or slice, and keeps its route so the deep
-link is honest. The board remains the work surface and the execution canvas remains the run
+link is honest. Authoring is a contract of five actions: `authoring.assets` reads the catalogue and
+`authoring.intake|draft|review|publish` write the brief, the draft, the reviewed decision and the
+release. Its intake queue is the catalogue grouped by the intake each draft cites — the family
+exposes the intake write-only, so a recorded brief is not a read a screen may show — and §5.7's
+dependency order is refused when the draft is attempted, not at publish. The board remains the work surface and the execution canvas remains the run
 surface; the run inspector keeps the provenance pattern (every stage's input → output is
 inspectable), gains the tools panel (tool version, credential alias, returned evidence) and drills
 to step and tool call (D52). The tools panel is T13's ledger (`tool_calls.list`); until that

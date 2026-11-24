@@ -212,7 +212,7 @@ async fn a_lesson_needs_a_statement() {
     let programme = create_programme(&running, "Lessons").await;
     let (status, body) = running
         .invoke(
-            "lessons.propose",
+            "programme_lessons.propose",
             TOKEN,
             json!({
                 "programme_id": programme,
@@ -270,7 +270,7 @@ async fn a_credit_and_a_lesson_round_trip() {
 
     let (status, body) = running
         .invoke(
-            "lessons.propose",
+            "programme_lessons.propose",
             TOKEN,
             json!({
                 "programme_id": programme,
@@ -284,12 +284,32 @@ async fn a_credit_and_a_lesson_round_trip() {
             None,
         )
         .await;
-    assert_eq!(status, 201, "{body}");
-    assert_eq!(output(&body)["independent_count"], 1, "{body}");
+    // T8's wall reaches the programme register: one reference is not evidence.
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(body["type"], "conflict", "{body}");
 
     let (status, body) = running
         .invoke(
-            "lessons.list",
+            "programme_lessons.propose",
+            TOKEN,
+            json!({
+                "programme_id": programme,
+                "cadence_id": cadence,
+                "finding_key": "F-1",
+                "statement": "Accept the increment with its evidence.",
+                "evidence": ["retro:note-1", "retro:note-2"],
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    assert_eq!(output(&body)["independent_count"], 2, "{body}");
+
+    let (status, body) = running
+        .invoke(
+            "programme_lessons.list",
             TOKEN,
             json!({"programme_id": programme}),
             None,
@@ -472,7 +492,7 @@ async fn a_retro_closes_once_each_finding_has_a_lesson() {
     for key in ["F-1", "F-2"] {
         let (status, body) = running
             .invoke(
-                "lessons.propose",
+                "programme_lessons.propose",
                 TOKEN,
                 json!({
                     "programme_id": programme,

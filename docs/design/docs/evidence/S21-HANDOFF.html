@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S21 step 9 — the work package's handoff: assign, remember, start · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-HANDOFF.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s21-step-9--the-work-packages-handoff-assign-remember-start">S21 step 9 — the work package's handoff: assign, remember, start</h1>
+<p><strong>Issue:</strong> #649 · <strong>Branch:</strong> <code>issue/649-s21-handoff</code> · <strong>Date:</strong> 2026-11-24 · <strong>Baseline:</strong> <code>origin/main@a8f67c3e</code> (the #648 registry refresh)</p>
+<h2 id="what-was-built">What was built</h2>
+<ul>
+<li><code>cards.assign</code> — one action, one transaction: it sets the card's active, tenant-scoped job binding, records what the receiver must know as one hot <code>work_package_memory</code> row, and starts the card's bound run through the same path <code>runs.create</code> uses (the andon, the binding's pin, the attempt, the <code>run.execute</code> enqueue and <code>run.created</code>).</li>
+<li>The handoff is a write to an existing card, so it presents the card's version (If-Match or <code>_version</code>) like <code>cards.update</code>/<code>cards.move</code>: a card that moved underneath the caller is <code>412</code> with the current representation, and two concurrent handoffs produce exactly one run.</li>
+<li>One live root run per card (SPEC_V2 §6.6.5): a card with a live run refuses <code>409 card_has_live_run</code> naming it, before any write; <code>uq_run_live</code> is the race backstop.</li>
+<li>One run-creation path: <code>runs.create</code>'s body is factored into <code>control/run_create.rs::create_bound_run_tx</code> and both actions call it; <code>runs.create</code>'s behaviour and tests are unchanged.</li>
+<li>One memory writer: <code>memory.remember</code>'s body is extracted as <code>remember_tx</code> and the handoff calls it; the note is an ordinary hot row the next run's Memory section selects.</li>
+<li>No migration; no new scope; no new event kind (<code>card.updated</code>, <code>memory.recorded</code>, <code>run.created</code>).</li>
+</ul>
+<h2 id="found-in-flight">Found in flight</h2>
+<p>The first cut passed the freshly read <code>current.card.version</code> to <code>update_card_tx</code> instead of the version parsed from the request's precondition. It compiled and every test passed except the new <code>a_stale_card_is_refused</code>, which caught a stale If-Match being silently accepted (a lost-update window). The handler now passes the precondition's version to the one writer, and the concurrent test's loser is a deterministic <code>412</code>.</p>
+<h2 id="not-this-step">Not this step</h2>
+<p>Auto-start on a bare <code>cards.move</code> or a claim; a claim/renew/release verb; automatic apply of an L1-accepted draft; any budget mechanism (the #526 lane's); a handoff of a project-level (card-less) run; parent-run memory; a typed inputs/acceptance-criteria authoring surface on the handoff; a UI; PDDL storage; a second memory writer; the live model/laya proof; <code>v1-p66-1</code>'s lane-refusal clause. <code>cards.update</code>'s <code>job_binding_id</code> remains a plain edit and is not live-run guarded (ADR 0017 decision 7).</p>
+<h2 id="measured-at-the-branch-head">Measured at the branch head</h2>
+<table>
+<thead>
+<tr>
+<th>Suite</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/actions/tests/card_handoff.rs</code> (new)</td>
+<td><strong>11 scenarios passed</strong> (14 with the support module's 3)</td>
+</tr>
+<tr>
+<td><code>crates/store/tests/prompt_catalogue.rs</code> (extended)</td>
+<td><strong>7 passed</strong> (one is the handoff row's selection)</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/registry.rs</code></td>
+<td><strong>12 passed</strong> — <code>EXPECTED</code> 531, internal 513, external 18</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/parity_http_mcp.rs</code></td>
+<td><strong>7 passed</strong> — the handoff sample answers 201 over both transports</td>
+</tr>
+<tr>
+<td><code>clippy -p conveyor-actions -p conveyor-store -p conveyor-server --all-targets -- -D warnings</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td><code>cargo fmt --all -- --check</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td><code>served-spec.lock.json</code></td>
+<td><strong>562 operations</strong>, <code>cards.assign</code> present, <code>--check-lock</code> <strong>exit 0</strong></td>
+</tr>
+<tr>
+<td><code>scripts/build-coverage.py --check</code>, <code>build-v2-coverage.py --check</code>, <code>build-programme-seed.py --check</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td><code>node docs/design/scripts/check-docs.cjs</code>, <code>build-docs.py --check</code></td>
+<td><strong>12 checks passed</strong>, <strong>142 sources, 0 failures</strong></td>
+</tr>
+<tr>
+<td><code>scripts/ci/board.py --dry-run</code></td>
+<td><strong>exit 0</strong> (reports three pre-existing issues, none this unit's)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reversal-proofs-each-guard-disabled-its-own-test-red-then-restored">Reversal proofs (each guard disabled, its own test red, then restored)</h2>
+<table>
+<thead>
+<tr>
+<th>Guard removed</th>
+<th>Test that turned red</th>
+<th>Observed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the handoff's memory insert (<code>remember_tx</code> fabricated the row instead)</td>
+<td><code>card_handoff::the_handoff_writes_one_memory_row</code></td>
+<td><strong>0 rows</strong>, "one row, one writer"</td>
+</tr>
+<tr>
+<td>the live-run pre-check</td>
+<td><code>card_handoff::a_second_handoff_is_refused_and_writes_nothing</code></td>
+<td><code>409 conflict</code> instead of <code>card_has_live_run</code></td>
+</tr>
+<tr>
+<td><code>ensure_card_binding</code></td>
+<td><code>card_handoff::an_unusable_binding_is_refused</code></td>
+<td><code>409 job_binding_stale</code> (a misleading store refusal) instead of <code>422 job_binding_unusable</code></td>
+</tr>
+<tr>
+<td>the note's source from the actor (a constant <code>system</code>)</td>
+<td><code>card_handoff::the_handoff_writes_one_memory_row</code></td>
+<td>source <code>system</code>, expected <code>human</code></td>
+</tr>
+<tr>
+<td>the andon check (both the handoff's early read and the shared run path)</td>
+<td><code>card_handoff::the_andon_refuses_a_handoff</code></td>
+<td><strong>201</strong> — the run started while the cord was on</td>
+</tr>
+</tbody>
+</table>
+<p>Each guard was restored and the full suite re-ran green (14 passed).</p>
+<h2 id="generated">Generated</h2>
+<ul>
+<li><code>docs/design/data/actions.json</code> — regenerated by <code>conveyor admin actions dump</code> (<strong>531 actions</strong>).</li>
+<li><code>docs/design/data/coverage.{json,js}</code> — regenerated (<code>build-coverage.py</code>).</li>
+<li><code>docs/design/docs/**</code> — regenerated for the plan/contract/ADR/receipt edits; the published <code>output-*.html</code>, <code>standards/</code> and <code>outputs.js</code> were restored from HEAD after the build (the known wipe).</li>
+<li><code>docs/design/architecture/diagrams/run-sequence.{light,dark}.svg</code> — re-rendered from the updated source with the system Chrome (<code>PUPPETEER_EXECUTABLE_PATH</code>).</li>
+<li><code>served-spec.lock.json</code> — <code>--print-openapi --write-lock</code>, then <code>--check-lock</code>.</li>
+<li><code>seed/programme.json</code> — current; it gains #649 only when the automated issue-registry refresh adds it to <code>docs/design/data/issues.json</code> (the generator is registry-driven; a hand edit fails <code>--check</code>).</li>
+<li>No rework finding is closed by this unit; the register is unchanged.</li>
+</ul>
+<h2 id="residuals-recorded-not-built">Residuals (recorded, not built)</h2>
+<ul>
+<li>Auto-start on a bare lane move or claim remains its own unit (ADR 0014).</li>
+<li><code>cards.update</code> can still change a binding while a run is live; the handoff refuses in that state. Whether an edit should be guarded is a card-authoring decision (ADR 0017 decision 7).</li>
+<li>A retry after a committed handoff answers <code>409 card_has_live_run</code>; callers reconcile with <code>cards.get</code>.</li>
+<li>The live model/laya proof stays <code>#[ignore]</code>d and blocked on the estate's caller licence (<code>docs/evidence/S21-RUN.md</code>).</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S21-HANDOFF.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

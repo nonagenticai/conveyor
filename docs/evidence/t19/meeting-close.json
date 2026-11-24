@@ -1,0 +1,160 @@
+== write: meetings.close ==
+{
+  "cadence_slot": null,
+  "card_id": "01a20c8a-3370-7a8f-b903-faf5f7cff917",
+  "card_name": "T19 live gate \u2014 decision forum",
+  "closed_at": "2026-11-24T08:19:39.998094Z",
+  "convener_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+  "convener_kind": "app_user",
+  "decision_rule": "majority",
+  "decision_window_end": "2026-12-01T07:52:15.788899Z",
+  "id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+  "meeting_type": "t19-live-gate",
+  "meeting_type_name": "T19 live gate",
+  "meeting_type_version": 1,
+  "opens_at": "2026-11-24T07:52:15.788899Z",
+  "retirement_candidate": false,
+  "status": "closed",
+  "version": 3
+}
+== read-back: meetings.get ==
+{
+  "agenda": [
+    {
+      "closed_at": "2026-11-24T07:55:12.305673Z",
+      "defer_reason": null,
+      "evidence_refs": [
+        {
+          "kind": "document",
+          "ref": "docs/plans/T19/evidence.md"
+        }
+      ],
+      "id": "01a20c8b-336f-7978-9efa-3f793cd1a974",
+      "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+      "outcome": "decision",
+      "outcome_ref": null,
+      "participating_departments": [],
+      "resolved_id": "01a20c89-5d47-754f-a183-b5074804c7d3",
+      "resolved_kind": "approval",
+      "sequence": 1,
+      "version": 2
+    },
+    {
+      "closed_at": "2026-11-24T08:19:08.868783Z",
+      "defer_reason": null,
+      "evidence_refs": [
+        {
+          "kind": "document",
+          "ref": "docs/plans/T19/evidence.md"
+        }
+      ],
+      "id": "01a20c8b-5d14-77b6-9f8c-0fbebd5b8556",
+      "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+      "outcome": "decision",
+      "outcome_ref": null,
+      "participating_departments": [],
+      "resolved_id": "01a20c89-bc7e-791c-b9cf-381d0b352562",
+      "resolved_kind": "approval",
+      "sequence": 2,
+      "version": 2
+    }
+  ],
+  "attendance": [
+    {
+      "delegated_from": null,
+      "department_id": null,
+      "id": "01a20c8a-d7c0-752b-bcdc-310e4b5d8626",
+      "invitation_state": "accepted",
+      "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+      "participant_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "participant_kind": "app_user",
+      "response_state": "accepted",
+      "seat": "chair",
+      "version": 2
+    }
+  ],
+  "instruments": {
+    "action_closure": 0.0,
+    "agenda_conversion": 1.0,
+    "commitment_slippage": 0,
+    "decision_latency_seconds": 176,
+    "decisions": 2,
+    "decisions_per_meeting": 2.0,
+    "items": 2,
+    "open_items": 0,
+    "participant_hours": 0.45666666666666667,
+    "person_hours_per_decision": 0.22833333333333333,
+    "quorum_miss_rate": 0.0
+  },
+  "meeting": {
+    "cadence_slot": null,
+    "card_id": "01a20c8a-3370-7a8f-b903-faf5f7cff917",
+    "card_name": "T19 live gate \u2014 decision forum",
+    "closed_at": "2026-11-24T08:19:39.998094Z",
+    "convener_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+    "convener_kind": "app_user",
+    "decision_rule": "majority",
+    "decision_window_end": "2026-12-01T07:52:15.788899Z",
+    "id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+    "meeting_type": "t19-live-gate",
+    "meeting_type_name": "T19 live gate",
+    "meeting_type_version": 1,
+    "opens_at": "2026-11-24T07:52:15.788899Z",
+    "retirement_candidate": false,
+    "status": "closed",
+    "version": 3
+  },
+  "meeting_type": {
+    "agenda_sources": [],
+    "allowed_outcomes": [
+      "decision",
+      "commitment",
+      "action",
+      "information",
+      "deferred"
+    ],
+    "convener_authority": {},
+    "decision_rule": "majority",
+    "decision_window_seconds": 604800,
+    "evidence_minimum": 0,
+    "id": "01a20c8a-3163-7882-88b2-f157e9a466ab",
+    "key": "t19-live-gate",
+    "name": "T19 live gate",
+    "purpose": "",
+    "quorum": 1,
+    "required_participation": [],
+    "status": "active",
+    "timebox_seconds": 3600,
+    "version": 1
+  },
+  "positions": [
+    {
+      "agenda_item_id": "01a20c8b-336f-7978-9efa-3f793cd1a974",
+      "commitment": null,
+      "conditions": [],
+      "id": "01a20c8d-008c-7930-9e82-86e3e7714283",
+      "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+      "participant_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "participant_kind": "app_user",
+      "rationale": "",
+      "recorded_at": "2026-11-24T07:54:57.015436Z",
+      "stance": "approve",
+      "surface": "web",
+      "version": 1
+    },
+    {
+      "agenda_item_id": "01a20c8b-5d14-77b6-9f8c-0fbebd5b8556",
+      "commitment": null,
+      "conditions": [],
+      "id": "01a20ca3-269c-73ee-aace-fdc8e4f173c8",
+      "meeting_id": "01a20c8a-33ac-7f2a-b02f-0d2165ef05d5",
+      "participant_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "participant_kind": "app_user",
+      "rationale": "",
+      "recorded_at": "2026-11-24T08:19:08.538639Z",
+      "stance": "approve",
+      "surface": "mcp",
+      "version": 1
+    }
+  ]
+}

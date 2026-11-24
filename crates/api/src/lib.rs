@@ -416,9 +416,15 @@ mod tests {
         let registry = conveyor_actions::registry();
         // T17 (#87) adds the five `authoring.*` actions: 513 -> 518.
         // T19 (#606) adds the twelve `meetings.*` actions: 518 -> 530.
+        // T5 (#77) adds eight internal kata actions: 530 -> 538; external stays 18.
+        // S21 step 9 (#649) adds `cards.assign`: 538 -> 539.
+        // T6 (#80) adds nine internal `development_projects.*` actions: 539 -> 548.
+        // T8 (#79) adds three internal `lessons.*` actions: 548 -> 551. T6 (#80) adds ten
+        // internal development-project actions and `cards.assign`; the lane adds its own family.
+        // The merged registry is 586: 567 internal, 19 external.
         assert_eq!(
             registry.len(),
-            572,
+            586,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \

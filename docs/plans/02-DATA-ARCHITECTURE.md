@@ -1448,6 +1448,26 @@ is data, never instruction; it renders after the current-step line inside the pr
 section budget refuses with the measured size rather than truncating. A workflow node without a
 `process_step_id` keeps today's rendering (residual).
 
+### 2.29 The card handoff — S21 step 9 (0 new tables)
+
+`cards.assign` writes existing rows in one transaction and starts the run through the same path
+`runs.create` uses; no table, no column, no migration.
+
+| Row | What the handoff reads or writes |
+|---|---|
+| `card` | **write**: `job_binding_id` (an active, tenant-scoped binding) and `version`; **read**: id, board, archive state |
+| `job_binding` | **read**: the active check, and through `insert_run_tx` the release pin and its snapshot |
+| `work_package_memory` | **write**: one hot row (`kind` defaults to `fact`, `source` from the actor, `run_id` set, `meta` free detail) through the shared `remember_tx`; the next prompt's Memory selector reads it (§2.27) |
+| `run` | **write**: one root run — the card's next attempt, the binding inherited, `parent_run_id IS NULL`; `uq_run_live` refuses a second live run with a typed 409 (§3.2) |
+| `job` | **write**: one `run.execute` job in the same transaction |
+| `event` | **write**: `card.updated`, `memory.recorded`, `run.created` |
+| `andon_state` | **read**: an engaged cord refuses the handoff before any write |
+
+The handoff is the level's entry (SPEC_V2 §6.6.1–5): the card names the binding, the note is memory,
+the run starts. It is not a lane move — `cards.move` changes no run and writes no memory. It accepts
+no `release_hash` (the binding is the pin) and writes no `run_step`; the run's first step is the
+executor's own (S21 step 4).
+
 ## 3. State machines and enforcement
 
 Every transition is a pure function in `crates/domain`; no DB trigger, no per-flow rule, no CHECK that
@@ -1491,7 +1511,10 @@ card's hot rows and the digest (§2.27); a process run's attempt is read by the 
 its declared `outputs`/`action_text`/`gate_kind` from the frozen `process_step` row, renders one
 request document in the process section and passes the same document to the step's laya judge
 (§2.28). A synthetic run-level `internal_agent` step declares none: its release definition is the
-request and its executor envelope never renders.
+request and its executor envelope never renders. **The handoff (S21 step 9)** writes the card's
+`job_binding_id`, the handoff note as a hot memory row, and the run itself in one transaction,
+starting the run through the same helper `runs.create` uses. The live-run invariant is the gate: a
+card with a live root run refuses the handoff `409 card_has_live_run` before any write (§2.29).
 
 ### 3.3 Approval
 

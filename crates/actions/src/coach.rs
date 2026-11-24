@@ -1345,11 +1345,12 @@ async fn coach_remedy(
             project_of_card_tx(&mut *tx, ctx.tenant, interruption.interrupted_card_id).await?;
         match policy.kata.clone() {
             Some(pin) => {
-                let opened = crate::kata::kata_open(
+                let (kata, candidate) = crate::kata::coach_open(
                     &mut *tx,
                     ctx.clone(),
-                    crate::kata::KataOpenIn {
+                    crate::kata::CoachKataOpenIn {
                         project_id,
+                        card_id: interruption.interrupted_card_id,
                         signature: interruption.signature.clone(),
                         instrument_kind: pin.instrument_kind,
                         instrument_id: pin.instrument_id,
@@ -1360,19 +1361,17 @@ async fn coach_remedy(
                         base_ref: pin.base_ref,
                     },
                 )
-                .await?
-                .value;
-                let id = Uuid::parse_str(&opened.id).map_err(|error| {
-                    tracing::error!(%error, "coach.remedy: the kata id is not a uuid");
-                    ActionError::internal()
-                })?;
-                store::coach::set_kata_candidate_tx(&mut *tx, ctx.tenant, interruption.id, id)
-                    .await
-                    .map_err(|error| {
-                        store_failure("coach.remedy: record the kata candidate", error)
-                    })?;
-                effect["kata_id"] = json!(opened.id);
-                kata_id = Some(opened.id);
+                .await?;
+                store::coach::set_kata_candidate_tx(
+                    &mut *tx,
+                    ctx.tenant,
+                    interruption.id,
+                    candidate,
+                )
+                .await
+                .map_err(|error| store_failure("coach.remedy: record the kata candidate", error))?;
+                effect["kata_id"] = json!(kata.to_string());
+                kata_id = Some(kata.to_string());
             }
             None => {
                 let approval = open_gate_tx(
