@@ -396,6 +396,53 @@ pub async fn get_meeting_type_tx(
         .map_err(MeetingStoreError::from)
 }
 
+/// List the tenant's forum policies, newest version first per key.
+pub async fn list_meeting_types_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    key: Option<&str>,
+    status: Option<&str>,
+    limit: i64,
+) -> Result<Vec<MeetingTypeRecord>> {
+    let sql = format!(
+        "SELECT {MEETING_TYPE_COLUMNS} FROM meeting_type
+          WHERE tenant_id = $1
+            AND ($2::text IS NULL OR key = $2)
+            AND ($3::text IS NULL OR status = $3)
+          ORDER BY key, version DESC
+          LIMIT $4"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(key)
+        .bind(status)
+        .bind(limit.clamp(1, 200))
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// Read one policy by key, at an exact version or (when omitted) the latest non-retired one.
+pub async fn get_meeting_type_by_key_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    key: &str,
+    version: Option<i64>,
+) -> Result<Option<MeetingTypeRecord>> {
+    let sql = format!(
+        "SELECT {MEETING_TYPE_COLUMNS} FROM meeting_type
+          WHERE tenant_id = $1 AND key = $2
+            AND ($3::bigint IS NULL OR version = $3)
+            AND ($3::bigint IS NOT NULL OR status <> 'retired')
+          ORDER BY version DESC LIMIT 1"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(key)
+        .bind(version)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
 // ── schedule / open ─────────────────────────────────────────────────────────────────────
 
 pub async fn schedule_tx(
@@ -552,6 +599,70 @@ pub async fn schedule_tx(
     get_meeting_tx(&mut *conn, tenant, meeting_id)
         .await?
         .ok_or(MeetingStoreError::NotFound("meeting"))
+}
+
+/// The human title of a cadence instance; the type's name is added by the meeting row.
+fn cadence_title(cadence: &crate::spine::CadenceRecord) -> String {
+    let label = match cadence.kind.as_str() {
+        "pi" => "PI planning",
+        "sprint" => "Sprint",
+        "demo" => "System demo",
+        "retro" => "Inspect & adapt",
+        "refinement" => "Refinement",
+        other => other,
+    };
+    format!("{label} · {}", cadence.period)
+}
+
+/// Materialise the meeting a cadence row names. The row must carry a `meeting_type_key`; a
+/// second call returns the existing non-cancelled instance, and the partial unique index is
+/// the database's promise behind that check.
+pub async fn materialise_cadence_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    actor: MeetingActor<'_>,
+    cadence: &crate::spine::CadenceRecord,
+    list_id: Uuid,
+    board_id: Option<Uuid>,
+) -> Result<MeetingRecord> {
+    let Some(key) = cadence
+        .meeting_type_key
+        .as_deref()
+        .map(str::trim)
+        .filter(|key| !key.is_empty())
+    else {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "cadence_type_missing",
+            detail: "the cadence row names no meeting type; set meeting_type_key first".into(),
+        });
+    };
+    let existing: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM meeting
+          WHERE tenant_id = $1 AND cadence_slot = $2 AND status <> 'cancelled'
+          ORDER BY created_at DESC LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence.id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    if let Some(id) = existing {
+        return get_meeting_tx(conn, tenant, id)
+            .await?
+            .ok_or(MeetingStoreError::NotFound("meeting"));
+    }
+    let title = cadence_title(cadence);
+    let new = NewMeeting {
+        meeting_type_key: key,
+        policy: None,
+        title: &title,
+        description: "",
+        list_id,
+        board_id,
+        convener_kind: "app_user",
+        convener_id: actor.id,
+        cadence_slot: Some(cadence.id),
+    };
+    schedule_tx(conn, tenant, actor, &new).await
 }
 
 pub async fn open_tx(

@@ -90,4 +90,4 @@ additional entry, not a replacement; a body without a type keeps the direct path
 
 Deliver T19F in the split the delivery contract writes: the plan and artefacts (#682), the
 implementation (#683) and the deployment-gated proof (#684). The live proof waits for the rollout
-that carries migration 0068; it is recorded as acceptance-blocked, never waived.
+that carries migration 0072; it is recorded as acceptance-blocked, never waived.

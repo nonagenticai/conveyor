@@ -1176,8 +1176,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19F-meeting-bindings.html",
       "source": "docs/plans/T19F-meeting-bindings.md",
       "section": "Plans",
-      "sha256": "b55d45b97942b6e8e99c48c3ec83d10cd7a978ada2ea1c2915ee60f3750a11eb",
-      "bytes": 14656,
+      "sha256": "36f5dd18cd786a154d2f75520763773d68e9316eec50c30e543a2e7bd1c096d1",
+      "bytes": 14639,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F-meeting-bindings.md"
     },
     {
@@ -1185,7 +1185,7 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19F/architecture-design.html",
       "source": "docs/plans/T19F/architecture-design.md",
       "section": "Plans",
-      "sha256": "56e9beb0b754d87260d1e61e8611f6344343c844f862b1dbfbb316f95cb035fe",
+      "sha256": "ed58e39bddfb8c7bd659d53717316a366bf91d5f5be4a889d9c0c582a64f31f4",
       "bytes": 6276,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/architecture-design.md"
     },
@@ -1203,7 +1203,7 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19F/inception-analysis.html",
       "source": "docs/plans/T19F/inception-analysis.md",
       "section": "Plans",
-      "sha256": "d8411fc4348cd72f7ff0b296713cb37c9f263376c6c91198ec41ad1d694ed76d",
+      "sha256": "55162f716afe6aa45fb72f2873500118b621e1f85766f01daa0a835dced10f22",
       "bytes": 5821,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/inception-analysis.md"
     },
@@ -1230,7 +1230,7 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19F/safe-epic.html",
       "source": "docs/plans/T19F/safe-epic.md",
       "section": "Plans",
-      "sha256": "6e87daefcbd4af476cabaf74e96a16e19f4762ac5b526ba9f338009c9d961bac",
+      "sha256": "a2cce62d6205b2ae424ba33216715ae42473e9376aa91fac318ccdf3c7620e51",
       "bytes": 2699,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/safe-epic.md"
     },

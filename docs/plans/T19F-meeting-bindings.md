@@ -1,12 +1,12 @@
 ---
 slice: T19F
 title: Decision-forum governance — policy authoring and the T9/T10 binding
-status: proposed
+status: built
 depends_on: [T19, T17, T9, T10, P0]
 spec_sections: ["§6.8", "§8.1", "§8.2", "§8.3", "§12 T19", "§12 T19F", "D66"]
 adds_tables: []
 adds_actions: [meetings.type_list, meetings.type_get, architecture.board_sit_open, architecture.board_sit_decide, cadences.materialise]
-adds_events: [meeting_type.published]
+adds_events: []
 adds_modules: []
 parity_ids: []
 ---
@@ -103,7 +103,7 @@ RLS and audit rules are the existing rows'.
 
 ### P1 — The policy authoring route
 
-Migration `0068_meeting_bindings.sql`; the `authoring.publish` hook; `meetings.type_list/get`.
+Migration `0072_meeting_bindings.sql`; the `authoring.publish` hook; `meetings.type_list/get`.
 
 - Given a live meeting pinned to a policy's v1, when a reviewed `kind=policy` asset for the same key
   is published, then a v2 row exists and the meeting still resolves v1.
@@ -172,7 +172,7 @@ governance chain, the live gate and the strict programme publish.
 
 ## 6. Data model
 
-`migrations/0068_meeting_bindings.sql`, additive only:
+`migrations/0072_meeting_bindings.sql`, additive only:
 
 | Object | Change |
 |---|---|
@@ -194,7 +194,8 @@ No new table. No FK on a versioned key: the actions resolve the latest non-retir
 | `cadences.materialise` | write | idempotent per cadence slot |
 | `authoring.publish` | write (changed) | a `kind=policy` payload writes the next `meeting_type` version |
 
-Events: `meeting_type.published` on the authoring publish. The meeting events stay T19's.
+No new event: the authoring publish keeps T17's event surface, and the meeting events stay
+T19's.
 
 ## 8. The programme
 

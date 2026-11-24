@@ -104,7 +104,7 @@ Nothing else is added.
 
 | Standard | Use |
 |---|---|
-| Rust + sqlx, AdditiveForward migrations | migration 0068 |
+| Rust + sqlx, AdditiveForward migrations | migration 0072 |
 | One ActionSpec per action | HTTP + MCP + OpenAPI + generated client |
 | RLS and tenant scoping | every altered table keeps `ENABLE`+`FORCE ROW LEVEL SECURITY` |
 | Deterministic generators | seed, coverage and docs are regenerated, never hand-edited |

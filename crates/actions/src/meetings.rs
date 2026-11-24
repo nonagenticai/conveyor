@@ -22,7 +22,10 @@ use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 use crate::views::Page;
 
-fn meeting_error(error: store::meetings::MeetingStoreError, action: &str) -> ActionError {
+pub(crate) fn meeting_error(
+    error: store::meetings::MeetingStoreError,
+    action: &str,
+) -> ActionError {
     use store::meetings::MeetingStoreError as E;
     match error {
         E::Database(error) => store_error(error, action),
@@ -995,6 +998,110 @@ async fn meetings_list(
         items: rows.into_iter().map(Into::into).collect(),
         next_cursor: None,
     }))
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct TypeListIn {
+    /// Exact-match policy key.
+    #[serde(default)]
+    pub key: Option<String>,
+    /// `draft | active | retired`; every status when omitted.
+    #[serde(default)]
+    pub status: Option<String>,
+    /// Page size; 50 by default, at most 200.
+    #[serde(default)]
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct TypeGetIn {
+    /// The policy row.
+    #[serde(default)]
+    pub id: Option<Uuid>,
+    /// The policy key; used when `id` is absent.
+    #[serde(default)]
+    pub key: Option<String>,
+    /// The exact version; the latest non-retired version when omitted.
+    #[serde(default)]
+    pub version: Option<i64>,
+}
+
+/// `meetings.type_list` — the tenant's forum policies, newest version first per key.
+#[crate::action(
+    name = "meetings.type_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn meetings_type_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: TypeListIn,
+) -> Result<HandlerOutput<Page<MeetingTypeOut>>, ActionError> {
+    if let Some(status) = input.status.as_deref()
+        && !matches!(status, "draft" | "active" | "retired")
+    {
+        return Err(invalid(
+            "status",
+            "invalid_value",
+            "status must be draft, active or retired",
+        ));
+    }
+    let rows = store::meetings::list_meeting_types_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.key.as_deref(),
+        input.status.as_deref(),
+        input.limit.unwrap_or(50),
+    )
+    .await
+    .map_err(|error| meeting_error(error, ctx.action))?;
+    Ok(HandlerOutput::ok(Page {
+        items: rows.into_iter().map(Into::into).collect(),
+        next_cursor: None,
+    }))
+}
+
+/// `meetings.type_get` — one policy by id, or by key at a version (latest when omitted).
+#[crate::action(
+    name = "meetings.type_get",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn meetings_type_get(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: TypeGetIn,
+) -> Result<HandlerOutput<MeetingTypeOut>, ActionError> {
+    let record = match (input.id, input.key.as_deref()) {
+        (Some(id), _) => store::meetings::get_meeting_type_tx(&mut *tx, ctx.tenant, id).await,
+        (None, Some(key)) => {
+            store::meetings::get_meeting_type_by_key_tx(&mut *tx, ctx.tenant, key, input.version)
+                .await
+        }
+        (None, None) => {
+            return Err(invalid(
+                "id",
+                "required",
+                "supply the policy's id or its key",
+            ));
+        }
+    }
+    .map_err(|error| meeting_error(error, ctx.action))?
+    .ok_or_else(|| ActionError::resource_not_found("meeting type"))?;
+    let version = record.version;
+    Ok(HandlerOutput::ok(record.into()).with_etag(version.to_string()))
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
