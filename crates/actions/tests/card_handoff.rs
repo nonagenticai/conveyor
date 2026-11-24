@@ -1024,11 +1024,19 @@ async fn a_stale_card_is_refused() {
         .await;
     assert_eq!(status, 200, "{updated}");
 
+    // The handoff is complete; the stale version is the only thing under test.
+    let artifact = seed_artifact(&pg, seeded.tenant).await;
     let (status, body) = running
         .invoke(
             "cards.assign",
             TOKEN,
-            json!({"card_id": card_id, "job_binding_id": binding, "note": "stale"}),
+            json!({
+                "card_id": card_id,
+                "job_binding_id": binding,
+                "note": "stale",
+                "acceptance": ["the handoff is accepted"],
+                "artifact_ids": [artifact],
+            }),
             Some(&stale),
             None,
             None,
