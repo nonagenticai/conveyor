@@ -3353,7 +3353,12 @@
    ],
    "failure_scenario": "S06b is recorded built while its agent-facing contract is untested; the gap is deferred indefinitely to S14.",
    "acceptance": "Run a real agent task end to end and record the run id, project id and one decision.",
-   "owner_project": "S06"
+   "owner_project": "S06",
+   "resolved_by": {
+    "commit": "c7276278c9eae17f89268ed487e2aa6aba7a77ae",
+    "test": "crates/api/tests/mcp_agent.rs::one_licence_principal_task_creates_reads_decides_and_closes",
+    "evidence": "cargo test -p conveyor-api --test mcp_agent: 5 passed; S06B-RECEIPT run_id 01a20f5f-1bc0-797b-bb83-d2631bb99e4b, project 01a20f5f-1b4b-75d6-96b6-085894e841ca, decided_by_kind agent; docs/evidence/S06b-agent-task.md (2026-11-24 update)"
+   }
   },
   {
    "id": "v1-s06-3",
