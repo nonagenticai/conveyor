@@ -30,8 +30,9 @@ receipt is `docs/evidence/S21-REQUEST.md`. Step 9 (the work package's handoff �
 assigns the binding, records what the receiver must know and starts the bound run) is **built and
 merged, #649/PR #651, 2026-11-24**; the design is §21 and the receipt is
 `docs/evidence/S21-HANDOFF.md`. Step 10 (the L1 laya gate — the ladder builds the case, the engine
-makes the call and the decision cites the recorded exchange) is **built, #656, 2026-11-24**; the
-design is §22, the decision record ADR 0018 and the receipt `docs/evidence/S21-LAYA.md`.
+makes the call and the decision cites the recorded exchange) is **open, #656**; the design is §22,
+the decision record ADR 0018 and the receipt `docs/evidence/S21-LAYA.md` (built; the merge is the
+PR's last CI run).
 **Depends on:** S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps),
 S09 (`retrieval.query` / `strata` packs).
 **Owner ruling:** George, 2026-11-09 — *a prompt is a run-time compilation from the procedure and the

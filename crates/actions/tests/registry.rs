@@ -128,10 +128,11 @@ use serde_json::{Value, json};
 /// organisational-memory lifecycle. 548 → **551**. **T15 (#86) adds 10 internal**:
 /// `toolkits.import_openapi|register_mcp|discover_mcp`, `tool_authoring.draft|validate|test|`
 /// `review|publish|promote` and the broker's registered-destination dispatch `tools.dispatch`
-/// — 551 → **561**; T12 (#88) adds the three remaining kata Gets → **564**. **S21 step 10
-/// (#656) adds 4**: `ladder.case` and `decision_option_sets.get|set` (internal) and
-/// `ladder.precheck` (external) — 564 → **568**, internal 546 → 549, external 18 → 19.
-const EXPECTED: [&str; 568] = [
+/// — 551 → **561**; T12 (#88) adds the three remaining kata Gets → **564**; #655 (T17b) adds
+/// `authoring.intakes` → **565**. **S21 step 10 (#656) adds 4**: `ladder.case` and
+/// `decision_option_sets.get|set` (internal) and `ladder.precheck` (external) — 565 → **569**,
+/// internal 547 → 550, external 18 → 19.
+const EXPECTED: [&str; 569] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -182,6 +183,7 @@ const EXPECTED: [&str; 568] = [
     "authoring.assets",
     "authoring.draft",
     "authoring.intake",
+    "authoring.intakes",
     "authoring.publish",
     "authoring.review",
     "baselines.get",
@@ -813,9 +815,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // registered-destination arm, not a new external declaration.
     // T12 (#88) adds three internal kata Gets (`kata.standardise|sustain|stretch`):
     // internal 543 -> 546; external stays 18.
+    // #655 (T17b) adds one internal read (`authoring.intakes`): internal 546 -> 547;
+    // external stays 18 — the queue reads this tenant's own intake rows.
     // S21 step 10 (#656) adds three internal actions (`ladder.case`, `decision_option_sets.get|set`)
-    // and one external (`ladder.precheck`): internal 546 -> 549, external 18 -> 19.
-    assert_eq!((internal, external), (549, 19));
+    // and one external (`ladder.precheck`): internal 547 -> 550, external 18 -> 19.
+    assert_eq!((internal, external), (550, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

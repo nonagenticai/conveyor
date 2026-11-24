@@ -2,12 +2,12 @@
 //! Tenant asset authoring — the intake brief and the asset drafts it produces (SPEC_V2 §5.7,
 //! §10.4; T17 #87, ported from #526, finding v1-w3b-3).
 //!
-//! The family is three writes around one lifecycle (`0068_authoring.sql`):
+//! The family is four writes and two reads around one lifecycle (`0064_authoring.sql`):
 //!
 //! ```text
 //! intake_create ──► asset_draft (status='draft') ──► asset_review ──► asset_publish
-//!                                                      │ reviewed  ──► published
-//!                                                      └ rejected
+//!       │                                              │ reviewed  ──► published
+//!       └── intake_list (the queue)                    └ rejected
 //! ```
 //!
 //! # The rules this module is the first lock for
@@ -257,6 +257,28 @@ pub async fn intake_create_tx(
         .bind(sources)
         .bind(actor)
         .fetch_one(&mut *conn)
+        .await?)
+}
+
+/// List the tenant's intakes, newest `created_at` first.
+///
+/// `status` is an optional exact-match filter (`open`/`closed`); a value outside the set simply
+/// matches nothing — this is a read, not a write rule.
+pub async fn intake_list_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    status: Option<&str>,
+) -> Result<Vec<IntakeRecord>, AuthoringStoreError> {
+    let sql = format!(
+        "SELECT {INTAKE_COLUMNS} FROM authoring_intake
+          WHERE tenant_id = $1
+            AND ($2::text IS NULL OR status = $2)
+          ORDER BY created_at DESC, id DESC"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(status)
+        .fetch_all(&mut *conn)
         .await?)
 }
 

@@ -942,8 +942,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "1363f2d2012d4c99b3b480ab8de88a5c974f36e81bb9d7b23502cff9a4cc577c",
-      "bytes": 259142,
+      "sha256": "b8a0a1edadb3622f7e7e38653cb1765ae3462036963ad051f0ffdcc917a814e6",
+      "bytes": 259149,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -1572,8 +1572,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "7eb951c6d9ec544698726514bd92d25090a11c9ed2835fe7adef3d38761d535f",
-      "bytes": 58158,
+      "sha256": "0dca766d1d244ee9e415c15077ec2311311571636f3b81877b08a25eca7e11c8",
+      "bytes": 58188,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

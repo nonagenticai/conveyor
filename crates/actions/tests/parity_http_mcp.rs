@@ -7312,6 +7312,7 @@ fn authoring_samples() -> Vec<Sample> {
             ),
             201,
         ),
+        expecting(plain("authoring.intakes", json!({"limit": 50}), None), 200),
         {
             let mut sample = plain("authoring.draft", json!({}), None);
             sample.prepare = true;
