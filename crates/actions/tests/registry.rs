@@ -144,9 +144,9 @@ use serde_json::{Value, json};
 /// **The #526 merge keeps both families**: the lane's `ladder.prepare` (internal) and
 /// `laya.classify` (external), and main's T12 kata Gets and `authoring.intakes`. Main's
 /// #656 `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` are retired
-/// with their handlers, so they do not appear here. The merged registry is
-/// **603: 584 internal, 19 external**.
-const EXPECTED: [&str; 603] = [
+/// with their handlers, so they do not appear here. T11's `metrics.reconciliation` read adds
+/// one internal action: **604: 585 internal, 19 external**.
+const EXPECTED: [&str; 604] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -477,6 +477,7 @@ const EXPECTED: [&str; 603] = [
     "metrics.maturity",
     "metrics.programme",
     "metrics.reconcile",
+    "metrics.reconciliation",
     "metrics.threshold_get",
     "metrics.threshold_update",
     "metrics.usage",
@@ -849,8 +850,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // The merge keeps main's T12 kata Gets (`kata.standardise|sustain|stretch`) and
     // `authoring.intakes` — four internal actions — and retires main's #656
     // `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` with their handlers.
-    // Final: 584 internal + 19 external = 603.
-    assert_eq!((internal, external), (584, 19));
+    // T11's `metrics.reconciliation` read adds one internal action.
+    // Final: 585 internal + 19 external = 604.
+    assert_eq!((internal, external), (585, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

@@ -8607,6 +8607,7 @@ fn spine_samples() -> Vec<Sample> {
         ),
         expecting(plain("metrics.maturity", json!({}), None), 200),
         expecting(plain("metrics.flow", json!({}), None), 200),
+        expecting(plain("metrics.reconciliation", json!({}), None), 200),
         expecting(
             plain("metrics.usage", json!({"level": "tenant"}), None),
             200,
