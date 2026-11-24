@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1dcb8-d24b-76de-b901-56fd56e001bc\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 0",
-      "exit": 0,
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "exit": 1,
       "id": "P0-charter",
       "kind": "command",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0",
-      "stderr": "",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -169,7 +169,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'P0-closure-outputs' did not pass; the gate check 'P0-benefit-baseline' did not pass; the gate check 'P0-artefact-standard' did not pass; the gate check 'P0-rework' did not pass",
+      "detail": "the gate check 'P0-charter' did not pass; the gate check 'P0-closure-outputs' did not pass; the gate check 'P0-benefit-baseline' did not pass; the gate check 'P0-artefact-standard' did not pass; the gate check 'P0-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -186,24 +186,25 @@
     }
   ],
   "failures": [
+    "P0-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "P0-closure-outputs (P0): the project declares no closure_outputs",
     "P0-benefit-baseline (P1): benefit 01a1e9df-0c4b-7807-b35c-5810ec418d45 baseline is not a structured measurement: 'not measured - no instrument exists (recorded as a kata on the kata project)'",
     "P0-artefact-standard (P1): 25 mandatory artefact package(s) open: std-pmp-closure-review-p0:P0, std-pmp-project-brief-p0:P0, std-togaf-benefits-diagram-p0:P0, std-togaf-candidate-solutions-p0:P0, std-togaf-phase-g-p0-g:P0, std-togaf-phase-h-p0-h:P0, std-togaf-project-context-diagram-p0:P0, dr-w4-proj-change-control-placeholder:P0, +17 more",
     "P0-rework (P0): 7 unresolved P0/P1 package(s): std-pmp-closure-review-p0:P0 (P1), std-pmp-project-brief-p0:P0 (P1), std-togaf-benefits-diagram-p0:P0 (P1), std-togaf-candidate-solutions-p0:P0 (P1), std-togaf-phase-g-p0-g:P0 (P1), std-togaf-phase-h-p0-h:P0 (P1), std-togaf-project-context-diagram-p0:P0 (P1)",
-    "gate (P0): the gate check 'P0-closure-outputs' did not pass; the gate check 'P0-benefit-baseline' did not pass; the gate check 'P0-artefact-standard' did not pass; the gate check 'P0-rework' did not pass",
+    "gate (P0): the gate check 'P0-charter' did not pass; the gate check 'P0-closure-outputs' did not pass; the gate check 'P0-benefit-baseline' did not pass; the gate check 'P0-artefact-standard' did not pass; the gate check 'P0-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The definition set is published; the charter and scope baseline are approved; the closure review and close gate are recorded.",
-  "generated_at": "2026-11-24T18:05:31.784808+00:00",
+  "generated_at": "2026-11-24T20:29:56.184514+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/P0.toml",
   "name": "Programme definition \u2014 vision, blueprint, plan and project briefs",
   "project": "P0",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T16:58:37.395498+00:00",
-    "git_sha": "d0fbc638d538ea66e4ab5abb74e2ddcc0ad2e8d9",
-    "path": "retained-snapshot/d0fbc638d538ea66e4ab5abb74e2ddcc0ad2e8d9"
+    "generated_at": "2026-11-24T18:25:22.625551+00:00",
+    "git_sha": "ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47",
+    "path": "retained-snapshot/ff90dd84a2983f5dc4fd0b69e6131c9b5af4ca47"
   },
   "verdict": "red",
   "warnings": []
