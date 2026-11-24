@@ -19,14 +19,17 @@ use std::pin::Pin;
 use conveyor_auth::Role;
 use conveyor_domain::TenantId;
 use conveyor_domain::executor::ExecutorKind;
-use conveyor_domain::ladder::{Outcome, unavailable};
+use conveyor_domain::ladder::{FailAction, FailPolicy, Outcome, unavailable};
 use conveyor_store as store;
 use conveyor_workflow::trace::hash_value;
 use serde_json::{Value, json};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::invoke::{ActionError, Authority, InvokeRequest, invoke};
+use crate::invoke::{
+    ActionError, Authority, GateUnavailable, InvokeRequest, invoke, invoke_with_timeout,
+    record_unavailable_decision,
+};
 use crate::process::judge;
 use crate::registry::registry;
 
@@ -719,8 +722,11 @@ async fn decide(
         }
     };
     let classify_key = format!("{prefix}:classify");
+    // SPEC_V2 §10.2: the tenant's configured laya budget bounds this classify call; the
+    // invoker caps it at the action's own 3 s hard budget, so the override can only lower it.
+    let laya_timeout_ms = u64::try_from(laya_config.timeout_ms).ok();
     let started = std::time::Instant::now();
-    let judged = invoke(
+    let judged = invoke_with_timeout(
         pool,
         registry(),
         tenant,
@@ -742,6 +748,7 @@ async fn decide(
             usage: None,
             credential_alias: None,
         },
+        laya_timeout_ms,
     )
     .await;
     let latency_ms = i32::try_from(started.elapsed().as_millis()).ok();
@@ -768,6 +775,8 @@ async fn decide(
 
     let Some(verdict) = verdict else {
         let outcome = unavailable(fail_policy, action);
+        let note = (fail_policy == FailPolicy::Open && action == FailAction::Annotate)
+            .then(|| "laya unavailable: the laya judge did not decide".to_owned());
         let judge_doc = json!({
             "decision": "unavailable",
             "outcome": outcome_str(outcome),
@@ -778,6 +787,47 @@ async fn decide(
             "laya_config_id": laya_config.id.to_string(),
             "latency_ms": latency_ms,
         });
+        // §7.2 (v1-w1c-5): the outage is an outcome, not an absent decision. The ladder's own
+        // `ladder.evaluate` never runs on this path, so the row is recorded here — in its own
+        // transaction, with the same fail_policy/action/note payload the invocation boundary
+        // records for a refused `ladder.evaluate`.
+        let mut decision_meta = judge_doc.clone();
+        if let Some(meta) = decision_meta.as_object_mut() {
+            meta.insert("run_id".to_owned(), json!(run.id));
+            meta.insert("card_id".to_owned(), json!(run.card_id));
+            meta.insert("job_binding_id".to_owned(), json!(binding.id));
+            meta.insert("release_hash".to_owned(), json!(binding.release_hash));
+            meta.insert("draft_document_id".to_owned(), json!(document_id));
+            if let Some(note) = note.as_ref() {
+                meta.insert("note".to_owned(), json!(note));
+            }
+        }
+        let outage = GateUnavailable {
+            fail_policy,
+            action,
+            outcome,
+            note,
+            policy_id: policy.policy.id,
+            policy_version: Some(policy.policy.version),
+            policy_refinement_id: policy.refinement.as_ref().map(|row| row.id),
+            refinement_version: policy.refinement.as_ref().map(|row| row.version),
+            laya_config_id: Some(laya_config.id),
+            laya_config_version: Some(laya_config.version),
+            input_hash: hash_value(&request),
+        };
+        record_unavailable_decision(
+            pool,
+            tenant,
+            &outage,
+            GATE_KIND,
+            judge::JUDGE_QUESTION,
+            Some(run.project_id),
+            run.card_id,
+            decision_meta,
+            "service",
+            Some(actor_id),
+        )
+        .await;
         // An open gate whose configured action is handover parks the draft for a person; a
         // refused outcome (closed, or block) fails closed with `gate_unavailable`.
         let escalation = matches!(outcome, Outcome::Escalated).then_some(Escalation {

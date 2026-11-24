@@ -45,8 +45,9 @@ use sqlx::PgConnection;
 use uuid::Uuid;
 
 use crate::control::{etag_of, invalid, parent_error, require_precondition_with, store_error};
-use crate::invoke::{ActionError, HandlerCtx};
-use crate::spec::HandlerOutput;
+use crate::invoke::{ActionError, GateUnavailable, HandlerCtx};
+use crate::process::judge::{LAYA_DEFAULT_TIMEOUT_MS, LAYA_HARD_TIMEOUT_MS};
+use crate::spec::{FieldError, HandlerOutput};
 use crate::views::Page;
 
 pub(crate) mod laya;
@@ -663,7 +664,7 @@ pub struct LayaConfigCreateIn {
     pub model_ref: String,
     /// The request parameters.
     pub params: Option<Value>,
-    /// The request timeout; defaults to 30000 ms.
+    /// The request timeout; defaults to 1500 ms and is refused above the 3000 ms hard budget.
     pub timeout_ms: Option<i32>,
 }
 
@@ -684,13 +685,39 @@ async fn laya_configs_create(
     ctx: HandlerCtx,
     input: LayaConfigCreateIn,
 ) -> Result<HandlerOutput<LayaConfigOut>, ActionError> {
+    // SPEC_V2 §10.2: the seam defaults to 1500 ms and never exceeds the 3 s hard budget. A
+    // configured value above it is refused as a field failure, not silently clamped — the
+    // caller must know its budget was not accepted.
+    let timeout_ms = input.timeout_ms.unwrap_or(LAYA_DEFAULT_TIMEOUT_MS);
+    if timeout_ms > LAYA_HARD_TIMEOUT_MS {
+        let detail = format!(
+            "the conveyor→laya seam's hard budget is {LAYA_HARD_TIMEOUT_MS} ms (SPEC_V2 §10.2); \
+             {timeout_ms} ms cannot be configured"
+        );
+        return Err(
+            ActionError::new(422, "timeout_above_budget", detail.clone()).with_errors(vec![
+                FieldError {
+                    field: "timeout_ms".to_owned(),
+                    code: "timeout_above_budget".to_owned(),
+                    detail,
+                },
+            ]),
+        );
+    }
+    if timeout_ms < 1 {
+        return Err(invalid(
+            "timeout_ms",
+            "invalid_value",
+            "timeout_ms must be at least 1 ms",
+        ));
+    }
     let record = store::ladder::insert_laya_config_tx(
         &mut *tx,
         ctx.tenant,
         &NewLayaConfig {
             model_ref: input.model_ref.trim().to_owned(),
             params: input.params.unwrap_or_else(|| serde_json::json!({})),
-            timeout_ms: input.timeout_ms.unwrap_or(30_000),
+            timeout_ms,
         },
     )
     .await
@@ -1432,14 +1459,20 @@ async fn laya_plan_tx(
 /// The design applies the policy's fail behaviour without ever treating the outage as a pass:
 /// a closed policy's outcome is `refused`; an open policy's is its configured action's
 /// (`escalated`, `refused` or the annotated `accepted` the caller must apply itself). The
-/// response carries that outcome; no `decision` row is written, because there is no answer to
-/// record. Recording the outage is v1-w1c-5's own card.
+/// response carries that outcome, and the error carries the explicit payload the invocation
+/// boundary records as the outage `decision` row after this handler's transaction rolls back
+/// (finding v1-w1c-5).
 fn gate_unavailable(
+    plan: &LayaPlan,
     fail_policy: FailPolicy,
     fail_action: FailAction,
     reason: impl std::fmt::Display,
 ) -> ActionError {
     let outcome = unavailable(fail_policy, fail_action);
+    let reason = reason.to_string();
+    let note = (fail_policy == FailPolicy::Open && fail_action == FailAction::Annotate)
+        .then(|| format!("laya unavailable: {reason}"));
+    let pins = plan.effective.pins();
     ActionError::new(
         503,
         "gate_unavailable",
@@ -1449,6 +1482,19 @@ fn gate_unavailable(
             outcome.as_str()
         ),
     )
+    .with_gate_outage(GateUnavailable {
+        fail_policy,
+        action: fail_action,
+        outcome,
+        note,
+        policy_id: plan.effective.policy.id,
+        policy_version: pins.policy_version,
+        policy_refinement_id: plan.effective.refinement.as_ref().map(|row| row.id),
+        refinement_version: pins.refinement_version,
+        laya_config_id: Some(plan.config.id),
+        laya_config_version: Some(plan.config.version),
+        input_hash: crate::spec::sha256_hex(plan.request.to_string().as_bytes()),
+    })
 }
 
 /// The request `ladder.prepare` returns.
@@ -1560,7 +1606,8 @@ pub struct EvaluateIn {
 /// the `ladder.prepare` document from the same rows, requires a successful `laya.classify`
 /// replay for that exact request hash, and reads the answer from the stored response and the
 /// latency from the invocation's own `duration_ms`. A missing, forged, tampered or unreadable
-/// call is `503 gate_unavailable` and writes nothing.
+/// call is `503 gate_unavailable`; the refusal carries the policy's outcome, which the
+/// invocation boundary records as an `unavailable` decision after the transaction rolls back.
 #[crate::action(
     name = "ladder.evaluate",
     version = 1,
@@ -1642,6 +1689,7 @@ async fn ladder_evaluate(
         } => response,
         store::idempotency::Lookup::Replay { status_code, .. } => {
             return Err(gate_unavailable(
+                &plan,
                 fail_policy,
                 fail_action,
                 format!("the verified call answered {status_code}"),
@@ -1649,6 +1697,7 @@ async fn ladder_evaluate(
         }
         store::idempotency::Lookup::Miss => {
             return Err(gate_unavailable(
+                &plan,
                 fail_policy,
                 fail_action,
                 "no successful laya.classify call carries this key",
@@ -1656,6 +1705,7 @@ async fn ladder_evaluate(
         }
         store::idempotency::Lookup::ConflictHash => {
             return Err(gate_unavailable(
+                &plan,
                 fail_policy,
                 fail_action,
                 "the key's request body is not this decision's request",
@@ -1663,6 +1713,7 @@ async fn ladder_evaluate(
         }
         store::idempotency::Lookup::InFlight => {
             return Err(gate_unavailable(
+                &plan,
                 fail_policy,
                 fail_action,
                 "the laya.classify call is still running",
@@ -1682,6 +1733,7 @@ async fn ladder_evaluate(
     })?
     .ok_or_else(|| {
         gate_unavailable(
+            &plan,
             fail_policy,
             fail_action,
             "no successful laya.classify invocation carries this key",
@@ -1689,6 +1741,7 @@ async fn ladder_evaluate(
     })?;
     if invocation.input_hash != plan.request_hash {
         return Err(gate_unavailable(
+            &plan,
             fail_policy,
             fail_action,
             "the invocation hashed a different request body",
@@ -1696,6 +1749,7 @@ async fn ladder_evaluate(
     }
     let output = response.get("output").ok_or_else(|| {
         gate_unavailable(
+            &plan,
             fail_policy,
             fail_action,
             "the stored replay carries no answer document",
@@ -1714,6 +1768,7 @@ async fn ladder_evaluate(
         }
         Err(laya::LayaError::Unreadable) => {
             return Err(gate_unavailable(
+                &plan,
                 fail_policy,
                 fail_action,
                 "the answer document is unreadable for this question",

@@ -24,6 +24,12 @@ pub const LAYA_SERVICE: &str = "laya";
 /// The operation every judge call uses.
 pub const LAYA_PATH: &str = "/v1/systemone";
 
+/// The conveyor→laya seam's measured default (SPEC_V2 §10.2).
+pub const LAYA_DEFAULT_TIMEOUT_MS: i32 = 1_500;
+
+/// The seam's hard budget (SPEC_V2 §10.2): no conveyor→laya call outlives 3 s.
+pub const LAYA_HARD_TIMEOUT_MS: i32 = 3_000;
+
 /// The default model the estate's laya gateway serves.
 pub const DEFAULT_LAYA_MODEL: &str = "system-1";
 
@@ -270,9 +276,10 @@ fn laya_judge() -> ActionSpec {
         output: wire_output,
         scopes: &[Scope::ProcessesWrite],
         idempotent: true,
-        // A decision is an inference call on a shared GPU host, so the budget covers the queue as
-        // well as the turn; 30 s was a local read's allowance, not a model call's.
-        timeout_ms: 60_000,
+        // SPEC_V2 §10.2 fixes the conveyor→laya seam at a 1500 ms default with a 3 s HARD
+        // budget: a stalled engine must be abandoned and recorded as an outage, never hold a
+        // worker for half a minute (finding v1-p102-1).
+        timeout_ms: u32::try_from(LAYA_HARD_TIMEOUT_MS).expect("the laya hard budget is positive"),
         // It changes nothing here; it meters an external decision call.
         effect: Effect::Read,
         confirm: Confirm::None,
