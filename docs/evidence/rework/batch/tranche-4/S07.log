@@ -1,13 +1,146 @@
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S07
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S07 --content docs/evidence/rework/tranche-4/rework-content-S07.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — S07 Requirements and search (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — S07 Requirements and search (Phase A) already present
+  artefact: Requirements Catalog — S07 Requirements and search (Phase A) already present
+  artefact: Solution Concept Diagram — S07 Requirements and search (Phase A) already present
+  artefact: Business Capability Map — S07 Requirements and search (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — S07 Requirements and search (Phase C) already present
+  artefact: Technology Standards Catalog — S07 Requirements and search (Phase D) already present
+  delivery contract: already live
+  baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  01 cadences.credit_demo ok
+  baseline approval: none pending
+  closure gate: already approved
+  destructive gate: already approved
+
+rework: projects.close refused at act 2: error: projects.close refused (409): project S07 cannot close until its mandatory artefacts exist (missing: architecture-artifact, benefits-diagram, candidate-solutions, change-control, gap-analysis, project-context-diagram, project-registers, project-wbs, statement-of-architecture-work)
+{"timestamp":"2026-11-25T07:29:29.856778Z","level":"ERROR","fields":{"message":"record failed invocation","error":"error occurred while decoding: error returned from database: relation \"gate_refusal\" does not exist at line 1498","action":"projects.close"},"target":"conveyor_actions::invoke"}
+FAILED: projects
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S07 --snapshot /tmp/conv526-t9-snap/data --outputs-dir /tmp/conv526-t9-snap/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/S07-bodies --local-bin /tmp/conv526-f726-bin
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [],
+  "refused": [
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Change requests' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Outcome vs acceptance' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Decision' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Approval' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Scope' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Outcome' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Risks' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Work packages' has a source that resolves to zero rows"
+      }
+    }
+  ],
+  "counts": {
+    "due": 8,
+    "present": 0,
+    "missing-edge": 0,
+    "stale": 0,
+    "ambiguous": 0
+  }
+}
 
 
-usage: publish-artefact-bodies.py [-h] [--standard STANDARD]
-                                  [--snapshot SNAPSHOT]
-                                  [--outputs-dir OUTPUTS_DIR]
-                                  [--category CATEGORY] [--project PROJECT]
-                                  [--all-projects] [--all] [--check]
-                                  [--dry-run] [--apply] [--republish-stale]
-                                  [--local-bin LOCAL_BIN]
-                                  [--actor-id ACTOR_ID] [--journal JOURNAL]
-                                  [--bodies-out BODIES_OUT] [--self-test]
-publish-artefact-bodies.py: error: --snapshot DIR is required
+[exit 1]
+

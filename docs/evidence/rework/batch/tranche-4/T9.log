@@ -1,13 +1,162 @@
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T9
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T9 --content docs/evidence/rework/tranche-4/rework-content-T9.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — T9 TOGAF ADM capability (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — T9 TOGAF ADM capability (Phase A) already present
+  artefact: Requirements Catalog — T9 TOGAF ADM capability (Phase A) already present
+  artefact: Solution Concept Diagram — T9 TOGAF ADM capability (Phase A) already present
+  artefact: Business Capability Map — T9 TOGAF ADM capability (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — T9 TOGAF ADM capability (Phase C) already present
+  artefact: Technology Standards Catalog — T9 TOGAF ADM capability (Phase D) already present
+  delivery contract: already live
+  baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+
+rework: inception-analysis: no body in the content file
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T9 --snapshot /tmp/conv526-t9-snap/data --outputs-dir /tmp/conv526-t9-snap/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T9-bodies --local-bin /tmp/conv526-f726-bin
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "delivery-contract",
+      "document_id": "01a20e7d-e42e-717b-92cf-dc3a0bc610cd",
+      "edge_repaired": true
+    },
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "project-baseline",
+      "document_id": "01a20e7d-e784-710a-ba3c-872443db1d71",
+      "edge_repaired": true
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "inception-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "statement-of-architecture-work",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "stale"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T9",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    }
+  ],
+  "counts": {
+    "due": 2,
+    "present": 0,
+    "missing-edge": 2,
+    "stale": 10,
+    "ambiguous": 0
+  }
+}
 
 
-usage: publish-artefact-bodies.py [-h] [--standard STANDARD]
-                                  [--snapshot SNAPSHOT]
-                                  [--outputs-dir OUTPUTS_DIR]
-                                  [--category CATEGORY] [--project PROJECT]
-                                  [--all-projects] [--all] [--check]
-                                  [--dry-run] [--apply] [--republish-stale]
-                                  [--local-bin LOCAL_BIN]
-                                  [--actor-id ACTOR_ID] [--journal JOURNAL]
-                                  [--bodies-out BODIES_OUT] [--self-test]
-publish-artefact-bodies.py: error: --snapshot DIR is required
+[exit 1]
+

@@ -187,7 +187,7 @@
     "gate (P0): the gate check 'T4-review' did not pass; the gate check 'T4-artefact-standard' did not pass; the gate check 'T4-rework' did not pass"
   ],
   "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata",
-  "generated_at": "2026-11-25T07:24:43.374136+00:00",
+  "generated_at": "2026-11-25T07:30:47.622272+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T4.toml",
   "name": "Kanban coach",

@@ -1,13 +1,177 @@
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T4
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T4 --content docs/evidence/rework/tranche-4/rework-content-T4.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd --keep-active
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: not applicable (the project stays active)
+  SoAW: already live
+  artefact: Stakeholder Map — T4 Kanban coach (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — T4 Kanban coach (Phase A) already present
+  artefact: Requirements Catalog — T4 Kanban coach (Phase A) already present
+  artefact: Solution Concept Diagram — T4 Kanban coach (Phase A) already present
+  artefact: Business Capability Map — T4 Kanban coach (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — T4 Kanban coach (Phase C) already present
+  artefact: Technology Standards Catalog — T4 Kanban coach (Phase D) already present
+  delivery contract: already live
+  baseline: already taken
+  closure-review output: not applicable (the project stays active)
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  01 cadences.credit_demo ok
+  baseline approval: none pending
+  closure: not applicable (the project stays active)
+T4: 1 acts recorded
 
 
-usage: publish-artefact-bodies.py [-h] [--standard STANDARD]
-                                  [--snapshot SNAPSHOT]
-                                  [--outputs-dir OUTPUTS_DIR]
-                                  [--category CATEGORY] [--project PROJECT]
-                                  [--all-projects] [--all] [--check]
-                                  [--dry-run] [--apply] [--republish-stale]
-                                  [--local-bin LOCAL_BIN]
-                                  [--actor-id ACTOR_ID] [--journal JOURNAL]
-                                  [--bodies-out BODIES_OUT] [--self-test]
-publish-artefact-bodies.py: error: --snapshot DIR is required
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T4 --snapshot /tmp/conv526-t9-snap/data --outputs-dir /tmp/conv526-t9-snap/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T4-bodies --local-bin /tmp/conv526-f726-bin
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "compliance-review",
+      "document_id": "01a2119d-2cd1-7655-aca8-545acaa460bb",
+      "natural_key": "artefact:T4:compliance-review:e29a19753f3a3966",
+      "body_sha256": "e29a19753f3a3966a865815e2b080804d1af90bec7db0b09d140523c9b376465"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "delivery-contract",
+      "document_id": "01a2119d-307c-75f5-8548-e80956efa22d",
+      "natural_key": "artefact:T4:delivery-contract:62367eadf822ed59",
+      "body_sha256": "62367eadf822ed592950b9799fcbfbac0dd0c19f56ebadcd3eb70afa18229be4"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "project-baseline",
+      "document_id": "01a2119d-3331-73bd-a7ba-0fcfc74cd6b3",
+      "natural_key": "artefact:T4:project-baseline:c081ef0791d688cf",
+      "body_sha256": "c081ef0791d688cfd32df9ae218512c6f089fa7d91673a03d09588b4513c270f"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "project-wbs",
+      "document_id": "01a2119d-35f1-7489-9838-1b1e2568e319",
+      "natural_key": "artefact:T4:project-wbs:5fce6d9540001a8d",
+      "body_sha256": "5fce6d9540001a8d130e2bcffd23648c4a03b78108aca2a1983d9da9f8b47d94"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "statement-of-architecture-work",
+      "document_id": "01a2119d-38d6-7296-a3b8-b86d31dff382",
+      "natural_key": "artefact:T4:statement-of-architecture-work:e50c854867cb0e5c",
+      "body_sha256": "e50c854867cb0e5ca48740b1fa475e571dd52fa0689ea59ad1d3aed5e94a2adf"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Links' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Risks' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 11,
+    "present": 0,
+    "missing-edge": 0,
+    "stale": 2,
+    "ambiguous": 0
+  }
+}
+
+
+[exit 1]
+
