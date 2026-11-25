@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d2f-75f2-a1fb-aa95893aa206\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
       "exit": 1,
       "id": "S14-charter",
       "kind": "command",
       "result": "fail",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
       "stdout": ""
     },
     {
@@ -151,7 +151,7 @@
   ],
   "failures": [
     "S14-baseline (P0): no project baseline",
-    "S14-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "S14-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
     "S14-contract (P0): no live board-approved delivery contract",
     "S14-review (P0): no Phase-G compliance review for the project's live contract",
     "S14-pi-cadence (P0): no PI cadence row for tranche-11",
@@ -165,16 +165,16 @@
     "gate (P0): the gate check 'S14-baseline' did not pass; the gate check 'S14-charter' did not pass; the gate check 'S14-contract' did not pass; the gate check 'S14-review' did not pass; the gate check 'S14-pi-cadence' did not pass; the gate check 'S14-pi-plan' did not pass; the gate check 'S14-pi-objectives' did not pass; the gate check 'S14-lessons' did not pass; the gate check 'S14-wsjf' did not pass; the gate check 'S14-demo-credits' did not pass; the gate check 'S14-artefact-standard' did not pass; the gate check 'S14-rework' did not pass"
   ],
   "gate": "S14 is accepted when the native gate passes \u2014 every used id in `parity/native.tsv` resolves to an `action:`, `test:`, `replacement:` or `dropped:` disposition and the check refuses a missing or unknown row \u2014 and the R0\u2013R7 cutover receipts exist; the plan records `docs/cutover/` as absent at HEAD.",
-  "generated_at": "2026-11-25T08:48:06.050301+00:00",
+  "generated_at": "2026-11-25T09:45:22.506419+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S14.toml",
   "name": "Cutover \u2014 deploy, seed, rehearse, decommission fr / RM / Planka",
   "project": "S14",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T08:47:56Z",
-    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
-    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
+    "generated_at": "2026-11-25T09:44:46Z",
+    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
   },
   "verdict": "red",
   "warnings": []

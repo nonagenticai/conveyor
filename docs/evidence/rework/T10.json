@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a211c8-fd26-762f-b500-83f016d10ca7 decided by a distinct approver",
+      "detail": "latest closure gate 01a21213-f4d2-7fcb-899f-6b372e9ad616 decided by a distinct approver",
       "id": "T10-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "19 mandatory artefact package(s) open: v1-p83-5:T10, std-pmp-project-baseline-t10:T10, std-pmp-project-registers-t10:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, std-togaf-architecture-artifact-instance-01a20287-be6f-76c8-8024-2bf280f120e7:T10, std-togaf-architecture-artifact-instance-01a20287-ef55-75a2-9520-b7cb2b48958a:T10, +11 more",
+      "detail": "23 mandatory artefact package(s) open: v1-p83-5:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, std-togaf-architecture-artifact-instance-01a20287-be6f-76c8-8024-2bf280f120e7:T10, std-togaf-architecture-artifact-instance-01a20287-ef55-75a2-9520-b7cb2b48958a:T10, std-togaf-architecture-artifact-instance-01a20288-20d5-713d-ac36-3f02673fdb32:T10, std-togaf-architecture-artifact-instance-01a20288-525a-714d-98bc-69c7a43b3c86:T10, +15 more",
       "id": "T10-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -177,22 +177,22 @@
     }
   ],
   "failures": [
-    "T10-artefact-standard (P1): 19 mandatory artefact package(s) open: v1-p83-5:T10, std-pmp-project-baseline-t10:T10, std-pmp-project-registers-t10:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, std-togaf-architecture-artifact-instance-01a20287-be6f-76c8-8024-2bf280f120e7:T10, std-togaf-architecture-artifact-instance-01a20287-ef55-75a2-9520-b7cb2b48958a:T10, +11 more",
+    "T10-artefact-standard (P1): 23 mandatory artefact package(s) open: v1-p83-5:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, std-togaf-architecture-artifact-instance-01a20287-be6f-76c8-8024-2bf280f120e7:T10, std-togaf-architecture-artifact-instance-01a20287-ef55-75a2-9520-b7cb2b48958a:T10, std-togaf-architecture-artifact-instance-01a20288-20d5-713d-ac36-3f02673fdb32:T10, std-togaf-architecture-artifact-instance-01a20288-525a-714d-98bc-69c7a43b3c86:T10, +15 more",
     "T10-rework (P0): 1 unresolved P0/P1 package(s): v1-p83-5:T10 (P1)",
     "gate (P0): the gate check 'T10-artefact-standard' did not pass; the gate check 'T10-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized",
-  "generated_at": "2026-11-25T09:40:28.676166+00:00",
+  "generated_at": "2026-11-25T09:45:23.633271+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T10.toml",
   "name": "SAFe cadence and MSP tranches",
   "project": "T10",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T08:47:56Z",
-    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
-    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
+    "generated_at": "2026-11-25T09:44:46Z",
+    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
   },
   "verdict": "red",
   "warnings": []

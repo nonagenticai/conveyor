@@ -12,28 +12,28 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "no project baseline",
+      "detail": "baseline 01a21214-4a5f-77a2-8137-7fef2dd397be approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "T18-baseline",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "no live board-approved delivery contract",
+      "detail": "contract 01a21214-3a3e-7c2b-b7d9-328b26a53ff7 approved by board decision 01a21214-3a87-726c-9180-d5aff504ce69 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "T18-contract",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "no Phase-G compliance review for the project's live contract",
+      "detail": "review 01a21214-4f05-7bc0-b0b6-2be68215c955 (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T18-review",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -75,19 +75,19 @@
     {
       "check": "wsjf",
       "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
-      "detail": "no WBS deliverable carries the plan",
+      "detail": "1 WBS node(s) carry the four WSJF inputs",
       "id": "T18-wsjf",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "demo_credits",
       "description": "every accepted deliverable has a demo credit carrying its evidence",
-      "detail": "no accepted deliverable to demo",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
       "id": "T18-demo-credits",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -102,7 +102,7 @@
     {
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "2 open P0 package(s): std-pmp-change-control-t18:T18, std-pmp-project-baseline-t18:T18",
+      "detail": "1 open P0 package(s): std-pmp-change-control-t18:T18",
       "id": "T18-product",
       "kind": "snapshot",
       "result": "fail",
@@ -124,7 +124,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "7 mandatory artefact package(s) open: std-pmp-change-control-t18:T18, std-pmp-project-baseline-t18:T18, unpublished_declared_output:T18, std-pmp-project-registers-t18:T18, contract_missing:T18, mandatory_artefacts:T18, std-togaf-compliance-review-t18:T18",
+      "detail": "7 mandatory artefact package(s) open: std-pmp-change-control-t18:T18, std-pmp-project-registers-t18:T18, std-togaf-delivery-contract-t18:T18, std-togaf-phase-b-t18-b:T18, std-togaf-phase-c-t18-c:T18, std-togaf-phase-d-t18-d:T18, std-togaf-phase-g-t18-g:T18",
       "id": "T18-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -133,7 +133,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "6 unresolved P0/P1 package(s): std-pmp-change-control-t18:T18 (P0), std-pmp-project-baseline-t18:T18 (P0), unpublished_declared_output:T18 (P1), std-pmp-project-registers-t18:T18 (P1), contract_missing:T18 (P1), mandatory_artefacts:T18 (P1)",
+      "detail": "1 unresolved P0/P1 package(s): std-pmp-change-control-t18:T18 (P0)",
       "id": "T18-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -142,7 +142,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T18-baseline' did not pass; the gate check 'T18-contract' did not pass; the gate check 'T18-review' did not pass; the gate check 'T18-wsjf' did not pass; the gate check 'T18-demo-credits' did not pass; the gate check 'T18-product' did not pass; the gate check 'T18-artefact-standard' did not pass; the gate check 'T18-rework' did not pass",
+      "detail": "the gate check 'T18-product' did not pass; the gate check 'T18-artefact-standard' did not pass; the gate check 'T18-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -150,27 +150,22 @@
     }
   ],
   "failures": [
-    "T18-baseline (P0): no project baseline",
-    "T18-contract (P0): no live board-approved delivery contract",
-    "T18-review (P0): no Phase-G compliance review for the project's live contract",
-    "T18-wsjf (P0): no WBS deliverable carries the plan",
-    "T18-demo-credits (P0): no accepted deliverable to demo",
-    "T18-product (P0): 2 open P0 package(s): std-pmp-change-control-t18:T18, std-pmp-project-baseline-t18:T18",
-    "T18-artefact-standard (P1): 7 mandatory artefact package(s) open: std-pmp-change-control-t18:T18, std-pmp-project-baseline-t18:T18, unpublished_declared_output:T18, std-pmp-project-registers-t18:T18, contract_missing:T18, mandatory_artefacts:T18, std-togaf-compliance-review-t18:T18",
-    "T18-rework (P0): 6 unresolved P0/P1 package(s): std-pmp-change-control-t18:T18 (P0), std-pmp-project-baseline-t18:T18 (P0), unpublished_declared_output:T18 (P1), std-pmp-project-registers-t18:T18 (P1), contract_missing:T18 (P1), mandatory_artefacts:T18 (P1)",
-    "gate (P0): the gate check 'T18-baseline' did not pass; the gate check 'T18-contract' did not pass; the gate check 'T18-review' did not pass; the gate check 'T18-wsjf' did not pass; the gate check 'T18-demo-credits' did not pass; the gate check 'T18-product' did not pass; the gate check 'T18-artefact-standard' did not pass; the gate check 'T18-rework' did not pass"
+    "T18-product (P0): 1 open P0 package(s): std-pmp-change-control-t18:T18",
+    "T18-artefact-standard (P1): 7 mandatory artefact package(s) open: std-pmp-change-control-t18:T18, std-pmp-project-registers-t18:T18, std-togaf-delivery-contract-t18:T18, std-togaf-phase-b-t18-b:T18, std-togaf-phase-c-t18-c:T18, std-togaf-phase-d-t18-d:T18, std-togaf-phase-g-t18-g:T18",
+    "T18-rework (P0): 1 unresolved P0/P1 package(s): std-pmp-change-control-t18:T18 (P0)",
+    "gate (P0): the gate check 'T18-product' did not pass; the gate check 'T18-artefact-standard' did not pass; the gate check 'T18-rework' did not pass"
   ],
   "gate": "a signed-in tenant drives portfolio \u2192 programme \u2192 project \u2192 work package, organisation \u2192 release \u2192 binding, procedures intake \u2192 publish, tools call \u2192 ledger, improve \u2192 kata \u2192 adoption, operations incident \u2192 postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports exists only from a real route and a present spec; no production screen renders a fixture",
-  "generated_at": "2026-11-25T09:40:51.994283+00:00",
+  "generated_at": "2026-11-25T09:45:24.347080+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T18.toml",
   "name": "The real V2 UI",
   "project": "T18",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T08:47:56Z",
-    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
-    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
+    "generated_at": "2026-11-25T09:44:46Z",
+    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
   },
   "verdict": "red",
   "warnings": []

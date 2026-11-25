@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "15 mandatory artefact package(s) open: std-pmp-project-baseline-t4:T4, std-pmp-project-registers-t4:T4, std-togaf-architecture-artifact-instance-01a2028c-33a0-76d6-acd6-57365a79dd10:T4, std-togaf-architecture-artifact-instance-01a2028c-6415-7dbb-bb08-ef2baa58aaa4:T4, std-togaf-architecture-artifact-instance-01a2028c-94d6-7e50-9d94-9e94feda14aa:T4, std-togaf-architecture-artifact-instance-01a2028c-c575-749c-a0c8-82c44effa477:T4, std-togaf-architecture-artifact-instance-01a2028c-f584-75ea-90cd-b929dd945aa4:T4, std-togaf-architecture-artifact-instance-01a2028d-27ab-7464-918c-e0e07c1a43dc:T4, +7 more",
+      "detail": "19 mandatory artefact package(s) open: std-togaf-architecture-artifact-instance-01a2028c-33a0-76d6-acd6-57365a79dd10:T4, std-togaf-architecture-artifact-instance-01a2028c-6415-7dbb-bb08-ef2baa58aaa4:T4, std-togaf-architecture-artifact-instance-01a2028c-94d6-7e50-9d94-9e94feda14aa:T4, std-togaf-architecture-artifact-instance-01a2028c-c575-749c-a0c8-82c44effa477:T4, std-togaf-architecture-artifact-instance-01a2028c-f584-75ea-90cd-b929dd945aa4:T4, std-togaf-architecture-artifact-instance-01a2028d-27ab-7464-918c-e0e07c1a43dc:T4, std-togaf-architecture-artifact-instance-01a2028d-57ed-7267-ab06-1a3585f3acd8:T4, std-togaf-architecture-artifact-instance-01a21214-5f15-7c09-9e6f-59f1f660aa78:T4, +11 more",
       "id": "T4-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -182,21 +182,21 @@
   ],
   "failures": [
     "T4-review (P0): the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver",
-    "T4-artefact-standard (P1): 15 mandatory artefact package(s) open: std-pmp-project-baseline-t4:T4, std-pmp-project-registers-t4:T4, std-togaf-architecture-artifact-instance-01a2028c-33a0-76d6-acd6-57365a79dd10:T4, std-togaf-architecture-artifact-instance-01a2028c-6415-7dbb-bb08-ef2baa58aaa4:T4, std-togaf-architecture-artifact-instance-01a2028c-94d6-7e50-9d94-9e94feda14aa:T4, std-togaf-architecture-artifact-instance-01a2028c-c575-749c-a0c8-82c44effa477:T4, std-togaf-architecture-artifact-instance-01a2028c-f584-75ea-90cd-b929dd945aa4:T4, std-togaf-architecture-artifact-instance-01a2028d-27ab-7464-918c-e0e07c1a43dc:T4, +7 more",
+    "T4-artefact-standard (P1): 19 mandatory artefact package(s) open: std-togaf-architecture-artifact-instance-01a2028c-33a0-76d6-acd6-57365a79dd10:T4, std-togaf-architecture-artifact-instance-01a2028c-6415-7dbb-bb08-ef2baa58aaa4:T4, std-togaf-architecture-artifact-instance-01a2028c-94d6-7e50-9d94-9e94feda14aa:T4, std-togaf-architecture-artifact-instance-01a2028c-c575-749c-a0c8-82c44effa477:T4, std-togaf-architecture-artifact-instance-01a2028c-f584-75ea-90cd-b929dd945aa4:T4, std-togaf-architecture-artifact-instance-01a2028d-27ab-7464-918c-e0e07c1a43dc:T4, std-togaf-architecture-artifact-instance-01a2028d-57ed-7267-ab06-1a3585f3acd8:T4, std-togaf-architecture-artifact-instance-01a21214-5f15-7c09-9e6f-59f1f660aa78:T4, +11 more",
     "T4-rework (P0): 1 unresolved P0/P1 package(s): seed_live_drift:T4 (P1)",
     "gate (P0): the gate check 'T4-review' did not pass; the gate check 'T4-artefact-standard' did not pass; the gate check 'T4-rework' did not pass"
   ],
   "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata",
-  "generated_at": "2026-11-25T09:41:02.019366+00:00",
+  "generated_at": "2026-11-25T09:45:24.757516+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T4.toml",
   "name": "Kanban coach",
   "project": "T4",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T08:47:56Z",
-    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
-    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
+    "generated_at": "2026-11-25T09:44:46Z",
+    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
   },
   "verdict": "red",
   "warnings": []

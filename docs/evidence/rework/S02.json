@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d27-7b45-abb5-bf851a4c3d4a\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "S02-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "",
       "stdout": ""
     },
     {
@@ -133,7 +133,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "23 mandatory artefact package(s) open: mandatory_artefacts:S02, tranche_plan:tranche-1, std-pmp-project-baseline-s02:S02, std-pmp-project-registers-s02:S02, std-togaf-architecture-artifact-instance-01a1ff84-8aab-76da-abbc-bbee569d7417:S02, std-togaf-architecture-artifact-instance-01a1ff84-b2bd-7741-ba51-db2e7c686957:S02, std-togaf-architecture-artifact-instance-01a1ff84-df25-7094-a0e3-64da36ef2c37:S02, std-togaf-architecture-artifact-instance-01a1ff85-09d8-71d9-8416-4bd269eb0520:S02, +15 more",
+      "detail": "24 mandatory artefact package(s) open: mandatory_artefacts:S02, tranche_plan:tranche-1, std-pmp-project-baseline-s02:S02, std-pmp-project-registers-s02:S02, std-togaf-architecture-artifact-instance-01a1ff84-8aab-76da-abbc-bbee569d7417:S02, std-togaf-architecture-artifact-instance-01a1ff84-b2bd-7741-ba51-db2e7c686957:S02, std-togaf-architecture-artifact-instance-01a1ff84-df25-7094-a0e3-64da36ef2c37:S02, std-togaf-architecture-artifact-instance-01a1ff85-09d8-71d9-8416-4bd269eb0520:S02, +16 more",
       "id": "S02-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -151,7 +151,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S02-project' did not pass; the gate check 'S02-charter' did not pass; the gate check 'S02-closure-outputs' did not pass; the gate check 'S02-artefact-standard' did not pass; the gate check 'S02-rework' did not pass",
+      "detail": "the gate check 'S02-project' did not pass; the gate check 'S02-closure-outputs' did not pass; the gate check 'S02-artefact-standard' did not pass; the gate check 'S02-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -160,23 +160,22 @@
   ],
   "failures": [
     "S02-project (P0): status is 'active', expected 'closed'",
-    "S02-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "S02-closure-outputs (P0): the project declares no closure_outputs",
-    "S02-artefact-standard (P1): 23 mandatory artefact package(s) open: mandatory_artefacts:S02, tranche_plan:tranche-1, std-pmp-project-baseline-s02:S02, std-pmp-project-registers-s02:S02, std-togaf-architecture-artifact-instance-01a1ff84-8aab-76da-abbc-bbee569d7417:S02, std-togaf-architecture-artifact-instance-01a1ff84-b2bd-7741-ba51-db2e7c686957:S02, std-togaf-architecture-artifact-instance-01a1ff84-df25-7094-a0e3-64da36ef2c37:S02, std-togaf-architecture-artifact-instance-01a1ff85-09d8-71d9-8416-4bd269eb0520:S02, +15 more",
+    "S02-artefact-standard (P1): 24 mandatory artefact package(s) open: mandatory_artefacts:S02, tranche_plan:tranche-1, std-pmp-project-baseline-s02:S02, std-pmp-project-registers-s02:S02, std-togaf-architecture-artifact-instance-01a1ff84-8aab-76da-abbc-bbee569d7417:S02, std-togaf-architecture-artifact-instance-01a1ff84-b2bd-7741-ba51-db2e7c686957:S02, std-togaf-architecture-artifact-instance-01a1ff84-df25-7094-a0e3-64da36ef2c37:S02, std-togaf-architecture-artifact-instance-01a1ff85-09d8-71d9-8416-4bd269eb0520:S02, +16 more",
     "S02-rework (P0): 1 unresolved P0/P1 package(s): mandatory_artefacts:S02 (P1)",
-    "gate (P0): the gate check 'S02-project' did not pass; the gate check 'S02-charter' did not pass; the gate check 'S02-closure-outputs' did not pass; the gate check 'S02-artefact-standard' did not pass; the gate check 'S02-rework' did not pass"
+    "gate (P0): the gate check 'S02-project' did not pass; the gate check 'S02-closure-outputs' did not pass; the gate check 'S02-artefact-standard' did not pass; the gate check 'S02-rework' did not pass"
   ],
   "gate": "The A\u2013D artefacts and the delivery contract exist, the brief and the evidence are published, the P2 long-job proof is landed, and the project closes through the one gate.",
-  "generated_at": "2026-11-25T08:48:04.873421+00:00",
+  "generated_at": "2026-11-25T09:45:21.091317+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S02.toml",
   "name": "Skeleton \u2014 workspace, tenancy, auth, jobs, SSE",
   "project": "S02",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T08:47:56Z",
-    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
-    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
+    "generated_at": "2026-11-25T09:44:46Z",
+    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
   },
   "verdict": "red",
   "warnings": []

@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d26-7573-9b0c-e0f60af92003\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "S00-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "",
       "stdout": ""
     },
     {
@@ -115,7 +115,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "23 mandatory artefact package(s) open: closure_outputs_undeclared:S00, mandatory_artefacts:S00, std-pmp-project-baseline-s00:S00, std-pmp-project-registers-s00:S00, std-togaf-architecture-artifact-instance-01a1ff38-2dca-7627-b4ab-c145428cae8f:S00, std-togaf-architecture-artifact-instance-01a1ff38-55ac-7daf-8cdd-3c1dc35141cb:S00, std-togaf-architecture-artifact-instance-01a1ff38-7b3c-746d-b892-d3484e0885a9:S00, std-togaf-architecture-artifact-instance-01a1ff38-a2f4-77df-b406-35e9f246bd8c:S00, +15 more",
+      "detail": "24 mandatory artefact package(s) open: closure_outputs_undeclared:S00, mandatory_artefacts:S00, std-pmp-project-baseline-s00:S00, std-pmp-project-registers-s00:S00, std-togaf-architecture-artifact-instance-01a1ff38-2dca-7627-b4ab-c145428cae8f:S00, std-togaf-architecture-artifact-instance-01a1ff38-55ac-7daf-8cdd-3c1dc35141cb:S00, std-togaf-architecture-artifact-instance-01a1ff38-7b3c-746d-b892-d3484e0885a9:S00, std-togaf-architecture-artifact-instance-01a1ff38-a2f4-77df-b406-35e9f246bd8c:S00, +16 more",
       "id": "S00-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -133,7 +133,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S00-charter' did not pass; the gate check 'S00-closure-outputs' did not pass; the gate check 'S00-artefact-standard' did not pass; the gate check 'S00-rework' did not pass",
+      "detail": "the gate check 'S00-closure-outputs' did not pass; the gate check 'S00-artefact-standard' did not pass; the gate check 'S00-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -150,24 +150,23 @@
     }
   ],
   "failures": [
-    "S00-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "S00-closure-outputs (P0): the project declares no closure_outputs",
-    "S00-artefact-standard (P1): 23 mandatory artefact package(s) open: closure_outputs_undeclared:S00, mandatory_artefacts:S00, std-pmp-project-baseline-s00:S00, std-pmp-project-registers-s00:S00, std-togaf-architecture-artifact-instance-01a1ff38-2dca-7627-b4ab-c145428cae8f:S00, std-togaf-architecture-artifact-instance-01a1ff38-55ac-7daf-8cdd-3c1dc35141cb:S00, std-togaf-architecture-artifact-instance-01a1ff38-7b3c-746d-b892-d3484e0885a9:S00, std-togaf-architecture-artifact-instance-01a1ff38-a2f4-77df-b406-35e9f246bd8c:S00, +15 more",
+    "S00-artefact-standard (P1): 24 mandatory artefact package(s) open: closure_outputs_undeclared:S00, mandatory_artefacts:S00, std-pmp-project-baseline-s00:S00, std-pmp-project-registers-s00:S00, std-togaf-architecture-artifact-instance-01a1ff38-2dca-7627-b4ab-c145428cae8f:S00, std-togaf-architecture-artifact-instance-01a1ff38-55ac-7daf-8cdd-3c1dc35141cb:S00, std-togaf-architecture-artifact-instance-01a1ff38-7b3c-746d-b892-d3484e0885a9:S00, std-togaf-architecture-artifact-instance-01a1ff38-a2f4-77df-b406-35e9f246bd8c:S00, +16 more",
     "S00-rework (P0): 2 unresolved P0/P1 package(s): closure_outputs_undeclared:S00 (P1), mandatory_artefacts:S00 (P1)",
-    "gate (P0): the gate check 'S00-charter' did not pass; the gate check 'S00-closure-outputs' did not pass; the gate check 'S00-artefact-standard' did not pass; the gate check 'S00-rework' did not pass",
+    "gate (P0): the gate check 'S00-closure-outputs' did not pass; the gate check 'S00-artefact-standard' did not pass; the gate check 'S00-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The A\u2013D artefacts, the closure review and the declared outputs exist; the project re-closes through the one gate.",
-  "generated_at": "2026-11-25T08:48:04.694545+00:00",
+  "generated_at": "2026-11-25T09:45:20.895120+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S00.toml",
   "name": "Usage inventory \u2192 parity/parity.yaml",
   "project": "S00",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T08:47:56Z",
-    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
-    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
+    "generated_at": "2026-11-25T09:44:46Z",
+    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
   },
   "verdict": "red",
   "warnings": []
