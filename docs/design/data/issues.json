@@ -1,6 +1,27 @@
 {
   "issues": [
     {
+      "number": 738,
+      "title": "fix: the Procedures loader must not settle empty while the capability manifest is still loading",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/738",
+      "updatedAt": "2026-11-25T13:54:08Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
       "number": 734,
       "title": "docs: S21's records state step 11 merged, and its migration as 0074",
       "state": "CLOSED",
@@ -442,7 +463,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-25T12:08:22Z",
+      "updatedAt": "2026-11-25T12:51:20Z",
       "labels": [
         {
           "name": "programme",
