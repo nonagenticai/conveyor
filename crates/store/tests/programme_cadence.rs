@@ -22,6 +22,7 @@ struct Fixture {
     cadence: Uuid,
     active_list: Uuid,
     card_type: Uuid,
+    programme: Uuid,
     project: Uuid,
 }
 
@@ -102,6 +103,7 @@ async fn fixture(db: &support::TestDb, wip_limit: Option<i32>) -> Fixture {
         cadence,
         active_list,
         card_type,
+        programme,
         project,
     };
     // A PI plan materialises only after a person approves it; the suite is about the plan.
@@ -147,13 +149,25 @@ async fn backlog(
     position: i64,
     inputs: (i32, i32, i32, i32),
 ) -> Uuid {
+    backlog_on(db, f.tenant.as_uuid(), f.project, title, position, inputs).await
+}
+
+/// One backlog row under a named project (the backlog is the programme's, v1-p82-5).
+async fn backlog_on(
+    db: &support::TestDb,
+    tenant: Uuid,
+    project: Uuid,
+    title: &str,
+    position: i64,
+    inputs: (i32, i32, i32, i32),
+) -> Uuid {
     sqlx::query_scalar(
         "INSERT INTO wbs_node (tenant_id, project_id, position, kind, title, status,
                                business_value, time_criticality, risk_reduction, job_size)
          VALUES ($1, $2, $3, 'deliverable', $4, 'open', $5, $6, $7, $8) RETURNING id",
     )
-    .bind(f.tenant.as_uuid())
-    .bind(f.project)
+    .bind(tenant)
+    .bind(project)
     .bind(position)
     .bind(title)
     .bind(inputs.0)
@@ -243,6 +257,61 @@ async fn materialisation_respects_wip_slots() {
     .await
     .expect("count untouched rows");
     assert_eq!(untouched, 3, "the backlog beyond the slots is untouched");
+}
+
+/// v1-p82-5 — the backlog spans every project in the cadence's programme, and only those.
+#[tokio::test]
+async fn the_backlog_spans_the_programme() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db, Some(10)).await;
+    let sibling: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name, programme_id)
+         VALUES ($1, $2, 'Sibling', $3) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(format!("SIB-{}", Uuid::now_v7().simple()))
+    .bind(f.programme)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the sibling project");
+    let outside: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name)
+         VALUES ($1, $2, 'Outside') RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(format!("OUT-{}", Uuid::now_v7().simple()))
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the outside project");
+
+    backlog(&db, &f, "own", 0, (1, 0, 0, 1)).await;
+    backlog_on(&db, f.tenant.as_uuid(), sibling, "sibling", 0, (1, 0, 0, 1)).await;
+    backlog_on(&db, f.tenant.as_uuid(), outside, "outside", 0, (1, 0, 0, 1)).await;
+
+    let cards = materialise(&db, &f).await;
+    assert_eq!(cards.len(), 2, "both programme projects draft");
+    let names: Vec<String> = sqlx::query_scalar(
+        "SELECT name FROM card WHERE tenant_id = $1 AND id = ANY($2) ORDER BY name",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(cards.clone())
+    .fetch_all(&db.super_pool)
+    .await
+    .expect("read the drafted cards");
+    assert_eq!(names, vec!["own", "sibling"]);
+    let outside_cards: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM wbs_node
+          WHERE tenant_id = $1 AND project_id = $2 AND card_id IS NOT NULL",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(outside)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("count the outside project's drafted rows");
+    assert_eq!(
+        outside_cards, 0,
+        "a project outside the programme is not drafted"
+    );
 }
 
 #[tokio::test]

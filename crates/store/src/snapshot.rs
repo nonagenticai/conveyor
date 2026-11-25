@@ -1527,8 +1527,10 @@ fn row_is_later(candidate: &Value, current: &Value, timestamp: &str) -> bool {
 
 /// `architecture.phase_progress`: one entry per project that declares `meta.adm_phase` (or has a
 /// contract), sorted by project key. Phases `a..h` are always listed; `preliminary` is listed only
-/// when declared. A phase is `evidenced` when an artefact, contract or compliance review names it;
-/// absence is explicit, and `next_required` is the first phase that still lacks evidence.
+/// when declared. A phase is `evidenced` by the same rows the phase gate reads: an APPROVED
+/// artefact or a LIVE contract (with its compliance review). A draft artefact and a superseded
+/// contract prove nothing; absence is explicit, and `next_required` is the first phase that
+/// still lacks evidence.
 fn phase_progress(
     projects: &Value,
     artifacts: &Value,
@@ -1537,6 +1539,9 @@ fn phase_progress(
 ) -> Value {
     let mut artifact_phases: HashSet<(String, String)> = HashSet::new();
     for artifact in artifacts.as_array().map(Vec::as_slice).unwrap_or_default() {
+        if artifact.get("status").and_then(Value::as_str) != Some("approved") {
+            continue;
+        }
         if let (Some(project), Some(phase)) = (
             artifact.get("project_id").and_then(Value::as_str),
             artifact.get("phase_code").and_then(Value::as_str),
@@ -1545,6 +1550,9 @@ fn phase_progress(
         }
     }
     let mut contract_by_phase: HashMap<(String, String), &Value> = HashMap::new();
+    // Whether a project is listed at all still reads every contract it has; evidence is the
+    // narrower live-only set below.
+    let mut projects_with_contracts: HashSet<&str> = HashSet::new();
     for contract in contracts.as_array().map(Vec::as_slice).unwrap_or_default() {
         let (Some(project), Some(phase)) = (
             contract.get("project_id").and_then(Value::as_str),
@@ -1552,6 +1560,10 @@ fn phase_progress(
         ) else {
             continue;
         };
+        projects_with_contracts.insert(project);
+        if contract.get("status").and_then(Value::as_str) != Some("live") {
+            continue;
+        }
         let key = (project.to_owned(), phase.to_owned());
         let replace = contract_by_phase
             .get(&key)
@@ -1584,9 +1596,7 @@ fn phase_progress(
             .get("meta")
             .and_then(|meta| meta.get("adm_phase"))
             .and_then(Value::as_str);
-        let has_contract = contract_by_phase
-            .keys()
-            .any(|(project_id, _)| project_id == id);
+        let has_contract = projects_with_contracts.contains(id);
         if declared_phase.is_none() && !has_contract {
             continue;
         }

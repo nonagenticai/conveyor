@@ -3757,9 +3757,10 @@ pub struct PiMaterialisation {
 /// cannot commit a plan nobody signed off. The tick reports the refusal and leaves the cadence
 /// `awaiting_approval`.
 ///
-/// The backlog is a `wbs_node(kind='deliverable', status='open')` row with no card yet. The
-/// score is `(business_value + time_criticality + risk_reduction) / job_size`, computed in the
-/// ordering and never stored (D-T1-4). The drafts land in the board named by
+/// The backlog is a `wbs_node(kind='deliverable', status='open')` row with no card yet, across
+/// every project whose `programme_id` is the cadence's programme (the ART's standing backlog).
+/// The score is `(business_value + time_criticality + risk_reduction) / job_size`, computed in
+/// the ordering and never stored (D-T1-4). The drafts land in the board named by
 /// `meta.board_id`'s intake lane, bounded by the active lane's `wip_limit` minus the cards live
 /// there; the cadence then moves `planned → materialised` in the same transaction, so a second
 /// tick creates nothing. A tick with no free slot writes nothing and leaves the cadence
@@ -3812,13 +3813,15 @@ pub async fn materialise_pi_tx(
         .and_then(Value::as_str)
         .ok_or(PlanStoreError::Illegal(PlanError::CadenceCardTypeMissing))?
         .to_owned();
-    let project_id: Option<Uuid> =
+    // The board names the lanes the drafts land in and must exist; the BACKLOG is the cadence's
+    // programme, not the board's one project (v1-p82-5).
+    let board_project: Option<Uuid> =
         sqlx::query_scalar("SELECT project_id FROM board WHERE tenant_id = $1 AND id = $2")
             .bind(tenant.as_uuid())
             .bind(board_id)
             .fetch_optional(&mut *conn)
             .await?;
-    let project_id = project_id.ok_or(PlanStoreError::NotFound { what: "board" })?;
+    board_project.ok_or(PlanStoreError::NotFound { what: "board" })?;
     let card_type_id: Option<Uuid> =
         sqlx::query_scalar("SELECT id FROM card_type WHERE tenant_id = $1 AND code = $2")
             .bind(tenant.as_uuid())
@@ -3863,18 +3866,21 @@ pub async fn materialise_pi_tx(
         return Ok(PiMaterialisation::default());
     }
 
-    let backlog_sql = "SELECT id, title, business_value, time_criticality, risk_reduction, job_size
-           FROM wbs_node
-          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'
-            AND status = 'open' AND card_id IS NULL";
+    let backlog_sql = "SELECT n.id, n.title, n.business_value, n.time_criticality,
+                              n.risk_reduction, n.job_size
+           FROM wbs_node n
+           JOIN project p ON p.tenant_id = n.tenant_id AND p.id = n.project_id
+          WHERE n.tenant_id = $1 AND p.programme_id = $2 AND n.kind = 'deliverable'
+            AND n.status = 'open' AND n.card_id IS NULL";
     let rows: Vec<(Uuid, String, i32, i32, i32, i32)> = sqlx::query_as(AssertSqlSafe(format!(
         "{backlog_sql}
-         ORDER BY ((business_value + time_criticality + risk_reduction)::numeric / job_size) DESC,
-                  position, id
+         ORDER BY ((n.business_value + n.time_criticality + n.risk_reduction)::numeric
+                   / n.job_size) DESC,
+                  n.position, n.id
          LIMIT $3"
     )))
     .bind(tenant.as_uuid())
-    .bind(project_id)
+    .bind(cadence.programme_id)
     .bind(slots)
     .fetch_all(&mut *conn)
     .await?;
@@ -3882,7 +3888,7 @@ pub async fn materialise_pi_tx(
         "SELECT count(*) FROM ({backlog_sql}) backlog"
     )))
     .bind(tenant.as_uuid())
-    .bind(project_id)
+    .bind(cadence.programme_id)
     .fetch_one(&mut *conn)
     .await?;
 
@@ -4256,6 +4262,10 @@ pub async fn propose_lesson_tx(
             why: "the statement is required",
         });
     }
+    // A lesson is evidence first: an empty array (or a non-array) references nothing at all.
+    if evidence.as_array().is_none_or(|refs| refs.is_empty()) {
+        return Err(PlanStoreError::Illegal(PlanError::LessonEvidenceMissing));
+    }
     // T8's rule reaches the retro too: the count is the distinct referenced objects, and a
     // single independent reference is never stored (the table CHECK is the backstop).
     let independent_count = crate::lesson::independent_count(evidence);
@@ -4517,7 +4527,19 @@ pub async fn close_retro_tx(
             .trim()
             .to_owned();
         let evidence = finding.get("evidence").cloned().unwrap_or(Value::Null);
-        if statement.is_empty() || !evidence.as_array().is_some_and(|refs| !refs.is_empty()) {
+        // Two different defects, two different answers: a finding with no lesson row and no
+        // inline proposal has NO lesson (named as such), while one that carries a partial
+        // proposal — a statement without evidence refs, or evidence without a statement —
+        // is an INCOMPLETE lesson. Collapsing them hid the missing-lesson case behind the
+        // wrong error (measured: retro_cannot_close_without_lessons expected
+        // RetroFindingWithoutLesson and got RetroFindingIncomplete).
+        let empty_evidence = !evidence.as_array().is_some_and(|refs| !refs.is_empty());
+        if statement.is_empty() && empty_evidence {
+            return Err(PlanStoreError::Illegal(
+                PlanError::RetroFindingWithoutLesson(key),
+            ));
+        }
+        if statement.is_empty() || empty_evidence {
             return Err(PlanStoreError::Illegal(PlanError::RetroFindingIncomplete(
                 key,
             )));
@@ -4528,9 +4550,11 @@ pub async fn close_retro_tx(
             .unwrap_or(false)
             || finding.get("kind").and_then(Value::as_str) == Some("systemic");
         let lesson_meta = if systemic {
-            // A systemic finding names the improvement it believes is worth opening; the kata
-            // gate (`kata.open`) validates measurability and refuses an unmeasurable one. The
-            // close never opens a kata itself (T5's gate is the only opener).
+            // A systemic finding names the improvement it believes is worth opening. When it also
+            // names the binding the kata would run on and a pre-registered prediction, the close
+            // emits the typed candidate — one kata, one `proposed` candidate row — in this
+            // transaction. A marker without them stays the lesson's note; `kata.open` remains the
+            // only path that makes a kata measurable.
             let kata = finding.get("kata").cloned().unwrap_or(Value::Null);
             let signature = kata
                 .get("signature")
@@ -4555,13 +4579,46 @@ pub async fn close_retro_tx(
                     key,
                 )));
             }
+            let prediction = kata.get("prediction").cloned().unwrap_or(Value::Null);
+            let binding_id = kata
+                .get("job_binding_id")
+                .and_then(Value::as_str)
+                .and_then(|raw| Uuid::parse_str(raw).ok());
+            if let (Some(binding_id), true) = (
+                binding_id,
+                prediction
+                    .as_object()
+                    .is_some_and(|object| !object.is_empty()),
+            ) {
+                let threshold = prediction.get("threshold").and_then(Value::as_f64);
+                crate::kata::open_retro_candidate_tx(
+                    &mut *conn,
+                    tenant,
+                    &signature,
+                    &title,
+                    &rationale,
+                    &target_ref,
+                    &prediction,
+                    binding_id,
+                    threshold,
+                )
+                .await
+                .map_err(|error| {
+                    tracing::error!(
+                        ?error,
+                        finding = %key,
+                        "close the retro: open its kata candidate"
+                    );
+                    PlanStoreError::Illegal(PlanError::RetroFindingIncomplete(key.clone()))
+                })?;
+            }
             serde_json::json!({
                 "kata_candidate": {
                     "signature": signature,
                     "title": title,
                     "rationale": rationale,
                     "target_ref": target_ref,
-                    "prediction": Value::Null,
+                    "prediction": prediction,
                 }
             })
         } else {
@@ -4850,11 +4907,14 @@ pub async fn benefit_realization_tx(
     })
 }
 
-/// Close a programme: its realization plan must name who continues the measurement.
+/// The conditions a programme meets before it may reach `closed`.
 ///
-/// "No plan" and "a plan with no owner" are different refusals, because they need different
-/// work; both write nothing.
-pub async fn close_programme_tx(
+/// A programme closes on its decision record and its measurement plan: at least one of its
+/// projects holds an approved `closure` governed asset, and the newest approved (or published)
+/// `benefits_realization_plan` names a `job` row as `meta.post_closure_owner` — a job id in this
+/// tenant, never free text. Every path that writes `closed` runs this first, so
+/// `programmes.update` and [`close_programme_tx`] cannot diverge; a refusal writes nothing.
+pub async fn assert_programme_can_close_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     programme_id: Uuid,
@@ -4869,24 +4929,71 @@ pub async fn close_programme_tx(
     if !exists {
         return Err(PlanStoreError::NotFound { what: "programme" });
     }
-    let plans: Vec<Option<String>> = sqlx::query_scalar(
+    let closure_asset: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1
+              FROM governed_asset a
+              JOIN project p ON p.tenant_id = a.tenant_id AND p.id = a.project_id
+             WHERE a.tenant_id = $1 AND p.programme_id = $2
+               AND a.kind = 'closure' AND a.status = 'approved'
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(programme_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if !closure_asset {
+        return Err(PlanStoreError::Illegal(PlanError::ClosureAssetMissing));
+    }
+    // "No plan" and "a plan with no owner" are different refusals, because they need different
+    // work. A plan that is not approved (or published) is no closure plan at all.
+    let owner: Option<Option<String>> = sqlx::query_scalar(
         "SELECT a.meta->>'post_closure_owner'
            FROM governed_asset a
            JOIN project p ON p.tenant_id = a.tenant_id AND p.id = a.project_id
           WHERE a.tenant_id = $1 AND p.programme_id = $2
             AND a.kind = 'benefits_realization_plan'
-          ORDER BY a.updated_at DESC",
+            AND a.status IN ('approved', 'published')
+          ORDER BY a.updated_at DESC, a.id DESC
+          LIMIT 1",
     )
     .bind(tenant.as_uuid())
     .bind(programme_id)
-    .fetch_all(&mut *conn)
+    .fetch_optional(&mut *conn)
     .await?;
-    let Some(owner) = plans.first() else {
+    let Some(owner) = owner else {
         return Err(PlanStoreError::Illegal(PlanError::RealizationPlanMissing));
     };
-    if owner.as_deref().is_none_or(|value| value.trim().is_empty()) {
+    let Some(owner_id) = owner
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .and_then(|value| Uuid::parse_str(value).ok())
+    else {
+        return Err(PlanStoreError::Illegal(PlanError::PostClosureOwnerMissing));
+    };
+    let job: bool =
+        sqlx::query_scalar("SELECT EXISTS (SELECT 1 FROM job WHERE tenant_id = $1 AND id = $2)")
+            .bind(tenant.as_uuid())
+            .bind(owner_id)
+            .fetch_one(&mut *conn)
+            .await?;
+    if !job {
         return Err(PlanStoreError::Illegal(PlanError::PostClosureOwnerMissing));
     }
+    Ok(())
+}
+
+/// Close a programme: its decision record and its measurement owner must both exist.
+///
+/// The conditions are [`assert_programme_can_close_tx`]'s, shared with every `programmes.update`
+/// that writes `closed`; the refusal writes nothing.
+pub async fn close_programme_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<(), PlanStoreError> {
+    assert_programme_can_close_tx(&mut *conn, tenant, programme_id).await?;
     sqlx::query(
         "UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2",

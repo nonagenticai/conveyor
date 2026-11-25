@@ -909,6 +909,10 @@ async fn coach_interrupt(
             // The one caller allowed to create a coach card (SPEC_V2 §6.2): the interruption
             // that references it is inserted in the same transaction (v1-p6-6).
             internal_coach_card: true,
+            internal_system_card: false,
+            // A coach card is the interruption's own record, not architecture-governed work;
+            // it carries no trace edge of its own (v1-w2c-6).
+            trace_link: None,
         },
     )
     .await?

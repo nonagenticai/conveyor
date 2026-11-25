@@ -44,8 +44,12 @@ async fn phases_a_to_f_pass_in_order() {
             "b": { "hld": ["business_capability_map"] },
             "c": { "hld": ["data_entity_catalog"] },
             "d": { "hld": ["technology_standards"] },
-            "e": { "sd": ["solution_concept"] },
-            "f": { "sd": ["business_capability_map"] },
+            // A phase kept in the set keeps its mandatory rows (0102).
+            "e": {
+                "sd": ["solution_concept"],
+                "hld": ["gap_analysis", "candidate_solutions", "project_context_diagram", "benefits_diagram"],
+            },
+            "f": { "sd": ["business_capability_map"], "hld": ["implementation_migration_plan"] },
         }),
         json!({
             "a": "statement_of_architecture_work",
@@ -156,6 +160,14 @@ async fn phases_a_to_f_pass_in_order() {
     // E and F borrow a seeded type: a tailored requirement may name any standard type, and an
     // absent set is refused rather than treated as satisfied.
     approved(&f, &project, "solution_concept", "e", "sd", "diagram").await;
+    for (key, kind) in [
+        ("gap_analysis", "matrix"),
+        ("candidate_solutions", "catalog"),
+        ("project_context_diagram", "diagram"),
+        ("benefits_diagram", "diagram"),
+    ] {
+        approved(&f, &project, key, "e", "hld", kind).await;
+    }
     let (status, out) = arch::advance(&f.running, &project, "e").await;
     assert_eq!(status, 200, "E: {out}");
     assert_eq!(out["next_phase"], "f", "{out}");
@@ -167,6 +179,15 @@ async fn phases_a_to_f_pass_in_order() {
         "f",
         "sd",
         "diagram",
+    )
+    .await;
+    approved(
+        &f,
+        &project,
+        "implementation_migration_plan",
+        "f",
+        "hld",
+        "catalog",
     )
     .await;
     arch::live_contract(&f, &project, "delivery_contract", "f").await;

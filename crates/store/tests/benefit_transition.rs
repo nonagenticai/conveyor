@@ -64,6 +64,17 @@ async fn fixture(db: &support::TestDb) -> Fixture {
         .expect("insert the project");
         projects.push(id);
     }
+    // The programme's decision record: a close reads the approved closure asset first.
+    sqlx::query(
+        "INSERT INTO governed_asset (tenant_id, kind, key, title, project_id, status)
+         VALUES ($1, 'closure', $2, 'Closure', $3, 'approved')",
+    )
+    .bind(tenant_id)
+    .bind(format!("closure-{}", Uuid::now_v7().simple()))
+    .bind(projects[0])
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the approved closure asset");
     let output: Uuid = sqlx::query_scalar(
         "INSERT INTO wbs_node (tenant_id, project_id, position, kind, title, status)
          VALUES ($1, $2, 0, 'deliverable', 'the new capability', 'open') RETURNING id",
@@ -299,9 +310,10 @@ async fn a_close_without_a_post_closure_owner_is_refused() {
         "a programme with no realization plan cannot close: {refused:?}"
     );
 
+    // A plan that is not approved is no closure plan at all.
     sqlx::query(
         "INSERT INTO governed_asset (tenant_id, kind, key, title, project_id, status, meta)
-         VALUES ($1, 'benefits_realization_plan', $2, 'Realization plan', $3, 'approved',
+         VALUES ($1, 'benefits_realization_plan', $2, 'Realization plan', $3, 'draft',
                  '{\"post_closure_owner\": \"\"}'::jsonb)",
     )
     .bind(f.tenant.as_uuid())
@@ -309,7 +321,27 @@ async fn a_close_without_a_post_closure_owner_is_refused() {
     .bind(f.project)
     .execute(&db.super_pool)
     .await
-    .expect("insert the plan");
+    .expect("insert the unapproved plan");
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let refused = spine::close_programme_tx(&mut tx, f.tenant, f.programme).await;
+    tx.rollback().await.expect("rollback");
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(PlanError::RealizationPlanMissing))
+        ),
+        "an unapproved plan is not a closure plan: {refused:?}"
+    );
+
+    // Approved, with an empty owner: the plan exists, its owner does not.
+    sqlx::query(
+        "UPDATE governed_asset SET status = 'approved'
+          WHERE tenant_id = $1 AND kind = 'benefits_realization_plan'",
+    )
+    .bind(f.tenant.as_uuid())
+    .execute(&db.super_pool)
+    .await
+    .expect("approve the plan");
     let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
     let refused = spine::close_programme_tx(&mut tx, f.tenant, f.programme).await;
     tx.rollback().await.expect("rollback");
@@ -321,6 +353,7 @@ async fn a_close_without_a_post_closure_owner_is_refused() {
         "a plan without a post-closure owner is refused: {refused:?}"
     );
 
+    // Free text is not an owner: the owner must be a job id.
     sqlx::query(
         "UPDATE governed_asset SET meta = jsonb_build_object('post_closure_owner', $2)
           WHERE tenant_id = $1 AND kind = 'benefits_realization_plan'",
@@ -329,11 +362,62 @@ async fn a_close_without_a_post_closure_owner_is_refused() {
     .bind(format!("ops lead ({})", f.user))
     .execute(&db.super_pool)
     .await
-    .expect("name the owner");
+    .expect("write a free-text owner");
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let refused = spine::close_programme_tx(&mut tx, f.tenant, f.programme).await;
+    tx.rollback().await.expect("rollback");
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(PlanError::PostClosureOwnerMissing))
+        ),
+        "free text is not a job id: {refused:?}"
+    );
+
+    // A UUID that names no job row is not a job id either.
+    sqlx::query(
+        "UPDATE governed_asset SET meta = jsonb_build_object('post_closure_owner', $2)
+          WHERE tenant_id = $1 AND kind = 'benefits_realization_plan'",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(Uuid::now_v7().to_string())
+    .execute(&db.super_pool)
+    .await
+    .expect("write a non-job owner");
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let refused = spine::close_programme_tx(&mut tx, f.tenant, f.programme).await;
+    tx.rollback().await.expect("rollback");
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(PlanError::PostClosureOwnerMissing))
+        ),
+        "an id that names no job cannot own the measurement: {refused:?}"
+    );
+
+    // A job row named by its id is the measured owner.
+    let job: Uuid = sqlx::query_scalar(
+        "INSERT INTO job (tenant_id, kind, dedupe_key)
+         VALUES ($1, 'closure', $2) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(format!("owner-{}", Uuid::now_v7().simple()))
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the post-closure job");
+    sqlx::query(
+        "UPDATE governed_asset SET meta = jsonb_build_object('post_closure_owner', $2)
+          WHERE tenant_id = $1 AND kind = 'benefits_realization_plan'",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(job.to_string())
+    .execute(&db.super_pool)
+    .await
+    .expect("name the job owner");
     let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
     spine::close_programme_tx(&mut tx, f.tenant, f.programme)
         .await
-        .expect("the named owner closes the programme");
+        .expect("the job owner closes the programme");
     tx.commit().await.expect("commit");
     let (status,): (String,) = sqlx::query_as("SELECT status FROM programme WHERE id = $1")
         .bind(f.programme)
@@ -341,4 +425,54 @@ async fn a_close_without_a_post_closure_owner_is_refused() {
         .await
         .expect("read the programme");
     assert_eq!(status, "closed");
+}
+
+#[tokio::test]
+async fn a_close_without_an_approved_closure_asset_is_refused() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    sqlx::query("DELETE FROM governed_asset WHERE tenant_id = $1 AND kind = 'closure'")
+        .bind(f.tenant.as_uuid())
+        .execute(&db.super_pool)
+        .await
+        .expect("remove the closure asset");
+    // A valid plan and job owner: the asset is the only missing condition.
+    let job: Uuid = sqlx::query_scalar(
+        "INSERT INTO job (tenant_id, kind, dedupe_key)
+         VALUES ($1, 'closure', $2) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(format!("owner-{}", Uuid::now_v7().simple()))
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the post-closure job");
+    sqlx::query(
+        "INSERT INTO governed_asset (tenant_id, kind, key, title, project_id, status, meta)
+         VALUES ($1, 'benefits_realization_plan', $2, 'Realization plan', $3, 'approved',
+                 jsonb_build_object('post_closure_owner', $4))",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(format!("RP-{}", Uuid::now_v7().simple()))
+    .bind(f.project)
+    .bind(job.to_string())
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the approved plan");
+
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let refused = spine::close_programme_tx(&mut tx, f.tenant, f.programme).await;
+    tx.rollback().await.expect("rollback");
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(PlanError::ClosureAssetMissing))
+        ),
+        "a programme with no approved closure asset cannot close: {refused:?}"
+    );
+    let (status,): (String,) = sqlx::query_as("SELECT status FROM programme WHERE id = $1")
+        .bind(f.programme)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("read the programme");
+    assert_eq!(status, "active", "the refusal wrote nothing");
 }

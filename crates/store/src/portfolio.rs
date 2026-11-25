@@ -72,6 +72,9 @@ pub enum PortfolioStoreError {
     /// A referenced parent does not exist in this tenant.
     #[error(transparent)]
     Parent(#[from] ParentError),
+    /// The programme's closure gate refused the write.
+    #[error(transparent)]
+    Closure(#[from] crate::spine::PlanStoreError),
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -352,6 +355,13 @@ pub async fn update_programme_tx(
         return Err(PortfolioStoreError::VersionMismatch {
             current: current.version,
         });
+    }
+    // A `closed` status is a transition, not an editable field: the same closure conditions the
+    // dedicated close runs must hold before the status can move, and the refusal writes nothing.
+    if patch.status.as_deref() == Some("closed") {
+        crate::spine::assert_programme_can_close_tx(&mut *conn, tenant, id)
+            .await
+            .map_err(PortfolioStoreError::Closure)?;
     }
     let sql = format!(
         "UPDATE programme

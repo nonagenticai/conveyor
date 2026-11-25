@@ -150,6 +150,7 @@ pub fn portfolio_error(error: PortfolioStoreError, action: &str) -> ActionError 
             "the baseline already carries an approver",
         ),
         PortfolioStoreError::Parent(error) => parent_error(error, action),
+        PortfolioStoreError::Closure(error) => crate::spine::spine_error(error, action),
         PortfolioStoreError::Database(error) => store_error(error, action),
     }
 }

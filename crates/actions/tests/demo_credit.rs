@@ -614,6 +614,110 @@ async fn a_retro_close_writes_the_lesson_and_a_systemic_candidate() {
     );
 }
 
+/// v1-p82-6 — a systemic finding that names the binding its kata would run on emits one typed
+/// candidate: a kata (visible through `kata.list`) and its `proposed` candidate row.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_systemic_finding_opens_one_kata_candidate() {
+    let (pg, running, seeded) = fixture().await;
+    let spine = support::kata::spine(&pg, &seeded).await;
+    let programme = create_programme(&running, "Retro candidate").await;
+    let project = create_project(&running).await;
+    let meta = retro_meta(&pg, seeded.tenant_id, &project).await;
+    let cadence = create_retro_cadence(&running, &programme, meta).await;
+    let cadence_id = Uuid::parse_str(&cadence).expect("the cadence uuid");
+
+    let findings = json!([{
+        "key": "F-1",
+        "statement": "the lease proof was missing again",
+        "evidence": ["retro:note-1", "retro:note-2"],
+        "systemic": true,
+        "kata": {
+            "signature": "lease-proof-candidate",
+            "title": "Pin the lease proof",
+            "rationale": "the same gap recurred",
+            "target_ref": {"kind": "procedure", "id": "lease"},
+            "prediction": {"threshold": 0.5},
+            "job_binding_id": spine.binding_id.to_string(),
+        }
+    }]);
+    let (status, body) = running
+        .invoke(
+            "retros.record_findings",
+            TOKEN,
+            json!({"cadence_id": cadence, "findings": findings}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let (status, body) = running
+        .invoke(
+            "retros.close",
+            TOKEN,
+            json!({"cadence_id": cadence}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+
+    let katas: Vec<(String, String)> =
+        sqlx::query_as("SELECT signature, status FROM kata WHERE tenant_id = $1")
+            .bind(seeded.tenant_id)
+            .fetch_all(&pg.super_pool)
+            .await
+            .expect("read the katas");
+    assert_eq!(
+        katas,
+        vec![("lease-proof-candidate".to_owned(), "open".to_owned())],
+        "one kata carries the systemic finding"
+    );
+    let candidates: Vec<(String, String)> = sqlx::query_as(
+        "SELECT c.title, c.status
+           FROM kata_candidate c
+           JOIN kata k ON k.tenant_id = c.tenant_id AND k.id = c.kata_id
+          WHERE c.tenant_id = $1",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_all(&pg.super_pool)
+    .await
+    .expect("read the candidates");
+    assert_eq!(
+        candidates,
+        vec![("Pin the lease proof".to_owned(), "proposed".to_owned())],
+        "the candidate is one proposed row"
+    );
+
+    // The kata is visible through the existing list query.
+    let (status, body) = running
+        .invoke("kata.list", TOKEN, json!({}), None, None, None)
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert!(
+        output(&body).as_array().is_some_and(|rows| rows
+            .iter()
+            .any(|row| row["signature"] == json!("lease-proof-candidate"))),
+        "the candidate's kata is listed: {body}"
+    );
+
+    // A second close writes no second candidate (idempotent per lesson).
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, seeded.tenant)
+        .await
+        .expect("scope the idempotent close");
+    conveyor_store::spine::close_retro_tx(&mut tx, seeded.tenant, cadence_id)
+        .await
+        .expect("the second close is idempotent");
+    tx.commit().await.expect("commit");
+    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM kata_candidate WHERE tenant_id = $1")
+        .bind(seeded.tenant_id)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("count the candidates");
+    assert_eq!(count, 1, "a second close writes no second candidate");
+}
+
 /// A retro cannot be closed through a generic cadence edit; the close gate is the only path.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn cadences_update_cannot_close_a_retro() {

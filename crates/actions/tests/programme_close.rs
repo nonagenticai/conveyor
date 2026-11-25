@@ -203,31 +203,44 @@ async fn charter(running: &support::Running, project: &str) {
     approve(running, &text(output(&body), "approval_id")).await;
 }
 
+/// The three baselines the closure completeness gate reads. The WBS node is created once, under
+/// the scope baseline; the schedule and cost baselines freeze the same project with no new nodes.
 async fn baseline(running: &support::Running, project: &str) {
+    baseline_kind(running, project, "scope", true).await;
+    baseline_kind(running, project, "schedule", false).await;
+    baseline_kind(running, project, "cost", false).await;
+}
+
+async fn baseline_kind(running: &support::Running, project: &str, kind: &str, with_wbs: bool) {
+    let wbs = if with_wbs {
+        json!([{
+            // The baseline is fixture for the close gate; the kind is not what it reads,
+            // and a `work_package` would owe a card (v1-p5-5).
+            "kind": "deliverable",
+            "title": "Deliver the project",
+            "business_value": 1,
+            "time_criticality": 1,
+            "risk_reduction": 1,
+            "job_size": 1,
+        }])
+    } else {
+        json!([])
+    };
     let (status, body) = running
         .invoke(
             "projects.baseline",
             TOKEN,
             json!({
                 "project_id": project,
-                "baseline_kind": "scope",
-                "wbs": [{
-                    // The baseline is fixture for the close gate; the kind is not what it reads,
-                    // and a `work_package` would owe a card (v1-p5-5).
-                    "kind": "deliverable",
-                    "title": "Deliver the project",
-                    "business_value": 1,
-                    "time_criticality": 1,
-                    "risk_reduction": 1,
-                    "job_size": 1,
-                }],
+                "baseline_kind": kind,
+                "wbs": wbs,
             }),
             None,
             None,
             None,
         )
         .await;
-    assert_eq!(status, 201, "{body}");
+    assert_eq!(status, 201, "{kind}: {body}");
     approve(running, &text(output(&body), "approval_id")).await;
 }
 
@@ -381,6 +394,20 @@ async fn close(
         .await
 }
 
+/// `programmes.update` to `closed` at the programme's initial version.
+async fn update_programme_closed(running: &support::Running, programme: &str) -> (u16, Value) {
+    running
+        .invoke(
+            "programmes.update",
+            TOKEN,
+            json!({"id": programme, "status": "closed"}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await
+}
+
 /// The published documents the fixture's mandatory set requires: the `v2-built` class
 /// (`project-brief`, `evidence`, `closure-review`), PMP's WBS and registers, and — because a
 /// programme project is governed — TOGAF's artefact pages. The delivery contract/compliance
@@ -483,6 +510,60 @@ async fn satisfy_mandatory_set(
     change_register_item(pg, seeded, project).await;
 }
 
+/// PMP §8.4's closure-completeness rows: one accepted deliverable and the four running
+/// registers (risk, issue, assumption, dependency).
+async fn satisfy_closure_completeness(pg: &support::Pg, seeded: &support::Seeded, project: &str) {
+    let project_id: Uuid = project.parse().expect("the project uuid");
+    sqlx::query(
+        "UPDATE wbs_node
+            SET status = 'accepted',
+                evidence = '[{\"kind\": \"document\", \"id\": \"acceptance\"}]'::jsonb,
+                version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("accept the deliverable");
+    for (index, kind) in ["risk", "issue", "assumption", "dependency"]
+        .into_iter()
+        .enumerate()
+    {
+        sqlx::query(
+            "INSERT INTO project_register_item (tenant_id, project_id, kind, code, title, body)
+             VALUES ($1, $2, $3, $4, $5, '')",
+        )
+        .bind(seeded.tenant_id)
+        .bind(project_id)
+        .bind(kind)
+        .bind(format!("REG-{index}"))
+        .bind(format!("A {kind} entry"))
+        .execute(&pg.super_pool)
+        .await
+        .expect("insert a running register row");
+    }
+}
+
+/// A project that meets every closure requirement, its closure gate already approved.
+async fn closable_project(
+    pg: &support::Pg,
+    running: &support::Running,
+    seeded: &support::Seeded,
+) -> String {
+    let delegation = support::delegation_ref(running, TOKEN).await;
+    let project = programme_project(pg, running, seeded).await;
+    charter(running, &project).await;
+    baseline(running, &project).await;
+    let contract = contract(pg, running, seeded, &project, &delegation).await;
+    review(running, &project, &contract, &delegation).await;
+    satisfy_mandatory_set(pg, running, seeded, &project, None).await;
+    satisfy_closure_completeness(pg, seeded, &project).await;
+    let gate = close_request(running, &project, &delegation).await;
+    approve(running, &gate).await;
+    project
+}
+
 /// An approved closure decision over an approved closure asset, written directly. A standalone
 /// project has no `projects.close_request` path (it refuses non-programme projects), so the
 /// fixture that needs a standalone close gate writes the two rows the gate reads.
@@ -556,6 +637,7 @@ async fn a_programme_project_closes_through_the_one_gate() {
     let contract = contract(&pg, &running, &seeded, &project, &delegation).await;
     review(&running, &project, &contract, &delegation).await;
     satisfy_mandatory_set(&pg, &running, &seeded, &project, None).await;
+    satisfy_closure_completeness(&pg, &seeded, &project).await;
 
     let gate = close_request(&running, &project, &delegation).await;
     approve(&running, &gate).await;
@@ -567,6 +649,257 @@ async fn a_programme_project_closes_through_the_one_gate() {
         "closed",
         "the conformant close closes: {body}"
     );
+}
+
+/// v1-p83-6 — the plan must be complete: no approved schedule baseline, no close.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn close_refuses_without_a_schedule_baseline() {
+    let (pg, running, seeded) = fixture().await;
+    let project = closable_project(&pg, &running, &seeded).await;
+    let project_id: Uuid = project.parse().expect("the project uuid");
+    sqlx::query(
+        "DELETE FROM project_baseline
+          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'schedule'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("remove the schedule baseline");
+
+    let (status, body) = close(&pg, &running, &seeded, &project).await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(body["type"], "closure_schedule_baseline_missing", "{body}");
+    assert_eq!(project_status(&running, &project).await, "active");
+}
+
+/// v1-p83-6 — no approved cost baseline, no close.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn close_refuses_without_a_cost_baseline() {
+    let (pg, running, seeded) = fixture().await;
+    let project = closable_project(&pg, &running, &seeded).await;
+    let project_id: Uuid = project.parse().expect("the project uuid");
+    sqlx::query(
+        "DELETE FROM project_baseline
+          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'cost'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("remove the cost baseline");
+
+    let (status, body) = close(&pg, &running, &seeded, &project).await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(body["type"], "closure_cost_baseline_missing", "{body}");
+    assert_eq!(project_status(&running, &project).await, "active");
+}
+
+/// v1-p83-6 — a closure with no accepted deliverable is not a delivered project.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn close_refuses_without_an_accepted_deliverable() {
+    let (pg, running, seeded) = fixture().await;
+    let project = closable_project(&pg, &running, &seeded).await;
+    let project_id: Uuid = project.parse().expect("the project uuid");
+    sqlx::query(
+        "UPDATE wbs_node SET status = 'open', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("reopen the deliverable");
+
+    let (status, body) = close(&pg, &running, &seeded, &project).await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(body["type"], "closure_deliverable_missing", "{body}");
+    assert_eq!(project_status(&running, &project).await, "active");
+}
+
+/// v1-p83-6 — each of the four running registers must be non-empty; the refusal names the kind.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn close_refuses_a_missing_register_kind() {
+    let (pg, running, seeded) = fixture().await;
+    let project = closable_project(&pg, &running, &seeded).await;
+    let project_id: Uuid = project.parse().expect("the project uuid");
+    for (index, kind) in ["risk", "issue", "assumption", "dependency"]
+        .into_iter()
+        .enumerate()
+    {
+        sqlx::query(
+            "DELETE FROM project_register_item
+              WHERE tenant_id = $1 AND project_id = $2 AND kind = $3",
+        )
+        .bind(seeded.tenant_id)
+        .bind(project_id)
+        .bind(kind)
+        .execute(&pg.super_pool)
+        .await
+        .expect("remove the register kind");
+
+        let (status, body) = close(&pg, &running, &seeded, &project).await;
+        assert_eq!(status, 409, "{kind}: {body}");
+        assert_eq!(body["type"], "closure_register_missing", "{kind}: {body}");
+        let detail = body["detail"].as_str().expect("a detail");
+        assert!(detail.contains(kind), "the refusal names {kind}: {detail}");
+
+        sqlx::query(
+            "INSERT INTO project_register_item (tenant_id, project_id, kind, code, title, body)
+             VALUES ($1, $2, $3, $4, $5, '')",
+        )
+        .bind(seeded.tenant_id)
+        .bind(project_id)
+        .bind(kind)
+        .bind(format!("REG-again-{index}"))
+        .bind(format!("A {kind} entry"))
+        .execute(&pg.super_pool)
+        .await
+        .expect("restore the register kind");
+    }
+    let (status, body) = close(&pg, &running, &seeded, &project).await;
+    assert_eq!(status, 200, "all four registers close the project: {body}");
+}
+
+/// v1-p83-5 — `programmes.update` cannot write `closed` around the programme's closure gate.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn programmes_update_runs_the_closure_gate_before_closing() {
+    let (pg, running, seeded) = fixture().await;
+    let (status, body) = running
+        .invoke(
+            "programmes.create",
+            TOKEN,
+            json!({"name": "Gate"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let programme = text(output(&body), "id");
+    let programme_id: Uuid = programme.parse().expect("the programme uuid");
+    let project: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name, programme_id)
+         VALUES ($1, $2, 'Closure project', $3) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(format!("PC-{}", Uuid::now_v7().simple()))
+    .bind(programme_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the project");
+
+    // No decision record: refused, and the row did not move.
+    let (status, refused) = update_programme_closed(&running, &programme).await;
+    assert_eq!(status, 409, "{refused}");
+    assert_eq!(
+        refused["type"], "programme_closure_asset_missing",
+        "{refused}"
+    );
+    let (status, read) = running
+        .invoke(
+            "programmes.get",
+            TOKEN,
+            json!({"id": programme.as_str()}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{read}");
+    assert_eq!(
+        output(&read)["status"],
+        "active",
+        "nothing was written: {read}"
+    );
+    assert_eq!(
+        output(&read)["version"],
+        1,
+        "the version did not move: {read}"
+    );
+
+    // The approved closure asset exists; the measurement plan does not.
+    sqlx::query(
+        "INSERT INTO governed_asset (tenant_id, kind, key, title, project_id, status)
+         VALUES ($1, 'closure', $2, 'Closure', $3, 'approved')",
+    )
+    .bind(seeded.tenant_id)
+    .bind(format!("closure-{}", Uuid::now_v7().simple()))
+    .bind(project)
+    .execute(&pg.super_pool)
+    .await
+    .expect("insert the closure asset");
+    let (status, refused) = update_programme_closed(&running, &programme).await;
+    assert_eq!(status, 409, "{refused}");
+    assert_eq!(
+        refused["type"], "programme_realization_plan_missing",
+        "{refused}"
+    );
+
+    // An approved plan with free text where the owner belongs is not an owner.
+    let plan: Uuid = sqlx::query_scalar(
+        "INSERT INTO governed_asset
+             (tenant_id, kind, key, title, project_id, status, meta)
+         VALUES ($1, 'benefits_realization_plan', $2, 'Plan', $3, 'approved',
+                 '{\"post_closure_owner\": \"ops lead\"}'::jsonb)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(format!("plan-{}", Uuid::now_v7().simple()))
+    .bind(project)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the realization plan");
+    let (status, refused) = update_programme_closed(&running, &programme).await;
+    assert_eq!(status, 409, "{refused}");
+    assert_eq!(
+        refused["type"], "programme_post_closure_owner_missing",
+        "{refused}"
+    );
+
+    // A UUID that names no job row is not an owner either.
+    sqlx::query(
+        "UPDATE governed_asset
+            SET meta = jsonb_build_object('post_closure_owner', $2)
+          WHERE tenant_id = $1 AND id = $3",
+    )
+    .bind(seeded.tenant_id)
+    .bind(Uuid::now_v7().to_string())
+    .bind(plan)
+    .execute(&pg.super_pool)
+    .await
+    .expect("write a non-job owner");
+    let (status, refused) = update_programme_closed(&running, &programme).await;
+    assert_eq!(status, 409, "{refused}");
+    assert_eq!(
+        refused["type"], "programme_post_closure_owner_missing",
+        "{refused}"
+    );
+
+    // A real job id is a measured owner: the same edit now closes the programme.
+    let job: Uuid = sqlx::query_scalar(
+        "INSERT INTO job (tenant_id, kind, dedupe_key)
+         VALUES ($1, 'closure', $2) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(format!("owner-{}", Uuid::now_v7().simple()))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the post-closure job");
+    sqlx::query(
+        "UPDATE governed_asset
+            SET meta = jsonb_build_object('post_closure_owner', $2)
+          WHERE tenant_id = $1 AND id = $3",
+    )
+    .bind(seeded.tenant_id)
+    .bind(job.to_string())
+    .bind(plan)
+    .execute(&pg.super_pool)
+    .await
+    .expect("name the job owner");
+    let (status, body) = update_programme_closed(&running, &programme).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(output(&body)["status"], "closed", "{body}");
 }
 
 /// v1-close-1 — a project cannot close while one mandatory artefact is unpublished.
@@ -597,18 +930,70 @@ async fn close_refuses_a_missing_mandatory_artefact() {
     assert_eq!(project_status(&running, &project).await, "active");
 }
 
-/// v1-close-1 — the committed ledger's open P0 for `S06` refuses the close even when every
-/// document and typed row exists.
+/// v1-close-1 — an open P0 REWORK CARD refuses the close even when every document and typed
+/// row exists.
+///
+/// The close gate reads two sources: the committed ledger (proved on constructed findings in
+/// `conveyor-domain` — the ledger currently carries no open P0, and a test that pinned one
+/// turned red the day it was resolved) and the materialised rework cards. This test proves the
+/// card half through the product's own create action.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn close_refuses_an_open_p0_finding() {
+async fn close_refuses_an_open_p0_rework_card() {
     let (pg, running, seeded) = fixture().await;
     let delegation = support::delegation_ref(&running, TOKEN).await;
-    let project = programme_project_keyed(&pg, &running, &seeded, "S06").await;
+    let project = programme_project_keyed(&pg, &running, &seeded, "S14").await;
     charter(&running, &project).await;
     baseline(&running, &project).await;
     let contract = contract(&pg, &running, &seeded, &project, &delegation).await;
     review(&running, &project, &contract, &delegation).await;
     satisfy_mandatory_set(&pg, &running, &seeded, &project, None).await;
+    satisfy_closure_completeness(&pg, &seeded, &project).await;
+
+    let project_id: Uuid = project.parse().expect("the project uuid");
+    sqlx::query(
+        "INSERT INTO card_type (tenant_id, code, label) VALUES ($1, 'rework', 'Rework')
+         ON CONFLICT DO NOTHING",
+    )
+    .bind(seeded.tenant_id)
+    .execute(&pg.super_pool)
+    .await
+    .expect("seed the rework card type");
+    let (board, lane): (Uuid, Uuid) = sqlx::query_as(
+        "SELECT b.id, l.id
+           FROM board b
+           JOIN list l ON l.tenant_id = b.tenant_id AND l.board_id = b.id
+          WHERE b.tenant_id = $1 AND b.project_id = $2
+            AND l.kind NOT IN ('done', 'archive')
+          ORDER BY l.position
+          LIMIT 1",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the project's board and a live lane");
+    let (status, body) = running
+        .invoke(
+            "cards.create",
+            TOKEN,
+            json!({
+                "board_id": board,
+                "list_id": lane,
+                "name": "Open P0 rework",
+                "card_type_code": "rework",
+                "meta": {
+                    "rework_key": "v1-test-p0",
+                    "severity": "P0",
+                    "owner_project": "S14"
+                }
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+
     let gate = close_request(&running, &project, &delegation).await;
     approve(&running, &gate).await;
 
@@ -617,8 +1002,8 @@ async fn close_refuses_an_open_p0_finding() {
     assert_eq!(body["type"], "closure_open_p0", "{body}");
     let detail = body["detail"].as_str().expect("a detail");
     assert!(
-        detail.contains("v1-s06-2"),
-        "the refusal names the open finding: {detail}"
+        detail.contains("v1-test-p0"),
+        "the refusal names the open card: {detail}"
     );
     assert_eq!(project_status(&running, &project).await, "active");
 }
@@ -636,6 +1021,7 @@ async fn an_unexpired_waiver_suppresses_an_open_p0_finding() {
     let contract = contract(&pg, &running, &seeded, &project, &delegation).await;
     review(&running, &project, &contract, &delegation).await;
     satisfy_mandatory_set(&pg, &running, &seeded, &project, None).await;
+    satisfy_closure_completeness(&pg, &seeded, &project).await;
     let gate = close_request(&running, &project, &delegation).await;
     approve(&running, &gate).await;
 

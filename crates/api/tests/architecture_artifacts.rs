@@ -8,6 +8,7 @@ mod arch;
 mod support;
 
 use serde_json::json;
+use uuid::Uuid;
 
 #[tokio::test]
 async fn a_catalog_is_queryable_rows() {
@@ -139,6 +140,9 @@ async fn an_approved_artefact_is_immutable() {
 async fn reuse_is_searchable_across_plateaus() {
     let f = arch::fixture().await;
     arch::tailor(&f, json!({}), json!({})).await;
+    // A link joins two artefacts of ONE project (#526); the reuse property under test is the
+    // plateau search, not a project boundary.
+    let project = arch::project(&f.running, "architecture").await;
 
     let enterprise_type = arch::type_id(&f.running, "business_capability_map").await;
     let enterprise = arch::artifact(
@@ -147,7 +151,7 @@ async fn reuse_is_searchable_across_plateaus() {
         "hld",
         "diagram",
         "Enterprise capability map",
-        json!({ "artifact_type_id": enterprise_type }),
+        json!({ "project_id": project, "artifact_type_id": enterprise_type }),
     )
     .await;
     let enterprise_id = arch::id_of(&enterprise);
@@ -160,7 +164,7 @@ async fn reuse_is_searchable_across_plateaus() {
         "sd",
         "diagram",
         "Solution concept reuse probe",
-        json!({ "artifact_type_id": solution_type }),
+        json!({ "project_id": project, "artifact_type_id": solution_type }),
     )
     .await;
     let solution_id = arch::id_of(&solution);
@@ -205,4 +209,122 @@ async fn reuse_is_searchable_across_plateaus() {
     )
     .await;
     assert_eq!(links["items"][0]["kind"], "reuse", "{links}");
+}
+
+/// Every link row of the tenant, read as the superuser so a refused insert cannot hide behind
+/// the request's own scope.
+async fn link_rows(f: &arch::Fixture) -> i64 {
+    sqlx::query_scalar("SELECT count(*) FROM architecture_artifact_link WHERE tenant_id = $1")
+        .bind(f.seeded.tenant_id)
+        .fetch_one(&f.pg.super_pool)
+        .await
+        .expect("count the tenant's links")
+}
+
+#[tokio::test]
+async fn a_link_across_projects_is_refused() {
+    let f = arch::fixture().await;
+    arch::tailor(&f, json!({}), json!({})).await;
+    let home = arch::project(&f.running, "architecture").await;
+    let other = arch::project(&f.running, "architecture").await;
+    let artifact_type_id = arch::type_id(&f.running, "solution_concept").await;
+    let from = arch::artifact(
+        &f.running,
+        "a",
+        "sd",
+        "diagram",
+        "Home solution",
+        json!({ "project_id": home, "artifact_type_id": artifact_type_id }),
+    )
+    .await;
+    let to = arch::artifact(
+        &f.running,
+        "a",
+        "sd",
+        "diagram",
+        "Other project's solution",
+        json!({ "project_id": other, "artifact_type_id": artifact_type_id }),
+    )
+    .await;
+
+    let (status, refused) = arch::call(
+        &f.running,
+        "architecture.artifacts_link",
+        json!({
+            "from_artifact_id": arch::id_of(&from),
+            "to_artifact_id": arch::id_of(&to),
+            "kind": "reuse",
+        }),
+        None,
+    )
+    .await;
+    assert_eq!(status, 409, "a cross-project link was written: {refused}");
+    assert_eq!(refused["type"], "conflict", "{refused}");
+    assert!(
+        refused["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("same project"),
+        "the refusal does not name the project boundary: {refused}"
+    );
+    assert_eq!(link_rows(&f).await, 0, "a refused link wrote a row");
+}
+
+#[tokio::test]
+async fn a_link_across_tenants_is_refused() {
+    let f = arch::fixture().await;
+    arch::tailor(&f, json!({}), json!({})).await;
+    let home = arch::project(&f.running, "architecture").await;
+    let artifact_type_id = arch::type_id(&f.running, "solution_concept").await;
+    let from = arch::artifact(
+        &f.running,
+        "a",
+        "sd",
+        "diagram",
+        "Home solution",
+        json!({ "project_id": home, "artifact_type_id": artifact_type_id }),
+    )
+    .await;
+
+    // A second tenant's artefact is invisible to this request's scope: the join cannot see it,
+    // so the link is refused exactly as a project-boundary crossing is.
+    let foreign_tenant: Uuid = sqlx::query_scalar(
+        "INSERT INTO tenant (slug, name) VALUES ('link-foreign', 'Foreign') RETURNING id",
+    )
+    .fetch_one(&f.pg.super_pool)
+    .await
+    .expect("insert the foreign tenant");
+    let foreign_project: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name) VALUES ($1, 'FOREIGN', 'Foreign') RETURNING id",
+    )
+    .bind(foreign_tenant)
+    .fetch_one(&f.pg.super_pool)
+    .await
+    .expect("insert the foreign project");
+    let foreign: Uuid = sqlx::query_scalar(
+        "INSERT INTO architecture_artifact
+             (tenant_id, project_id, phase_code, plateau, artifact_kind, title)
+         VALUES ($1, $2, 'a', 'sd', 'diagram', 'Foreign solution')
+         RETURNING id",
+    )
+    .bind(foreign_tenant)
+    .bind(foreign_project)
+    .fetch_one(&f.pg.super_pool)
+    .await
+    .expect("insert the foreign artefact");
+
+    let (status, refused) = arch::call(
+        &f.running,
+        "architecture.artifacts_link",
+        json!({
+            "from_artifact_id": arch::id_of(&from),
+            "to_artifact_id": foreign,
+            "kind": "reuse",
+        }),
+        None,
+    )
+    .await;
+    assert_eq!(status, 409, "a cross-tenant link was written: {refused}");
+    assert_eq!(refused["type"], "conflict", "{refused}");
+    assert_eq!(link_rows(&f).await, 0, "a refused link wrote a row");
 }

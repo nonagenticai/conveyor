@@ -62,6 +62,9 @@ fn arch_error(error: ArchitectureStoreError, action: &str) -> ActionError {
                 ArchitectureRule::OutcomeNotApproved(_) => {
                     ActionError::new(409, "architecture_outcome_not_approved", detail)
                 }
+                ArchitectureRule::OutcomeNotOnDeliveryContract => {
+                    ActionError::new(409, "architecture_outcome_not_on_delivery_contract", detail)
+                }
                 ArchitectureRule::AssessmentIncomplete { .. } => {
                     invalid("scores", "assessment_incomplete", detail)
                 }
@@ -331,6 +334,23 @@ async fn architecture_artifacts_create(
     ctx: HandlerCtx,
     input: ArtifactCreateIn,
 ) -> Result<HandlerOutput<ArtifactOut>, ActionError> {
+    // An artefact is a typed row of a project, not a free-floating document: the phase gate
+    // resolves it by its project and its standard type, so a row missing either can never
+    // evidence a phase and would only hide in the repository. Refused before the store writes.
+    let Some(project_id) = input.project_id else {
+        return Err(invalid(
+            "project_id",
+            "required",
+            "an artefact must name the project it belongs to",
+        ));
+    };
+    let Some(artifact_type_id) = input.artifact_type_id else {
+        return Err(invalid(
+            "artifact_type_id",
+            "required",
+            "an artefact must name its artifact_type",
+        ));
+    };
     let entries: Vec<NewEntry> = input
         .entries
         .iter()
@@ -342,8 +362,8 @@ async fn architecture_artifacts_create(
         })
         .collect();
     let new = NewArtifact {
-        project_id: input.project_id,
-        artifact_type_id: input.artifact_type_id,
+        project_id: Some(project_id),
+        artifact_type_id: Some(artifact_type_id),
         phase_code: input.phase_code,
         plateau: input.plateau,
         artifact_kind: input.artifact_kind,

@@ -1254,6 +1254,117 @@ pub async fn insert_candidate_tx(
         .await?)
 }
 
+/// Open a retro finding's systemic marker as a typed candidate.
+///
+/// The finding names the ACTIVE binding the kata would run on; the kata is opened once per
+/// signature (the same live-signature rule `open_tx` enforces), and one `kata_candidate` in
+/// `proposed` — the review state — is recorded under it. A re-close of the same retro finds both
+/// rows and writes nothing, so the pair is idempotent.
+pub async fn open_retro_candidate_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    signature: &str,
+    title: &str,
+    rationale: &str,
+    target_ref: &Value,
+    prediction: &Value,
+    job_binding_id: Uuid,
+    threshold: Option<f64>,
+) -> Result<Uuid, KataStoreError> {
+    let existing: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM kata
+          WHERE tenant_id = $1 AND signature = $2
+            AND status IN ('open', 'observed', 'analysed', 'hypothesised', 'proposed', 'measured')
+          ORDER BY created_at, id LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(signature)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let kata_id = match existing {
+        Some(id) => id,
+        None => {
+            let binding: Option<(String, String)> = sqlx::query_as(
+                "SELECT release_hash, status FROM job_binding
+                  WHERE tenant_id = $1 AND id = $2",
+            )
+            .bind(tenant.as_uuid())
+            .bind(job_binding_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+            let Some((release_hash, status)) = binding else {
+                return Err(KataStoreError::NotOpen {
+                    status: "no such binding".to_owned(),
+                });
+            };
+            if status != "active" {
+                return Err(KataStoreError::NotOpen { status });
+            }
+            let surface = target_ref
+                .get("kind")
+                .and_then(Value::as_str)
+                .filter(|kind| {
+                    matches!(
+                        *kind,
+                        "procedure" | "prompt" | "knowledge" | "tool" | "job_config" | "code"
+                    )
+                })
+                .unwrap_or("procedure")
+                .to_owned();
+            let target = target_ref
+                .get("id")
+                .or_else(|| target_ref.get("ref"))
+                .and_then(Value::as_str)
+                .unwrap_or(signature)
+                .to_owned();
+            open_tx(
+                &mut *conn,
+                tenant,
+                NewKata {
+                    job_binding_id,
+                    release_hash,
+                    signature: signature.to_owned(),
+                    title: title.to_owned(),
+                    target_surface: surface,
+                    target_ref: target,
+                    threshold,
+                    instrument_version_id: None,
+                    baseline_version_id: None,
+                    created_by: None,
+                    project_id: None,
+                    instrument_kind: None,
+                    instrument_id: None,
+                    instrument_version: None,
+                    split: None,
+                    split_sha256: None,
+                    prediction_payload: Some(prediction.clone()),
+                    base_ref: Some(target_ref.clone()),
+                },
+            )
+            .await?
+            .id
+        }
+    };
+    let exists: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM kata_candidate
+             WHERE tenant_id = $1 AND kata_id = $2 AND title = $3
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(kata_id)
+    .bind(title.trim())
+    .fetch_one(&mut *conn)
+    .await?;
+    if !exists {
+        insert_candidate_tx(
+            &mut *conn, tenant, kata_id, title, rationale, target_ref, prediction,
+        )
+        .await?;
+    }
+    Ok(kata_id)
+}
+
 /// Register one propagation target; it starts `pending` and carries its own later gate.
 pub async fn propagate_tx(
     conn: &mut PgConnection,

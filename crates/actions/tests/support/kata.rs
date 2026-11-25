@@ -107,6 +107,7 @@ pub async fn spine(pg: &Pg, seeded: &Seeded) -> Spine {
         .expect("release");
     let capability: Uuid = sqlx::query_scalar(
         "INSERT INTO capability (tenant_id, code, label) VALUES ($1, 'kata', 'Kata')
+         ON CONFLICT (tenant_id, code) DO UPDATE SET label = excluded.label
          RETURNING id",
     )
     .bind(seeded.tenant_id)

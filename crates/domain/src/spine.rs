@@ -257,6 +257,12 @@ pub enum PlanError {
     /// The realization plan does not name who continues measurement after closure.
     #[error("post_closure_owner_missing")]
     PostClosureOwnerMissing,
+    /// The programme has no approved closure asset among its projects.
+    #[error("closure_asset_missing")]
+    ClosureAssetMissing,
+    /// A lesson carries no evidence reference at all.
+    #[error("lesson_evidence_missing")]
+    LessonEvidenceMissing,
 }
 
 /// Compute the WSJF score from the four stored inputs.

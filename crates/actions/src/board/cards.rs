@@ -13,9 +13,12 @@
 //! Every mutation writes exactly one `event` row in the same transaction (CONTRACT §7).
 
 use chrono::Utc;
-use conveyor_domain::{ArchiveError, Card, CardType, ListKind, TenantId, Version};
+use conveyor_domain::{
+    ArchiveError, AssetKind, AssetStatus, Card, CardType, ListKind, TenantId, Version,
+};
 use conveyor_store as store;
 use conveyor_store::card::{CardRecord, CardUpdate, NewCard};
+use conveyor_store::trace_link::{END_TYPES, LINK_KINDS, NewTraceLink};
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -26,10 +29,11 @@ use crate::board::events::{
 use crate::board::matrix;
 use crate::board::read::card_view_tx;
 use crate::board::views::{
-    CardCreateIn, CardDuplicateIn, CardLabelIn, CardOut, CardUpdateIn, CardView, CardsCommentIn,
-    CardsListIn, CardsMoveIn, CommentOut, IdIn, card_out, comment_out,
+    CardCreateIn, CardCreateTraceIn, CardDuplicateIn, CardLabelIn, CardOut, CardUpdateIn, CardView,
+    CardsCommentIn, CardsListIn, CardsMoveIn, CommentOut, IdIn, card_out, comment_out,
 };
 use crate::board::{etag_of, invalid, require_precondition_with, row_version, store_error};
+use crate::governance::trace::trace_error;
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 use crate::views::Page;
@@ -94,10 +98,134 @@ async fn assert_card_done_tx(
 
 use super::events::card_event;
 
+/// The project type whose cards are architecture-governed (TOGAF §8.5, v1-w2c-6).
+const ARCHITECTURE_PROJECT_TYPE: &str = "architecture";
+
+/// A validated birth edge: the card is always the `from` end, so only the other end survives
+/// validation. The id of the `from` end does not exist until the card is inserted, which is
+/// why the edge is described here and written immediately after the insert.
+struct CardTrace {
+    to_type: String,
+    to_id: Uuid,
+    kind: String,
+}
+
+/// Validate the trace edge an architecture-governed card must be born with (v1-w2c-6).
+///
+/// The board's project type is the switch. A board whose project type is `architecture`
+/// refuses a card with no `trace_link` (`409 card_trace_link_required`) and one whose target
+/// is not an APPROVED requirement or ADR (`409 card_trace_link_unapproved`); the edge is
+/// written in the same transaction as the card, so a card with no valid edge never commits.
+/// Every other project type keeps creating cards with no link; a link the caller does supply
+/// there is still validated and written, never silently ignored.
+///
+/// `internal` covers the actions that open a system record — `coach.interrupt`'s coach card
+/// and the ops/reconciliation incident cards — which are records of what happened, not
+/// governed work, so the required-edge rule does not apply to them. The flags are
+/// `serde(skip)`/`schemars(skip)` on the input, so no caller of the public action can reach
+/// them.
+async fn card_trace_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    board_id: Uuid,
+    trace: Option<CardCreateTraceIn>,
+    internal: bool,
+) -> Result<Option<CardTrace>, ActionError> {
+    let project_type = store::board::project_type_code_for_board_tx(&mut *conn, tenant, board_id)
+        .await
+        .map_err(|error| store_error(error, "cards.create"))?;
+    let governed = project_type.as_deref() == Some(ARCHITECTURE_PROJECT_TYPE);
+    let Some(trace) = trace else {
+        if governed && !internal {
+            return Err(ActionError::new(
+                409,
+                "card_trace_link_required",
+                "an architecture-governed board accepts no card without a trace link to an \
+                 APPROVED requirement or architecture asset (TOGAF §8.5)",
+            ));
+        }
+        return Ok(None);
+    };
+    if !END_TYPES.contains(&trace.to_type.as_str()) {
+        return Err(invalid(
+            "trace_link.to_type",
+            "invalid_value",
+            format!(
+                "{:?} is not a trace end type; expected one of {}",
+                trace.to_type,
+                END_TYPES.join(", ")
+            ),
+        ));
+    }
+    let kind = trace.kind.as_deref().unwrap_or("traces");
+    if !LINK_KINDS.contains(&kind) {
+        return Err(invalid(
+            "trace_link.kind",
+            "invalid_value",
+            format!(
+                "{kind:?} is not a trace kind; expected one of {}",
+                LINK_KINDS.join(", ")
+            ),
+        ));
+    }
+    if governed && trace.to_type != "governed_asset" {
+        return Err(ActionError::new(
+            409,
+            "card_trace_link_unapproved",
+            "architecture-governed work traces to an approved governed asset (a requirement \
+             or an architecture decision), not to another end type",
+        ));
+    }
+    if governed {
+        let asset = store::governance::get_asset_tx(&mut *conn, tenant, trace.to_id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "read the card's trace target");
+                ActionError::internal()
+            })?
+            .ok_or_else(|| {
+                ActionError::new(
+                    409,
+                    "card_trace_link_unapproved",
+                    format!(
+                        "no governed asset {} in this tenant; a governed card traces to an \
+                         APPROVED requirement or architecture asset",
+                        trace.to_id
+                    ),
+                )
+            })?;
+        if asset.status != AssetStatus::Approved
+            || !matches!(asset.kind, AssetKind::Requirement | AssetKind::Adr)
+        {
+            return Err(ActionError::new(
+                409,
+                "card_trace_link_unapproved",
+                format!(
+                    "governed asset {} is {} {}; a governed card traces to an APPROVED \
+                     requirement or architecture asset",
+                    asset.id,
+                    asset.status.as_str(),
+                    asset.kind.as_str()
+                ),
+            ));
+        }
+    }
+    Ok(Some(CardTrace {
+        to_type: trace.to_type,
+        to_id: trace.to_id,
+        kind: kind.to_owned(),
+    }))
+}
+
 /// Create a card in a live lane.
 ///
 /// Birth is not a transition (S5-D6): the matrix has no from-state, so any lane except the
 /// archive kind is accepted. The position is appended under the board's advisory lock.
+///
+/// On an architecture-governed board (`project.project_type_code = "architecture"`) the card
+/// is born with a trace edge to an APPROVED requirement or architecture asset, written in the
+/// same transaction (TOGAF §8.5, v1-w2c-6); see [`card_trace_tx`]. Every other board is
+/// unchanged.
 #[crate::action(
     name = "cards.create",
     version = 1,
@@ -192,6 +320,17 @@ pub(crate) async fn cards_create(
         }
     };
 
+    // The governance refusal happens BEFORE the card is written, so a refused create adds no
+    // row and no event; the edge itself is written after the insert, in this transaction.
+    let trace = card_trace_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.board_id,
+        input.trace_link,
+        input.internal_coach_card || input.internal_system_card,
+    )
+    .await?;
+
     store::position::lock_board_tx(&mut *tx, ctx.tenant, input.board_id)
         .await
         .map_err(|error| store_error(error, "cards.create"))?;
@@ -234,6 +373,23 @@ pub(crate) async fn cards_create(
         ),
         store::card::CardStoreError::Database(error) => store_error(error, "cards.create"),
     })?;
+
+    // The birth edge: same transaction as the card, so the two commit together or not at all.
+    if let Some(trace) = trace {
+        store::trace_link::insert_trace_link_tx(
+            &mut *tx,
+            ctx.tenant,
+            &NewTraceLink {
+                from_type: "card".to_owned(),
+                from_id: created.id,
+                to_type: trace.to_type,
+                to_id: trace.to_id,
+                kind: trace.kind,
+            },
+        )
+        .await
+        .map_err(|error| trace_error(error, "cards.create"))?;
+    }
 
     let record = read_card(tx, ctx.tenant, created.id).await?;
     card_event(

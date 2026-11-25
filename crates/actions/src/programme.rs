@@ -634,6 +634,68 @@ pub(crate) async fn assert_project_can_close(
     // order above is unchanged; a standalone project with a closure gate met them at its branch.
     assert_mandatory_artefacts(&mut *tx, tenant, &project).await?;
     assert_no_open_p0(&mut *tx, tenant, &project).await?;
+
+    // v1-p83-6 (PMP §8.4): the plan the closure freezes must itself be complete — the schedule
+    // and cost baselines approved, at least one deliverable accepted, and the four running
+    // registers populated. An archived or folded project is history, so it keeps the same
+    // exemption the mandatory artefact set applies.
+    if !mandatory_artefacts_exempt(&project) {
+        for (kind, code) in [
+            ("schedule", "closure_schedule_baseline_missing"),
+            ("cost", "closure_cost_baseline_missing"),
+        ] {
+            let baseline =
+                spine_store::latest_approved_baseline_tx(&mut *tx, tenant, project_id, kind)
+                    .await
+                    .map_err(|error| {
+                        tracing::error!(%error, kind, "close gate: read the baseline");
+                        ActionError::internal()
+                    })?;
+            if baseline.is_none() {
+                return Err(ActionError::new(
+                    409,
+                    code,
+                    format!("the project has no approved {kind} baseline"),
+                ));
+            }
+        }
+        let wbs = spine_store::list_wbs_tx(&mut *tx, tenant, project_id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "close gate: read the project's WBS");
+                ActionError::internal()
+            })?;
+        if !wbs
+            .iter()
+            .any(|node| node.kind == "deliverable" && node.status == "accepted")
+        {
+            return Err(ActionError::new(
+                409,
+                "closure_deliverable_missing",
+                "the project has no accepted deliverable",
+            ));
+        }
+        let registers = spine_store::list_register_tx(&mut *tx, tenant, project_id, None)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "close gate: read the project's registers");
+                ActionError::internal()
+            })?;
+        let missing: Vec<&str> = ["risk", "issue", "assumption", "dependency"]
+            .into_iter()
+            .filter(|kind| !registers.iter().any(|row| row.kind == *kind))
+            .collect();
+        if !missing.is_empty() {
+            return Err(ActionError::new(
+                409,
+                "closure_register_missing",
+                format!(
+                    "the project's registers are incomplete (missing: {})",
+                    missing.join(", ")
+                ),
+            ));
+        }
+    }
     Ok(())
 }
 

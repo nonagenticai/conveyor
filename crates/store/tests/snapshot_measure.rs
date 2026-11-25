@@ -767,6 +767,92 @@ async fn a_declared_adm_phase_reports_contract_compliance_and_next_required() {
     assert_eq!(row["next_required"], "b");
 }
 
+/// The phase gate's evidence, not any row that names a phase: an approved artefact evidences
+/// its phase, a draft one does not, and only a live contract counts (a superseded one is the
+/// record of what used to close the phase).
+#[tokio::test]
+async fn only_approved_artefacts_and_live_contracts_evidence_a_phase() {
+    let (db, tenant, _programme, project) = programme_fixture().await;
+    sqlx::query("UPDATE project SET meta = $1 WHERE id = $2")
+        .bind(serde_json::json!({"adm_phase": "a", "plateau": "psa"}))
+        .bind(project.project)
+        .execute(&db.super_pool)
+        .await
+        .expect("declare the ADM phase");
+    // Phase C: a draft artefact (the table's default status).
+    sqlx::query(
+        "INSERT INTO architecture_artifact
+             (tenant_id, project_id, phase_code, plateau, artifact_kind, title)
+         VALUES ($1, $2, 'c', 'hld', 'catalog', 'Draft data entity catalog')",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project.project)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the draft artefact");
+    // Phase D: a superseded contract.
+    sqlx::query(
+        "INSERT INTO architecture_contract
+             (tenant_id, project_id, kind, phase_code, title, status)
+         VALUES ($1, $2, 'statement_of_architecture_work', 'd', 'Retired SAW', 'superseded')",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project.project)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the superseded contract");
+    // Phase E: an approved artefact — the positive control.
+    sqlx::query(
+        "INSERT INTO architecture_artifact
+             (tenant_id, project_id, phase_code, plateau, artifact_kind, title, status)
+         VALUES ($1, $2, 'e', 'hld', 'matrix', 'Approved gap analysis', 'approved')",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project.project)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the approved artefact");
+
+    let data = snapshot(&db, tenant).await;
+    let rows = data.architecture["phase_progress"]
+        .as_array()
+        .expect("phase_progress is an array");
+    let row = rows
+        .iter()
+        .find(|row| row["project"] == "MSP")
+        .expect("the declaring project");
+    let phases = row["phases"].as_array().expect("phases");
+    let phase = |code: &str| {
+        phases
+            .iter()
+            .find(|phase| phase["phase"] == code)
+            .unwrap_or_else(|| panic!("phase {code} in {row}"))
+    };
+    assert_eq!(
+        phase("c")["state"],
+        "not-evidenced",
+        "a draft artefact evidenced its phase: {}",
+        phase("c")
+    );
+    assert_eq!(
+        phase("d")["state"],
+        "not-evidenced",
+        "a superseded contract evidenced its phase: {}",
+        phase("d")
+    );
+    assert!(
+        phase("d")["contract"].is_null(),
+        "a superseded contract is rendered as the phase's contract: {}",
+        phase("d")
+    );
+    assert_eq!(
+        phase("e")["state"],
+        "evidenced",
+        "an approved artefact is the gate's evidence: {}",
+        phase("e")
+    );
+}
+
 /// A rework card's meta keys are projected onto the card row; absent meta is JSON null, never an
 /// empty string.
 #[tokio::test]

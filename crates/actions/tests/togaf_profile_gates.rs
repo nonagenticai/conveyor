@@ -111,11 +111,22 @@ async fn insert_profile(
     requirements: Value,
     kinds: Value,
 ) {
+    // An adopted profile must cite an existing board decision (0107); the finding under test is
+    // the malformed requirement map, not the adoption evidence.
+    let decision: Uuid = sqlx::query_scalar(
+        "INSERT INTO approval (tenant_id, gate, kind, status)
+         VALUES ($1, 'architecture_board', 'architecture_board', 'approved')
+         RETURNING id",
+    )
+    .bind(f.seeded.tenant_id)
+    .fetch_one(&f.pg.super_pool)
+    .await
+    .expect("insert the board decision");
     sqlx::query(
         "INSERT INTO adm_profile
             (tenant_id, key, name, phase_set, artifact_requirements, contract_kinds,
-             status, adopted_at)
-         VALUES ($1, $2, $3, $4, $5, $6, 'adopted', now())",
+             status, adopted_at, board_decision_id)
+         VALUES ($1, $2, $3, $4, $5, $6, 'adopted', now(), $7)",
     )
     .bind(f.seeded.tenant_id)
     .bind(key)
@@ -123,6 +134,7 @@ async fn insert_profile(
     .bind(phase_set)
     .bind(requirements)
     .bind(kinds)
+    .bind(decision)
     .execute(&f.pg.super_pool)
     .await
     .expect("insert an adopted profile");

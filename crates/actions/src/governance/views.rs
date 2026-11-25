@@ -489,7 +489,7 @@ pub struct ProjectRequestOut {
     pub external_origin: String,
     /// The forwarded body.
     pub payload: Value,
-    /// `draft | approved | rejected | promoted`.
+    /// `draft | approved | rejected | promoted | expired`.
     pub status: String,
     /// The project this request became.
     pub project_id: Option<String>,

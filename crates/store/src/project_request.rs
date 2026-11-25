@@ -12,6 +12,11 @@
 //!
 //! Status changes are status-guarded, not version-guarded (CONTRACT §3); an edit is
 //! version-guarded through `expected_version` (the caller's `If-Match`).
+//!
+//! **Expiry.** [`expire_stale_project_requests_tx`] moves a `draft` still unresolved after
+//! [`TIMEOUT_HOURS`] to the terminal `expired` status in place (S06 §5.3's
+//! `project_request.timeout`, S07 §5.4). The row is never deleted; the `version` bump makes the
+//! expiry visible to every reader, and a second sweep matches no row.
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::{TenantId, Version};
@@ -22,8 +27,13 @@ use uuid::Uuid;
 use crate::project::{NewProject, ProjectStoreError, insert_project_tx};
 use crate::version_of;
 
-/// The four `project_request.status` values (0007's CHECK), in lifecycle order.
-pub const STATUSES: [&str; 4] = ["draft", "approved", "rejected", "promoted"];
+/// The five `project_request.status` values (0007's CHECK, widened by 0106), in lifecycle
+/// order. `expired` is terminal: only the timeout sweep produces it.
+pub const STATUSES: [&str; 5] = ["draft", "approved", "rejected", "promoted", "expired"];
+
+/// The unresolved window `project_request.timeout` applies (S06 §5.3; S07's open question 4
+/// fixes the production default at 24 h).
+pub const TIMEOUT_HOURS: i64 = 24;
 
 /// An intake to create (or re-post, keyed by `external_ref`).
 #[derive(Clone, Debug)]
@@ -102,7 +112,7 @@ pub enum ProjectRequestStoreError {
         /// The project the request became.
         project_id: Option<Uuid>,
     },
-    /// The request is `approved` and cannot be re-opened by a re-post.
+    /// The request is `approved` or `expired` and cannot be re-opened by a re-post.
     #[error("the project request is {status} and cannot be updated by a re-post")]
     Locked {
         /// The status that blocked the write.
@@ -118,7 +128,8 @@ pub enum ProjectRequestStoreError {
     },
     /// A status filter outside [`STATUSES`].
     #[error(
-        "unknown project request status {0:?}: expected one of draft, approved, rejected, promoted"
+        "unknown project request status {0:?}: expected one of draft, approved, rejected, \
+         promoted, expired"
     )]
     UnknownStatus(String),
     /// Creating the project refused the caller's input (or the database did).
@@ -167,9 +178,9 @@ impl From<ProjectRequestRow> for ProjectRequestRecord {
 ///
 /// One statement does the work: a fresh key inserts; an existing `draft`/`rejected` row
 /// absorbs the new payload (and a `rejected` row re-opens as `draft`) and bumps its version;
-/// an `approved`/`promoted` row matches the `DO UPDATE … WHERE` and returns no row, which is
-/// then classified by a follow-up `SELECT` — `promoted` becomes
-/// [`ProjectRequestStoreError::Promoted`] with the project id, `approved` becomes
+/// an `approved`/`promoted`/`expired` row matches the `DO UPDATE … WHERE` and returns no row,
+/// which is then classified by a follow-up `SELECT` — `promoted` becomes
+/// [`ProjectRequestStoreError::Promoted`] with the project id, `approved` and `expired` become
 /// [`ProjectRequestStoreError::Locked`].
 pub async fn create_project_request_tx(
     conn: &mut PgConnection,
@@ -205,8 +216,9 @@ pub async fn create_project_request_tx(
         return Ok(row.into());
     }
 
-    // No row: either the existing row is `approved`/`promoted`, or a concurrent transaction
-    // changed it between our statement and this read. Both are reported from what is stored.
+    // No row: either the existing row is `approved`/`promoted`/`expired`, or a concurrent
+    // transaction changed it between our statement and this read. Both are reported from what
+    // is stored.
     let existing: Option<(String, Option<Uuid>)> = sqlx::query_as(
         "SELECT status, project_id FROM project_request
           WHERE tenant_id = $1 AND external_ref = $2",
@@ -352,8 +364,8 @@ async fn transition_tx(
     Ok(row.into())
 }
 
-/// Approve a `draft`/`rejected` request. Anything already `approved` or `promoted` is
-/// [`ProjectRequestStoreError::Illegal`] (CONTRACT §3: a status transition is not
+/// Approve a `draft`/`rejected` request. Anything already `approved`, `promoted` or `expired`
+/// is [`ProjectRequestStoreError::Illegal`] (CONTRACT §3: a status transition is not
 /// version-guarded).
 pub async fn approve_project_request_tx(
     conn: &mut PgConnection,
@@ -370,6 +382,33 @@ pub async fn reject_project_request_tx(
     id: Uuid,
 ) -> Result<ProjectRequestRecord, ProjectRequestStoreError> {
     transition_tx(conn, tenant, id, "rejected").await
+}
+
+/// Expire every `draft` intake created before `created_before`, in place (S06 §5.3,
+/// `project_request.timeout`; S07 §5.4).
+///
+/// Only `draft` is unresolved: `approved` is waiting on a human promote, and
+/// `rejected`/`promoted`/`expired` are already terminal. The status guard is also the
+/// idempotency witness — a second sweep matches nothing and returns no row, so a caller that
+/// announces each returned row cannot announce it twice. The row is never deleted; its bumped
+/// `version` makes the expiry visible to every reader.
+pub async fn expire_stale_project_requests_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    created_before: DateTime<Utc>,
+) -> Result<Vec<ProjectRequestRecord>, sqlx::Error> {
+    let sql = format!(
+        "UPDATE project_request
+            SET status = 'expired', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND status = 'draft' AND created_at < $2
+          RETURNING {COLUMNS}"
+    );
+    let rows: Vec<ProjectRequestRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(created_before)
+        .fetch_all(&mut *conn)
+        .await?;
+    Ok(rows.into_iter().map(Into::into).collect())
 }
 
 /// Promote an `approved` request by creating its project **in this transaction**.
@@ -440,6 +479,9 @@ mod tests {
 
     #[test]
     fn the_status_vocabulary_matches_the_check() {
-        assert_eq!(STATUSES, ["draft", "approved", "rejected", "promoted"]);
+        assert_eq!(
+            STATUSES,
+            ["draft", "approved", "rejected", "promoted", "expired"]
+        );
     }
 }
