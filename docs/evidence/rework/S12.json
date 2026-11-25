@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d2e-7585-8cb4-ab197d2e6dab\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
       "exit": 1,
       "id": "S12-charter",
       "kind": "command",
       "result": "fail",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "7 mandatory artefact package(s) open: closed_without_closure_review:S12, std-pmp-change-control-s12:S12, std-pmp-project-baseline-s12:S12, std-pmp-project-registers-s12:S12, std-pmp-project-wbs-s12:S12, std-togaf-compliance-review-s12:S12, std-togaf-delivery-contract-s12:S12",
+      "detail": "11 mandatory artefact package(s) open: project_in_unauthorised_tranche:S12, closed_without_closure_review:S12, closure_outputs_undeclared:S12, unpublished_declared_output:S12, mandatory_artefacts:S12, std-pmp-change-control-s12:S12, std-pmp-project-baseline-s12:S12, std-pmp-project-registers-s12:S12, +3 more",
       "id": "S12-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -151,7 +151,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): closed_without_closure_review:S12 (P1)",
+      "detail": "5 unresolved P0/P1 package(s): project_in_unauthorised_tranche:S12 (P0), closed_without_closure_review:S12 (P1), closure_outputs_undeclared:S12 (P1), unpublished_declared_output:S12 (P1), mandatory_artefacts:S12 (P1)",
       "id": "S12-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -178,7 +178,7 @@
   ],
   "failures": [
     "S12-baseline (P0): no project baseline",
-    "S12-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+    "S12-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "S12-closure-outputs (P0): the project declares no closure_outputs",
     "S12-contract (P0): no live board-approved delivery contract",
     "S12-review (P0): no Phase-G compliance review for the project's live contract",
@@ -189,22 +189,22 @@
     "S12-lessons (P1): no retro cadence row for tranche-10",
     "S12-wsjf (P0): no WBS deliverable carries the plan",
     "S12-demo-credits (P0): no accepted deliverable to demo",
-    "S12-artefact-standard (P1): 7 mandatory artefact package(s) open: closed_without_closure_review:S12, std-pmp-change-control-s12:S12, std-pmp-project-baseline-s12:S12, std-pmp-project-registers-s12:S12, std-pmp-project-wbs-s12:S12, std-togaf-compliance-review-s12:S12, std-togaf-delivery-contract-s12:S12",
-    "S12-rework (P0): 1 unresolved P0/P1 package(s): closed_without_closure_review:S12 (P1)",
+    "S12-artefact-standard (P1): 11 mandatory artefact package(s) open: project_in_unauthorised_tranche:S12, closed_without_closure_review:S12, closure_outputs_undeclared:S12, unpublished_declared_output:S12, mandatory_artefacts:S12, std-pmp-change-control-s12:S12, std-pmp-project-baseline-s12:S12, std-pmp-project-registers-s12:S12, +3 more",
+    "S12-rework (P0): 5 unresolved P0/P1 package(s): project_in_unauthorised_tranche:S12 (P0), closed_without_closure_review:S12 (P1), closure_outputs_undeclared:S12 (P1), unpublished_declared_output:S12 (P1), mandatory_artefacts:S12 (P1)",
     "gate (P0): the gate check 'S12-baseline' did not pass; the gate check 'S12-charter' did not pass; the gate check 'S12-closure-outputs' did not pass; the gate check 'S12-contract' did not pass; the gate check 'S12-review' did not pass; the gate check 'S12-closure-gate' did not pass; the gate check 'S12-pi-cadence' did not pass; the gate check 'S12-pi-plan' did not pass; the gate check 'S12-pi-objectives' did not pass; the gate check 'S12-lessons' did not pass; the gate check 'S12-wsjf' did not pass; the gate check 'S12-demo-credits' did not pass; the gate check 'S12-artefact-standard' did not pass; the gate check 'S12-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "S12 is accepted when every spec asserts empty state, error state and happy path \u2014 a spec that only asserts the happy path fails review \u2014 and the coverage table has no orphan.",
-  "generated_at": "2026-11-24T22:51:46.259566+00:00",
+  "generated_at": "2026-11-25T08:48:05.899406+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S12.toml",
   "name": "UI build-out",
   "project": "S12",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:44:10.403624+00:00",
-    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
-    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
+    "generated_at": "2026-11-25T08:47:56Z",
+    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
+    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
   },
   "verdict": "red",
   "warnings": []

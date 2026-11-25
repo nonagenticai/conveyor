@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d33-7282-b7b0-6dde32c38ab1\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 0",
-      "exit": 0,
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "exit": 1,
       "id": "T2-charter",
       "kind": "command",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0",
-      "stderr": "",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -52,7 +52,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a20fba-dcd9-75fe-8ebd-849e0b9eeb5a (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+      "detail": "review 01a211c9-1a6a-7a81-bd09-6c67f07dac63 (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
       "id": "T2-review",
       "kind": "snapshot",
       "result": "pass",
@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "17 mandatory artefact package(s) open: dr-w4-proj-compliance-decision:T2, dr-w4-proj-compliance-waivers:T2, std-pmp-project-baseline-t2:T2, std-pmp-project-registers-t2:T2, std-togaf-architecture-artifact-instance-01a2005a-c050-7b80-acf9-1cb8acfb3bee:T2, std-togaf-architecture-artifact-instance-01a2005a-e90f-7933-9d24-2511a3c65a3c:T2, std-togaf-architecture-artifact-instance-01a2005b-2148-7741-b38b-cf36a7b4f634:T2, std-togaf-architecture-artifact-instance-01a2005b-5299-79c6-9fd1-03707a72121a:T2, +9 more",
+      "detail": "18 mandatory artefact package(s) open: dr-w4-proj-compliance-decision:T2, dr-w4-proj-compliance-waivers:T2, mandatory_artefacts:T2, std-pmp-project-baseline-t2:T2, std-pmp-project-registers-t2:T2, std-togaf-architecture-artifact-instance-01a2005a-c050-7b80-acf9-1cb8acfb3bee:T2, std-togaf-architecture-artifact-instance-01a2005a-e90f-7933-9d24-2511a3c65a3c:T2, std-togaf-architecture-artifact-instance-01a2005b-2148-7741-b38b-cf36a7b4f634:T2, +10 more",
       "id": "T2-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -151,7 +151,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "2 unresolved P0/P1 package(s): dr-w4-proj-compliance-decision:T2 (P1), dr-w4-proj-compliance-waivers:T2 (P1)",
+      "detail": "3 unresolved P0/P1 package(s): dr-w4-proj-compliance-decision:T2 (P1), dr-w4-proj-compliance-waivers:T2 (P1), mandatory_artefacts:T2 (P1)",
       "id": "T2-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -160,7 +160,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T2-artefact-standard' did not pass; the gate check 'T2-rework' did not pass",
+      "detail": "the gate check 'T2-charter' did not pass; the gate check 'T2-artefact-standard' did not pass; the gate check 'T2-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -177,22 +177,23 @@
     }
   ],
   "failures": [
-    "T2-artefact-standard (P1): 17 mandatory artefact package(s) open: dr-w4-proj-compliance-decision:T2, dr-w4-proj-compliance-waivers:T2, std-pmp-project-baseline-t2:T2, std-pmp-project-registers-t2:T2, std-togaf-architecture-artifact-instance-01a2005a-c050-7b80-acf9-1cb8acfb3bee:T2, std-togaf-architecture-artifact-instance-01a2005a-e90f-7933-9d24-2511a3c65a3c:T2, std-togaf-architecture-artifact-instance-01a2005b-2148-7741-b38b-cf36a7b4f634:T2, std-togaf-architecture-artifact-instance-01a2005b-5299-79c6-9fd1-03707a72121a:T2, +9 more",
-    "T2-rework (P0): 2 unresolved P0/P1 package(s): dr-w4-proj-compliance-decision:T2 (P1), dr-w4-proj-compliance-waivers:T2 (P1)",
-    "gate (P0): the gate check 'T2-artefact-standard' did not pass; the gate check 'T2-rework' did not pass",
+    "T2-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "T2-artefact-standard (P1): 18 mandatory artefact package(s) open: dr-w4-proj-compliance-decision:T2, dr-w4-proj-compliance-waivers:T2, mandatory_artefacts:T2, std-pmp-project-baseline-t2:T2, std-pmp-project-registers-t2:T2, std-togaf-architecture-artifact-instance-01a2005a-c050-7b80-acf9-1cb8acfb3bee:T2, std-togaf-architecture-artifact-instance-01a2005a-e90f-7933-9d24-2511a3c65a3c:T2, std-togaf-architecture-artifact-instance-01a2005b-2148-7741-b38b-cf36a7b4f634:T2, +10 more",
+    "T2-rework (P0): 3 unresolved P0/P1 package(s): dr-w4-proj-compliance-decision:T2 (P1), dr-w4-proj-compliance-waivers:T2 (P1), mandatory_artefacts:T2 (P1)",
+    "gate (P0): the gate check 'T2-charter' did not pass; the gate check 'T2-artefact-standard' did not pass; the gate check 'T2-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card",
-  "generated_at": "2026-11-24T22:51:49.401545+00:00",
+  "generated_at": "2026-11-25T08:48:07.661389+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T2.toml",
   "name": "Decision ladder",
   "project": "T2",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:44:10.403624+00:00",
-    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
-    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
+    "generated_at": "2026-11-25T08:47:56Z",
+    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
+    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
   },
   "verdict": "red",
   "warnings": []

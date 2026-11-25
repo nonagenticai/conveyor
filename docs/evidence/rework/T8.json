@@ -3,10 +3,10 @@
     {
       "check": "project",
       "description": "T8 is active",
-      "detail": "project T8 is active",
+      "detail": "status is 'closed', expected 'active'",
       "id": "T8-project",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d35-76bb-a22e-be49e3e95d16\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
       "exit": 1,
       "id": "T8-charter",
       "kind": "command",
       "result": "fail",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -115,16 +115,16 @@
     {
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "no open P0 package for this project",
+      "detail": "1 open P0 package(s): closed_without_closure_review:T8",
       "id": "T8-product",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "4 mandatory artefact package(s) open: std-pmp-change-control-t8:T8, std-pmp-project-baseline-t8:T8, std-pmp-project-registers-t8:T8, std-togaf-compliance-review-t8:T8",
+      "detail": "10 mandatory artefact package(s) open: closed_without_closure_review:T8, project_in_unauthorised_tranche:T8, unpublished_declared_output:T8, contract_missing:T8, mandatory_artefacts:T8, std-pmp-change-control-t8:T8, std-pmp-project-baseline-t8:T8, std-pmp-project-registers-t8:T8, +2 more",
       "id": "T8-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -133,7 +133,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): v1-w3c-4:T8 (P1)",
+      "detail": "6 unresolved P0/P1 package(s): closed_without_closure_review:T8 (P0), project_in_unauthorised_tranche:T8 (P0), unpublished_declared_output:T8 (P1), v1-w3c-4:T8 (P1), contract_missing:T8 (P1), mandatory_artefacts:T8 (P1)",
       "id": "T8-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -142,16 +142,26 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T8-baseline' did not pass; the gate check 'T8-charter' did not pass; the gate check 'T8-contract' did not pass; the gate check 'T8-review' did not pass; the gate check 'T8-pi-cadence' did not pass; the gate check 'T8-pi-plan' did not pass; the gate check 'T8-pi-objectives' did not pass; the gate check 'T8-wsjf' did not pass; the gate check 'T8-demo-credits' did not pass; the gate check 'T8-lessons' did not pass; the gate check 'T8-artefact-standard' did not pass; the gate check 'T8-rework' did not pass",
+      "detail": "the gate check 'T8-project' did not pass; the gate check 'T8-baseline' did not pass; the gate check 'T8-charter' did not pass; the gate check 'T8-contract' did not pass; the gate check 'T8-review' did not pass; the gate check 'T8-pi-cadence' did not pass; the gate check 'T8-pi-plan' did not pass; the gate check 'T8-pi-objectives' did not pass; the gate check 'T8-wsjf' did not pass; the gate check 'T8-demo-credits' did not pass; the gate check 'T8-lessons' did not pass; the gate check 'T8-product' did not pass; the gate check 'T8-artefact-standard' did not pass; the gate check 'T8-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "a closed project must not carry a red acceptance manifest",
+      "detail": "the project is closed while its manifest is red",
+      "id": "closed-on-red",
+      "kind": "snapshot",
       "result": "fail",
       "severity": "P0"
     }
   ],
   "failures": [
+    "T8-project (P0): status is 'closed', expected 'active'",
     "T8-baseline (P0): no project baseline",
-    "T8-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+    "T8-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "T8-contract (P0): no live board-approved delivery contract",
     "T8-review (P0): no Phase-G compliance review for the project's live contract",
     "T8-pi-cadence (P0): no PI cadence row for tranche-11",
@@ -160,21 +170,23 @@
     "T8-wsjf (P0): no WBS deliverable carries the plan",
     "T8-demo-credits (P0): no accepted deliverable to demo",
     "T8-lessons (P1): no retro cadence row for tranche-11",
-    "T8-artefact-standard (P1): 4 mandatory artefact package(s) open: std-pmp-change-control-t8:T8, std-pmp-project-baseline-t8:T8, std-pmp-project-registers-t8:T8, std-togaf-compliance-review-t8:T8",
-    "T8-rework (P0): 1 unresolved P0/P1 package(s): v1-w3c-4:T8 (P1)",
-    "gate (P0): the gate check 'T8-baseline' did not pass; the gate check 'T8-charter' did not pass; the gate check 'T8-contract' did not pass; the gate check 'T8-review' did not pass; the gate check 'T8-pi-cadence' did not pass; the gate check 'T8-pi-plan' did not pass; the gate check 'T8-pi-objectives' did not pass; the gate check 'T8-wsjf' did not pass; the gate check 'T8-demo-credits' did not pass; the gate check 'T8-lessons' did not pass; the gate check 'T8-artefact-standard' did not pass; the gate check 'T8-rework' did not pass"
+    "T8-product (P0): 1 open P0 package(s): closed_without_closure_review:T8",
+    "T8-artefact-standard (P1): 10 mandatory artefact package(s) open: closed_without_closure_review:T8, project_in_unauthorised_tranche:T8, unpublished_declared_output:T8, contract_missing:T8, mandatory_artefacts:T8, std-pmp-change-control-t8:T8, std-pmp-project-baseline-t8:T8, std-pmp-project-registers-t8:T8, +2 more",
+    "T8-rework (P0): 6 unresolved P0/P1 package(s): closed_without_closure_review:T8 (P0), project_in_unauthorised_tranche:T8 (P0), unpublished_declared_output:T8 (P1), v1-w3c-4:T8 (P1), contract_missing:T8 (P1), mandatory_artefacts:T8 (P1)",
+    "gate (P0): the gate check 'T8-project' did not pass; the gate check 'T8-baseline' did not pass; the gate check 'T8-charter' did not pass; the gate check 'T8-contract' did not pass; the gate check 'T8-review' did not pass; the gate check 'T8-pi-cadence' did not pass; the gate check 'T8-pi-plan' did not pass; the gate check 'T8-pi-objectives' did not pass; the gate check 'T8-wsjf' did not pass; the gate check 'T8-demo-credits' did not pass; the gate check 'T8-lessons' did not pass; the gate check 'T8-product' did not pass; the gate check 'T8-artefact-standard' did not pass; the gate check 'T8-rework' did not pass",
+    "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "T8 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine' \u2014 is the condition on which it may be closed, not a claim that it is met.",
-  "generated_at": "2026-11-24T22:51:50.209818+00:00",
+  "generated_at": "2026-11-25T08:48:08.166701+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T8.toml",
   "name": "Organisational memory",
   "project": "T8",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:44:10.403624+00:00",
-    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
-    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
+    "generated_at": "2026-11-25T08:47:56Z",
+    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
+    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
   },
   "verdict": "red",
   "warnings": []

@@ -3,10 +3,10 @@
     {
       "check": "project",
       "description": "S18 is active",
-      "detail": "status is 'closed', expected 'active'",
+      "detail": "project S18 is active",
       "id": "S18-project",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d30-7f95-9d93-30eaabfec6da\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
       "exit": 1,
       "id": "S18-charter",
       "kind": "command",
       "result": "fail",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -124,7 +124,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "7 mandatory artefact package(s) open: closed_without_closure_review:S18, std-pmp-change-control-s18:S18, std-pmp-project-baseline-s18:S18, std-pmp-project-registers-s18:S18, std-pmp-project-wbs-s18:S18, std-togaf-compliance-review-s18:S18, std-togaf-delivery-contract-s18:S18",
+      "detail": "8 mandatory artefact package(s) open: project_in_unauthorised_tranche:S18, unpublished_declared_output:S18, mandatory_artefacts:S18, std-pmp-change-control-s18:S18, std-pmp-project-baseline-s18:S18, std-pmp-project-registers-s18:S18, std-togaf-compliance-review-s18:S18, std-togaf-delivery-contract-s18:S18 (2 not yet due: tranche planned)",
       "id": "S18-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -133,7 +133,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): closed_without_closure_review:S18 (P1)",
+      "detail": "3 unresolved P0/P1 package(s): project_in_unauthorised_tranche:S18 (P1), unpublished_declared_output:S18 (P1), mandatory_artefacts:S18 (P1) (2 not yet due: tranche planned)",
       "id": "S18-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -142,26 +142,16 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S18-project' did not pass; the gate check 'S18-baseline' did not pass; the gate check 'S18-charter' did not pass; the gate check 'S18-contract' did not pass; the gate check 'S18-review' did not pass; the gate check 'S18-pi-cadence' did not pass; the gate check 'S18-pi-plan' did not pass; the gate check 'S18-pi-objectives' did not pass; the gate check 'S18-lessons' did not pass; the gate check 'S18-wsjf' did not pass; the gate check 'S18-demo-credits' did not pass; the gate check 'S18-artefact-standard' did not pass; the gate check 'S18-rework' did not pass",
+      "detail": "the gate check 'S18-baseline' did not pass; the gate check 'S18-charter' did not pass; the gate check 'S18-contract' did not pass; the gate check 'S18-review' did not pass; the gate check 'S18-pi-cadence' did not pass; the gate check 'S18-pi-plan' did not pass; the gate check 'S18-pi-objectives' did not pass; the gate check 'S18-lessons' did not pass; the gate check 'S18-wsjf' did not pass; the gate check 'S18-demo-credits' did not pass; the gate check 'S18-artefact-standard' did not pass; the gate check 'S18-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
       "result": "fail",
       "severity": "P0"
     }
   ],
   "failures": [
-    "S18-project (P0): status is 'closed', expected 'active'",
     "S18-baseline (P0): no project baseline",
-    "S18-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+    "S18-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "S18-contract (P0): no live board-approved delivery contract",
     "S18-review (P0): no Phase-G compliance review for the project's live contract",
     "S18-pi-cadence (P0): no PI cadence row for tranche-9",
@@ -170,22 +160,21 @@
     "S18-lessons (P1): no retro cadence row for tranche-9",
     "S18-wsjf (P0): no WBS deliverable carries the plan",
     "S18-demo-credits (P0): no accepted deliverable to demo",
-    "S18-artefact-standard (P1): 7 mandatory artefact package(s) open: closed_without_closure_review:S18, std-pmp-change-control-s18:S18, std-pmp-project-baseline-s18:S18, std-pmp-project-registers-s18:S18, std-pmp-project-wbs-s18:S18, std-togaf-compliance-review-s18:S18, std-togaf-delivery-contract-s18:S18",
-    "S18-rework (P0): 1 unresolved P0/P1 package(s): closed_without_closure_review:S18 (P1)",
-    "gate (P0): the gate check 'S18-project' did not pass; the gate check 'S18-baseline' did not pass; the gate check 'S18-charter' did not pass; the gate check 'S18-contract' did not pass; the gate check 'S18-review' did not pass; the gate check 'S18-pi-cadence' did not pass; the gate check 'S18-pi-plan' did not pass; the gate check 'S18-pi-objectives' did not pass; the gate check 'S18-lessons' did not pass; the gate check 'S18-wsjf' did not pass; the gate check 'S18-demo-credits' did not pass; the gate check 'S18-artefact-standard' did not pass; the gate check 'S18-rework' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
+    "S18-artefact-standard (P1): 8 mandatory artefact package(s) open: project_in_unauthorised_tranche:S18, unpublished_declared_output:S18, mandatory_artefacts:S18, std-pmp-change-control-s18:S18, std-pmp-project-baseline-s18:S18, std-pmp-project-registers-s18:S18, std-togaf-compliance-review-s18:S18, std-togaf-delivery-contract-s18:S18 (2 not yet due: tranche planned)",
+    "S18-rework (P0): 3 unresolved P0/P1 package(s): project_in_unauthorised_tranche:S18 (P1), unpublished_declared_output:S18 (P1), mandatory_artefacts:S18 (P1) (2 not yet due: tranche planned)",
+    "gate (P0): the gate check 'S18-baseline' did not pass; the gate check 'S18-charter' did not pass; the gate check 'S18-contract' did not pass; the gate check 'S18-review' did not pass; the gate check 'S18-pi-cadence' did not pass; the gate check 'S18-pi-plan' did not pass; the gate check 'S18-pi-objectives' did not pass; the gate check 'S18-lessons' did not pass; the gate check 'S18-wsjf' did not pass; the gate check 'S18-demo-credits' did not pass; the gate check 'S18-artefact-standard' did not pass; the gate check 'S18-rework' did not pass"
   ],
   "gate": "The end-to-end proof is one real katas-tenant iteration: a candidate `capability_agent` version, one run, a comparison against the promoted baseline, and a recorded keep/revert \u2014 with the screen showing the same numbers.",
-  "generated_at": "2026-11-24T22:51:47.156865+00:00",
+  "generated_at": "2026-11-25T08:48:06.352896+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S18.toml",
   "name": "Kata continuous improvement",
   "project": "S18",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:44:10.403624+00:00",
-    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
-    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
+    "generated_at": "2026-11-25T08:47:56Z",
+    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
+    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
   },
   "verdict": "red",
   "warnings": []
