@@ -1539,7 +1539,8 @@
             ],
             "failure_scenario": "Create a job whose departments declare a required kind (e.g. charter) that the job definition never sets. job_releases.publish returns 200 with a release hash and a snapshot that contains no resolved charter; job_bindings.create pins that release active and a run proceeds. Required knowledge is missing and the mandated 409 release_not_ready never fires. Two sibling departments with conflicting values likewise produce a clean release instead of 422 department_conflict.",
             "acceptance": "Publishing over a department whose required kind has no resolvable value returns 409 release_not_ready with the kind and department named; two sibling departments declaring one kind at different values return 422 department_conflict; the release snapshot records the resolved layer values and their sources, and a successful publish is reproducible byte-for-byte.",
-            "owner_project": "T0"
+            "owner_project": "T0",
+            "resolved_by": "fixed in #697 before merge: migration 0072's organisation_layer resolves base -> industry -> department archetype -> departments -> job, required tightens downward only, publish refuses 409 release_not_ready / 422 department_conflict, and every value's level and source is recorded (crates/store/tests/organisation.rs, crates/actions/tests/parity_http_mcp.rs)"
         },
         {
             "id": "v1-w1a-3",
@@ -3398,7 +3399,8 @@
             ],
             "failure_scenario": "capability_agents.create with prompt_ref null and status active succeeds; a process run resolves it, readiness passes, agent.run sends the step-input messages and the model answers; inference_call records a NULL prompt hash, so the call is not reproducible and can carry an arbitrary caller-supplied system message.",
             "acceptance": "Creating or activating an internal_agent without a resolvable prompt_ref is refused, readiness blocks it and agent.run cannot call a model without compiled text; a test proves a NULL prompt_ref yields zero calls and every internal_agent call carries a 64-hex prompt hash.",
-            "owner_project": "PLATFORM"
+            "owner_project": "PLATFORM",
+            "resolved_by": "fixed in #697 before merge: an active internal_agent must name a resolvable prompt (domain validate_agent_config, create/update 422 prompt_ref_required, readiness prompt_not_configured, and agent.run refuses 409 before any inference), and every recorded call carries a 64-hex prompt_sha256 (crates/actions/tests/capability.rs, agent_run_resolved.rs, internal_agent_runtime.rs)"
         },
         {
             "id": "v1-p76-1",
@@ -3456,7 +3458,8 @@
             ],
             "failure_scenario": "A tenant wants to cap the copilot prompt; there is no prompt create or update action and no route exposing budget_chars, so the only route is direct SQL. Every compiled prompt is unbounded and an oversized prompt is sent rather than refused.",
             "acceptance": "An action can set and version prompt.budget_chars and prompt_section.budget_chars; with a tight ceiling the compile refuses with the measured size over the limit and makes no model call; a test sets a ceiling and asserts the refusal.",
-            "owner_project": "PLATFORM"
+            "owner_project": "PLATFORM",
+            "resolved_by": "fixed in #697 before merge: prompt_recipes.create writes the recipe-level budget_chars (0 refused), so the compile's measured refusal is reachable from an authored recipe (crates/actions/tests/prompt_recipes.rs, prompt_compile.rs)"
         },
         {
             "id": "v1-p76-2",

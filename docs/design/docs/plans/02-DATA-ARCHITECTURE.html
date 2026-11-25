@@ -1411,6 +1411,128 @@ CREATE TABLE job_binding (
 </table>
 <p><strong>Authoring a set is one row's version bump, never a second row.</strong> <code>decision_option_sets.set</code> updates the existing header (<code>version = version + 1</code>) and replaces its children inside the same transaction, so the partial unique indexes in <code>0071</code> are never asked to hold two live sets and a reader never sees a half-replaced menu. Old labels survive only in <code>decision_option</code> — the per-decision record of what that decision chose between; a decision is reproducible from its own row plus its set version.</p>
 <p><strong>The call itself writes no conveyor row of ours beyond the engine's own bookkeeping.</strong> The laya service is external: <code>ladder.precheck</code> is dispatched with the tenant's sealed <code>laya.token</code>, and the engine records the claim (<code>idempotency_key</code>), the invocation (<code>action_invocation</code>) and the response body that the <code>idempotency_key.response</code> column already holds. That record is the provenance: the decision cites it rather than restating it, so nothing in <code>decision</code> can be written from a request body.</p>
+<h3 id="231-the-accepted-draft-and-the-prompt-receipt--s21-step-11-0-new-tables">2.31 The accepted draft and the prompt receipt — S21 step 11 (0 new tables)</h3>
+<p>Two existing columns become writable contracts; no row changes shape.</p>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>decision_policy.meta.on_accept</code></td>
+<td><code>"park"</code> (default when absent) or <code>"apply"</code>; validated by `decision_policies.create</td>
+</tr>
+<tr>
+<td><code>prompt.budget_chars</code></td>
+<td>the recipe's whole-prompt character ceiling, written by <code>prompt_recipes.create</code> with the version (existing column, migration <code>0031</code>; the read path and the measured refusal already existed)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the step reads or writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>decision_policy</code></td>
+<td><strong>read</strong>: <code>meta.on_accept</code> for the effective policy; <strong>write</strong>: the value through the policy actions only</td>
+</tr>
+<tr>
+<td><code>prompt</code></td>
+<td><strong>write</strong>: <code>budget_chars</code> on a new recipe version; <strong>read</strong>: the ceiling at compile</td>
+</tr>
+<tr>
+<td><code>document</code></td>
+<td><strong>write</strong> (unchanged gate): <code>card_id</code> + an <code>applied</code> revision by <code>apply_draft_tx</code> when the accepted gate applies</td>
+</tr>
+<tr>
+<td><code>decision</code></td>
+<td><strong>read</strong>: the recorded L1 decision the apply cites (<code>meta.draft_document_id</code>, <code>prompt_sha256</code>, <code>run_id</code>)</td>
+</tr>
+<tr>
+<td><code>event</code></td>
+<td><strong>write</strong>: <code>document.applied</code> through the same gate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>A cardless run attaches nothing.</strong> <code>apply_draft_tx</code> takes a card; when the run has none the executor records <code>apply_skipped: no_card</code> in the step judge and finishes succeeded. No document row is written.</p>
+<h3 id="232-the-release-knowledge-layers--s21-step-11-migration-0074">2.32 The release knowledge layers — S21 step 11 (migration <code>0074</code>)</h3>
+<p>One table carries every layer SPEC_V2 §4.1 defines; nothing else changes shape.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tenant_id</code></td>
+<td>RLS scope, <code>app_current_tenant()</code> default, enabled and forced</td>
+</tr>
+<tr>
+<td><code>level</code></td>
+<td>`base</td>
+</tr>
+<tr>
+<td><code>industry_id</code> / <code>department_id</code> / <code>job_id</code></td>
+<td>exactly one non-null, matching the level (CHECK)</td>
+</tr>
+<tr>
+<td><code>kind</code></td>
+<td>the knowledge kind this row sets</td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td>the value, jsonb (whole kinds may be structured)</td>
+</tr>
+<tr>
+<td><code>required</code></td>
+<td>the layer's declaration; the resolved value is <code>OR</code> over the path</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>bumped on change; one live row per <code>(tenant, level, scope, kind)</code></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the publish reads or writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>organisation_layer</code></td>
+<td><strong>read</strong>: the whole path for the job's placement, in resolve order; <strong>write</strong>: through <code>organisation_layers.set</code> only</td>
+</tr>
+<tr>
+<td><code>department</code></td>
+<td><strong>read</strong>: the ordered placement (<code>ordinal</code>) and the archetype reference</td>
+</tr>
+<tr>
+<td><code>industry</code></td>
+<td><strong>read</strong>: the placement's industry key</td>
+</tr>
+<tr>
+<td><code>job_catalogue</code></td>
+<td><strong>read</strong>: the anatomy</td>
+</tr>
+<tr>
+<td><code>job_release</code></td>
+<td><strong>write</strong>: one immutable row whose snapshot carries a sorted <code>layers</code> member (<code>value</code>, <code>required</code>, <code>level</code>, <code>source_key</code> per kind) and whose hash covers it</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Resolution order.</strong> base → industry → department archetype → each department by <code>ordinal</code> → job; the last setter wins. Two departments in the placement disagreeing on a kind is <code>422 department_conflict</code> unless a job-layer row sets that kind; a required kind with no value is <code>409 release_not_ready</code> naming the kind and department. Both refuse before the insert.</p>
 <h2 id="3-state-machines-and-enforcement">3. State machines and enforcement</h2>
 <p>Every transition is a pure function in <code>crates/domain</code>; no DB trigger, no per-flow rule, no CHECK that duplicates the function. The CHECK constraints below guard <em>vocabulary</em>, never <em>legality</em>.</p>
 <h3 id="31-card-lifecycle">3.1 Card lifecycle</h3>

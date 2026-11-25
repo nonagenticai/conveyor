@@ -39,6 +39,11 @@ sequenceDiagram
       R-->>WF: unattached draft artefact
       WF->>L: gate.precheck over the draft, with the same request document as case input
       L-->>WF: answer and confidence
+      alt accepted and the policy declares on_accept=apply
+        WF->>WF: apply the draft to its card through the one apply_draft_tx gate
+      else accepted and parked (the default)
+        Note over WF: run succeeds, the draft stays unattached
+      end
     end
     opt gate requires approval
       WF->>G: park the run (waiting_approval) and request the gate

@@ -663,3 +663,49 @@ async fn a_generated_draft_cannot_transition_a_card() {
     );
     assert_eq!(output(&bypass)["type"], "draft_requires_gate", "{bypass}");
 }
+
+/// P1.3 (S21 step 11, issue #697): a policy declares what an accepted gate does with its draft,
+/// and an unknown declaration is refused before any write.
+#[tokio::test]
+async fn an_unknown_on_accept_value_is_refused() {
+    let (_pg, running, _seeded) = fixture().await;
+    let (status, body) = running
+        .invoke(
+            "decision_policies.create",
+            "dev:alice",
+            json!({
+                "kind": "gate.precheck",
+                "threshold": 0.5,
+                "fail_policy": "closed",
+                "action": "handover",
+                "meta": {"on_accept": "later"}
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert!(
+        body.to_string().contains("invalid_policy_meta"),
+        "the refusal names the contract: {body}"
+    );
+
+    let (status, body) = running
+        .invoke(
+            "decision_policies.create",
+            "dev:alice",
+            json!({
+                "kind": "gate.precheck",
+                "threshold": 0.5,
+                "fail_policy": "closed",
+                "action": "handover",
+                "meta": {"on_accept": "apply"}
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "a declared value is accepted: {body}");
+}
