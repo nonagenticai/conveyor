@@ -67,6 +67,16 @@ BOILERPLATE = (
     "derived from the record or explicitly absent",
     "one standards artefact, derived",
 )
+# `architecture.artifacts_create`'s input schema. A catalog/matrix entry carries `axis_a`
+# and may carry `axis_b`, `value`, `position`; the action ignores every other key. A pack
+# written against the document's prose (id/requirement/owner/verification) therefore loses
+# every field and the create refuses on the missing axis_a — measured on the T18 pack, whose
+# ten-entry artefacts stopped that member's chain. The preflight refuses it before the act.
+ENTRY_FIELDS = {"axis_a", "axis_b", "value", "position"}
+ARTEFACT_FIELDS = {
+    "artifact_kind", "body", "entries", "phase_code", "plateau", "purpose", "scope",
+    "stakeholders", "title",
+}
 
 
 def fail(message: str) -> "NoReturn":  # noqa: F821 - a deliberate abort
@@ -173,6 +183,19 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
                     or {}).get("required") or ["Metadata", "Entries", "Links", "Document"]
     for artefact in artefacts:
         label = f"artefact {artefact.get('title')!r}"
+        unknown = sorted(set(artefact) - ARTEFACT_FIELDS)
+        expect(not unknown,
+               f"{label} carries fields the create action drops: {', '.join(unknown)}")
+        for position, entry in enumerate(artefact.get("entries") or []):
+            if not isinstance(entry, dict):
+                problems.append(f"{label} entry {position} is not an object")
+                continue
+            unknown = sorted(set(entry) - ENTRY_FIELDS)
+            expect(not unknown,
+                   f"{label} entry {position} carries fields the action drops: "
+                   + ", ".join(unknown))
+            expect(isinstance(entry.get("axis_a"), str) and bool(str(entry.get("axis_a")).strip()),
+                   f"{label} entry {position} needs axis_a (the action's entry schema)")
         body = artefact.get("body")
         expect(isinstance(body, str) and bool(body.strip()),
                f"{label} needs an authored body")
@@ -349,6 +372,21 @@ def self_test() -> None:
     problems = check(thin_soaw, standard, ids, wsjf, True)
     if not any("soaw body" in problem for problem in problems):
         raise SystemExit("self-test: a thin SoAW body was not refused")
+
+    # The action's entry schema: a pack written against the document's prose
+    # (id/requirement/owner/verification) loses every field in the action and refuses on the
+    # missing axis_a. Measured on the T18 pack, which stopped that member's chain.
+    freeform = json.loads(json.dumps(good))
+    freeform["artifacts"][0]["entries"] = [
+        {"id": "R1", "requirement": "one shell", "owner": "T18-1",
+         "verification": "shell.spec.ts"},
+    ]
+    problems = check(freeform, standard, ids, wsjf, True)
+    for needle in ("carries fields the action drops", "needs axis_a"):
+        if not any(needle in problem for problem in problems):
+            raise SystemExit(
+                f"self-test: a freeform entry did not trip {needle!r}: {problems}"
+            )
 
     active = json.loads(json.dumps(good))
     del active["closure"], active["closure_review"]
