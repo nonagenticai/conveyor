@@ -1529,7 +1529,7 @@
       "key": "T19F",
       "name": "Decision-forum governance (follow-on)",
       "description": "Follow-on: docs/plans/T19F-meeting-bindings.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/T19F-meeting-bindings.md",
@@ -1672,6 +1672,7 @@
           223,
           224,
           225,
+          395,
           435,
           476,
           526,
@@ -1680,7 +1681,8 @@
           660,
           669,
           681,
-          693
+          693,
+          716
         ],
         "depends_on": [],
         "plan_status": "active",
