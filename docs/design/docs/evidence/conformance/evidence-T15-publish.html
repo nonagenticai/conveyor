@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T15 evidence — publish · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T15-publish.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t15-evidence--publish">T15 evidence — publish</h1>
+<p><code>documents.publish</code> for <code>01a2121b-60eb-71db-a750-c48bfd0c5112</code> (admin act, If-Match). The standard's required headings are checked on this transition.</p>
+<pre><code>== write: documents.publish ==
+{
+  &quot;body&quot;: &quot;---\ndocument: T15/evidence\nversion: 1\nstatus: published\nproject: T15\ncategory: evidence\nowner: programme-manager\nreviewer: Architecture Board\nreview_date: 2026-11-25\nartifact_kind: evidence\nphase: G\nplateau: capability\n---\n\n# T15 \u2014 Tool authoring and BYO: evidence\n\n## Claim\n\nT15 delivers the tool-authoring route: a tool generated from a spec is published and called, the\npublication approval defaults to a human and is tenant-configurable, a BYO MCP server is bound,\nnarrowed and audited, and no publishing job can exceed its effect ceiling.\n\n## Evidence\n\n- `crates/actions/tests/tool_authoring.rs::a_tool_generated_from_a_spec_is_published_and_called`,\n  `::a_scaffolded_service_registers_its_own_openapi`\n- `::publication_waits_for_a_human_by_default`,\n  `::a_tenant_policy_changes_the_publication_gate_without_a_code_change`\n- `crates/actions/tests/byo_tools.rs::only_the_bound_subset_is_callable_and_each_call_is_audited`,\n  `::a_call_time_url_is_refused_and_a_byo_toolkit_is_tenant_scoped`\n- `::the_publishing_job_cannot_widen_its_own_effect_ceiling`,\n  `::publication_refuses_an_unbounded_draft_and_defaults_the_class_to_read`,\n  `::a_destructive_tool_needs_a_named_approver`\n- PR #666, merge `a2ef9194eb2c`; `actions:tools` = `exists` in `docs/evidence/v2-coverage.md`.\n\n## Verification\n\n`cargo test -p conveyor-actions --test tool_authoring --test byo_tools` on a checked-out main; the\nCI equivalent is the PR&#39;s `preflight` and `ci-public` at the merge commit.\n\n## Links\n\n- `docs/plans/inception/T15/00-project-brief.md`, `01-inception-analysis.md`,\n  `02-architecture-design.md`\n- Issue #86; PR #666; `docs/evidence/v2-coverage.md`.\n\n## Gap\n\n`/tools` is the V1 legacy surface and is not evidence for this project. A promotion returns\n`requested`; no platform version is stamped. Caller-supplied URLs and an archived-kag binding are\nnot claimed. No other delivery gap is named by the record.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;evidence&quot;,
+  &quot;content_hash&quot;: &quot;1125d15c8701469263f7912d7e32220251ead5623db55fe05a0652e8c6b19a05&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-25T09:48:33.783785Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a2121b-60eb-71db-a750-c48bfd0c5112&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;evidence&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;1125d15c8701469263f7912d7e32220251ead5623db55fe05a0652e8c6b19a05&quot;,
+    &quot;size_bytes&quot;: 1904,
+    &quot;unit&quot;: &quot;T15&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a1d039-0d37-7f20-9959-979c31daeb5e&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: true,
+  &quot;published_at&quot;: &quot;2026-11-25T09:48:39.033041Z&quot;,
+  &quot;published_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;published_by_name&quot;: &quot;FR Test&quot;,
+  &quot;size_bytes&quot;: 1904,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;Evidence \u2014 T15 Tool authoring and BYO&quot;,
+  &quot;unit&quot;: &quot;T15&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-25T09:48:39.033041Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: documents.get ==
+{
+  &quot;body&quot;: &quot;---\ndocument: T15/evidence\nversion: 1\nstatus: published\nproject: T15\ncategory: evidence\nowner: programme-manager\nreviewer: Architecture Board\nreview_date: 2026-11-25\nartifact_kind: evidence\nphase: G\nplateau: capability\n---\n\n# T15 \u2014 Tool authoring and BYO: evidence\n\n## Claim\n\nT15 delivers the tool-authoring route: a tool generated from a spec is published and called, the\npublication approval defaults to a human and is tenant-configurable, a BYO MCP server is bound,\nnarrowed and audited, and no publishing job can exceed its effect ceiling.\n\n## Evidence\n\n- `crates/actions/tests/tool_authoring.rs::a_tool_generated_from_a_spec_is_published_and_called`,\n  `::a_scaffolded_service_registers_its_own_openapi`\n- `::publication_waits_for_a_human_by_default`,\n  `::a_tenant_policy_changes_the_publication_gate_without_a_code_change`\n- `crates/actions/tests/byo_tools.rs::only_the_bound_subset_is_callable_and_each_call_is_audited`,\n  `::a_call_time_url_is_refused_and_a_byo_toolkit_is_tenant_scoped`\n- `::the_publishing_job_cannot_widen_its_own_effect_ceiling`,\n  `::publication_refuses_an_unbounded_draft_and_defaults_the_class_to_read`,\n  `::a_destructive_tool_needs_a_named_approver`\n- PR #666, merge `a2ef9194eb2c`; `actions:tools` = `exists` in `docs/evidence/v2-coverage.md`.\n\n## Verification\n\n`cargo test -p conveyor-actions --test tool_authoring --test byo_tools` on a checked-out main; the\nCI equivalent is the PR&#39;s `preflight` and `ci-public` at the merge commit.\n\n## Links\n\n- `docs/plans/inception/T15/00-project-brief.md`, `01-inception-analysis.md`,\n  `02-architecture-design.md`\n- Issue #86; PR #666; `docs/evidence/v2-coverage.md`.\n\n## Gap\n\n`/tools` is the V1 legacy surface and is not evidence for this project. A promotion returns\n`requested`; no platform version is stamped. Caller-supplied URLs and an archived-kag binding are\nnot claimed. No other delivery gap is named by the record.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;evidence&quot;,
+  &quot;content_hash&quot;: &quot;1125d15c8701469263f7912d7e32220251ead5623db55fe05a0652e8c6b19a05&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-25T09:48:33.783785Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a2121b-60eb-71db-a750-c48bfd0c5112&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;evidence&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;1125d15c8701469263f7912d7e32220251ead5623db55fe05a0652e8c6b19a05&quot;,
+    &quot;size_bytes&quot;: 1904,
+    &quot;unit&quot;: &quot;T15&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a1d039-0d37-7f20-9959-979c31daeb5e&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: true,
+  &quot;published_at&quot;: &quot;2026-11-25T09:48:39.033041Z&quot;,
+  &quot;published_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;published_by_name&quot;: &quot;FR Test&quot;,
+  &quot;size_bytes&quot;: 1904,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;Evidence \u2014 T15 Tool authoring and BYO&quot;,
+  &quot;unit&quot;: &quot;T15&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-25T09:48:39.033041Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/conformance/evidence-T15-publish.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

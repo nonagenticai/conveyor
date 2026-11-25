@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T17 evidence — the published output · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T17.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t17-evidence--the-published-output">T17 evidence — the published output</h1>
+<p><code>documents.compose</code> of <code>docs/plans/T17/evidence.md</code> (category <code>evidence</code>, unit <code>T17</code>), then <code>documents.publish</code>; the audit's declared-output rule reads this row.</p>
+<pre><code>== write: documents.compose ==
+{
+  &quot;body&quot;: &quot;---\ndocument: T17/evidence\nversion: 1\nstatus: published\nproject: T17\ncategory: evidence\nowner: programme-manager\nreviewer: Architecture Board\nreview_date: 2026-11-25\nartifact_kind: evidence\nphase: G\nplateau: capability\n---\n\n# T17 \u2014 Tenant asset authoring: evidence\n\n## Claim\n\nT17 delivers tenant asset authoring: a short brief plus documents drafts a reviewed catalogue of\ndepartments, jobs, procedures and policies, which publishes with its decisions; no asset can\npublish itself and none can widen a tool grant.\n\n## Evidence\n\n- `crates/actions/tests/authoring.rs::a_chat_brief_drafts_the_org_and_job_catalogue`,\n  `::documents_yield_linked_procedure_and_policy_drafts`,\n  `::a_draft_that_references_an_unpublished_asset_is_refused`,\n  `::a_reviewed_catalogue_publishes_with_its_decisions`\n- `crates/actions/tests/authoring_standard.rs` (the output-standard checks)\n- `crates/actions/tests/asset_review.rs::the_authoring_job_cannot_publish_its_own_asset`,\n  `::a_non_human_decision_cannot_complete_an_asset_gate`,\n  `::an_asset_never_widens_a_tool_grant`\n- Merges `c29c7f52d939` (PR #632), `38334552e9b8` (PR #659), `ca392a97d7d8` (PR #687);\n  `actions:authoring` = `exists` in `docs/evidence/v2-coverage.md`.\n\n## Verification\n\n`cargo test -p conveyor-actions --test authoring --test asset_review --test authoring_standard`\nand `npx playwright test apps/web/e2e/authoring.spec.ts` on a checked-out main; the CI equivalent is\nthe PRs&#39; `preflight`, `ci-public` and `web` at the merge commits.\n\n## Links\n\n- `docs/plans/inception/T17/00-project-brief.md`, `01-inception-analysis.md`,\n  `02-architecture-design.md`\n- Issues #87, #629, #655; PRs #632, #659, #687; `docs/evidence/v2-coverage.md`.\n\n## Gap\n\nThe dependency order is refused at the draft attempt, not at publish \u2014 no publish-time check is\nclaimed. The live procedure/policy ingestion is T16&#39;s capability; this project proves the linked\ndrafts and the refusals. No tool-grant widening is possible and none is claimed.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;evidence&quot;,
+  &quot;content_hash&quot;: &quot;e8e4885f7f92881ce3a78502c39ef64e8fce95488f26c5417200fd6698fc767f&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-25T09:48:59.890703Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a2121b-c6e2-75c4-98b0-bc2265acf711&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;evidence&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;e8e4885f7f92881ce3a78502c39ef64e8fce95488f26c5417200fd6698fc767f&quot;,
+    &quot;size_bytes&quot;: 1978,
+    &quot;unit&quot;: &quot;T17&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a1d039-0d38-7db1-b685-d76bd4cebf47&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: false,
+  &quot;published_at&quot;: null,
+  &quot;published_by&quot;: null,
+  &quot;published_by_name&quot;: null,
+  &quot;size_bytes&quot;: 1978,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;Evidence \u2014 T17 Tenant asset authoring&quot;,
+  &quot;unit&quot;: &quot;T17&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-25T09:48:59.890703Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: documents.list ==
+{
+  &quot;items&quot;: [
+    {
+      &quot;body&quot;: null,
+      &quot;card_id&quot;: null,
+      &quot;category&quot;: &quot;evidence&quot;,
+      &quot;content_hash&quot;: &quot;e8e4885f7f92881ce3a78502c39ef64e8fce95488f26c5417200fd6698fc767f&quot;,
+      &quot;content_type&quot;: &quot;text/markdown&quot;,
+      &quot;created_at&quot;: &quot;2026-11-25T09:48:59.890703Z&quot;,
+      &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+      &quot;created_by_name&quot;: &quot;FR Test&quot;,
+      &quot;external_ref&quot;: null,
+      &quot;id&quot;: &quot;01a2121b-c6e2-75c4-98b0-bc2265acf711&quot;,
+      &quot;kind&quot;: &quot;document&quot;,
+      &quot;meta&quot;: {
+        &quot;category&quot;: &quot;evidence&quot;,
+        &quot;content_type&quot;: &quot;text/markdown&quot;,
+        &quot;sha256&quot;: &quot;e8e4885f7f92881ce3a78502c39ef64e8fce95488f26c5417200fd6698fc767f&quot;,
+        &quot;size_bytes&quot;: 1978,
+        &quot;unit&quot;: &quot;T17&quot;
+      },
+      &quot;parent_document_id&quot;: null,
+      &quot;project_id&quot;: &quot;01a1d039-0d38-7db1-b685-d76bd4cebf47&quot;,
+      &quot;publish_requested_at&quot;: null,
+      &quot;publishable&quot;: false,
+      &quot;published_at&quot;: null,
+      &quot;published_by&quot;: null,
+      &quot;published_by_name&quot;: null,
+      &quot;size_bytes&quot;: 1978,
+      &quot;status&quot;: &quot;active&quot;,
+      &quot;title&quot;: &quot;Evidence \u2014 T17 Tenant asset authoring&quot;,
+      &quot;unit&quot;: &quot;T17&quot;,
+      &quot;updated_at&quot;: &quot;2026-11-25T09:48:59.890703Z&quot;,
+      &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+      &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+      &quot;version&quot;: 1
+    }
+  ]
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/conformance/evidence-T17.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

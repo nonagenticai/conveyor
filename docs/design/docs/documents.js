@@ -587,6 +587,231 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
     {
+      "title": "T15 closure-review — publish",
+      "path": "docs/evidence/conformance/closure-review-T15-publish.html",
+      "source": "docs/evidence/conformance/closure-review-T15-publish.md",
+      "section": "Evidence",
+      "sha256": "f9287b2a3adfe8dfe6c9bb5e71d95195cedb37ee8300ba8d9d6e3d361716e164",
+      "bytes": 7560,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T15-publish.md"
+    },
+    {
+      "title": "T15 closure-review — the published output",
+      "path": "docs/evidence/conformance/closure-review-T15.html",
+      "source": "docs/evidence/conformance/closure-review-T15.md",
+      "section": "Evidence",
+      "sha256": "2481848f484a7e0f26655011ce9c1d371d6d8ba4bf0c86c73ef3aff9369d033d",
+      "bytes": 5169,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T15.md"
+    },
+    {
+      "title": "T17 closure-review — publish",
+      "path": "docs/evidence/conformance/closure-review-T17-publish.html",
+      "source": "docs/evidence/conformance/closure-review-T17-publish.md",
+      "section": "Evidence",
+      "sha256": "34101fcab70b8445950696ff496d0a474f97a3785a9a5ebb87ded0133b39f267",
+      "bytes": 7842,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T17-publish.md"
+    },
+    {
+      "title": "T17 closure-review — the published output",
+      "path": "docs/evidence/conformance/closure-review-T17.html",
+      "source": "docs/evidence/conformance/closure-review-T17.md",
+      "section": "Evidence",
+      "sha256": "1ecd4578b1edf0a75a7d0ad5355916f47bedeef31e02d26c1f5f4bff1b1e8e89",
+      "bytes": 5310,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T17.md"
+    },
+    {
+      "title": "T19F closure-review — publish",
+      "path": "docs/evidence/conformance/closure-review-T19F-publish.html",
+      "source": "docs/evidence/conformance/closure-review-T19F-publish.md",
+      "section": "Evidence",
+      "sha256": "22caac941e32fcf62a31177701e194e5a045a5967831fb3c4cd01808d67916d2",
+      "bytes": 14496,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T19F-publish.md"
+    },
+    {
+      "title": "T19F closure-review — the published output",
+      "path": "docs/evidence/conformance/closure-review-T19F.html",
+      "source": "docs/evidence/conformance/closure-review-T19F.md",
+      "section": "Evidence",
+      "sha256": "2cf16f17840e621546ab0a1ba641408371c6a6787a878a4d8fb96a2ca018d64a",
+      "bytes": 21232,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T19F.md"
+    },
+    {
+      "title": "T5 closure-review — publish",
+      "path": "docs/evidence/conformance/closure-review-T5-publish.html",
+      "source": "docs/evidence/conformance/closure-review-T5-publish.md",
+      "section": "Evidence",
+      "sha256": "eca52bfbc89c4af5e092b1b7a71379c65b99e64fc5dbb14315128ea94ce055da",
+      "bytes": 8025,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T5-publish.md"
+    },
+    {
+      "title": "T5 closure-review — the published output",
+      "path": "docs/evidence/conformance/closure-review-T5.html",
+      "source": "docs/evidence/conformance/closure-review-T5.md",
+      "section": "Evidence",
+      "sha256": "14f0813d23d2c437d29a1645807dbf16159d56db2ac5d9d1b4d18b366970d128",
+      "bytes": 5378,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T5.md"
+    },
+    {
+      "title": "T6 closure-review — publish",
+      "path": "docs/evidence/conformance/closure-review-T6-publish.html",
+      "source": "docs/evidence/conformance/closure-review-T6-publish.md",
+      "section": "Evidence",
+      "sha256": "1e6d5e19a05aa9b6e3f81fa065eb3274099699e18b48defb3aab8a2770f81a45",
+      "bytes": 8175,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T6-publish.md"
+    },
+    {
+      "title": "T6 closure-review — the published output",
+      "path": "docs/evidence/conformance/closure-review-T6.html",
+      "source": "docs/evidence/conformance/closure-review-T6.md",
+      "section": "Evidence",
+      "sha256": "f1841edd93db5ad0c150d2c767af6d223b74ec8fec3c2fb25c395ac704e5bb74",
+      "bytes": 5468,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T6.md"
+    },
+    {
+      "title": "T8 closure-review — publish",
+      "path": "docs/evidence/conformance/closure-review-T8-publish.html",
+      "source": "docs/evidence/conformance/closure-review-T8-publish.md",
+      "section": "Evidence",
+      "sha256": "2dc5b8bcd49cab50bf78090c9b701a3129b93b6e29d0ee3ceb64dd248bb80c28",
+      "bytes": 6997,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T8-publish.md"
+    },
+    {
+      "title": "T8 closure-review — the published output",
+      "path": "docs/evidence/conformance/closure-review-T8.html",
+      "source": "docs/evidence/conformance/closure-review-T8.md",
+      "section": "Evidence",
+      "sha256": "09ccf4cdd94d0e969b4f07c8b2bb8f05681fdd7e3aa9d5b50196221c3eed0fd4",
+      "bytes": 4881,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/closure-review-T8.md"
+    },
+    {
+      "title": "T12 evidence — publish",
+      "path": "docs/evidence/conformance/evidence-T12-publish.html",
+      "source": "docs/evidence/conformance/evidence-T12-publish.md",
+      "section": "Evidence",
+      "sha256": "0c221be3ad32dc62e44262f2518812a424d62f29ef288d799d8f54847d67dcaa",
+      "bytes": 7068,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T12-publish.md"
+    },
+    {
+      "title": "T12 evidence — the published output",
+      "path": "docs/evidence/conformance/evidence-T12.html",
+      "source": "docs/evidence/conformance/evidence-T12.md",
+      "section": "Evidence",
+      "sha256": "d80b40d6f3175d53acf5aab1a72cf6dba326e7c4252b13677dab4e9851cac970",
+      "bytes": 4889,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T12.md"
+    },
+    {
+      "title": "T15 evidence — publish",
+      "path": "docs/evidence/conformance/evidence-T15-publish.html",
+      "source": "docs/evidence/conformance/evidence-T15-publish.md",
+      "section": "Evidence",
+      "sha256": "3bcd4ebd12a8e1008bb94099bd6e1aa80e2f4488cfb3b3d9a92a43bbe4015269",
+      "bytes": 6504,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T15-publish.md"
+    },
+    {
+      "title": "T15 evidence — the published output",
+      "path": "docs/evidence/conformance/evidence-T15.html",
+      "source": "docs/evidence/conformance/evidence-T15.md",
+      "section": "Evidence",
+      "sha256": "edf1090a52dbbb8e5a3728b6d98ab20da6819a924c389bdd4ab5448d9451a6fb",
+      "bytes": 4608,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T15.md"
+    },
+    {
+      "title": "T17 evidence — publish",
+      "path": "docs/evidence/conformance/evidence-T17-publish.html",
+      "source": "docs/evidence/conformance/evidence-T17-publish.md",
+      "section": "Evidence",
+      "sha256": "d20d96f9c055c75a678ce44d1daeb446a9c2dc4b71b103b998aba298fe83293b",
+      "bytes": 6660,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T17-publish.md"
+    },
+    {
+      "title": "T17 evidence — the published output",
+      "path": "docs/evidence/conformance/evidence-T17.html",
+      "source": "docs/evidence/conformance/evidence-T17.md",
+      "section": "Evidence",
+      "sha256": "f09a9847d5738fa5e07a48460be63c14b70b44a2d37930226112f08d3bd5d628",
+      "bytes": 4686,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T17.md"
+    },
+    {
+      "title": "T19F evidence — the published update",
+      "path": "docs/evidence/conformance/evidence-T19F.html",
+      "source": "docs/evidence/conformance/evidence-T19F.md",
+      "section": "Evidence",
+      "sha256": "9c8dc190b71bae5dad7a7f09aa607e318b142b44d57428af890c24df4d1acde6",
+      "bytes": 35925,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T19F.md"
+    },
+    {
+      "title": "T5 evidence — publish",
+      "path": "docs/evidence/conformance/evidence-T5-publish.html",
+      "source": "docs/evidence/conformance/evidence-T5-publish.md",
+      "section": "Evidence",
+      "sha256": "b52bdd92318c468361c081e5f50476c0a08c427534ccf19f018d9fdba9b47706",
+      "bytes": 6387,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T5-publish.md"
+    },
+    {
+      "title": "T5 evidence — the published output",
+      "path": "docs/evidence/conformance/evidence-T5.html",
+      "source": "docs/evidence/conformance/evidence-T5.md",
+      "section": "Evidence",
+      "sha256": "c00dfd2a4990abb62636267573a3aea1eca0a9c37a40d94f156bab7fc5062445",
+      "bytes": 4526,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T5.md"
+    },
+    {
+      "title": "T6 evidence — publish",
+      "path": "docs/evidence/conformance/evidence-T6-publish.html",
+      "source": "docs/evidence/conformance/evidence-T6-publish.md",
+      "section": "Evidence",
+      "sha256": "934170b208bbb3b481e96605d774977d8b733e699aba841e47a976bb25a2833c",
+      "bytes": 6459,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T6-publish.md"
+    },
+    {
+      "title": "T6 evidence — the published output",
+      "path": "docs/evidence/conformance/evidence-T6.html",
+      "source": "docs/evidence/conformance/evidence-T6.md",
+      "section": "Evidence",
+      "sha256": "a0458ccf571b12ef589a48aae79fe1ad2e2d586f55f97fb5ef9ccb06bf2135ed",
+      "bytes": 4577,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T6.md"
+    },
+    {
+      "title": "T8 project-brief — publish",
+      "path": "docs/evidence/conformance/project-brief-T8-publish.html",
+      "source": "docs/evidence/conformance/project-brief-T8-publish.md",
+      "section": "Evidence",
+      "sha256": "ddf36754c055e2d5d588b2b0495915d765066b80379a98dfa20c228f7628eca7",
+      "bytes": 8660,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/project-brief-T8-publish.md"
+    },
+    {
+      "title": "T8 project-brief — the published output",
+      "path": "docs/evidence/conformance/project-brief-T8.html",
+      "source": "docs/evidence/conformance/project-brief-T8.md",
+      "section": "Evidence",
+      "sha256": "8bf08b389880b52a141cf642b7ed3b34cdb7b7e27ade654a131fb7d9af0b3971",
+      "bytes": 6920,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/project-brief-T8.md"
+    },
+    {
       "title": "The evidence-review service — capture and drop table (2026-11-18)",
       "path": "docs/evidence/evidence-review-capture-2026-11-18.html",
       "source": "docs/evidence/evidence-review-capture-2026-11-18.md",
@@ -1514,6 +1739,51 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
     },
     {
+      "title": "T12 — One organisation loop: evidence",
+      "path": "docs/plans/T12/evidence.html",
+      "source": "docs/plans/T12/evidence.md",
+      "section": "Plans",
+      "sha256": "76691699ac3f1cf66eb14252ef8b230de12f1826b7a7e948edb10210b7dd585b",
+      "bytes": 2155,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T12/evidence.md"
+    },
+    {
+      "title": "T15 — Tool authoring and BYO: closure review",
+      "path": "docs/plans/T15/closure-review.html",
+      "source": "docs/plans/T15/closure-review.md",
+      "section": "Plans",
+      "sha256": "80a42675eab96067f328650d9a9bb5a4343b1c8fc636d18399b1c3eb5f48c860",
+      "bytes": 2413,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T15/closure-review.md"
+    },
+    {
+      "title": "T15 — Tool authoring and BYO: evidence",
+      "path": "docs/plans/T15/evidence.html",
+      "source": "docs/plans/T15/evidence.md",
+      "section": "Plans",
+      "sha256": "1125d15c8701469263f7912d7e32220251ead5623db55fe05a0652e8c6b19a05",
+      "bytes": 1904,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T15/evidence.md"
+    },
+    {
+      "title": "T17 — Tenant asset authoring: closure review",
+      "path": "docs/plans/T17/closure-review.html",
+      "source": "docs/plans/T17/closure-review.md",
+      "section": "Plans",
+      "sha256": "7c5c190ffd4dd8da55e963725636bd12c1715f3edf3ba31dc6b420ecf15b494c",
+      "bytes": 2550,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T17/closure-review.md"
+    },
+    {
+      "title": "T17 — Tenant asset authoring: evidence",
+      "path": "docs/plans/T17/evidence.html",
+      "source": "docs/plans/T17/evidence.md",
+      "section": "Plans",
+      "sha256": "e8e4885f7f92881ce3a78502c39ef64e8fce95488f26c5417200fd6698fc767f",
+      "bytes": 1978,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T17/evidence.md"
+    },
+    {
       "title": "T18 — The real V2 UI",
       "path": "docs/plans/T18-real-v2-ui.html",
       "source": "docs/plans/T18-real-v2-ui.md",
@@ -1710,6 +1980,60 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "700f10bc9b03a87f77abf24d79458d386d5dd7eabeb198e7dd46c44e0850a611",
       "bytes": 2699,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/safe-epic.md"
+    },
+    {
+      "title": "T5 — Kata: closure review",
+      "path": "docs/plans/T5/closure-review.html",
+      "source": "docs/plans/T5/closure-review.md",
+      "section": "Plans",
+      "sha256": "83533f1147ee4602844cfbf2b1e452d507aabff10ce831a36b32d20b28914f49",
+      "bytes": 2667,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T5/closure-review.md"
+    },
+    {
+      "title": "T5 — Kata: evidence",
+      "path": "docs/plans/T5/evidence.html",
+      "source": "docs/plans/T5/evidence.md",
+      "section": "Plans",
+      "sha256": "547352fa0926cd8c98b084e84d26ca118aa15d6b1a4c755513a8720dcc7726f3",
+      "bytes": 1864,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T5/evidence.md"
+    },
+    {
+      "title": "T6 — Development project: closure review",
+      "path": "docs/plans/T6/closure-review.html",
+      "source": "docs/plans/T6/closure-review.md",
+      "section": "Plans",
+      "sha256": "be036ce33841406082c1d800059b28560bfdb652391fe4400f4b774320d07475",
+      "bytes": 2723,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T6/closure-review.md"
+    },
+    {
+      "title": "T6 — Development project: evidence",
+      "path": "docs/plans/T6/evidence.html",
+      "source": "docs/plans/T6/evidence.md",
+      "section": "Plans",
+      "sha256": "cfb3159221b32a0e62a374ceed71c0eff18f31b97afbcb469c24bb171a340b79",
+      "bytes": 1885,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T6/evidence.md"
+    },
+    {
+      "title": "T8 — Organisational memory: closure review",
+      "path": "docs/plans/T8/closure-review.html",
+      "source": "docs/plans/T8/closure-review.md",
+      "section": "Plans",
+      "sha256": "f20f70081bc2ba1382f0e7acd1f05aaf9b7b190adc4f3922bf1e3dbbbe7cad7a",
+      "bytes": 2132,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T8/closure-review.md"
+    },
+    {
+      "title": "T8 — Organisational memory: project brief",
+      "path": "docs/plans/T8/project-brief.html",
+      "source": "docs/plans/T8/project-brief.md",
+      "section": "Plans",
+      "sha256": "730d496a0daccbfb8db9a74d951dc24e1b70a87874155d5134bdf3b672ca9ba3",
+      "bytes": 2904,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T8/project-brief.md"
     },
     {
       "title": "T9 — TOGAF ADM capability",
