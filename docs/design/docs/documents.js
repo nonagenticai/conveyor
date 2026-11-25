@@ -1194,9 +1194,27 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19F/artifact-register.html",
       "source": "docs/plans/T19F/artifact-register.md",
       "section": "Plans",
-      "sha256": "0da8389f33a51f2ab6b2c78032cac8fe6841a4717c4e38172882a92f5b35ebdd",
-      "bytes": 4256,
+      "sha256": "e164bea570355c9c971a254363c95cae239507f5b544f6e7f8161094fc17669b",
+      "bytes": 4244,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/artifact-register.md"
+    },
+    {
+      "title": "T19F — Forum bindings: closure review",
+      "path": "docs/plans/T19F/closure-review.html",
+      "source": "docs/plans/T19F/closure-review.md",
+      "section": "Plans",
+      "sha256": "b7435f8dcb5f8e4775c1fd983e286e04c56c80825e51e47ff8395fee4327efa9",
+      "bytes": 3144,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/closure-review.md"
+    },
+    {
+      "title": "T19F — Forum bindings: evidence",
+      "path": "docs/plans/T19F/evidence.html",
+      "source": "docs/plans/T19F/evidence.md",
+      "section": "Plans",
+      "sha256": "b5a6186c12e86c2a3b1192337e1917db9876093b3d2de464984ceced7a3946cd",
+      "bytes": 5562,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/evidence.md"
     },
     {
       "title": "T19F — Inception analysis",

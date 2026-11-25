@@ -487,8 +487,8 @@ PROFILES: dict[str, dict] = {
             "reference": "B7",
         },
         "reviews": [
-            ("statement_of_architecture_work", "compliant"),
-            ("delivery_contract", "fully_conformant"),
+            ("statement_of_architecture_work", "conformant"),
+            ("delivery_contract", "conformant"),
         ],
         "document_title": "T19F — Architecture artifact (the typed TOGAF set)",
         "document_heading": "T19F forum bindings",

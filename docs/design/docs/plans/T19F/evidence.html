@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F — Forum bindings: evidence · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/evidence.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f--forum-bindings-evidence">T19F — Forum bindings: evidence</h1>
+<h2 id="claim">Claim</h2>
+<p>Issue #683 implements the two T19 follow-ups on <code>main</code> (merge <code>eb0deb61</code>): a <code>meeting_type</code> version is written only by the reviewed authoring route, a governance body decides a subject in a sitting whose seats write <code>via='meeting'</code> decision rows, and a cadence row materialises its own meeting once. Issue #684 runs the live chain and gate on the deployed engine and records the programme publication.</p>
+<p>The construction evidence below is at <code>eb0deb61</code>; the live rows are recorded by <code>scripts/t19f-live-gate-check.py --apply</code> and re-read by <code>--check</code>.</p>
+<h2 id="construction-evidence-issue-683">Construction evidence (issue #683)</h2>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Scenario</th>
+<th>Evidence</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1.1</td>
+<td>policy v2 publishes; the in-flight v1 meeting still resolves v1</td>
+<td><code>crates/api/tests/meetings_authoring.rs::policy_publish_versions_meeting_type</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P1.2</td>
+<td>an unreviewed policy asset is refused</td>
+<td><code>meetings_authoring.rs::policy_publish_requires_review</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P1.3</td>
+<td>a reused authoring asset key is refused</td>
+<td><code>meetings_authoring.rs::a_reused_asset_key_is_refused</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P1.4</td>
+<td>the type reads return the versions in order</td>
+<td><code>meetings_authoring.rs::type_list_and_get_read_versions</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P2.1</td>
+<td>the sitting closes through <code>close_item_tx</code> with <code>via='meeting'</code> rows</td>
+<td><code>crates/api/tests/meetings_binding.rs::board_sitting_uses_close_item</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P2.2</td>
+<td>a body with no bound type refuses a sitting <code>422</code></td>
+<td><code>meetings_binding.rs::a_body_without_a_type_refuses_a_sitting</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P2.3</td>
+<td>a quorum miss defers <code>inquorate</code></td>
+<td><code>meetings_binding.rs::a_quorum_miss_defers_inquorate</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P2.4</td>
+<td>the direct <code>board_decide</code> path is unchanged</td>
+<td><code>meetings_binding.rs::the_direct_board_decide_path_still_works</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P3.1</td>
+<td>materialise is idempotent</td>
+<td><code>meetings_binding.rs::cadence_materialise_is_idempotent</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P3.2</td>
+<td>a cadence with no type is refused <code>422 cadence_type_missing</code></td>
+<td><code>meetings_binding.rs::a_cadence_without_a_type_is_refused</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P3.3</td>
+<td>the cadence agenda item resolves the slot</td>
+<td><code>meetings_binding.rs::the_cadence_item_resolves</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P3.4</td>
+<td>T19's slot rule is unchanged (a second scheduled meeting is legal)</td>
+<td><code>crates/api/tests/meetings_policy.rs::a_second_live_meeting_in_a_slot_is_refused</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P4.1</td>
+<td>the mock UI carries the policy, sitting and cadence panels</td>
+<td><code>node docs/design/scripts/check-v2.cjs</code></td>
+<td>pass (281 checks)</td>
+</tr>
+<tr>
+<td>P4.2</td>
+<td>the real app renders the pinned type/version and the policy list</td>
+<td><code>apps/web/e2e/meetings.spec.ts</code> in <code>web.yml</code></td>
+<td>pass at <code>eb0deb61</code></td>
+</tr>
+<tr>
+<td>P5.1</td>
+<td>every new action has one declaration and HTTP/MCP agree</td>
+<td><code>cargo test -p conveyor-actions --test registry --test parity_http_mcp</code></td>
+<td>pass (12/12, 7/7)</td>
+</tr>
+<tr>
+<td>P5.2</td>
+<td>the migration ledger reaches 73</td>
+<td><code>cargo test -p conveyor-store --test s07_schema</code></td>
+<td>pass (3/3)</td>
+</tr>
+<tr>
+<td>P5.3</td>
+<td>T19F is <code>built</code> in the coverage and seed data</td>
+<td><code>python3 scripts/build-coverage.py --check &amp;&amp; node docs/design/scripts/check-coverage.cjs</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>P5.4</td>
+<td>the design pack agrees</td>
+<td><code>check-data</code>, <code>check-docs</code>, <code>check-v2</code>, <code>check-console</code>, <code>build-docs --check</code></td>
+<td>pass</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-live-gate-issue-684">The live gate (issue #684)</h2>
+<p><code>scripts/t19f-live-gate-check.py --apply</code> performs, through the deployed engine's action surface: a meeting scheduled against forum policy v1; a v2 published through <code>authoring.intake</code> → <code>draft</code> → <code>approvals.request</code>/<code>decide</code> → <code>authoring.review</code> → <code>authoring.publish</code>; a board sitting opened on a real contract with <code>architecture.board_sit_open</code>, one chair invitation/response/position and <code>architecture.board_sit_decide</code>; and a cadence row materialised twice. Every write names an evidence file under <code>docs/evidence/t19f/gate/</code>; the ids are <code>docs/evidence/t19f/live-gate.json</code>. <code>--check</code> re-reads the rows and asserts:</p>
+<table>
+<thead>
+<tr>
+<th>Invariant</th>
+<th>Evidence</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the v1-pinned meeting still resolves version 1 after v2 publishes</td>
+<td><code>live-gate.json.policy</code></td>
+<td>pending</td>
+</tr>
+<tr>
+<td>the forum type carries an active v2</td>
+<td><code>live-gate.json.policy</code></td>
+<td>pending</td>
+</tr>
+<tr>
+<td>the sitting's approval is <code>approved</code> with exactly one <code>via.surface='meeting'</code> decision row naming the chair</td>
+<td><code>live-gate.json.sitting</code></td>
+<td>pending</td>
+</tr>
+<tr>
+<td>the sitting's agenda item closed as <code>decision</code></td>
+<td><code>live-gate.json.sitting</code></td>
+<td>pending</td>
+</tr>
+<tr>
+<td>the cadence meeting carries the bound type and the slot, non-cancelled</td>
+<td><code>live-gate.json.cadence</code></td>
+<td>pending</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-governance-chain-issue-684">The governance chain (issue #684)</h2>
+<p><code>scripts/governance-chain.py --project T19F --check</code> asserts the T19F record: seven approved artefacts, both live contracts with a requester distinct from the approver, B7 read back and not overwritten, one Phase-G compliance review per contract (read from the published <code>architecture.json</code>), and the published <code>architecture-artifact</code> document with its four headings. Evidence under <code>docs/evidence/t19f/gov/</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Invariant</th>
+<th>Evidence</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>seven mandatory artefacts are approved on T19F</td>
+<td><code>gov/artifact-*.md</code></td>
+<td>pending</td>
+</tr>
+<tr>
+<td>the SoAW and the delivery contract are live, requester ≠ approver</td>
+<td><code>gov/contract-*.md</code></td>
+<td>pending</td>
+</tr>
+<tr>
+<td>B7's baseline and owner are read back, not overwritten</td>
+<td><code>gov/benefit-b7-baseline.md</code></td>
+<td>pending</td>
+</tr>
+<tr>
+<td>both contracts carry a Phase-G compliance review</td>
+<td>published <code>architecture.json</code></td>
+<td>pending</td>
+</tr>
+<tr>
+<td>the <code>architecture-artifact</code> document is published with Metadata/Entries/Links/Document</td>
+<td><code>gov/artifact-document-publish.md</code></td>
+<td>pending</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T19F/evidence.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
