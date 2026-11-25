@@ -1311,7 +1311,7 @@
       "key": "T14",
       "name": "Estate toolkits",
       "description": "SPEC_V2 slice T14 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1527,7 +1527,7 @@
       "key": "T19F",
       "name": "Decision-forum governance (follow-on)",
       "description": "Follow-on: docs/plans/T19F-meeting-bindings.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/T19F-meeting-bindings.md",
@@ -1535,7 +1535,8 @@
         "issues": [
           682,
           683,
-          684
+          684,
+          722
         ],
         "depends_on": [
           "T19",
@@ -1544,7 +1545,7 @@
           "T10",
           "P0"
         ],
-        "plan_status": "proposed",
+        "plan_status": "built",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 6,
@@ -1557,6 +1558,7 @@
         ],
         "adm_phase": "G",
         "plateau": "capability",
+        "closure_deferred_to_tranche": 6,
         "gate": "a reviewed policy asset publishes a new immutable meeting_type version while an in-flight meeting keeps its pinned version; a board subject decision is taken in a sitting whose qualifying seats each write one approval_decision with via='meeting'; a cadence row materialises exactly one meeting; the direct board path is unchanged"
       }
     },
@@ -1668,19 +1670,16 @@
           193,
           222,
           223,
-          224,
           225,
           395,
           435,
           476,
           526,
           569,
-          572,
           660,
           669,
-          681,
-          693,
-          716
+          726,
+          729
         ],
         "depends_on": [],
         "plan_status": "active",

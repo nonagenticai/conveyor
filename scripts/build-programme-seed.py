@@ -52,17 +52,29 @@ ISSUES_FILE = ROOT / "docs" / "design" / "data" / "issues.json"
 def load_standard() -> dict:
     return json.loads(STANDARD_PATH.read_text(encoding="utf-8"))
 
-def definition_project_meta() -> dict[str, dict[str, str]]:
-    """The ADM placement per project, from the checked-in definition (empty when absent)."""
+def definition_project_meta() -> dict[str, dict]:
+    """The per-project declaration, from the checked-in definition (empty when absent).
+
+    `adm_phase`/`plateau` place the project in the architecture; `closure_deferred_to_tranche`
+    is the programme's recorded decision that closure waits for that tranche review (T19F), which
+    `programme_state.derive_status` honours ahead of the all-issues-closed rule.
+    """
     if not DEFINITION_PATH.exists():
         return {}
     document = json.loads(DEFINITION_PATH.read_text(encoding="utf-8"))
-    out: dict[str, dict[str, str]] = {}
+    out: dict[str, dict] = {}
     for key, entry in (document.get("projects") or {}).items():
-        phase = (entry or {}).get("adm_phase", "")
-        plateau = (entry or {}).get("plateau", "")
+        entry = entry or {}
+        declared: dict = {}
+        phase = entry.get("adm_phase", "")
+        plateau = entry.get("plateau", "")
         if phase and plateau:
-            out[key] = {"adm_phase": phase, "plateau": plateau}
+            declared.update({"adm_phase": phase, "plateau": plateau})
+        deferred = entry.get("closure_deferred_to_tranche")
+        if isinstance(deferred, int) and not isinstance(deferred, bool) and deferred > 0:
+            declared["closure_deferred_to_tranche"] = deferred
+        if declared:
+            out[key] = declared
     return out
 
 
@@ -197,7 +209,7 @@ FOLLOW_ON_PROJECTS = [
         "description": "Follow-on: docs/plans/T19F-meeting-bindings.md",
         "plan": "docs/plans/T19F-meeting-bindings.md",
         "track": "v2",
-        "plan_status": "proposed",
+        "plan_status": "built",
         "depends_on": ["T19", "T17", "T9", "T10", "P0"],
         "gate": (
             "a reviewed policy asset publishes a new immutable meeting_type version while an "
@@ -505,7 +517,9 @@ def build(issues: list[dict]) -> dict:
                 numbers.append(number)
         numbers.sort()
         measured = coverage.get(project["key"], {})
-        status = derive_status(project, project_issues, coverage)
+        # The definition's declaration (ADM placement, a deferred closure) is an input to the
+        # status rule, so it is merged before the meta exists.
+        status = derive_status({**project, **adm.get(project["key"], {})}, project_issues, coverage)
         cls = standard_class(std, project, measured.get("status", ""))
         out_projects.append(
             {

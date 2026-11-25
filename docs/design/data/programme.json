@@ -1,8 +1,105 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-25T03:46:32.319854100+00:00",
+  "generated_at": "2026-11-25T09:58:16.505745364+00:00",
   "issue_registry": {
     "issues": [
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 729,
+        "state": "OPEN",
+        "title": "design: build-docs must preserve the published outputs index — main's design-pack is red",
+        "updatedAt": "2026-11-25T09:40:51Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/729"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          }
+        ],
+        "number": 726,
+        "state": "OPEN",
+        "title": "rework: strict conformance — the published closure records, the T19F deferral and a green strict publish",
+        "updatedAt": "2026-11-25T09:37:22Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/726"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "5319E7",
+            "name": "programme"
+          },
+          {
+            "color": "6E7781",
+            "name": "T19F"
+          }
+        ],
+        "number": 722,
+        "state": "CLOSED",
+        "title": "proof: T19F close-out — the human authoring review, the 12/12 live gate and the refreshed record",
+        "updatedAt": "2026-11-25T09:36:23Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/722"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          }
+        ],
+        "number": 716,
+        "state": "CLOSED",
+        "title": "fix: the acceptance job provisions the environment its commands need",
+        "updatedAt": "2026-11-25T09:01:18Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/716"
+      },
+      {
+        "labels": [
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "0E8A16",
+            "name": "status:ready"
+          }
+        ],
+        "number": 714,
+        "state": "CLOSED",
+        "title": "fix: publish the live conformance gap register so design-pack is reproducible",
+        "updatedAt": "2026-11-25T07:49:31Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/714"
+      },
       {
         "labels": [
           {
@@ -25,7 +122,7 @@
         "number": 697,
         "state": "OPEN",
         "title": "add: S21 step 11 — the execution level closes: apply-on-accept, prompt receipts, release knowledge layers",
-        "updatedAt": "2026-11-24T23:17:30Z",
+        "updatedAt": "2026-11-25T09:43:01Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/697"
       },
       {
@@ -46,7 +143,7 @@
         "number": 696,
         "state": "CLOSED",
         "title": "fix: the acceptance manifest declares the dco context the main ruleset requires",
-        "updatedAt": "2026-11-24T23:40:31Z",
+        "updatedAt": "2026-11-25T07:43:13Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/696"
       },
       {
@@ -56,14 +153,14 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           }
         ],
         "number": 693,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "docs: a closing unit updates its v2-slice-artefacts row to the measured shape",
-        "updatedAt": "2026-11-24T22:22:45Z",
+        "updatedAt": "2026-11-25T09:15:06Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/693"
       },
       {
@@ -94,8 +191,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "6E7781",
@@ -103,9 +200,9 @@
           }
         ],
         "number": 688,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "add: media-discovery accepts its licence bearer in Authorization, so the conveyor broker can call it",
-        "updatedAt": "2026-11-24T21:18:27Z",
+        "updatedAt": "2026-11-25T08:27:41Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/688"
       },
       {
@@ -128,9 +225,9 @@
           }
         ],
         "number": 684,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "proof: T19F — the live gate, the published programme record and the closure review",
-        "updatedAt": "2026-11-25T03:14:20Z",
+        "updatedAt": "2026-11-25T04:29:17Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/684"
       },
       {
@@ -194,14 +291,14 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           }
         ],
         "number": 681,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "fix: publish-data derives the docs index and the programme seed from the data it installs",
-        "updatedAt": "2026-11-24T19:20:34Z",
+        "updatedAt": "2026-11-25T08:33:08Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/681"
       },
       {
@@ -253,14 +350,14 @@
             "name": "bug"
           },
           {
-            "color": "FBCA04",
-            "name": "status:claimed"
+            "color": "0E8A16",
+            "name": "status:ready"
           }
         ],
         "number": 669,
         "state": "OPEN",
         "title": "rollback across a migration boundary cannot serve the prior digest (sqlx VersionMissing 70; Flux restores the pinned image)",
-        "updatedAt": "2026-11-24T22:24:23Z",
+        "updatedAt": "2026-11-25T07:20:23Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/669"
       },
       {
@@ -311,7 +408,7 @@
         "number": 660,
         "state": "OPEN",
         "title": "conveyor-buildout — the SPEC_V2 programme",
-        "updatedAt": "2026-11-25T03:39:01Z",
+        "updatedAt": "2026-11-25T08:27:54Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/660"
       },
       {
@@ -480,8 +577,8 @@
             "name": "unit"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "6E7781",
@@ -499,7 +596,7 @@
         "number": 630,
         "state": "OPEN",
         "title": "T18-3c: the run inspector's executor kind, binding pin and tools panel",
-        "updatedAt": "2026-11-25T00:10:24Z",
+        "updatedAt": "2026-11-25T09:47:11Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/630"
       },
       {
@@ -916,8 +1013,8 @@
             "name": "unit"
           },
           {
-            "color": "D93F0B",
-            "name": "status:blocked"
+            "color": "FBCA04",
+            "name": "status:claimed"
           },
           {
             "color": "5319E7",
@@ -925,9 +1022,9 @@
           }
         ],
         "number": 572,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "v1-ui-1: typed evidence in the console's destructive flow",
-        "updatedAt": "2026-11-22T07:46:23Z",
+        "updatedAt": "2026-11-25T09:01:18Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/572"
       },
       {
@@ -986,7 +1083,7 @@
         "number": 566,
         "state": "OPEN",
         "title": "T18-5: Architecture capability, System architecture, Knowledge and the T12 acceptance",
-        "updatedAt": "2026-11-25T00:55:40Z",
+        "updatedAt": "2026-11-25T07:19:29Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/566"
       },
       {
@@ -1380,7 +1477,7 @@
         "number": 526,
         "state": "OPEN",
         "title": "#526 programme: the retrospective rework — tranche 0, all remaining tranches, benefits and the viability gate (U5a–U5h, U6, U7)",
-        "updatedAt": "2026-11-24T23:47:41Z",
+        "updatedAt": "2026-11-25T09:46:08Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/526"
       },
       {
@@ -2143,9 +2240,9 @@
           }
         ],
         "number": 395,
-        "state": "CLOSED",
+        "state": "OPEN",
         "title": "architecture: the board approves a contract for every delivery project",
-        "updatedAt": "2026-11-24T20:26:43Z",
+        "updatedAt": "2026-11-25T07:17:56Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/395"
       },
       {
@@ -3421,14 +3518,14 @@
             "name": "good first issue"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           }
         ],
         "number": 224,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "docs: CONTRIBUTING must say how to install Playwright for the design-pack checks",
-        "updatedAt": "2026-11-16T19:34:02Z",
+        "updatedAt": "2026-11-25T09:12:44Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/224"
       },
       {
@@ -3463,14 +3560,14 @@
             "name": "good first issue"
           },
           {
-            "color": "0E8A16",
-            "name": "status:ready"
+            "color": "FBCA04",
+            "name": "status:claimed"
           }
         ],
         "number": 222,
         "state": "OPEN",
         "title": "docs: repair the four broken relative links in docs/design/legacy/UI-SPEC.md",
-        "updatedAt": "2026-11-16T19:33:59Z",
+        "updatedAt": "2026-11-25T09:14:24Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/222"
       },
       {
@@ -4780,8 +4877,8 @@
             "name": "unit"
           },
           {
-            "color": "FBCA04",
-            "name": "status:claimed"
+            "color": "0E8A16",
+            "name": "status:ready"
           },
           {
             "color": "6E7781",
@@ -4791,7 +4888,7 @@
         "number": 88,
         "state": "OPEN",
         "title": "T12 — One organisation loop (the acceptance of V2)",
-        "updatedAt": "2026-11-24T22:24:20Z",
+        "updatedAt": "2026-11-25T07:20:21Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/88"
       },
       {
@@ -5773,14 +5870,14 @@
             "name": "unit"
           },
           {
-            "color": "FBCA04",
-            "name": "status:claimed"
+            "color": "0E8A16",
+            "name": "status:ready"
           }
         ],
         "number": 16,
         "state": "OPEN",
         "title": "train — post-#9 queue sweep and merged-branch cleanup",
-        "updatedAt": "2026-11-24T22:24:29Z",
+        "updatedAt": "2026-11-25T07:20:19Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/16"
       },
       {
@@ -5853,8 +5950,8 @@
             "name": "unit"
           },
           {
-            "color": "FBCA04",
-            "name": "status:claimed"
+            "color": "0E8A16",
+            "name": "status:ready"
           },
           {
             "color": "6E7781",
@@ -5864,7 +5961,7 @@
         "number": 12,
         "state": "OPEN",
         "title": "S18 — executor-backed producers and the real improvement loop",
-        "updatedAt": "2026-11-24T22:24:26Z",
+        "updatedAt": "2026-11-25T07:20:18Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/12"
       },
       {

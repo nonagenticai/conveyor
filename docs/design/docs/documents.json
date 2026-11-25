@@ -204,8 +204,8 @@
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
       "section": "Design",
-      "sha256": "99f60ef3b7625241851c414192eeed5cd152d31f8cde19fa8b6fa34c83c55c77",
-      "bytes": 19270,
+      "sha256": "a667ae658c5f831a6c6ea2ebcaf619efd40b9b99d9f090944d44ee2cada0a7b5",
+      "bytes": 21143,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md"
     },
     {
@@ -231,8 +231,8 @@
       "path": "docs/design/data/conformance.html",
       "source": "docs/design/data/conformance.md",
       "section": "Design",
-      "sha256": "81ed52dcd07d46c5d88c7637666cff1eb72cda636360a6a59dfb01baed853416",
-      "bytes": 24819,
+      "sha256": "454fe2e53c797bdc58c18da41d5a88dc61713916b7bb75c76db802fa72b37553",
+      "bytes": 23713,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
     {
@@ -582,8 +582,8 @@
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "81ed52dcd07d46c5d88c7637666cff1eb72cda636360a6a59dfb01baed853416",
-      "bytes": 24819,
+      "sha256": "454fe2e53c797bdc58c18da41d5a88dc61713916b7bb75c76db802fa72b37553",
+      "bytes": 23713,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
     {
@@ -1662,8 +1662,8 @@
       "path": "docs/plans/T19F/closure-review.html",
       "source": "docs/plans/T19F/closure-review.md",
       "section": "Plans",
-      "sha256": "e4e1b098c436c15ba24d0cd3978e867e6f7c67f431ffe2f3d6457cd8af8ddc57",
-      "bytes": 4531,
+      "sha256": "d97a1ac4a57cbeb0337db9ebe110be82ae89f5d80a9b471f9cdc49ff0c6a923a",
+      "bytes": 5707,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/closure-review.md"
     },
     {
@@ -1671,8 +1671,8 @@
       "path": "docs/plans/T19F/evidence.html",
       "source": "docs/plans/T19F/evidence.md",
       "section": "Plans",
-      "sha256": "11d3606fac16be0d35905ec9d097287d6900f1780e833a245b224c05f7855737",
-      "bytes": 7533,
+      "sha256": "c39217218eed5fa33c66f627793fb64c5e630d2153ed090e261edcd8aabdfb9c",
+      "bytes": 7656,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/evidence.md"
     },
     {

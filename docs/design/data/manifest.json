@@ -2,92 +2,92 @@
   "feedback_url": "https://github.com/nonagenticai/conveyor/discussions",
   "files": [
     {
-      "bytes": 1822128,
+      "bytes": 1822698,
       "path": "architecture.json",
-      "records": 541,
-      "sha256": "fe127d02e1b8e033c3e513c6169b339a3db08e6b328c02b65d46d99237a06ddc"
+      "records": 542,
+      "sha256": "1f8b63b1f818f268114510b28f30d2834f64f752ce88a48b767751d91606c929"
     },
     {
-      "bytes": 135629,
+      "bytes": 140714,
       "path": "artefacts.json",
-      "records": 286,
-      "sha256": "e7414f61354514a88e617c023ae221ad953917a6d09976ca310ae994e430f0f5"
+      "records": 298,
+      "sha256": "ac224143cd5fb26f6281b44778ba2f5c0e4b43797eebb0a92638a809c2340a47"
     },
     {
-      "bytes": 1832917,
+      "bytes": 1832914,
       "path": "config.json",
       "records": 2256,
-      "sha256": "b7cabcb1620c4dddc9ea0a3d62ade80704f0fb4dd6a24eb38821729ac40a206e"
+      "sha256": "f6d76920b5881d0254d739761e69f1c0a9102cbb6a361670adce2d639b262b32"
     },
     {
       "bytes": 109,
       "path": "evidence.json",
       "records": 0,
-      "sha256": "db9e6759c2b0c377dfeb865385175bbdd9e10ae7cfd80df6c17beded325aa375"
+      "sha256": "3362b62712f80da88bff10aa4690a44f48151d9153927f639e4936e103b16769"
     },
     {
       "bytes": 110,
       "path": "feedback.json",
       "records": 0,
-      "sha256": "2ba2b5682cd98bec611e8272aa17e453df2ea015d4f90bc3ff5737efd2ddd779"
+      "sha256": "2347e2c11502c95f4594f4da9d2c56f87ea85fc20279e32b92a250d861987ae7"
     },
     {
       "bytes": 4552,
       "path": "measure.json",
       "records": 0,
-      "sha256": "939d18187f33a6be6529f6efc6430b261441ffc8fd48434cb0637fdf8e66f02f"
+      "sha256": "d96d228d209e3aef3255441ff5a287baae81e53728107b167956ae5e8cc6e3f8"
     },
     {
       "bytes": 455648,
       "path": "msp.json",
       "records": 175,
-      "sha256": "8ba65bff70b66b13aac5ddfd1666dccb89beb587e50cd4a968de6726fe5349e0"
+      "sha256": "2f75451172d28ee14510f7f7c35793cfa8d1b6391df4e401158fb3aa203a94ef"
     },
     {
       "bytes": 1031,
       "path": "ops.json",
       "records": 1,
-      "sha256": "aa704f4c797e6531636e45c1590f097ccba8a89e8cecbd3b8614411ae0994456"
+      "sha256": "33c651837949c9aa44672048787369718d308f1cdf691be3e7e2d2ab5073408c"
     },
     {
       "bytes": 16712,
       "path": "organisation.json",
       "records": 34,
-      "sha256": "ac9f2f2a8c9747efae61e99627b0127be35da7a57210fa16a140adca53d5a7af"
+      "sha256": "4cc87e645a67d9beaeff84a95c434285eaae6f5e1bc90e9c7872e2c0c492926c"
     },
     {
-      "bytes": 244831,
+      "bytes": 247577,
       "path": "programme.json",
       "records": 54,
-      "sha256": "b96a39748db93451e58654def31c49fa8f97ac19650d3bf913e44be73acced30"
+      "sha256": "6a507d289b1302666dfc53bf85201c79f08866e3c46a79969ca55e085a3c5b08"
     },
     {
-      "bytes": 1422771,
+      "bytes": 1411998,
       "path": "rework.json",
-      "records": 438,
-      "sha256": "48033baab197506fca12d50982701afbd113ed9a072464c65fe6325f6a160d9b"
+      "records": 432,
+      "sha256": "1a09d3547a94702ae3c711faf80d8514b0cb3f82c0d20be01f1694bb8441f923"
     },
     {
       "bytes": 226,
       "path": "secrets.json",
       "records": 0,
-      "sha256": "5647b431898385dc245393b70e8e870e0192a209f4d641ee89a2a6aa715688e3"
+      "sha256": "4f7a7b98ef69649373ae131558ee364bc40c2365e7bfbdd5988b7febc72945af"
     },
     {
-      "bytes": 5447338,
+      "bytes": 5446969,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "88d8553c867117e73c52f163a91c5fb88c3afe778dcd6fb488d0c2d49e603232"
+      "sha256": "b4fe5250d712fa13154cbb2bc9659308bdf02d4f196bc04a89d1e2da7d6df7af"
     },
     {
-      "bytes": 1600336,
+      "bytes": 1601226,
       "path": "work.json",
-      "records": 2632,
-      "sha256": "c0d2e7c5e91f85c581f074d369ffefc918bc19ffd2761b203ac78414892d8c1e"
+      "records": 2634,
+      "sha256": "17947439221b296bdb568bd58a5ed9fdc8ffdff4f9f5f47868589a54e77bb558"
     }
   ],
-  "generated_at": "2026-11-25T03:46:32.319854100+00:00",
-  "git_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+  "generated_at": "2026-11-25T09:58:16.505745364+00:00",
+  "git_sha": "da865627a5083121e1c26e9d3d2143db8d7fc947",
   "migration": {
     "description": "meeting bindings",
     "version": 73

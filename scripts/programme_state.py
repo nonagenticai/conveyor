@@ -11,13 +11,16 @@ The precedence, highest first:
 
 1. the coverage row says `archived`, or the plan says `superseded` → `archived`;
 2. `PLATFORM` is a standing project and is never done → `active`;
-3. every unit issue is closed, and there is at least one → `closed`;
-4. any unit issue is open → `active`;
-5. the coverage row says `built` or `standing` → `closed`;
-6. the plan frontmatter says `built*` or `active` → `closed`;
-7. otherwise → `draft`.
+3. `closure_deferred_to_tranche` is declared (a positive integer) → `active`: the programme has
+   recorded that closure waits for that tranche review, and a project closed inside a planned
+   tranche manufactures a `project_in_unauthorised_tranche` P0 (T19F's closure review);
+4. every unit issue is closed, and there is at least one → `closed`;
+5. any unit issue is open → `active`;
+6. the coverage row says `built` or `standing` → `closed`;
+7. the plan frontmatter says `built*` or `active` → `closed`;
+8. otherwise → `draft`.
 
-Rules 3 and 4 are the change: **GitHub issue state outranks every measurement.** The coverage row
+Rules 4 and 5 are the change: **GitHub issue state outranks every measurement.** The coverage row
 answers "does the mock UI cover this project", not "is the work delivered", so it may never keep a
 project open whose units are all closed. A plan frontmatter field never outranks a closed issue
 either.
@@ -52,6 +55,14 @@ def derive_status(project: dict, issues: list[dict], coverage: dict[str, dict]) 
         return "archived"
     if key == "PLATFORM":
         return "active"  # a standing project: it is never done
+    # A deferred closure is a recorded programme decision, not a measurement. The declaration
+    # travels in the seed's `meta` (from `seed/programme-definition.json`); `build-programme-seed`
+    # also passes it at the top level, before the meta exists.
+    deferred = project.get("closure_deferred_to_tranche")
+    if deferred is None:
+        deferred = (project.get("meta") or {}).get("closure_deferred_to_tranche")
+    if isinstance(deferred, int) and not isinstance(deferred, bool) and deferred > 0:
+        return "active"
     if issues and all(issue.get("state") != "OPEN" for issue in issues):
         return "closed"
     if any(issue.get("state") == "OPEN" for issue in issues):
@@ -125,6 +136,26 @@ def self_test() -> None:
         ("no units and a proposed measurement", project("T15"), [], "draft"),
         ("archived coverage wins", project("S00"), closed, "archived"),
         ("PLATFORM stands forever", project("PLATFORM"), closed, "active"),
+        # T19F: a closure the programme deferred to the tranche-6 review stays active even
+        # though every unit issue is closed (a closed project in a planned tranche is a P0).
+        (
+            "a declared closure deferral keeps the project active",
+            {**project("T19F"), "closure_deferred_to_tranche": 6},
+            closed,
+            "active",
+        ),
+        (
+            "the deferral reads from the seed meta too",
+            {**project("T19F"), "meta": {"closure_deferred_to_tranche": 6}},
+            closed,
+            "active",
+        ),
+        (
+            "archived beats a deferral",
+            {**project("S00"), "closure_deferred_to_tranche": 6},
+            closed,
+            "archived",
+        ),
         ("plan frontmatter is the last resort", project("X", "built-steps-1-3"), [], "closed"),
     ]
     failures = 0

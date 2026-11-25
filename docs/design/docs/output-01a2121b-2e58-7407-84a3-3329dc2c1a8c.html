@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T15 Tool authoring and BYO · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><hr />
+<h2>document: T15/closure-review
+version: 1
+status: published
+project: T15
+category: closure-review
+owner: programme-manager
+reviewer: Architecture Board
+review_date: 2026-11-25
+artifact_kind: closure-review
+phase: G
+plateau: capability</h2>
+<h1>T15 — Tool authoring and BYO: closure review</h1>
+<p>Whether the project delivered its acceptance, on its evidence, and the decision that follows.</p>
+<h2>Outcome vs acceptance</h2>
+<table><thead><tr><th>Acceptance criterion</th><th>Evidence</th><th>Result</th></tr></thead><tbody>
+<tr><td>A tool generated from a spec is published and called by a job</td><td><code>crates/actions/tests/tool_authoring.rs::a_tool_generated_from_a_spec_is_published_and_called</code>; <code>::a_scaffolded_service_registers_its_own_openapi</code></td><td>pass</td></tr>
+<tr><td>Publication approval defaults to a human and is tenant-configurable</td><td><code>tool_authoring.rs::publication_waits_for_a_human_by_default</code>, <code>::a_tenant_policy_changes_the_publication_gate_without_a_code_change</code></td><td>pass</td></tr>
+<tr><td>A BYO MCP server is bound, narrowed and audited</td><td><code>crates/actions/tests/byo_tools.rs::only_the_bound_subset_is_callable_and_each_call_is_audited</code>, <code>::a_call_time_url_is_refused_and_a_byo_toolkit_is_tenant_scoped</code></td><td>pass</td></tr>
+<tr><td>A tenant cannot exceed its effect ceiling</td><td><code>tool_authoring.rs::the_publishing_job_cannot_widen_its_own_effect_ceiling</code>, <code>::publication_refuses_an_unbounded_draft_and_defaults_the_class_to_read</code>, <code>::a_destructive_tool_needs_a_named_approver</code></td><td>pass</td></tr>
+<tr><td>The delivery is on main and gated</td><td>issue #86 closed by PR #666, merge <code>a2ef9194eb2c</code>; <code>actions:tools</code> is <code>exists</code> in <code>docs/evidence/v2-coverage.md</code></td><td>pass</td></tr>
+</tbody></table>
+<h2>Evidence</h2>
+<ul>
+<li>Delivery merge <code>a2ef9194eb2c</code> (PR #666); the <code>tool_authoring.rs</code> and <code>byo_tools.rs</code> scenarios.</li>
+<li>The inception set: <code>docs/plans/inception/T15/</code> (brief, analysis, design).</li>
+<li>Published inception documents: brief <code>01a1e008-4866-73b3-aff3-4b81913d1e23</code>, design
+<code>01a1ee5f-5b42-70c5-9c35-86f977d14e85</code>.</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li><code>/tools</code> is the V1 legacy surface; it is <strong>not</strong> evidence for T15 (<code>v2-coverage.md</code>).</li>
+<li>A promotion returns <code>requested</code>; it does <strong>not</strong> stamp a platform version — not claimed.</li>
+<li>Caller-supplied URLs are refused by design; an archived-kag binding is not claimed.</li>
+<li>The tranche-12 authorisation is <strong>not</strong> claimed here; it is the #526 programme chain's act.</li>
+</ul>
+<h2>Decision</h2>
+<p>Close. Acceptance is met on the evidence above; the listed items are either design refusals or
+other units' scope, and no tranche authorisation is manufactured.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool authoring and BYO · conveyor output · published 2026-11-25T09:58:16.505745364+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

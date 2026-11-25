@@ -1,62 +1,7 @@
 window.CONVEYOR_REWORK = {
-  "generated_at": "2026-11-25T03:46:18.516715051+00:00",
-  "git_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+  "generated_at": "2026-11-25T09:58:04.690966065+00:00",
+  "git_sha": "da865627a5083121e1c26e9d3d2143db8d7fc947",
   "packages": [
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T15",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T15"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T15",
-      "owner_project": "T15",
-      "rule": "closed_without_closure_review",
-      "scope": "T15",
-      "severity": "P0",
-      "spec": "§8.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T15"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T16",
       "apply_to": "PLATFORM",
@@ -110,61 +55,6 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
           "subject": "T16"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T17",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T17"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T17",
-      "owner_project": "T17",
-      "rule": "closed_without_closure_review",
-      "scope": "T17",
-      "severity": "P0",
-      "spec": "§8.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T17"
         }
       ],
       "title": "Publish the project's closure review"
@@ -227,116 +117,6 @@ window.CONVEYOR_REWORK = {
       "title": "Publish the project's closure review"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T5",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T5"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T5",
-      "owner_project": "T5",
-      "rule": "closed_without_closure_review",
-      "scope": "T5",
-      "severity": "P0",
-      "spec": "§8.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T5"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T6",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T6"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T6",
-      "owner_project": "T6",
-      "rule": "closed_without_closure_review",
-      "scope": "T6",
-      "severity": "P0",
-      "spec": "§8.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T6"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T7",
       "apply_to": "PLATFORM",
       "artefact": "closure_review",
@@ -389,61 +169,6 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
           "subject": "T7"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T8",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T8"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T8",
-      "owner_project": "T8",
-      "rule": "closed_without_closure_review",
-      "scope": "T8",
-      "severity": "P0",
-      "spec": "§8.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T8"
         }
       ],
       "title": "Publish the project's closure review"
@@ -509,7 +234,7 @@ window.CONVEYOR_REWORK = {
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "reason": "the project closed before its tranche authorisation; the tranche is still planned and its authorisation is the #526 authority-repair chain",
           "severity": "P0",
           "subject": "T5"
         }
@@ -568,7 +293,7 @@ window.CONVEYOR_REWORK = {
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "reason": "the project closed before its tranche authorisation; the tranche is still planned and its authorisation is the #526 authority-repair chain",
           "severity": "P0",
           "subject": "T6"
         },
@@ -578,7 +303,7 @@ window.CONVEYOR_REWORK = {
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "reason": "the project closed before its tranche authorisation; the tranche is still planned and its authorisation is the #526 authority-repair chain",
           "severity": "P0",
           "subject": "T8"
         },
@@ -645,7 +370,7 @@ window.CONVEYOR_REWORK = {
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "reason": "the project closed before its tranche authorisation; the tranche is still planned and its authorisation is the #526 authority-repair chain",
           "severity": "P0",
           "subject": "T15"
         }
@@ -882,7 +607,7 @@ window.CONVEYOR_REWORK = {
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "reason": "the project closed before its tranche authorisation; the tranche is still planned and its authorisation is the #526 authority-repair chain",
           "severity": "P0",
           "subject": "T17"
         },
@@ -991,9 +716,9 @@ window.CONVEYOR_REWORK = {
           "detail": "project is active in tranche 6 whose state is 'planned'",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "active at tranche 6, whose authorisation is the #526 tranche chain; the closure review defers closure to the tranche-6 review",
           "severity": "P1",
           "subject": "T19F"
         },
@@ -6156,7 +5881,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 2,
+        "entries": 1,
         "owners": [
           "programme owner"
         ]
@@ -6179,8 +5904,7 @@ window.CONVEYOR_REWORK = {
           "rule": "unpublished_declared_output",
           "source": "snapshot",
           "subjects": [
-            "S12",
-            "T5"
+            "S12"
           ]
         }
       ],
@@ -6192,7 +5916,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 2,
+      "subject_count": 1,
       "subjects": [
         {
           "detail": "declared outputs are not published: project-brief",
@@ -6203,16 +5927,6 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S12"
-        },
-        {
-          "detail": "declared outputs are not published: closure-review, evidence",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T5"
         }
       ],
       "title": "Publish every output the project declares"
@@ -6224,7 +5938,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 3,
+        "entries": 1,
         "owners": [
           "programme owner"
         ]
@@ -6247,9 +5961,7 @@ window.CONVEYOR_REWORK = {
           "rule": "unpublished_declared_output",
           "source": "snapshot",
           "subjects": [
-            "S14",
-            "T6",
-            "T8"
+            "S14"
           ]
         }
       ],
@@ -6261,7 +5973,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 3,
+      "subject_count": 1,
       "subjects": [
         {
           "detail": "declared outputs are not published: project-brief",
@@ -6272,136 +5984,6 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S14"
-        },
-        {
-          "detail": "declared outputs are not published: closure-review, evidence",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T6"
-        },
-        {
-          "detail": "declared outputs are not published: closure-review, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T8"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-12",
-      "apply_to": "PLATFORM",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "T15"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-12",
-      "owner_project": "PLATFORM",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-12",
-      "severity": "P1",
-      "spec": "§8.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: closure-review, evidence",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T15"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-13",
-      "apply_to": "T12",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "T12"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-13",
-      "owner_project": "T12",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-13",
-      "severity": "P1",
-      "spec": "§8.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: evidence",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T12"
         }
       ],
       "title": "Publish every output the project declares"
@@ -6593,7 +6175,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 5,
+        "entries": 4,
         "owners": [
           "programme owner"
         ]
@@ -6619,7 +6201,6 @@ window.CONVEYOR_REWORK = {
             "S06",
             "S08",
             "S17",
-            "T17",
             "T7"
           ]
         }
@@ -6632,7 +6213,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§8.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 5,
+      "subject_count": 4,
       "subjects": [
         {
           "detail": "declared outputs are not published: project-brief",
@@ -6663,16 +6244,6 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S17"
-        },
-        {
-          "detail": "declared outputs are not published: closure-review, evidence",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T17"
         },
         {
           "detail": "declared outputs are not published: closure-review, evidence, project-brief",
@@ -8865,6 +8436,63 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "Demo and retro cadence rows enforce nothing: no evidence, no credit, no lessons"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check seed_live_drift:programme",
+      "apply_to": "PLATFORM",
+      "artefact": "seed_reconciliation",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 1,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The seeded project facts equal the live rows, or the drift is recorded and approved",
+          "met": false
+        },
+        {
+          "item": "The audit reports no seed_live_drift gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "seed_live_drift",
+          "source": "snapshot",
+          "subjects": [
+            "T14"
+          ]
+        }
+      ],
+      "key": "seed_live_drift:programme",
+      "owner_project": "PLATFORM",
+      "rule": "seed_live_drift",
+      "scope": "programme",
+      "severity": "P1",
+      "spec": "§5.3",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "the seed derives `closed` from T14's closed unit issues, while the live row stays `active`: closing a project in planned tranche 13 manufactures a tranche P0, and the synchronisation waits on the tranche-13 authorisation (#526 chain) or a seed install",
+          "severity": "P1",
+          "subject": "T14"
+        }
+      ],
+      "title": "Reconcile the seed with the live rows"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p101-1:T2",
@@ -42065,11 +41693,11 @@ window.CONVEYOR_REWORK = {
   "scorecard": {
     "MSP": {
       "findings": 8,
-      "gaps": 119,
-      "p0": 33,
-      "p1": 81,
+      "gaps": 108,
+      "p0": 28,
+      "p1": 75,
       "p2": 5,
-      "packages": 79,
+      "packages": 72,
       "rules": 12,
       "rules_clean": 5,
       "rules_with_gaps": 7,
@@ -42101,14 +41729,14 @@ window.CONVEYOR_REWORK = {
     },
     "SPEC": {
       "findings": 83,
-      "gaps": 14,
+      "gaps": 15,
       "p0": 0,
-      "p1": 0,
+      "p1": 1,
       "p2": 14,
-      "packages": 94,
+      "packages": 95,
       "rules": 8,
-      "rules_clean": 5,
-      "rules_with_gaps": 3,
+      "rules_clean": 4,
+      "rules_with_gaps": 4,
       "suppressed": 0
     },
     "TOGAF": {
@@ -42124,29 +41752,29 @@ window.CONVEYOR_REWORK = {
       "suppressed": 0
     }
   },
-  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.mnMK5M1bkK/data",
+  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.QYF6cZ98F8/data",
   "summary": {
     "by_severity": {
-      "P0": 33,
-      "P1": 187,
+      "P0": 28,
+      "P1": 186,
       "P2": 218
     },
     "by_standard": {
-      "MSP": 79,
+      "MSP": 72,
       "PMP": 34,
       "SAFe": 13,
-      "SPEC": 94,
+      "SPEC": 95,
       "TOGAF": 218
     },
     "by_status": {
-      "open": 436,
+      "open": 430,
       "suppressed": 2
     },
     "duplicates": 0,
-    "open": 436,
-    "packages": 438,
+    "open": 430,
+    "packages": 432,
     "resolved": 17,
-    "subjects": 550,
+    "subjects": 540,
     "suppressed": 2
   }
 };

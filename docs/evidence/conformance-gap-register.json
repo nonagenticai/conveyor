@@ -1,7 +1,7 @@
 {
   "counts": {
-    "P0": 34,
-    "P1": 137,
+    "P0": 29,
+    "P1": 132,
     "P2": 37,
     "P3": 0
   },
@@ -12,23 +12,7 @@
       "evidence": null,
       "rule": "closed_without_closure_review",
       "severity": "P0",
-      "subject": "T15"
-    },
-    {
-      "detail": "project is closed but its closure review is not published",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "closed_without_closure_review",
-      "severity": "P0",
       "subject": "T16"
-    },
-    {
-      "detail": "project is closed but its closure review is not published",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "closed_without_closure_review",
-      "severity": "P0",
-      "subject": "T17"
     },
     {
       "detail": "project is closed but its closure review is not published",
@@ -44,31 +28,7 @@
       "evidence": null,
       "rule": "closed_without_closure_review",
       "severity": "P0",
-      "subject": "T5"
-    },
-    {
-      "detail": "project is closed but its closure review is not published",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "closed_without_closure_review",
-      "severity": "P0",
-      "subject": "T6"
-    },
-    {
-      "detail": "project is closed but its closure review is not published",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "closed_without_closure_review",
-      "severity": "P0",
       "subject": "T7"
-    },
-    {
-      "detail": "project is closed but its closure review is not published",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "closed_without_closure_review",
-      "severity": "P0",
-      "subject": "T8"
     },
     {
       "detail": "a non-conformant review has no active waiver",
@@ -1119,6 +1079,14 @@
       "subject": "T19F"
     },
     {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T14"
+    },
+    {
       "detail": "declared outputs are not published: project-brief",
       "disposition": "rework",
       "evidence": null,
@@ -1287,14 +1255,6 @@
       "subject": "S21"
     },
     {
-      "detail": "declared outputs are not published: evidence",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "unpublished_declared_output",
-      "severity": "P1",
-      "subject": "T12"
-    },
-    {
       "detail": "declared outputs are not published: evidence, project-brief",
       "disposition": "rework",
       "evidence": null,
@@ -1303,28 +1263,12 @@
       "subject": "T14"
     },
     {
-      "detail": "declared outputs are not published: closure-review, evidence",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "unpublished_declared_output",
-      "severity": "P1",
-      "subject": "T15"
-    },
-    {
       "detail": "declared outputs are not published: closure-review, evidence, project-brief",
       "disposition": "rework",
       "evidence": null,
       "rule": "unpublished_declared_output",
       "severity": "P1",
       "subject": "T16"
-    },
-    {
-      "detail": "declared outputs are not published: closure-review, evidence",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "unpublished_declared_output",
-      "severity": "P1",
-      "subject": "T17"
     },
     {
       "detail": "declared outputs are not published: architecture-design, inception-analysis, project-brief",
@@ -1343,36 +1287,12 @@
       "subject": "T3"
     },
     {
-      "detail": "declared outputs are not published: closure-review, evidence",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "unpublished_declared_output",
-      "severity": "P1",
-      "subject": "T5"
-    },
-    {
-      "detail": "declared outputs are not published: closure-review, evidence",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "unpublished_declared_output",
-      "severity": "P1",
-      "subject": "T6"
-    },
-    {
       "detail": "declared outputs are not published: closure-review, evidence, project-brief",
       "disposition": "rework",
       "evidence": null,
       "rule": "unpublished_declared_output",
       "severity": "P1",
       "subject": "T7"
-    },
-    {
-      "detail": "declared outputs are not published: closure-review, project-brief",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "unpublished_declared_output",
-      "severity": "P1",
-      "subject": "T8"
     },
     {
       "detail": "168 declared dependency edge(s) carry no blocks|needs|supersedes|informs kind",
@@ -1672,8 +1592,8 @@
     }
   ],
   "snapshot": {
-    "generated_at": "2026-11-25T03:46:32.319854100+00:00",
-    "git_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+    "generated_at": "2026-11-25T09:58:16.505745364+00:00",
+    "git_sha": "da865627a5083121e1c26e9d3d2143db8d7fc947",
     "path": "data",
     "tenant": "nonagentic"
   },

@@ -36238,9 +36238,26 @@
       "title": "T19F live gate — the sitting subject",
       "updated_at": "2026-11-25T03:38:24.653635+00:00",
       "version": 1
+    },
+    {
+      "approval_id": null,
+      "approved_at": null,
+      "approved_by": null,
+      "body": null,
+      "created_at": "2026-11-25T08:38:21.802439+00:00",
+      "id": "01a211db-1c05-78c9-8607-fea6634193e8",
+      "kind": "delivery_contract",
+      "phase_code": "f",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "status": "superseded",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "T19F live gate — the sitting subject",
+      "updated_at": "2026-11-25T08:41:16.158173+00:00",
+      "version": 2
     }
   ],
-  "generated_at": "2026-11-25T03:46:32.319854100+00:00",
+  "generated_at": "2026-11-25T09:58:16.505745364+00:00",
   "links": [
     {
       "from_artifact_id": "01a20233-abbe-7e25-9206-6f3c8bcba167",
@@ -39969,9 +39986,9 @@
         {
           "compliance": null,
           "contract": {
-            "id": "01a210c8-7ea8-7dc9-8104-700ecfe2905b",
+            "id": "01a211db-1c05-78c9-8607-fea6634193e8",
             "kind": "delivery_contract",
-            "status": "draft"
+            "status": "superseded"
           },
           "phase": "f",
           "state": "evidenced"
