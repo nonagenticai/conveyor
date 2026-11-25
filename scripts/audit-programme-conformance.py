@@ -30,6 +30,26 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def acceptance_status(key: str) -> str | None:
+    """The acceptance manifest's pinned target status for `<KEY>-project`, when it has one.
+
+    A manifest that pins `active` holds the project open by decision (S05 until its six gate
+    properties execute; T18/T14 by their acceptance), so the seed's historical status is not the
+    plan and its difference is not a drift. Measured 2026-11-25: the held projects carried P1
+    drift packages the record had settled by decision.
+    """
+    path = ROOT / "acceptance" / "programme" / f"{key}.toml"
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8")
+    match = re.search(
+        r'\[\[check\]\]\s*id\s*=\s*"' + re.escape(key) + r'-project".*?status\s*=\s*"(\w+)"',
+        text,
+        re.S,
+    )
+    return match.group(1) if match else None
 DEFAULT_SNAPSHOT = ROOT / "docs" / "design" / "data"
 DEFAULT_STANDARD = ROOT / "governance" / "conformance.json"
 DEFAULT_BASELINE = ROOT / "docs" / "evidence" / "conformance-baseline.json"
@@ -1438,7 +1458,12 @@ class Audit:
         for project in self.data.projects:
             key = project.get("key", "?")
             seed = self.data.seed_by_key.get(key)
-            if seed and seed.get("status") != project.get("status"):
+            pinned = acceptance_status(key)
+            if (
+                seed
+                and seed.get("status") != project.get("status")
+                and not (pinned and pinned == project.get("status"))
+            ):
                 severity = (
                     "P1"
                     if seed.get("status") == "closed" and project.get("status") != "closed"
