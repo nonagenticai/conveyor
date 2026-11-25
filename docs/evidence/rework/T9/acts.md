@@ -18,3 +18,5 @@ behaviour is proved inside `togaf_h_change.rs::a_scope_change_produces_a_change_
 T9: 59 acts in `transcript.jsonl`; the last run recorded 2.
 
 T9: 70 acts in `transcript.jsonl`; the last run recorded 2.
+
+T9: 186 acts in `transcript.jsonl`; the last run recorded 66.

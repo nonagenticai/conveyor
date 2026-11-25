@@ -91,7 +91,13 @@
           "position": 6
         }
       ],
-      "body": "# Stakeholder map — T16 procedure ingestion (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-201c-701d-bc1e-056eefbdc8da; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Six stakeholders on the influence/interest/engagement axes, approved in the 2026-11-24 rework cut.\n\n## Entries\n\nSix stakeholders on the influence/interest/engagement axes: the Architecture Board approves contract and Phase-G conformance; the programme owner decides the outcome of governed procedure knowledge; procedure publishers decide what is published; operations and procedure owners are consulted because their SOPs become runnable procedures; delivery teams are consulted for a stable ingestion and PDDL surface; tenants are informed and own their rows and sources.\n\n## Links\n\nDerives from the T16 row of docs/SPEC_V2.md §12, decision D53 and the tranche-4 PI plan 01a202a1-dbb9-7e49-b64a-cf97c3fab095; realizes the Phase A stakeholder view for the procedure-ingestion capability; reuses the programme roles and the Architecture Board already recorded in the conveyor buildout programme 01a1d039-0d24-7d16-ae52-4841e96ccfac.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope."
+      "body": "# Stakeholder map — T16 procedure ingestion (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-201c-701d-bc1e-056eefbdc8da; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Six stakeholders on the influence/interest/engagement axes, approved in the 2026-11-24 rework cut.\n\n## Entries\n\nSix stakeholders on the influence/interest/engagement axes: the Architecture Board approves contract and Phase-G conformance; the programme owner decides the outcome of governed procedure knowledge; procedure publishers decide what is published; operations and procedure owners are consulted because their SOPs become runnable procedures; delivery teams are consulted for a stable ingestion and PDDL surface; tenants are informed and own their rows and sources.\n\n## Links\n\nDerives from the T16 row of docs/SPEC_V2.md §12, decision D53 and the tranche-4 PI plan 01a202a1-dbb9-7e49-b64a-cf97c3fab095; realizes the Phase A stakeholder view for the procedure-ingestion capability; reuses the programme roles and the Architecture Board already recorded in the conveyor buildout programme 01a1d039-0d24-7d16-ae52-4841e96ccfac.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope.",
+      "links": [
+        {
+          "to": "Requirements catalogue — T16 procedure ingestion (retrospective, 2026-11-23)",
+          "kind": "dependency"
+        }
+      ]
     },
     {
       "title": "Driver, goal and objective catalogue — T16 procedure ingestion (retrospective, 2026-11-23)",
@@ -143,7 +149,13 @@
           "position": 4
         }
       ],
-      "body": "# Driver, goal and objective catalogue — T16 procedure ingestion (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-20a5-752e-a91d-c5b7ee790855; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Four driver-to-goal rows, each with the objective the T16 gate tests.\n\n## Entries\n\nFour driver-to-goal rows: D1 free-text procedure knowledge to G1 ingested, typed procedure drafts through procedures.ingest_sop, ingest_rdf and ingest_process; D2 a drafting job publishing its own output to G2 the human publication gate; D3 a re-ingest forking the published row to G3 versioned re-ingest where the published row keeps its source and pack; D4 an unreviewed source binding a job to G4 reviewed sources only, where a bound job runs the PDDL steps and an unreviewed source never binds.\n\n## Links\n\nDerives from the T16 gate in docs/SPEC_V2.md §12, the requirements catalogue 01a211c9-212a-70d4-bbbf-17c3c5038409, decision D53 and the closed issues #85 and #448; realizes the Phase A driver view for the procedure-ingestion slice; reuses the approved solution concept 01a211c9-21b3-7d90-a789-8de4b76a8105 and the tranche-4 programme objectives of the PI plan 01a202a1-dbb9-7e49-b64a-cf97c3fab095.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope."
+      "body": "# Driver, goal and objective catalogue — T16 procedure ingestion (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-20a5-752e-a91d-c5b7ee790855; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Four driver-to-goal rows, each with the objective the T16 gate tests.\n\n## Entries\n\nFour driver-to-goal rows: D1 free-text procedure knowledge to G1 ingested, typed procedure drafts through procedures.ingest_sop, ingest_rdf and ingest_process; D2 a drafting job publishing its own output to G2 the human publication gate; D3 a re-ingest forking the published row to G3 versioned re-ingest where the published row keeps its source and pack; D4 an unreviewed source binding a job to G4 reviewed sources only, where a bound job runs the PDDL steps and an unreviewed source never binds.\n\n## Links\n\nDerives from the T16 gate in docs/SPEC_V2.md §12, the requirements catalogue 01a211c9-212a-70d4-bbbf-17c3c5038409, decision D53 and the closed issues #85 and #448; realizes the Phase A driver view for the procedure-ingestion slice; reuses the approved solution concept 01a211c9-21b3-7d90-a789-8de4b76a8105 and the tranche-4 programme objectives of the PI plan 01a202a1-dbb9-7e49-b64a-cf97c3fab095.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope.",
+      "links": [
+        {
+          "to": "Stakeholder map — T16 procedure ingestion (retrospective, 2026-11-23)",
+          "kind": "derivation"
+        }
+      ]
     },
     {
       "title": "Requirements catalogue — T16 procedure ingestion (retrospective, 2026-11-23)",
@@ -217,7 +229,13 @@
           "position": 6
         }
       ],
-      "body": "# Requirements catalogue — T16 procedure ingestion (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-212a-70d4-bbbf-17c3c5038409; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Six must-priority requirements with their acceptance lines, approved in the 2026-11-24 rework cut.\n\n## Entries\n\nSix must-priority requirements with their acceptance lines: R1 SOP intake, where a PDF SOP becomes a PDDL procedure draft with capability and job drafts; R2 RDF/OWL intake, where an OWL or Turtle file becomes a knowledge pack bound by knowledge_pack_ref; R3 process-document intake, where BPMN, Visio and draw.io become PDDL procedure drafts; R4 the publication gate, where publication needs human approval and the drafting job cannot publish; R5 versioning, where a re-ingest creates a new draft version while the published row keeps its source and pack; R6 bound execution, where a bound job runs the PDDL steps and an unreviewed source cannot bind.\n\n## Links\n\nDerives from the T16 and Procedures destination rows of docs/SPEC_V2.md §12, decision D53 and the gate carried by acceptance/programme/T16.toml; realizes the Phase A requirements view for the procedure-ingestion slice; reuses the driver catalogue 01a211c9-20a5-752e-a91d-c5b7ee790855 and the solution concept 01a211c9-21b3-7d90-a789-8de4b76a8105.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope."
+      "body": "# Requirements catalogue — T16 procedure ingestion (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-212a-70d4-bbbf-17c3c5038409; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Six must-priority requirements with their acceptance lines, approved in the 2026-11-24 rework cut.\n\n## Entries\n\nSix must-priority requirements with their acceptance lines: R1 SOP intake, where a PDF SOP becomes a PDDL procedure draft with capability and job drafts; R2 RDF/OWL intake, where an OWL or Turtle file becomes a knowledge pack bound by knowledge_pack_ref; R3 process-document intake, where BPMN, Visio and draw.io become PDDL procedure drafts; R4 the publication gate, where publication needs human approval and the drafting job cannot publish; R5 versioning, where a re-ingest creates a new draft version while the published row keeps its source and pack; R6 bound execution, where a bound job runs the PDDL steps and an unreviewed source cannot bind.\n\n## Links\n\nDerives from the T16 and Procedures destination rows of docs/SPEC_V2.md §12, decision D53 and the gate carried by acceptance/programme/T16.toml; realizes the Phase A requirements view for the procedure-ingestion slice; reuses the driver catalogue 01a211c9-20a5-752e-a91d-c5b7ee790855 and the solution concept 01a211c9-21b3-7d90-a789-8de4b76a8105.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope.",
+      "links": [
+        {
+          "to": "Driver, goal and objective catalogue — T16 procedure ingestion (retrospective, 2026-11-23)",
+          "kind": "derivation"
+        }
+      ]
     },
     {
       "title": "Solution concept — T16 procedure ingestion (retrospective, 2026-11-23)",
@@ -291,7 +309,13 @@
           "position": 6
         }
       ],
-      "body": "# Solution concept — T16 procedure ingestion (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-21b3-7d90-a789-8de4b76a8105; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Six components and edges, approved in the 2026-11-24 rework cut; no RDF store, graph store or reasoner appears.\n\n## Entries\n\nSix diagram entries: the knowledge pack as a component bound by knowledge_pack_ref, not copied; the procedures capability writing capability, job and PDDL procedure drafts into the one store; the process engine running the PDDL steps of a reviewed, bound procedure; the publication gate where a human approval, never the drafting job, publishes; the three source families (SOP, RDF/OWL and BPMN/Visio/draw.io) entering through the intake actions with no side channel; and the source → draft → published-row edge where a re-ingest versions the draft and the published row stays stable.\n\n## Links\n\nDerives from docs/SPEC_V2.md §12, decision D53 and the requirements catalogue 01a211c9-212a-70d4-bbbf-17c3c5038409; realizes the Phase A solution view for the procedure-ingestion slice; reuses the business capability map 01a211c9-223d-793d-901f-9bda541ac0be and the technology standards 01a211c9-2355-7f70-ac03-cda28d967ba0.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope. The concept deliberately contains no RDF store, graph store or reasoner, matching D53, and the data entity catalogue 01a211c9-22d1-752d-a37e-9f00de53a021 names the tables it touches."
+      "body": "# Solution concept — T16 procedure ingestion (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-21b3-7d90-a789-8de4b76a8105; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Six components and edges, approved in the 2026-11-24 rework cut; no RDF store, graph store or reasoner appears.\n\n## Entries\n\nSix diagram entries: the knowledge pack as a component bound by knowledge_pack_ref, not copied; the procedures capability writing capability, job and PDDL procedure drafts into the one store; the process engine running the PDDL steps of a reviewed, bound procedure; the publication gate where a human approval, never the drafting job, publishes; the three source families (SOP, RDF/OWL and BPMN/Visio/draw.io) entering through the intake actions with no side channel; and the source → draft → published-row edge where a re-ingest versions the draft and the published row stays stable.\n\n## Links\n\nDerives from docs/SPEC_V2.md §12, decision D53 and the requirements catalogue 01a211c9-212a-70d4-bbbf-17c3c5038409; realizes the Phase A solution view for the procedure-ingestion slice; reuses the business capability map 01a211c9-223d-793d-901f-9bda541ac0be and the technology standards 01a211c9-2355-7f70-ac03-cda28d967ba0.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope. The concept deliberately contains no RDF store, graph store or reasoner, matching D53, and the data entity catalogue 01a211c9-22d1-752d-a37e-9f00de53a021 names the tables it touches.",
+      "links": [
+        {
+          "to": "Requirements catalogue — T16 procedure ingestion (retrospective, 2026-11-23)",
+          "kind": "realization"
+        }
+      ]
     },
     {
       "title": "Business capability map — T16 procedure ingestion (retrospective, 2026-11-23)",
@@ -356,7 +380,17 @@
           "position": 5
         }
       ],
-      "body": "# Business capability map — T16 procedure ingestion (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-223d-793d-901f-9bda541ac0be; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Five capabilities, each recorded live in the approved map.\n\n## Entries\n\nFive capabilities, each recorded live in the approved map: procedure governance through procedures.ingest_sop, ingest_rdf and ingest_process with publish behind a gate; knowledge management through knowledge packs bound to the procedure by knowledge_pack_ref; process execution, where a bound job runs the PDDL steps; version management, where procedure_versioning applies on re-ingest; and assurance, where an unreviewed source cannot bind. The map records the capability surface only and claims no maturity beyond the live evidence named in each row.\n\n## Links\n\nDerives from docs/SPEC_V2.md §12, decision D53 and the destination row that places T16 at /procedures over capability, procedure and step; realizes the Phase B capability view; reuses the requirements catalogue 01a211c9-212a-70d4-bbbf-17c3c5038409, the solution concept 01a211c9-21b3-7d90-a789-8de4b76a8105 and the closed issues #85 and #448.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope."
+      "body": "# Business capability map — T16 procedure ingestion (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-223d-793d-901f-9bda541ac0be; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Five capabilities, each recorded live in the approved map.\n\n## Entries\n\nFive capabilities, each recorded live in the approved map: procedure governance through procedures.ingest_sop, ingest_rdf and ingest_process with publish behind a gate; knowledge management through knowledge packs bound to the procedure by knowledge_pack_ref; process execution, where a bound job runs the PDDL steps; version management, where procedure_versioning applies on re-ingest; and assurance, where an unreviewed source cannot bind. The map records the capability surface only and claims no maturity beyond the live evidence named in each row.\n\n## Links\n\nDerives from docs/SPEC_V2.md §12, decision D53 and the destination row that places T16 at /procedures over capability, procedure and step; realizes the Phase B capability view; reuses the requirements catalogue 01a211c9-212a-70d4-bbbf-17c3c5038409, the solution concept 01a211c9-21b3-7d90-a789-8de4b76a8105 and the closed issues #85 and #448.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope.",
+      "links": [
+        {
+          "to": "Solution concept — T16 procedure ingestion (retrospective, 2026-11-23)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Requirements catalogue — T16 procedure ingestion (retrospective, 2026-11-23)",
+          "kind": "reuse"
+        }
+      ]
     },
     {
       "title": "Data entity catalogue — T16 procedure ingestion (retrospective, 2026-11-23)",
@@ -421,7 +455,21 @@
           "position": 5
         }
       ],
-      "body": "# Data entity catalogue — T16 procedure ingestion (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-22d1-752d-a37e-9f00de53a021; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Five entity rows with their owning schema and table names; no row data is recorded.\n\n## Entries\n\nFive entity rows: the procedure row carrying source, version and status in the procedures schema; the draft row holding capability and job drafts in procedure_draft; the knowledge-pack row bound by reference in the knowledge schema; the approval rows (approval and approval_decision) owned by the gate and carrying the publication decision; and the evidence row spanning document and wbs_node.evidence, which carries the acceptance transcript and tests. All rows are tenant-scoped in the one PostgreSQL 18 store.\n\n## Links\n\nDerives from docs/SPEC_V2.md §12, decision D53 and the solution concept 01a211c9-21b3-7d90-a789-8de4b76a8105; realizes the Phase C data view for the procedure-ingestion slice; reuses the technology standards 01a211c9-2355-7f70-ac03-cda28d967ba0 and the approved requirements catalogue 01a211c9-212a-70d4-bbbf-17c3c5038409.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope. The catalogue names ownership and table only and records no row data, which keeps live tenant state out of the governance record."
+      "body": "# Data entity catalogue — T16 procedure ingestion (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-22d1-752d-a37e-9f00de53a021; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Five entity rows with their owning schema and table names; no row data is recorded.\n\n## Entries\n\nFive entity rows: the procedure row carrying source, version and status in the procedures schema; the draft row holding capability and job drafts in procedure_draft; the knowledge-pack row bound by reference in the knowledge schema; the approval rows (approval and approval_decision) owned by the gate and carrying the publication decision; and the evidence row spanning document and wbs_node.evidence, which carries the acceptance transcript and tests. All rows are tenant-scoped in the one PostgreSQL 18 store.\n\n## Links\n\nDerives from docs/SPEC_V2.md §12, decision D53 and the solution concept 01a211c9-21b3-7d90-a789-8de4b76a8105; realizes the Phase C data view for the procedure-ingestion slice; reuses the technology standards 01a211c9-2355-7f70-ac03-cda28d967ba0 and the approved requirements catalogue 01a211c9-212a-70d4-bbbf-17c3c5038409.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope. The catalogue names ownership and table only and records no row data, which keeps live tenant state out of the governance record.",
+      "links": [
+        {
+          "to": "Solution concept — T16 procedure ingestion (retrospective, 2026-11-23)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Business capability map — T16 procedure ingestion (retrospective, 2026-11-23)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Technology standards — T16 procedure ingestion (retrospective, 2026-11-23)",
+          "kind": "reuse"
+        }
+      ]
     },
     {
       "title": "Technology standards — T16 procedure ingestion (retrospective, 2026-11-23)",
@@ -481,9 +529,133 @@
           "position": 5
         }
       ],
-      "body": "# Technology standards — T16 procedure ingestion (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-2355-7f70-ac03-cda28d967ba0; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Five standards binding the slice to the estate's one-store, unversioned-route conventions.\n\n## Entries\n\nFive standards: HTTP on unversioned /api routes such as /api/actions/procedures.*, with no version segment, per the programme convention; MCP as the same action registry through a second transport; PDDL as planner input, where procedure drafts compile to PDDL and bound jobs execute the steps; PostgreSQL 18 as the one store with tenant-scoped rows and psycopg 3.3 clients; and the stable Rust workspace carrying the action registry and the procedures capability.\n\n## Links\n\nDerives from docs/SPEC_V2.md §12, decision D53, the unversioned-route and one-store conventions recorded in the programme instructions and the approved solution concept 01a211c9-21b3-7d90-a789-8de4b76a8105; realizes the Phase D standards view; reuses the data entity catalogue 01a211c9-22d1-752d-a37e-9f00de53a021 and the business capability map 01a211c9-223d-793d-901f-9bda541ac0be.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope. The standards introduce no second database, transport or runtime graph engine."
+      "body": "# Technology standards — T16 procedure ingestion (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d38-76fb-9394-b75934d16fcd; artefact 01a211c9-2355-7f70-ac03-cda28d967ba0; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14. Five standards binding the slice to the estate's one-store, unversioned-route conventions.\n\n## Entries\n\nFive standards: HTTP on unversioned /api routes such as /api/actions/procedures.*, with no version segment, per the programme convention; MCP as the same action registry through a second transport; PDDL as planner input, where procedure drafts compile to PDDL and bound jobs execute the steps; PostgreSQL 18 as the one store with tenant-scoped rows and psycopg 3.3 clients; and the stable Rust workspace carrying the action registry and the procedures capability.\n\n## Links\n\nDerives from docs/SPEC_V2.md §12, decision D53, the unversioned-route and one-store conventions recorded in the programme instructions and the approved solution concept 01a211c9-21b3-7d90-a789-8de4b76a8105; realizes the Phase D standards view; reuses the data entity catalogue 01a211c9-22d1-752d-a37e-9f00de53a021 and the business capability map 01a211c9-223d-793d-901f-9bda541ac0be.\n\n## Document\n\nThe artefact sits in T16's approved Phase A–D set under scope baseline 01a211c9-1b81-769b-b842-5cc91097dbfd, taken 2026-11-24T16:58:21Z, and is published with the retrospective record: the project brief 01a211c8-ecbf-7745-a45c-69512bfd2ac2, the acceptance evidence 01a211c9-1e60-7383-bb48-09c283194df6 and the project baseline 01a211c9-2942-7649-aca2-2e10eb2a8bdc carry the narrative. This body renders the approved rows as authored prose and adds no row, no commitment and no scope. The standards introduce no second database, transport or runtime graph engine.",
+      "links": [
+        {
+          "to": "Data entity catalogue — T16 procedure ingestion (retrospective, 2026-11-23)",
+          "kind": "reuse"
+        },
+        {
+          "to": "Business capability map — T16 procedure ingestion (retrospective, 2026-11-23)",
+          "kind": "reuse"
+        }
+      ]
     }
   ],
+  "registers": {
+    "risk": [
+      {
+        "code": "T16-R1",
+        "title": "The live T16 gate is not re-executed, so acceptance rests on the built flag and the approved artefacts rather than a fresh run",
+        "body": "The 2026-11-24 snapshot records meta.measured_status: built, but the pack's verification section states that a new SOP, OWL file or BPMN diagram was not ingested end to end, the human publication gate was not exercised on a new draft, and PDDL execution by a bound job was not re-run. The Phase-G review therefore levels the project consistent rather than compliant, and the live gate remains acceptance/programme/T16.toml. If the built capability cannot actually pass that gate, this record would overstate delivery.",
+        "status": "open",
+        "severity": "high",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "response": "Run the acceptance/programme/T16.toml gate end to end — a real SOP, an OWL file and a BPMN diagram through procedures.ingest_sop, ingest_rdf and ingest_process, a draft published only behind the human gate, and a bound job executing the PDDL steps — and publish the run evidence before any close decision.",
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R1–R6 acceptance lines — Requirements catalogue — T16 procedure ingestion (retrospective, 2026-11-23)",
+            "acceptance/programme/T16.toml"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "code": "T16-R2",
+        "title": "The earlier close predates the tranche-4 authorisation, so the tranche-4 review may not accept the reconstructed record",
+        "body": "The project closed at 2026-11-24T16:58:23Z, before tranche 4 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce was authorised at 17:04:34Z by the tranche-3 review 01a211c9-0ef6-7a66-92b7-d114dc40a886, and the reopen decision document/01a1fb9f-f19e-749b-9218-a4428b2e3dac reverted it for record completion. The review also records that no contemporaneous Phase-G review, contract or in-sequence acceptance exists. If the tranche-4 review does not accept a retrospective record authored after an out-of-sequence close, T16 has no authorised delivery position and stays active.",
+        "status": "open",
+        "severity": "medium",
+        "probability": "medium",
+        "impact": 3,
+        "review_at": "2026-12-08",
+        "response": "Present this retrospective pack to the tranche-4 review and let it decide continue against its exit criteria; keep the project active and make no close or waiver from this record.",
+        "meta": {
+          "owner": "the programme owner"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "T16-review check — acceptance/programme/T16.toml",
+            "T16-closure-gate check — acceptance/programme/T16.toml"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "T16-I1",
+        "title": "The project closed without a charter, scope baseline, delivery contract, Phase-G review or published closure review",
+        "body": "Reopen decision document/01a1fb9f-f19e-749b-9218-a4428b2e3dac records that T16 closed without its charter, scope baseline, delivery contract, Phase-G review and published closure review; at the snapshot the statement_of_architecture_work and delivery_contract were absent and the review set was empty, the only earlier review being the closure review 01a211c9-1eca-7222-84ec-f81fc2237080. The project was reopened at 2026-11-24T16:57:39Z (version 11) to complete the record against acceptance/programme/T16.toml, not to add scope.",
+        "status": "open",
+        "severity": "high",
+        "response": "Publish this retrospective pack — charter, scope baseline, the seven A–D artefacts, SoAW, delivery contract, Phase-G review, brief and evidence — and let the tranche-4 review verify the record is complete before any new close."
+      },
+      {
+        "code": "T16-I2",
+        "title": "The statement of architecture work and delivery contract were missing at the snapshot and are supplied retrospectively",
+        "body": "The delivery contract's retrospective field records that at the 2026-11-24 snapshot both the SoAW and the delivery contract were missing from the project's contract set; this pack supplies them and does not attest that they existed when the work was delivered. The approval field likewise records that the Phase-G decision is the retrospective review, so the contract cannot be read as a contemporaneous commitment by the Architecture Board.",
+        "status": "open",
+        "severity": "medium",
+        "response": "Treat the SoAW and delivery contract as retrospective attestations; the tranche-4 review weighs that limit explicitly rather than reading them as approvals made at delivery time."
+      }
+    ],
+    "assumption": [
+      {
+        "code": "T16-A1",
+        "title": "RDF/OWL/Turtle stays a strata knowledge-pack import bound by knowledge_pack_ref; T16 owns no RDF store, graph store or reasoner",
+        "body": "Decision D53 (owner 2026-11-19) removed the PKO store and made RDF/OWL/Turtle a knowledge-pack import; the charter, SoAW, requirement R2, the solution concept, the data entity catalogue and the capability map all bind the pack to the procedure by knowledge_pack_ref and record no second store, transport or graph engine. If a later decision reintroduced a runtime graph or reasoner, R2, the solution concept and the technology standards would all need re-baselining.",
+        "status": "open"
+      },
+      {
+        "code": "T16-A2",
+        "title": "The tranche-4 review decides continue, so this retrospective needs no close, no waiver and no new scope",
+        "body": "The delivery contract states that the project stays active for the tranche-4 review to decide continue and that no waiver is claimed or required; the charter, review and evidence all keep closes false. The assumption is that completing the record is sufficient for the tranche review and that the earlier close, made before authorisation, is not treated as the authorised close.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "code": "T16-D1",
+        "title": "T16 depends on T2, T13 and P0, and builds on the tool spine those projects carry",
+        "body": "The project row records meta.depends_on [T2, T13, P0] and the project brief places T16 after T2 and T13, with T17 after T16 and T3; T16 follows the tool spine as the first authoring feature built on it. P0 supplies the action registry, approval primitive and process primitives the ingest, publish and bind path uses. Neither dependency is owned by this project, so a slip in either changes what T16 can evidence.",
+        "status": "open"
+      },
+      {
+        "code": "T16-D2",
+        "title": "T17's tenant-wide generalisation is sequenced after T16, so T16's pack binding and publication gate constrain it",
+        "body": "SPEC_V2 places T17 after T16 and T3, and the charter excludes T17's generalisation to every tenant asset from this slice. T17 therefore inherits the knowledge_pack_ref binding, the human publication gate and the no-unreviewed-binding rule demonstrated here; if any of those changed, the sequencing recorded in the project brief and the boundary in the charter would no longer hold.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "code": "T16-B1",
+        "title": "A drafting job can no longer publish its own procedure; a human decision owns publication",
+        "body": "Driver D2 to goal G2 to requirement R4: publication requires a human approval and the drafting job cannot publish, carried by the publication gate component in the solution concept and the procedure-governance capability in the business capability map. Operations and publishers keep authority over what becomes a live procedure while intake and drafting are automated.",
+        "status": "open"
+      },
+      {
+        "code": "T16-B2",
+        "title": "A re-ingest versions the draft while the published row keeps its source and its knowledge pack",
+        "body": "Driver D3 to goal G3 to requirement R5: a re-ingest creates the next draft version and the published row is stable; the solution concept's source to draft to published-row edge and the version-management capability record it. Republishing no longer forks the row that bound jobs and tenants depend on.",
+        "status": "open"
+      },
+      {
+        "code": "T16-B3",
+        "title": "An unreviewed source never binds a job, so bound execution only runs reviewed PDDL procedures",
+        "body": "Driver D4 to goal G4 to requirement R6: a bound job runs the PDDL steps and an unreviewed source cannot bind; the assurance capability in the business capability map records the same evidence. Together with the SOP, RDF/OWL and BPMN/Visio/draw.io intake actions, it turns free-text procedure knowledge into typed drafts without letting an unreviewed source reach execution.",
+        "status": "open"
+      }
+    ]
+  },
   "delivery_contract": {
     "title": "Delivery contract — T16 SOP, RDF/OWL and process-document ingestion (retrospective, 2026-11-24)",
     "body": {

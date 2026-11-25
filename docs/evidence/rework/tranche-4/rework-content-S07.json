@@ -117,7 +117,13 @@
           "position": 9
         }
       ],
-      "body": "# Stakeholder Map — S07 Requirements and search (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine stakeholders sit on the influence/interest/engagement axes. The sponsoring group decides the tranche and the re-close, the SRO is accountable, the programme architect is responsible, and the Architecture Board approves. The S03 and S04 owners are consulted because the slice builds on their tables and registry; S08 and S12 are consulted or informed as consumers; tenants and requirement authors are informed because the lifecycle and search serve them directly.\n\n## Links\n\nDerives from `docs/plans/slices/S07-requirements-search.md` §1–§4 and §10; realizes the Phase A stakeholder view for the requirements and search capability; reuses the programme roles already recorded for the conveyor buildout and the S03/S04 dependency ownership.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. The project's only contemporaneous publication is the evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36, published 2026-11-16T22:43:11Z; this stakeholder view is authored in the 2026-11-24 retrospective pack and is approved with the rest of the A–D set.\n"
+      "body": "# Stakeholder Map — S07 Requirements and search (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine stakeholders sit on the influence/interest/engagement axes. The sponsoring group decides the tranche and the re-close, the SRO is accountable, the programme architect is responsible, and the Architecture Board approves. The S03 and S04 owners are consulted because the slice builds on their tables and registry; S08 and S12 are consulted or informed as consumers; tenants and requirement authors are informed because the lifecycle and search serve them directly.\n\n## Links\n\nDerives from `docs/plans/slices/S07-requirements-search.md` §1–§4 and §10; realizes the Phase A stakeholder view for the requirements and search capability; reuses the programme roles already recorded for the conveyor buildout and the S03/S04 dependency ownership.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. The project's only contemporaneous publication is the evidence page 01a1e687-4d95-70a0-8cf9-a624a30dcb36, published 2026-11-16T22:43:11Z; this stakeholder view is authored in the 2026-11-24 retrospective pack and is approved with the rest of the A–D set.\n",
+      "links": [
+        {
+          "to": "Business Capability Map — S07 Requirements and search (Phase B)",
+          "kind": "dependency"
+        }
+      ]
     },
     {
       "title": "Driver/Goal/Objective Catalog — S07 Requirements and search (Phase A)",
@@ -183,7 +189,13 @@
           "position": 6
         }
       ],
-      "body": "# Driver/Goal/Objective Catalog — S07 Requirements and search (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nSix drivers and their goals: RM's fragmented tables against one lifecycle, missing history against one revision per mutation, unmeasured quality against the advisory rubric, unsearchable requirements against ranked FTS plus trigram, RM-only catalogue and intake against an idempotent seed and project_requests, and implicit traceability against a single trace-link writer. Each objective names the plan section that installs it, so the catalog is the traceable bridge from driver to requirement.\n\n## Links\n\nDerives from the slice plan §1, §4, §5.6, §5.7 and §9; realizes the Phase A driver, goal and objective view; reuses SPEC §4, §6, §8 S7 and §11 R2 and the data architecture sections §2.4, §2.7 and §3.4 that the plan cites.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set; each objective is carried into a requirement in the sibling Requirements Catalog. The plan is `docs/plans/slices/S07-requirements-search.md` and the published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n"
+      "body": "# Driver/Goal/Objective Catalog — S07 Requirements and search (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nSix drivers and their goals: RM's fragmented tables against one lifecycle, missing history against one revision per mutation, unmeasured quality against the advisory rubric, unsearchable requirements against ranked FTS plus trigram, RM-only catalogue and intake against an idempotent seed and project_requests, and implicit traceability against a single trace-link writer. Each objective names the plan section that installs it, so the catalog is the traceable bridge from driver to requirement.\n\n## Links\n\nDerives from the slice plan §1, §4, §5.6, §5.7 and §9; realizes the Phase A driver, goal and objective view; reuses SPEC §4, §6, §8 S7 and §11 R2 and the data architecture sections §2.4, §2.7 and §3.4 that the plan cites.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set; each objective is carried into a requirement in the sibling Requirements Catalog. The plan is `docs/plans/slices/S07-requirements-search.md` and the published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n",
+      "links": [
+        {
+          "to": "Requirements Catalog — S07 Requirements and search (Phase A)",
+          "kind": "derivation"
+        }
+      ]
     },
     {
       "title": "Requirements Catalog — S07 Requirements and search (Phase A)",
@@ -327,7 +339,13 @@
           "position": 14
         }
       ],
-      "body": "# Requirements Catalog — S07 Requirements and search (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nFourteen requirements, all must: the five-table schema with tenancy and trigonometry indexes, the 32 registry-declared actions, kind fixed at declaration, the supersede invariant, one revision per mutation, a Rust compare, an idempotent catalogue import, an advisory quality rubric, three ranked search arms, a 40-query human-labelled eval with explicit targets, a single trace-link writer, an idempotent project-request intake, the outbox events and the plan §7 gate itself.\n\n## Links\n\nDerives from the slice plan §5.1–§5.8 and §7; realizes the Phase A requirements view; reuses S03's schema and tenancy conventions and S04's registry contract rather than restating them.\n\n## Document\n\nThe artefact sits under the slice plan; each requirement's acceptance is exercised by one of search_index, s07_assets, s07_requests, s07_store, s07_seed, s07_governance or search_eval, and the record-level instrument is acceptance/programme/S07.toml. The published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n"
+      "body": "# Requirements Catalog — S07 Requirements and search (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nFourteen requirements, all must: the five-table schema with tenancy and trigonometry indexes, the 32 registry-declared actions, kind fixed at declaration, the supersede invariant, one revision per mutation, a Rust compare, an idempotent catalogue import, an advisory quality rubric, three ranked search arms, a 40-query human-labelled eval with explicit targets, a single trace-link writer, an idempotent project-request intake, the outbox events and the plan §7 gate itself.\n\n## Links\n\nDerives from the slice plan §5.1–§5.8 and §7; realizes the Phase A requirements view; reuses S03's schema and tenancy conventions and S04's registry contract rather than restating them.\n\n## Document\n\nThe artefact sits under the slice plan; each requirement's acceptance is exercised by one of search_index, s07_assets, s07_requests, s07_store, s07_seed, s07_governance or search_eval, and the record-level instrument is acceptance/programme/S07.toml. The published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n",
+      "links": [
+        {
+          "to": "Solution Concept Diagram — S07 Requirements and search (Phase A)",
+          "kind": "derivation"
+        }
+      ]
     },
     {
       "title": "Solution Concept Diagram — S07 Requirements and search (Phase A)",
@@ -444,7 +462,17 @@
           "position": 11
         }
       ],
-      "body": "# Solution Concept Diagram — S07 Requirements and search (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEleven elements. The write path runs action, store, asset plus revision, then outbox in one transaction; quality scoring hangs off commit as a job and writes only its evaluation rows; search reads three GIN-backed arms; trace_links and project_requests use the same action surface. The eval harness sits beside the search module and measures it against baselines rather than against itself.\n\n## Links\n\nDerives from the slice plan §5 and the deliverable list in the plan header; realizes the Phase A solution concept; reuses S03's schema, S04's registry and S02's migrate, event and job rather than adding parallel machinery.\n\n## Document\n\nThe artefact sits under the slice plan and the delivery contract; the components are the files listed in the plan's deliverable block, and the project's published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n"
+      "body": "# Solution Concept Diagram — S07 Requirements and search (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEleven elements. The write path runs action, store, asset plus revision, then outbox in one transaction; quality scoring hangs off commit as a job and writes only its evaluation rows; search reads three GIN-backed arms; trace_links and project_requests use the same action surface. The eval harness sits beside the search module and measures it against baselines rather than against itself.\n\n## Links\n\nDerives from the slice plan §5 and the deliverable list in the plan header; realizes the Phase A solution concept; reuses S03's schema, S04's registry and S02's migrate, event and job rather than adding parallel machinery.\n\n## Document\n\nThe artefact sits under the slice plan and the delivery contract; the components are the files listed in the plan's deliverable block, and the project's published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n",
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — S07 Requirements and search (Phase C)",
+          "kind": "realization"
+        },
+        {
+          "to": "Business Capability Map — S07 Requirements and search (Phase B)",
+          "kind": "realization"
+        }
+      ]
     },
     {
       "title": "Business Capability Map — S07 Requirements and search (Phase B)",
@@ -543,7 +571,13 @@
           "position": 9
         }
       ],
-      "body": "# Business Capability Map — S07 Requirements and search (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine capabilities: requirement lifecycle, principle governance with conflict detection, decision governance, catalogue management, quality scoring, search, traceability, project intake and revision comparison. Each names the action surface that realises it and records the same maturity honestly: the project meta claims built, while the snapshot carries no run of the functional gate or the eval, so the map does not mark any capability proven.\n\n## Links\n\nDerives from the slice plan §1, §5 and §9; realizes the Phase B capability view; reuses the S03 lifecycle, the S04 registry and the S02 job machinery rather than introducing new capability surfaces.\n\n## Document\n\nThe artefact sits under the slice plan and the delivery contract; the published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36, which claims the slice but does not carry the gate run.\n"
+      "body": "# Business Capability Map — S07 Requirements and search (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine capabilities: requirement lifecycle, principle governance with conflict detection, decision governance, catalogue management, quality scoring, search, traceability, project intake and revision comparison. Each names the action surface that realises it and records the same maturity honestly: the project meta claims built, while the snapshot carries no run of the functional gate or the eval, so the map does not mark any capability proven.\n\n## Links\n\nDerives from the slice plan §1, §5 and §9; realizes the Phase B capability view; reuses the S03 lifecycle, the S04 registry and the S02 job machinery rather than introducing new capability surfaces.\n\n## Document\n\nThe artefact sits under the slice plan and the delivery contract; the published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36, which claims the slice but does not carry the gate run.\n",
+      "links": [
+        {
+          "to": "Technology Standards Catalog — S07 Requirements and search (Phase D)",
+          "kind": "realization"
+        }
+      ]
     },
     {
       "title": "Data Entity/Data Component Catalog — S07 Requirements and search (Phase C)",
@@ -651,7 +685,13 @@
           "position": 9
         }
       ],
-      "body": "# Data Entity/Data Component Catalog — S07 Requirements and search (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine entries: the four S03 entities the slice reuses (governed_asset, revision, catalogue_entry, trace_link), the three tables it adds (quality_evaluation, principle_conflict, project_request), the dropped outline pair and the trigram indexes. Each entry names its owner and its invariant; the dropped pair is recorded as absent rather than carried forward as if S08 still owns it.\n\n## Links\n\nDerives from the slice plan §5.1, §5.3, §5.4 and the 2026-11-08 header note on the 0011 drop; realizes the Phase C data view; reuses S03's columns and constraints verbatim instead of redefining them.\n\n## Document\n\nThe artefact sits under the slice plan and the delivery contract; migration 0007 is the schema record and the published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n"
+      "body": "# Data Entity/Data Component Catalog — S07 Requirements and search (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine entries: the four S03 entities the slice reuses (governed_asset, revision, catalogue_entry, trace_link), the three tables it adds (quality_evaluation, principle_conflict, project_request), the dropped outline pair and the trigram indexes. Each entry names its owner and its invariant; the dropped pair is recorded as absent rather than carried forward as if S08 still owns it.\n\n## Links\n\nDerives from the slice plan §5.1, §5.3, §5.4 and the 2026-11-08 header note on the 0011 drop; realizes the Phase C data view; reuses S03's columns and constraints verbatim instead of redefining them.\n\n## Document\n\nThe artefact sits under the slice plan and the delivery contract; migration 0007 is the schema record and the published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n",
+      "links": [
+        {
+          "to": "Technology Standards Catalog — S07 Requirements and search (Phase D)",
+          "kind": "realization"
+        }
+      ]
     },
     {
       "title": "Technology Standards Catalog — S07 Requirements and search (Phase D)",
@@ -757,9 +797,153 @@
           "position": 11
         }
       ],
-      "body": "# Technology Standards Catalog — S07 Requirements and search (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEleven standards: Postgres 18 with forced row-level security, text-plus-CHECK enumerations, a generated tsvector with a literal english config, trigram beside full text, the LEAKPROOF provisioning both GINs depend on, JCS-canonical hashing, the unversioned action-only write path, transactional outbox events, post-commit quality jobs, committed ranking weights and the verification route that names its index.\n\n## Links\n\nDerives from the slice plan §5.1–§5.8, §7 and §8, and the repository contract sections the plan cites; realizes the Phase D standards view; reuses the S03 tenancy and S04 registry standards instead of forking them.\n\n## Document\n\nThe artefact sits under the slice plan and the delivery contract; the standards are exercised by migrations/0007_requirements.sql, the six gate test targets and search_eval, the instrument is acceptance/programme/S07.toml, and the published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n"
+      "body": "# Technology Standards Catalog — S07 Requirements and search (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2c-7322-b2f9-4dd041153894; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEleven standards: Postgres 18 with forced row-level security, text-plus-CHECK enumerations, a generated tsvector with a literal english config, trigram beside full text, the LEAKPROOF provisioning both GINs depend on, JCS-canonical hashing, the unversioned action-only write path, transactional outbox events, post-commit quality jobs, committed ranking weights and the verification route that names its index.\n\n## Links\n\nDerives from the slice plan §5.1–§5.8, §7 and §8, and the repository contract sections the plan cites; realizes the Phase D standards view; reuses the S03 tenancy and S04 registry standards instead of forking them.\n\n## Document\n\nThe artefact sits under the slice plan and the delivery contract; the standards are exercised by migrations/0007_requirements.sql, the six gate test targets and search_eval, the instrument is acceptance/programme/S07.toml, and the published evidence page is 01a1e687-4d95-70a0-8cf9-a624a30dcb36.\n",
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — S07 Requirements and search (Phase C)",
+          "kind": "dependency"
+        }
+      ]
     }
   ],
+  "registers": {
+    "risk": [
+      {
+        "title": "The plan §7 functional gate has no recorded run",
+        "code": "S07-R1",
+        "body": "The charter, the Phase-G review, the closure and its review all record that plan §7's seven properties (a)–(g), the six named test targets and the EXPLAIN index check have no run at the snapshot; the close stands on the record-level checks of acceptance/programme/S07.toml alone. The slice could therefore close with a gate that has never refused anything outside this pack's checker.",
+        "probability": "high",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "severity": "high",
+        "status": "open",
+        "response": "run search_index, s07_assets, s07_requests, s07_store, s07_seed and s07_governance plus the EXPLAIN block in the lane and attach the output to the project's evidence page",
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R-14 Gate The plan §7 gate names its targets and its index"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "The §5.6 relevance targets have no measured eval numbers",
+        "code": "S07-R2",
+        "body": "No A/B/C/D numbers and no completion record exist for the 40-query eval. The Phase-G review records the level consistent rather than compliant because recall@5 ≥ 0.75, MRR ≥ 0.60 and B ≥ C are unmeasured, and the pgvector contingency (loss above 0.05 or C unreachable) cannot be decided without them.",
+        "probability": "high",
+        "impact": 3,
+        "review_at": "2026-12-15",
+        "severity": "medium",
+        "status": "open",
+        "response": "run search_eval with BASELINE=ab, BASELINE=c and GRID=1, record the §5.6 decision on pgvector, and publish the numbers",
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R-10 Eval A human-labelled 40-query eval set with explicit targets"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "title": "Both GIN indexes are dead if the trigram operators are not LEAKPROOF",
+        "code": "S07-R3",
+        "body": "The Technology Standards Catalog records that ts_match_vq and word_similarity_op must be LEAKPROOF or both GIN indexes are dead under FORCE ROW LEVEL SECURITY, and that the 2026-11-08 measurement showed a degraded plan satisfying a loose grep before the check was tightened. No run at the snapshot proves the operators are provisioned.",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "severity": "high",
+        "status": "open",
+        "response": "re-run the EXPLAIN block under enable_seqscan=off as conveyor_runtime and assert the named GIN index in search_index",
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R-01 Schema Five §5.1 tables with full tenancy and the trigram indexes",
+            "R-09 Search Three ranked arms with SQL-side predicates"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "issue": [
+      {
+        "title": "The snapshot carries no linked issue and no baseline row",
+        "code": "S07-I1",
+        "body": "The Phase-G review records that the snapshot carries no charter, Statement of Architecture Work, delivery contract, artefact set, Phase-G review, closure review, baseline row or linked issue, and meta.issues is empty. This retrospective supplies the record set but creates no GitHub issue link or baseline row for S07.",
+        "severity": "medium",
+        "status": "open"
+      },
+      {
+        "title": "The plan §10.3 open question still assumes outline and outline_node exist",
+        "code": "S07-I2",
+        "body": "The Data Entity/Data Component Catalog records that outline and outline_node were built by migration 0007 and dropped by 0011 after S00 measured zero usage, while the plan's §10.3 open question still assumes they exist; the plan text and the schema record disagree.",
+        "severity": "low",
+        "status": "open"
+      }
+    ],
+    "assumption": [
+      {
+        "title": "The 2026-11-24 snapshot is the authoritative record for S07",
+        "code": "S07-A1",
+        "body": "The delivery contract judges acceptance against the record at the 2026-11-24 rework snapshot, where project 01a1d039-0d2c-7322-b2f9-4dd041153894 is closed at version 7 and last updated 2026-11-21T01:06:16Z; the checker refuses any id that appears nowhere in that snapshot, so the pack assumes the snapshot is complete and current for S07.",
+        "status": "held"
+      },
+      {
+        "title": "S03 and S04 keep the surfaces S07 reuses",
+        "code": "S07-A2",
+        "body": "S07 reuses S03's governed_asset, revision, catalogue_entry and trace_link with their fixed kind vocabulary and tenancy conventions, and ships all 32 actions through S04's registry, ActionSpec derive and OpenAPI and MCP projection; the pack assumes those surfaces stay as the record declares them.",
+        "status": "held"
+      }
+    ],
+    "dependency": [
+      {
+        "title": "S03 keeps governed_asset, revision, catalogue_entry and trace_link",
+        "code": "S07-D1",
+        "body": "The Requirements Catalog and the Data Entity/Data Component Catalog reuse S03's four tables, columns, constraints and tenancy verbatim rather than redefining them, and the Solution Concept Diagram treats S03's schema as the transaction boundary; a change to those surfaces invalidates the slice's schema requirements.",
+        "status": "satisfied"
+      },
+      {
+        "title": "S04 projects every S07 action through the registry",
+        "code": "S07-D2",
+        "body": "The 32 actions (requirements.*, principles.*, decisions.*, catalogues.list|import, quality.score, search.query, trace_links.* and project_requests.*) are declared through the S04 ActionSpec derive and served as unversioned /api/<resource> routes; the action surface depends on the registry remaining the single write path.",
+        "status": "satisfied"
+      },
+      {
+        "title": "PostgreSQL 18 carries pg_trgm and the LEAKPROOF operators",
+        "code": "S07-D3",
+        "body": "The Technology Standards Catalog fixes pg_trgm, the generated tsv with a literal english config and the LEAKPROOF provisioning in scripts/db-roles.sql; without the operators both GIN indexes are dead under FORCE RLS, so the search requirements depend on that provisioning.",
+        "status": "open"
+      }
+    ],
+    "benefit": [
+      {
+        "title": "One governed_asset lifecycle replaces RM's 57 domain tables",
+        "code": "S07-B1",
+        "body": "D1 and G1 in the Driver/Goal/Objective Catalog put requirements, principles and decisions on one handler bound to a fixed kind at declaration; the Business Capability Map records the lifecycle capability as claimed built in the record, with the functional gate run not evidenced.",
+        "status": "claimed"
+      },
+      {
+        "title": "Every mutation leaves an immutable revision with a Rust field-level compare",
+        "code": "S07-B2",
+        "body": "D2/G2 and R-05/R-06 give each mutation one revision with seq = version and a SHA-256 hash of JCS-canonical JSON, and requirements.compare diffs two revisions in Rust with acceptance matched by criterion id; the capability map records it as claimed built in the record, with the functional gate run not evidenced.",
+        "status": "claimed"
+      },
+      {
+        "title": "A measured relevance baseline over 40 human-labelled queries",
+        "code": "S07-B3",
+        "body": "D4/G4 and R-10 target a 40-query eval over three ranked arms with recall@5 ≥ 0.75, MRR ≥ 0.60 and B ≥ C, with pgvector only when the loss exceeds 0.05; no eval numbers are recorded at the snapshot, so the measurement benefit remains planned.",
+        "status": "planned"
+      }
+    ]
+  },
   "delivery_contract": {
     "title": "Delivery contract — S07 Requirements and search (retrospective, 2026-11-24)",
     "body": {

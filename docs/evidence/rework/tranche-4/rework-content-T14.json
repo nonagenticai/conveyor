@@ -18,6 +18,12 @@
       "plateau": "psa",
       "artifact_kind": "matrix",
       "purpose": "Who is affected by the estate-toolkit import wave, what each needs, and how the rework engages them.",
+      "links": [
+        {
+          "to": "Requirements Catalog — T14 Estate toolkits (Phase A)",
+          "kind": "dependency"
+        }
+      ],
       "scope": "the live-service import wave, the probe and live-call windows, the scientific-compute schedule, the zero-use report and the outage drill across the estate.",
       "stakeholders": {
         "owner": "programme architect (conveyor-e2e)",
@@ -140,6 +146,12 @@
       "plateau": "psa",
       "artifact_kind": "catalog",
       "purpose": "The drivers behind the estate-toolkit import wave, the goal each serves and the objective the slice installs.",
+      "links": [
+        {
+          "to": "Stakeholder Map — T14 Estate toolkits (Phase A)",
+          "kind": "derivation"
+        }
+      ],
       "scope": "broker-only calls, proof per published toolkit, scientific-compute scale discipline, zero-use retirement, outage resilience, draft intake and receipt-backed evidence.",
       "stakeholders": {
         "owner": "programme architect (conveyor-e2e)",
@@ -225,6 +237,12 @@
       "plateau": "psa",
       "artifact_kind": "catalog",
       "purpose": "The requirements the T14 gate and its contracts must satisfy, each with an executable acceptance.",
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog — T14 Estate toolkits (Phase A)",
+          "kind": "derivation"
+        }
+      ],
       "scope": "the four gate clauses, the import-wave coverage, the draft services, the broker path, effect classes and credential profiles, and the provenance and retirement gate.",
       "stakeholders": {
         "owner": "programme architect (conveyor-e2e)",
@@ -336,6 +354,12 @@
       "plateau": "psa",
       "artifact_kind": "diagram",
       "purpose": "The components, receipts and edges that carry the estate-toolkit import wave, its proof and its failure semantics.",
+      "links": [
+        {
+          "to": "Requirements Catalog — T14 Estate toolkits (Phase A)",
+          "kind": "realization"
+        }
+      ],
       "scope": "the T13 tool family, the broker, the import wave, the probe and live-call harnesses, the scientific_processor scale controller, the zero-use report, the outage-unbind test and the retirement gate.",
       "stakeholders": {
         "owner": "programme architect (conveyor-e2e)",
@@ -483,6 +507,16 @@
       "plateau": "hld",
       "artifact_kind": "diagram",
       "purpose": "The capabilities the estate-toolkit slice declares and how far each is evidenced at the rework.",
+      "links": [
+        {
+          "to": "Solution Concept Diagram — T14 Estate toolkits (Phase A)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Driver/Goal/Objective Catalog — T14 Estate toolkits (Phase A)",
+          "kind": "derivation"
+        }
+      ],
       "scope": "governed estate import, publication proof, scientific-compute discipline, zero-use retirement, outage resilience, draft intake, broker-only execution and receipt-backed evidence.",
       "stakeholders": {
         "owner": "programme architect (conveyor-e2e)",
@@ -576,6 +610,16 @@
       "plateau": "hld",
       "artifact_kind": "catalog",
       "purpose": "The entities and instruments the estate-toolkit slice adds, each with its owner and its one invariant.",
+      "links": [
+        {
+          "to": "Business Capability Map — T14 Estate toolkits (Phase B)",
+          "kind": "derivation"
+        },
+        {
+          "to": "Solution Concept Diagram — T14 Estate toolkits (Phase A)",
+          "kind": "derivation"
+        }
+      ],
       "scope": "the T13 tool family, the import-wave rows, the probe, live-call and scale receipts, the zero-use report, the outage-unbind record and the retirement gate.",
       "stakeholders": {
         "owner": "programme architect (conveyor-e2e)",
@@ -726,6 +770,12 @@
       "plateau": "hld",
       "artifact_kind": "catalog",
       "purpose": "The standards the estate-toolkit slice fixes for its call path, proof, scale discipline, outage semantics and evidence.",
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — T14 Estate toolkits (Phase C)",
+          "kind": "derivation"
+        }
+      ],
       "scope": "broker-only calls, effect classes, credential profiles, the draft state, the probe, live-call, scale and zero-use instruments, outage semantics and the verification route.",
       "stakeholders": {
         "owner": "programme architect (conveyor-e2e)",
@@ -829,6 +879,128 @@
       "body": "# Technology Standards Catalog — T14 Estate toolkits (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-24; project 01a1d039-0d37-7896-adfb-fa7bd2279dfd; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEleven standards: the broker-only call path, the effect-class ceiling, the binding-scoped credential profile, the draft state, the probe and live-call standards, the scientific_processor scale discipline, the outage semantics, the zero-use report, the receipt-backed evidence rule and the verification route through acceptance/programme/T14.toml and the hosted preflight.\n\n## Links\n\nDerives from the SPEC_V2 §12 T14 gate, T13's tool platform standards in acceptance/programme/T13.toml and the repository's delivery rules in docs/plans/03-DELIVERY.md; realizes the Phase D standards view for the import wave.\n\n## Document\n\nThe artefact sits under the T14 project row; each standard names the instrument that would prove it, and none of those instruments has a recorded run in the 2026-11-24 snapshot, which is the gap this rework records."
     }
   ],
+  "registers": {
+    "risk": [
+      {
+        "code": "T14-R1",
+        "title": "The four gate clauses have no executed receipt, so the project's built status is unproven",
+        "body": "The charter, the delivery contract and the Phase-G review all record that the 2026-11-24 snapshot carries no probe or live-call receipt for any toolkit, no scientific_processor scale-up and scale-back receipt, no zero-use report and no backend-outage unbind run. meta.measured_status says built, but a built status is a record claim, not a gate pass; until the SPEC_V2 §12 T14 gate runs on the live estate through acceptance/programme/T14.toml the four clauses stay open verification and no closure is possible.",
+        "status": "open",
+        "severity": "high",
+        "probability": "high",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "response": "Run the four gate clauses on the live estate and keep one receipt per clause; keep the project active until every receipt exists rather than inferring a pass from the built status.",
+        "meta": {
+          "owner": "the programme architect (conveyor-e2e)"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R1 Probe and live call per published toolkit",
+            "R2 scientific_processor scale receipt",
+            "R3 Zero-use report",
+            "R4 Backend-outage unbind test",
+            "acceptance/programme/T14.toml"
+          ],
+          "decisions": []
+        }
+      },
+      {
+        "code": "T14-R2",
+        "title": "scientific_processor could be left scaled up or scaled without a receipt, consuming scarce host compute",
+        "body": "D3/G3 and requirement R2 make the scale discipline a gate clause: scientific_processor is scaled up before its probe and live call and scaled back afterwards, with both edges recorded. The snapshot holds no scale receipt at all, so neither the scale-up nor the return to the prior size is evidenced; an unrecorded scale or a left-up host is a gate failure, not an optimisation.",
+        "status": "open",
+        "severity": "high",
+        "probability": "medium",
+        "impact": 4,
+        "review_at": "2026-12-08",
+        "response": "Wrap the probe and the live call in the scale controller, record the scale-up and scale-back edges, and confirm the host returns to its prior size before counting the clause.",
+        "meta": {
+          "owner": "the scientific compute owners — scientific_processor and lean4_prover"
+        },
+        "links": {
+          "cards": [],
+          "requirements": [
+            "R2 scientific_processor scale receipt",
+            "acceptance/programme/T14.toml"
+          ],
+          "decisions": []
+        }
+      }
+    ],
+    "issue": [
+      {
+        "code": "T14-I1",
+        "title": "No probe or live-call receipt exists for any published toolkit at the 2026-11-24 snapshot",
+        "body": "The review findings and the evidence output record that the facts return no artefact, contract, review, baseline or output rows for T14 and no gate receipt, and organisation.json carries no toolkit rows, so publication cannot be counted from the record. The Business Capability Map therefore records governed estate import and publication proof as not evidenced rather than delivered.",
+        "status": "open",
+        "severity": "high"
+      },
+      {
+        "code": "T14-I2",
+        "title": "Issue 561 (research and Lean toolkits, first wave) remains open while the record claims the slice built",
+        "body": "Issues 558 and 560 are closed without receipts and issue 561 is open at 2026-11-22T08:25:44Z; requirement R8 records the research and Lean wave as outstanding and not delivered. A built status alongside an open import issue is the record's own evidence that the wave is incomplete.",
+        "status": "open",
+        "severity": "medium"
+      },
+      {
+        "code": "T14-I3",
+        "title": "The plan fragment docs/SPEC_V2.md#12 is status draft and there is no standalone T14 slice plan",
+        "body": "The Phase-G review records that the SPEC_V2 §12 plan fragment is draft and that no standalone T14 slice plan exists, and the project meta carries plan_status: draft; the WBS deliverable is therefore held to a draft fragment. A plan that is not accepted cannot anchor a closure, so this stays open while the project stays active.",
+        "status": "open",
+        "severity": "medium"
+      }
+    ],
+    "assumption": [
+      {
+        "code": "T14-A1",
+        "title": "The 2026-11-24 facts snapshot is the authoritative record for T14",
+        "body": "The charter states this retrospective reconstructs the lifecycle record, does not attest contemporaneous intent and records the gap truthfully, and the review is a new verdict written at 2026-11-24 rather than a copy of a prior one. Every judgement in this pack is read from that snapshot, and the content checker refuses any id that appears nowhere in it.",
+        "status": "open"
+      },
+      {
+        "code": "T14-A2",
+        "title": "The level consistent stands without a waiver because the record shows no refused gate",
+        "body": "The Statement of Architecture Work and the review both reason that the record supports consistent — the seven A–D artefacts, the Statement of Architecture Work, the delivery contract and the WSJF inputs 10/9/10/8 exist — and does not support non_conformant because nothing in the record shows a refused gate, the missing receipts being the project's open verification item. The programme has no waiver for T14, so the review relies on that distinction staying true.",
+        "status": "open"
+      }
+    ],
+    "dependency": [
+      {
+        "code": "T14-D1",
+        "title": "T13 supplies the tool family, the broker, the effect classes and the credential profiles",
+        "body": "meta.depends_on names T13 and P0, and the project brief carries the blocked-by T13 edge for tool, toolkit, tool_binding and tool_call, the broker tools.call, the effect classes, the credential profiles and the schema-valid-input refusal. T13's compliance review records the tool platform passing at lane head 582e2dc6 against acceptance/programme/T13.toml; T14 adds estate rows and receipts and creates no second registry.",
+        "status": "satisfied"
+      },
+      {
+        "code": "T14-D2",
+        "title": "P0 supplies the standing delegation and the accepted exception under which this retrospective runs",
+        "body": "The charter and the delivery contract name the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 as the authority for this rework, and the accepted P0 register item U3-EXC-T14 01a1fbad-8c5f-7086-b569-28e8f0cf6fac records the earlier close in an unauthorised tranche as a retrospective exception. With no live T14 contract or review before this pack, P0's record is what the rework stands on.",
+        "status": "satisfied"
+      }
+    ],
+    "benefit": [
+      {
+        "code": "T14-B1",
+        "title": "Every estate tool is called through the broker and leaves one tool_call row, so no call escapes the governed path",
+        "body": "D1/G1 and requirement R9 make the governed call path the slice's first objective: each live service enters as tool, toolkit and tool_binding rows and is invoked through tools.call, while a direct backend call is not a T14 toolkit. Broker-only execution is the one capability the Business Capability Map records as evidenced, inherited from T13's compliance review at lane head 582e2dc6.",
+        "status": "baselined"
+      },
+      {
+        "code": "T14-B2",
+        "title": "Publication requires a probe and one live call, so an unproven toolkit cannot be counted as published",
+        "body": "D2/G2 and requirement R1 make proof the act the gate guards: each published toolkit carries a probe receipt and one live-call receipt, and a draft is never counted as published. The zero-use report and the retirement gate then read the same tool_call rows, so the catalogue's published entries are the ones that demonstrably work.",
+        "status": "baselined"
+      },
+      {
+        "code": "T14-B3",
+        "title": "An unused toolkit has a recorded exit path through the zero-use report and the provenance and retirement gate",
+        "body": "D4/G4 and requirements R3 and R7 make unused toolkits visible: a zero-use report over tool_call names the toolkits with no calls and feeds the executable provenance and retirement gate delivered by issue 558, so an unused toolkit is offered for retirement rather than left silently bound and costing money.",
+        "status": "baselined"
+      }
+    ]
+  },
   "delivery_contract": {
     "title": "Delivery contract — T14 Estate toolkits (retrospective, 2026-11-24)",
     "body": {
