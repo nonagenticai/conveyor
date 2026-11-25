@@ -114,6 +114,7 @@ async fn archive_one(
             name: "approvals.request".to_owned(),
             status: 500,
             detail: format!("the gate carried no id: {gate}"),
+            errors: String::new(),
         })?;
     approver
         .call(
