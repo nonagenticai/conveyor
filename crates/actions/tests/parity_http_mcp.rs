@@ -2564,6 +2564,7 @@ async fn seed_arch_profile(pg: &support::Pg, ctx: &Ctx, project: Uuid) {
                 commissioning_authority: "parity programme".to_owned(),
                 decision_limits: json!({}),
                 members: json!([{ "role": "parity architect" }]),
+                meeting_type_key: None,
             },
         )
         .await
