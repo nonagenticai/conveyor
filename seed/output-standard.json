@@ -4473,11 +4473,20 @@
             "file": "architecture.json",
             "pointer": "/contracts",
             "match": {
-              "phase_code": "g"
+              "kind": "delivery_contract",
+              "project_id": "$project_id"
             }
           }
         ],
         "Evidence": [
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/compliance_reviews",
+            "match": {
+              "project_id": "$project_id"
+            }
+          },
           {
             "kind": "rows",
             "file": "architecture.json",

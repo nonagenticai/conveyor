@@ -1928,11 +1928,14 @@ fn validate_links(links: &Value) -> Result<(), ActionError> {
 }
 
 /// §8.4's risk register rule: a risk is probability, impact, owner, review date and at least
-/// one link. A row missing one is a note, not a managed risk.
+/// one link. A row missing one is a note, not a managed risk. The owner is a job when the
+/// work runs as one; in a record whose projects are not queue jobs it is a named role in
+/// `meta.owner` (owner's 2026-11-25 decision: backfill and keep the rule, never a bare risk).
 fn risk_missing(
     probability: Option<&str>,
     impact: Option<i32>,
     owner_job_id: Option<Uuid>,
+    owner_role: Option<&str>,
     review_at: Option<NaiveDate>,
     links: &Value,
 ) -> Vec<&'static str> {
@@ -1943,8 +1946,8 @@ fn risk_missing(
     if impact.is_none() {
         missing.push("impact");
     }
-    if owner_job_id.is_none() {
-        missing.push("owner_job_id");
+    if owner_job_id.is_none() && owner_role.is_none_or(|value| value.trim().is_empty()) {
+        missing.push("owner_job_id or meta.owner");
     }
     if review_at.is_none() {
         missing.push("review_at");
@@ -1997,10 +2000,16 @@ async fn registers_create(
         .unwrap_or_else(store::spine::empty_register_links);
     validate_links(&links)?;
     if kind == "risk" {
+        let owner_role = input
+            .meta
+            .as_ref()
+            .and_then(|meta| meta.get("owner"))
+            .and_then(Value::as_str);
         let missing = risk_missing(
             input.probability.as_deref(),
             input.impact,
             input.owner_job_id,
+            owner_role,
             input.review_at,
             &links,
         );
@@ -2104,6 +2113,12 @@ async fn registers_update(
     // the check runs against the merged row (the fields the update leaves alone keep their
     // stored values).
     if current.kind == "risk" {
+        let owner_role = input
+            .meta
+            .as_ref()
+            .unwrap_or(&current.meta)
+            .get("owner")
+            .and_then(Value::as_str);
         let missing = risk_missing(
             input
                 .probability
@@ -2111,6 +2126,7 @@ async fn registers_update(
                 .or(current.probability.as_deref()),
             input.impact.or(current.impact),
             input.owner_job_id.or(current.owner_job_id),
+            owner_role,
             input.review_at.or(current.review_at),
             input.links.as_ref().unwrap_or(&current.links),
         );

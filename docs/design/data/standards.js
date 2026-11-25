@@ -131852,7 +131852,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-design-publish-g.html",
-        "sha256": "36a1f8da903435c5c4521cc65fe35414bca506e9ef5b6b63a10c3a374f64fac4"
+        "sha256": "6343a10b6b50a6989c00cebf600f5fe4a164a7afd3b2a9822075bbbdc15daf6f"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -131887,31 +131887,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff3e-0f21-7e12-888d-1a54e7a90c9d",
+                  "status": "live",
+                  "title": "Delivery contract — DESIGN-PUBLISH: the published studio design pack"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1ff3f-2d51-7091-bacb-e7a5cb7b016c",
+                  "status": "",
+                  "title": "01a1ff3f-2d51-7091-bacb-e7a5cb7b016c"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -131929,12 +131944,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d39-7414-b43c-450de170ffe1:g",
         "key": "DESIGN-PUBLISH/g",
@@ -131952,7 +131967,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-p0-g.html",
-        "sha256": "ca8111312220f160631e215deea06a9d05b8c1cea7b82dee316e6b94d224d954"
+        "sha256": "751b83ebf0e76b6a762e7cbe78d00e786c9fae4ef4edd4e5c048dab5b11d129a"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -131987,31 +132002,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1fdd4-ab0f-7802-b7a7-2541a2902e6b",
+                  "status": "live",
+                  "title": "Delivery contract — P0 programme definition (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1fdd7-8227-7441-8f43-385bd3e186fa",
+                  "status": "",
+                  "title": "01a1fdd7-8227-7441-8f43-385bd3e186fa"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -132029,12 +132059,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1dcb8-d24b-76de-b901-56fd56e001bc:g",
         "key": "P0/g",
@@ -132052,7 +132082,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-platform-g.html",
-        "sha256": "bebb92b95181dfc6ff45370dbd94fd8843341cd9d04604d3e08340bba3718090"
+        "sha256": "03afbc487293d9da625508fad410c0dbd76779371858d3ef67626b2f3c99479c"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -132106,12 +132136,23 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a20204-542b-77bb-846a-183671a18675",
+                  "status": "",
+                  "title": "01a20204-542b-77bb-846a-183671a18675"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -132129,12 +132170,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d39-79ce-84b6-1173b94bc67f:g",
         "key": "PLATFORM/g",
@@ -132152,7 +132193,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s00-g.html",
-        "sha256": "c0ad835ece7eb9a95d1330f55a2b8aa7ecc288f230d25e2c01c8c7c5a871ec0d"
+        "sha256": "76e85d4de4aa8c6d07a5cba3833f3b51807d861a5eadfff14007a17732e062b5"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -132163,8 +132204,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S00",
-      "package_key": "mandatory_artefacts:tranche-0",
-      "package_published": true,
+      "package_key": "std-togaf-phase-g-s00-g:S00",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -132187,31 +132228,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738",
+                  "status": "live",
+                  "title": "Delivery contract — S00 (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1ff3a-6a97-7c12-841c-1c4f803cffb6",
+                  "status": "",
+                  "title": "01a1ff3a-6a97-7c12-841c-1c4f803cffb6"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -132229,12 +132285,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d26-7573-9b0c-e0f60af92003:g",
         "key": "S00/g",
@@ -132252,7 +132308,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s01-g.html",
-        "sha256": "7eeda2529318ed22d35d58c3bad0f81c4ddc2bc9de84601a26d019d3dd19d12a"
+        "sha256": "06368bf6a45a089a0953b7332f4a51611edac79a7442b8ad9e3c3fcbb6eb1eda"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -132263,8 +132319,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S01",
-      "package_key": "mandatory_artefacts:tranche-0",
-      "package_published": true,
+      "package_key": "std-togaf-phase-g-s01-g:S01",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -132287,31 +132343,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff31-30fe-7003-8d62-59278699d128",
+                  "status": "live",
+                  "title": "Delivery contract — S01 (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1ff32-159a-7028-a2d2-b4bcc1ce9eef",
+                  "status": "",
+                  "title": "01a1ff32-159a-7028-a2d2-b4bcc1ce9eef"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -132329,12 +132400,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d27-724c-9bae-af96b2d926b1:g",
         "key": "S01/g",
@@ -132352,7 +132423,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s02-g.html",
-        "sha256": "85fe3cad5056ca89370e76881c154747bd58cb7b79679500eaa4e12c95a2bf9b"
+        "sha256": "a07cd66b4abf4985c59e25e3d2d336ea55b9f005adfec39185ccf5c8d2736f53"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -132363,8 +132434,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S02",
-      "package_key": "mandatory_artefacts:tranche-1",
-      "package_published": true,
+      "package_key": "std-togaf-phase-g-s02-g:S02",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -132387,31 +132458,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff85-bda3-7671-a5b1-42eae3b0e6ee",
+                  "status": "live",
+                  "title": "Delivery Contract — S02 Skeleton (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1ff87-19a4-783f-85c5-033d5f38cedf",
+                  "status": "",
+                  "title": "01a1ff87-19a4-783f-85c5-033d5f38cedf"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -132429,12 +132515,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a:g",
         "key": "S02/g",
@@ -132452,7 +132538,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s03-g.html",
-        "sha256": "415443fd7a45cdfd0ca733e0657638296df9e729da3d5247c38683898281faeb"
+        "sha256": "20794d37ed184fa3d196ca09974a62a2ec6f6d47c5d025b30832738164634ef9"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -132487,31 +132573,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20063-3a7d-7e67-a437-2e0884f6c46a",
+                  "status": "live",
+                  "title": "Delivery contract — S03 Domain and schema (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a20066-3107-7b16-8835-6b6cd2aa8c84",
+                  "status": "",
+                  "title": "01a20066-3107-7b16-8835-6b6cd2aa8c84"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -132529,12 +132630,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d28-743b-86c7-0d0698ed69c1:g",
         "key": "S03/g",
@@ -132552,7 +132653,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s04-g.html",
-        "sha256": "e50a8161e4b26c91bd9a904ecf98ddda3ae622e53c3b286246b49bb9a9594b06"
+        "sha256": "33f400882bb22b0f87f6c671b3ef4adfd7464451eea42f9cf416abc46a832bcf"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -132563,8 +132664,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S04",
-      "package_key": "mandatory_artefacts:tranche-3",
-      "package_published": true,
+      "package_key": "std-togaf-phase-g-s04-g:S04",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -132606,12 +132707,23 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a20284-e742-757a-ae91-0b8fb19ad3c0",
+                  "status": "",
+                  "title": "01a20284-e742-757a-ae91-0b8fb19ad3c0"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -132629,12 +132741,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d28-7eb6-a62a-f420e742595c:g",
         "key": "S04/g",
@@ -132712,6 +132824,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -132817,6 +132936,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -132912,6 +133038,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -133017,6 +133150,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -133112,6 +133252,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -133217,6 +133364,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -133312,6 +133466,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -133417,6 +133578,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -133512,6 +133680,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -133617,6 +133792,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -133712,6 +133894,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -133817,6 +134006,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -133912,6 +134108,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -134017,6 +134220,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -134112,6 +134322,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -134217,6 +134434,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -134312,6 +134536,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -134417,6 +134648,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -134512,6 +134750,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -134617,6 +134862,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -134652,7 +134904,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-spec-v2-g.html",
-        "sha256": "bd0a3f4ac8dd8f3079a47640dbeccb5dff221abf9dfbceeff21cd071f82d2caf"
+        "sha256": "60a28ddffc289974e891ee2c27f12a090fb07a36944e019251c68ee8ba163fa9"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -134687,31 +134939,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff42-7bd0-7d9e-883a-1059368cd356",
+                  "status": "live",
+                  "title": "Delivery contract — SPEC-V2, retrospective acceptance of the organisational operating model (2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1ff43-a1bc-758d-89dc-c97d0fb0265a",
+                  "status": "",
+                  "title": "01a1ff43-a1bc-758d-89dc-c97d0fb0265a"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -134729,12 +134996,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50:g",
         "key": "SPEC-V2/g",
@@ -134752,7 +135019,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t0-g.html",
-        "sha256": "df99c9773d2114eebea35862c53bba8652f68b72651cf8dd49448aaaaece2fb3"
+        "sha256": "8da041ad0cc510035cec694beb414229cce86ca94f04caeb2448ba81d2e686fb"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -134763,8 +135030,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T0",
-      "package_key": "mandatory_artefacts:tranche-0",
-      "package_published": true,
+      "package_key": "std-togaf-phase-g-t0-g:T0",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -134787,31 +135054,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff47-1159-707b-a737-582f894cc956",
+                  "status": "live",
+                  "title": "Delivery contract — T0 Model and contracts (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c",
+                  "status": "",
+                  "title": "01a1ff48-20c6-77d2-b0d1-5fd0ca2b7d9c"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -134829,12 +135111,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d32-7734-98da-fb7f1e2386c7:g",
         "key": "T0/g",
@@ -134852,7 +135134,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t1-g.html",
-        "sha256": "16a4cdaa986dd063e505155266b94d9727a6738ef4ce50d705bb978efece95f1"
+        "sha256": "e6e0a8cc19d1a4934a2c7bb86d39097d8f2bb4e809a0eb60a08d9579121da3e4"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -134863,8 +135145,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T1",
-      "package_key": "mandatory_artefacts:tranche-1",
-      "package_published": true,
+      "package_key": "std-togaf-phase-g-t1-g:T1",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -134887,31 +135169,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff8a-754f-70de-a63a-fa8d00596433",
+                  "status": "live",
+                  "title": "Delivery contract — T1 Plan spine (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d",
+                  "status": "",
+                  "title": "01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -134929,12 +135226,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d32-7c81-8365-371217d16ef7:g",
         "key": "T1/g",
@@ -134952,7 +135249,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t10-g.html",
-        "sha256": "2ace221a96f03de5f204cd0e5f866bc97e9ffa625741c74be626efee65c65463"
+        "sha256": "ab563f0350a87acc6bc68c6a6cedca41f1cc3fc825b762fdc74abf508c3099b4"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -134987,31 +135284,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20289-2b08-7ea3-96f6-b2ac928a7be4",
+                  "status": "live",
+                  "title": "Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a2028a-3c4e-7a50-8ee9-d59ad0f11396",
+                  "status": "",
+                  "title": "01a2028a-3c4e-7a50-8ee9-d59ad0f11396"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -135029,12 +135341,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9:g",
         "key": "T10/g",
@@ -135052,7 +135364,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t11-g.html",
-        "sha256": "e046d845a8b207c11a6863a4abc4e71f9285af7c6be7cc3b328b1e623e2c23cd"
+        "sha256": "a4c3ef94b727b44b3ff085136b51eb0cf1c057236b42a4319e35edd537121cac"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -135063,8 +135375,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T11",
-      "package_key": "mandatory_artefacts:tranche-1",
-      "package_published": true,
+      "package_key": "std-togaf-phase-g-t11-g:T11",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -135087,31 +135399,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff8f-08ee-7bc5-bb39-81304d03c4ef",
+                  "status": "live",
+                  "title": "Delivery contract — T11 Metrics, metering and maturity (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1ff90-4e19-7bcf-acbf-3f29d980572e",
+                  "status": "",
+                  "title": "01a1ff90-4e19-7bcf-acbf-3f29d980572e"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -135129,12 +135456,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d36-782b-8b18-ff07a64dedbe:g",
         "key": "T11/g",
@@ -135217,6 +135544,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -135252,7 +135586,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t13-g.html",
-        "sha256": "ab1b1a174b2df395a4024d7c036afcabdb900c9836cc20768e96f39dc595b301"
+        "sha256": "4692d12a1aadc6255c5e6660206ede9f720b893300107d809ce6659c22adbfb1"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -135287,31 +135621,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20277-2d08-7c91-bce6-1a8326add30c",
+                  "status": "live",
+                  "title": "Delivery contract — T13 Tool platform (retrospective, 2026-11-22)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a2027a-6502-72a6-9ef8-4c1582dbdf36",
+                  "status": "",
+                  "title": "01a2027a-6502-72a6-9ef8-4c1582dbdf36"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -135329,12 +135678,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d:g",
         "key": "T13/g",
@@ -135412,6 +135761,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -135517,6 +135873,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -135612,6 +135975,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -135717,6 +136087,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -135817,6 +136194,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -135852,7 +136236,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t19-g.html",
-        "sha256": "d40a13fa150dc3a07fb981d4853a2377ad70e9bf0007f440cb3dd52382c29525"
+        "sha256": "8c6390c8a0d086415af025ca6290faf00ca8c472b1ba59568f74ebb2d549ef28"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -135887,31 +136271,51 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20cea-91bb-77f4-a880-044c90bb5f0e",
+                  "status": "live",
+                  "title": "Delivery contract — T19 decision forums (2026-11-24)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 2,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a20ceb-66b2-75a4-ac9f-6ceae8ab187d",
+                  "status": "",
+                  "title": "01a20ceb-66b2-75a4-ac9f-6ceae8ab187d"
+                },
+                {
+                  "id": "01a20ceb-5316-7ea3-95df-001bd0b15560",
+                  "status": "",
+                  "title": "01a20ceb-5316-7ea3-95df-001bd0b15560"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -135929,12 +136333,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1:g",
         "key": "T19/g",
@@ -135952,7 +136356,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t19f-g.html",
-        "sha256": "44ff2576859d7f574cd9faf8ef31f2cde31e310b0aed3a2a22b520310a60f8ac"
+        "sha256": "cc212f6d544e5cb4ea661d8be003230a1874a861cdb72df4bcd45f32c40c7c80"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -135987,31 +136391,56 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 2,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a210bd-f408-778a-b67e-9b6cf36ca62a",
+                  "status": "live",
+                  "title": "Delivery contract — T19F forum bindings (2026-11-25)"
+                },
+                {
+                  "id": "01a210c8-7ea8-7dc9-8104-700ecfe2905b",
+                  "status": "draft",
+                  "title": "T19F live gate — the sitting subject"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 2,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a210be-4ded-728e-96ba-d4805b5f9b29",
+                  "status": "",
+                  "title": "01a210be-4ded-728e-96ba-d4805b5f9b29"
+                },
+                {
+                  "id": "01a210be-3a02-75f3-b39d-5309d7a2cd92",
+                  "status": "",
+                  "title": "01a210be-3a02-75f3-b39d-5309d7a2cd92"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -136029,12 +136458,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:g",
         "key": "T19F/g",
@@ -136052,7 +136481,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t2-g.html",
-        "sha256": "5a5a0056557f7da06860acf3ced8e3ff3ca09a68350a7b53a9c26eec7a345112"
+        "sha256": "66dd43daaf6db554adf38e949e385c7fd60972184bac026f4ee3928e382b7e6a"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -136063,8 +136492,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T2",
-      "package_key": "mandatory_artefacts:tranche-2",
-      "package_published": true,
+      "package_key": "std-togaf-phase-g-t2-g:T2",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -136087,31 +136516,56 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 2,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a2005c-18e4-75a7-9c20-2d83728194e0",
+                  "status": "superseded",
+                  "title": "Delivery contract — T2 Decision ladder (retrospective, U5a)"
+                },
+                {
+                  "id": "01a2009a-7bce-7a8f-96fd-f5159286a09e",
+                  "status": "live",
+                  "title": "Delivery contract — T2 Decision ladder (re-review at the fixed P0)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 2,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a2009b-0768-72c1-bba1-2a8a3a8dae59",
+                  "status": "",
+                  "title": "01a2009b-0768-72c1-bba1-2a8a3a8dae59"
+                },
+                {
+                  "id": "01a2005d-20eb-72af-a5de-4606c0b16008",
+                  "status": "",
+                  "title": "01a2005d-20eb-72af-a5de-4606c0b16008"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -136129,12 +136583,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1:g",
         "key": "T2/g",
@@ -136217,6 +136671,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -136252,7 +136713,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t4-g.html",
-        "sha256": "6ac11de05d03f4c42b4c3b2f9160550a8d36ce2f2d91e9ff75da1c6238be7bb7"
+        "sha256": "dda304bc64a498ca69cb10e03e5ec52cf6aeb4e267e4849d5c0ee3e874d3da48"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -136287,31 +136748,46 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a2028d-942b-759a-ad59-ab9c38629977",
+                  "status": "live",
+                  "title": "Delivery contract — T4 Kanban coach (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 1,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a2028e-a1be-779d-a762-8d118fc2ec0b",
+                  "status": "",
+                  "title": "01a2028e-a1be-779d-a762-8d118fc2ec0b"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -136329,12 +136805,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d33-7e7e-890e-b437b0c78db9:g",
         "key": "T4/g",
@@ -136412,6 +136888,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -136517,6 +137000,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -136612,6 +137102,13 @@ window.CONVEYOR_STANDARDS = {
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -136717,6 +137214,13 @@ window.CONVEYOR_STANDARDS = {
               "file": "architecture.json",
               "items": [],
               "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
               "pointer": "/artifacts"
             },
             {
@@ -136752,7 +137256,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t9-g.html",
-        "sha256": "80b4e240d28b60914263b8a867d471a14d9fe255ff484b0b34d184d9c1315e5c"
+        "sha256": "9e7c670d03b3da980c23f2677238094a732fb4ca6faef987168e22018bc27345"
       },
       "gate": {
         "approval_id": "",
@@ -136787,31 +137291,51 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20280-25ea-759d-8f96-51980017b97e",
+                  "status": "live",
+                  "title": "Delivery contract — T9 TOGAF ADM capability (retrospective, 2026-11-22)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
           "heading": "Evidence",
-          "missing": [
-            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
+            {
+              "count": 2,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a20284-debf-7149-ba0d-d59c876255f7",
+                  "status": "",
+                  "title": "01a20284-debf-7149-ba0d-d59c876255f7"
+                },
+                {
+                  "id": "01a1f357-69eb-7716-811e-ce22ea93d496",
+                  "status": "",
+                  "title": "01a1f357-69eb-7716-811e-ce22ea93d496"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            },
             {
               "count": 0,
               "file": "architecture.json",
@@ -136829,12 +137353,12 @@ window.CONVEYOR_STANDARDS = {
               "scope": "subject"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d:g",
         "key": "T9/g",
@@ -144685,22 +145209,22 @@ window.CONVEYOR_STANDARDS = {
       "partial": 0
     },
     "TOGAF": {
-      "absent": 180,
+      "absent": 161,
       "artefacts": 654,
       "evidenced": 161,
-      "partial": 313
+      "partial": 332
     }
   },
   "generated_at": "2026-11-25T03:46:32.319854100+00:00",
   "git_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
-  "payload_sha256": "fc0384848e2c8d4084f3ca5043e7794e31446b80ad8e912f6bd4c6dfd6a77445",
+  "payload_sha256": "9c6ff47e0cb3e76391574f5c4bd531ded4f1ba7b5c3cb316bddbe32a0ff69b32",
   "schema": "design-standards/v1",
   "summary": {
-    "absent": 373,
+    "absent": 354,
     "artefacts": 1012,
     "evidenced": 256,
-    "findings": 574,
+    "findings": 582,
     "mandatory": 912,
-    "partial": 383
+    "partial": 402
   }
 };

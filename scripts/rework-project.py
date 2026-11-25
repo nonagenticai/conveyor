@@ -400,53 +400,65 @@ class Runner:
         required = len(artefact_keys)
         if len(self.content["artifacts"]) != required:
             fail(f"the content must carry the {required} artefacts in the standard order")
+        artefact_ids: dict[str, str] = {}
+        snapshot_documents = {
+            str(row.get("id")): row.get("document_id")
+            for row in (self.snapshot_json("architecture.json").get("artifacts") or [])
+        }
         for index, artefact in enumerate(self.content["artifacts"]):
             key = artefact_keys[index]
             if artefact["title"] in titles:
                 row = titles[artefact["title"]]
                 meta = dict(row.get("meta") or {})
-                if meta.get("artifact_key") != key:
-                    # An approved artefact is immutable; the repair is a new version. The
-                    # supersede writes a draft copy, the draft takes the standard key in its
-                    # meta (the row has no type binding), and the draft is approved.
-                    draft = self.invoke(
-                        "architecture.artifacts_supersede",
-                        {"id": row["id"]},
-                        read_action="architecture.artifacts_get",
-                        read_id_from_output="id",
-                        if_match=row.get("version", 1),
-                    )
-                    meta = dict(draft.get("meta") or {})
-                    meta.update(
-                        {
-                            "retrospective": True,
-                            "delegation_ref": self.delegation,
-                            "artifact_key": key,
-                        }
-                    )
-                    draft = self.invoke(
-                        "architecture.artifacts_update",
-                        {"id": draft["id"], "meta": meta},
-                        read_action="architecture.artifacts_get",
-                        read_input={"id": draft["id"]},
-                        if_match=draft.get("version", 1),
-                    )
-                    self.invoke(
-                        "architecture.artifacts_approve",
-                        {"id": draft["id"]},
-                        actor=APPROVER,
-                        if_match=draft.get("version", 1),
-                    )
-                    print(f"  artefact: {artefact['title']} re-versioned and bound to {key}")
-                else:
+                document_id = snapshot_documents.get(str(row.get("id"))) or row.get("document_id")
+                needs_key = meta.get("artifact_key") != key
+                if not needs_key and document_id:
+                    artefact_ids[artefact["title"]] = str(row["id"])
                     print(f"  artefact: {artefact['title']} already present")
+                    continue
+                # An approved artefact is immutable; the repair is a new version that carries
+                # the standard key and the published document it sits under. The document is
+                # published first, so the new row pins a real body from its first version.
+                document_id = document_id or self.publish_artefact_document(artefact)
+                draft = self.invoke(
+                    "architecture.artifacts_supersede",
+                    {"id": row["id"]},
+                    read_action="architecture.artifacts_get",
+                    read_id_from_output="id",
+                    if_match=row.get("version", 1),
+                )
+                meta = dict(draft.get("meta") or {})
+                meta.update(
+                    {
+                        "retrospective": True,
+                        "delegation_ref": self.delegation,
+                        "artifact_key": key,
+                    }
+                )
+                draft = self.invoke(
+                    "architecture.artifacts_update",
+                    {"id": draft["id"], "meta": meta, "document_id": document_id},
+                    read_action="architecture.artifacts_get",
+                    read_input={"id": draft["id"]},
+                    if_match=draft.get("version", 1),
+                )
+                self.invoke(
+                    "architecture.artifacts_approve",
+                    {"id": draft["id"]},
+                    actor=APPROVER,
+                    if_match=draft.get("version", 1),
+                )
+                artefact_ids[artefact["title"]] = str(draft["id"])
+                print(f"  artefact: {artefact['title']} re-versioned, bound and documented")
                 continue
+            document_id = self.publish_artefact_document(artefact)
             created = self.invoke(
                 "architecture.artifacts_create",
                 dict(
                     artefact,
                     project_id=self.project_id,
                     artifact_type_id=standard.get(key),
+                    document_id=document_id,
                     meta={
                         "retrospective": True,
                         "delegation_ref": self.delegation,
@@ -462,6 +474,8 @@ class Runner:
                 actor=APPROVER,
                 if_match=1,
             )
+            artefact_ids[artefact["title"]] = str(created["id"])
+        self.ensure_artefact_links(artefact_ids)
 
         # 6. the delivery contract
         contract = next(
@@ -503,10 +517,14 @@ class Runner:
         else:
             print("  delivery contract: already live")
 
+        # 6b. the six-section project register, before the baseline freezes it (§8.4)
+        self.ensure_registers()
+
         # 7. baseline with the project's one WBS deliverable
         baselines = [
             b for b in self.snapshot_json("msp.json").get("project_baselines", [])
             if b.get("project_id") == self.project_id
+            and str(b.get("kind") or "scope") == "scope"
         ]
         deliverable = None
         if baselines:
@@ -544,6 +562,9 @@ class Runner:
             # the deliverable before the baseline freezes the scope is also the truer order:
             # the baseline records the accepted scope.
             self.baseline_approval = plan["approval_id"]
+
+        # 7b. the schedule and cost baselines the PMP baseline rule reads
+        self.ensure_extra_baselines()
 
         # 8. publish the retrospective closure review output
         outputs = self._published_outputs()
@@ -806,6 +827,127 @@ class Runner:
                 page.write(
                     f"\n{self.project}: {total} acts in `transcript.jsonl`; "
                     f"the last run recorded {self.acts}.\n"
+                )
+
+    def ensure_registers(self) -> None:
+        """Write the project register the PMP rule reads (§8.4).
+
+        The content authors the rows; this runner only writes them. A risk's owner is the
+        pack's `meta.owner` role when no queue job owns the work (owner's 2026-11-25
+        decision: backfill and keep the risk managed); probability, impact, review date and
+        a link stay mandatory. On resume the live list is read first — `registers.create` is
+        not idempotent.
+        """
+        rows = self.content.get("registers") or {}
+        if not rows:
+            print("  registers: none in the content")
+            return
+        existing = self._read(
+            "registers.list", {"project_id": self.project_id}
+        ).get("items", [])
+        have = {(row.get("kind"), row.get("title")) for row in existing}
+        for kind, items in rows.items():
+            for item in items:
+                title = str(item.get("title") or "").strip()
+                if not title:
+                    fail(f"registers: a {kind} row has no title")
+                if (kind, title) in have:
+                    print(f"  register {kind}: {title} already present")
+                    continue
+                self.invoke(
+                    "registers.create",
+                    {"project_id": self.project_id, "kind": kind, **item},
+                    read_action="registers.list",
+                    read_input={"project_id": self.project_id},
+                    read_match=[f"kind={kind}", f"title={title}"],
+                )
+
+    def ensure_extra_baselines(self) -> None:
+        """Take the schedule and cost baselines the PMP baseline rule reads.
+
+        The plan already exists; the two baselines freeze the same WBS with an empty insert,
+        so no duplicate node is written. Each take opens its own approval, decided by the
+        distinct approver. A resumed run reads the pre-run snapshot's kinds and skips one
+        that already exists.
+        """
+        existing = {
+            str(row.get("kind") or "scope")
+            for row in self.snapshot_json("msp.json").get("project_baselines", [])
+            if row.get("project_id") == self.project_id
+        }
+        for kind in ("schedule", "cost"):
+            if kind in existing:
+                print(f"  {kind} baseline: already taken")
+                continue
+            taken = self.invoke(
+                "projects.baseline",
+                {"project_id": self.project_id, "baseline_kind": kind, "wbs": []},
+                read_action="baselines.get",
+                read_id_from_output="baseline_id",
+            )
+            self.decide(taken["approval_id"], f"approve the {kind} baseline")
+
+    def publish_artefact_document(self, artefact: dict) -> str:
+        """Compose and publish the artefact's own document, once.
+
+        The standard's artefact-instance rule reads `document_id` off the artefact row; a
+        published body is what makes the metadata inspectable. A resumed run reuses the
+        published document of the same title from the pre-run outputs index.
+        """
+        title = str(artefact["title"])
+        for row in self._published_outputs():
+            if (
+                row.get("title") == title
+                and row.get("category") == "architecture-artifact-instance"
+            ):
+                return str(row["id"])
+        body = str(artefact.get("body") or "")
+        if not body.strip():
+            fail(f"artefact {title}: no body to publish")
+        doc = self.invoke(
+            "documents.compose",
+            {
+                "title": title,
+                "project_id": self.project_id,
+                "body": body,
+                "category": "architecture-artifact-instance",
+                "publishable": True,
+            },
+            read_action="documents.get",
+            read_id_from_output="id",
+        )
+        self.invoke(
+            "documents.publish",
+            {"id": doc["id"], "publish": True},
+            read_input={"id": doc["id"]},
+            if_match=doc.get("version", 1),
+        )
+        return str(doc["id"])
+
+    def ensure_artefact_links(self, ids_by_title: dict[str, str]) -> None:
+        """Create the pack's declared artefact edges (§8.1); an orphan artefact is refused."""
+        for artefact in self.content["artifacts"]:
+            source = ids_by_title.get(str(artefact["title"]))
+            if not source:
+                fail(f"artefact {artefact['title']}: no created id to link from")
+            for link in artefact.get("links") or []:
+                target_title = str(link.get("to") or "")
+                target = ids_by_title.get(target_title)
+                if not target:
+                    fail(
+                        f"artefact {artefact['title']}: link target {target_title!r} "
+                        "is not an artefact of this pack"
+                    )
+                self.invoke(
+                    "architecture.artifacts_link",
+                    {
+                        "from_artifact_id": source,
+                        "to_artifact_id": target,
+                        "kind": str(link.get("kind") or "derivation"),
+                    },
+                    read_action="architecture.artifacts_links",
+                    read_input={"id": source},
+                    read_match=[f"to_artifact_id={target}"],
                 )
 
     def _published_outputs(self) -> list[dict]:

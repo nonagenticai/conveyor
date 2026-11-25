@@ -1177,10 +1177,32 @@ def computed_rows(
             *[{"kind": "skill", **row} for row in architecture.get("skills") or []],
         ]
     if name == "artifact_metadata":
-        row = subject.get("meta") or {}
-        return [{"kind": str(row.get("artifact_kind") or "artifact"), **row}]
+        # The snapshot projects the artefact's typed fields on the ROW (artifact_kind,
+        # document_id, entries, ...); meta carries the retrospective binding. Reading only meta
+        # false-reddened every artefact-instance section (measured 2026-11-25: 86 artefacts had
+        # a document while the resolver reported none).
+        meta = dict(subject.get("meta") or {})
+        fields = {
+            key: subject.get(key)
+            for key in (
+                "artifact_kind",
+                "artifact_type_id",
+                "phase_code",
+                "plateau",
+                "status",
+                "version",
+                "contract_id",
+            )
+            if subject.get(key) is not None
+        }
+        fields.update(meta)
+        return [{"kind": str(fields.get("artifact_kind") or "artifact"), **fields}]
     if name == "artifact_entries":
-        entries = (subject.get("meta") or {}).get("entries") or []
+        entries = (
+            subject.get("entries")
+            or (subject.get("meta") or {}).get("entries")
+            or []
+        )
         return [{"kind": "entry", **entry} for entry in entries if isinstance(entry, dict)]
     if name == "artifact_links":
         artifact_id = str(subject.get("id") or "")
@@ -1205,7 +1227,11 @@ def computed_rows(
             or str(link.get("to_artifact_id") or "") in owned
         ]
     if name == "artifact_document":
-        document_id = str((subject.get("meta") or {}).get("document_id") or "")
+        document_id = str(
+            subject.get("document_id")
+            or (subject.get("meta") or {}).get("document_id")
+            or ""
+        )
         if not document_id:
             return []
         return [

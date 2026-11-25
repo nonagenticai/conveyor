@@ -128,16 +128,16 @@
       "sha256": "88d8553c867117e73c52f163a91c5fb88c3afe778dcd6fb488d0c2d49e603232"
     },
     {
-      "bytes": 4587492,
+      "bytes": 4603910,
       "path": "standards.js",
       "records": 0,
-      "sha256": "4289205cc86a5d71d9921a27721893d19929af65d77bea023e40c3d36eaf8a77"
+      "sha256": "17cbb2442374dd404bf62534dbe3bf74da7a57b91cf950e46db243ffa62ab099"
     },
     {
-      "bytes": 4587463,
+      "bytes": 4603881,
       "path": "standards.json",
       "records": 0,
-      "sha256": "766add58254444c6262ecf264973104642fe67a444eb21017416487eccdf5f89"
+      "sha256": "0fde3e61e27d4d11434ae7899f91711fdaa3d452306cdc931e333eadfe341392"
     },
     {
       "bytes": 1600336,
