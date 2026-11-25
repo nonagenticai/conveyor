@@ -31,8 +31,16 @@ pub struct BindingCreateIn {
     /// The one-off run this grant belongs to.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub run_id: Option<Uuid>,
-    /// The published toolkit version to pin.
-    pub toolkit_id: Uuid,
+    /// The published toolkit version to pin. Exactly one of this and `toolkit_key`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub toolkit_id: Option<Uuid>,
+    /// The toolkit's callable prefix; the latest published version is pinned unless
+    /// `toolkit_version` names one. Exactly one of this and `toolkit_id`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub toolkit_key: Option<String>,
+    /// The semantic version to pin with `toolkit_key`; absent = the latest published version.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub toolkit_version: Option<i64>,
     /// The effect ceiling (default `read`); it may not exceed the toolkit's strongest tool.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub effect_ceiling: Option<String>,
@@ -56,6 +64,10 @@ pub struct BindingUpdateIn {
     /// The new credential alias; the empty string clears it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub credential_alias: Option<String>,
+    /// Clear the credential alias (the lane's explicit form; mutually exclusive with a
+    /// non-empty `credential_alias`).
+    #[serde(default)]
+    pub clear_credential_alias: bool,
     /// The new per-minute rate limit.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rate_limit_per_min: Option<i32>,
@@ -84,6 +96,10 @@ pub struct BindingOut {
     pub run_id: Option<Uuid>,
     /// The pinned toolkit version.
     pub toolkit_id: Uuid,
+    /// The toolkit's callable prefix.
+    pub toolkit_key: String,
+    /// The toolkit's semantic version.
+    pub toolkit_version: i64,
     /// The effect ceiling.
     pub effect_ceiling: String,
     /// The sealed credential alias.
@@ -112,6 +128,8 @@ fn out(row: &store::tool::BindingRow) -> BindingOut {
         job_binding_id: row.job_binding_id,
         run_id: row.run_id,
         toolkit_id: row.toolkit_id,
+        toolkit_key: row.toolkit_key.clone(),
+        toolkit_version: row.toolkit_version,
         effect_ceiling: row.effect_ceiling.clone(),
         credential_alias: row.credential_alias.clone(),
         rate_limit_per_min: row.rate_limit_per_min,
@@ -176,15 +194,43 @@ async fn tool_bindings_create(
             "the rate limit must be positive".to_owned(),
         ));
     }
-    let toolkit = store::tool::toolkit_by_id(&mut *tx, ctx.tenant, input.toolkit_id)
-        .await
-        .map_err(|error| {
-            tracing::error!(%error, "tool_bindings.create: read the toolkit");
-            ActionError::internal()
-        })?
-        .ok_or_else(|| ActionError::resource_not_found("toolkit"))?;
+    if input.toolkit_id.is_some() && input.toolkit_version.is_some() {
+        return Err(invalid(
+            "toolkit_version",
+            "toolkit_id",
+            "toolkit_version pins a toolkit_key; drop it when toolkit_id names the version"
+                .to_owned(),
+        ));
+    }
+    let toolkit = match (input.toolkit_id, input.toolkit_key.as_deref()) {
+        (Some(id), None) => store::tool::toolkit_by_id(&mut *tx, ctx.tenant, id).await,
+        (None, Some(key)) => match input.toolkit_version {
+            Some(version) => {
+                store::tool::toolkit_by_key_version(&mut *tx, ctx.tenant, key, version).await
+            }
+            None => store::tool::latest_toolkit(&mut *tx, ctx.tenant, key).await,
+        },
+        (Some(_), Some(_)) | (None, None) => {
+            return Err(invalid(
+                "toolkit",
+                "one_toolkit",
+                "name exactly one of toolkit_id or toolkit_key".to_owned(),
+            ));
+        }
+    }
+    .map_err(|error| {
+        tracing::error!(%error, "tool_bindings.create: read the toolkit");
+        ActionError::internal()
+    })?
+    .ok_or_else(|| ActionError::resource_not_found("toolkit"))?;
     if toolkit.status != "published" {
-        return Err(ActionError::resource_not_found("toolkit"));
+        // A toolkit that exists but is not published is a conflict, not a miss: the caller
+        // named a real key and the reason it cannot bind is its lifecycle state.
+        return Err(ActionError::new(
+            409,
+            "toolkit_not_published",
+            "the toolkit is not published".to_owned(),
+        ));
     }
     let tools = store::tool::tools_of(&mut *tx, ctx.tenant, toolkit.id)
         .await
@@ -296,10 +342,27 @@ async fn tool_bindings_update(
             "the rate limit must be positive".to_owned(),
         ));
     }
-    let credential = match input.credential_alias.as_deref() {
-        Some("") => None,
-        Some(value) => Some(value.to_owned()),
-        None => row.credential_alias.clone(),
+    if input.clear_credential_alias
+        && input
+            .credential_alias
+            .as_deref()
+            .is_some_and(|value| !value.is_empty())
+    {
+        return Err(invalid(
+            "credential_alias",
+            "one_alias",
+            "clear_credential_alias and a non-empty credential_alias are mutually exclusive"
+                .to_owned(),
+        ));
+    }
+    let credential = if input.clear_credential_alias {
+        None
+    } else {
+        match input.credential_alias.as_deref() {
+            Some("") => None,
+            Some(value) => Some(value.to_owned()),
+            None => row.credential_alias.clone(),
+        }
     };
     let updated = store::tool::update_binding(
         &mut *tx,

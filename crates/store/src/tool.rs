@@ -545,6 +545,8 @@ pub struct NewTool<'a> {
     pub input_schema: &'a Value,
     /// The closed output schema copied from the action.
     pub output_schema: &'a Value,
+    /// The write verification declaration (§11.3); `{}` on a non-writing tool.
+    pub verify: &'a Value,
     /// The effect class copied from the action.
     pub effect: &'a str,
     /// `required | optional | forbidden`.
@@ -650,8 +652,8 @@ pub async fn insert_tool(
 ) -> Result<Uuid, ToolStoreError> {
     let (id,): (Uuid,) = sqlx::query_as(
         "INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, output_schema, effect,
-                           idempotency, timeout_secs, redact, meta, handler_action, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'published')
+                           idempotency, timeout_secs, redact, meta, handler_action, verify, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'published')
          RETURNING id",
     )
     .bind(tenant.as_uuid())
@@ -665,6 +667,7 @@ pub async fn insert_tool(
     .bind(tool.redact)
     .bind(tool.meta)
     .bind(tool.handler_action)
+    .bind(tool.verify)
     .fetch_one(conn)
     .await?;
     Ok(id)
@@ -756,175 +759,6 @@ pub async fn reenable_probe_disabled(
     .await?
     .rows_affected();
     Ok(done)
-}
-
-/// One tool binding to insert (§11.1: the grant a job binding or a run holds).
-pub struct NewToolBinding<'a> {
-    /// The durable job binding this grant belongs to (one of the two targets).
-    pub job_binding_id: Option<Uuid>,
-    /// The single run this grant belongs to (one of the two targets).
-    pub run_id: Option<Uuid>,
-    /// The published toolkit version the grant pins.
-    pub toolkit_id: Uuid,
-    /// The ceiling the broker enforces; it narrows the tool's own effect.
-    pub effect_ceiling: &'a str,
-    /// The sealed tenant secret the broker opens for a credentialed destination.
-    pub credential_alias: Option<&'a str>,
-}
-
-/// Insert one tool binding and return its id.
-pub async fn insert_binding(
-    conn: &mut PgConnection,
-    tenant: TenantId,
-    binding: &NewToolBinding<'_>,
-) -> Result<Uuid, ToolStoreError> {
-    let (id,): (Uuid,) = sqlx::query_as(
-        "INSERT INTO tool_binding (tenant_id, job_binding_id, run_id, toolkit_id,
-                                   effect_ceiling, credential_alias)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         RETURNING id",
-    )
-    .bind(tenant.as_uuid())
-    .bind(binding.job_binding_id)
-    .bind(binding.run_id)
-    .bind(binding.toolkit_id)
-    .bind(binding.effect_ceiling)
-    .bind(binding.credential_alias)
-    .fetch_one(conn)
-    .await?;
-    Ok(id)
-}
-
-/// The fields an update may change. `None` leaves the column as it is; `Some(None)` clears
-/// the credential alias.
-pub struct ToolBindingPatch<'a> {
-    /// The new ceiling; it narrows, never raises.
-    pub effect_ceiling: Option<&'a str>,
-    /// `Some(alias)` sets it, `Some(None)` clears it, `None` leaves it.
-    pub credential_alias: Option<Option<&'a str>>,
-    /// Enable or disable the grant.
-    pub enabled: Option<bool>,
-}
-
-/// Apply a patch to one binding. Returns the number of rows changed (0 = not found).
-pub async fn update_binding(
-    conn: &mut PgConnection,
-    tenant: TenantId,
-    id: Uuid,
-    patch: &ToolBindingPatch<'_>,
-) -> Result<u64, ToolStoreError> {
-    let (alias_set, alias) = match patch.credential_alias {
-        Some(value) => (true, value),
-        None => (false, None),
-    };
-    let done = sqlx::query(
-        "UPDATE tool_binding
-            SET effect_ceiling = COALESCE($3, effect_ceiling),
-                credential_alias = CASE WHEN $4 THEN $5 ELSE credential_alias END,
-                enabled = COALESCE($6, enabled),
-                version = version + 1,
-                updated_at = now()
-          WHERE tenant_id = $1 AND id = $2",
-    )
-    .bind(tenant.as_uuid())
-    .bind(id)
-    .bind(patch.effect_ceiling)
-    .bind(alias_set)
-    .bind(alias)
-    .bind(patch.enabled)
-    .execute(conn)
-    .await?
-    .rows_affected();
-    Ok(done)
-}
-
-/// Retire one binding: new runs no longer resolve it, in-flight runs finish (§11.6).
-pub async fn retire_binding(
-    conn: &mut PgConnection,
-    tenant: TenantId,
-    id: Uuid,
-) -> Result<u64, ToolStoreError> {
-    let done = sqlx::query(
-        "UPDATE tool_binding
-            SET enabled = false, version = version + 1, updated_at = now()
-          WHERE tenant_id = $1 AND id = $2 AND enabled",
-    )
-    .bind(tenant.as_uuid())
-    .bind(id)
-    .execute(conn)
-    .await?
-    .rows_affected();
-    Ok(done)
-}
-
-/// One binding as a reader sees it.
-#[derive(Clone, Debug, sqlx::FromRow)]
-pub struct ToolBindingRecord {
-    /// The binding id.
-    pub id: Uuid,
-    /// The durable job binding, when this grant targets one.
-    pub job_binding_id: Option<Uuid>,
-    /// The run, when this grant targets one.
-    pub run_id: Option<Uuid>,
-    /// The toolkit version row.
-    pub toolkit_id: Uuid,
-    /// The toolkit key.
-    pub toolkit_key: String,
-    /// The toolkit's semantic version.
-    pub toolkit_version: i64,
-    /// The enforced ceiling.
-    pub effect_ceiling: String,
-    /// The sealed credential alias.
-    pub credential_alias: Option<String>,
-    /// Whether the broker resolves it.
-    pub enabled: bool,
-    /// The row lock.
-    pub version: i64,
-}
-
-/// One binding by id.
-pub async fn binding_by_id(
-    conn: &mut PgConnection,
-    tenant: TenantId,
-    id: Uuid,
-) -> Result<Option<ToolBindingRecord>, ToolStoreError> {
-    let row: Option<ToolBindingRecord> = sqlx::query_as(
-        "SELECT b.id, b.job_binding_id, b.run_id, b.toolkit_id, k.key AS toolkit_key,
-                k.toolkit_version, b.effect_ceiling, b.credential_alias, b.enabled, b.version
-           FROM tool_binding b
-           JOIN toolkit k ON k.id = b.toolkit_id AND k.tenant_id = b.tenant_id
-          WHERE b.tenant_id = $1 AND b.id = $2",
-    )
-    .bind(tenant.as_uuid())
-    .bind(id)
-    .fetch_optional(conn)
-    .await?;
-    Ok(row)
-}
-
-/// The bindings for one job binding, one run, or every binding when neither is named.
-pub async fn bindings_for(
-    conn: &mut PgConnection,
-    tenant: TenantId,
-    job_binding_id: Option<Uuid>,
-    run_id: Option<Uuid>,
-) -> Result<Vec<ToolBindingRecord>, ToolStoreError> {
-    let rows: Vec<ToolBindingRecord> = sqlx::query_as(
-        "SELECT b.id, b.job_binding_id, b.run_id, b.toolkit_id, k.key AS toolkit_key,
-                k.toolkit_version, b.effect_ceiling, b.credential_alias, b.enabled, b.version
-           FROM tool_binding b
-           JOIN toolkit k ON k.id = b.toolkit_id AND k.tenant_id = b.tenant_id
-          WHERE b.tenant_id = $1
-            AND ($2::uuid IS NULL OR b.job_binding_id = $2)
-            AND ($3::uuid IS NULL OR b.run_id = $3)
-          ORDER BY k.key, b.created_at",
-    )
-    .bind(tenant.as_uuid())
-    .bind(job_binding_id)
-    .bind(run_id)
-    .fetch_all(conn)
-    .await?;
-    Ok(rows)
 }
 
 /// One toolkit version by key and semantic version.
@@ -1027,6 +861,10 @@ pub struct BindingRow {
     pub run_id: Option<Uuid>,
     /// The pinned toolkit version.
     pub toolkit_id: Uuid,
+    /// The toolkit key (joined from `toolkit`).
+    pub toolkit_key: String,
+    /// The toolkit's semantic version (joined from `toolkit`).
+    pub toolkit_version: i64,
     /// `read | write | spend | destructive`.
     pub effect_ceiling: String,
     /// The sealed credential alias.
@@ -1064,12 +902,11 @@ pub async fn insert_binding(
     tenant: TenantId,
     binding: &NewBinding<'_>,
 ) -> Result<BindingRow, ToolStoreError> {
-    let row = sqlx::query_as(
+    let (id,): (Uuid,) = sqlx::query_as(
         "INSERT INTO tool_binding (tenant_id, job_binding_id, run_id, toolkit_id, effect_ceiling,
                                    credential_alias, rate_limit_per_min)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
-         RETURNING id, job_binding_id, run_id, toolkit_id, effect_ceiling, credential_alias,
-                   rate_limit_per_min, enabled, meta, version",
+         RETURNING id",
     )
     .bind(tenant.as_uuid())
     .bind(binding.job_binding_id)
@@ -1078,9 +915,11 @@ pub async fn insert_binding(
     .bind(binding.effect_ceiling)
     .bind(binding.credential_alias)
     .bind(binding.rate_limit_per_min)
-    .fetch_one(conn)
+    .fetch_one(&mut *conn)
     .await?;
-    Ok(row)
+    binding_by_id(conn, tenant, id)
+        .await?
+        .ok_or(ToolStoreError::Database(sqlx::Error::RowNotFound))
 }
 
 /// One binding by id, tenant-scoped.
@@ -1090,10 +929,12 @@ pub async fn binding_by_id(
     id: Uuid,
 ) -> Result<Option<BindingRow>, ToolStoreError> {
     let row = sqlx::query_as(
-        "SELECT id, job_binding_id, run_id, toolkit_id, effect_ceiling, credential_alias,
-                rate_limit_per_min, enabled, meta, version
-           FROM tool_binding
-          WHERE tenant_id = $1 AND id = $2",
+        "SELECT b.id, b.job_binding_id, b.run_id, b.toolkit_id, k.key AS toolkit_key,
+                k.toolkit_version, b.effect_ceiling, b.credential_alias,
+                b.rate_limit_per_min, b.enabled, b.meta, b.version
+           FROM tool_binding b
+           JOIN toolkit k ON k.id = b.toolkit_id AND k.tenant_id = b.tenant_id
+          WHERE b.tenant_id = $1 AND b.id = $2",
     )
     .bind(tenant.as_uuid())
     .bind(id)
@@ -1114,14 +955,16 @@ pub async fn bindings_list(
     limit: i64,
 ) -> Result<Vec<BindingRow>, ToolStoreError> {
     let rows = sqlx::query_as(
-        "SELECT id, job_binding_id, run_id, toolkit_id, effect_ceiling, credential_alias,
-                rate_limit_per_min, enabled, meta, version
-           FROM tool_binding
-          WHERE tenant_id = $1
-            AND ($2::uuid IS NULL OR job_binding_id = $2)
-            AND ($3::uuid IS NULL OR run_id = $3)
-            AND ($4::bool IS NULL OR enabled = $4)
-          ORDER BY created_at DESC, id DESC
+        "SELECT b.id, b.job_binding_id, b.run_id, b.toolkit_id, k.key AS toolkit_key,
+                k.toolkit_version, b.effect_ceiling, b.credential_alias,
+                b.rate_limit_per_min, b.enabled, b.meta, b.version
+           FROM tool_binding b
+           JOIN toolkit k ON k.id = b.toolkit_id AND k.tenant_id = b.tenant_id
+          WHERE b.tenant_id = $1
+            AND ($2::uuid IS NULL OR b.job_binding_id = $2)
+            AND ($3::uuid IS NULL OR b.run_id = $3)
+            AND ($4::bool IS NULL OR b.enabled = $4)
+          ORDER BY b.created_at DESC, b.id DESC
           LIMIT $5",
     )
     .bind(tenant.as_uuid())
@@ -1155,7 +998,7 @@ pub async fn update_binding(
     expected: i64,
     update: &BindingUpdate<'_>,
 ) -> Result<Option<BindingRow>, ToolStoreError> {
-    let row = sqlx::query_as(
+    let row: Option<(Uuid,)> = sqlx::query_as(
         "UPDATE tool_binding
             SET effect_ceiling = $4,
                 credential_alias = $5,
@@ -1164,8 +1007,7 @@ pub async fn update_binding(
                 version = version + 1,
                 updated_at = now()
           WHERE tenant_id = $1 AND id = $2 AND version = $3
-          RETURNING id, job_binding_id, run_id, toolkit_id, effect_ceiling, credential_alias,
-                    rate_limit_per_min, enabled, meta, version",
+          RETURNING id",
     )
     .bind(tenant.as_uuid())
     .bind(id)
@@ -1174,9 +1016,12 @@ pub async fn update_binding(
     .bind(update.credential_alias)
     .bind(update.rate_limit_per_min)
     .bind(update.enabled)
-    .fetch_optional(conn)
+    .fetch_optional(&mut *conn)
     .await?;
-    Ok(row)
+    match row {
+        Some((id,)) => binding_by_id(conn, tenant, id).await,
+        None => Ok(None),
+    }
 }
 
 /// Retire a binding at an expected version, recording the actor. `None` means stale or gone.
@@ -1187,23 +1032,25 @@ pub async fn retire_binding(
     expected: i64,
     actor: &str,
 ) -> Result<Option<BindingRow>, ToolStoreError> {
-    let row = sqlx::query_as(
+    let row: Option<(Uuid,)> = sqlx::query_as(
         "UPDATE tool_binding
             SET enabled = false,
                 meta = meta || jsonb_build_object('retired_by', $4::text),
                 version = version + 1,
                 updated_at = now()
           WHERE tenant_id = $1 AND id = $2 AND version = $3
-          RETURNING id, job_binding_id, run_id, toolkit_id, effect_ceiling, credential_alias,
-                    rate_limit_per_min, enabled, meta, version",
+          RETURNING id",
     )
     .bind(tenant.as_uuid())
     .bind(id)
     .bind(expected)
     .bind(actor)
-    .fetch_optional(conn)
+    .fetch_optional(&mut *conn)
     .await?;
-    Ok(row)
+    match row {
+        Some((id,)) => binding_by_id(conn, tenant, id).await,
+        None => Ok(None),
+    }
 }
 
 /// One published tool with its toolkit context.
