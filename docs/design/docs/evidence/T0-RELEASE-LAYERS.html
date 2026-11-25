@@ -25,11 +25,11 @@
     </header>
     <main class="doc-body"><h1 id="t0--the-release-compiles-the-knowledge-layers-receipt">T0 — the release compiles the knowledge layers: receipt</h1>
 <p>Issue #697 · branch <code>issue/697-s21-execution-loop</code> · ADR <code>0020-release-knowledge-layers</code> · CONTRACT §30 · S21 §23 P4 · migration <code>0074</code> · resolves rework <code>v1-w1a-2</code></p>
-<p><strong>State: built.</strong> Measured on 2026-11-24 at the code of <code>b7722710</code> (the suites at <code>54c51a63</code>), before the PR. The merge is the lane's last CI run; nothing here is claimed for <code>main</code> yet.</p>
+<p><strong>State: built.</strong> Measured at <code>8eef79ba</code> (the branch merged with <code>main@9ace4e81</code>) on 2026-11-25, before the PR. The merge is the lane's last CI run; nothing here is claimed for <code>main</code> yet.</p>
 <h2 id="what-changes-at-this-level">What changes at this level</h2>
 <p>Before: <code>compile_release_tx</code> built the release snapshot from <code>job_catalogue.definition</code>, the industry and the placement rows. No code read a knowledge layer, so an unresolved required kind could not stop a publish and two sibling departments could disagree silently; neither <code>release_not_ready</code> nor <code>department_conflict</code> existed anywhere under <code>crates/</code>.</p>
 <p>After: migration <code>0074</code> adds <code>organisation_layer</code> (base, industry, department archetype, each department in declared <code>ordinal</code>, job). The publish resolves each kind in that order, tightens <code>required</code> downward only, refuses <code>422 department_conflict</code> for disagreeing siblings unless a job-layer row resolves it, and refuses <code>409 release_not_ready</code> naming the kind and department when a required kind has no value. The snapshot carries every resolved value with its level and source key, sorted, so two identical publishes hash identically. <code>organisation_layers.set|list</code> author and read the rows; no new scope.</p>
-<h2 id="measured-suites-code-b7722710-suites-at-54c51a63">Measured suites (code <code>b7722710</code>, suites at <code>54c51a63</code>)</h2>
+<h2 id="measured-suites-exact-head-8eef79ba">Measured suites (exact head <code>8eef79ba</code>)</h2>
 <table>
 <thead>
 <tr>
@@ -48,7 +48,7 @@
 </tr>
 <tr>
 <td><code>crates/actions/tests/registry.rs</code></td>
-<td><strong>12 passed</strong> — 571 actions (552 internal, 19 external)</td>
+<td><strong>12 passed</strong> — 589 actions (565 internal, 24 external)</td>
 </tr>
 <tr>
 <td><code>clippy -D warnings</code> (store, actions; all targets) / <code>fmt --check</code></td>
@@ -60,7 +60,7 @@
 </tr>
 <tr>
 <td><code>served-spec.lock.json</code></td>
-<td><strong>602 operations</strong>, <code>--check-lock</code> exit 0</td>
+<td><strong>620 operations</strong>, <code>--check-lock</code> exit 0</td>
 </tr>
 <tr>
 <td>rework audit <code>--rework-check v1-w1a-2</code></td>

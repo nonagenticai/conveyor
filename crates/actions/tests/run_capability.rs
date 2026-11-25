@@ -157,8 +157,8 @@ async fn bind(
     let agent: Uuid = sqlx::query_scalar(
         // A generic executor, not a process agent (which must name its process).
         "INSERT INTO capability_agent
-             (tenant_id, capability_id, key, role, status, model_ref, allowed_actions)
-         VALUES ($1, $2, $3, 'tool_agent', $4, 'local-llm', $5) RETURNING id",
+             (tenant_id, capability_id, key, role, status, model_ref, prompt_ref, allowed_actions)
+         VALUES ($1, $2, $3, 'tool_agent', $4, 'local-llm', 'agent@1', $5) RETURNING id",
     )
     .bind(seeded.tenant_id)
     .bind(capability)

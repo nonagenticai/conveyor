@@ -8561,8 +8561,10 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
         // A process_agent must name its process (0035's CHECK); this anchor is a generic
         // executor, so it declares the tool-agent role.
         "INSERT INTO capability_agent
-             (tenant_id, capability_id, key, role, status, model_ref, max_iterations, timeout_secs)
-         VALUES ($1, $2, 'parity-anchor', 'tool_agent', 'active', 'claude-sonnet-5-5', 8, 300)
+             (tenant_id, capability_id, key, role, status, model_ref, prompt_ref, max_iterations,
+              timeout_secs)
+         VALUES ($1, $2, 'parity-anchor', 'tool_agent', 'active', 'claude-sonnet-5-5', 'agent@1',
+                 8, 300)
          RETURNING id",
     )
     .bind(seeded.tenant_id)
