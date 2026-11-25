@@ -5,92 +5,92 @@
       "bytes": 1822698,
       "path": "architecture.json",
       "records": 542,
-      "sha256": "c813449479c6d6a133879ede3acace0084a142d9ae8fbf237b51f4968c440394"
+      "sha256": "4bb1138af87ff1f20d904ec3eb9b92bd95c750c561ee31c8fc576513ef8c30aa"
     },
     {
       "bytes": 140714,
       "path": "artefacts.json",
       "records": 298,
-      "sha256": "366975d227d7f1af370161b8a4a94770f2461556db1a21c8ae462ab4d8e37114"
+      "sha256": "92f04414e61dafe21206462634363587f440c7e231723a5551431aa45c74d64d"
     },
     {
       "bytes": 1832917,
       "path": "config.json",
       "records": 2256,
-      "sha256": "618eb9d07614b8adafebd16d1e5613a33321b305b0c7ae580fd5932ec907160a"
+      "sha256": "a98ca90d57126192fb783558b63f494049e2e4352a7e2c8c5ea65a777192cfa2"
     },
     {
       "bytes": 109,
       "path": "evidence.json",
       "records": 0,
-      "sha256": "a1bf6701b94f69d523ca91d19ff7ea6515edf8312bbc63c431d6d63ae883387d"
+      "sha256": "9a2a18915e0ad9009b7f4d60b427b963e54615b614d1228289cc03b3c9f66ab0"
     },
     {
       "bytes": 110,
       "path": "feedback.json",
       "records": 0,
-      "sha256": "9e0383c99327c8227a61817b7507760ca057b8970c24badc7ded8248e785acc0"
+      "sha256": "b70a9a58ece8980e51f4761651a965eef941df284566618285adef57441542c4"
     },
     {
       "bytes": 4552,
       "path": "measure.json",
       "records": 0,
-      "sha256": "6b1b69665d9f6bdc8cabfa250dc2d77052f1b94fba1c880a80e84b85cacfc1e7"
+      "sha256": "e10e1acbbecc63c698a764c07f0951bb7c39289037a67edf8b8c0edcf089b17d"
     },
     {
       "bytes": 455648,
       "path": "msp.json",
       "records": 175,
-      "sha256": "891e737f7dc0ea8b96493c3d5e448eebece9c6f5af300af811a8fd7c520f944f"
+      "sha256": "e83674b3aebee9cd85d5f740d77b6ff4b2a367cc9ead5a5679eb02be511232f0"
     },
     {
       "bytes": 1031,
       "path": "ops.json",
       "records": 1,
-      "sha256": "1b07176719644e17255b9033b423925c70f4ca0c5839bb377b123d50fb5641a3"
+      "sha256": "c33c500c397bf5e8ed7e2e30fa1aeb57cbf92f06e71b29d8e6c0c4e120cb95c6"
     },
     {
       "bytes": 16712,
       "path": "organisation.json",
       "records": 34,
-      "sha256": "2f86569e3a30b47c8e5d7618dbbafa7aab7ab73b5172d1d092f06e29ba541643"
+      "sha256": "4b6319445595b7c9ddfabec237dea69ab1c5c5b1635fc065d3f8b19765b2502f"
     },
     {
       "bytes": 248720,
       "path": "programme.json",
       "records": 54,
-      "sha256": "90519658e629ef85192fb75204d5bce8fb99732bf4ec03d383f1ce9aa94770b6"
+      "sha256": "305d9ad14c9d6539684bc6f89a9ec9438afade7d2f0c446f8c68a7d89e4fdb0b"
     },
     {
-      "bytes": 1401809,
+      "bytes": 1402413,
       "path": "rework.json",
       "records": 429,
-      "sha256": "83597d4e394e927428569d9f2eb64b0c141f43a7477d0ab6f51126d6d779cda3"
+      "sha256": "120fd741b73310da5413e679093916024a0526f076066af7e905e076d1efe428"
     },
     {
       "bytes": 226,
       "path": "secrets.json",
       "records": 0,
-      "sha256": "acb70f8db85ff9205e5b67f8f538fcf161b1833233a934aaa184a5a56493072e"
+      "sha256": "7a34c601b733802d9e4e0d4d77a314828b2402fa1157322a16b6ccf350bb85a8"
     },
     {
-      "bytes": 5440604,
+      "bytes": 5441081,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "04a5aac4b215d1de9f2d51410c88541b136b2a1b54bf61f79b80f14cc4eb0e19"
+      "sha256": "2af1ad73df8bf1464d248109c64bc9a7db6f88054289cfe768863c64b52bb3bd"
     },
     {
       "bytes": 1601226,
       "path": "work.json",
       "records": 2634,
-      "sha256": "d219032f054d9621671c934a2f71b1c3ae868b02a7281f3d37deedae9512595c"
+      "sha256": "5e0da36bc2adddd519aeffc7b5b040895e232d3b171318ad9e1952f92b333f2c"
     }
   ],
-  "generated_at": "2026-11-25T11:14:11.890355316+00:00",
-  "git_sha": "15cc28b677a05892a41c88179a33ace87a7d2bb7",
+  "generated_at": "2026-11-25T11:25:19.603151696+00:00",
+  "git_sha": "bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df",
   "migration": {
-    "description": "meeting bindings",
-    "version": 73
+    "description": "organisation layers",
+    "version": 74
   },
   "redaction": "no secret values, no encryption key ids, no emails, no OIDC subjects, no session or licence tokens",
   "schema": "design-snapshot/v1",

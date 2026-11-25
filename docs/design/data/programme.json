@@ -1,6 +1,6 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-25T11:14:11.890355316+00:00",
+  "generated_at": "2026-11-25T11:25:19.603151696+00:00",
   "issue_registry": {
     "issues": [
       {
@@ -80,7 +80,7 @@
         "number": 726,
         "state": "OPEN",
         "title": "rework: strict conformance — the published closure records, the T19F deferral and a green strict publish",
-        "updatedAt": "2026-11-25T10:33:12Z",
+        "updatedAt": "2026-11-25T11:15:03Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/726"
       },
       {
@@ -450,7 +450,7 @@
         "number": 660,
         "state": "OPEN",
         "title": "conveyor-buildout — the SPEC_V2 programme",
-        "updatedAt": "2026-11-25T10:02:38Z",
+        "updatedAt": "2026-11-25T11:22:11Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/660"
       },
       {

@@ -1,11 +1,11 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `15cc28b677a05892a41c88179a33ace87a7d2bb7` generated `2026-11-25T11:14:11.890355316+00:00` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.dOYOK4XN32/data`.
+Snapshot: `bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df` generated `2026-11-25T11:25:19.603151696+00:00` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.GOOS58ge8M/data`.
 
 | Severity | Count |
 |---|---:|
 | P0 | 29 |
-| P1 | 132 |
+| P1 | 133 |
 | P2 | 37 |
 | P3 | 0 |
 
@@ -147,6 +147,7 @@ Snapshot: `15cc28b677a05892a41c88179a33ace87a7d2bb7` generated `2026-11-25T11:14
 | `project_in_unauthorised_tranche` | `T14` | P1 | project is active in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T18` | P1 | project is active in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T19F` | P1 | project is active in tranche 6 whose state is 'planned' |
+| `seed_live_drift` | `S21` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T14` | P1 | seed status 'closed' != live status 'active' |
 | `unpublished_declared_output` | `S04` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S05` | P1 | declared outputs are not published: project-brief |
@@ -209,7 +210,7 @@ Snapshot: `15cc28b677a05892a41c88179a33ace87a7d2bb7` generated `2026-11-25T11:14
 | S18 | active | 9 | 0 | 3 | 1 | 0 |
 | S19 | active | 8 | 0 | 3 | 1 | 0 |
 | S20 | closed | 9 | 1 | 4 | 0 | 0 |
-| S21 | active | 9 | 0 | 3 | 1 | 0 |
+| S21 | active | 9 | 0 | 4 | 1 | 0 |
 | SPEC-V2 | active | 0 | 0 | 0 | 0 | 0 |
 | T0 | closed | 0 | 0 | 1 | 0 | 0 |
 | T1 | closed | 1 | 0 | 2 | 2 | 0 |

@@ -1210,6 +1210,15 @@
     },
     {
       "rule": "seed_live_drift",
+      "subject": "S21",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "the seed derives `closed` from S21's closed unit issues (#713 closed the execution level), while the live row stays `active`: closing a project in planned tranche 9 manufactures a tranche P0, and the synchronisation waits on the tranche-9 authorisation (#526 chain) or a seed install"
+    },
+    {
+      "rule": "seed_live_drift",
       "subject": "T14",
       "severity": "P1",
       "disposition": "rework",

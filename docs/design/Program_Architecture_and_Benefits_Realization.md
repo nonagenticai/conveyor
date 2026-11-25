@@ -246,15 +246,15 @@ records, not waivers:
 - the baseline's severity for the five closed projects' tranche gaps moved to **P0** (they closed
   before their tranches were authorised — still #526's chain), and eight resolved entries
   (S18/S21/SPEC-V2 closure records; T5/T6/T8 seed drift) were removed;
-- one further time-boxed entry accepts a **seed/live drift** that the registry refresh surfaced:
-  T14's seed derives `closed` from its closed unit issues while the live row stays `active`;
-  closing it in planned tranche 13 would manufacture a tranche P0, so the synchronisation waits on
-  the tranche-13 authorisation (#526 chain) or a seed install;
+- two further time-boxed entries accept **seed/live drifts** that the registry refresh surfaced:
+  T14's and S21's seeds derive `closed` from their closed unit issues while the live rows stay
+  `active`; closing them in planned tranches 13 and 9 would manufacture tranche P0s, so each
+  synchronisation waits on its tranche's authorisation (#526 chain) or a seed install;
 - `scripts/programme_state.py` honours a declared `closure_deferred_to_tranche`, so T19F's
   deferred closure keeps it active instead of deriving `closed` from its closed issues, and
   `seed/programme-definition.json` carries the declaration.
 
-The strict set is 161 P0/P1 gaps (29 P0, 132 P1): each is either fixed or an accepted, owned and
+The strict set is 162 P0/P1 gaps (29 P0, 133 P1): each is either fixed or an accepted, owned and
 expiring ledger entry. No tranche is authorised by this record.
 
 ## 7. What this study does not claim

@@ -1,6 +1,6 @@
 window.CONVEYOR_REWORK = {
-  "generated_at": "2026-11-25T11:14:00.550226488+00:00",
-  "git_sha": "15cc28b677a05892a41c88179a33ace87a7d2bb7",
+  "generated_at": "2026-11-25T11:25:08.159569651+00:00",
+  "git_sha": "bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df",
   "packages": [
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T16",
@@ -8369,7 +8369,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 1,
+        "entries": 2,
         "owners": [
           "programme owner"
         ]
@@ -8392,6 +8392,7 @@ window.CONVEYOR_REWORK = {
           "rule": "seed_live_drift",
           "source": "snapshot",
           "subjects": [
+            "S21",
             "T14"
           ]
         }
@@ -8404,8 +8405,18 @@ window.CONVEYOR_REWORK = {
       "spec": "§5.3",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 1,
+      "subject_count": 2,
       "subjects": [
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "the seed derives `closed` from S21's closed unit issues (#713 closed the execution level), while the live row stays `active`: closing a project in planned tranche 9 manufactures a tranche P0, and the synchronisation waits on the tranche-9 authorisation (#526 chain) or a seed install",
+          "severity": "P1",
+          "subject": "S21"
+        },
         {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
@@ -41480,9 +41491,9 @@ window.CONVEYOR_REWORK = {
     },
     "SPEC": {
       "findings": 80,
-      "gaps": 15,
+      "gaps": 16,
       "p0": 0,
-      "p1": 1,
+      "p1": 2,
       "p2": 14,
       "packages": 92,
       "rules": 8,
@@ -41503,7 +41514,7 @@ window.CONVEYOR_REWORK = {
       "suppressed": 0
     }
   },
-  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.dOYOK4XN32/data",
+  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.GOOS58ge8M/data",
   "summary": {
     "by_severity": {
       "P0": 27,
@@ -41525,7 +41536,7 @@ window.CONVEYOR_REWORK = {
     "open": 427,
     "packages": 429,
     "resolved": 20,
-    "subjects": 537,
+    "subjects": 538,
     "suppressed": 2
   }
 };
