@@ -28,6 +28,7 @@ import fcntl
 import hashlib
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -484,6 +485,26 @@ def issue_states(snapshot: Path) -> dict[int, str]:
     return states
 
 
+def manifest_status(key: str) -> str | None:
+    """The acceptance manifest's pinned target status for `<KEY>-project`, when it has one.
+
+    The project's acceptance is the authored statement of what closing it means; a manifest
+    that pins `active` holds the project open whatever the pack's closure content says
+    (measured: S05, held open until its six gate properties execute), and one that pins
+    `closed` requires the pack to supply closure content.
+    """
+    path = ROOT / "acceptance" / "programme" / f"{key}.toml"
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8")
+    match = re.search(
+        r'\[\[check\]\]\s*id\s*=\s*"' + re.escape(key) + r'-project".*?status\s*=\s*"(\w+)"',
+        text,
+        re.S,
+    )
+    return match.group(1) if match else None
+
+
 def closes_project(project: dict, states: dict[int, str], content: dict | None) -> bool:
     """The pack declares the close; every linked issue must be closed.
 
@@ -493,8 +514,14 @@ def closes_project(project: dict, states: dict[int, str], content: dict | None) 
     project that must close once green, and the checker refused the authored pack. The pack
     states this tranche's intent — closure and closure_review present — and an open linked
     issue vetoes it. `meta.issues` lists numbers, not states, so the registry at the
-    snapshot's sha supplies the states.
+    snapshot's sha supplies the states. A manifest that pins `<KEY>-project`'s status wins.
     """
+    key = str(project.get("key") or "")
+    pinned = manifest_status(key)
+    if pinned == "active":
+        return False
+    if pinned in {"closed", "archived"}:
+        return True
     if not content or not content.get("closure") or not content.get("closure_review"):
         return False
     numbers = (project.get("meta") or {}).get("issues") or []
