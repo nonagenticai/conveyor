@@ -1507,7 +1507,7 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           15,
           581,
@@ -1517,9 +1517,10 @@
           624,
           649,
           656,
-          697
+          697,
+          734
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2787,8 +2788,8 @@
       },
       "total": 51,
       "uncovered": [],
-      "with_open_units": 12,
-      "without_open_units": 39
+      "with_open_units": 13,
+      "without_open_units": 38
     },
     "screens": {
       "actions_invoked": 39,
