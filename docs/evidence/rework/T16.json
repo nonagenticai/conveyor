@@ -12,7 +12,7 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "baseline 01a20fba-df15-7458-ab75-f0fa0e4ae6f1 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "detail": "baseline 01a20e7e-814e-761e-8176-6750e2a6eefc approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "T16-baseline",
       "kind": "snapshot",
       "result": "pass",
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a20fba-e8ac-787e-ace6-bb006dfda771 decided by a distinct approver",
+      "detail": "latest closure gate 01a20e7e-8b26-77fd-ac15-57c255a9c6e1 decided by a distinct approver",
       "id": "T16-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -124,7 +124,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a20fba-ccfe-7e9a-81f3-c8e89cf78ac9 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
       "id": "T16-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "12 mandatory artefact package(s) open: std-togaf-phase-g-t16-g:T16, std-pmp-project-baseline-t16:T16, std-pmp-project-registers-t16:T16, std-togaf-architecture-artifact-instance-01a20fba-eace-7a14-85c0-000ac94b2048:T16, std-togaf-architecture-artifact-instance-01a20fba-ec38-7155-b991-8f06f741913c:T16, std-togaf-architecture-artifact-instance-01a20fba-ed9a-7f66-ab4a-fb4ba7314f01:T16, std-togaf-architecture-artifact-instance-01a20fba-eefe-7703-b3e1-f48774cc6436:T16, std-togaf-architecture-artifact-instance-01a20fba-f063-7d41-9c9d-ad0c1cecf384:T16, +4 more",
+      "detail": "13 mandatory artefact package(s) open: contract_missing:T16, std-togaf-phase-g-t16-g:T16, std-pmp-project-baseline-t16:T16, std-pmp-project-registers-t16:T16, std-togaf-architecture-artifact-instance-01a20e7e-8d5e-74e7-b24d-c95826f683ff:T16, std-togaf-architecture-artifact-instance-01a20e7e-8ed2-758f-aba3-473310bcc527:T16, std-togaf-architecture-artifact-instance-01a20e7e-9045-71a3-83bd-9f1c82abd8c0:T16, std-togaf-architecture-artifact-instance-01a20e7e-91b5-7ba6-9ffc-922428588752:T16, +5 more",
       "id": "T16-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -151,7 +151,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): std-togaf-phase-g-t16-g:T16 (P1)",
+      "detail": "3 unresolved P0/P1 package(s): seed_live_drift:T16 (P1), contract_missing:T16 (P1), std-togaf-phase-g-t16-g:T16 (P1)",
       "id": "T16-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -170,21 +170,21 @@
   "failures": [
     "T16-contract (P0): no live board-approved delivery contract",
     "T16-review (P0): no Phase-G compliance review for the project's live contract",
-    "T16-artefact-standard (P1): 12 mandatory artefact package(s) open: std-togaf-phase-g-t16-g:T16, std-pmp-project-baseline-t16:T16, std-pmp-project-registers-t16:T16, std-togaf-architecture-artifact-instance-01a20fba-eace-7a14-85c0-000ac94b2048:T16, std-togaf-architecture-artifact-instance-01a20fba-ec38-7155-b991-8f06f741913c:T16, std-togaf-architecture-artifact-instance-01a20fba-ed9a-7f66-ab4a-fb4ba7314f01:T16, std-togaf-architecture-artifact-instance-01a20fba-eefe-7703-b3e1-f48774cc6436:T16, std-togaf-architecture-artifact-instance-01a20fba-f063-7d41-9c9d-ad0c1cecf384:T16, +4 more",
-    "T16-rework (P0): 1 unresolved P0/P1 package(s): std-togaf-phase-g-t16-g:T16 (P1)",
+    "T16-artefact-standard (P1): 13 mandatory artefact package(s) open: contract_missing:T16, std-togaf-phase-g-t16-g:T16, std-pmp-project-baseline-t16:T16, std-pmp-project-registers-t16:T16, std-togaf-architecture-artifact-instance-01a20e7e-8d5e-74e7-b24d-c95826f683ff:T16, std-togaf-architecture-artifact-instance-01a20e7e-8ed2-758f-aba3-473310bcc527:T16, std-togaf-architecture-artifact-instance-01a20e7e-9045-71a3-83bd-9f1c82abd8c0:T16, std-togaf-architecture-artifact-instance-01a20e7e-91b5-7ba6-9ffc-922428588752:T16, +5 more",
+    "T16-rework (P0): 3 unresolved P0/P1 package(s): seed_live_drift:T16 (P1), contract_missing:T16 (P1), std-togaf-phase-g-t16-g:T16 (P1)",
     "gate (P0): the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-artefact-standard' did not pass; the gate check 'T16-rework' did not pass"
   ],
   "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds",
-  "generated_at": "2026-11-24T22:51:48.836763+00:00",
+  "generated_at": "2026-11-25T07:24:25.859274+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T16.toml",
   "name": "SOP, RDF/OWL and process-document ingestion",
   "project": "T16",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:44:10.403624+00:00",
-    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
-    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
+    "generated_at": "2026-11-24T22:54:29.947376+00:00",
+    "git_sha": "f726f48a3830c4682f4baba14dd09a91c5f26b7e",
+    "path": "retained-snapshot/f726f48a3830c4682f4baba14dd09a91c5f26b7e"
   },
   "verdict": "red",
   "warnings": []

@@ -3,50 +3,50 @@
     {
       "check": "project",
       "description": "S05 is active \u2014 reworked to the record set, held open until its six gate properties execute",
-      "detail": "status is 'closed', expected 'active'",
+      "detail": "project S05 is active",
       "id": "S05-project",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "no project baseline",
+      "detail": "baseline 01a20ec8-1ee4-766c-8dbe-9e1cd474cc3c approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "S05-baseline",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d29-796d-967b-1e819a4dd40a\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "S05-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "",
       "stdout": ""
     },
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "no live board-approved delivery contract",
+      "detail": "contract 01a20ec8-11ee-7fb4-b2b5-a4df9c410145 approved by board decision 01a20ec8-1284-7090-942c-2430824fb5eb about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "S05-contract",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "no Phase-G compliance review for the project's live contract",
+      "detail": "review 01a20ec8-2b71-7099-8ad0-5d0d5ecdd053 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "S05-review",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -88,7 +88,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a20fba-ccfe-7e9a-81f3-c8e89cf78ac9 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
       "id": "S05-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -97,34 +97,34 @@
     {
       "check": "wsjf",
       "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
-      "detail": "no WBS deliverable carries the plan",
+      "detail": "1 WBS node(s) carry the four WSJF inputs",
       "id": "S05-wsjf",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "demo_credits",
       "description": "every accepted deliverable has a demo credit carrying its evidence",
-      "detail": "no accepted deliverable to demo",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
       "id": "S05-demo-credits",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "2 open P0 package(s): std-pmp-change-control-s05:S05, std-pmp-project-baseline-s05:S05",
+      "detail": "no open P0 package for this project",
       "id": "S05-product",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "7 mandatory artefact package(s) open: std-pmp-change-control-s05:S05, std-pmp-project-baseline-s05:S05, closed_without_closure_review:S05, std-pmp-project-wbs-s05:S05, std-togaf-delivery-contract-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-compliance-review-s05:S05",
+      "detail": "15 mandatory artefact package(s) open: std-togaf-phase-g-s05-g:S05, std-pmp-project-baseline-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-architecture-artifact-instance-01a20ec8-1479-7d97-8c92-428ed9ea0b6f:S05, std-togaf-architecture-artifact-instance-01a20ec8-15b2-7709-b738-34a9e7488ef6:S05, std-togaf-architecture-artifact-instance-01a20ec8-16d8-76aa-8be3-d675f9691ee2:S05, std-togaf-architecture-artifact-instance-01a20ec8-1813-72f9-9ed8-89dff7f44d4a:S05, std-togaf-architecture-artifact-instance-01a20ec8-195c-753b-9f09-3e2b224a6e8e:S05, +7 more",
       "id": "S05-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -133,7 +133,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "6 unresolved P0/P1 package(s): std-pmp-change-control-s05:S05 (P0), std-pmp-project-baseline-s05:S05 (P0), closed_without_closure_review:S05 (P1), std-pmp-project-wbs-s05:S05 (P1), v1-s05-1:S05 (P1), std-togaf-delivery-contract-s05:S05 (P1)",
+      "detail": "3 unresolved P0/P1 package(s): seed_live_drift:S05 (P1), v1-s05-1:S05 (P1), std-togaf-phase-g-s05-g:S05 (P1)",
       "id": "S05-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -142,47 +142,29 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S05-project' did not pass; the gate check 'S05-baseline' did not pass; the gate check 'S05-charter' did not pass; the gate check 'S05-contract' did not pass; the gate check 'S05-review' did not pass; the gate check 'S05-wsjf' did not pass; the gate check 'S05-demo-credits' did not pass; the gate check 'S05-product' did not pass; the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass",
+      "detail": "the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
       "result": "fail",
       "severity": "P0"
     }
   ],
   "failures": [
-    "S05-project (P0): status is 'closed', expected 'active'",
-    "S05-baseline (P0): no project baseline",
-    "S05-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-    "S05-contract (P0): no live board-approved delivery contract",
-    "S05-review (P0): no Phase-G compliance review for the project's live contract",
-    "S05-wsjf (P0): no WBS deliverable carries the plan",
-    "S05-demo-credits (P0): no accepted deliverable to demo",
-    "S05-product (P0): 2 open P0 package(s): std-pmp-change-control-s05:S05, std-pmp-project-baseline-s05:S05",
-    "S05-artefact-standard (P1): 7 mandatory artefact package(s) open: std-pmp-change-control-s05:S05, std-pmp-project-baseline-s05:S05, closed_without_closure_review:S05, std-pmp-project-wbs-s05:S05, std-togaf-delivery-contract-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-compliance-review-s05:S05",
-    "S05-rework (P0): 6 unresolved P0/P1 package(s): std-pmp-change-control-s05:S05 (P0), std-pmp-project-baseline-s05:S05 (P0), closed_without_closure_review:S05 (P1), std-pmp-project-wbs-s05:S05 (P1), v1-s05-1:S05 (P1), std-togaf-delivery-contract-s05:S05 (P1)",
-    "gate (P0): the gate check 'S05-project' did not pass; the gate check 'S05-baseline' did not pass; the gate check 'S05-charter' did not pass; the gate check 'S05-contract' did not pass; the gate check 'S05-review' did not pass; the gate check 'S05-wsjf' did not pass; the gate check 'S05-demo-credits' did not pass; the gate check 'S05-product' did not pass; the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
+    "S05-artefact-standard (P1): 15 mandatory artefact package(s) open: std-togaf-phase-g-s05-g:S05, std-pmp-project-baseline-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-architecture-artifact-instance-01a20ec8-1479-7d97-8c92-428ed9ea0b6f:S05, std-togaf-architecture-artifact-instance-01a20ec8-15b2-7709-b738-34a9e7488ef6:S05, std-togaf-architecture-artifact-instance-01a20ec8-16d8-76aa-8be3-d675f9691ee2:S05, std-togaf-architecture-artifact-instance-01a20ec8-1813-72f9-9ed8-89dff7f44d4a:S05, std-togaf-architecture-artifact-instance-01a20ec8-195c-753b-9f09-3e2b224a6e8e:S05, +7 more",
+    "S05-rework (P0): 3 unresolved P0/P1 package(s): seed_live_drift:S05 (P1), v1-s05-1:S05 (P1), std-togaf-phase-g-s05-g:S05 (P1)",
+    "gate (P0): the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass"
   ],
   "gate": "replay a board export, win a two-client race and survive the 1k-card load \u2014 zero deltas on 1,000 cards, one 200 and one 412 with the current representation, p95 \u2264 120 ms at 20 rps, the exact webhook shape, SSE within 200 ms, and no second store",
-  "generated_at": "2026-11-24T22:51:44.854675+00:00",
+  "generated_at": "2026-11-25T07:23:21.230625+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S05.toml",
   "name": "Board \u2014 projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
   "project": "S05",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:44:10.403624+00:00",
-    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
-    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
+    "generated_at": "2026-11-24T22:54:29.947376+00:00",
+    "git_sha": "f726f48a3830c4682f4baba14dd09a91c5f26b7e",
+    "path": "retained-snapshot/f726f48a3830c4682f4baba14dd09a91c5f26b7e"
   },
   "verdict": "red",
   "warnings": []

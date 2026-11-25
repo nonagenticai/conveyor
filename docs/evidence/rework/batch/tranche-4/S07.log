@@ -1,0 +1,13 @@
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S07
+
+
+usage: publish-artefact-bodies.py [-h] [--standard STANDARD]
+                                  [--snapshot SNAPSHOT]
+                                  [--outputs-dir OUTPUTS_DIR]
+                                  [--category CATEGORY] [--project PROJECT]
+                                  [--all-projects] [--all] [--check]
+                                  [--dry-run] [--apply] [--republish-stale]
+                                  [--local-bin LOCAL_BIN]
+                                  [--actor-id ACTOR_ID] [--journal JOURNAL]
+                                  [--bodies-out BODIES_OUT] [--self-test]
+publish-artefact-bodies.py: error: --snapshot DIR is required

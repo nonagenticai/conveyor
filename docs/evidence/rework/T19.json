@@ -124,7 +124,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a20fba-ccfe-7e9a-81f3-c8e89cf78ac9 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
       "id": "T19-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -189,16 +189,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "the meeting is a card plus a typed record: an agenda item that decides names one approval, each qualifying seat records one position, close_item derives the item's outcome by arithmetic over the positions and the linked approval's stricter policy (quorum, required departments, dual control, evidence, conflict exclusion), an observer never counts, a human who requested the gate is always excluded (P4), a quorum miss defers with reason inquorate, an item with no outcome cannot close, and no transcript or chat is a decision; the eight meetings suites and the web room spec pass",
-  "generated_at": "2026-11-24T22:51:49.278438+00:00",
+  "generated_at": "2026-11-25T07:24:36.091149+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T19.toml",
   "name": "Decision forums (meetings)",
   "project": "T19",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:44:10.403624+00:00",
-    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
-    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
+    "generated_at": "2026-11-24T22:54:29.947376+00:00",
+    "git_sha": "f726f48a3830c4682f4baba14dd09a91c5f26b7e",
+    "path": "retained-snapshot/f726f48a3830c4682f4baba14dd09a91c5f26b7e"
   },
   "verdict": "red",
   "warnings": []

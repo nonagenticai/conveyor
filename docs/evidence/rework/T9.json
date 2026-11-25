@@ -173,7 +173,7 @@
     "gate (P0): the gate check 'T9-artefact-standard' did not pass; the gate check 'T9-rework' did not pass"
   ],
   "gate": "an architecture project passes Preliminary and A\u2013F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata",
-  "generated_at": "2026-11-25T07:14:30.610075+00:00",
+  "generated_at": "2026-11-25T07:24:46.945475+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T9.toml",
   "name": "TOGAF ADM capability",
