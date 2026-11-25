@@ -334,7 +334,7 @@
       "tranche": 0,
       "units": {
         "blocked": 0,
-        "claimed": 4,
+        "claimed": 2,
         "numbers": [
           16,
           17,
@@ -350,24 +350,20 @@
           95,
           102,
           193,
-          222,
           223,
-          224,
           225,
           395,
           435,
           476,
           526,
           569,
-          572,
           660,
           669,
-          681,
-          693,
-          716
+          726,
+          733
         ],
-        "open": 17,
-        "ready": 8,
+        "open": 13,
+        "ready": 6,
         "unknown": 0
       }
     },
@@ -1488,16 +1484,16 @@
       "key": "S21",
       "measured": {
         "actions": [
-          10,
-          10
+          12,
+          12
         ],
         "modules": [
           4,
           4
         ],
         "tables": [
-          4,
-          4
+          5,
+          5
         ]
       },
       "name": "Message construction (the compiled prompt)",
@@ -1511,7 +1507,7 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           15,
           581,
@@ -1523,7 +1519,7 @@
           656,
           697
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -1826,7 +1822,7 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           76,
           556,
@@ -1834,7 +1830,7 @@
           630
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1877,7 +1873,7 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           83,
           558,
@@ -1885,7 +1881,7 @@
           561,
           688
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2169,7 +2165,8 @@
         "numbers": [
           682,
           683,
-          684
+          684,
+          722
         ],
         "open": 0,
         "ready": 0,
@@ -2790,8 +2787,8 @@
       },
       "total": 51,
       "uncovered": [],
-      "with_open_units": 14,
-      "without_open_units": 37
+      "with_open_units": 12,
+      "without_open_units": 39
     },
     "screens": {
       "actions_invoked": 39,

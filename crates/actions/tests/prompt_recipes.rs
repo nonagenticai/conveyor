@@ -363,3 +363,118 @@ async fn a_selector_is_validated_for_its_source_and_unknown_members_are_refused(
         .await;
     assert_eq!(status, 422, "{response}");
 }
+
+// ── S21 step 11 (issue #697): the recipe's character ceiling is authored, not raw SQL ──────
+
+/// One literal-only recipe body with a whole-prompt ceiling.
+fn budget_recipe(key: &str, budget: Option<i64>) -> Value {
+    let mut body = json!({
+        "key": key,
+        "title": "Budgeted recipe",
+        "sections": [{
+            "position": 1,
+            "source_kind": "system",
+            "required": true,
+            "template": "You audit prompts."
+        }]
+    });
+    if let Some(budget) = budget {
+        body["budget_chars"] = json!(budget);
+    }
+    body
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_recipe_budget_is_written_and_refuses_measured() {
+    let (pg, running, seeded) = fixture().await;
+
+    let created = create(&running, budget_recipe("p3_tight", Some(5))).await;
+    assert_eq!(
+        output(&created)["budget_chars"],
+        json!(5),
+        "the ceiling is on the created version: {created}"
+    );
+    let (status, body) = running
+        .invoke(
+            "prompt_recipes.activate",
+            TOKEN,
+            json!({"key": "p3_tight", "version": 1}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+
+    let refused = compile_for_audit(&pg.runtime, seeded.tenant, "p3_tight@1")
+        .await
+        .expect_err("the authored ceiling refuses with the measured size");
+    match refused {
+        PromptError::BudgetExceeded {
+            limit, measured, ..
+        } => {
+            assert_eq!(limit, 5);
+            assert!(
+                measured > limit,
+                "measured {measured} over a ceiling of {limit}"
+            );
+        }
+        other => panic!("expected BudgetExceeded, got {other:?}"),
+    }
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_new_version_changes_the_ceiling() {
+    let (pg, running, seeded) = fixture().await;
+    let created = create(&running, budget_recipe("p3_raise", Some(5))).await;
+    assert_eq!(output(&created)["budget_chars"], json!(5));
+    // One draft per key (migration 0062): the tight version is activated before the next is
+    // authored, and the new version then replaces it on activation.
+    let (status, body) = running
+        .invoke(
+            "prompt_recipes.activate",
+            TOKEN,
+            json!({"key": "p3_raise", "version": 1}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let created = create(&running, budget_recipe("p3_raise", Some(10_000))).await;
+    assert_eq!(
+        output(&created)["version"],
+        json!(2),
+        "a create is the next version: {created}"
+    );
+    let (status, body) = running
+        .invoke(
+            "prompt_recipes.activate",
+            TOKEN,
+            json!({"key": "p3_raise", "version": 2}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let compiled = compile_for_audit(&pg.runtime, seeded.tenant, "p3_raise@2")
+        .await
+        .expect("the raised ceiling compiles");
+    assert!(compiled.text.contains("You audit prompts."));
+    assert_eq!(
+        compiled.sha256.len(),
+        64,
+        "the compiled identity is a sha256"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_zero_budget_is_refused() {
+    let (_pg, running, _seeded) = fixture().await;
+    let recipe = budget_recipe("p3_zero", Some(0));
+    let (status, body) = running
+        .invoke("prompt_recipes.create", TOKEN, recipe, None, None, None)
+        .await;
+    assert_eq!(status, 422, "a ceiling of 0 is not a ceiling: {body}");
+}

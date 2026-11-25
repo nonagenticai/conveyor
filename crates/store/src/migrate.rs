@@ -338,9 +338,12 @@ mod tests {
                 // #557: the per-tool verification declaration (0072_tool_meta.sql, SPEC_V2 §11.3).
                 (72, "tool meta".to_owned()),
                 (73, "meeting bindings".to_owned()),
+                // S21 step 11 (#697): the release knowledge layers the compiler resolves
+                // (0074_organisation_layers.sql, SPEC_V2 §4.1).
+                (74, "organisation layers".to_owned()),
                 // T18-3c (#630): the run pins the executor kind it was created with
-                // (0074_run_executor_kind.sql, SPEC_V2 §10.5.2).
-                (74, "run executor kind".to_owned())
+                // (0075_run_executor_kind.sql, SPEC_V2 §10.5.2).
+                (75, "run executor kind".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

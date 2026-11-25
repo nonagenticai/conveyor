@@ -344,6 +344,7 @@ jobs:
           docs/design/scripts/publish-standards.sh --check
           bash scripts/ci/tests/standards_pack.sh
           bash scripts/ci/tests/publish_audit.sh
+          bash scripts/ci/tests/build_docs_preserve.sh
           python3 scripts/ci/board.py --self-test
           node docs/design/scripts/check-coverage.cjs --self-test
           node docs/design/scripts/check-data.cjs

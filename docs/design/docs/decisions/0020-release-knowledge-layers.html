@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0020 — The release compiles the knowledge layers · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0020-release-knowledge-layers.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0020--the-release-compiles-the-knowledge-layers">0020 — The release compiles the knowledge layers</h1>
+<p>Status: Accepted · Date: 2026-11-24 · Issue: #697 · Resolves: S21 §23 P4, rework <code>v1-w1a-2</code>; implements SPEC_V2 §4.1, §4.2</p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><p><strong>One table holds every layer.</strong> Migration <code>0074</code> adds <code>organisation_layer</code>: <code>tenant_id</code>, <code>level ∈ base | industry | department_archetype | department | job</code>, exactly one scope column per level (<code>industry_id</code>, <code>department_id</code> or <code>job_id</code>, enforced by a CHECK), <code>kind</code>, <code>value</code> (jsonb), <code>required</code> (bool), <code>version</code>, timestamps, RLS enabled and forced. One live row per <code>(tenant, level, scope, kind)</code>; a change is a version bump, never a second row. There is no second catalogue and no imported manifest — §4.1 makes the conveyor's own tables the catalogue.</p></li>
+<li><p><strong>Resolution is the declared order, later wins.</strong> <code>compile_release_tx</code> reads the placement and resolves each kind through base → industry → department archetype → each department in its declared <code>ordinal</code> → job. The last layer that sets a kind provides the value; the snapshot records that value's level and scope key alongside it.</p></li>
+<li><p><strong><code>required</code> tightens downward only.</strong> A kind is required if any layer in the path declares it required; a lower layer may require what an ancestor left optional, never the reverse. The resolved <code>required</code> flag is part of the snapshot.</p></li>
+<li><p><strong>Sibling departments must agree, or the job resolves it.</strong> Two departments in the same placement setting one kind to different values is <code>422 department_conflict</code>, naming the kind and the departments — unless a job-layer row sets that kind, which resolves the conflict at the top of the path. The rule is evaluated during publish, before any row is written.</p></li>
+<li><p><strong>A required kind with no resolvable value refuses the publish.</strong> <code>409 release_not_ready</code> names the kind and the department whose path is short. It is a refusal to publish, never a published release with a hole; the release row is not written.</p></li>
+<li><p><strong>The snapshot names every value's source, deterministically.</strong> The compiled snapshot carries a <code>layers</code> member: one entry per resolved kind with <code>value</code>, <code>required</code>, <code>level</code> and <code>source_key</code>, sorted by kind. The release hash is the canonical hash of that snapshot, so two identical publishes are byte-for-byte identical and a value's origin is auditable from the release alone.</p></li>
+<li><p><strong>The layers are authorable.</strong> <code>organisation_layers.set</code> (<code>jobs:write</code>) upserts one row per <code>(tenant, level, scope, kind)</code> with its <code>value</code> and <code>required</code>; <code>organisation_layers.list</code> (<code>jobs:read</code>) reads them by level and scope. A table nobody can write is the <code>tool_binding</code> defect again (<code>v1-p111-1</code>).</p></li>
+<li><p><strong>No other behaviour moves.</strong> The release remains immutable and pinned; a binding still pins one release hash. Existing <code>job_release</code> rows are never rewritten — a publish after this unit writes a new row whose snapshot includes <code>layers</code>; old rows keep their bytes and their hashes.</p></li>
+</ol>
+<h2 id="why">Why</h2>
+<p>SPEC_V2 §4.1: "Knowledge is layered base → industry → department archetype → each department in declared order (with its region sub-layer) → job. Kinds are declared at every layer; a kind is required or optional; <code>required</code> can only be tightened downward. Sibling departments that set one key to different values are a compile error (<code>department_conflict</code>), resolved only by a job-layer row. … no resolvable required knowledge → <code>409 release_not_ready</code> naming the kind and department." Nothing in the code reads a layer: <code>compile_release_tx</code> assembles the snapshot from <code>job_catalogue.definition</code>, the industry and the placement rows, and neither refusal class exists anywhere under <code>crates/</code>. A job can therefore be released and run with a required kind unresolved, and the release hash describes a configuration the spec says cannot exist.</p>
+<p>The rejection of a second store is forced by §4.1's last paragraph: "The catalogue is the conveyor's own data … No manifest is imported from another system, and no other system is asked to validate a release." One table, one writer, one resolver.</p>
+<h2 id="alternatives-rejected">Alternatives rejected</h2>
+<ul>
+<li><strong>Layers inside <code>job_catalogue.definition</code>.</strong> One jsonb blob per job cannot express industry, department-archetype or per-department layers, cannot name a value's source, and cannot detect a sibling conflict — it would encode the same resolution logic in a place no reader can audit.</li>
+<li><strong>One table per level.</strong> Five tables, five writers and five RLS policies for one concept invite drift; the SPEC treats the layers as one chain.</li>
+<li><strong>Resolving at run time instead of publish.</strong> The release is immutable and pinned; a run-time read would make the pin a lie and let a knowledge change alter a running job's configuration.</li>
+<li><strong>A separate required-kind registry.</strong> Two stores that can disagree about whether a kind is required; <code>required</code> is a property of the layer row that sets the value.</li>
+<li><strong>Failing the run instead of the publish.</strong> §4.1 puts the refusal at release: a run that starts with an unresolved required kind has already spent a model call by the time it is noticed.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>Migration <code>0074</code> adds one table; no existing table changes shape.</li>
+<li>Two actions join the registry (<code>569 → 571</code> at the issue's baseline measure); the served-spec lock moves by their operations; <code>jobs:read|write</code> are reused, so no new scope.</li>
+<li>A publish after this unit carries a <code>layers</code> member in its snapshot, so a test asserting a literal hash for a new publish moves with the shape; existing release rows are untouched.</li>
+<li><code>v1-w1a-2</code> clears when the unit's acceptance passes; the register records the PR.</li>
+<li>The region sub-layer named in §4.1 is folded into the department level's <code>source_key</code> when a region exists; no region rows are seeded, and a separate region level is not introduced until the spec gives it content.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0020-release-knowledge-layers.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

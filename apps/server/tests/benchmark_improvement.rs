@@ -169,11 +169,31 @@ async fn fixture(db: &common::TestDb) -> Fixture {
     .fetch_one(&mut *tx)
     .await
     .expect("a capability");
+    // SPEC_V2 §7.7 (#697): an active executor must name a resolvable prompt.
+    let (improvement_prompt,): (Uuid,) = sqlx::query_as(
+        "INSERT INTO prompt (tenant_id, key, version, status, title)
+         VALUES ($1, 'improvement_prompt', 1, 'active', 'Improvement prompt') RETURNING id",
+    )
+    .bind(tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the improvement prompt");
+    sqlx::query(
+        "INSERT INTO prompt_section
+             (tenant_id, prompt_id, position, source_kind, required, template)
+         VALUES ($1, $2, 1, 'system', true, 'Improve the benchmark arm.')",
+    )
+    .bind(tenant_id)
+    .bind(improvement_prompt)
+    .execute(&mut *tx)
+    .await
+    .expect("the improvement prompt section");
     let agent: Uuid = sqlx::query_scalar(
         "INSERT INTO capability_agent
              (tenant_id, capability_id, key, role, status, model_ref, prompt_ref,
               max_iterations, timeout_secs)
-         VALUES ($1, $2, 'improvement-agent', 'tool_agent', 'active', 'test-model', NULL, 8, 300)
+         VALUES ($1, $2, 'improvement-agent', 'tool_agent', 'active', 'test-model',
+                 'improvement_prompt@1', 8, 300)
          RETURNING id",
     )
     .bind(tenant_id)

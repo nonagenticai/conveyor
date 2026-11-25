@@ -200,12 +200,30 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0018-l1-laya-provenance.md"
     },
     {
+      "title": "0019 — The accepted draft is applied and every call is receipted",
+      "path": "docs/decisions/0019-accepted-draft-and-prompt-receipts.html",
+      "source": "docs/decisions/0019-accepted-draft-and-prompt-receipts.md",
+      "section": "Decisions",
+      "sha256": "5b96c380773c731af94b466eede02594e154d5b7500df1d708b134b865d16141",
+      "bytes": 6059,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0019-accepted-draft-and-prompt-receipts.md"
+    },
+    {
+      "title": "0020 — The release compiles the knowledge layers",
+      "path": "docs/decisions/0020-release-knowledge-layers.html",
+      "source": "docs/decisions/0020-release-knowledge-layers.md",
+      "section": "Decisions",
+      "sha256": "a1d0302527912a04ac95492c7f2685c221ea3d17f2935e2a419bd9108947af93",
+      "bytes": 5895,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0020-release-knowledge-layers.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
       "section": "Design",
-      "sha256": "a5ce762378364acf2866183f5ee384e2f20417f48f90958cda2bacfa831cb7df",
-      "bytes": 18895,
+      "sha256": "99f60ef3b7625241851c414192eeed5cd152d31f8cde19fa8b6fa34c83c55c77",
+      "bytes": 19270,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md"
     },
     {
@@ -488,6 +506,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-BUDGET.md"
     },
     {
+      "title": "S21 step 11 — the level closes: apply-on-accept, prompt receipts and the recipe budget",
+      "path": "docs/evidence/S21-EXECUTION.html",
+      "source": "docs/evidence/S21-EXECUTION.md",
+      "section": "Evidence",
+      "sha256": "91d8c37f034e4a2b85dfd6617d4731009647a58157a1f54fdfc3cd3426f9958b",
+      "bytes": 5089,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-EXECUTION.md"
+    },
+    {
       "title": "S21 step 4 — the internalagent executor runtime and its tool grant",
       "path": "docs/evidence/S21-EXECUTOR.html",
       "source": "docs/evidence/S21-EXECUTOR.md",
@@ -558,6 +585,15 @@
       "sha256": "d7ce665d7ac7e8ce18f9ca8434a3324ef83061e1d0651fe6ecf16c26a3177cab",
       "bytes": 5255,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-WORKPACKAGE.md"
+    },
+    {
+      "title": "T0 — the release compiles the knowledge layers: receipt",
+      "path": "docs/evidence/T0-RELEASE-LAYERS.html",
+      "source": "docs/evidence/T0-RELEASE-LAYERS.md",
+      "section": "Evidence",
+      "sha256": "6ca42bdc4336edff56db14cf573b1637b58ec0d4d8e7393287b63a16a42e6eda",
+      "bytes": 3842,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/T0-RELEASE-LAYERS.md"
     },
     {
       "title": "T19 plan audit — independent verification record",
@@ -942,8 +978,8 @@
       "path": "docs/evidence/t19f/gate/01-schedule-v1.html",
       "source": "docs/evidence/t19f/gate/01-schedule-v1.md",
       "section": "Evidence",
-      "sha256": "61d99b989ca499a373ba398da4392dcaa71357a4d8a5b49e70baf3389ff87000",
-      "bytes": 2256,
+      "sha256": "08ce65df2bd8bf1424f0dacb35ca7cf88a6dc0873d94688de7b56fc30a6822e3",
+      "bytes": 2948,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/01-schedule-v1.md"
     },
     {
@@ -974,6 +1010,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/04-review-request.md"
     },
     {
+      "title": "T19F live gate — the human review gate (fresh)",
+      "path": "docs/evidence/t19f/gate/04b-human-review-request.html",
+      "source": "docs/evidence/t19f/gate/04b-human-review-request.md",
+      "section": "Evidence",
+      "sha256": "5c5a9f010f923e2af28871d5f52cba31dc1b69d009d75c6be974e16af9d3091b",
+      "bytes": 3132,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/04b-human-review-request.md"
+    },
+    {
       "title": "T19F live gate — the review approval",
       "path": "docs/evidence/t19f/gate/05-review-decision.html",
       "source": "docs/evidence/t19f/gate/05-review-decision.md",
@@ -983,21 +1028,39 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/05-review-decision.md"
     },
     {
+      "title": "T19F live gate — the human review decision",
+      "path": "docs/evidence/t19f/gate/05b-human-decision.html",
+      "source": "docs/evidence/t19f/gate/05b-human-decision.md",
+      "section": "Evidence",
+      "sha256": "05b90e7116938dcd175f83993ece563940d22be88bd2c234336626acaa8a813e",
+      "bytes": 3003,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/05b-human-decision.md"
+    },
+    {
       "title": "T19F live gate — the authoring review",
       "path": "docs/evidence/t19f/gate/06-authoring-review.html",
       "source": "docs/evidence/t19f/gate/06-authoring-review.md",
       "section": "Evidence",
-      "sha256": "87e19f6bd6cf6f53e4e8d255332bc5b4365fe26485ab0561542343f54bb51a6e",
-      "bytes": 591,
+      "sha256": "e655e11ba68532551d57feea28aab300e7c33fdfa638039951640575e2916008",
+      "bytes": 2223,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/06-authoring-review.md"
+    },
+    {
+      "title": "T19F live gate — publishing the policy v2",
+      "path": "docs/evidence/t19f/gate/07-authoring-publish.html",
+      "source": "docs/evidence/t19f/gate/07-authoring-publish.md",
+      "section": "Evidence",
+      "sha256": "630853dab8e13af342fc5f80f5b925c398d53275d68a9a4bda4234b2518c1306",
+      "bytes": 1943,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/07-authoring-publish.md"
     },
     {
       "title": "T19F live gate — the sitting body",
       "path": "docs/evidence/t19f/gate/08-board-open.html",
       "source": "docs/evidence/t19f/gate/08-board-open.md",
       "section": "Evidence",
-      "sha256": "5db5a0abb938f8f6c6bcb62f99b66358e4c5bb37fd8f84b16b18e4219b16b20c",
-      "bytes": 978,
+      "sha256": "92be3337160497bef1929d7a31392d5b63b259fdaa85bf67841e2c066de67d66",
+      "bytes": 1812,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/08-board-open.md"
     },
     {
@@ -1005,8 +1068,8 @@
       "path": "docs/evidence/t19f/gate/09-board-activate.html",
       "source": "docs/evidence/t19f/gate/09-board-activate.md",
       "section": "Evidence",
-      "sha256": "938e03daa70e8f303246c8693413876970ff4d290b03eac30e81569b1e56c48e",
-      "bytes": 601,
+      "sha256": "856c9c2a75e568f550af1d9ee5e3e703708468f5b150b9a00ff00c48f755e244",
+      "bytes": 1123,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/09-board-activate.md"
     },
     {
@@ -1014,17 +1077,26 @@
       "path": "docs/evidence/t19f/gate/10-sitting-subject.html",
       "source": "docs/evidence/t19f/gate/10-sitting-subject.md",
       "section": "Evidence",
-      "sha256": "38d1af951b7bf5d22a69094bd59d2b1894d511075744d8c4c25a416be8c75def",
-      "bytes": 1137,
+      "sha256": "4cb1c14e2171fd31a1dc0465571445a4627dcfc25dbabde2396f647c98e41980",
+      "bytes": 2190,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/10-sitting-subject.md"
+    },
+    {
+      "title": "T19F live gate — superseding the duplicate sitting subject",
+      "path": "docs/evidence/t19f/gate/10b-supersede-duplicate-contract.html",
+      "source": "docs/evidence/t19f/gate/10b-supersede-duplicate-contract.md",
+      "section": "Evidence",
+      "sha256": "9650aabc79cf98bb5a17774bddb8afe955f0b6cf819d23c7f17b531e492f05af",
+      "bytes": 1668,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/10b-supersede-duplicate-contract.md"
     },
     {
       "title": "T19F live gate — the sitting opens",
       "path": "docs/evidence/t19f/gate/11-sitting-open.html",
       "source": "docs/evidence/t19f/gate/11-sitting-open.md",
       "section": "Evidence",
-      "sha256": "a28247db3a5114fa090805823d7b7fbdc1faf2a3098440c5e088d8f50815f61f",
-      "bytes": 764,
+      "sha256": "605660b80fe5b34137405272f55033401e45b27ebdf3115c02a158b0aba3fa02",
+      "bytes": 1344,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/11-sitting-open.md"
     },
     {
@@ -1032,8 +1104,8 @@
       "path": "docs/evidence/t19f/gate/12-sitting-invite.html",
       "source": "docs/evidence/t19f/gate/12-sitting-invite.md",
       "section": "Evidence",
-      "sha256": "7b483e3c88b677e8cde1f6b95ed626875b41e53fb4b9f61090845cb518bd8cea",
-      "bytes": 3044,
+      "sha256": "76b6c5302347c48e6114d89857955f301442000633211aeee07f10b90e1c5d04",
+      "bytes": 7094,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/12-sitting-invite.md"
     },
     {
@@ -1041,8 +1113,8 @@
       "path": "docs/evidence/t19f/gate/13-sitting-respond.html",
       "source": "docs/evidence/t19f/gate/13-sitting-respond.md",
       "section": "Evidence",
-      "sha256": "249bbb2f79cc0a1e8a961d351078eaad64e4d87c8369facebb7911d0723543ae",
-      "bytes": 3059,
+      "sha256": "3f1e89274d9f49fbc893daa3fcf06162be942ba6b62d9a071a748f1bc9915f37",
+      "bytes": 7112,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/13-sitting-respond.md"
     },
     {
@@ -1365,8 +1437,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "36eca2e9475876120ccc695318ed827ef80c34130b3c3abe2a0e17edf9a61dba",
-      "bytes": 260000,
+      "sha256": "7f5f5b504b61bcd7cbde955a4b424b03a0fa336f1e043c20597f52ec9ccd7738",
+      "bytes": 261463,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -1374,8 +1446,8 @@
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "24c093ecc71b23d40f9e5b37bc8f314f66fc60058cddb0221dfbaaaf025692d3",
-      "bytes": 90260,
+      "sha256": "e4f413b9b9adfcbab634c8d7fe89420cb4c8663624a40943739b333db082e75c",
+      "bytes": 93787,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -1383,8 +1455,8 @@
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "1dce63a65f1f0a11d922dc8782a448805d3ff3db25b9aec35c920d888e8c73ff",
-      "bytes": 155537,
+      "sha256": "1b47251a006b19dad9c7a24496dd56875f5d5c54ea7571f8ca850578eb1d35af",
+      "bytes": 158600,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -1626,8 +1698,8 @@
       "path": "docs/plans/T19F/closure-review.html",
       "source": "docs/plans/T19F/closure-review.md",
       "section": "Plans",
-      "sha256": "81a50bf16a1b18e8b14a558a640adb7095dc6d127fd613639aef8c0ea9b2e2e0",
-      "bytes": 3786,
+      "sha256": "e4e1b098c436c15ba24d0cd3978e867e6f7c67f431ffe2f3d6457cd8af8ddc57",
+      "bytes": 4531,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/closure-review.md"
     },
     {
@@ -1635,8 +1707,8 @@
       "path": "docs/plans/T19F/evidence.html",
       "source": "docs/plans/T19F/evidence.md",
       "section": "Plans",
-      "sha256": "ed5eef0610d9088347b903d1a4788971661e58e95f9cc18f0eccb321e1a945ed",
-      "bytes": 6886,
+      "sha256": "11d3606fac16be0d35905ec9d097287d6900f1780e833a245b224c05f7855737",
+      "bytes": 7533,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/evidence.md"
     },
     {
@@ -2076,8 +2148,8 @@
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "0dca766d1d244ee9e415c15077ec2311311571636f3b81877b08a25eca7e11c8",
-      "bytes": 58188,
+      "sha256": "f751901b3b99de99db9cac9890839ca11f1a4b9a6d3961b7c10afd707e49661d",
+      "bytes": 62915,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]
