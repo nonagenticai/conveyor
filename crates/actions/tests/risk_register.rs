@@ -216,6 +216,82 @@ async fn a_risk_without_review_at_is_refused() {
     );
 }
 
+/// P2b — a risk whose owner is a named role is complete when no queue job owns the work:
+/// probability, impact, review date and a link are still the rule (owner's 2026-11-25
+/// decision: backfill and keep the risk managed, never a bare risk).
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_risk_owner_may_be_a_named_role_without_a_job() {
+    let (_, running, _) = fixture().await;
+    let programme = create_programme(&running, "Role-owned risk programme").await;
+
+    let (status, body) = running
+        .invoke(
+            "registers.create",
+            TOKEN,
+            json!({
+                "programme_id": programme,
+                "kind": "risk",
+                "code": "R-02",
+                "title": "The role-owned risk",
+                "probability": "high",
+                "impact": 5,
+                "review_at": "2026-12-15",
+                "meta": {"owner": "the programme architect (conveyor-e2e)"},
+                "links": {
+                    "cards": [],
+                    "requirements": [{"kind": "objective", "ref": "quality gate"}],
+                    "decisions": []
+                }
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let risk = output(&body);
+    assert_eq!(risk["owner_job_id"], Value::Null, "{body}");
+    assert_eq!(
+        risk["meta"]["owner"], "the programme architect (conveyor-e2e)",
+        "{body}"
+    );
+}
+
+/// P2c — a risk with neither a job nor a role is still refused, and the refusal names the
+/// owner. The role path is an owner, not a waiver of the rule.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_risk_without_any_owner_is_refused() {
+    let (_, running, _) = fixture().await;
+    let programme = create_programme(&running, "Ownerless risk programme").await;
+
+    let (status, body) = running
+        .invoke(
+            "registers.create",
+            TOKEN,
+            json!({
+                "programme_id": programme,
+                "kind": "risk",
+                "title": "The ownerless risk",
+                "probability": "high",
+                "impact": 5,
+                "review_at": "2026-12-15",
+                "links": {
+                    "cards": [],
+                    "requirements": [{"kind": "objective", "ref": "quality gate"}],
+                    "decisions": []
+                }
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["errors"][0]["code"], "risk_incomplete", "{body}");
+    let detail = text(&body["errors"][0], "detail");
+    assert!(detail.contains("owner"), "{body}");
+}
+
 /// P3 — both parents at once is refused; a project's read does not return programme rows.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_register_row_has_exactly_one_parent() {

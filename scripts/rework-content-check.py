@@ -74,8 +74,19 @@ BOILERPLATE = (
 # ten-entry artefacts stopped that member's chain. The preflight refuses it before the act.
 ENTRY_FIELDS = {"axis_a", "axis_b", "value", "position"}
 ARTEFACT_FIELDS = {
-    "artifact_kind", "body", "entries", "phase_code", "plateau", "purpose", "scope",
-    "stakeholders", "title",
+    "artifact_kind", "body", "entries", "links", "phase_code", "plateau", "purpose",
+    "scope", "stakeholders", "title",
+}
+# `architecture.artifacts_link` (§8.1): four kinds, and both ends must be artefacts of the
+# pack — an edge to a title the factory never creates is an orphan, refused before the act.
+LINK_KINDS = {"derivation", "realization", "reuse", "dependency"}
+# `registers.create` (§8.4): the five kinds the pack authors. The sixth, `change`, is created
+# by the factory's acceptance path; a pack that authored one would duplicate that gate.
+REGISTER_KINDS = {"risk", "issue", "assumption", "dependency", "benefit", "change"}
+REGISTER_REQUIRED = {"risk", "issue", "assumption", "dependency", "benefit"}
+REGISTER_FIELDS = {
+    "baseline_ref", "body", "code", "impact", "links", "meta", "owner_job_id",
+    "probability", "response", "review_at", "severity", "status", "title",
 }
 
 
@@ -202,6 +213,69 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
         if isinstance(body, str) and body.strip():
             check_authored(body, art_required, label, problems)
 
+    titles = {str(a.get("title")) for a in artefacts if a.get("title")}
+    for artefact in artefacts:
+        label = f"artefact {artefact.get('title')!r}"
+        links = artefact.get("links")
+        expect(isinstance(links, list) and bool(links),
+               f"{label} needs at least one link (§8.1: an artefact with no link is an orphan)")
+        for index, link in enumerate(links or []):
+            if not isinstance(link, dict):
+                problems.append(f"{label} link {index} is not an object")
+                continue
+            unknown = sorted(set(link) - {"to", "kind"})
+            expect(not unknown,
+                   f"{label} link {index} carries unknown fields: {', '.join(unknown)}")
+            target = str(link.get("to") or "")
+            expect(target in titles and target != artefact.get("title"),
+                   f"{label} link {index} must name another artefact of this pack, "
+                   f"not {target!r}")
+            expect(link.get("kind") in LINK_KINDS,
+                   f"{label} link {index} kind {link.get('kind')!r} is not one of "
+                   f"{sorted(LINK_KINDS)}")
+
+    registers = content.get("registers")
+    expect(isinstance(registers, dict) and bool(registers),
+           "registers must be a {kind: [rows]} object (§8.4)")
+    if isinstance(registers, dict):
+        unknown_kinds = sorted(set(registers) - REGISTER_KINDS)
+        expect(not unknown_kinds,
+               f"registers carries unknown kinds: {', '.join(unknown_kinds)}")
+        for kind in sorted(REGISTER_REQUIRED):
+            rows = registers.get(kind)
+            expect(isinstance(rows, list) and bool(rows),
+                   f"registers needs at least one {kind} row")
+        for kind, rows in registers.items():
+            for index, row in enumerate(rows or []):
+                label = f"register {kind} row {index}"
+                if not isinstance(row, dict):
+                    problems.append(f"{label} is not an object")
+                    continue
+                unknown = sorted(set(row) - REGISTER_FIELDS)
+                expect(not unknown,
+                       f"{label} carries fields the action drops: {', '.join(unknown)}")
+                expect(isinstance(row.get("title"), str) and bool(row["title"].strip()),
+                       f"{label} needs a title")
+                if kind != "risk":
+                    continue
+                expect(isinstance(row.get("probability"), str)
+                       and bool(row["probability"].strip()),
+                       f"{label} (a risk) needs probability")
+                expect(isinstance(row.get("impact"), int),
+                       f"{label} (a risk) needs an integer impact")
+                expect(isinstance(row.get("review_at"), str)
+                       and bool(row["review_at"].strip()),
+                       f"{label} (a risk) needs review_at")
+                owner = row.get("owner_job_id") or (row.get("meta") or {}).get("owner")
+                expect(bool(owner),
+                       f"{label} (a risk) needs an owner job or meta.owner")
+                links = row.get("links")
+                linked = isinstance(links, dict) and any(
+                    isinstance(links.get(key), list) and links.get(key)
+                    for key in ("cards", "requirements", "decisions")
+                )
+                expect(linked, f"{label} (a risk) needs at least one link")
+
     contract = content.get("delivery_contract") or {}
     expect(isinstance(contract.get("title"), str) and isinstance(contract.get("body"), dict),
            "delivery_contract must be {title, body: object}")
@@ -319,9 +393,27 @@ def self_test() -> None:
         "artifacts": [
             {"title": f"Artefact {index}", "phase_code": phase, "plateau": plateau,
              "artifact_kind": kind, "entries": [{"axis_a": "a", "axis_b": "b", "value": "v"}],
+             "links": [{"to": f"Artefact {(index + 1) % len(REQUIRED_ARTEFACTS)}",
+                        "kind": "derivation"}],
              "body": body_for("architecture-artifact")}
             for index, (phase, plateau, kind) in enumerate(REQUIRED_ARTEFACTS)
         ],
+        "registers": {
+            "risk": [{
+                "title": "Vendor delay on the shared platform",
+                "body": "Authored risk statement. " * 4,
+                "probability": "medium",
+                "impact": 4,
+                "review_at": "2026-12-01",
+                "links": {"cards": [], "requirements": ["docs/SPEC_V2.md#12"],
+                          "decisions": []},
+                "meta": {"owner": "the programme architect (conveyor-e2e)"},
+            }],
+            "issue": [{"title": "The gate is open", "body": "Authored issue. " * 4}],
+            "assumption": [{"title": "The estate stays reachable", "body": "Authored. " * 4}],
+            "dependency": [{"title": "T2 closes first", "body": "Authored. " * 4}],
+            "benefit": [{"title": "Fewer manual gates", "body": "Authored. " * 4}],
+        },
         "delivery_contract": {"title": "Contract", "body": {
             "compliance": "Authored compliance method. " * 4,
             "acceptance": "Authored acceptance statement. " * 4,
@@ -372,6 +464,29 @@ def self_test() -> None:
     problems = check(thin_soaw, standard, ids, wsjf, True)
     if not any("soaw body" in problem for problem in problems):
         raise SystemExit("self-test: a thin SoAW body was not refused")
+
+    # The register and link gates (§8.4/§8.1): a missing kind, an ownerless risk and an
+    # orphan edge are refused before the factory can half-write the project.
+    no_risk = json.loads(json.dumps(good))
+    del no_risk["registers"]["risk"]
+    problems = check(no_risk, standard, ids, wsjf, True)
+    if not any("at least one risk row" in problem for problem in problems):
+        raise SystemExit("self-test: a register without risks was not refused")
+    ownerless = json.loads(json.dumps(good))
+    ownerless["registers"]["risk"][0].pop("meta")
+    problems = check(ownerless, standard, ids, wsjf, True)
+    if not any("owner job or meta.owner" in problem for problem in problems):
+        raise SystemExit("self-test: an ownerless risk was not refused")
+    orphan = json.loads(json.dumps(good))
+    orphan["artifacts"][0]["links"] = [{"to": "Not an artefact", "kind": "derivation"}]
+    problems = check(orphan, standard, ids, wsjf, True)
+    if not any("must name another artefact" in problem for problem in problems):
+        raise SystemExit("self-test: an orphan link was not refused")
+    bad_kind = json.loads(json.dumps(good))
+    bad_kind["artifacts"][0]["links"] = [{"to": "Artefact 1", "kind": "related"}]
+    problems = check(bad_kind, standard, ids, wsjf, True)
+    if not any("is not one of" in problem for problem in problems):
+        raise SystemExit("self-test: an unknown link kind was not refused")
 
     # The action's entry schema: a pack written against the document's prose
     # (id/requirement/owner/verification) loses every field in the action and refuses on the
