@@ -87,7 +87,18 @@ random local ports, and removes them on exit.
 
 A docs-only change does not need the Rust suite. CI still runs `secret-scan`, `no-private-refs`,
 `dco`, `lint` and `design-pack`, and creates the Rust and image jobs as skipped. For the design
-pack, run `node docs/design/scripts/check-docs.cjs` and the other `docs/design/scripts/check-*.cjs`
+pack, six of the `docs/design/scripts/check-*.cjs` checks drive a headless browser
+(`check-architecture`, `check-console`, `check-learning`, `check-studio`, `check-v2`,
+`check-workbench`) and need Playwright. The repository has no root `package.json`, so a fresh
+clone does not have it — run the same pinned install the `design-pack` CI job runs, once per
+checkout:
+
+```sh
+npm install --no-save --no-package-lock playwright@1.62.1
+npx playwright install --with-deps chromium
+```
+
+Then `node docs/design/scripts/check-docs.cjs` and the other `docs/design/scripts/check-*.cjs`
 checks.
 
 ## How your work is credited
