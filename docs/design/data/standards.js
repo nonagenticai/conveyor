@@ -113698,7 +113698,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-design-publish-g.html",
-        "sha256": "6343a10b6b50a6989c00cebf600f5fe4a164a7afd3b2a9822075bbbdc15daf6f"
+        "sha256": "cf2f783261b6e88358e69ab55c8812cab95cde5aff8ce2b874eb1be9cdf7cbbe"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -113712,24 +113712,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-design-publish-g:DESIGN-PUBLISH",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -113791,6 +113773,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -113813,7 +113813,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-p0-g.html",
-        "sha256": "751b83ebf0e76b6a762e7cbe78d00e786c9fae4ef4edd4e5c048dab5b11d129a"
+        "sha256": "0ed05d637b06a8ff2baf9771e644db03f434d4362712806854aab0e4c1c515ff"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -113827,24 +113827,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-p0-g:P0",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -113906,6 +113888,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -113928,7 +113928,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-platform-g.html",
-        "sha256": "03afbc487293d9da625508fad410c0dbd76779371858d3ef67626b2f3c99479c"
+        "sha256": "335976dd92b8fe702bbca1cb31a153ea0728265af73a73b0022d1e559df371b9"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -113942,24 +113942,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-platform-g:PLATFORM",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -114017,6 +113999,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -114039,7 +114039,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s00-g.html",
-        "sha256": "76e85d4de4aa8c6d07a5cba3833f3b51807d861a5eadfff14007a17732e062b5"
+        "sha256": "de12233bdd89d33cd580a848307a6c8da5b22cee5e73558b8596535716af120f"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -114053,24 +114053,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-s00-g:S00",
       "package_published": false,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -114132,6 +114114,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -114154,7 +114154,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s01-g.html",
-        "sha256": "06368bf6a45a089a0953b7332f4a51611edac79a7442b8ad9e3c3fcbb6eb1eda"
+        "sha256": "3fc9a1f685da4ed6d6a3838d5e345009dc3d0b189c52d9f5c270e1271525c177"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -114168,24 +114168,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-s01-g:S01",
       "package_published": false,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -114247,6 +114229,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -114269,7 +114269,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s02-g.html",
-        "sha256": "a07cd66b4abf4985c59e25e3d2d336ea55b9f005adfec39185ccf5c8d2736f53"
+        "sha256": "c9af126abe8c65268cb11aba13dd18353157d53901aaffa228355161dc08dffc"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -114283,24 +114283,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-s02-g:S02",
       "package_published": false,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -114362,6 +114344,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -114384,7 +114384,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s03-g.html",
-        "sha256": "20794d37ed184fa3d196ca09974a62a2ec6f6d47c5d025b30832738164634ef9"
+        "sha256": "9215b6fa8c6994176a98f41107784286d451f68f2920c4fa4fefae701c630473"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -114398,24 +114398,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-s03-g:S03",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -114477,6 +114459,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -114499,7 +114499,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s04-g.html",
-        "sha256": "33f400882bb22b0f87f6c671b3ef4adfd7464451eea42f9cf416abc46a832bcf"
+        "sha256": "e780e8b3d7ec2f65fcd2e75d902734fafb8aee36d5e1bef17d5029e05d8c73f0"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -114513,24 +114513,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-s04-g:S04",
       "package_published": false,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -114588,6 +114570,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -114610,7 +114610,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s05-g.html",
-        "sha256": "dc8e32239b5626fbcb0aff7d7eed4c2abc2f8e291fe933a242e4294fa97f8098"
+        "sha256": "8b884ae8e2861a5eef6ee7371eb455164cfb499c9706f156f182eebc2f8a730d"
       },
       "gate": {
         "approval_id": "",
@@ -114624,24 +114624,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-4",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -114695,6 +114677,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -114717,7 +114717,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s06-g.html",
-        "sha256": "9ea6a9e083b39f59c768472dab335726775fcc1909a1d5d9c404aab989e5a543"
+        "sha256": "b34942b03a5405b6cd5442cad3cbc92d85d17195bf4105fa6b9ea8eef44986d8"
       },
       "gate": {
         "approval_id": "",
@@ -114731,24 +114731,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-5",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -114802,6 +114784,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -114824,7 +114824,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s06b-g.html",
-        "sha256": "1288b0acd82150b883471b342043e484daf6e03678097b6b4c2828af43b8b0e2"
+        "sha256": "5481fc35026a9d5b2b8ac209828dc7a771f616f00fd0eabe62a73d5b12fafca3"
       },
       "gate": {
         "approval_id": "",
@@ -114838,24 +114838,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-6",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -114909,6 +114891,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -114931,7 +114931,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s06c-g.html",
-        "sha256": "8888b343ac22f45312ab96ab46e091445f692528330c1e98e4e30760842c337f"
+        "sha256": "6bfe17a492fa1d59d15e1e77a38af9e1d79c044c5676d6d97e5a3d727f9db331"
       },
       "gate": {
         "approval_id": "",
@@ -114945,24 +114945,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-7",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -115016,6 +114998,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -115038,7 +115038,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s06d-g.html",
-        "sha256": "5d2a2869c4cf1bb4bc091a3ec71f234155da8970bf7b652d4ad4345c862c8c4a"
+        "sha256": "7be79c983815fddc2734bfb066813da2d678c016cef62d0932c3c82868f4fe94"
       },
       "gate": {
         "approval_id": "",
@@ -115052,24 +115052,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-8",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -115123,6 +115105,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -115145,7 +115145,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s07-g.html",
-        "sha256": "41235a26d323f7ad831af80301dae938a6cd8d02671c575e9c42e0f59b322ab7"
+        "sha256": "a08c9e5f45022126f5ce48965824ec61866ca11f323c15dd45fd4c61f4f63af9"
       },
       "gate": {
         "approval_id": "",
@@ -115159,24 +115159,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-4",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -115230,6 +115212,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -115252,7 +115252,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s08-g.html",
-        "sha256": "c94a27aa4b681e961f5a182210900b39051dab518463c7cf0bec372828733fb9"
+        "sha256": "0215c943f470abd5233a997ab0ea19df12970080baad3e59f57d99e1f1011dac"
       },
       "gate": {
         "approval_id": "",
@@ -115266,24 +115266,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-5",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -115337,6 +115319,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -115359,7 +115359,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s09-g.html",
-        "sha256": "8892bc52c47570cedf4d290f0abf0bb282017fa3836d3d0560c34fbd99e168bf"
+        "sha256": "0c290b5d3671eff15055648937e0e128a0c6509c174731454cfa2571d76c3cdd"
       },
       "gate": {
         "approval_id": "",
@@ -115373,24 +115373,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-4",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -115444,6 +115426,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -115466,7 +115466,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s10-g.html",
-        "sha256": "366521497709f183a2841f5f1ff97eeb03fe77e22dd9803d9340dd0e5d8e5e23"
+        "sha256": "de317f660acc94cec6d6be0e4f436be81a3a0c3ccfecd7ba0bf757ac4ee4572e"
       },
       "gate": {
         "approval_id": "",
@@ -115480,24 +115480,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-6",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -115551,6 +115533,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -115573,7 +115573,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s11-g.html",
-        "sha256": "ab913dd6982c463900e70c7b4a74a6e58688ff1dcc4b3e11d0e506ec46164aed"
+        "sha256": "a48cb45c83da0443a4cad8c7e20121784e62de65e675948fac7313b2cc0563e6"
       },
       "gate": {
         "approval_id": "",
@@ -115587,24 +115587,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-6",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -115658,6 +115640,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -115680,7 +115680,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s12-g.html",
-        "sha256": "fbbf27167ebeaf2cab638d8383f8b73882334534bf4e8b5d872ad7921b73cb50"
+        "sha256": "bf3814c58ca8c28473da039e3c49edc1fa4c417e2c6c49a4bdf2c51e4d4f918e"
       },
       "gate": {
         "approval_id": "",
@@ -115694,24 +115694,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-10",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -115765,6 +115747,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -115787,7 +115787,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s13-g.html",
-        "sha256": "786f69d8bc5d28db7053deede0b97a1ab6ee5b43486fefc6661710e103647133"
+        "sha256": "a54eb728b41588846ed499377966a4c50784de8622eedb5942493248c51efa5c"
       },
       "gate": {
         "approval_id": "",
@@ -115801,24 +115801,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-8",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -115872,6 +115854,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -115894,7 +115894,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s14-g.html",
-        "sha256": "7e9596211f2be03392974b361aabca9d1845ed28c73d333a568520fe341b4d5b"
+        "sha256": "6dc09bbc459972d88ec5ffb57e20af889b8f85e6849a3afb05c4c25736530011"
       },
       "gate": {
         "approval_id": "",
@@ -115908,24 +115908,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-11",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -115979,6 +115961,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -116001,7 +116001,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s15-g.html",
-        "sha256": "87544079e5b016e75213e2ac17462cbf6815ba4d8fcbe481ad151eaed2deaafb"
+        "sha256": "1f6b82bf779009b8c2ca4a9162334081bb66f2fc80d37a94d6a2a19a2831cc69"
       },
       "gate": {
         "approval_id": "",
@@ -116015,24 +116015,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-7",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -116086,6 +116068,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -116108,7 +116108,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s16-g.html",
-        "sha256": "0d68d456c240d6a24434bb05cd61d2f8533e43fe41892feba5a247c654f4b983"
+        "sha256": "bde1d4a2f865e71fe78fc9310968a25d469950a71fc9508d3ce420fd1deedf33"
       },
       "gate": {
         "approval_id": "",
@@ -116122,24 +116122,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-7",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -116193,6 +116175,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -116215,7 +116215,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s17-g.html",
-        "sha256": "adb28e28bf6cf3daff3d39f4b94b4fe2dc0ca42bea1f17a3f648ff85887bf9aa"
+        "sha256": "9ad72ef07b21ba3f93fe5be6deb9ce239d50f4ac88d2cd865048fe39fe55581d"
       },
       "gate": {
         "approval_id": "",
@@ -116229,24 +116229,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-5",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -116300,6 +116282,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -116322,7 +116322,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s18-g.html",
-        "sha256": "5ad6c929593b8e7e05a58405b1636b5f598d185d1edcd8e52b07452b68be86f2"
+        "sha256": "34ab24215e62f4e9ac93b211d4e0db934599c0763bd412190db01756af456809"
       },
       "gate": {
         "approval_id": "",
@@ -116336,24 +116336,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-9",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -116407,6 +116389,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -116429,7 +116429,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s19-g.html",
-        "sha256": "f9091edda92e67d6e9d15a9cc32f0a9571e953ac4a80f027bc00085124ff5642"
+        "sha256": "d65ef6f3305ef870fd316aa4a694313ea150217cce4e2452832eb6fc363791aa"
       },
       "gate": {
         "approval_id": "",
@@ -116443,24 +116443,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-8",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -116514,6 +116496,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -116536,7 +116536,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s20-g.html",
-        "sha256": "3eaa7df76b023e113c77254234f6e1dcb94a46c659ca15cbb5ba3949a2f62f5f"
+        "sha256": "5bd40da38977e3b732dc73c6e9cf9e0c3c9d205d448e6b2c365c4c39df1aef46"
       },
       "gate": {
         "approval_id": "",
@@ -116550,24 +116550,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-9",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -116621,6 +116603,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -116643,7 +116643,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s21-g.html",
-        "sha256": "b7b6c1a5caab3f7c730e9b0dbaf3e4bba133695a9f5f526e81ed609abfe3187c"
+        "sha256": "b150ba0b5aef17bdbee8c31cdb10b78bdd77fcae6f186e2a9f5c3b5dc8d866c6"
       },
       "gate": {
         "approval_id": "",
@@ -116657,24 +116657,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-9",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -116728,6 +116710,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -116750,7 +116750,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-spec-v2-g.html",
-        "sha256": "60a28ddffc289974e891ee2c27f12a090fb07a36944e019251c68ee8ba163fa9"
+        "sha256": "3a69f3bf85768e9d2ff9231b3deeb5942dd1efe0f948b88373fce9d29ff91043"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -116764,24 +116764,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-spec-v2-g:SPEC-V2",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -116843,6 +116825,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -116865,7 +116865,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t0-g.html",
-        "sha256": "8da041ad0cc510035cec694beb414229cce86ca94f04caeb2448ba81d2e686fb"
+        "sha256": "463182d16ae18154013c317a018e4ad322ab90b51c53f4c0c9ba6cd9865f1e7e"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -116879,24 +116879,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-t0-g:T0",
       "package_published": false,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -116958,6 +116940,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -116980,7 +116980,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t1-g.html",
-        "sha256": "e6e0a8cc19d1a4934a2c7bb86d39097d8f2bb4e809a0eb60a08d9579121da3e4"
+        "sha256": "c13de7c7686a4a1adc404a727c73e566d93b60e36fd7f06065a318749fd9a94f"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -116994,24 +116994,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-t1-g:T1",
       "package_published": false,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -117073,6 +117055,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -117095,7 +117095,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t10-g.html",
-        "sha256": "ab563f0350a87acc6bc68c6a6cedca41f1cc3fc825b762fdc74abf508c3099b4"
+        "sha256": "d10c6a51889da0063d4147410645fd34b6d43d3af1e6b8cdb3eab1fe84b4150b"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -117109,24 +117109,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-t10-g:T10",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -117188,6 +117170,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -117210,7 +117210,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t11-g.html",
-        "sha256": "a4c3ef94b727b44b3ff085136b51eb0cf1c057236b42a4319e35edd537121cac"
+        "sha256": "a1f300b01040b5d79ef07ec33c4ac35410ceaeb8ce3facec2132f572cc9e2bcd"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -117224,24 +117224,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-t11-g:T11",
       "package_published": false,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -117303,6 +117285,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -117325,7 +117325,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t12-g.html",
-        "sha256": "5ba564c84ecbc97b0ae293484027377b611daaefda0e550dc0189ded8939d396"
+        "sha256": "962c244a54096fb39643af1f6db2e47017e1cc804db41826974ea206ef9decbc"
       },
       "gate": {
         "approval_id": "",
@@ -117339,24 +117339,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-13",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -117410,6 +117392,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -117432,7 +117432,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t13-g.html",
-        "sha256": "4692d12a1aadc6255c5e6660206ede9f720b893300107d809ce6659c22adbfb1"
+        "sha256": "0650eba77b247afb99ac3a8bd337ca7a6c166bc7a7d355261715c8123624b934"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -117446,24 +117446,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-t13-g:T13",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -117525,6 +117507,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -117547,7 +117547,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t14-g.html",
-        "sha256": "fb15a7bf06dde3a1e227f004ba446c8c5feb7459d6ca5b3805cbd42d964f4c8d"
+        "sha256": "e95e2134f2de7d999ab53055ae9150cbc9c3de58cb8f11f81d546f70680cd74d"
       },
       "gate": {
         "approval_id": "",
@@ -117561,24 +117561,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-4",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -117632,6 +117614,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -117654,7 +117654,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t15-g.html",
-        "sha256": "5af3f65bfbffae5e67260d9b4da1ab3d328871d4844adb7da3c00f784294ffe7"
+        "sha256": "99ae7d9d898d86a3a2c55b707a9fb160cc73a3da1f45037a248ba677ee4d5cb1"
       },
       "gate": {
         "approval_id": "",
@@ -117668,24 +117668,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-12",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -117739,6 +117721,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -117761,7 +117761,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t16-g.html",
-        "sha256": "a4d42dcf0c610c184adb4816c3cf29be34d8ade1c500697ce29b01da02cc9e26"
+        "sha256": "2decf4ea14bc7df04b8f2000cb6e0ad27cdd903d519066b81d8ee863b5c95882"
       },
       "gate": {
         "approval_id": "",
@@ -117775,24 +117775,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-t16-g:T16",
       "package_published": false,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -117846,6 +117828,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -117868,7 +117868,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t17-g.html",
-        "sha256": "3bbed8d1af074d51f258d9c961da807ad5abb0074bf67e029563fb9f37e5cf4c"
+        "sha256": "b390ea35e9cd6bc9f4b72f5d4e734c3a10131de2f351db682de12424e7f79deb"
       },
       "gate": {
         "approval_id": "",
@@ -117882,24 +117882,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-5",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -117953,6 +117935,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -117975,7 +117975,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t18-g.html",
-        "sha256": "cb993737f1a5a6fb6ca6d837042737476995bd309e9f87076e577ce9a667393f"
+        "sha256": "403271bc47b737aa15c0ab65924b35010741bc8d4c63886b27076dd36baf609d"
       },
       "gate": {
         "approval_id": "",
@@ -117989,24 +117989,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-4",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -118060,6 +118042,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -118082,7 +118082,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t19-g.html",
-        "sha256": "8c6390c8a0d086415af025ca6290faf00ca8c472b1ba59568f74ebb2d549ef28"
+        "sha256": "9b35b51f327dc3fcfa6935434fd01d40f7a142f62dedf4e59e02f81f92b0f0fe"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -118096,24 +118096,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-t19-g:T19",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -118180,6 +118162,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -118202,7 +118202,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t19f-g.html",
-        "sha256": "cc212f6d544e5cb4ea661d8be003230a1874a861cdb72df4bcd45f32c40c7c80"
+        "sha256": "75f6fb7ca356b6bfc04e4ed542e38e991d4677732d37fb0cdeff40afb1d23b2a"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -118216,24 +118216,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-t19f-g:T19F",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -118305,6 +118287,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -118327,7 +118327,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t2-g.html",
-        "sha256": "66dd43daaf6db554adf38e949e385c7fd60972184bac026f4ee3928e382b7e6a"
+        "sha256": "b742d0f6f5ed4889010f01509b04a48fefd47211cbcc3e5b776c04261ef40a75"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -118341,24 +118341,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-t2-g:T2",
       "package_published": false,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -118430,6 +118412,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -118452,7 +118452,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t3-g.html",
-        "sha256": "6b454538b89745c372a47c2a456439928121575523997d41bee5aad4ad7f7e2b"
+        "sha256": "bfb98999592350302ea4ba48d05dc910b0327e070175407a07a8b40c8f9701c8"
       },
       "gate": {
         "approval_id": "",
@@ -118466,24 +118466,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-3",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -118537,6 +118519,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -118559,7 +118559,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t4-g.html",
-        "sha256": "dda304bc64a498ca69cb10e03e5ec52cf6aeb4e267e4849d5c0ee3e874d3da48"
+        "sha256": "29b76debf69c44a410e9d5d730cb06d34ee26e53e9ba77225acdef544ffd675e"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -118573,24 +118573,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-t4-g:T4",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -118652,6 +118634,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -118674,7 +118674,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t5-g.html",
-        "sha256": "7218c0a5bbce71106953a6c61695efe00a2562023f487b15d05d5428397a0e82"
+        "sha256": "282891a92ead560be939b54ee1a994d44135e7333dd65cefc7e323bcfcfda1e6"
       },
       "gate": {
         "approval_id": "",
@@ -118688,24 +118688,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-10",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -118759,6 +118741,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -118781,7 +118781,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t6-g.html",
-        "sha256": "937dd4d36bffb2134e08bf542352ed9151f82c920634f9245a1a0180c214bd67"
+        "sha256": "4545ae65e436263d8d3b7722a1df7496da821d6c78c15c9f6f0e81339b9c72a0"
       },
       "gate": {
         "approval_id": "",
@@ -118795,24 +118795,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-11",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -118866,6 +118848,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -118888,7 +118888,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t7-g.html",
-        "sha256": "a7456c6b9d143305e05c4c0ec6671e055306e5794d5a51c3b7c3ad6b3b082244"
+        "sha256": "ebc8f72758a856730c23597eabee5524e95e88633dc11d06226f1090819263b6"
       },
       "gate": {
         "approval_id": "",
@@ -118902,24 +118902,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-5",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -118973,6 +118955,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -118995,7 +118995,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t8-g.html",
-        "sha256": "1684fff32f5a67873ae4b1fc0b97e533f3cdbf757110527a6c2fe3f13162e275"
+        "sha256": "74b3345714349f0a42f10aa7030551576067386bf53b1b842954429e162e1567"
       },
       "gate": {
         "approval_id": "",
@@ -119009,24 +119009,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "mandatory_artefacts:tranche-11",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -119080,6 +119062,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -119102,7 +119102,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t9-g.html",
-        "sha256": "9e7c670d03b3da980c23f2677238094a732fb4ca6faef987168e22018bc27345"
+        "sha256": "7fe3683f885588d294ca2e5e4a12d459159daed539f9293a234a13a55a259a16"
       },
       "gate": {
         "approval_id": "",
@@ -119116,24 +119116,6 @@ window.CONVEYOR_STANDARDS = {
       "package_key": "std-togaf-phase-g-t9-g:T9",
       "package_published": true,
       "sections": [
-        {
-          "cause": "record",
-          "heading": "Mandatory artefacts",
-          "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
-          ],
-          "required": true,
-          "severity": "",
-          "sources": [
-            {
-              "count": 0,
-              "items": [],
-              "kind": "computed",
-              "name": "phase_artefacts"
-            }
-          ],
-          "status": "absent"
-        },
         {
           "cause": "record",
           "heading": "Contract and gate",
@@ -119200,6 +119182,24 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "evidenced"
+        },
+        {
+          "cause": "record",
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "required": false,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
         }
       ],
       "spec": "§8.1",
@@ -127063,7 +127063,7 @@ window.CONVEYOR_STANDARDS = {
   },
   "generated_at": "2026-11-25T03:46:32.319854100+00:00",
   "git_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
-  "payload_sha256": "97572626712cf794bf67be0c74442c42012cb636c521aee943433c1d033bceb1",
+  "payload_sha256": "80e614d2cecd1d90700aab4f4a08039abc323bc8c5afe06304332e8745f0aa43",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 354,

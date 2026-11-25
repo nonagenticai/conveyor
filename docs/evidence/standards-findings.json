@@ -26663,23 +26663,11 @@
       "title": "TOGAF artefact partial: phase-g"
     },
     {
-      "acceptance": "std-togaf-phase-g-platform-g: evidence the missing section(s) Mandatory artefacts, Contract and gate of Phase G — PLATFORM — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-phase-g-platform-g: evidence the missing section(s) Contract and gate, Mandatory artefacts of Phase G — PLATFORM — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
       "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
-        {
-          "artefact": "std-togaf-phase-g-platform-g",
-          "section": "Mandatory artefacts",
-          "snapshot": [
-            [
-              null,
-              null,
-              0
-            ]
-          ],
-          "source": "artefact"
-        },
         {
           "artefact": "std-togaf-phase-g-platform-g",
           "section": "Contract and gate",
@@ -26691,18 +26679,30 @@
             ]
           ],
           "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-phase-g-platform-g",
+          "section": "Mandatory artefacts",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
         }
       ],
       "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
       "id": "std-togaf-phase-g-platform-g",
       "kind": "RECORD",
       "missing": [
-        "Mandatory artefacts",
-        "Contract and gate"
+        "Contract and gate",
+        "Mandatory artefacts"
       ],
       "owner_project": "PLATFORM",
       "package_key": "std-togaf-phase-g-platform-g:PLATFORM",
-      "problem": "The phase-g artefact for PLATFORM — G is partial; missing required sections: Mandatory artefacts, Contract and gate.",
+      "problem": "The phase-g artefact for PLATFORM — G is partial; missing required sections: Contract and gate, Mandatory artefacts.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -26886,23 +26886,11 @@
       "title": "TOGAF artefact partial: phase-g"
     },
     {
-      "acceptance": "std-togaf-phase-g-s04-g: evidence the missing section(s) Mandatory artefacts, Contract and gate of Phase G — S04 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-phase-g-s04-g: evidence the missing section(s) Contract and gate, Mandatory artefacts of Phase G — S04 — G from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
       "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
-        {
-          "artefact": "std-togaf-phase-g-s04-g",
-          "section": "Mandatory artefacts",
-          "snapshot": [
-            [
-              null,
-              null,
-              0
-            ]
-          ],
-          "source": "artefact"
-        },
         {
           "artefact": "std-togaf-phase-g-s04-g",
           "section": "Contract and gate",
@@ -26914,18 +26902,30 @@
             ]
           ],
           "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-phase-g-s04-g",
+          "section": "Mandatory artefacts",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
         }
       ],
       "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
       "id": "std-togaf-phase-g-s04-g",
       "kind": "RECORD",
       "missing": [
-        "Mandatory artefacts",
-        "Contract and gate"
+        "Contract and gate",
+        "Mandatory artefacts"
       ],
       "owner_project": "S04",
       "package_key": "std-togaf-phase-g-s04-g:S04",
-      "problem": "The phase-g artefact for S04 — G is partial; missing required sections: Mandatory artefacts, Contract and gate.",
+      "problem": "The phase-g artefact for S04 — G is partial; missing required sections: Contract and gate, Mandatory artefacts.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -27193,23 +27193,11 @@
       "title": "TOGAF artefact partial: phase-g"
     },
     {
-      "acceptance": "std-togaf-phase-g-t16-g: evidence the missing section(s) Mandatory artefacts, Contract and gate, Evidence of Phase G — T16 — G from architecture.json#/contracts, architecture.json#/compliance_reviews, architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-phase-g-t16-g: evidence the missing section(s) Contract and gate, Evidence, Mandatory artefacts of Phase G — T16 — G from architecture.json#/contracts, architecture.json#/compliance_reviews, architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-g",
       "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
-        {
-          "artefact": "std-togaf-phase-g-t16-g",
-          "section": "Mandatory artefacts",
-          "snapshot": [
-            [
-              null,
-              null,
-              0
-            ]
-          ],
-          "source": "artefact"
-        },
         {
           "artefact": "std-togaf-phase-g-t16-g",
           "section": "Contract and gate",
@@ -27243,19 +27231,31 @@
             ]
           ],
           "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-phase-g-t16-g",
+          "section": "Mandatory artefacts",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
         }
       ],
       "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
       "id": "std-togaf-phase-g-t16-g",
       "kind": "RECORD",
       "missing": [
-        "Mandatory artefacts",
         "Contract and gate",
-        "Evidence"
+        "Evidence",
+        "Mandatory artefacts"
       ],
       "owner_project": "T16",
       "package_key": "std-togaf-phase-g-t16-g:T16",
-      "problem": "The phase-g artefact for T16 — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence. Not yet due: tranche 4 is planned.",
+      "problem": "The phase-g artefact for T16 — G is absent; missing required sections: Contract and gate, Evidence, Mandatory artefacts. Not yet due: tranche 4 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",

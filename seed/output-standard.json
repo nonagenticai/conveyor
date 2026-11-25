@@ -4449,11 +4449,11 @@
     },
     "phase-g": {
       "required": [
-        "Mandatory artefacts",
         "Contract and gate",
         "Evidence"
       ],
       "optional": [
+        "Mandatory artefacts",
         "Findings"
       ],
       "skeleton": "# Phase G\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
