@@ -311,6 +311,16 @@ class Runner:
 
         # 1. reopen a closed project, citing the delegation the rework runs under
         if project["status"] == "closed":
+            # A reopen is legal only for a project the retrospective judged "rework"; the
+            # verdict is a programme-owned key, so the factory records it first (measured on
+            # T19: `projects.reopen` refused with meta.viability absent).
+            row = self.project_row()
+            if not (row.get("meta") or {}).get("viability"):
+                self.invoke(
+                    "projects.programme_meta",
+                    {"id": self.project_id, "meta": {"viability": "rework"}},
+                    if_match=row["version"],
+                )
             self.invoke(
                 "projects.reopen",
                 {
@@ -1028,7 +1038,12 @@ class Runner:
         the `wbs.update` needs no change.
         """
         items = self._read("baselines.list", {"project_id": self.project_id}).get("items", [])
-        approved = [row for row in items if row.get("approved_by")]
+        # The direct route's change must name the SCOPE baseline: a schedule or cost baseline
+        # (added by this rework) is refused `baseline_not_scope` (measured on the tr4 batch).
+        approved = [
+            row for row in items
+            if row.get("approved_by") and str(row.get("kind") or "scope") == "scope"
+        ]
         if not approved:
             return None
         baseline = max(approved, key=lambda row: row.get("taken_at") or "")
