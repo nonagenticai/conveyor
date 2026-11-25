@@ -94,10 +94,20 @@ pub struct ToolManifest {
     pub key: String,
     /// The registry action the broker dispatches (`coding_jobs.create`).
     pub action: String,
+    /// The idempotency rule the published tool carries (`required | optional | forbidden`).
+    /// Absent is `optional`; a write or destructive tool must declare `required`.
+    #[serde(default)]
+    pub idempotency: Option<String>,
     /// Response fields the broker replaces with `[redacted]` (SPEC_V2 §11.3).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub redact: Vec<String>,
+    /// The sibling tool key that reads the written object back. Required for a write or
+    /// destructive tool; the named sibling must be a `read` action.
+    #[serde(default)]
+    pub verification: Option<String>,
     /// How the broker proves the write happened; absent only on non-writing tools (§11.3).
+    /// The richer declaration (verdict + checks, or read_back); `verification` above is the
+    /// sibling-key form. A write tool declares at least one of the two.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub verify: Option<VerifyManifest>,
 }
@@ -178,7 +188,7 @@ pub enum ManifestError {
     },
     /// A writing tool that declares no verification path would be publishable but unprovable.
     #[error(
-        "toolkit {toolkit:?} tool {tool:?} is a {effect} tool with no verification path; declare verify.verdict + verify.checks or verify.read_back"
+        "toolkit {toolkit:?} tool {tool:?} is a {effect} tool with no verification path; declare verification, verify.verdict + verify.checks, or verify.read_back"
     )]
     UnverifiedWrite {
         /// The toolkit.
@@ -199,6 +209,30 @@ pub enum ManifestError {
         tool: String,
         /// The read-back tool key the manifest named.
         read_back: String,
+    },
+    /// The idempotency rule is not one of the three the column accepts.
+    #[error("{tool:?} has idempotency {value:?}, not required|optional|forbidden")]
+    InvalidIdempotency {
+        /// The tool.
+        tool: String,
+        /// The rejected value.
+        value: String,
+    },
+    /// The verification names a tool the manifest does not declare.
+    #[error("{tool:?} verifies through unknown tool {verification:?}")]
+    UnknownVerification {
+        /// The tool that declares the verification.
+        tool: String,
+        /// The missing sibling.
+        verification: String,
+    },
+    /// The verification tool is not a read.
+    #[error("{tool:?} verifies through {verification:?}, which is not a read")]
+    VerificationNotRead {
+        /// The tool that declares the verification.
+        tool: String,
+        /// The sibling that must read.
+        verification: String,
     },
 }
 
@@ -278,34 +312,66 @@ fn validate(manifest: &ToolkitManifest) -> Result<(), ManifestError> {
             });
         }
         effects.push((tool, spec.effect));
+        if let Some(idempotency) = tool.idempotency.as_deref()
+            && !matches!(idempotency, "required" | "optional" | "forbidden")
+        {
+            return Err(ManifestError::InvalidIdempotency {
+                tool: tool.key.clone(),
+                value: idempotency.to_owned(),
+            });
+        }
     }
-    // A write with no verification path cannot be published (§11.3). `read_back` names another
-    // tool in this same manifest, so it is resolved only after every action above is known good.
+    // A write with no verification path cannot be published (§11.3). Two shapes are accepted:
+    // the sibling read-tool key (`verification`) and the declared block (`verify`), whose
+    // `read_back` names another tool in this same manifest. They are resolved only after every
+    // action above is known good.
     for (tool, effect) in &effects {
         if !matches!(*effect, Effect::Write | Effect::Destructive) {
             continue;
         }
-        let Some(verify) = &tool.verify else {
-            return Err(ManifestError::UnverifiedWrite {
-                toolkit: manifest.key.clone(),
-                tool: tool.key.clone(),
-                effect: effect.as_str().to_owned(),
-            });
-        };
-        if let Some(read_back) = &verify.read_back {
-            let resolves = effects.iter().any(|(candidate, candidate_effect)| {
-                candidate.key == *read_back && *candidate_effect == Effect::Read
-            });
-            if !resolves {
-                return Err(ManifestError::InvalidReadBack {
-                    toolkit: manifest.key.clone(),
+        if let Some(verification) = tool.verification.as_deref() {
+            let sibling = manifest
+                .tools
+                .iter()
+                .find(|candidate| candidate.key == verification)
+                .ok_or_else(|| ManifestError::UnknownVerification {
                     tool: tool.key.clone(),
-                    read_back: read_back.clone(),
+                    verification: verification.to_owned(),
+                })?;
+            let sibling_spec = crate::registry::registry()
+                .get(sibling.action.as_str())
+                .ok_or_else(|| ManifestError::UnknownAction {
+                    action: sibling.action.clone(),
+                })?;
+            if sibling_spec.effect != crate::spec::Effect::Read {
+                return Err(ManifestError::VerificationNotRead {
+                    tool: tool.key.clone(),
+                    verification: verification.to_owned(),
                 });
             }
-        } else if verify.verdict.is_none() || verify.checks.is_none() {
-            // Synchronous writes need both halves: a verdict says pass/fail, `checks[]` says what
-            // was read back. Either one alone is not a verification path.
+        }
+        if let Some(verify) = &tool.verify {
+            if let Some(read_back) = &verify.read_back {
+                let resolves = effects.iter().any(|(candidate, candidate_effect)| {
+                    candidate.key == *read_back && *candidate_effect == Effect::Read
+                });
+                if !resolves {
+                    return Err(ManifestError::InvalidReadBack {
+                        toolkit: manifest.key.clone(),
+                        tool: tool.key.clone(),
+                        read_back: read_back.clone(),
+                    });
+                }
+            } else if verify.verdict.is_none() || verify.checks.is_none() {
+                // Synchronous writes need both halves: a verdict says pass/fail, `checks[]` says
+                // what was read back. Either one alone is not a verification path.
+                return Err(ManifestError::UnverifiedWrite {
+                    toolkit: manifest.key.clone(),
+                    tool: tool.key.clone(),
+                    effect: effect.as_str().to_owned(),
+                });
+            }
+        } else if tool.verification.is_none() {
             return Err(ManifestError::UnverifiedWrite {
                 toolkit: manifest.key.clone(),
                 tool: tool.key.clone(),
@@ -332,7 +398,7 @@ fn key_shape(key: &str) -> bool {
 /// — inserts a new version.
 pub fn content_hash(manifest: &ToolkitManifest) -> String {
     let mut hasher = Sha256::new();
-    hasher.update(b"conveyor.toolkit.v1\0");
+    hasher.update(b"conveyor.toolkit.v2\0");
     for part in [
         manifest.key.as_str(),
         manifest.service.as_str(),
@@ -370,10 +436,22 @@ pub fn content_hash(manifest: &ToolkitManifest) -> String {
             hasher.update([0u8]);
             hasher.update(spec.timeout_ms.to_string().as_bytes());
             hasher.update([0u8]);
-            let schema = serde_json::to_vec(&(spec.input)()).unwrap_or_default();
-            hasher.update(Sha256::digest(&schema));
+            let input = serde_json::to_vec(&(spec.input)()).unwrap_or_default();
+            hasher.update(Sha256::digest(&input));
+            hasher.update([0u8]);
+            // The output schema is copied from the action at publish time; hashing it here makes
+            // a registry schema change a new version, exactly like the input schema.
+            let output = serde_json::to_vec(&(spec.output)()).unwrap_or_default();
+            hasher.update(Sha256::digest(&output));
             hasher.update([0u8]);
         }
+        hasher.update(tool.idempotency.as_deref().unwrap_or("").as_bytes());
+        hasher.update([0u8]);
+        let redact = serde_json::to_vec(&tool.redact).unwrap_or_default();
+        hasher.update(Sha256::digest(&redact));
+        hasher.update([0u8]);
+        hasher.update(tool.verification.as_deref().unwrap_or("").as_bytes());
+        hasher.update([0u8]);
     }
     hex(&hasher.finalize())
 }
@@ -431,7 +509,9 @@ mod tests {
             tools: vec![ToolManifest {
                 key: "jobs_create".to_owned(),
                 action: "coding_jobs.create".to_owned(),
+                idempotency: None,
                 redact: Vec::new(),
+                verification: None,
                 verify,
             }],
         }
@@ -485,13 +565,17 @@ mod tests {
                 ToolManifest {
                     key: "jobs_create".to_owned(),
                     action: "coding_jobs.create".to_owned(),
+                    idempotency: None,
                     redact: Vec::new(),
+                    verification: None,
                     verify: None,
                 },
                 ToolManifest {
                     key: "jobs_get".to_owned(),
                     action: "coding_jobs.get".to_owned(),
+                    idempotency: None,
                     redact: Vec::new(),
+                    verification: None,
                     verify: None,
                 },
             ],
@@ -515,5 +599,23 @@ mod tests {
             content_hash(&redacted),
             content_hash(&coding_manifest(None))
         );
+    }
+
+    #[test]
+    fn a_changed_contract_is_a_new_version() {
+        let base = manifests().expect("the embedded manifests validate")[0].clone();
+        let original = content_hash(&base);
+
+        let mut changed = base.clone();
+        changed.tools[0].idempotency = Some("optional".to_owned());
+        assert_ne!(content_hash(&changed), original, "idempotency must hash");
+
+        let mut changed = base.clone();
+        changed.tools[0].redact.push("secret".to_owned());
+        assert_ne!(content_hash(&changed), original, "redact must hash");
+
+        let mut changed = base.clone();
+        changed.tools[0].verification = None;
+        assert_ne!(content_hash(&changed), original, "verification must hash");
     }
 }

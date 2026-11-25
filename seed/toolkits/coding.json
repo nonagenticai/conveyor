@@ -11,6 +11,8 @@
     {
       "key": "jobs_create",
       "action": "coding_jobs.create",
+      "idempotency": "required",
+      "verification": "jobs_get",
       "verify": { "read_back": "jobs_get" }
     },
     { "key": "jobs_get", "action": "coding_jobs.get" }

@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F live gate — the cadence row · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/16-cadence-create.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f-live-gate--the-cadence-row">T19F live gate — the cadence row</h1>
+<p>Action <code>cadences.create</code>, period <code>2026-PI-T19F</code>, bound to <code>t19f_live_gate_forum</code>.</p>
+<pre><code>== write: cadences.create ==
+{
+  &quot;id&quot;: &quot;01a210c9-0d47-7473-8339-7ea7648e59e9&quot;,
+  &quot;kind&quot;: &quot;pi&quot;,
+  &quot;meeting_type_key&quot;: &quot;t19f_live_gate_forum&quot;,
+  &quot;meta&quot;: {},
+  &quot;period&quot;: &quot;2026-PI-T19F&quot;,
+  &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+  &quot;state&quot;: &quot;planned&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: cadences.list ==
+{
+  &quot;items&quot;: [
+    {
+      &quot;id&quot;: &quot;01a1ff21-33f0-7e5a-bafc-b09b6fc73c13&quot;,
+      &quot;kind&quot;: &quot;pi&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;retrospective&quot;: true,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-ced2-7769-b12f-f6fba0997914&quot;,
+        &quot;tranche_number&quot;: 0
+      },
+      &quot;period&quot;: &quot;tranche-0&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a1ff21-547f-73e8-b256-4bee7fdc9c70&quot;,
+      &quot;kind&quot;: &quot;refinement&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;retrospective&quot;: true,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-ced2-7769-b12f-f6fba0997914&quot;,
+        &quot;tranche_number&quot;: 0
+      },
+      &quot;period&quot;: &quot;tranche-0&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a1ff21-7354-7777-996b-4c8cb12f25e9&quot;,
+      &quot;kind&quot;: &quot;demo&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;retrospective&quot;: true,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-ced2-7769-b12f-f6fba0997914&quot;,
+        &quot;tranche_number&quot;: 0
+      },
+      &quot;period&quot;: &quot;tranche-0&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;materialised&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;id&quot;: &quot;01a1ff21-8b3b-7d8c-a94f-7ea0e53dbe66&quot;,
+      &quot;kind&quot;: &quot;retro&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;retrospective&quot;: true,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-ced2-7769-b12f-f6fba0997914&quot;,
+        &quot;tranche_number&quot;: 0
+      },
+      &quot;period&quot;: &quot;tranche-0&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a1ff73-df1f-78c5-8793-101de5a3dd60&quot;,
+      &quot;kind&quot;: &quot;pi&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;retrospective&quot;: true,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-d787-7f5c-b5ed-15b05f3dc531&quot;,
+        &quot;tranche_number&quot;: 1
+      },
+      &quot;period&quot;: &quot;tranche-1&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;id&quot;: &quot;01a1ff74-8982-77b9-971e-e4517c55d09a&quot;,
+      &quot;kind&quot;: &quot;refinement&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;retrospective&quot;: true,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-d787-7f5c-b5ed-15b05f3dc531&quot;,
+        &quot;tranche_number&quot;: 1
+      },
+      &quot;period&quot;: &quot;tranche-1&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a1ff74-9819-72dc-a1f2-e102c73e9672&quot;,
+      &quot;kind&quot;: &quot;demo&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;retrospective&quot;: true,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-d787-7f5c-b5ed-15b05f3dc531&quot;,
+        &quot;tranche_number&quot;: 1
+      },
+      &quot;period&quot;: &quot;tranche-1&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;materialised&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;id&quot;: &quot;01a1ff74-a4d5-773a-a565-4bb5f9153557&quot;,
+      &quot;kind&quot;: &quot;retro&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;retrospective&quot;: true,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-d787-7f5c-b5ed-15b05f3dc531&quot;,
+        &quot;tranche_number&quot;: 1
+      },
+      &quot;period&quot;: &quot;tranche-1&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a2004a-51f4-7482-b5f8-455a4bd371b5&quot;,
+      &quot;kind&quot;: &quot;pi&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;retrospective&quot;: true,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-e2ac-786b-ac48-3b8bcdf12188&quot;,
+        &quot;tranche_number&quot;: 2
+      },
+      &quot;period&quot;: &quot;tranche-2&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a2004a-739d-717e-81dd-15ddf37f4c2f&quot;,
+      &quot;kind&quot;: &quot;refinement&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;retrospective&quot;: true,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-e2ac-786b-ac48-3b8bcdf12188&quot;,
+        &quot;tranche_number&quot;: 2
+      },
+      &quot;period&quot;: &quot;tranche-2&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a2004a-87d8-77e9-b06a-171361548e38&quot;,
+      &quot;kind&quot;: &quot;demo&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;retrospective&quot;: true,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-e2ac-786b-ac48-3b8bcdf12188&quot;,
+        &quot;tranche_number&quot;: 2
+      },
+      &quot;period&quot;: &quot;tranche-2&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;materialised&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;id&quot;: &quot;01a2004a-9c9a-7999-bbbd-9976427009b6&quot;,
+      &quot;kind&quot;: &quot;retro&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;retrospective&quot;: true,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-e2ac-786b-ac48-3b8bcdf12188&quot;,
+        &quot;tranche_number&quot;: 2
+      },
+      &quot;period&quot;: &quot;tranche-2&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a20280-a739-7bb9-823f-232f34b32aaa&quot;,
+      &quot;kind&quot;: &quot;pi&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-eb54-74d8-a2b5-44fb2b87eb52&quot;,
+        &quot;tranche_number&quot;: 3
+      },
+      &quot;period&quot;: &quot;tranche-3&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a20280-d52b-7791-a9b1-ebc2a10b5c3d&quot;,
+      &quot;kind&quot;: &quot;refinement&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-eb54-74d8-a2b5-44fb2b87eb52&quot;,
+        &quot;tranche_number&quot;: 3
+      },
+      &quot;period&quot;: &quot;tranche-3&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a20280-ef3f-7aac-8fad-3840a7995847&quot;,
+      &quot;kind&quot;: &quot;demo&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-eb54-74d8-a2b5-44fb2b87eb52&quot;,
+        &quot;tranche_number&quot;: 3
+      },
+      &quot;period&quot;: &quot;tranche-3&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;materialised&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;id&quot;: &quot;01a20281-09ba-709a-b61e-51a22f2ed172&quot;,
+      &quot;kind&quot;: &quot;retro&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-eb54-74d8-a2b5-44fb2b87eb52&quot;,
+        &quot;tranche_number&quot;: 3
+      },
+      &quot;period&quot;: &quot;tranche-3&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a202a1-dbb9-7e49-b64a-cf97c3fab095&quot;,
+      &quot;kind&quot;: &quot;pi&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce&quot;,
+        &quot;tranche_number&quot;: 4
+      },
+      &quot;period&quot;: &quot;tranche-4&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a202a1-f4ee-7acc-8e57-50ac6f0417fd&quot;,
+      &quot;kind&quot;: &quot;demo&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce&quot;,
+        &quot;tranche_number&quot;: 4
+      },
+      &quot;period&quot;: &quot;tranche-4&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;materialised&quot;,
+      &quot;version&quot;: 2
+    },
+    {
+      &quot;id&quot;: &quot;01a202a2-0e3f-75be-9f2b-c572ddcdfce9&quot;,
+      &quot;kind&quot;: &quot;retro&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce&quot;,
+        &quot;tranche_number&quot;: 4
+      },
+      &quot;period&quot;: &quot;tranche-4&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a202a2-2705-7392-a2d1-03ca2b3a174e&quot;,
+      &quot;kind&quot;: &quot;refinement&quot;,
+      &quot;meeting_type_key&quot;: null,
+      &quot;meta&quot;: {
+        &quot;delegation_ref&quot;: &quot;01a1ff1f-e4ba-72dc-9c1a-13049933cf14&quot;,
+        &quot;tranche_id&quot;: &quot;01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce&quot;,
+        &quot;tranche_number&quot;: 4
+      },
+      &quot;period&quot;: &quot;tranche-4&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;01a210c9-0d47-7473-8339-7ea7648e59e9&quot;,
+      &quot;kind&quot;: &quot;pi&quot;,
+      &quot;meeting_type_key&quot;: &quot;t19f_live_gate_forum&quot;,
+      &quot;meta&quot;: {},
+      &quot;period&quot;: &quot;2026-PI-T19F&quot;,
+      &quot;programme_id&quot;: &quot;01a1d039-0d24-7d16-ae52-4841e96ccfac&quot;,
+      &quot;state&quot;: &quot;planned&quot;,
+      &quot;version&quot;: 1
+    }
+  ]
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19f/gate/16-cadence-create.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

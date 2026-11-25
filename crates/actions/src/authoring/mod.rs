@@ -91,6 +91,9 @@ fn authoring_error(error: AuthoringStoreError, action: &str) -> ActionError {
             "asset_already_published",
             "an asset of this kind and key is already published",
         ),
+        AuthoringStoreError::Illegal(AuthoringError::PolicyInvalid { detail }) => {
+            ActionError::new(422, "invalid_policy_payload", detail)
+        }
         AuthoringStoreError::Database(error) => store_error(error, action),
     }
 }
@@ -146,6 +149,8 @@ pub struct AssetOut {
     pub review_approval_id: Option<Uuid>,
     /// When the row was published; absent until then.
     pub published_at: Option<DateTime<Utc>>,
+    /// The `meeting_type` version a policy asset published; `null` for every other kind.
+    pub published_meeting_type_id: Option<Uuid>,
     /// The If-Match version.
     pub version: i64,
 }
@@ -161,6 +166,7 @@ fn asset_out(record: &AssetRecord) -> AssetOut {
         status: record.status.clone(),
         review_approval_id: record.review_approval_id,
         published_at: record.published_at,
+        published_meeting_type_id: record.published_meeting_type_id,
         version: record.version,
     }
 }

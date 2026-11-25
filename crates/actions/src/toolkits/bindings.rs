@@ -1,163 +1,162 @@
 #![forbid(unsafe_code)]
-//! `tool_bindings.*` — the writer for the tool grant (SPEC_V2 §11.1, §11.4; T13 finding
-//! `v1-p111-1`).
+//! `tool_bindings.create|update|retire` — the grant becomes operable (SPEC_V2 §11.4, §11.8;
+//! issue #557).
 //!
-//! A `tool_binding` is one of the two rows that authorise a tool call: it pins a published
-//! toolkit version to a job binding or a single run, carries the effect ceiling the broker
-//! enforces and the sealed credential alias it opens. Until this module existed, only the tests
-//! wrote that row, so a real tenant's broker could never resolve a call.
+//! A binding is tenant-scoped and names exactly one target: a durable job binding or a run. It
+//! pins one published toolkit version and narrows that toolkit's effect with a ceiling. The
+//! ceiling can only narrow: `create` refuses a ceiling above the strongest effect the toolkit
+//! publishes, and `update` refuses a ceiling above the current one. The broker checks the same
+//! rank again at the call, so the action is not the only guard.
 //!
-//! * `tool_bindings.create` — resolve the published toolkit version, validate one target and the
-//!   ceiling, insert the grant, read it back.
-//! * `tool_bindings.update` — narrow the ceiling, set or clear the credential alias, enable or
-//!   disable the grant. The ceiling narrows, never raises (§11.4).
-//! * `tool_bindings.retire` — disable the grant; in-flight runs finish, new runs do not resolve.
-//! * `tool_bindings.list` — the grants for one job binding, one run, or all.
-//!
-//! A draft or retired toolkit version is refused at creation: a binding must pin something the
-//! broker may call. The write is tenant-scoped and every response is the row read back.
+//! `update` and `retire` require `If-Match` (or `_version`). A stale precondition is `412` with
+//! the current representation, the repository-wide CONTRACT §3 rule — not the `409` the issue's
+//! first draft named.
 
 use conveyor_store as store;
 use serde::{Deserialize, Serialize};
+use serde_json::{Value, json};
 use sqlx::PgConnection;
 use uuid::Uuid;
 
 use crate::invoke::{ActionError, HandlerCtx};
-
-const CEILINGS: [&str; 4] = ["read", "write", "spend", "destructive"];
-
-fn store_error(error: store::tool::ToolStoreError, action: &'static str) -> ActionError {
-    if let store::tool::ToolStoreError::Database(sqlx::Error::Database(detail)) = &error
-        && detail.is_unique_violation()
-    {
-        return ActionError::new(
-            409,
-            "binding_exists",
-            "this target already holds a binding for that toolkit version",
-        );
-    }
-    tracing::error!(%error, action, "tool binding store error");
-    ActionError::internal()
-}
+use crate::spec::{Effect, FieldError};
+use crate::views::{Page, PageIn};
 
 /// `tool_bindings.create`'s input.
 #[derive(Clone, Debug, Deserialize, schemars::JsonSchema)]
-pub struct ToolBindingCreateIn {
-    /// The toolkit's callable prefix (`coding`).
-    pub toolkit_key: String,
-    /// The published version to pin; absent = the latest published version.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub toolkit_version: Option<i64>,
-    /// The durable job binding this grant belongs to (one of the two targets).
+pub struct BindingCreateIn {
+    /// The durable job binding this grant belongs to. Exactly one of this and `run_id`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub job_binding_id: Option<Uuid>,
-    /// The single run this grant belongs to (one of the two targets).
+    /// The one-off run this grant belongs to.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub run_id: Option<Uuid>,
-    /// `read | write | spend | destructive`; default `read`.
+    /// The published toolkit version to pin. Exactly one of this and `toolkit_key`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub toolkit_id: Option<Uuid>,
+    /// The toolkit's callable prefix; the latest published version is pinned unless
+    /// `toolkit_version` names one. Exactly one of this and `toolkit_id`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub toolkit_key: Option<String>,
+    /// The semantic version to pin with `toolkit_key`; absent = the latest published version.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub toolkit_version: Option<i64>,
+    /// The effect ceiling (default `read`); it may not exceed the toolkit's strongest tool.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub effect_ceiling: Option<String>,
-    /// The sealed tenant secret the broker opens for a credentialed destination.
+    /// The sealed credential alias the broker resolves.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub credential_alias: Option<String>,
+    /// The per-minute rate limit.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rate_limit_per_min: Option<i32>,
 }
 
-/// `tool_bindings.update`'s input.
+/// `tool_bindings.update`'s input. Absent fields keep their stored value; an empty credential
+/// alias clears it.
 #[derive(Clone, Debug, Deserialize, schemars::JsonSchema)]
-pub struct ToolBindingUpdateIn {
-    /// The binding.
+pub struct BindingUpdateIn {
+    /// The binding to update.
     pub id: Uuid,
-    /// The new ceiling; it narrows, never raises.
+    /// The new ceiling; it may only narrow.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub effect_ceiling: Option<String>,
-    /// The new sealed credential alias.
+    /// The new credential alias; the empty string clears it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub credential_alias: Option<String>,
-    /// Clear the credential alias (mutually exclusive with `credential_alias`).
+    /// Clear the credential alias (the lane's explicit form; mutually exclusive with a
+    /// non-empty `credential_alias`).
     #[serde(default)]
     pub clear_credential_alias: bool,
-    /// Enable or disable the grant.
+    /// The new per-minute rate limit.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rate_limit_per_min: Option<i32>,
+    /// Whether the grant is live.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
 }
 
 /// `tool_bindings.retire`'s input.
 #[derive(Clone, Debug, Deserialize, schemars::JsonSchema)]
-pub struct ToolBindingRetireIn {
-    /// The binding.
+pub struct BindingRetireIn {
+    /// The binding to retire.
     pub id: Uuid,
 }
 
-/// `tool_bindings.list`'s input.
-#[derive(Clone, Debug, Deserialize, schemars::JsonSchema)]
-pub struct ToolBindingListIn {
-    /// Only the grants for this job binding.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub job_binding_id: Option<Uuid>,
-    /// Only the grants for this run.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub run_id: Option<Uuid>,
-}
-
-/// One binding as the actions return it.
+/// One binding, as the actions return it.
 #[derive(Clone, Debug, Serialize, schemars::JsonSchema)]
-pub struct ToolBindingOut {
-    /// The binding id.
+pub struct BindingOut {
+    /// The row.
     pub id: Uuid,
-    /// The job binding target.
+    /// The durable job binding, when this is a job grant.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub job_binding_id: Option<Uuid>,
-    /// The run target.
+    /// The one-off run, when this is a run grant.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub run_id: Option<Uuid>,
-    /// The pinned toolkit version row.
+    /// The pinned toolkit version.
     pub toolkit_id: Uuid,
-    /// The toolkit key.
+    /// The toolkit's callable prefix.
     pub toolkit_key: String,
     /// The toolkit's semantic version.
     pub toolkit_version: i64,
-    /// The enforced ceiling.
+    /// The effect ceiling.
     pub effect_ceiling: String,
     /// The sealed credential alias.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub credential_alias: Option<String>,
-    /// Whether the broker resolves it.
+    /// The per-minute rate limit.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rate_limit_per_min: Option<i32>,
+    /// Whether the grant is live.
     pub enabled: bool,
-    /// The row lock.
+    /// The If-Match version.
     pub version: i64,
 }
 
-impl From<store::tool::ToolBindingRecord> for ToolBindingOut {
-    fn from(row: store::tool::ToolBindingRecord) -> Self {
-        Self {
-            id: row.id,
-            job_binding_id: row.job_binding_id,
-            run_id: row.run_id,
-            toolkit_id: row.toolkit_id,
-            toolkit_key: row.toolkit_key,
-            toolkit_version: row.toolkit_version,
-            effect_ceiling: row.effect_ceiling,
-            credential_alias: row.credential_alias,
-            enabled: row.enabled,
-            version: row.version,
-        }
+fn invalid(field: &str, code: &str, detail: String) -> ActionError {
+    ActionError::invalid_input(vec![FieldError {
+        field: field.to_owned(),
+        code: code.to_owned(),
+        detail,
+    }])
+}
+
+fn out(row: &store::tool::BindingRow) -> BindingOut {
+    BindingOut {
+        id: row.id,
+        job_binding_id: row.job_binding_id,
+        run_id: row.run_id,
+        toolkit_id: row.toolkit_id,
+        toolkit_key: row.toolkit_key.clone(),
+        toolkit_version: row.toolkit_version,
+        effect_ceiling: row.effect_ceiling.clone(),
+        credential_alias: row.credential_alias.clone(),
+        rate_limit_per_min: row.rate_limit_per_min,
+        enabled: row.enabled,
+        version: row.version,
     }
 }
 
-/// `tool_bindings.list`'s answer.
-#[derive(Clone, Debug, Serialize, schemars::JsonSchema)]
-pub struct ToolBindingListOut {
-    /// The bindings, toolkit key order.
-    pub bindings: Vec<ToolBindingOut>,
+/// The current representation a stale `If-Match` returns (CONTRACT §3).
+fn current(row: &store::tool::BindingRow) -> Value {
+    json!({
+        "id": row.id,
+        "job_binding_id": row.job_binding_id,
+        "run_id": row.run_id,
+        "toolkit_id": row.toolkit_id,
+        "effect_ceiling": row.effect_ceiling,
+        "credential_alias": row.credential_alias,
+        "rate_limit_per_min": row.rate_limit_per_min,
+        "enabled": row.enabled,
+        "version": row.version,
+    })
 }
 
-fn validate_ceiling(value: &str) -> Result<&str, ActionError> {
-    if CEILINGS.contains(&value) {
-        Ok(value)
-    } else {
-        Err(ActionError::new(
-            422,
-            "effect_ceiling_invalid",
-            format!("effect_ceiling must be one of {CEILINGS:?}"),
-        ))
-    }
+/// The expected row version, or the `412` the contract requires.
+fn expected_version(ctx: &HandlerCtx, current: Value) -> Result<i64, ActionError> {
+    crate::board::require_precondition_with(ctx, ctx.action, current)?;
+    ctx.version.ok_or_else(ActionError::internal)
 }
 
 #[crate::action(
@@ -174,62 +173,115 @@ fn validate_ceiling(value: &str) -> Result<&str, ActionError> {
 async fn tool_bindings_create(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
-    input: ToolBindingCreateIn,
-) -> Result<ToolBindingOut, ActionError> {
-    if input.job_binding_id.is_some() == input.run_id.is_some() {
-        return Err(ActionError::new(
-            422,
-            "binding_target",
-            "exactly one of job_binding_id and run_id is required",
+    input: BindingCreateIn,
+) -> Result<BindingOut, ActionError> {
+    match (input.job_binding_id.is_some(), input.run_id.is_some()) {
+        (true, false) | (false, true) => {}
+        _ => {
+            return Err(invalid(
+                "job_binding_id",
+                "one_target",
+                "name exactly one of job_binding_id or run_id".to_owned(),
+            ));
+        }
+    }
+    if let Some(rate) = input.rate_limit_per_min
+        && rate <= 0
+    {
+        return Err(invalid(
+            "rate_limit_per_min",
+            "range",
+            "the rate limit must be positive".to_owned(),
         ));
     }
-    let ceiling = input.effect_ceiling.as_deref().unwrap_or("read");
-    validate_ceiling(ceiling)?;
-    let toolkit = match input.toolkit_version {
-        Some(version) => {
-            store::tool::toolkit_by_key_version(&mut *tx, ctx.tenant, &input.toolkit_key, version)
-                .await
-                .map_err(|error| store_error(error, "tool_bindings.create"))?
-        }
-        None => store::tool::latest_toolkit(&mut *tx, ctx.tenant, &input.toolkit_key)
-            .await
-            .map_err(|error| store_error(error, "tool_bindings.create"))?,
+    if input.toolkit_id.is_some() && input.toolkit_version.is_some() {
+        return Err(invalid(
+            "toolkit_version",
+            "toolkit_id",
+            "toolkit_version pins a toolkit_key; drop it when toolkit_id names the version"
+                .to_owned(),
+        ));
     }
-    .ok_or_else(|| {
-        ActionError::new(
-            404,
-            "toolkit_not_found",
-            format!("no toolkit {:?} at that version", input.toolkit_key),
-        )
-    })?;
+    let toolkit = match (input.toolkit_id, input.toolkit_key.as_deref()) {
+        (Some(id), None) => store::tool::toolkit_by_id(&mut *tx, ctx.tenant, id).await,
+        (None, Some(key)) => match input.toolkit_version {
+            Some(version) => {
+                store::tool::toolkit_by_key_version(&mut *tx, ctx.tenant, key, version).await
+            }
+            None => store::tool::latest_toolkit(&mut *tx, ctx.tenant, key).await,
+        },
+        (Some(_), Some(_)) | (None, None) => {
+            return Err(invalid(
+                "toolkit",
+                "one_toolkit",
+                "name exactly one of toolkit_id or toolkit_key".to_owned(),
+            ));
+        }
+    }
+    .map_err(|error| {
+        tracing::error!(%error, "tool_bindings.create: read the toolkit");
+        ActionError::internal()
+    })?
+    .ok_or_else(|| ActionError::resource_not_found("toolkit"))?;
     if toolkit.status != "published" {
+        // A toolkit that exists but is not published is a conflict, not a miss: the caller
+        // named a real key and the reason it cannot bind is its lifecycle state.
         return Err(ActionError::new(
             409,
             "toolkit_not_published",
+            "the toolkit is not published".to_owned(),
+        ));
+    }
+    let tools = store::tool::tools_of(&mut *tx, ctx.tenant, toolkit.id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "tool_bindings.create: read the toolkit's tools");
+            ActionError::internal()
+        })?;
+    let strongest = tools
+        .iter()
+        .filter_map(|tool| Effect::parse(&tool.effect))
+        .map(Effect::rank)
+        .max()
+        .unwrap_or(Effect::Read.rank());
+    let ceiling_text = input.effect_ceiling.as_deref().unwrap_or("read");
+    let ceiling = Effect::parse(ceiling_text).ok_or_else(|| {
+        invalid(
+            "effect_ceiling",
+            "effect",
+            format!("{ceiling_text:?} is not read|write|spend|destructive"),
+        )
+    })?;
+    if ceiling.rank() > strongest {
+        // #557 P2.1 names the widened-grant refusal with the effect code the T18 Tools contract
+        // and SPEC_V2 §11.4 use at the call: `403 tool_effect_forbidden`. The issue's first
+        // draft said 422; the correction is recorded on #557.
+        return Err(ActionError::new(
+            403,
+            "tool_effect_forbidden",
             format!(
-                "toolkit {:?} version {} is {}; only a published version can be bound",
-                toolkit.key, toolkit.toolkit_version, toolkit.status
+                "{ceiling_text:?} is above the toolkit's strongest effect; the binding narrows only"
             ),
         ));
     }
-    let id = store::tool::insert_binding(
+    let row = store::tool::insert_binding(
         &mut *tx,
         ctx.tenant,
-        &store::tool::NewToolBinding {
+        &store::tool::NewBinding {
             job_binding_id: input.job_binding_id,
             run_id: input.run_id,
             toolkit_id: toolkit.id,
-            effect_ceiling: ceiling,
+            effect_ceiling: ceiling.as_str(),
             credential_alias: input.credential_alias.as_deref(),
+            rate_limit_per_min: input.rate_limit_per_min,
         },
     )
     .await
-    .map_err(|error| store_error(error, "tool_bindings.create"))?;
-    let row = store::tool::binding_by_id(&mut *tx, ctx.tenant, id)
-        .await
-        .map_err(|error| store_error(error, "tool_bindings.create"))?
-        .ok_or_else(ActionError::internal)?;
-    Ok(row.into())
+    .map_err(|error| {
+        tracing::error!(%error, "tool_bindings.create: insert the binding");
+        ActionError::internal()
+    })?;
+    Ok(out(&row))
 }
 
 #[crate::action(
@@ -246,47 +298,102 @@ async fn tool_bindings_create(
 async fn tool_bindings_update(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
-    input: ToolBindingUpdateIn,
-) -> Result<ToolBindingOut, ActionError> {
-    if let Some(ceiling) = input.effect_ceiling.as_deref() {
-        validate_ceiling(ceiling)?;
-    }
-    if input.clear_credential_alias && input.credential_alias.is_some() {
-        return Err(ActionError::new(
-            422,
-            "credential_alias_ambiguous",
-            "set credential_alias or clear_credential_alias, not both",
+    input: BindingUpdateIn,
+) -> Result<BindingOut, ActionError> {
+    let row = store::tool::binding_by_id(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "tool_bindings.update: read the binding");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| ActionError::resource_not_found("tool binding"))?;
+    let expected = expected_version(&ctx, current(&row))?;
+
+    let current_ceiling = Effect::parse(&row.effect_ceiling).unwrap_or(Effect::Read);
+    let ceiling = match input.effect_ceiling.as_deref() {
+        Some(text) => {
+            let parsed = Effect::parse(text).ok_or_else(|| {
+                invalid(
+                    "effect_ceiling",
+                    "effect",
+                    format!("{text:?} is not read|write|spend|destructive"),
+                )
+            })?;
+            if parsed.rank() > current_ceiling.rank() {
+                return Err(ActionError::new(
+                    403,
+                    "tool_effect_forbidden",
+                    format!(
+                        "{text:?} is above the current ceiling {:?}; the binding may only narrow",
+                        row.effect_ceiling
+                    ),
+                ));
+            }
+            parsed
+        }
+        None => current_ceiling,
+    };
+    if let Some(rate) = input.rate_limit_per_min
+        && rate <= 0
+    {
+        return Err(invalid(
+            "rate_limit_per_min",
+            "range",
+            "the rate limit must be positive".to_owned(),
         ));
     }
-    let alias = if input.clear_credential_alias {
-        Some(None)
+    if input.clear_credential_alias
+        && input
+            .credential_alias
+            .as_deref()
+            .is_some_and(|value| !value.is_empty())
+    {
+        return Err(invalid(
+            "credential_alias",
+            "one_alias",
+            "clear_credential_alias and a non-empty credential_alias are mutually exclusive"
+                .to_owned(),
+        ));
+    }
+    let credential = if input.clear_credential_alias {
+        None
     } else {
-        input.credential_alias.as_deref().map(Some)
+        match input.credential_alias.as_deref() {
+            Some("") => None,
+            Some(value) => Some(value.to_owned()),
+            None => row.credential_alias.clone(),
+        }
     };
-    let changed = store::tool::update_binding(
+    let updated = store::tool::update_binding(
         &mut *tx,
         ctx.tenant,
-        input.id,
-        &store::tool::ToolBindingPatch {
-            effect_ceiling: input.effect_ceiling.as_deref(),
-            credential_alias: alias,
-            enabled: input.enabled,
+        row.id,
+        expected,
+        &store::tool::BindingUpdate {
+            effect_ceiling: ceiling.as_str(),
+            credential_alias: credential.as_deref(),
+            rate_limit_per_min: input.rate_limit_per_min.or(row.rate_limit_per_min),
+            enabled: input.enabled.unwrap_or(row.enabled),
         },
     )
     .await
-    .map_err(|error| store_error(error, "tool_bindings.update"))?;
-    if changed == 0 {
-        return Err(ActionError::new(
-            404,
-            "binding_not_found",
-            "no such binding",
-        ));
+    .map_err(|error| {
+        tracing::error!(%error, "tool_bindings.update: update the binding");
+        ActionError::internal()
+    })?;
+    match updated {
+        Some(row) => Ok(out(&row)),
+        None => {
+            let latest = store::tool::binding_by_id(&mut *tx, ctx.tenant, input.id)
+                .await
+                .ok()
+                .flatten();
+            Err(ActionError::precondition_with(
+                latest.as_ref().map(current).unwrap_or(Value::Null),
+                "the binding changed; re-read it".to_owned(),
+            ))
+        }
     }
-    let row = store::tool::binding_by_id(&mut *tx, ctx.tenant, input.id)
-        .await
-        .map_err(|error| store_error(error, "tool_bindings.update"))?
-        .ok_or_else(ActionError::internal)?;
-    Ok(row.into())
 }
 
 #[crate::action(
@@ -294,7 +401,7 @@ async fn tool_bindings_update(
     version = 1,
     kind = "internal",
     scopes = ["tools:write"],
-    idempotent = true,
+    idempotent = false,
     timeout_ms = 30000,
     effect = "write",
     confirm = "none",
@@ -303,22 +410,56 @@ async fn tool_bindings_update(
 async fn tool_bindings_retire(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
-    input: ToolBindingRetireIn,
-) -> Result<ToolBindingOut, ActionError> {
+    input: BindingRetireIn,
+) -> Result<BindingOut, ActionError> {
     let row = store::tool::binding_by_id(&mut *tx, ctx.tenant, input.id)
         .await
-        .map_err(|error| store_error(error, "tool_bindings.retire"))?
-        .ok_or_else(|| ActionError::new(404, "binding_not_found", "no such binding"))?;
-    store::tool::retire_binding(&mut *tx, ctx.tenant, input.id)
+        .map_err(|error| {
+            tracing::error!(%error, "tool_bindings.retire: read the binding");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| ActionError::resource_not_found("tool binding"))?;
+    let expected = expected_version(&ctx, current(&row))?;
+    let actor = ctx.actor_id.to_string();
+    let retired = store::tool::retire_binding(&mut *tx, ctx.tenant, row.id, expected, &actor)
         .await
-        .map_err(|error| store_error(error, "tool_bindings.retire"))?;
-    let row = store::tool::binding_by_id(&mut *tx, ctx.tenant, row.id)
-        .await
-        .map_err(|error| store_error(error, "tool_bindings.retire"))?
-        .ok_or_else(ActionError::internal)?;
-    Ok(row.into())
+        .map_err(|error| {
+            tracing::error!(%error, "tool_bindings.retire: retire the binding");
+            ActionError::internal()
+        })?;
+    match retired {
+        Some(row) => Ok(out(&row)),
+        None => {
+            let latest = store::tool::binding_by_id(&mut *tx, ctx.tenant, input.id)
+                .await
+                .ok()
+                .flatten();
+            Err(ActionError::precondition_with(
+                latest.as_ref().map(current).unwrap_or(Value::Null),
+                "the binding changed; re-read it".to_owned(),
+            ))
+        }
+    }
 }
 
+/// `tool_bindings.list`'s input.
+#[derive(Clone, Debug, Deserialize, schemars::JsonSchema)]
+pub struct BindingListIn {
+    /// Only this durable job binding's grants.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_binding_id: Option<Uuid>,
+    /// Only this run's grants.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub run_id: Option<Uuid>,
+    /// Only live (`true`) or disabled (`false`) grants.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub enabled: Option<bool>,
+    /// The shared page envelope; the list is capped at 200 and is not cursor-paged.
+    #[serde(default)]
+    pub page: PageIn,
+}
+
+/// Every grant in the tenant, filtered by the target the caller names.
 #[crate::action(
     name = "tool_bindings.list",
     version = 1,
@@ -333,12 +474,24 @@ async fn tool_bindings_retire(
 async fn tool_bindings_list(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
-    input: ToolBindingListIn,
-) -> Result<ToolBindingListOut, ActionError> {
-    let rows = store::tool::bindings_for(&mut *tx, ctx.tenant, input.job_binding_id, input.run_id)
-        .await
-        .map_err(|error| store_error(error, "tool_bindings.list"))?;
-    Ok(ToolBindingListOut {
-        bindings: rows.into_iter().map(ToolBindingOut::from).collect(),
+    input: BindingListIn,
+) -> Result<Page<BindingOut>, ActionError> {
+    let limit = i64::from(input.page.limit.unwrap_or(50).clamp(1, 200));
+    let rows = store::tool::bindings_list(
+        &mut *tx,
+        ctx.tenant,
+        input.job_binding_id,
+        input.run_id,
+        input.enabled,
+        limit,
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "tool_bindings.list: read the grants");
+        ActionError::internal()
+    })?;
+    Ok(Page {
+        items: rows.iter().map(out).collect(),
+        next_cursor: None,
     })
 }

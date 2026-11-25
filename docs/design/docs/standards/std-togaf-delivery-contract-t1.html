@@ -17,6 +17,7 @@
       .std-meta dd { margin:.15rem 0 0; }
       .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
       .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-intent { max-width:68ch; }
       .std-source { font-size:.85rem; opacity:.8; }
       .std-index { list-style:none; padding:0; }
       .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
@@ -36,24 +37,24 @@
         <div><dt>Standard</dt><dd>TOGAF</dd></div>
         <div><dt>Level</dt><dd>project</dd></div>
         <div><dt>Subject</dt><dd>SPEC_V2 slice T1 (docs/SPEC_V2.md §12)</dd></div>
-        <div><dt>Status</dt><dd>evidenced</dd></div>
+        <div><dt>Status</dt><dd>partial</dd></div>
         <div><dt>SPEC</dt><dd>§8.1</dd></div>
         <div><dt>Gate</dt><dd>live</dd></div>
         <div><dt>Package</dt><dd><code>std-togaf-delivery-contract-t1:T1</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-24T16:30:00Z · a2ef9194eb2c</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-25T03:46:32.319854100+00:00 · b51896a61b28</dd></div>
       </dl>
       <h2>Commitments</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-absent">Not evidenced — Explicit absence — the contract&#x27;s commitment list: a commitments field on the delivery contract body (see <code>std-togaf-delivery-contract-t1:T1</code>).</p><h2>Compliance method</h2>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T1 Plan spine (retrospective, U5a) <span class="std-state">live</span></li>
-</ul><h2>Compliance method</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
-<ul>
-<li>Delivery contract — T1 Plan spine (retrospective, U5a) <span class="std-state">live</span></li>
+<li>compliance: T1 is assessed clause by clause against the SPEC_V2 §12 gate and the ten issue-#72 scenarios. Each scenario has one named real-Postgres test in crates/actions/tests/plan_spine.rs or crates/api/tests/approval_dual.rs, and the refusal slugs are stable: 409 dependency_cycle, 409 self_approval, 422 change_impact_missing, 422 benefit_profile_incomplete, 422 benefit_map_incomplete and 422 tranche_evidence_missing. The Phase-G review records the compliance level against this contract; the rework&#x27;s acceptance instrument is acceptance/programme/T1.toml, and the closure gate is decided by an approver other than its requester.</li>
 </ul><h2>Approval</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_approval</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T1 Plan spine (retrospective, U5a) <span class="std-state">live</span></li>
+<li>approval 01a1ff8a-880f-7d08-b322-9656f2c5355f — live <span class="std-state">live</span></li>
 </ul>
     </main>
   </body>

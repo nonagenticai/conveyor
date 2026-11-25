@@ -83,11 +83,11 @@ additional entry, not a replacement; a body without a type keeps the direct path
 | T17 file collision | medium | merge conflict | rebase before the PR; the hook does not change signatures |
 | A policy version is published without evidence | low | governance defect | `authoring.review` requires an approved approval row; the plan tests the refusal |
 | A board sitting bypasses the direct policy | low | dual control lowered | `close_item_tx` is the only writer; the stricter approval policy wins |
-| A cadence slot gets a second meeting | medium | duplicate deliberation | the partial unique index; the action is idempotent |
+| A cadence slot gets a second meeting | medium | duplicate deliberation | the cadence row lock; the action is idempotent |
 | T19F closure manufactures a P0 | high if closed | strict gate red | T19F stays active; the closure review defers to the tranche-6 review |
 
 ## Recommendation
 
 Deliver T19F in the split the delivery contract writes: the plan and artefacts (#682), the
 implementation (#683) and the deployment-gated proof (#684). The live proof waits for the rollout
-that carries migration 0068; it is recorded as acceptance-blocked, never waived.
+that carries migration 0073; it is recorded as acceptance-blocked, never waived.

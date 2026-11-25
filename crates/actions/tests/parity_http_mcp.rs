@@ -2374,6 +2374,7 @@ async fn seed_arch_board(pg: &support::Pg, ctx: &Ctx) -> Uuid {
                 commissioning_authority: "parity programme".to_owned(),
                 decision_limits: json!({}),
                 members: json!([{ "role": "parity architect" }]),
+                meeting_type_key: None,
             },
         )
         .await
@@ -7283,6 +7284,20 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             ),
             200,
         ),
+        // ── T13/T14 (#557): the bindings and the catalogue reads ──────────────────────────
+        // The reads answer an empty page; the by-id and by-name refusals are the typed 404.
+        expecting(plain("tools.list", json!({}), None), 200),
+        expecting(plain("toolkits.list", json!({}), None), 200),
+        expecting(plain("tool_calls.list", json!({}), None), 200),
+        expecting(plain("tool_bindings.list", json!({}), None), 200),
+        expecting(
+            plain(
+                "tools.get",
+                json!({"toolkit": "missing", "tool": "missing"}),
+                None,
+            ),
+            404,
+        ),
         expecting(
             plain(
                 "tool_bindings.create",
@@ -7595,6 +7610,33 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             });
             expecting(sample, 201)
         },
+        // T19F: an unknown body is the deterministic refusal on both transports; the sitting's
+        // lifecycle is exercised by the meetings_binding suite.
+        expecting(
+            plain(
+                "architecture.board_sit_open",
+                json!({
+                    "body_id": uuid::Uuid::nil(),
+                    "subject_kind": "contract",
+                    "subject_id": uuid::Uuid::nil(),
+                    "list_id": uuid::Uuid::nil(),
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "architecture.board_sit_decide",
+                json!({
+                    "body_id": uuid::Uuid::nil(),
+                    "meeting_id": uuid::Uuid::nil(),
+                    "agenda_item_id": uuid::Uuid::nil(),
+                }),
+                None,
+            ),
+            404,
+        ),
         {
             let mut sample = plain("architecture.contracts_request", json!({}), None);
             sample.prepare = true;
@@ -7722,6 +7764,11 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         // the aggregate's lifecycle. `schedule` refuses before the list lookup because the type
         // has no policy to create.
         expecting(plain("meetings.list", json!({"limit": 5}), None), 200),
+        expecting(plain("meetings.type_list", json!({}), None), 200),
+        expecting(
+            plain("meetings.type_get", json!({"id": uuid::Uuid::nil()}), None),
+            404,
+        ),
         expecting(
             plain(
                 "meetings.get",
@@ -8687,6 +8734,14 @@ fn spine_samples() -> Vec<Sample> {
             sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("cadences.list")}));
             expecting(sample, 200)
         },
+        expecting(
+            plain(
+                "cadences.materialise",
+                json!({"id": uuid::Uuid::nil(), "list_id": uuid::Uuid::nil()}),
+                None,
+            ),
+            404,
+        ),
         {
             // The plan gate's opening call: a pending approval on a fresh PI cadence. A decision
             // is a person's second act and is covered by `pi_plan_approval`; parity needs the

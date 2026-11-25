@@ -80,6 +80,14 @@ test("the Meetings destination lists the forum and the room renders its record",
   await expect(page.locator(".problem")).toHaveCount(0);
 });
 
+test("the destination lists the forum policies", async ({ page, request }) => {
+  await seedMeeting(request, `Playwright policy list ${Date.now()}`);
+  await page.goto("/meetings");
+  await expect(page.getByRole("heading", { name: "Forum policies" })).toBeVisible();
+  await expect(page.getByText("board_", { exact: false }).first()).toBeVisible();
+  await expect(page.locator(".problem")).toHaveCount(0);
+});
+
 test("the owner seat is offered and an unseated principal sees the refusal", async ({
   page,
   request,
@@ -103,6 +111,7 @@ test("the empty destination is honest", async ({ page }) => {
   await page.goto("/meetings");
   await expect(page.getByRole("heading", { name: "Meetings" })).toBeVisible();
   await expect(page.getByText("No meeting in this tenant yet.")).toBeVisible();
+  await expect(page.getByText("No forum policy in this tenant yet.")).toBeVisible();
   await expect(page.locator(".problem")).toHaveCount(0);
 });
 

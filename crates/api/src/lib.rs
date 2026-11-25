@@ -430,10 +430,10 @@ mod tests {
         // S21 step 10's ladder.case, ladder.precheck and decision_option_sets.get|set are retired
         // with the duplicate ladder path. T11's metrics.reconciliation read adds one internal
         // action and T11's billing shim adds one external read (`billing.rollup`) — the merged
-        // registry is 605: 585 internal, 20 external.
+        // registry is 619: 594 internal, 25 external after the main merge.
         assert_eq!(
             registry.len(),
-            610,
+            619,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -480,7 +480,7 @@ mod tests {
              authoring.intakes; S21 step 10's ladder.case, ladder.precheck and \
              decision_option_sets.get|set are retired with the duplicate ladder path; T11's \
              metrics.reconciliation read is the 604th action; T11's billing shim adds one \
-             external read (`billing.rollup`), the 610th (610: 585 internal, 25 external). \
+             external read (`billing.rollup`), the 619th (619: 594 internal, 25 external). \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
         );

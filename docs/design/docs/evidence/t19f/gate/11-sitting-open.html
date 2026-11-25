@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F live gate — the sitting opens · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/11-sitting-open.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f-live-gate--the-sitting-opens">T19F live gate — the sitting opens</h1>
+<p>Action <code>architecture.board_sit_open</code> on contract 01a210c8-7ea8-7dc9-8104-700ecfe2905b: a pending approval, a live meeting and a deciding item.</p>
+<pre><code>== write: architecture.board_sit_open ==
+{
+  &quot;approval_id&quot;: &quot;01a210c8-9273-7964-9b97-0f3dd810bcf3&quot;,
+  &quot;meeting_id&quot;: &quot;01a210c8-94ee-73ba-9147-88f2b4729ae0&quot;
+}
+== read-back: architecture.board_get ==
+{
+  &quot;charter&quot;: &quot;Decides the T19F live-gate subject in a sitting.&quot;,
+  &quot;commissioning_authority&quot;: &quot;&quot;,
+  &quot;decision_limits&quot;: {},
+  &quot;id&quot;: &quot;01a210c8-579b-7808-bc32-aef8899b0b7a&quot;,
+  &quot;key&quot;: &quot;t19f-live-gate-board&quot;,
+  &quot;kind&quot;: &quot;architecture_board&quot;,
+  &quot;meeting_type_key&quot;: &quot;t19f_live_gate_forum&quot;,
+  &quot;members&quot;: [],
+  &quot;name&quot;: &quot;T19F live-gate board&quot;,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;version&quot;: 2
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19f/gate/11-sitting-open.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

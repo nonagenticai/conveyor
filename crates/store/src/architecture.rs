@@ -48,6 +48,9 @@ pub enum ArchitectureStoreError {
         /// Why.
         why: &'static str,
     },
+    /// A meeting the board sitting delegates to refused the write.
+    #[error(transparent)]
+    Meeting(#[from] crate::meetings::MeetingStoreError),
 }
 
 /// The capability's refusal vocabulary.
@@ -278,6 +281,8 @@ pub struct GovernanceBodyRecord {
     pub decision_limits: Value,
     /// Members.
     pub members: Value,
+    /// The forum type this body's sittings use; NULL falls back to the body's own key.
+    pub meeting_type_key: Option<String>,
     /// draft | active | retired.
     pub status: String,
     /// The If-Match version.
@@ -428,7 +433,7 @@ const TYPE_COLUMNS: &str = "id, key, name, artifact_kind, phase_code, plateau, m
 const PROFILE_COLUMNS: &str = "id, key, name, phase_set, artifact_requirements, contract_kinds, \
     status, adopted_at, board_decision_id, version";
 const BODY_COLUMNS: &str = "id, kind, key, name, charter, commissioning_authority, \
-    decision_limits, members, status, version";
+    decision_limits, members, meeting_type_key, status, version";
 const CONTRACT_COLUMNS: &str = "id, project_id, kind, phase_code, title, body, status, \
     approval_id, approved_by, approved_at, requested_by, supersedes_id, superseded_by_id, version";
 const REVIEW_COLUMNS: &str = "id, project_id, contract_id, level, findings, evidence, outcome, \
@@ -1254,6 +1259,8 @@ pub struct NewBody {
     pub decision_limits: Value,
     /// Members.
     pub members: Value,
+    /// The forum type this body's sittings use; the body's key when omitted.
+    pub meeting_type_key: Option<String>,
 }
 
 /// Create a governance body.
@@ -1309,8 +1316,9 @@ pub async fn open_body_tx(
     }
     let sql = format!(
         "INSERT INTO governance_body
-            (tenant_id, kind, key, name, charter, commissioning_authority, decision_limits, members)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            (tenant_id, kind, key, name, charter, commissioning_authority, decision_limits,
+             members, meeting_type_key)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
          ON CONFLICT (tenant_id, key) DO NOTHING
          RETURNING {BODY_COLUMNS}"
     );
@@ -1323,6 +1331,7 @@ pub async fn open_body_tx(
         .bind(&new.commissioning_authority)
         .bind(&new.decision_limits)
         .bind(&new.members)
+        .bind(&new.meeting_type_key)
         .fetch_optional(&mut *conn)
         .await?;
     match inserted {
@@ -1367,6 +1376,195 @@ pub async fn list_bodies_tx(
         .bind(kind)
         .fetch_all(&mut *conn)
         .await?)
+}
+
+/// A board sitting: the approval the seats decide and the meeting they decide it in.
+#[derive(Clone, Copy, Debug)]
+pub struct BoardSitting {
+    /// The meeting card's row.
+    pub meeting_id: Uuid,
+    /// The pending approval the agenda item decides.
+    pub approval_id: Uuid,
+}
+
+/// The subject tables a board decision can name.
+fn board_subject_table(kind: &str) -> Option<&'static str> {
+    match kind {
+        "contract" => Some("architecture_contract"),
+        "artifact" => Some("architecture_artifact"),
+        "adm_profile" => Some("adm_profile"),
+        "waiver" => Some("architecture_waiver"),
+        _ => None,
+    }
+}
+
+/// Open (or resume) the board's sitting over one subject: a pending approval, a live meeting
+/// with the body's standing type, and the approval as its deciding agenda item. Idempotent:
+/// an existing pending approval on a scheduled or live sitting is returned unchanged.
+// The caller's transaction, tenant and actor plus the five subject/sitting fields; grouping
+// them would only move the tuple.
+#[allow(clippy::too_many_arguments)]
+pub async fn open_board_sitting_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    actor: crate::meetings::MeetingActor<'_>,
+    body_id: Uuid,
+    subject_kind: &str,
+    subject_id: Uuid,
+    list_id: Uuid,
+    evidence: &Value,
+) -> Result<BoardSitting, ArchitectureStoreError> {
+    let body = get_body_tx(&mut *conn, tenant, body_id)
+        .await?
+        .ok_or(ArchitectureStoreError::NotFound("governance body"))?;
+    if body.status != "active" {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "governance body",
+            why: "the body is not active; approve it before it can sit",
+        });
+    }
+    let table = board_subject_table(subject_kind).ok_or(ArchitectureStoreError::Conflict {
+        what: "board decision",
+        why: "the subject kind must be contract, artifact, adm_profile or waiver",
+    })?;
+    let exists: bool = sqlx::query_scalar(AssertSqlSafe(format!(
+        "SELECT EXISTS (SELECT 1 FROM {table} WHERE tenant_id = $1 AND id = $2)"
+    )))
+    .bind(tenant.as_uuid())
+    .bind(subject_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if !exists {
+        return Err(ArchitectureStoreError::NotFound("board decision subject"));
+    }
+    let meeting_type_key = body
+        .meeting_type_key
+        .clone()
+        .filter(|key| !key.trim().is_empty())
+        .unwrap_or_else(|| body.key.clone());
+
+    let existing: Option<(Uuid, Uuid)> = sqlx::query_as(
+        "SELECT a.id, i.meeting_id
+           FROM approval a
+           JOIN meeting_agenda_item i
+             ON i.tenant_id = a.tenant_id AND i.resolved_kind = 'approval'
+            AND i.resolved_id = a.id
+           JOIN meeting m ON m.tenant_id = i.tenant_id AND m.id = i.meeting_id
+          WHERE a.tenant_id = $1 AND a.status = 'pending'
+            AND a.gate = 'architecture_board'
+            AND a.meta ->> 'body_id' = $2
+            AND a.meta ->> 'subject_kind' = $3
+            AND a.meta ->> 'subject_id' = $4
+            AND m.status IN ('scheduled', 'live')
+          ORDER BY m.created_at DESC LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(body.id.to_string())
+    .bind(subject_kind)
+    .bind(subject_id.to_string())
+    .fetch_optional(&mut *conn)
+    .await?;
+    if let Some((approval_id, meeting_id)) = existing {
+        return Ok(BoardSitting {
+            meeting_id,
+            approval_id,
+        });
+    }
+
+    let approval_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO approval
+            (tenant_id, gate, kind, status, required_decisions, requested_by, meta)
+         VALUES ($1, 'architecture_board', 'architecture_board', 'pending', 1, $2, $3)
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(actor.id)
+    .bind(json!({
+        "body_id": body.id,
+        "evidence": evidence,
+        "subject_kind": subject_kind,
+        "subject_id": subject_id,
+    }))
+    .fetch_one(&mut *conn)
+    .await?;
+
+    let existing_meeting: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM meeting
+          WHERE tenant_id = $1 AND convener_governance_body_id = $2
+            AND status IN ('scheduled', 'live')
+          ORDER BY created_at DESC LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(body.id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let meeting_id = match existing_meeting {
+        Some(id) => id,
+        None => {
+            let title = format!("{} sitting", body.name);
+            let new = crate::meetings::NewMeeting {
+                meeting_type_key: &meeting_type_key,
+                policy: None,
+                title: &title,
+                description: "A board sitting over its subject decisions.",
+                list_id,
+                board_id: None,
+                convener_kind: "governance_body",
+                convener_id: body.id,
+                cadence_slot: None,
+            };
+            let meeting = crate::meetings::schedule_tx(&mut *conn, tenant, actor, &new).await?;
+            crate::meetings::open_tx(&mut *conn, tenant, meeting.id, None).await?;
+            meeting.id
+        }
+    };
+    crate::meetings::agenda_add_tx(
+        &mut *conn,
+        tenant,
+        meeting_id,
+        &crate::meetings::NewAgendaItem {
+            resolved_kind: "approval",
+            resolved_id: approval_id,
+            participating_departments: &[],
+            evidence_refs: evidence,
+        },
+    )
+    .await?;
+    Ok(BoardSitting {
+        meeting_id,
+        approval_id,
+    })
+}
+
+/// Decide the sitting's item through T19's arithmetic; the meeting must be the body's.
+pub async fn decide_board_sitting_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    body_id: Uuid,
+    meeting_id: Uuid,
+    agenda_item_id: Uuid,
+) -> Result<crate::meetings::CloseItemResult, ArchitectureStoreError> {
+    let convener: Option<Option<Uuid>> = sqlx::query_scalar(
+        "SELECT convener_governance_body_id FROM meeting WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    match convener {
+        None => return Err(ArchitectureStoreError::NotFound("meeting")),
+        Some(Some(id)) if id == body_id => {}
+        Some(_) => {
+            return Err(ArchitectureStoreError::Conflict {
+                what: "meeting",
+                why: "the sitting was not convened by this body",
+            });
+        }
+    }
+    Ok(
+        crate::meetings::close_item_tx(&mut *conn, tenant, meeting_id, agenda_item_id, None)
+            .await?,
+    )
 }
 
 /// Read a governance body.

@@ -43,7 +43,7 @@ board path; a new UI destination.
 
 | Id | Enabler | Serves |
 |---|---|---|
-| E1 | Migration 0068: the authoring link, the two binding keys and the cadence-slot index | F1, F2, F3 |
+| E1 | Migration 0073: the authoring link, the two binding keys and the cadence-slot index | F1, F2, F3 |
 | E2 | The extracted board approval insert shared by `board_decide` and `board_sit_open` | F2 |
 | E3 | The registry/OpenAPI/coverage regeneration and the T19F programme row | F1–F4 |
 
