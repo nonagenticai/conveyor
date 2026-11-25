@@ -37,12 +37,12 @@
 <tr>
 <td><code>exists</code></td>
 <td>the real route and its Playwright spec exist</td>
-<td>60</td>
+<td>63</td>
 </tr>
 <tr>
 <td><code>extend</code></td>
 <td>a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner</td>
-<td>6</td>
+<td>3</td>
 </tr>
 <tr>
 <td><code>new</code></td>
@@ -597,24 +597,24 @@
 <td>§10.5</td>
 <td>destination</td>
 <td>Improve</td>
-<td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/improve' found<br>apps/web/e2e/improve.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/evals/improvement' found<br>docs/design/v2.js: page 'improve' — design reference, not implementation<br>apps/web/src/app.rs: route '/improve' renders ImproveGate (a gate; owner: T4, T5)<br><em>V1 /evals/improvement carries the improvement campaigns; the coach/kata/lessons path is T4/T5.</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/improve' found<br>apps/web/e2e/improve.spec.ts: present<br>apps/web/src/app.rs: V1 ancestor '/evals/improvement' found<br>docs/design/v2.js: page 'improve' — design reference, not implementation<br><em>V1 /evals/improvement carries the improvement campaigns; the coach/kata/lessons path is T4/T5.</em></td>
 </tr>
 <tr>
 <td><code>destination:Operations</code></td>
 <td>§10.5</td>
 <td>destination</td>
 <td>Operations</td>
-<td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/operations' found<br>apps/web/e2e/operations.spec.ts: absent<br>docs/design/v2.js: page 'operations' — design reference, not implementation<br>apps/web/src/app.rs: route '/operations' renders OperationsGate (a gate; owner: T7)<br><em>No route and no operations actions; the incident/runbook/postmortem path is T7.</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/operations' found<br>apps/web/e2e/operations.spec.ts: present<br>docs/design/v2.js: page 'operations' — design reference, not implementation<br><em>No route and no operations actions; the incident/runbook/postmortem path is T7.</em></td>
 </tr>
 <tr>
 <td><code>destination:Tools</code></td>
 <td>§10.5</td>
 <td>destination</td>
 <td>Tools</td>
-<td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/tools' found<br>apps/web/e2e/tools.spec.ts: absent<br>docs/design/v2.js: page 'toolkits' — design reference, not implementation<br>apps/web/src/app.rs: route '/tools' renders ToolsGate (a gate; owner: T13–T15)<br><em>V1 /tools is a legacy coding-action catalogue; the tool/toolkit/binding/call rows are T13–T15.</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/tools' found<br>apps/web/e2e/tools.spec.ts: present<br>docs/design/v2.js: page 'toolkits' — design reference, not implementation<br><em>V1 /tools is a legacy coding-action catalogue; the tool/toolkit/binding/call rows are T13–T15.</em></td>
 </tr>
 </tbody>
 </table>
