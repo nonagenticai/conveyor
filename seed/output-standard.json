@@ -2114,7 +2114,7 @@
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -3890,7 +3890,7 @@
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -3946,7 +3946,7 @@
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -4002,7 +4002,7 @@
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -4058,7 +4058,7 @@
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -4325,7 +4325,7 @@
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -4435,7 +4435,7 @@
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -4500,7 +4500,7 @@
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }
@@ -4556,7 +4556,7 @@
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "scope": "subject"
             }
           }

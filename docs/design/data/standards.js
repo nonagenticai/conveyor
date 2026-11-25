@@ -57703,7 +57703,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -57962,7 +57962,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -58074,7 +58074,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -58333,7 +58333,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -58592,7 +58592,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -58851,7 +58851,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -59110,7 +59110,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -59319,7 +59319,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -59578,7 +59578,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -59837,7 +59837,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -60096,7 +60096,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -60276,7 +60276,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -60535,7 +60535,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -60715,7 +60715,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -60743,10 +60743,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "architecture-artifact",
+      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t19.html",
-        "sha256": "b3a7124e49e9a30a8d79930a75596efec4f730d1e22e69ee15e388307451f05e"
+        "sha256": "09f04d0f45426dcbd725361cee98a75c7baa3a113ed29e05422810b55748a3d7"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -60758,6 +60759,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T19",
       "package_key": "std-togaf-architecture-artifact-t19:T19",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -60920,31 +60922,28 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Document",
-          "missing": [],
+          "missing": [
+            "No row or document satisfies 'Document'; a document exists but lacks the heading"
+          ],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
-              "count": 1,
+              "category": "architecture-artifact-instance",
+              "count": 0,
               "file": "artefacts.json",
-              "items": [
-                {
-                  "id": "01a20ce4-73e4-7009-9ec7-eb2265e9e84e",
-                  "title": "T19 — Architecture artifact (the typed TOGAF set)"
-                }
-              ],
+              "items": [],
               "kind": "documents",
               "pointer": "/documents",
               "scope": "subject"
             }
           ],
-          "status": "evidenced"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "evidenced",
+      "status": "partial",
       "subject": {
         "id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
         "key": "T19",
@@ -60958,10 +60957,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "architecture-artifact",
+      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t19f.html",
-        "sha256": "564d089b9fab6ab762e24ce90660279f283ccff7aa4fd7e773418e1a83b6f487"
+        "sha256": "a84ce3b70197fa9557206f8cc5d784701543f77fa7ceb0df50a993f887cad288"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -60973,6 +60973,7 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-togaf-architecture-artifact-t19f:T19F",
+      "package_published": false,
       "sections": [
         {
           "cause": "record",
@@ -61135,31 +61136,28 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Document",
-          "missing": [],
+          "missing": [
+            "No row or document satisfies 'Document'; a document exists but lacks the heading"
+          ],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
-              "count": 1,
+              "category": "architecture-artifact-instance",
+              "count": 0,
               "file": "artefacts.json",
-              "items": [
-                {
-                  "id": "01a210be-6a72-77d4-ae4f-9ab9fa3c7f2a",
-                  "title": "T19F — Architecture artifact (the typed TOGAF set)"
-                }
-              ],
+              "items": [],
               "kind": "documents",
               "pointer": "/documents",
               "scope": "subject"
             }
           ],
-          "status": "evidenced"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "evidenced",
+      "status": "partial",
       "subject": {
         "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
         "key": "T19F",
@@ -61404,7 +61402,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -61584,7 +61582,7 @@ window.CONVEYOR_STANDARDS = {
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -61616,7 +61614,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t9.html",
-        "sha256": "c1e79e13d7497fecef5bc3ca68c6d9e765798fb097554927006b1cad69aab136"
+        "sha256": "af602377ac078d174227f3bdc7f3c0b899493a3abf40189da34ba5f858e94772"
       },
       "gate": {
         "approval_id": "",
@@ -61757,26 +61755,23 @@ window.CONVEYOR_STANDARDS = {
         {
           "cause": "record",
           "heading": "Document",
-          "missing": [],
+          "missing": [
+            "No row or document satisfies 'Document'; a document exists but lacks the heading"
+          ],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "category": "architecture-artifact",
-              "count": 1,
+              "category": "architecture-artifact-instance",
+              "count": 0,
               "file": "artefacts.json",
-              "items": [
-                {
-                  "id": "01a1f2dd-3623-701c-b0ba-169d83d7907a",
-                  "title": "Architecture artefact — the principles catalogue (PF-1)"
-                }
-              ],
+              "items": [],
               "kind": "documents",
               "pointer": "/documents",
               "scope": "subject"
             }
           ],
-          "status": "evidenced"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -116815,7 +116810,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -117050,7 +117045,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -117285,7 +117280,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -117520,7 +117515,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -117755,7 +117750,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -117990,7 +117985,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -118225,7 +118220,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -118460,7 +118455,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -118695,7 +118690,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -118930,7 +118925,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -119165,7 +119160,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -119400,7 +119395,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -119635,7 +119630,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -119870,7 +119865,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -120105,7 +120100,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -120340,7 +120335,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -120575,7 +120570,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -120810,7 +120805,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -121045,7 +121040,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -121208,7 +121203,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -121371,7 +121366,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -121534,7 +121529,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -121697,7 +121692,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -121860,7 +121855,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -122023,7 +122018,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -122186,7 +122181,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -122349,7 +122344,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -122512,7 +122507,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -122675,7 +122670,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -122838,7 +122833,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -123001,7 +122996,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -123164,7 +123159,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -123327,7 +123322,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -123490,7 +123485,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -123653,7 +123648,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -123816,7 +123811,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -123979,7 +123974,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -124142,7 +124137,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -124305,7 +124300,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -124468,7 +124463,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -124631,7 +124626,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -124794,7 +124789,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -124957,7 +124952,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -125120,7 +125115,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -125283,7 +125278,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -125446,7 +125441,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -125609,7 +125604,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -125772,7 +125767,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -125935,7 +125930,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -126098,7 +126093,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -126261,7 +126256,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -126424,7 +126419,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -126587,7 +126582,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -126750,7 +126745,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -126913,7 +126908,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -127076,7 +127071,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -127239,7 +127234,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -127402,7 +127397,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -127565,7 +127560,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -127728,7 +127723,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -127891,7 +127886,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -128054,7 +128049,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -128217,7 +128212,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -128380,7 +128375,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -128543,7 +128538,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -128706,7 +128701,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -128869,7 +128864,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -129032,7 +129027,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -129195,7 +129190,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -129358,7 +129353,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -129521,7 +129516,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -129684,7 +129679,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -129847,7 +129842,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -130010,7 +130005,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -130173,7 +130168,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -130336,7 +130331,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -130436,7 +130431,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -130643,7 +130638,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -130850,7 +130845,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -131077,7 +131072,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -131343,7 +131338,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -131502,7 +131497,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -131661,7 +131656,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -131820,7 +131815,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -131935,7 +131930,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -132050,7 +132045,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -132161,7 +132156,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -132276,7 +132271,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -132391,7 +132386,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -132506,7 +132501,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -132621,7 +132616,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -132732,7 +132727,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -132839,7 +132834,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -132946,7 +132941,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -133053,7 +133048,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -133160,7 +133155,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -133267,7 +133262,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -133374,7 +133369,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -133481,7 +133476,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -133588,7 +133583,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -133695,7 +133690,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -133802,7 +133797,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -133909,7 +133904,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -134016,7 +134011,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -134123,7 +134118,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -134230,7 +134225,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -134337,7 +134332,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -134444,7 +134439,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -134551,7 +134546,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -134658,7 +134653,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -134765,7 +134760,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -134872,7 +134867,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -134987,7 +134982,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -135102,7 +135097,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -135217,7 +135212,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -135332,7 +135327,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -135447,7 +135442,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -135554,7 +135549,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -135669,7 +135664,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -135776,7 +135771,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -135883,7 +135878,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -135990,7 +135985,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -136097,7 +136092,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -136204,7 +136199,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -136324,7 +136319,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -136449,7 +136444,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -136574,7 +136569,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -136681,7 +136676,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -136796,7 +136791,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -136903,7 +136898,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -137010,7 +137005,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -137117,7 +137112,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -137224,7 +137219,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -137344,7 +137339,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -137444,7 +137439,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -137544,7 +137539,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -137644,7 +137639,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -137744,7 +137739,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/artifacts"
             },
             {
-              "category": "architecture-artifact",
+              "category": "architecture-artifact-instance",
               "count": 0,
               "file": "artefacts.json",
               "items": [],
@@ -145211,20 +145206,20 @@ window.CONVEYOR_STANDARDS = {
     "TOGAF": {
       "absent": 161,
       "artefacts": 654,
-      "evidenced": 161,
-      "partial": 332
+      "evidenced": 159,
+      "partial": 334
     }
   },
   "generated_at": "2026-11-25T03:46:32.319854100+00:00",
   "git_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
-  "payload_sha256": "9c6ff47e0cb3e76391574f5c4bd531ded4f1ba7b5c3cb316bddbe32a0ff69b32",
+  "payload_sha256": "751b95f32df81dc008fc05aa1ec67ac99a10bed44edb6a5f050c7a505c173eaa",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 354,
     "artefacts": 1012,
-    "evidenced": 256,
-    "findings": 582,
+    "evidenced": 254,
+    "findings": 584,
     "mandatory": 912,
-    "partial": 402
+    "partial": 404
   }
 };
