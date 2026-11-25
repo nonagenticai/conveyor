@@ -16150,11 +16150,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "closure-review",
-      "covered_key": "",
+      "covered_key": "closed_without_closure_review:S05",
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s05.html",
-        "sha256": "1084e8ac937d29e5621a2059864d1449c547a30623a2e6163e7e4c0a3747a3f0"
+        "sha256": "905d83d3917557e13cf62d2b43eff3ea02e47f3611678169b28550a3bba0eaf7"
       },
       "gate": {
         "approval_id": "",
@@ -16165,8 +16165,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S05",
-      "package_key": "std-pmp-closure-review-s05:S05",
-      "package_published": false,
+      "package_key": "closed_without_closure_review:S05",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -18332,11 +18332,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "closure-review",
-      "covered_key": "",
+      "covered_key": "closed_without_closure_review:T15",
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t15.html",
-        "sha256": "a8a048341f6d704a6ad9b414bfefa41dbe6b5caefa9a73e53be876dad5ff02d5"
+        "sha256": "635965d801603a116d765f0a342d2ade72814f2040d45859ee3824cddacc7518"
       },
       "gate": {
         "approval_id": "",
@@ -18347,8 +18347,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T15",
-      "package_key": "std-pmp-closure-review-t15:T15",
-      "package_published": false,
+      "package_key": "closed_without_closure_review:T15",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -18570,11 +18570,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "closure-review",
-      "covered_key": "",
+      "covered_key": "closed_without_closure_review:T17",
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t17.html",
-        "sha256": "4191c7420d751454c7e1b99e039e039671553e90461d236def5e0b699f453e2f"
+        "sha256": "8d7e7e0df22f7655ea4f3432a899353d9dec360c15dcb681e6acccc117e77e43"
       },
       "gate": {
         "approval_id": "",
@@ -18585,8 +18585,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T17",
-      "package_key": "std-pmp-closure-review-t17:T17",
-      "package_published": false,
+      "package_key": "closed_without_closure_review:T17",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -19195,11 +19195,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "closure-review",
-      "covered_key": "",
+      "covered_key": "closed_without_closure_review:T5",
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t5.html",
-        "sha256": "8e80b2f29858ec0551836004d5e02a4502f88b6142cb556f67a35415a7a05668"
+        "sha256": "d3ee9a87708f651a6aef928460efc0ca8e6003912ffeee35e526d93edf836af0"
       },
       "gate": {
         "approval_id": "",
@@ -19210,8 +19210,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T5",
-      "package_key": "std-pmp-closure-review-t5:T5",
-      "package_published": false,
+      "package_key": "closed_without_closure_review:T5",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -19314,11 +19314,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "closure-review",
-      "covered_key": "",
+      "covered_key": "closed_without_closure_review:T6",
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t6.html",
-        "sha256": "be83cdfc1760244edd6dc6bb081b5977d5a9ac78afb1890873afed0ddd2beb27"
+        "sha256": "f05d3d5b19581d7ea0d6907fd51d34ec082e8427b415b9bc7df9450b64009558"
       },
       "gate": {
         "approval_id": "",
@@ -19329,8 +19329,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T6",
-      "package_key": "std-pmp-closure-review-t6:T6",
-      "package_published": false,
+      "package_key": "closed_without_closure_review:T6",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -19552,11 +19552,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "closure-review",
-      "covered_key": "",
+      "covered_key": "closed_without_closure_review:T8",
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t8.html",
-        "sha256": "589cd26994788f3311a31e4030b07f5c32c875a5e0ca2cdc6e696a92defb2f24"
+        "sha256": "bd2521bc04540e25260cd9131139701e00cd04991730b5695ac3852ea33bf86b"
       },
       "gate": {
         "approval_id": "",
@@ -19567,8 +19567,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T8",
-      "package_key": "std-pmp-closure-review-t8:T8",
-      "package_published": false,
+      "package_key": "closed_without_closure_review:T8",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -29131,11 +29131,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S05",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s05.html",
-        "sha256": "296a91aca3e710537e07db6af608a991bc8bee3183a520107ff2a3ffc1ee1a05"
+        "sha256": "150da47efa0f88880fe9e6ab947f3bcc633038e8b05a84dbcd5cc0684670cfec"
       },
       "gate": {
         "approval_id": "",
@@ -29146,8 +29146,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S05",
-      "package_key": "std-pmp-project-brief-s05:S05",
-      "package_published": false,
+      "package_key": "unpublished_declared_output:tranche-4",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -48098,11 +48098,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-wbs",
-      "covered_key": "",
+      "covered_key": "wbs_absent:S18",
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s18.html",
-        "sha256": "27c106052bbedfe5ea29be47f293b9c3e5396565170abebf346ed8427e142c29"
+        "sha256": "19280e8b3d9ac0b84fdd8c2433e87202bd029ca933dc209ea97a5a9cded96a58"
       },
       "gate": {
         "approval_id": "",
@@ -48113,8 +48113,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S18",
-      "package_key": "std-pmp-project-wbs-s18:S18",
-      "package_published": false,
+      "package_key": "wbs_absent:tranche-9",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -48374,11 +48374,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-wbs",
-      "covered_key": "",
+      "covered_key": "wbs_absent:S21",
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s21.html",
-        "sha256": "73d1556e69a0abd706992b2115e36946b508f469e00d2848acf4ae6e0fb54f62"
+        "sha256": "c161d944f33aefdaa0ed30d204221858b1aa2e3e118f7680d1a4b96c91d492e2"
       },
       "gate": {
         "approval_id": "",
@@ -48389,8 +48389,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S21",
-      "package_key": "std-pmp-project-wbs-s21:S21",
-      "package_published": false,
+      "package_key": "wbs_absent:tranche-9",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -49277,7 +49277,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-wbs",
-      "covered_key": "wbs_absent:T15",
+      "covered_key": "",
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t15.html",
@@ -49461,7 +49461,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-wbs",
-      "covered_key": "wbs_absent:T17",
+      "covered_key": "",
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t17.html",
@@ -49737,11 +49737,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-wbs",
-      "covered_key": "",
+      "covered_key": "wbs_absent:T19F",
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t19f.html",
-        "sha256": "24296a5dbd841894567f9a234cc259740c2a5a8e2cc6300bb32659a6a2c502f2"
+        "sha256": "42f42e47ac30796d10c64d75b118dba294632702340b22e40f2a2144a07d637c"
       },
       "gate": {
         "approval_id": "01a210c3-9007-75f4-927c-d1dc32f54c6b",
@@ -49752,8 +49752,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "T19F",
-      "package_key": "std-pmp-project-wbs-t19f:T19F",
-      "package_published": false,
+      "package_key": "wbs_absent:tranche-6",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -50125,7 +50125,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-wbs",
-      "covered_key": "wbs_absent:T5",
+      "covered_key": "",
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t5.html",
@@ -50217,7 +50217,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-wbs",
-      "covered_key": "wbs_absent:T6",
+      "covered_key": "",
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t6.html",
@@ -50401,7 +50401,7 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "project-wbs",
-      "covered_key": "wbs_absent:T8",
+      "covered_key": "",
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t8.html",
@@ -132648,11 +132648,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "phase-g",
-      "covered_key": "",
+      "covered_key": "mandatory_artefacts:S05",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s05-g.html",
-        "sha256": "0573e804a738def4a0c672b016c8975213f23bfdbcabd93e9e9bb0e51405acfa"
+        "sha256": "dc8e32239b5626fbcb0aff7d7eed4c2abc2f8e291fe933a242e4294fa97f8098"
       },
       "gate": {
         "approval_id": "",
@@ -132663,8 +132663,8 @@ window.CONVEYOR_STANDARDS = {
       "level": "project",
       "mandatory": true,
       "owner_project": "S05",
-      "package_key": "std-togaf-phase-g-s05-g:S05",
-      "package_published": false,
+      "package_key": "mandatory_artefacts:tranche-4",
+      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -144693,13 +144693,13 @@ window.CONVEYOR_STANDARDS = {
   },
   "generated_at": "2026-11-25T03:46:32.319854100+00:00",
   "git_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
-  "payload_sha256": "af37e6425d8e0db1fbf9b3b7256a6f23fb66e8b8214700fe51e2b11c4f98c05d",
+  "payload_sha256": "fc0384848e2c8d4084f3ca5043e7794e31446b80ad8e912f6bd4c6dfd6a77445",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 373,
     "artefacts": 1012,
     "evidenced": 256,
-    "findings": 580,
+    "findings": 574,
     "mandatory": 912,
     "partial": 383
   }
