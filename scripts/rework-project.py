@@ -541,7 +541,35 @@ class Runner:
                 version=contract.get("version", 1),
             )
         else:
-            print("  delivery contract: already live")
+            # A live contract whose body lacks a field the standard's page reads is repaired by
+            # a superseding revision, never by editing an approved row: the packs author
+            # commitments/compliance/approval, and the record's contract must carry them for the
+            # page's sections to resolve (measured 2026-11-25: every member's Commitments empty).
+            pack_body = self.content["delivery_contract"]["body"] or {}
+            live_body = contract.get("body") or {}
+            missing = [name for name in pack_body if name not in live_body]
+            if missing:
+                requested = self.invoke(
+                    "architecture.contracts_request",
+                    {
+                        "project_id": self.project_id,
+                        "kind": "delivery_contract",
+                        "phase_code": "f",
+                        "title": self.content["delivery_contract"]["title"],
+                        "body": pack_body,
+                        "supersedes_id": contract["id"],
+                    },
+                    read_action="architecture.contracts_get",
+                    read_id_from_output="id",
+                )
+                contract = self.approve_contract(
+                    requested["id"],
+                    "approve the delivery contract revision",
+                    version=1,
+                )
+                print("  delivery contract: revised to carry the authored body")
+            else:
+                print("  delivery contract: already live")
 
         # 6b. the six-section project register, before the baseline freezes it (§8.4)
         self.ensure_registers()
