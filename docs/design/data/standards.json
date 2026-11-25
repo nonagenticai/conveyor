@@ -102775,11 +102775,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-design-publish-b.html",
-        "sha256": "0bf5aa90b0f9df29eb97bed40ffdf14003900e5a34cc152db66fd1b929cf423c"
+        "sha256": "3e485e7d3da44df161db76bf3f4fa93e9c0d50e8946d3090c5815c9c714c9670"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -102791,7 +102790,6 @@
       "mandatory": true,
       "owner_project": "DESIGN-PUBLISH",
       "package_key": "std-togaf-phase-b-design-publish-b:DESIGN-PUBLISH",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -102818,21 +102816,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff3e-0f21-7e12-888d-1a54e7a90c9d",
+                  "status": "live",
+                  "title": "Delivery contract — DESIGN-PUBLISH: the published studio design pack"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -102924,7 +102926,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d39-7414-b43c-450de170ffe1:b",
         "key": "DESIGN-PUBLISH/b",
@@ -102938,11 +102940,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-p0-b.html",
-        "sha256": "3a0ff943fa131ae57765543b2bc2a120c58e462eca26b845c27c006a7c9f0ca7"
+        "sha256": "92f8c7e805158914a131455e06e6025b61d78b9b50877cc4b2770fb03b276caa"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -102954,7 +102955,6 @@
       "mandatory": true,
       "owner_project": "P0",
       "package_key": "std-togaf-phase-b-p0-b:P0",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -102981,21 +102981,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1fdd4-ab0f-7802-b7a7-2541a2902e6b",
+                  "status": "live",
+                  "title": "Delivery contract — P0 programme definition (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -103087,7 +103091,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1dcb8-d24b-76de-b901-56fd56e001bc:b",
         "key": "P0/b",
@@ -103264,11 +103268,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "mandatory_artefacts:S00",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s00-b.html",
-        "sha256": "099f2093869b84e9fcca3efeb072f3b25a603ac39b20a765357197eddfa42c1f"
+        "sha256": "713edd79f524ec1e6d3526e4fd629325e9cb1974b9a85abe056cc97b2f27ba27"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -103280,7 +103283,6 @@
       "mandatory": true,
       "owner_project": "S00",
       "package_key": "std-togaf-phase-b-s00-b:S00",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -103307,21 +103309,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738",
+                  "status": "live",
+                  "title": "Delivery contract — S00 (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -103413,7 +103419,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d26-7573-9b0c-e0f60af92003:b",
         "key": "S00/b",
@@ -103427,11 +103433,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "mandatory_artefacts:S01",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s01-b.html",
-        "sha256": "15cb0a68138c0b749edec2a7f1ce105fc603283373880b4be14684430736c302"
+        "sha256": "26cf1c18b56535d9d8ea52dede7eda9436a764fd39e9b5fbc5817a4b6c5bc607"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -103443,7 +103448,6 @@
       "mandatory": true,
       "owner_project": "S01",
       "package_key": "std-togaf-phase-b-s01-b:S01",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -103470,21 +103474,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff31-30fe-7003-8d62-59278699d128",
+                  "status": "live",
+                  "title": "Delivery contract — S01 (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -103576,7 +103584,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d27-724c-9bae-af96b2d926b1:b",
         "key": "S01/b",
@@ -103590,11 +103598,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "mandatory_artefacts:S02",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s02-b.html",
-        "sha256": "3a938e266ccbc571a935a12ae793b6b916a29d9f339d7a5c4cce86640ecc88dc"
+        "sha256": "41655349346f7aca205631891d4d665691cbe50d8d4d65bf34c022c877a7a4c1"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -103606,7 +103613,6 @@
       "mandatory": true,
       "owner_project": "S02",
       "package_key": "std-togaf-phase-b-s02-b:S02",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -103633,21 +103639,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff85-bda3-7671-a5b1-42eae3b0e6ee",
+                  "status": "live",
+                  "title": "Delivery Contract — S02 Skeleton (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -103739,7 +103749,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a:b",
         "key": "S02/b",
@@ -103753,11 +103763,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s03-b.html",
-        "sha256": "4226d3687fb76fb069ed05ee902c11ea99b198f75b1203f8befd8e0365003639"
+        "sha256": "91db234d34b0c256b99ba6a1b26a2a5c5d621f75d6b48da29cf6a025ec8d51f9"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -103769,7 +103778,6 @@
       "mandatory": true,
       "owner_project": "S03",
       "package_key": "std-togaf-phase-b-s03-b:S03",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -103796,21 +103804,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20063-3a7d-7e67-a437-2e0884f6c46a",
+                  "status": "live",
+                  "title": "Delivery contract — S03 Domain and schema (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -103902,7 +103914,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d28-743b-86c7-0d0698ed69c1:b",
         "key": "S03/b",
@@ -104079,11 +104091,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-spec-v2-b.html",
-        "sha256": "559a95dc14bcdeb35ac83e7a5f1bf0e1cf910e4fb4733ebbf76cdacf8d5257d4"
+        "sha256": "9db2cd0e41835c6f828fa6fd1460c554342f1ae8b63dc507c8a1732e135f960f"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -104095,7 +104106,6 @@
       "mandatory": true,
       "owner_project": "SPEC-V2",
       "package_key": "std-togaf-phase-b-spec-v2-b:SPEC-V2",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -104122,21 +104132,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff42-7bd0-7d9e-883a-1059368cd356",
+                  "status": "live",
+                  "title": "Delivery contract — SPEC-V2, retrospective acceptance of the organisational operating model (2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -104228,7 +104242,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50:b",
         "key": "SPEC-V2/b",
@@ -104242,11 +104256,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "mandatory_artefacts:T0",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t0-b.html",
-        "sha256": "47a8ac035dead57190b7a435c7242cac461bca24365657d62433e92c3febed05"
+        "sha256": "5fcf5ab22f7082f57f4639e554b66951ddc4406669fe954cd4e039eb06451f3c"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -104258,7 +104271,6 @@
       "mandatory": true,
       "owner_project": "T0",
       "package_key": "std-togaf-phase-b-t0-b:T0",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -104285,21 +104297,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff47-1159-707b-a737-582f894cc956",
+                  "status": "live",
+                  "title": "Delivery contract — T0 Model and contracts (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -104391,7 +104407,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d32-7734-98da-fb7f1e2386c7:b",
         "key": "T0/b",
@@ -104405,11 +104421,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "mandatory_artefacts:T1",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t1-b.html",
-        "sha256": "d4803694f44cdd115b7655736cf167d0573b184f136cda1c72e05d3dae68a74c"
+        "sha256": "2c90b262ec6a77fbfd3ac79200a49f642ce8e541421e59e0653a5b5b48fc7a37"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -104421,7 +104436,6 @@
       "mandatory": true,
       "owner_project": "T1",
       "package_key": "std-togaf-phase-b-t1-b:T1",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -104448,21 +104462,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff8a-754f-70de-a63a-fa8d00596433",
+                  "status": "live",
+                  "title": "Delivery contract — T1 Plan spine (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -104554,7 +104572,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d32-7c81-8365-371217d16ef7:b",
         "key": "T1/b",
@@ -104568,11 +104586,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t10-b.html",
-        "sha256": "2bca9a0e84ea2ab13a5eb3fa2542a699c38975554ba531cdb4b8594287873ad9"
+        "sha256": "b2b4ae57bf19aba595154f7ec3dcd78497424ddbcc71ea16a3371ec6474be7ea"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -104584,7 +104601,6 @@
       "mandatory": true,
       "owner_project": "T10",
       "package_key": "std-togaf-phase-b-t10-b:T10",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -104611,21 +104627,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20289-2b08-7ea3-96f6-b2ac928a7be4",
+                  "status": "live",
+                  "title": "Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -104717,7 +104737,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9:b",
         "key": "T10/b",
@@ -104731,11 +104751,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "mandatory_artefacts:T11",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t11-b.html",
-        "sha256": "c1e47d1e17d1e5dd79e74477231bb44ef580fec2de98a4576edbca8d497b7f15"
+        "sha256": "dd121a6aaae975e50adc6e4d705ef316b413c9ba6f2452c95b00bcef42d9055a"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -104747,7 +104766,6 @@
       "mandatory": true,
       "owner_project": "T11",
       "package_key": "std-togaf-phase-b-t11-b:T11",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -104774,21 +104792,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff8f-08ee-7bc5-bb39-81304d03c4ef",
+                  "status": "live",
+                  "title": "Delivery contract — T11 Metrics, metering and maturity (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -104880,7 +104902,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d36-782b-8b18-ff07a64dedbe:b",
         "key": "T11/b",
@@ -104894,11 +104916,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t13-b.html",
-        "sha256": "3a1a535bdafb7e3894490a882b1f4072ca4e170304c67c55721f9a93c1f6cf40"
+        "sha256": "6b41153f552410a555023cd1b238759ecafcc7b79d1db4795d6ec58578833527"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -104910,7 +104931,6 @@
       "mandatory": true,
       "owner_project": "T13",
       "package_key": "std-togaf-phase-b-t13-b:T13",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -104937,21 +104957,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20277-2d08-7c91-bce6-1a8326add30c",
+                  "status": "live",
+                  "title": "Delivery contract — T13 Tool platform (retrospective, 2026-11-22)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -105043,7 +105067,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d:b",
         "key": "T13/b",
@@ -105057,11 +105081,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t19-b.html",
-        "sha256": "ab38b30f352bf1d88eb241ce6047daf66c685a32a36204b4344eed7b823c4d7b"
+        "sha256": "65871c328616a15bd64880a8482c68f0f585c6cb2faa341323fdc88335fd7aa8"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -105073,7 +105096,6 @@
       "mandatory": true,
       "owner_project": "T19",
       "package_key": "std-togaf-phase-b-t19-b:T19",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -105100,21 +105122,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20cea-91bb-77f4-a880-044c90bb5f0e",
+                  "status": "live",
+                  "title": "Delivery contract — T19 decision forums (2026-11-24)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -105206,7 +105232,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1:b",
         "key": "T19/b",
@@ -105220,11 +105246,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t19f-b.html",
-        "sha256": "c174de4cd77f0d9af0523764edf666b0285eb8d8bad8c0c1527d5558a424a5c2"
+        "sha256": "677c0648f54d087901e4a78b063588445e6c68d7116b50f0bfa6bc5c00044e68"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -105236,7 +105261,6 @@
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-togaf-phase-b-t19f-b:T19F",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -105263,21 +105287,30 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 2,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a210bd-f408-778a-b67e-9b6cf36ca62a",
+                  "status": "live",
+                  "title": "Delivery contract — T19F forum bindings (2026-11-25)"
+                },
+                {
+                  "id": "01a210c8-7ea8-7dc9-8104-700ecfe2905b",
+                  "status": "draft",
+                  "title": "T19F live gate — the sitting subject"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -105369,7 +105402,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:b",
         "key": "T19F/b",
@@ -105383,11 +105416,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "mandatory_artefacts:T2",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t2-b.html",
-        "sha256": "dd94f71203377db1ecc9016501c174f1339f16eaa3fbecd2d0d9908b79bc9661"
+        "sha256": "dabd06f965863d9b45cc36ec4a62cdbaacfaf0e4a7389386c3b93ca6327b763e"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -105399,7 +105431,6 @@
       "mandatory": true,
       "owner_project": "T2",
       "package_key": "std-togaf-phase-b-t2-b:T2",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -105426,21 +105457,30 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 2,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a2005c-18e4-75a7-9c20-2d83728194e0",
+                  "status": "superseded",
+                  "title": "Delivery contract — T2 Decision ladder (retrospective, U5a)"
+                },
+                {
+                  "id": "01a2009a-7bce-7a8f-96fd-f5159286a09e",
+                  "status": "live",
+                  "title": "Delivery contract — T2 Decision ladder (re-review at the fixed P0)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -105532,7 +105572,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1:b",
         "key": "T2/b",
@@ -105546,11 +105586,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t4-b.html",
-        "sha256": "cda5e30e49fa67b3fe3073c66655af7ab8ab16e9d8c8146e43e58c416ec6ffa3"
+        "sha256": "23e0ae43cca0a24d8cf5da76b8f2d0702410ee1bbfc634b883425c719e98df6a"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -105562,7 +105601,6 @@
       "mandatory": true,
       "owner_project": "T4",
       "package_key": "std-togaf-phase-b-t4-b:T4",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -105589,21 +105627,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a2028d-942b-759a-ad59-ab9c38629977",
+                  "status": "live",
+                  "title": "Delivery contract — T4 Kanban coach (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -105695,7 +105737,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d33-7e7e-890e-b437b0c78db9:b",
         "key": "T4/b",
@@ -105709,11 +105751,10 @@
     },
     {
       "category": "phase-b",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t9-b.html",
-        "sha256": "7f5fa887baaf391d4536c9b33bad8285afc81e3e1fe7698d6053429238396420"
+        "sha256": "10c77d07aff9a698f88beb09539a4ea8316b4e5dd71bd334833aea1ca15cf394"
       },
       "gate": {
         "approval_id": "",
@@ -105725,7 +105766,6 @@
       "mandatory": true,
       "owner_project": "T9",
       "package_key": "std-togaf-phase-b-t9-b:T9",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -105752,21 +105792,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20280-25ea-759d-8f96-51980017b97e",
+                  "status": "live",
+                  "title": "Delivery contract — T9 TOGAF ADM capability (retrospective, 2026-11-22)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -105858,7 +105902,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d:b",
         "key": "T9/b",
@@ -105872,11 +105916,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-design-publish-c.html",
-        "sha256": "6afdfab1846ad6704a567ddc0e73a8e1282af503c43afa0f60c1d66cad425cca"
+        "sha256": "c3b0a3e3e5cec0ad47c54d353deb9023352ae5f5bb1cf948818bc556b9eaa428"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -105888,7 +105931,6 @@
       "mandatory": true,
       "owner_project": "DESIGN-PUBLISH",
       "package_key": "std-togaf-phase-c-design-publish-c:DESIGN-PUBLISH",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -105915,21 +105957,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff3e-0f21-7e12-888d-1a54e7a90c9d",
+                  "status": "live",
+                  "title": "Delivery contract — DESIGN-PUBLISH: the published studio design pack"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -106021,7 +106067,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d39-7414-b43c-450de170ffe1:c",
         "key": "DESIGN-PUBLISH/c",
@@ -106035,11 +106081,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-p0-c.html",
-        "sha256": "a769d089e9d81a271a9901907c47d2b2e1ac6795c2f7f34f62e832f0882761cf"
+        "sha256": "90a59132afe4fbadf7554f05176771aa326416508ee595fa90e465529ef9214f"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -106051,7 +106096,6 @@
       "mandatory": true,
       "owner_project": "P0",
       "package_key": "std-togaf-phase-c-p0-c:P0",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -106078,21 +106122,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1fdd4-ab0f-7802-b7a7-2541a2902e6b",
+                  "status": "live",
+                  "title": "Delivery contract — P0 programme definition (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -106184,7 +106232,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1dcb8-d24b-76de-b901-56fd56e001bc:c",
         "key": "P0/c",
@@ -106361,11 +106409,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "mandatory_artefacts:S00",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s00-c.html",
-        "sha256": "c14c00dd7c640952f409b01458a111f7c66ed7a01833976db817c34fbfd7f7d7"
+        "sha256": "bae5f81ca297ead28bcc136eaae95d01acff55829b33f79c0329b2002266e67d"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -106377,7 +106424,6 @@
       "mandatory": true,
       "owner_project": "S00",
       "package_key": "std-togaf-phase-c-s00-c:S00",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -106404,21 +106450,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738",
+                  "status": "live",
+                  "title": "Delivery contract — S00 (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -106510,7 +106560,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d26-7573-9b0c-e0f60af92003:c",
         "key": "S00/c",
@@ -106524,11 +106574,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "mandatory_artefacts:S01",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s01-c.html",
-        "sha256": "18c85d4d9c69778719902f3e6b8e58552ef80ff148324e6c08bbb06966e9229d"
+        "sha256": "dd3ad174018493d600695c379c5f535af40157c785693e5d07d7df8e022f4467"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -106540,7 +106589,6 @@
       "mandatory": true,
       "owner_project": "S01",
       "package_key": "std-togaf-phase-c-s01-c:S01",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -106567,21 +106615,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff31-30fe-7003-8d62-59278699d128",
+                  "status": "live",
+                  "title": "Delivery contract — S01 (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -106673,7 +106725,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d27-724c-9bae-af96b2d926b1:c",
         "key": "S01/c",
@@ -106687,11 +106739,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "mandatory_artefacts:S02",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s02-c.html",
-        "sha256": "1520ddee3da46678227a52041473f7e38e2666c19842bb21a3e6e19b562f35de"
+        "sha256": "2f519c709acce09ca65b0a998f7eb6aaf2d012218a775a654f25e1725b9b00cc"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -106703,7 +106754,6 @@
       "mandatory": true,
       "owner_project": "S02",
       "package_key": "std-togaf-phase-c-s02-c:S02",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -106730,21 +106780,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff85-bda3-7671-a5b1-42eae3b0e6ee",
+                  "status": "live",
+                  "title": "Delivery Contract — S02 Skeleton (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -106836,7 +106890,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a:c",
         "key": "S02/c",
@@ -106850,11 +106904,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s03-c.html",
-        "sha256": "332039938f47bf5e3db6de3855881a827838887b9ad697620e1079485458cca5"
+        "sha256": "6a8f192dea2f4332095cd132679013b82b059764b104e8e51891f13d6a59a508"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -106866,7 +106919,6 @@
       "mandatory": true,
       "owner_project": "S03",
       "package_key": "std-togaf-phase-c-s03-c:S03",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -106893,21 +106945,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20063-3a7d-7e67-a437-2e0884f6c46a",
+                  "status": "live",
+                  "title": "Delivery contract — S03 Domain and schema (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -106999,7 +107055,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d28-743b-86c7-0d0698ed69c1:c",
         "key": "S03/c",
@@ -107176,11 +107232,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-spec-v2-c.html",
-        "sha256": "84b41b613f5e6192d96210d8ed15cdcd89930d5a35650fe3e9cf187fd7fcc38b"
+        "sha256": "79c650a03d1556c1379ee39a17cd4ea29f13aa8f258705728f2ac78799c534f7"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -107192,7 +107247,6 @@
       "mandatory": true,
       "owner_project": "SPEC-V2",
       "package_key": "std-togaf-phase-c-spec-v2-c:SPEC-V2",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -107219,21 +107273,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff42-7bd0-7d9e-883a-1059368cd356",
+                  "status": "live",
+                  "title": "Delivery contract — SPEC-V2, retrospective acceptance of the organisational operating model (2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -107325,7 +107383,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50:c",
         "key": "SPEC-V2/c",
@@ -107339,11 +107397,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "mandatory_artefacts:T0",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t0-c.html",
-        "sha256": "922337ac56c55800ab8b64a81e9384ba8fd3424a711650eefb02e1db05b6a5d5"
+        "sha256": "389cc238197f5333140bdbd83b602467570f7a956bed61f8e2394d1ada81a948"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -107355,7 +107412,6 @@
       "mandatory": true,
       "owner_project": "T0",
       "package_key": "std-togaf-phase-c-t0-c:T0",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -107382,21 +107438,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff47-1159-707b-a737-582f894cc956",
+                  "status": "live",
+                  "title": "Delivery contract — T0 Model and contracts (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -107488,7 +107548,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d32-7734-98da-fb7f1e2386c7:c",
         "key": "T0/c",
@@ -107502,11 +107562,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "mandatory_artefacts:T1",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t1-c.html",
-        "sha256": "24084a083fb1f49463a5588dc5ce430211666a4aca035b30e45c82377f1c7ad3"
+        "sha256": "4dc21ea704defd362abf95a1aca24bc60fa7cd5909c9a16e1fbac38eed7ed2af"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -107518,7 +107577,6 @@
       "mandatory": true,
       "owner_project": "T1",
       "package_key": "std-togaf-phase-c-t1-c:T1",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -107545,21 +107603,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff8a-754f-70de-a63a-fa8d00596433",
+                  "status": "live",
+                  "title": "Delivery contract — T1 Plan spine (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -107651,7 +107713,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d32-7c81-8365-371217d16ef7:c",
         "key": "T1/c",
@@ -107665,11 +107727,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t10-c.html",
-        "sha256": "6aac51c3a97a4c2042eb720279a8a07d915adf0ad720a77e6167ccfb014b3edd"
+        "sha256": "273e554ce901048c7cbae01300428b2622d3b81089d5533889e175ccd0bc843f"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -107681,7 +107742,6 @@
       "mandatory": true,
       "owner_project": "T10",
       "package_key": "std-togaf-phase-c-t10-c:T10",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -107708,21 +107768,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20289-2b08-7ea3-96f6-b2ac928a7be4",
+                  "status": "live",
+                  "title": "Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -107814,7 +107878,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9:c",
         "key": "T10/c",
@@ -107828,11 +107892,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "mandatory_artefacts:T11",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t11-c.html",
-        "sha256": "46efab60683e0046a6e14356b5bfe44fae1361720b2fbd6e44532d8012385358"
+        "sha256": "1e29e70a76b99b74ffef98cfd3aaf7211c0d65c30c922fd61628c901add6dfcf"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -107844,7 +107907,6 @@
       "mandatory": true,
       "owner_project": "T11",
       "package_key": "std-togaf-phase-c-t11-c:T11",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -107871,21 +107933,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff8f-08ee-7bc5-bb39-81304d03c4ef",
+                  "status": "live",
+                  "title": "Delivery contract — T11 Metrics, metering and maturity (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -107977,7 +108043,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d36-782b-8b18-ff07a64dedbe:c",
         "key": "T11/c",
@@ -107991,11 +108057,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t13-c.html",
-        "sha256": "e00b03a2476b7e9aae32db1746f6f9c54306a0ee7cb6a1bbfd186779b368d130"
+        "sha256": "54e51b4585f8379b8f289b6b4f0000c1c6696e09282b0190b1da5631bf44386c"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -108007,7 +108072,6 @@
       "mandatory": true,
       "owner_project": "T13",
       "package_key": "std-togaf-phase-c-t13-c:T13",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -108034,21 +108098,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20277-2d08-7c91-bce6-1a8326add30c",
+                  "status": "live",
+                  "title": "Delivery contract — T13 Tool platform (retrospective, 2026-11-22)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -108140,7 +108208,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d:c",
         "key": "T13/c",
@@ -108154,11 +108222,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t19-c.html",
-        "sha256": "465c825233a17a234d9e8b36506f0b596d64930f1dfb1faa11402fdaf43a5193"
+        "sha256": "43a51b55314b2445d2f832d38c2a1c511d609aa0730106541df159e77fb3cdb2"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -108170,7 +108237,6 @@
       "mandatory": true,
       "owner_project": "T19",
       "package_key": "std-togaf-phase-c-t19-c:T19",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -108197,21 +108263,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20cea-91bb-77f4-a880-044c90bb5f0e",
+                  "status": "live",
+                  "title": "Delivery contract — T19 decision forums (2026-11-24)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -108303,7 +108373,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1:c",
         "key": "T19/c",
@@ -108317,11 +108387,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t19f-c.html",
-        "sha256": "25186b4a15be9636aedea95483fb96e004a8698856dc4ff8f63f34ba2aef0f24"
+        "sha256": "1ecea6b94e71be5877ee0e5522f99145da37a209f442077c4c6e3479f8802053"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -108333,7 +108402,6 @@
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-togaf-phase-c-t19f-c:T19F",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -108360,21 +108428,30 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 2,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a210bd-f408-778a-b67e-9b6cf36ca62a",
+                  "status": "live",
+                  "title": "Delivery contract — T19F forum bindings (2026-11-25)"
+                },
+                {
+                  "id": "01a210c8-7ea8-7dc9-8104-700ecfe2905b",
+                  "status": "draft",
+                  "title": "T19F live gate — the sitting subject"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -108466,7 +108543,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:c",
         "key": "T19F/c",
@@ -108480,11 +108557,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "mandatory_artefacts:T2",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t2-c.html",
-        "sha256": "2829ee290fd8857147681672f94bf881ac0054ebc7975bf587d81ceb389976e1"
+        "sha256": "87deaea5325efba123aa0734ff5ccb5b7f7adf009054ac6405ba40c06470a12b"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -108496,7 +108572,6 @@
       "mandatory": true,
       "owner_project": "T2",
       "package_key": "std-togaf-phase-c-t2-c:T2",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -108523,21 +108598,30 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 2,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a2005c-18e4-75a7-9c20-2d83728194e0",
+                  "status": "superseded",
+                  "title": "Delivery contract — T2 Decision ladder (retrospective, U5a)"
+                },
+                {
+                  "id": "01a2009a-7bce-7a8f-96fd-f5159286a09e",
+                  "status": "live",
+                  "title": "Delivery contract — T2 Decision ladder (re-review at the fixed P0)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -108629,7 +108713,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1:c",
         "key": "T2/c",
@@ -108643,11 +108727,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t4-c.html",
-        "sha256": "c5c0f1a1589bb7cb203bcd25fc19461eecf0504f360b0a4f8d0fa3155b2099ea"
+        "sha256": "2db8e6d2a260a50f61db2d79c872c9463f94697564eb14e205f878e25c732348"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -108659,7 +108742,6 @@
       "mandatory": true,
       "owner_project": "T4",
       "package_key": "std-togaf-phase-c-t4-c:T4",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -108686,21 +108768,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a2028d-942b-759a-ad59-ab9c38629977",
+                  "status": "live",
+                  "title": "Delivery contract — T4 Kanban coach (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -108792,7 +108878,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d33-7e7e-890e-b437b0c78db9:c",
         "key": "T4/c",
@@ -108806,11 +108892,10 @@
     },
     {
       "category": "phase-c",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t9-c.html",
-        "sha256": "7a20e1d45e2a4a8ab8b5dc1b18ec3b7daa8553b495518009a60a2ba21c389056"
+        "sha256": "e912989ff527a5508060324846ea879a3e8ef45f6f25b6fb789e8988b4d09496"
       },
       "gate": {
         "approval_id": "",
@@ -108822,7 +108907,6 @@
       "mandatory": true,
       "owner_project": "T9",
       "package_key": "std-togaf-phase-c-t9-c:T9",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -108849,21 +108933,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20280-25ea-759d-8f96-51980017b97e",
+                  "status": "live",
+                  "title": "Delivery contract — T9 TOGAF ADM capability (retrospective, 2026-11-22)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -108955,7 +109043,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d:c",
         "key": "T9/c",
@@ -108969,11 +109057,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-design-publish-d.html",
-        "sha256": "4b5c39c8cff92429ad686dc60d945002109a533e6924e3be667c20b7910f1b52"
+        "sha256": "a50e1f166662fda3d0bec1e13ad1cc0defcb0013356981d79c24313fa092109f"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -108985,7 +109072,6 @@
       "mandatory": true,
       "owner_project": "DESIGN-PUBLISH",
       "package_key": "std-togaf-phase-d-design-publish-d:DESIGN-PUBLISH",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -109012,21 +109098,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff3e-0f21-7e12-888d-1a54e7a90c9d",
+                  "status": "live",
+                  "title": "Delivery contract — DESIGN-PUBLISH: the published studio design pack"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -109118,7 +109208,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d39-7414-b43c-450de170ffe1:d",
         "key": "DESIGN-PUBLISH/d",
@@ -109132,11 +109222,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-p0-d.html",
-        "sha256": "b58c5302b24aabc7effcd656404bc71e4fd9275a1c84e2218db49e06103294fd"
+        "sha256": "203812d364de0f0f4ddbd28da4c24ba9903bba163e246dfd06d71c18abc12c1d"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -109148,7 +109237,6 @@
       "mandatory": true,
       "owner_project": "P0",
       "package_key": "std-togaf-phase-d-p0-d:P0",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -109175,21 +109263,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1fdd4-ab0f-7802-b7a7-2541a2902e6b",
+                  "status": "live",
+                  "title": "Delivery contract — P0 programme definition (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -109281,7 +109373,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1dcb8-d24b-76de-b901-56fd56e001bc:d",
         "key": "P0/d",
@@ -109458,11 +109550,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "mandatory_artefacts:S00",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s00-d.html",
-        "sha256": "e184f06b6a43c983901907aa7b2e835e377a1f8449fbc236ae7ace26c6e39918"
+        "sha256": "02f1db06ad99c39a0f9c41479c95d68012ed0444663a0cdf3e41bec70e6d4c11"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -109474,7 +109565,6 @@
       "mandatory": true,
       "owner_project": "S00",
       "package_key": "std-togaf-phase-d-s00-d:S00",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -109501,21 +109591,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738",
+                  "status": "live",
+                  "title": "Delivery contract — S00 (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -109607,7 +109701,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d26-7573-9b0c-e0f60af92003:d",
         "key": "S00/d",
@@ -109621,11 +109715,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "mandatory_artefacts:S01",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s01-d.html",
-        "sha256": "b41afcf47e072b5ef12ee5f968f93ba5817eb8702c32b2f2e1fef05ad842f3de"
+        "sha256": "4554780a267fe5cba7b5f872d35b20ac1455799cfe4883eaccbe4b2b73548797"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -109637,7 +109730,6 @@
       "mandatory": true,
       "owner_project": "S01",
       "package_key": "std-togaf-phase-d-s01-d:S01",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -109664,21 +109756,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff31-30fe-7003-8d62-59278699d128",
+                  "status": "live",
+                  "title": "Delivery contract — S01 (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -109770,7 +109866,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d27-724c-9bae-af96b2d926b1:d",
         "key": "S01/d",
@@ -109784,11 +109880,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "mandatory_artefacts:S02",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s02-d.html",
-        "sha256": "6ca461f4bb48f592bcce5a7d585a3dffebed0b670df0d88d06f457a65fe08fc5"
+        "sha256": "2ce371f357288b44d7b68f87fb6b2d96d4d337b1eb60198f4a28d55737bab33b"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -109800,7 +109895,6 @@
       "mandatory": true,
       "owner_project": "S02",
       "package_key": "std-togaf-phase-d-s02-d:S02",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -109827,21 +109921,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff85-bda3-7671-a5b1-42eae3b0e6ee",
+                  "status": "live",
+                  "title": "Delivery Contract — S02 Skeleton (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -109933,7 +110031,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a:d",
         "key": "S02/d",
@@ -109947,11 +110045,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s03-d.html",
-        "sha256": "65ed35033743d9f5e1dfefc46707aa7630ddeda5833a06a31b1969478a81556f"
+        "sha256": "0fc1e88ce9a94abb796dc309d206e6a0b3cdebbded0272807577a3d28a0b3db4"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -109963,7 +110060,6 @@
       "mandatory": true,
       "owner_project": "S03",
       "package_key": "std-togaf-phase-d-s03-d:S03",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -109990,21 +110086,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20063-3a7d-7e67-a437-2e0884f6c46a",
+                  "status": "live",
+                  "title": "Delivery contract — S03 Domain and schema (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -110096,7 +110196,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d28-743b-86c7-0d0698ed69c1:d",
         "key": "S03/d",
@@ -110273,11 +110373,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-spec-v2-d.html",
-        "sha256": "ed25c76f31c823d16fe05222689ee8c7daa39d76acad9c711e060881844f8387"
+        "sha256": "a895e0893ce260cc4ceefe2f946cc9385572dd5247c011267d4bcaf4e02c0280"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -110289,7 +110388,6 @@
       "mandatory": true,
       "owner_project": "SPEC-V2",
       "package_key": "std-togaf-phase-d-spec-v2-d:SPEC-V2",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -110316,21 +110414,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff42-7bd0-7d9e-883a-1059368cd356",
+                  "status": "live",
+                  "title": "Delivery contract — SPEC-V2, retrospective acceptance of the organisational operating model (2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -110422,7 +110524,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50:d",
         "key": "SPEC-V2/d",
@@ -110436,11 +110538,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "mandatory_artefacts:T0",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t0-d.html",
-        "sha256": "541762cef259bc789762902e5441f71f0ba36181fb2d866f3d0c22a1038693c9"
+        "sha256": "21eaddb70de8a1e11a31dd713893d2fc52d2abcfbfb409365dd9dad8d0220350"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -110452,7 +110553,6 @@
       "mandatory": true,
       "owner_project": "T0",
       "package_key": "std-togaf-phase-d-t0-d:T0",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -110479,21 +110579,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff47-1159-707b-a737-582f894cc956",
+                  "status": "live",
+                  "title": "Delivery contract — T0 Model and contracts (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -110585,7 +110689,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d32-7734-98da-fb7f1e2386c7:d",
         "key": "T0/d",
@@ -110599,11 +110703,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "mandatory_artefacts:T1",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t1-d.html",
-        "sha256": "ca4eaa81ecbe0f65a6c69debd8365e2b84d2ca8e2bb422c87ef63ec435280918"
+        "sha256": "fc883f7be8e13c66ff8813d1066de420b0658e9b8aba7ccac392a0e53a57464b"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -110615,7 +110718,6 @@
       "mandatory": true,
       "owner_project": "T1",
       "package_key": "std-togaf-phase-d-t1-d:T1",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -110642,21 +110744,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff8a-754f-70de-a63a-fa8d00596433",
+                  "status": "live",
+                  "title": "Delivery contract — T1 Plan spine (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -110748,7 +110854,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d32-7c81-8365-371217d16ef7:d",
         "key": "T1/d",
@@ -110762,11 +110868,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t10-d.html",
-        "sha256": "8c0e193eb425ab0f67c355fdb1a2f599c6ca3a57504a9e98717233c92358846c"
+        "sha256": "9b37ee5f79f018c1dd97e4249a0108b7a0cdd34dd6522f8187f5d8d979cb32e6"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -110778,7 +110883,6 @@
       "mandatory": true,
       "owner_project": "T10",
       "package_key": "std-togaf-phase-d-t10-d:T10",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -110805,21 +110909,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20289-2b08-7ea3-96f6-b2ac928a7be4",
+                  "status": "live",
+                  "title": "Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -110911,7 +111019,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9:d",
         "key": "T10/d",
@@ -110925,11 +111033,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "mandatory_artefacts:T11",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t11-d.html",
-        "sha256": "9c7a1b4775c3da4718c1a0cb1500f9d65f784d9fe13c64a11741921a24ed8201"
+        "sha256": "0ca6b2443b1ce9ee1f1ee9f4bef72523a84ed4c588813f579283e1e00d1bc2a5"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -110941,7 +111048,6 @@
       "mandatory": true,
       "owner_project": "T11",
       "package_key": "std-togaf-phase-d-t11-d:T11",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -110968,21 +111074,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff8f-08ee-7bc5-bb39-81304d03c4ef",
+                  "status": "live",
+                  "title": "Delivery contract — T11 Metrics, metering and maturity (retrospective, 2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -111074,7 +111184,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d36-782b-8b18-ff07a64dedbe:d",
         "key": "T11/d",
@@ -111088,11 +111198,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t13-d.html",
-        "sha256": "b27b4b60e18fe229447ef2cc1e26fdee5d9be50961ddc66c35f9a650b25fec32"
+        "sha256": "8b2349157f1105cd5cb7cef930b0e031faa11067102dcdd5214ae462351919db"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -111104,7 +111213,6 @@
       "mandatory": true,
       "owner_project": "T13",
       "package_key": "std-togaf-phase-d-t13-d:T13",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -111131,21 +111239,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20277-2d08-7c91-bce6-1a8326add30c",
+                  "status": "live",
+                  "title": "Delivery contract — T13 Tool platform (retrospective, 2026-11-22)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -111237,7 +111349,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d:d",
         "key": "T13/d",
@@ -111251,11 +111363,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t19-d.html",
-        "sha256": "3f298ae35ab05c10162f0b6e297f7c2806738b8c6588a9161164411813701753"
+        "sha256": "e98566cde9334af26863af321cadddce0e27678acb1bc6f2319487ce836661fd"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -111267,7 +111378,6 @@
       "mandatory": true,
       "owner_project": "T19",
       "package_key": "std-togaf-phase-d-t19-d:T19",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -111294,21 +111404,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20cea-91bb-77f4-a880-044c90bb5f0e",
+                  "status": "live",
+                  "title": "Delivery contract — T19 decision forums (2026-11-24)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -111400,7 +111514,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1:d",
         "key": "T19/d",
@@ -111414,11 +111528,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t19f-d.html",
-        "sha256": "9a90599182f00d11966d4a1edc184f92355d17132359e1d5eacef5ff5b5ab718"
+        "sha256": "6923f08c4f5a2dc653f5d8644146bf2930a27f6d5554153c0a7cb50d910f55e8"
       },
       "gate": {
         "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
@@ -111430,7 +111543,6 @@
       "mandatory": true,
       "owner_project": "T19F",
       "package_key": "std-togaf-phase-d-t19f-d:T19F",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -111457,21 +111569,30 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 2,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a210bd-f408-778a-b67e-9b6cf36ca62a",
+                  "status": "live",
+                  "title": "Delivery contract — T19F forum bindings (2026-11-25)"
+                },
+                {
+                  "id": "01a210c8-7ea8-7dc9-8104-700ecfe2905b",
+                  "status": "draft",
+                  "title": "T19F live gate — the sitting subject"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -111563,7 +111684,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:d",
         "key": "T19F/d",
@@ -111577,11 +111698,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "mandatory_artefacts:T2",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t2-d.html",
-        "sha256": "67350e7042a444891abce6f499700d9eb11864c66af3d80a69bc72b0fc338b79"
+        "sha256": "924509d53247dbea0c41c6013b8981a189d5988e533faee4034b44fd1e2a2445"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -111593,7 +111713,6 @@
       "mandatory": true,
       "owner_project": "T2",
       "package_key": "std-togaf-phase-d-t2-d:T2",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -111620,21 +111739,30 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 2,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a2005c-18e4-75a7-9c20-2d83728194e0",
+                  "status": "superseded",
+                  "title": "Delivery contract — T2 Decision ladder (retrospective, U5a)"
+                },
+                {
+                  "id": "01a2009a-7bce-7a8f-96fd-f5159286a09e",
+                  "status": "live",
+                  "title": "Delivery contract — T2 Decision ladder (re-review at the fixed P0)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -111726,7 +111854,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1:d",
         "key": "T2/d",
@@ -111740,11 +111868,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t4-d.html",
-        "sha256": "8d13c16335e003eb135331a0ba9eba194cca7992b26629c10bfe41e2f532703c"
+        "sha256": "ff94d848165391f432425ee0070c605d4db2e3ed7ce7d5eb43545c288ee945da"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -111756,7 +111883,6 @@
       "mandatory": true,
       "owner_project": "T4",
       "package_key": "std-togaf-phase-d-t4-d:T4",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -111783,21 +111909,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a2028d-942b-759a-ad59-ab9c38629977",
+                  "status": "live",
+                  "title": "Delivery contract — T4 Kanban coach (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -111889,7 +112019,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d33-7e7e-890e-b437b0c78db9:d",
         "key": "T4/d",
@@ -111903,11 +112033,10 @@
     },
     {
       "category": "phase-d",
-      "covered_key": "",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t9-d.html",
-        "sha256": "dbbdfb5ebe3b0a80cddb647553bee29920b0c3d1179eb1263d2ceba94e65b88a"
+        "sha256": "2547e9d68d4d201d8e39267c3de3532b77ddee3820d96b2e9cc5030d83fe2187"
       },
       "gate": {
         "approval_id": "",
@@ -111919,7 +112048,6 @@
       "mandatory": true,
       "owner_project": "T9",
       "package_key": "std-togaf-phase-d-t9-d:T9",
-      "package_published": true,
       "sections": [
         {
           "cause": "record",
@@ -111946,21 +112074,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a20280-25ea-759d-8f96-51980017b97e",
+                  "status": "live",
+                  "title": "Delivery contract — T9 TOGAF ADM capability (retrospective, 2026-11-22)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -112052,7 +112184,7 @@
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d:d",
         "key": "T9/d",
@@ -112070,7 +112202,7 @@
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-design-publish-e.html",
-        "sha256": "044544565f699ae30caa05d5d08939cfaa6b9425b0547f68ce18be178cd753f4"
+        "sha256": "03042b1ff3d6f970e0ebda2167f901c1a9f70cb4af14d93e96297a9356d85768"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -112105,21 +112237,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff3e-0f21-7e12-888d-1a54e7a90c9d",
+                  "status": "live",
+                  "title": "Delivery contract — DESIGN-PUBLISH: the published studio design pack"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -112277,7 +112413,7 @@
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-p0-e.html",
-        "sha256": "efcf3a8b120954d83815d6876d5990ada0c4a1f5cfb098765962ab778002649a"
+        "sha256": "edf1b68b20fc5670e90fd953bd85d717e548325ad6ae12c0b32a9544d2550488"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -112312,21 +112448,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1fdd4-ab0f-7802-b7a7-2541a2902e6b",
+                  "status": "live",
+                  "title": "Delivery contract — P0 programme definition (retrospective, U5a)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -112711,7 +112851,7 @@
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-spec-v2-e.html",
-        "sha256": "ece1eeda24a9a669195c60b509a72eb4d6b943f3ea2b5ca19a47453acd40b4a9"
+        "sha256": "fe92f188b545bd9f31d9b2007790863a9780b112123c14b4dc997be95a5038cb"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -112746,21 +112886,25 @@
         {
           "cause": "record",
           "heading": "Contract and gate",
-          "missing": [
-            "No row or document satisfies 'Contract and gate'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
             {
-              "count": 0,
+              "count": 1,
               "file": "architecture.json",
-              "items": [],
+              "items": [
+                {
+                  "id": "01a1ff42-7bd0-7d9e-883a-1059368cd356",
+                  "status": "live",
+                  "title": "Delivery contract — SPEC-V2, retrospective acceptance of the organisational operating model (2026-11-21)"
+                }
+              ],
               "kind": "rows",
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "cause": "record",
@@ -126913,20 +127057,20 @@
     "TOGAF": {
       "absent": 161,
       "artefacts": 518,
-      "evidenced": 159,
-      "partial": 198
+      "evidenced": 210,
+      "partial": 147
     }
   },
   "generated_at": "2026-11-25T03:46:32.319854100+00:00",
   "git_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
-  "payload_sha256": "fc2b05ae38ff660274c91ce486d84cc94fd7ca3dcc5d2f6d672acc7a77bbbc0b",
+  "payload_sha256": "97572626712cf794bf67be0c74442c42012cb636c521aee943433c1d033bceb1",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 354,
     "artefacts": 876,
-    "evidenced": 254,
-    "findings": 448,
+    "evidenced": 305,
+    "findings": 397,
     "mandatory": 776,
-    "partial": 268
+    "partial": 217
   }
 }
