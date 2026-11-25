@@ -17,6 +17,7 @@
       .std-meta dd { margin:.15rem 0 0; }
       .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
       .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-intent { max-width:68ch; }
       .std-source { font-size:.85rem; opacity:.8; }
       .std-index { list-style:none; padding:0; }
       .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
@@ -36,24 +37,24 @@
         <div><dt>Standard</dt><dd>TOGAF</dd></div>
         <div><dt>Level</dt><dd>project</dd></div>
         <div><dt>Subject</dt><dd>SPEC_V2 slice T9 (docs/SPEC_V2.md §12)</dd></div>
-        <div><dt>Status</dt><dd>evidenced</dd></div>
+        <div><dt>Status</dt><dd>partial</dd></div>
         <div><dt>SPEC</dt><dd>§8.1</dd></div>
         <div><dt>Gate</dt><dd>superseded</dd></div>
         <div><dt>Package</dt><dd><code>std-togaf-delivery-contract-t9:T9</code></dd></div>
         <div><dt>Provenance</dt><dd>2026-11-25T03:46:32.319854100+00:00 · b51896a61b28</dd></div>
       </dl>
       <h2>Commitments</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-absent">Not evidenced — Explicit absence — the contract&#x27;s commitment list: a commitments field on the delivery contract body (see <code>std-togaf-delivery-contract-t9:T9</code>).</p><h2>Compliance method</h2>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T9 TOGAF ADM capability (retrospective, 2026-11-22) <span class="std-state">live</span></li>
-</ul><h2>Compliance method</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
-<ul>
-<li>Delivery contract — T9 TOGAF ADM capability (retrospective, 2026-11-22) <span class="std-state">live</span></li>
+<li>compliance: T9 is assessed clause by clause against the SPEC_V2 §12 gate and the plan&#x27;s D1–D5 scenarios. The Preliminary and artefact clauses are proved by `crates/api/tests/architecture_artifacts.rs::a_catalog_is_queryable_rows`, `::an_approved_artefact_is_immutable`, `::reuse_is_searchable_across_plateaus` and `crates/api/tests/architecture_capability.rs::the_profile_names_the_mandatory_set`, `::a_maturity_assessment_needs_every_dimension`, `::a_skills_assessment_names_its_role`. The A–F order, draft refusal and contract-reopen clauses are proved by `crates/api/tests/togaf_architecture_phases.rs::phases_a_to_f_pass_in_order`, `::a_draft_artefact_refuses_the_contract`, `::a_contract_change_reopens_the_gate`. The design gate is proved by `crates/api/tests/togaf_delivery_design_gate.rs::a_delivery_project_without_a_contract_cannot_pass_design`, `::a_superseded_contract_refuses_design` and `::a_live_contract_opens_the_design_gate`; the one-level and dated-waiver clause by `crates/api/tests/architecture_compliance.rs::one_level_and_a_dated_waiver`. The fifth clause, an H review producing exactly one change or kata, is not proved: open finding v1-p81-6 records that Phase H enforces existence, not exactly one typed outcome, and the plan&#x27;s `crates/api/tests/togaf_h_change.rs::a_systemic_finding_produces_a_kata_candidate` does not exist at HEAD; the file carries `::a_scope_change_produces_a_change_register_row` and `::an_unrecorded_review_refuses_the_gate`, and `crates/actions/tests/togaf_kata_outcome.rs::a_bare_kata_outcome_is_refused` and `::a_kata_outcome_names_a_kata_candidate_of_the_project` prove typed kata outcomes. Six findings remain open: v1-p81-4, v1-p81-5, v1-p81-6, v1-w2a-3, v1-w2a-4 and v1-w2a-6; six were resolved at `92e6b223` (v1-p81-1, v1-p81-2, v1-p81-3, v1-w2a-2, v1-u5a-t9-1, v1-u5a-t9-2). The compliance level is non_conformant. The rework&#x27;s acceptance instrument is `acceptance/programme/T9.toml`.</li>
 </ul><h2>Approval</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_approval</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T9 TOGAF ADM capability (retrospective, 2026-11-22) <span class="std-state">live</span></li>
+<li>approval 01a20280-3d7c-72fd-bb24-5fe966d512e2 — live <span class="std-state">live</span></li>
 </ul>
     </main>
   </body>

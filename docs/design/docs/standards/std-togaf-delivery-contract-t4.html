@@ -17,6 +17,7 @@
       .std-meta dd { margin:.15rem 0 0; }
       .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
       .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-intent { max-width:68ch; }
       .std-source { font-size:.85rem; opacity:.8; }
       .std-index { list-style:none; padding:0; }
       .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
@@ -36,24 +37,24 @@
         <div><dt>Standard</dt><dd>TOGAF</dd></div>
         <div><dt>Level</dt><dd>project</dd></div>
         <div><dt>Subject</dt><dd>SPEC_V2 slice T4 (docs/SPEC_V2.md §12)</dd></div>
-        <div><dt>Status</dt><dd>evidenced</dd></div>
+        <div><dt>Status</dt><dd>partial</dd></div>
         <div><dt>SPEC</dt><dd>§8.1</dd></div>
         <div><dt>Gate</dt><dd>live</dd></div>
         <div><dt>Package</dt><dd><code>std-togaf-delivery-contract-t4:T4</code></dd></div>
         <div><dt>Provenance</dt><dd>2026-11-25T03:46:32.319854100+00:00 · b51896a61b28</dd></div>
       </dl>
       <h2>Commitments</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-absent">Not evidenced — Explicit absence — the contract&#x27;s commitment list: a commitments field on the delivery contract body (see <code>std-togaf-delivery-contract-t4:T4</code>).</p><h2>Compliance method</h2>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T4 Kanban coach (retrospective, U5a) <span class="std-state">live</span></li>
-</ul><h2>Compliance method</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
-<ul>
-<li>Delivery contract — T4 Kanban coach (retrospective, U5a) <span class="std-state">live</span></li>
+<li>compliance: T4 is assessed clause by clause against the SPEC_V2 section 12 gate. Clause 1 (&#x27;an injected failure yields exactly one coach card and one remedy&#x27;) is proved for a first interruption by `crates/actions/tests/coach.rs::an_interruption_yields_one_coach_card_one_triage_and_one_remedy` (line 577) and by the seeded-process test (line 1131), but is refuted as a universal by v1-p6-4: the per-card cap counts every interruption regardless of signature and refuses a fourth failed run with no coach card and no escalation, and `err.card` suppresses coaching when a live root run exists. Clause 2 (&#x27;a repeat signature escalates&#x27;) is proved by `::a_repeat_signature_escalates_instead_of_a_second_card` (line 683). Clause 3 (&#x27;no coach card about a coach card&#x27;) is proved by `::a_failed_coach_run_never_opens_a_coach_card` (line 745) and `::a_nested_coach_run_is_refused` (line 1343). Clause 4 (&#x27;a systemic class opens a kata&#x27;) is proved only as a `kata.open` process start by `::a_systemic_class_opens_one_kata` (line 816), with `::a_transient_class_opens_no_kata` (line 864), and v1-p6-2 shows the path stores a run id, not a kata with instrument and threshold. The batch admitted four findings — v1-p6-2, v1-p6-4 and v1-p6-5 (P1) and v1-p6-6 (P2). The compliance level is non_conformant; no finding is P0, so the manifest&#x27;s product gate does not reopen the register&#x27;s `closed` status. The rework&#x27;s acceptance instrument is `acceptance/programme/T4.toml`.</li>
 </ul><h2>Approval</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_approval</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T4 Kanban coach (retrospective, U5a) <span class="std-state">live</span></li>
+<li>approval 01a2028d-abf9-78fb-a9c6-eb06c4bdd634 — live <span class="std-state">live</span></li>
 </ul>
     </main>
   </body>
