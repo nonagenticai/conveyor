@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d29-796d-967b-1e819a4dd40a\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "S05-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "",
       "stdout": ""
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S05-project' did not pass; the gate check 'S05-baseline' did not pass; the gate check 'S05-charter' did not pass; the gate check 'S05-contract' did not pass; the gate check 'S05-review' did not pass; the gate check 'S05-wsjf' did not pass; the gate check 'S05-demo-credits' did not pass; the gate check 'S05-product' did not pass; the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass",
+      "detail": "the gate check 'S05-project' did not pass; the gate check 'S05-baseline' did not pass; the gate check 'S05-contract' did not pass; the gate check 'S05-review' did not pass; the gate check 'S05-wsjf' did not pass; the gate check 'S05-demo-credits' did not pass; the gate check 'S05-product' did not pass; the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -161,7 +161,6 @@
   "failures": [
     "S05-project (P0): status is 'closed', expected 'active'",
     "S05-baseline (P0): no project baseline",
-    "S05-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "S05-contract (P0): no live board-approved delivery contract",
     "S05-review (P0): no Phase-G compliance review for the project's live contract",
     "S05-wsjf (P0): no WBS deliverable carries the plan",
@@ -169,11 +168,11 @@
     "S05-product (P0): 2 open P0 package(s): std-pmp-change-control-s05:S05, std-pmp-project-baseline-s05:S05",
     "S05-artefact-standard (P1): 10 mandatory artefact package(s) open: std-pmp-change-control-s05:S05, std-pmp-project-baseline-s05:S05, closed_without_closure_review:S05, closure_outputs_undeclared:S05, unpublished_declared_output:S05, std-pmp-project-wbs-s05:S05, mandatory_artefacts:S05, std-togaf-delivery-contract-s05:S05, +2 more",
     "S05-rework (P0): 9 unresolved P0/P1 package(s): std-pmp-change-control-s05:S05 (P0), std-pmp-project-baseline-s05:S05 (P0), closed_without_closure_review:S05 (P1), closure_outputs_undeclared:S05 (P1), unpublished_declared_output:S05 (P1), std-pmp-project-wbs-s05:S05 (P1), v1-s05-1:S05 (P1), mandatory_artefacts:S05 (P1), +1 more",
-    "gate (P0): the gate check 'S05-project' did not pass; the gate check 'S05-baseline' did not pass; the gate check 'S05-charter' did not pass; the gate check 'S05-contract' did not pass; the gate check 'S05-review' did not pass; the gate check 'S05-wsjf' did not pass; the gate check 'S05-demo-credits' did not pass; the gate check 'S05-product' did not pass; the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass",
+    "gate (P0): the gate check 'S05-project' did not pass; the gate check 'S05-baseline' did not pass; the gate check 'S05-contract' did not pass; the gate check 'S05-review' did not pass; the gate check 'S05-wsjf' did not pass; the gate check 'S05-demo-credits' did not pass; the gate check 'S05-product' did not pass; the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "replay a board export, win a two-client race and survive the 1k-card load \u2014 zero deltas on 1,000 cards, one 200 and one 412 with the current representation, p95 \u2264 120 ms at 20 rps, the exact webhook shape, SSE within 200 ms, and no second store",
-  "generated_at": "2026-11-25T08:48:05.125247+00:00",
+  "generated_at": "2026-11-25T09:40:06.209127+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S05.toml",
   "name": "Board \u2014 projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",

@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d2d-71f1-a403-c9abe52c1888\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "S09-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "",
       "stdout": ""
     },
     {
@@ -160,7 +160,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S09-baseline' did not pass; the gate check 'S09-charter' did not pass; the gate check 'S09-closure-outputs' did not pass; the gate check 'S09-contract' did not pass; the gate check 'S09-review' did not pass; the gate check 'S09-closure-gate' did not pass; the gate check 'S09-wsjf' did not pass; the gate check 'S09-demo-credits' did not pass; the gate check 'S09-product' did not pass; the gate check 'S09-artefact-standard' did not pass; the gate check 'S09-rework' did not pass",
+      "detail": "the gate check 'S09-baseline' did not pass; the gate check 'S09-closure-outputs' did not pass; the gate check 'S09-contract' did not pass; the gate check 'S09-review' did not pass; the gate check 'S09-closure-gate' did not pass; the gate check 'S09-wsjf' did not pass; the gate check 'S09-demo-credits' did not pass; the gate check 'S09-product' did not pass; the gate check 'S09-artefact-standard' did not pass; the gate check 'S09-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -178,7 +178,6 @@
   ],
   "failures": [
     "S09-baseline (P0): no project baseline",
-    "S09-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "S09-closure-outputs (P0): the project declares no closure_outputs",
     "S09-contract (P0): no live board-approved delivery contract",
     "S09-review (P0): no Phase-G compliance review for the project's live contract",
@@ -188,11 +187,11 @@
     "S09-product (P0): 2 open P0 package(s): std-pmp-change-control-s09:S09, std-pmp-project-baseline-s09:S09",
     "S09-artefact-standard (P1): 10 mandatory artefact package(s) open: std-pmp-change-control-s09:S09, std-pmp-project-baseline-s09:S09, closed_without_closure_review:S09, closure_outputs_undeclared:S09, unpublished_declared_output:S09, std-pmp-project-wbs-s09:S09, mandatory_artefacts:S09, std-togaf-delivery-contract-s09:S09, +2 more",
     "S09-rework (P0): 9 unresolved P0/P1 package(s): std-pmp-change-control-s09:S09 (P0), std-pmp-project-baseline-s09:S09 (P0), closed_without_closure_review:S09 (P1), closure_outputs_undeclared:S09 (P1), unpublished_declared_output:S09 (P1), std-pmp-project-wbs-s09:S09 (P1), v1-s09-1:S09 (P1), mandatory_artefacts:S09 (P1), +1 more",
-    "gate (P0): the gate check 'S09-baseline' did not pass; the gate check 'S09-charter' did not pass; the gate check 'S09-closure-outputs' did not pass; the gate check 'S09-contract' did not pass; the gate check 'S09-review' did not pass; the gate check 'S09-closure-gate' did not pass; the gate check 'S09-wsjf' did not pass; the gate check 'S09-demo-credits' did not pass; the gate check 'S09-product' did not pass; the gate check 'S09-artefact-standard' did not pass; the gate check 'S09-rework' did not pass",
+    "gate (P0): the gate check 'S09-baseline' did not pass; the gate check 'S09-closure-outputs' did not pass; the gate check 'S09-contract' did not pass; the gate check 'S09-review' did not pass; the gate check 'S09-closure-gate' did not pass; the gate check 'S09-wsjf' did not pass; the gate check 'S09-demo-credits' did not pass; the gate check 'S09-product' did not pass; the gate check 'S09-artefact-standard' did not pass; the gate check 'S09-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "the feature-list items are green \u2014 a 1 MiB round-trip whose sha256 equals `content_hash` with the object key gone after delete, a 10 MiB upload refused `413`, secrets never returning plaintext, the workers page rendering live rows, every report number equal to its SQL count, `timeout_ms` on every external, and billing with no write action and no metering event",
-  "generated_at": "2026-11-25T08:48:05.647150+00:00",
+  "generated_at": "2026-11-25T09:40:21.275966+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S09.toml",
   "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",

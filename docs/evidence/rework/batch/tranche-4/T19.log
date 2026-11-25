@@ -2,12 +2,11 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
 
 
 rework: projects.reopen refused at act 1: error: projects.reopen refused (409): project 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1 has meta.viability absent; only a project the retrospective judged "rework" can be reopened
-{"timestamp":"2026-11-25T07:30:30.771799Z","level":"ERROR","fields":{"message":"record failed invocation","error":"error occurred while decoding: error returned from database: relation \"gate_refusal\" does not exist at line 1498","action":"projects.reopen"},"target":"conveyor_actions::invoke"}
 FAILED: projects.reopen: transport exited 1
 
 [exit 1]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T19 --snapshot /tmp/conv526-t9-snap/data --outputs-dir /tmp/conv526-t9-snap/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T19-bodies --local-bin /tmp/conv526-f726-bin
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T19 --snapshot /tmp/conv526-r2b-snap/data --outputs-dir /tmp/conv526-r2b-snap/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T19-bodies --local-bin /tmp/conv526-r3-cli
 
 {
   "schema": "artefact-publication/v1",
@@ -16,7 +15,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "project_key": "T19",
       "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
       "category": "compliance-review",
-      "document_id": "01a2119c-fdd6-77d8-9222-71a556d18f3c",
+      "document_id": "01a21214-5713-72e0-8f0e-61a774ed3c89",
       "natural_key": "artefact:T19:compliance-review:6b80c9990a78d4c7",
       "body_sha256": "6b80c9990a78d4c730fd4d41da20e29ce4ea856924a6a3f5fb6dfa098186886b"
     },
@@ -24,7 +23,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "project_key": "T19",
       "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
       "category": "delivery-contract",
-      "document_id": "01a2119d-0063-739b-a686-a34376c110b7",
+      "document_id": "01a21214-57ee-70ce-8ed2-f6f454d55ad7",
       "natural_key": "artefact:T19:delivery-contract:99494f6cd68d1f34",
       "body_sha256": "99494f6cd68d1f34a506956eedcaef12b644ddd5a56ada0cdef83eb98ec58f76"
     },
@@ -32,7 +31,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "project_key": "T19",
       "project_id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
       "category": "statement-of-architecture-work",
-      "document_id": "01a2119d-03c5-7686-a7e0-fc1858a6bcee",
+      "document_id": "01a21214-58cc-7334-8c11-cbdadf165798",
       "natural_key": "artefact:T19:statement-of-architecture-work:42c0bd69f1a72e97",
       "body_sha256": "42c0bd69f1a72e97ae0f29daf9ec14d937be18ae39e9f39c4ca5f36a42b9a1a5"
     }

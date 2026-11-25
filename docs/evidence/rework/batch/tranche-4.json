@@ -1,30 +1,86 @@
 {
   "blocked": 0,
-  "generated_at": "2026-11-25T07:30:53+00:00",
+  "generated_at": "2026-11-25T09:41:06+00:00",
   "green": 0,
   "members": [
     {
-      "factory_exit": 0,
+      "factory_exit": 1,
       "gaps": [
         {
-          "detail": "15 mandatory artefact package(s) open: std-togaf-phase-g-s05-g:S05, std-pmp-project-baseline-s05:S05, std-pmp-project-registers-s05:S05, std-togaf-architecture-artifact-instance-01a20ec8-1479-7d97-8c92-428ed9ea0b6f:S05, std-togaf-architecture-artifact-instance-01a20ec8-15b2-7709-b738-34a9e7488ef6:S05, std-togaf-architecture-artifact-instance-01a20ec8-16d8-76aa-8be3-d675f9691ee2:S05, std-togaf-arch",
+          "detail": "status is 'closed', expected 'active'",
+          "gap": "record",
+          "id": "S05-project",
+          "kind": "snapshot",
+          "severity": "P0"
+        },
+        {
+          "detail": "no project baseline",
+          "gap": "record",
+          "id": "S05-baseline",
+          "kind": "snapshot",
+          "severity": "P0"
+        },
+        {
+          "detail": "no live board-approved delivery contract",
+          "gap": "record",
+          "id": "S05-contract",
+          "kind": "snapshot",
+          "severity": "P0"
+        },
+        {
+          "detail": "no Phase-G compliance review for the project's live contract",
+          "gap": "record",
+          "id": "S05-review",
+          "kind": "snapshot",
+          "severity": "P0"
+        },
+        {
+          "detail": "no WBS deliverable carries the plan",
+          "gap": "record",
+          "id": "S05-wsjf",
+          "kind": "snapshot",
+          "severity": "P0"
+        },
+        {
+          "detail": "no accepted deliverable to demo",
+          "gap": "record",
+          "id": "S05-demo-credits",
+          "kind": "snapshot",
+          "severity": "P0"
+        },
+        {
+          "detail": "2 open P0 package(s): std-pmp-change-control-s05:S05, std-pmp-project-baseline-s05:S05",
+          "gap": "record",
+          "id": "S05-product",
+          "kind": "snapshot",
+          "severity": "P0"
+        },
+        {
+          "detail": "10 mandatory artefact package(s) open: std-pmp-change-control-s05:S05, std-pmp-project-baseline-s05:S05, closed_without_closure_review:S05, closure_outputs_undeclared:S05, unpublished_declared_output:S05, std-pmp-project-wbs-s05:S05, mandatory_artefacts:S05, std-togaf-delivery-contract-s05:S05, +2 more",
           "gap": "record",
           "id": "S05-artefact-standard",
           "kind": "snapshot",
           "severity": "P1"
         },
         {
-          "detail": "3 unresolved P0/P1 package(s): seed_live_drift:S05 (P1), v1-s05-1:S05 (P1), std-togaf-phase-g-s05-g:S05 (P1)",
+          "detail": "9 unresolved P0/P1 package(s): std-pmp-change-control-s05:S05 (P0), std-pmp-project-baseline-s05:S05 (P0), closed_without_closure_review:S05 (P1), closure_outputs_undeclared:S05 (P1), unpublished_declared_output:S05 (P1), std-pmp-project-wbs-s05:S05 (P1), v1-s05-1:S05 (P1), mandatory_artefacts:S05 (P1), +1 more",
           "gap": "record",
           "id": "S05-rework",
           "kind": "snapshot",
           "severity": "P0"
         },
         {
-          "detail": "the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass",
+          "detail": "the gate check 'S05-project' did not pass; the gate check 'S05-baseline' did not pass; the gate check 'S05-contract' did not pass; the gate check 'S05-review' did not pass; the gate check 'S05-wsjf' did not pass; the gate check 'S05-demo-credits' did not pass; the gate check 'S05-product' did not pass; the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass",
           "gap": "code",
           "id": "gate",
           "kind": "manifest",
+          "severity": "P0"
+        },
+        {
+          "detail": "the project is closed while its manifest is red",
+          "gap": "record",
+          "id": "closed-on-red",
+          "kind": "snapshot",
           "severity": "P0"
         }
       ],
@@ -223,14 +279,14 @@
       "factory_exit": 0,
       "gaps": [
         {
-          "detail": "19 mandatory artefact package(s) open: v1-p83-5:T10, std-togaf-phase-g-t10-g:T10, std-pmp-project-baseline-t10:T10, std-pmp-project-registers-t10:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, std-togaf-architecture-artifact-instance-01a20287-be6f-76c8-8024-2bf280f120e7:T10, +11 more",
+          "detail": "19 mandatory artefact package(s) open: v1-p83-5:T10, std-pmp-project-baseline-t10:T10, std-pmp-project-registers-t10:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, std-togaf-architecture-artifact-instance-01a20287-be6f-76c8-8024-2bf280f120e7:T10, std-togaf-architecture-artifact-instance-01a20287-ef55-75a2-9520-b7cb2b48958a:T10, +11 more",
           "gap": "record",
           "id": "T10-artefact-standard",
           "kind": "snapshot",
           "severity": "P1"
         },
         {
-          "detail": "2 unresolved P0/P1 package(s): v1-p83-5:T10 (P1), std-togaf-phase-g-t10-g:T10 (P1)",
+          "detail": "1 unresolved P0/P1 package(s): v1-p83-5:T10 (P1)",
           "gap": "record",
           "id": "T10-rework",
           "kind": "snapshot",
@@ -360,7 +416,7 @@
           "severity": "P0"
         },
         {
-          "detail": "13 mandatory artefact package(s) open: contract_missing:T16, std-togaf-phase-g-t16-g:T16, std-pmp-project-baseline-t16:T16, std-pmp-project-registers-t16:T16, std-togaf-architecture-artifact-instance-01a20e7e-8d5e-74e7-b24d-c95826f683ff:T16, std-togaf-architecture-artifact-instance-01a20e7e-8ed2-758f-aba3-473310bcc527:T16, std-togaf-architecture-artifact-instance-01a20e7e-9045-71a3-83bd-9f1c82abd8",
+          "detail": "13 mandatory artefact package(s) open: contract_missing:T16, std-togaf-phase-g-t16-g:T16, std-pmp-project-baseline-t16:T16, std-pmp-project-registers-t16:T16, std-togaf-architecture-artifact-instance-01a211c9-201c-701d-bc1e-056eefbdc8da:T16, std-togaf-architecture-artifact-instance-01a211c9-20a5-752e-a91d-c5b7ee790855:T16, std-togaf-architecture-artifact-instance-01a211c9-212a-70d4-bbbf-17c3c50384",
           "gap": "record",
           "id": "T16-artefact-standard",
           "kind": "snapshot",
@@ -387,7 +443,7 @@
       "state": "RECEIPT_RED"
     },
     {
-      "factory_exit": 1,
+      "factory_exit": 0,
       "gaps": [
         {
           "detail": "no project baseline",
@@ -432,13 +488,6 @@
           "severity": "P0"
         },
         {
-          "detail": "exit 1: build-v2-coverage: stale output(s): /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/v2-coverage.json, /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/v2-coverage.md; re-run without --check",
-          "gap": "code",
-          "id": "T18-coverage",
-          "kind": "command",
-          "severity": "P0"
-        },
-        {
           "detail": "7 mandatory artefact package(s) open: std-pmp-change-control-t18:T18, std-pmp-project-baseline-t18:T18, unpublished_declared_output:T18, std-pmp-project-registers-t18:T18, contract_missing:T18, mandatory_artefacts:T18, std-togaf-compliance-review-t18:T18",
           "gap": "record",
           "id": "T18-artefact-standard",
@@ -453,7 +502,7 @@
           "severity": "P0"
         },
         {
-          "detail": "the gate check 'T18-baseline' did not pass; the gate check 'T18-contract' did not pass; the gate check 'T18-review' did not pass; the gate check 'T18-wsjf' did not pass; the gate check 'T18-demo-credits' did not pass; the gate check 'T18-product' did not pass; the gate check 'T18-coverage' did not pass; the gate check 'T18-artefact-standard' did not pass; the gate check 'T18-rework' did not pass",
+          "detail": "the gate check 'T18-baseline' did not pass; the gate check 'T18-contract' did not pass; the gate check 'T18-review' did not pass; the gate check 'T18-wsjf' did not pass; the gate check 'T18-demo-credits' did not pass; the gate check 'T18-product' did not pass; the gate check 'T18-artefact-standard' did not pass; the gate check 'T18-rework' did not pass",
           "gap": "code",
           "id": "gate",
           "kind": "manifest",
@@ -511,14 +560,14 @@
           "severity": "P0"
         },
         {
-          "detail": "16 mandatory artefact package(s) open: std-pmp-change-control-t19:T19, std-pmp-project-baseline-t19:T19, std-pmp-project-registers-t19:T19, std-pmp-project-wbs-t19:T19, std-togaf-phase-g-t19-g:T19, std-togaf-architecture-artifact-instance-01a20cdd-e71f-7d06-8ca5-701ff6b7d69e:T19, std-togaf-architecture-artifact-instance-01a20cde-0f97-7f74-afd8-7cd74e0990e3:T19, std-togaf-architecture-artifact-inst",
+          "detail": "16 mandatory artefact package(s) open: std-pmp-change-control-t19:T19, std-pmp-project-baseline-t19:T19, std-pmp-project-registers-t19:T19, std-pmp-project-wbs-t19:T19, std-togaf-architecture-artifact-instance-01a20cdd-e71f-7d06-8ca5-701ff6b7d69e:T19, std-togaf-architecture-artifact-instance-01a20cde-0f97-7f74-afd8-7cd74e0990e3:T19, std-togaf-architecture-artifact-instance-01a20cde-371c-7d85-ae2d-",
           "gap": "record",
           "id": "T19-artefact-standard",
           "kind": "snapshot",
           "severity": "P1"
         },
         {
-          "detail": "6 unresolved P0/P1 package(s): std-pmp-change-control-t19:T19 (P0), std-pmp-project-baseline-t19:T19 (P0), std-pmp-project-registers-t19:T19 (P1), std-pmp-project-wbs-t19:T19 (P1), v1-meetings-1:T19 (P1), std-togaf-phase-g-t19-g:T19 (P1)",
+          "detail": "5 unresolved P0/P1 package(s): std-pmp-change-control-t19:T19 (P0), std-pmp-project-baseline-t19:T19 (P0), std-pmp-project-registers-t19:T19 (P1), std-pmp-project-wbs-t19:T19 (P1), v1-meetings-1:T19 (P1)",
           "gap": "record",
           "id": "T19-rework",
           "kind": "snapshot",
@@ -555,14 +604,14 @@
           "severity": "P0"
         },
         {
-          "detail": "15 mandatory artefact package(s) open: std-togaf-phase-g-t4-g:T4, std-pmp-project-baseline-t4:T4, std-pmp-project-registers-t4:T4, std-togaf-architecture-artifact-instance-01a2028c-33a0-76d6-acd6-57365a79dd10:T4, std-togaf-architecture-artifact-instance-01a2028c-6415-7dbb-bb08-ef2baa58aaa4:T4, std-togaf-architecture-artifact-instance-01a2028c-94d6-7e50-9d94-9e94feda14aa:T4, std-togaf-architecture-",
+          "detail": "15 mandatory artefact package(s) open: std-pmp-project-baseline-t4:T4, std-pmp-project-registers-t4:T4, std-togaf-architecture-artifact-instance-01a2028c-33a0-76d6-acd6-57365a79dd10:T4, std-togaf-architecture-artifact-instance-01a2028c-6415-7dbb-bb08-ef2baa58aaa4:T4, std-togaf-architecture-artifact-instance-01a2028c-94d6-7e50-9d94-9e94feda14aa:T4, std-togaf-architecture-artifact-instance-01a2028c-",
           "gap": "record",
           "id": "T4-artefact-standard",
           "kind": "snapshot",
           "severity": "P1"
         },
         {
-          "detail": "2 unresolved P0/P1 package(s): seed_live_drift:T4 (P1), std-togaf-phase-g-t4-g:T4 (P1)",
+          "detail": "1 unresolved P0/P1 package(s): seed_live_drift:T4 (P1)",
           "gap": "record",
           "id": "T4-rework",
           "kind": "snapshot",
@@ -582,17 +631,17 @@
       "state": "RECEIPT_RED"
     },
     {
-      "factory_exit": 1,
+      "factory_exit": 0,
       "gaps": [
         {
-          "detail": "20 mandatory artefact package(s) open: std-togaf-phase-g-t9-g:T9, v1-p81-5:T9, v1-w2a-3:T9, v1-w2a-4:T9, std-pmp-project-baseline-t9:T9, std-pmp-project-registers-t9:T9, std-togaf-architecture-artifact-instance-01a2027e-b3fc-7af8-a4d2-53e0ba2cca67:T9, std-togaf-architecture-artifact-instance-01a2027e-e784-7a23-9098-ca96a7610047:T9, +12 more",
+          "detail": "20 mandatory artefact package(s) open: v1-p81-5:T9, v1-w2a-3:T9, v1-w2a-4:T9, std-pmp-project-baseline-t9:T9, std-pmp-project-registers-t9:T9, std-togaf-architecture-artifact-instance-01a2027e-b3fc-7af8-a4d2-53e0ba2cca67:T9, std-togaf-architecture-artifact-instance-01a2027e-e784-7a23-9098-ca96a7610047:T9, std-togaf-architecture-artifact-instance-01a2027f-1a9a-78d0-bddb-1f7d1898d3f8:T9, +12 more",
           "gap": "record",
           "id": "T9-artefact-standard",
           "kind": "snapshot",
           "severity": "P1"
         },
         {
-          "detail": "5 unresolved P0/P1 package(s): seed_live_drift:T9 (P1), std-togaf-phase-g-t9-g:T9 (P1), v1-p81-5:T9 (P1), v1-w2a-3:T9 (P1), v1-w2a-4:T9 (P1)",
+          "detail": "3 unresolved P0/P1 package(s): v1-p81-5:T9 (P1), v1-w2a-3:T9 (P1), v1-w2a-4:T9 (P1)",
           "gap": "record",
           "id": "T9-rework",
           "kind": "snapshot",
@@ -604,6 +653,13 @@
           "id": "gate",
           "kind": "manifest",
           "severity": "P0"
+        },
+        {
+          "detail": "the project is closed while its manifest is red",
+          "gap": "record",
+          "id": "closed-on-red",
+          "kind": "snapshot",
+          "severity": "P0"
         }
       ],
       "key": "T9",
@@ -613,6 +669,6 @@
     }
   ],
   "red": 10,
-  "snapshot_sha": "f726f48a3830c4682f4baba14dd09a91c5f26b7e",
+  "snapshot_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
   "tranche": 4
 }

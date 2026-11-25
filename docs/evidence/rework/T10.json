@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d36-70c1-a5e8-f50956c5e3f9\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "T10-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "",
       "stdout": ""
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "19 mandatory artefact package(s) open: v1-p83-5:T10, std-togaf-phase-g-t10-g:T10, std-pmp-project-baseline-t10:T10, std-pmp-project-registers-t10:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, std-togaf-architecture-artifact-instance-01a20287-be6f-76c8-8024-2bf280f120e7:T10, +11 more",
+      "detail": "19 mandatory artefact package(s) open: v1-p83-5:T10, std-pmp-project-baseline-t10:T10, std-pmp-project-registers-t10:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, std-togaf-architecture-artifact-instance-01a20287-be6f-76c8-8024-2bf280f120e7:T10, std-togaf-architecture-artifact-instance-01a20287-ef55-75a2-9520-b7cb2b48958a:T10, +11 more",
       "id": "T10-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -151,7 +151,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "2 unresolved P0/P1 package(s): v1-p83-5:T10 (P1), std-togaf-phase-g-t10-g:T10 (P1)",
+      "detail": "1 unresolved P0/P1 package(s): v1-p83-5:T10 (P1)",
       "id": "T10-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -160,7 +160,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T10-charter' did not pass; the gate check 'T10-artefact-standard' did not pass; the gate check 'T10-rework' did not pass",
+      "detail": "the gate check 'T10-artefact-standard' did not pass; the gate check 'T10-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -177,14 +177,13 @@
     }
   ],
   "failures": [
-    "T10-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-    "T10-artefact-standard (P1): 19 mandatory artefact package(s) open: v1-p83-5:T10, std-togaf-phase-g-t10-g:T10, std-pmp-project-baseline-t10:T10, std-pmp-project-registers-t10:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, std-togaf-architecture-artifact-instance-01a20287-be6f-76c8-8024-2bf280f120e7:T10, +11 more",
-    "T10-rework (P0): 2 unresolved P0/P1 package(s): v1-p83-5:T10 (P1), std-togaf-phase-g-t10-g:T10 (P1)",
-    "gate (P0): the gate check 'T10-charter' did not pass; the gate check 'T10-artefact-standard' did not pass; the gate check 'T10-rework' did not pass",
+    "T10-artefact-standard (P1): 19 mandatory artefact package(s) open: v1-p83-5:T10, std-pmp-project-baseline-t10:T10, std-pmp-project-registers-t10:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, std-togaf-architecture-artifact-instance-01a20287-be6f-76c8-8024-2bf280f120e7:T10, std-togaf-architecture-artifact-instance-01a20287-ef55-75a2-9520-b7cb2b48958a:T10, +11 more",
+    "T10-rework (P0): 1 unresolved P0/P1 package(s): v1-p83-5:T10 (P1)",
+    "gate (P0): the gate check 'T10-artefact-standard' did not pass; the gate check 'T10-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized",
-  "generated_at": "2026-11-25T08:48:06.884993+00:00",
+  "generated_at": "2026-11-25T09:40:28.676166+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T10.toml",
   "name": "SAFe cadence and MSP tranches",

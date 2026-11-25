@@ -1,43 +1,112 @@
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S05 --content docs/evidence/rework/tranche-4/rework-content-S05.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd --keep-active
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S05 --content docs/evidence/rework/tranche-4/rework-content-S05.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
 
-  reopen: not needed
-  charter: already approved
-  closure outputs: not applicable (the project stays active)
-  SoAW: already live
-  artefact: Stakeholder Map — S05 Board (Phase A) already present
-  artefact: Driver/Goal/Objective Catalog — S05 Board (Phase A) already present
-  artefact: Requirements Catalog — S05 Board (Phase A) already present
-  artefact: Solution Concept Diagram — S05 Board (Phase A) already present
-  artefact: Business Capability Map — S05 Board (Phase B) already present
-  artefact: Data Entity/Data Component Catalog — S05 Board (Phase C) already present
-  artefact: Technology Standards Catalog — S05 Board (Phase D) already present
-  delivery contract: already live
-  baseline: already taken
-  closure-review output: not applicable (the project stays active)
-  project-brief output: current
-  evidence output: current
-  Phase-G review: already recorded
-  01 cadences.credit_demo ok
-  baseline approval: none pending
-  closure: not applicable (the project stays active)
-S05: 1 acts recorded
+  01 projects.reopen ok
+  02 projects.charter ok
+  03 approvals.decide ok
+  04 projects.programme_meta ok
+  05 architecture.contracts_request ok
+  06 architecture.board_decide ok
+  07 architecture.contracts_approve ok
+  08 documents.compose ok
+  09 documents.publish ok
+  10 architecture.artifacts_create ok
+  11 architecture.artifacts_approve ok
+  12 documents.compose ok
+  13 documents.publish ok
+  14 architecture.artifacts_create ok
+  15 architecture.artifacts_approve ok
+  16 documents.compose ok
+  17 documents.publish ok
+  18 architecture.artifacts_create ok
+  19 architecture.artifacts_approve ok
+  20 documents.compose ok
+  21 documents.publish ok
+  22 architecture.artifacts_create ok
+  23 architecture.artifacts_approve ok
+  24 documents.compose ok
+  25 documents.publish ok
+  26 architecture.artifacts_create ok
+  27 architecture.artifacts_approve ok
+  28 documents.compose ok
+  29 documents.publish ok
+  30 architecture.artifacts_create ok
+  31 architecture.artifacts_approve ok
+  32 documents.compose ok
+  33 documents.publish ok
+  34 architecture.artifacts_create ok
+  35 architecture.artifacts_approve ok
+  36 architecture.artifacts_link ok
+  37 architecture.artifacts_link ok
+  38 architecture.artifacts_link ok
+  39 architecture.artifacts_link ok
+  40 architecture.artifacts_link ok
+  41 architecture.artifacts_link ok
+  42 architecture.artifacts_link ok
+  43 architecture.artifacts_link ok
+  44 architecture.contracts_request ok
+  45 architecture.board_decide ok
+  46 architecture.contracts_approve ok
+  47 registers.create ok
+  48 registers.create ok
+  49 registers.create ok
+  50 registers.create ok
+  51 registers.create ok
+  52 registers.create ok
+  53 registers.create ok
+  54 registers.create ok
+  55 registers.create ok
+  56 registers.create ok
+  57 registers.create ok
+  58 projects.baseline ok
+  59 projects.baseline ok
+  60 approvals.decide ok
+  61 projects.baseline ok
+  62 approvals.decide ok
+  63 documents.compose ok
+  64 documents.publish ok
+  65 documents.compose ok
+  66 documents.publish ok
+  67 documents.publish ok
+  68 documents.update ok
+  69 documents.publish ok
+  evidence output: body corrected and republished
+  70 architecture.reviews_record ok
 
+rework: changes.request refused at act 71: error: changes.request refused (422): the input does not match the action schema [baseline_id: baseline 01a21213-98f2-7e28-8b64-3c661b999a10 is a cost baseline; the direct route needs the scope baseline (baseline_not_scope)]
+FAILED: changes.request: transport exited 1
 
-[exit 0]
+[exit 1]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S05 --snapshot /tmp/conv526-t9-snap/data --outputs-dir /tmp/conv526-t9-snap/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/S05-bodies --local-bin /tmp/conv526-f726-bin
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S05 --snapshot /tmp/conv526-r2b-snap/data --outputs-dir /tmp/conv526-r2b-snap/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/S05-bodies --local-bin /tmp/conv526-r3-cli
 
 {
   "schema": "artefact-publication/v1",
   "applied": [],
-  "skipped": [
+  "skipped": [],
+  "refused": [
     {
       "project_key": "S05",
       "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
       "category": "change-control",
       "mandatory": true,
       "trigger": null,
-      "state": "stale"
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Change requests' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S05",
+      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+      "category": "closure-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Outcome vs acceptance' has a source that resolves to zero rows"
+      }
     },
     {
       "project_key": "S05",
@@ -45,7 +114,11 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "category": "compliance-review",
       "mandatory": true,
       "trigger": null,
-      "state": "present"
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Decision' has a source that resolves to zero rows"
+      }
     },
     {
       "project_key": "S05",
@@ -53,7 +126,11 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "category": "delivery-contract",
       "mandatory": true,
       "trigger": null,
-      "state": "present"
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Approval' has a source that resolves to zero rows"
+      }
     },
     {
       "project_key": "S05",
@@ -61,7 +138,11 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "category": "project-baseline",
       "mandatory": true,
       "trigger": null,
-      "state": "present"
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Scope' has a source that resolves to zero rows"
+      }
     },
     {
       "project_key": "S05",
@@ -69,60 +150,10 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "category": "project-brief",
       "mandatory": true,
       "trigger": null,
-      "state": "stale"
-    },
-    {
-      "project_key": "S05",
-      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
-      "category": "project-wbs",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    },
-    {
-      "project_key": "S05",
-      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
-      "category": "statement-of-architecture-work",
-      "mandatory": true,
-      "trigger": null,
-      "state": "present"
-    }
-  ],
-  "refused": [
-    {
-      "project_key": "S05",
-      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
-      "category": "architecture-analysis",
-      "mandatory": false,
-      "trigger": null,
       "state": "due",
       "refusal": {
         "code": "EMPTY_POINTER",
-        "message": "required heading 'Current state' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S05",
-      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
-      "category": "architecture-artifact",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Links' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S05",
-      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
-      "category": "architecture-design",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+        "message": "required heading 'Outcome' has a source that resolves to zero rows"
       }
     },
     {
@@ -140,33 +171,21 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
     {
       "project_key": "S05",
       "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
-      "category": "statement-of-intent",
-      "mandatory": false,
+      "category": "project-wbs",
+      "mandatory": true,
       "trigger": null,
       "state": "due",
       "refusal": {
         "code": "EMPTY_POINTER",
-        "message": "required heading 'Intended use' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S05",
-      "project_id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
-      "category": "waiver",
-      "mandatory": false,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "NO_EVIDENCE",
-        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+        "message": "required heading 'Work packages' has a source that resolves to zero rows"
       }
     }
   ],
   "counts": {
-    "due": 6,
-    "present": 5,
+    "due": 8,
+    "present": 0,
     "missing-edge": 0,
-    "stale": 2,
+    "stale": 0,
     "ambiguous": 0
   }
 }
