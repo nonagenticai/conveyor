@@ -1,4 +1,4 @@
--- 0074_run_executor_kind.sql — T18-3c: the run pins the executor kind it was created with.
+-- 0075_run_executor_kind.sql — T18-3c: the run pins the executor kind it was created with.
 --
 -- SPEC_V2 §10.5.2: the run inspector shows the run's executor kind and its job binding /
 -- release pin. The binding is the source at creation; copying the kind onto the run is the
