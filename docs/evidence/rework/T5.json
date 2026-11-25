@@ -3,10 +3,10 @@
     {
       "check": "project",
       "description": "T5 is active",
-      "detail": "project T5 is active",
+      "detail": "status is 'closed', expected 'active'",
       "id": "T5-project",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d34-73db-975e-5d178d729cef\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
       "exit": 1,
       "id": "T5-charter",
       "kind": "command",
       "result": "fail",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -115,16 +115,16 @@
     {
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "no open P0 package for this project",
+      "detail": "1 open P0 package(s): closed_without_closure_review:T5",
       "id": "T5-product",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "5 mandatory artefact package(s) open: dr-w3-lessons-1:T5, std-pmp-change-control-t5:T5, std-pmp-project-baseline-t5:T5, std-pmp-project-registers-t5:T5, std-togaf-compliance-review-t5:T5 (2 not yet due: tranche planned)",
+      "detail": "11 mandatory artefact package(s) open: closed_without_closure_review:T5, project_in_unauthorised_tranche:T5, unpublished_declared_output:T5, dr-w3-lessons-1:T5, contract_missing:T5, mandatory_artefacts:T5, std-pmp-change-control-t5:T5, std-pmp-project-baseline-t5:T5, +3 more",
       "id": "T5-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -133,7 +133,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "4 unresolved P0/P1 package(s): dr-w3-lessons-1:T5 (P1), v1-p119-1:T5 (P1), v1-p93-1:T5 (P1), v1-w1b-3:T5 (P1) (2 not yet due: tranche planned)",
+      "detail": "9 unresolved P0/P1 package(s): closed_without_closure_review:T5 (P0), project_in_unauthorised_tranche:T5 (P0), unpublished_declared_output:T5 (P1), dr-w3-lessons-1:T5 (P1), v1-p119-1:T5 (P1), v1-p93-1:T5 (P1), v1-w1b-3:T5 (P1), contract_missing:T5 (P1), +1 more",
       "id": "T5-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -142,16 +142,26 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T5-baseline' did not pass; the gate check 'T5-charter' did not pass; the gate check 'T5-contract' did not pass; the gate check 'T5-review' did not pass; the gate check 'T5-pi-cadence' did not pass; the gate check 'T5-pi-plan' did not pass; the gate check 'T5-pi-objectives' did not pass; the gate check 'T5-wsjf' did not pass; the gate check 'T5-demo-credits' did not pass; the gate check 'T5-lessons' did not pass; the gate check 'T5-artefact-standard' did not pass; the gate check 'T5-rework' did not pass",
+      "detail": "the gate check 'T5-project' did not pass; the gate check 'T5-baseline' did not pass; the gate check 'T5-charter' did not pass; the gate check 'T5-contract' did not pass; the gate check 'T5-review' did not pass; the gate check 'T5-pi-cadence' did not pass; the gate check 'T5-pi-plan' did not pass; the gate check 'T5-pi-objectives' did not pass; the gate check 'T5-wsjf' did not pass; the gate check 'T5-demo-credits' did not pass; the gate check 'T5-lessons' did not pass; the gate check 'T5-product' did not pass; the gate check 'T5-artefact-standard' did not pass; the gate check 'T5-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "a closed project must not carry a red acceptance manifest",
+      "detail": "the project is closed while its manifest is red",
+      "id": "closed-on-red",
+      "kind": "snapshot",
       "result": "fail",
       "severity": "P0"
     }
   ],
   "failures": [
+    "T5-project (P0): status is 'closed', expected 'active'",
     "T5-baseline (P0): no project baseline",
-    "T5-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+    "T5-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "T5-contract (P0): no live board-approved delivery contract",
     "T5-review (P0): no Phase-G compliance review for the project's live contract",
     "T5-pi-cadence (P0): no PI cadence row for tranche-10",
@@ -160,21 +170,23 @@
     "T5-wsjf (P0): no WBS deliverable carries the plan",
     "T5-demo-credits (P0): no accepted deliverable to demo",
     "T5-lessons (P1): no retro cadence row for tranche-10",
-    "T5-artefact-standard (P1): 5 mandatory artefact package(s) open: dr-w3-lessons-1:T5, std-pmp-change-control-t5:T5, std-pmp-project-baseline-t5:T5, std-pmp-project-registers-t5:T5, std-togaf-compliance-review-t5:T5 (2 not yet due: tranche planned)",
-    "T5-rework (P0): 4 unresolved P0/P1 package(s): dr-w3-lessons-1:T5 (P1), v1-p119-1:T5 (P1), v1-p93-1:T5 (P1), v1-w1b-3:T5 (P1) (2 not yet due: tranche planned)",
-    "gate (P0): the gate check 'T5-baseline' did not pass; the gate check 'T5-charter' did not pass; the gate check 'T5-contract' did not pass; the gate check 'T5-review' did not pass; the gate check 'T5-pi-cadence' did not pass; the gate check 'T5-pi-plan' did not pass; the gate check 'T5-pi-objectives' did not pass; the gate check 'T5-wsjf' did not pass; the gate check 'T5-demo-credits' did not pass; the gate check 'T5-lessons' did not pass; the gate check 'T5-artefact-standard' did not pass; the gate check 'T5-rework' did not pass"
+    "T5-product (P0): 1 open P0 package(s): closed_without_closure_review:T5",
+    "T5-artefact-standard (P1): 11 mandatory artefact package(s) open: closed_without_closure_review:T5, project_in_unauthorised_tranche:T5, unpublished_declared_output:T5, dr-w3-lessons-1:T5, contract_missing:T5, mandatory_artefacts:T5, std-pmp-change-control-t5:T5, std-pmp-project-baseline-t5:T5, +3 more",
+    "T5-rework (P0): 9 unresolved P0/P1 package(s): closed_without_closure_review:T5 (P0), project_in_unauthorised_tranche:T5 (P0), unpublished_declared_output:T5 (P1), dr-w3-lessons-1:T5 (P1), v1-p119-1:T5 (P1), v1-p93-1:T5 (P1), v1-w1b-3:T5 (P1), contract_missing:T5 (P1), +1 more",
+    "gate (P0): the gate check 'T5-project' did not pass; the gate check 'T5-baseline' did not pass; the gate check 'T5-charter' did not pass; the gate check 'T5-contract' did not pass; the gate check 'T5-review' did not pass; the gate check 'T5-pi-cadence' did not pass; the gate check 'T5-pi-plan' did not pass; the gate check 'T5-pi-objectives' did not pass; the gate check 'T5-wsjf' did not pass; the gate check 'T5-demo-credits' did not pass; the gate check 'T5-lessons' did not pass; the gate check 'T5-product' did not pass; the gate check 'T5-artefact-standard' did not pass; the gate check 'T5-rework' did not pass",
+    "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "T5 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened' \u2014 is the condition on which it may be closed, not a claim that it is met.",
-  "generated_at": "2026-11-24T22:51:49.820412+00:00",
+  "generated_at": "2026-11-25T08:48:07.939224+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T5.toml",
   "name": "Kata",
   "project": "T5",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:44:10.403624+00:00",
-    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
-    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
+    "generated_at": "2026-11-25T08:47:56Z",
+    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
+    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
   },
   "verdict": "red",
   "warnings": []

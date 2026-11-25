@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d39-79ce-84b6-1173b94bc67f\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 0",
-      "exit": 0,
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "exit": 1,
       "id": "PLATFORM-charter",
       "kind": "command",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0",
-      "stderr": "",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -70,7 +70,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "119 mandatory artefact package(s) open: benefit_baseline_placeholder:programme, closure_outputs_undeclared:P0, closure_outputs_undeclared:S00, closure_outputs_undeclared:S01, closure_outputs_undeclared:S03, closure_outputs_undeclared:S05, closure_outputs_undeclared:S06b, closure_outputs_undeclared:S06c, +111 more (4 not yet due: tranche planned)",
+      "detail": "64 mandatory artefact package(s) open: benefit_baseline_placeholder:programme, dr-w4-prog-mandate-probe-row:PLATFORM, dr-w4-prog-risk-owners:PLATFORM, std-msp-benefit-transition-b1:PLATFORM, std-msp-benefit-transition-b2:PLATFORM, std-msp-benefit-transition-b3:PLATFORM, std-msp-benefit-transition-b4:PLATFORM, std-msp-benefit-transition-b5:PLATFORM, +56 more (4 not yet due: tranche planned)",
       "id": "PLATFORM-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -79,7 +79,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "91 unresolved P0/P1 package(s): benefit_baseline_placeholder:programme (P1), closure_outputs_undeclared:P0 (P1), closure_outputs_undeclared:S00 (P1), closure_outputs_undeclared:S01 (P1), closure_outputs_undeclared:S03 (P1), closure_outputs_undeclared:S05 (P1), closure_outputs_undeclared:S06b (P1), closure_outputs_undeclared:S06c (P1), +83 more (4 not yet due: tranche planned)",
+      "detail": "27 unresolved P0/P1 package(s): benefit_baseline_placeholder:programme (P1), dr-w4-prog-mandate-probe-row:PLATFORM (P1), dr-w4-prog-risk-owners:PLATFORM (P1), std-msp-benefit-transition-b1:PLATFORM (P1), std-msp-benefit-transition-b2:PLATFORM (P1), std-msp-benefit-transition-b3:PLATFORM (P1), std-msp-benefit-transition-b4:PLATFORM (P1), std-msp-benefit-transition-b5:PLATFORM (P1), +19 more (4 not yet due: tranche planned)",
       "id": "PLATFORM-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -88,7 +88,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'PLATFORM-artefact-standard' did not pass; the gate check 'PLATFORM-rework' did not pass",
+      "detail": "the gate check 'PLATFORM-charter' did not pass; the gate check 'PLATFORM-artefact-standard' did not pass; the gate check 'PLATFORM-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -96,21 +96,22 @@
     }
   ],
   "failures": [
-    "PLATFORM-artefact-standard (P1): 119 mandatory artefact package(s) open: benefit_baseline_placeholder:programme, closure_outputs_undeclared:P0, closure_outputs_undeclared:S00, closure_outputs_undeclared:S01, closure_outputs_undeclared:S03, closure_outputs_undeclared:S05, closure_outputs_undeclared:S06b, closure_outputs_undeclared:S06c, +111 more (4 not yet due: tranche planned)",
-    "PLATFORM-rework (P0): 91 unresolved P0/P1 package(s): benefit_baseline_placeholder:programme (P1), closure_outputs_undeclared:P0 (P1), closure_outputs_undeclared:S00 (P1), closure_outputs_undeclared:S01 (P1), closure_outputs_undeclared:S03 (P1), closure_outputs_undeclared:S05 (P1), closure_outputs_undeclared:S06b (P1), closure_outputs_undeclared:S06c (P1), +83 more (4 not yet due: tranche planned)",
-    "gate (P0): the gate check 'PLATFORM-artefact-standard' did not pass; the gate check 'PLATFORM-rework' did not pass"
+    "PLATFORM-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "PLATFORM-artefact-standard (P1): 64 mandatory artefact package(s) open: benefit_baseline_placeholder:programme, dr-w4-prog-mandate-probe-row:PLATFORM, dr-w4-prog-risk-owners:PLATFORM, std-msp-benefit-transition-b1:PLATFORM, std-msp-benefit-transition-b2:PLATFORM, std-msp-benefit-transition-b3:PLATFORM, std-msp-benefit-transition-b4:PLATFORM, std-msp-benefit-transition-b5:PLATFORM, +56 more (4 not yet due: tranche planned)",
+    "PLATFORM-rework (P0): 27 unresolved P0/P1 package(s): benefit_baseline_placeholder:programme (P1), dr-w4-prog-mandate-probe-row:PLATFORM (P1), dr-w4-prog-risk-owners:PLATFORM (P1), std-msp-benefit-transition-b1:PLATFORM (P1), std-msp-benefit-transition-b2:PLATFORM (P1), std-msp-benefit-transition-b3:PLATFORM (P1), std-msp-benefit-transition-b4:PLATFORM (P1), std-msp-benefit-transition-b5:PLATFORM (P1), +19 more (4 not yet due: tranche planned)",
+    "gate (P0): the gate check 'PLATFORM-charter' did not pass; the gate check 'PLATFORM-artefact-standard' did not pass; the gate check 'PLATFORM-rework' did not pass"
   ],
   "gate": "The standing platform row carries an approved charter and a baseline; it does not close.",
-  "generated_at": "2026-11-24T22:51:44.077629+00:00",
+  "generated_at": "2026-11-25T08:48:04.619468+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/PLATFORM.toml",
   "name": "CI, runners and platform",
   "project": "PLATFORM",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:44:10.403624+00:00",
-    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
-    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
+    "generated_at": "2026-11-25T08:47:56Z",
+    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
+    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
   },
   "verdict": "red",
   "warnings": []

@@ -1,12 +1,12 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `f627baa9` generated `2026-11-25T08:18:48.307955+00:00` from `conv526-r2-snap/data`.
+Snapshot: `f207cd4f6651270b69b65c607ef89694eb88f8b0` generated `2026-11-25T08:47:28Z` from `conv526-r2b-snap/data`.
 
 | Severity | Count |
 |---|---:|
 | P0 | 21 |
-| P1 | 141 |
-| P2 | 16 |
+| P1 | 142 |
+| P2 | 17 |
 | P3 | 0 |
 
 ## P0 and P1
@@ -144,6 +144,7 @@ Snapshot: `f627baa9` generated `2026-11-25T08:18:48.307955+00:00` from `conv526-
 | `project_in_unauthorised_tranche` | `T19F` | P1 | project is active in tranche 6 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T7` | P1 | project is active in tranche 5 whose state is 'planned' |
 | `seed_live_drift` | `T16` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `T19F` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T3` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T4` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T7` | P1 | seed status 'closed' != live status 'active' |
@@ -215,14 +216,14 @@ Snapshot: `f627baa9` generated `2026-11-25T08:18:48.307955+00:00` from `conv526-
 | T10 | closed | 4 | 0 | 0 | 0 | 0 |
 | T11 | closed | 1 | 0 | 2 | 0 | 0 |
 | T12 | active | 13 | 0 | 4 | 1 | 0 |
-| T13 | active | 3 | 0 | 0 | 0 | 0 |
+| T13 | closed | 3 | 0 | 0 | 1 | 0 |
 | T14 | active | 4 | 0 | 3 | 1 | 0 |
 | T15 | closed | 12 | 2 | 3 | 0 | 0 |
 | T16 | active | 4 | 0 | 2 | 0 | 0 |
 | T17 | closed | 5 | 2 | 3 | 0 | 0 |
 | T18 | active | 4 | 0 | 3 | 1 | 0 |
 | T19 | closed | 4 | 0 | 0 | 0 | 0 |
-| T19F | active | 6 | 0 | 1 | 1 | 0 |
+| T19F | active | 6 | 0 | 2 | 1 | 0 |
 | T2 | closed | 2 | 0 | 1 | 0 | 0 |
 | T3 | active | 3 | 0 | 3 | 0 | 0 |
 | T4 | active | 4 | 0 | 1 | 0 | 0 |

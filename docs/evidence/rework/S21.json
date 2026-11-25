@@ -3,10 +3,10 @@
     {
       "check": "project",
       "description": "S21 is active",
-      "detail": "status is 'closed', expected 'active'",
+      "detail": "project S21 is active",
       "id": "S21-project",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d32-71f6-bad4-81493c102060\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
       "exit": 1,
       "id": "S21-charter",
       "kind": "command",
       "result": "fail",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -124,7 +124,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "7 mandatory artefact package(s) open: closed_without_closure_review:S21, std-pmp-change-control-s21:S21, std-pmp-project-baseline-s21:S21, std-pmp-project-registers-s21:S21, std-pmp-project-wbs-s21:S21, std-togaf-compliance-review-s21:S21, std-togaf-delivery-contract-s21:S21",
+      "detail": "8 mandatory artefact package(s) open: project_in_unauthorised_tranche:S21, unpublished_declared_output:S21, mandatory_artefacts:S21, std-pmp-change-control-s21:S21, std-pmp-project-baseline-s21:S21, std-pmp-project-registers-s21:S21, std-togaf-compliance-review-s21:S21, std-togaf-delivery-contract-s21:S21",
       "id": "S21-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -133,7 +133,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): closed_without_closure_review:S21 (P1)",
+      "detail": "3 unresolved P0/P1 package(s): project_in_unauthorised_tranche:S21 (P1), unpublished_declared_output:S21 (P1), mandatory_artefacts:S21 (P1)",
       "id": "S21-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -142,26 +142,16 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S21-project' did not pass; the gate check 'S21-baseline' did not pass; the gate check 'S21-charter' did not pass; the gate check 'S21-contract' did not pass; the gate check 'S21-review' did not pass; the gate check 'S21-pi-cadence' did not pass; the gate check 'S21-pi-plan' did not pass; the gate check 'S21-pi-objectives' did not pass; the gate check 'S21-lessons' did not pass; the gate check 'S21-wsjf' did not pass; the gate check 'S21-demo-credits' did not pass; the gate check 'S21-artefact-standard' did not pass; the gate check 'S21-rework' did not pass",
+      "detail": "the gate check 'S21-baseline' did not pass; the gate check 'S21-charter' did not pass; the gate check 'S21-contract' did not pass; the gate check 'S21-review' did not pass; the gate check 'S21-pi-cadence' did not pass; the gate check 'S21-pi-plan' did not pass; the gate check 'S21-pi-objectives' did not pass; the gate check 'S21-lessons' did not pass; the gate check 'S21-wsjf' did not pass; the gate check 'S21-demo-credits' did not pass; the gate check 'S21-artefact-standard' did not pass; the gate check 'S21-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
       "result": "fail",
       "severity": "P0"
     }
   ],
   "failures": [
-    "S21-project (P0): status is 'closed', expected 'active'",
     "S21-baseline (P0): no project baseline",
-    "S21-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
+    "S21-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "S21-contract (P0): no live board-approved delivery contract",
     "S21-review (P0): no Phase-G compliance review for the project's live contract",
     "S21-pi-cadence (P0): no PI cadence row for tranche-9",
@@ -170,22 +160,21 @@
     "S21-lessons (P1): no retro cadence row for tranche-9",
     "S21-wsjf (P0): no WBS deliverable carries the plan",
     "S21-demo-credits (P0): no accepted deliverable to demo",
-    "S21-artefact-standard (P1): 7 mandatory artefact package(s) open: closed_without_closure_review:S21, std-pmp-change-control-s21:S21, std-pmp-project-baseline-s21:S21, std-pmp-project-registers-s21:S21, std-pmp-project-wbs-s21:S21, std-togaf-compliance-review-s21:S21, std-togaf-delivery-contract-s21:S21",
-    "S21-rework (P0): 1 unresolved P0/P1 package(s): closed_without_closure_review:S21 (P1)",
-    "gate (P0): the gate check 'S21-project' did not pass; the gate check 'S21-baseline' did not pass; the gate check 'S21-charter' did not pass; the gate check 'S21-contract' did not pass; the gate check 'S21-review' did not pass; the gate check 'S21-pi-cadence' did not pass; the gate check 'S21-pi-plan' did not pass; the gate check 'S21-pi-objectives' did not pass; the gate check 'S21-lessons' did not pass; the gate check 'S21-wsjf' did not pass; the gate check 'S21-demo-credits' did not pass; the gate check 'S21-artefact-standard' did not pass; the gate check 'S21-rework' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
+    "S21-artefact-standard (P1): 8 mandatory artefact package(s) open: project_in_unauthorised_tranche:S21, unpublished_declared_output:S21, mandatory_artefacts:S21, std-pmp-change-control-s21:S21, std-pmp-project-baseline-s21:S21, std-pmp-project-registers-s21:S21, std-togaf-compliance-review-s21:S21, std-togaf-delivery-contract-s21:S21",
+    "S21-rework (P0): 3 unresolved P0/P1 package(s): project_in_unauthorised_tranche:S21 (P1), unpublished_declared_output:S21 (P1), mandatory_artefacts:S21 (P1)",
+    "gate (P0): the gate check 'S21-baseline' did not pass; the gate check 'S21-charter' did not pass; the gate check 'S21-contract' did not pass; the gate check 'S21-review' did not pass; the gate check 'S21-pi-cadence' did not pass; the gate check 'S21-pi-plan' did not pass; the gate check 'S21-pi-objectives' did not pass; the gate check 'S21-lessons' did not pass; the gate check 'S21-wsjf' did not pass; the gate check 'S21-demo-credits' did not pass; the gate check 'S21-artefact-standard' did not pass; the gate check 'S21-rework' did not pass"
   ],
   "gate": "S21 is accepted when a step whose recipe requires `procedure` and whose run has none fails by name before a model call, the same recipe and the same facts compile byte-identically, changing the card changes the hash while changing an unrelated tenant's card does not, an over-budget section refuses with the measured size and never truncates, and the prompt audit can name the compiled text it audited by `(prompt_ref, prompt_sha256)`.",
-  "generated_at": "2026-11-24T22:51:47.570295+00:00",
+  "generated_at": "2026-11-25T08:48:06.580422+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S21.toml",
   "name": "Message construction",
   "project": "S21",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:44:10.403624+00:00",
-    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
-    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
+    "generated_at": "2026-11-25T08:47:56Z",
+    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
+    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
   },
   "verdict": "red",
   "warnings": []

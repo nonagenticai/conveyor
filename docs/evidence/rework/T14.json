@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d37-7896-adfb-fa7bd2279dfd\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 0",
-      "exit": 0,
+      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "exit": 1,
       "id": "T14-charter",
       "kind": "command",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0",
-      "stderr": "",
+      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
       "stdout": ""
     },
     {
@@ -124,7 +124,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a211c9-1412-772b-b094-06288207fcd1 carries a statement and evidence from the tranche-4 retro",
       "id": "T14-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -160,7 +160,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T14-baseline' did not pass; the gate check 'T14-closure-outputs' did not pass; the gate check 'T14-contract' did not pass; the gate check 'T14-review' did not pass; the gate check 'T14-closure-gate' did not pass; the gate check 'T14-wsjf' did not pass; the gate check 'T14-demo-credits' did not pass; the gate check 'T14-product' did not pass; the gate check 'T14-artefact-standard' did not pass; the gate check 'T14-rework' did not pass",
+      "detail": "the gate check 'T14-baseline' did not pass; the gate check 'T14-charter' did not pass; the gate check 'T14-closure-outputs' did not pass; the gate check 'T14-contract' did not pass; the gate check 'T14-review' did not pass; the gate check 'T14-closure-gate' did not pass; the gate check 'T14-wsjf' did not pass; the gate check 'T14-demo-credits' did not pass; the gate check 'T14-product' did not pass; the gate check 'T14-artefact-standard' did not pass; the gate check 'T14-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -169,6 +169,7 @@
   ],
   "failures": [
     "T14-baseline (P0): no project baseline",
+    "T14-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "T14-closure-outputs (P0): declared closure outputs are not published: closure-review",
     "T14-contract (P0): no live board-approved delivery contract",
     "T14-review (P0): no Phase-G compliance review for the project's live contract",
@@ -178,19 +179,19 @@
     "T14-product (P0): 2 open P0 package(s): std-pmp-change-control-t14:T14, std-pmp-project-baseline-t14:T14",
     "T14-artefact-standard (P1): 7 mandatory artefact package(s) open: std-pmp-change-control-t14:T14, std-pmp-project-baseline-t14:T14, unpublished_declared_output:T14, contract_missing:T14, mandatory_artefacts:T14, std-pmp-project-registers-t14:T14, std-togaf-compliance-review-t14:T14",
     "T14-rework (P0): 6 unresolved P0/P1 package(s): std-pmp-change-control-t14:T14 (P0), std-pmp-project-baseline-t14:T14 (P0), unpublished_declared_output:T14 (P1), v1-w3c-2:T14 (P1), contract_missing:T14 (P1), mandatory_artefacts:T14 (P1)",
-    "gate (P0): the gate check 'T14-baseline' did not pass; the gate check 'T14-closure-outputs' did not pass; the gate check 'T14-contract' did not pass; the gate check 'T14-review' did not pass; the gate check 'T14-closure-gate' did not pass; the gate check 'T14-wsjf' did not pass; the gate check 'T14-demo-credits' did not pass; the gate check 'T14-product' did not pass; the gate check 'T14-artefact-standard' did not pass; the gate check 'T14-rework' did not pass"
+    "gate (P0): the gate check 'T14-baseline' did not pass; the gate check 'T14-charter' did not pass; the gate check 'T14-closure-outputs' did not pass; the gate check 'T14-contract' did not pass; the gate check 'T14-review' did not pass; the gate check 'T14-closure-gate' did not pass; the gate check 'T14-wsjf' did not pass; the gate check 'T14-demo-credits' did not pass; the gate check 'T14-product' did not pass; the gate check 'T14-artefact-standard' did not pass; the gate check 'T14-rework' did not pass"
   ],
   "gate": "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish",
-  "generated_at": "2026-11-25T07:30:06.790857+00:00",
+  "generated_at": "2026-11-25T08:48:07.187523+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T14.toml",
   "name": "Estate toolkits",
   "project": "T14",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:54:29.947376+00:00",
-    "git_sha": "f726f48a3830c4682f4baba14dd09a91c5f26b7e",
-    "path": "retained-snapshot/f726f48a3830c4682f4baba14dd09a91c5f26b7e"
+    "generated_at": "2026-11-25T08:47:56Z",
+    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
+    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
   },
   "verdict": "red",
   "warnings": []
