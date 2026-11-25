@@ -417,20 +417,6 @@ pub fn content_hash(manifest: &ToolkitManifest) -> String {
         hasher.update([0u8]);
         hasher.update(tool.action.as_bytes());
         hasher.update([0u8]);
-        // Only a declared rule is content: a tool that never carried one hashes exactly as it did
-        // before this field existed, so the first publish after the upgrade bumps only the tools
-        // whose declarations changed.
-        if !tool.redact.is_empty() {
-            hasher.update(serde_json::to_vec(&tool.redact).unwrap_or_default());
-            hasher.update([0u8]);
-        }
-        // Only a declared path is content: a tool that never carried one hashes exactly as it did
-        // before this field existed, so the first publish after the upgrade bumps only the
-        // toolkits whose tools gained a declaration.
-        if let Some(verify) = &tool.verify {
-            hasher.update(serde_json::to_vec(verify).unwrap_or_default());
-            hasher.update([0u8]);
-        }
         if let Some(spec) = crate::registry::registry().get(tool.action.as_str()) {
             hasher.update(spec.effect.as_str().as_bytes());
             hasher.update([0u8]);

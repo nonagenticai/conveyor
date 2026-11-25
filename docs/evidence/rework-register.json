@@ -1231,17 +1231,7 @@
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S18"
-        },
-        {
-          "detail": "project is active in tranche 9 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
+          "severity": "P0",
           "subject": "S21"
         }
       ],
@@ -26279,7 +26269,7 @@
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "168 declared dependency edge(s) carry no blocks|needs|supersedes|informs kind",
+          "detail": "163 declared dependency edge(s) carry no blocks|needs|supersedes|informs kind",
           "disposition": "rework",
           "evidence": [],
           "expires": null,
@@ -42107,8 +42097,8 @@
       "p2": 14,
       "packages": 94,
       "rules": 8,
-      "rules_clean": 5,
-      "rules_with_gaps": 3,
+      "rules_clean": 4,
+      "rules_with_gaps": 4,
       "suppressed": 0
     },
     "TOGAF": {

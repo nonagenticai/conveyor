@@ -334,7 +334,7 @@
       "tranche": 0,
       "units": {
         "blocked": 1,
-        "claimed": 3,
+        "claimed": 6,
         "numbers": [
           16,
           17,
@@ -361,10 +361,13 @@
           572,
           660,
           669,
+          680,
           681,
-          693
+          691,
+          693,
+          696
         ],
-        "open": 15,
+        "open": 18,
         "ready": 7,
         "unknown": 0
       }
@@ -1823,16 +1826,16 @@
       "track": "v2",
       "tranche": 3,
       "units": {
-        "blocked": 0,
-        "claimed": 0,
+        "blocked": 1,
+        "claimed": 1,
         "numbers": [
           76,
           556,
           557,
           630
         ],
-        "open": 1,
-        "ready": 1,
+        "open": 2,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2063,8 +2066,8 @@
       "track": "v2",
       "tranche": 4,
       "units": {
-        "blocked": 0,
-        "claimed": 0,
+        "blocked": 1,
+        "claimed": 1,
         "numbers": [
           559,
           562,
@@ -2073,8 +2076,8 @@
           565,
           566
         ],
-        "open": 1,
-        "ready": 1,
+        "open": 2,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2134,11 +2137,11 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": null,
+      "gap": "action meetings.type_list, action meetings.type_get, action architecture.board_sit_open, action architecture.board_sit_decide, action cadences.materialise",
       "key": "T19F",
       "measured": {
         "actions": [
-          5,
+          0,
           5
         ],
         "modules": [
@@ -2158,19 +2161,19 @@
         "S11"
       ],
       "plan": "docs/plans/T19F-meeting-bindings.md",
-      "status": "built",
+      "status": "proposed",
       "track": "v2",
       "tranche": 6,
       "units": {
-        "blocked": 0,
-        "claimed": 1,
+        "blocked": 1,
+        "claimed": 0,
         "numbers": [
           682,
           683,
           684
         ],
-        "open": 1,
-        "ready": 0,
+        "open": 2,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -2783,7 +2786,7 @@
         "built": 46,
         "partial": 2,
         "planned": 0,
-        "proposed": 1,
+        "proposed": 2,
         "standing": 1
       },
       "total": 51,
