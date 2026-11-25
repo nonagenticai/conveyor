@@ -1,0 +1,37 @@
+{
+ "schema": "s05-load-gate/v1",
+ "measured_at": "2026-11-25T10:50:25.876589+00:00",
+ "commit": "9884fb3f39efc61e1c2b5828d962dc76b47bc192",
+ "command": "k6 run -e BASE_URL=http://127.0.0.1:8932 -e BOARD_ID=01a21252-53ae-7f01-bfb6-7bfef416b536 -e DEV_AUTH_TOKEN=dev:alice tests/load/board.js",
+ "fixture": "tests/fixtures/board/v1-1000.json imported through the real actions (conveyor admin import board): 1,000 cards / 10 lists",
+ "database": "disposable postgres:18 at 127.0.0.1:55461 (migrate --dev-seed); no record database touched",
+ "thresholds": {
+  "first_page_p95_ms": 120,
+  "five_page_total_ms": 500,
+  "checks_rate": 1.0,
+  "http_req_failed_rate": 0.0
+ },
+ "measured": {
+  "first_page_p95_ms": 19.82,
+  "first_page_p95_ms_named": 19.53,
+  "five_page_avg_ms": 73.34,
+  "five_page_max_ms": 76.7,
+  "five_page_min_ms": 68.82,
+  "checks_total": 2420,
+  "checks_succeeded": 2420,
+  "http_reqs": 1225,
+  "http_req_failed": 0,
+  "duration_seconds": 60,
+  "rate": "20 rps first page; 5 independent five-page walks"
+ },
+ "clauses": {
+  "status is 200": "PASS",
+  "page carries items": "PASS",
+  "the walk served every page": "PASS",
+  "the walk read five pages": "PASS",
+  "the walk read 1,000 cards": "PASS",
+  "the walk used every cursor": "PASS"
+ },
+ "log": "docs/evidence/s05-load-gate.log",
+ "verdict": "green"
+}
