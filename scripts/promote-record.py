@@ -2556,6 +2556,11 @@ def existing_for(
         card = state.cards.get(key.first)
         if card is None:
             return None
+        # Archive is terminal. A card stamped after it reached this entry's lane is already
+        # past it, so the journal's move is reflected and must skip. Re-invoking asks an
+        # archived card to move and earns a correct 409 for a wrong request (the T13 pair).
+        if card.get("archived_at") and key.second != "archive":
+            return card
         if lane_kind(state, card.get("list_id")) == key.second:
             return card
         # The lanes are not readable as rows (no action lists a board's lanes), so the two
@@ -5447,7 +5452,29 @@ def self_test() -> int:
             f"{[(o.entry.natural_key, o.verdict, o.detail) for o in second]}",
         )
 
-        # 8b. A pending closure gate is not a decision. The close_request readback must
+        # 8b. An archived card has passed the move's lane: archive is terminal, so the
+        # journal's earlier move is already reflected and must skip, not earn a 409.
+        move_entry = next(entry for entry in entries if entry.action == "cards.move")
+        archive_lane = "01a1d3e7-0000-4000-8000-0000000000a2"
+        archived_state = State()
+        archived_state.cards[card] = {
+            "id": card, "board_id": board, "list_id": archive_lane,
+            "version": 3, "comments": [], "archived_at": "2026-11-24T17:34:31Z",
+        }
+        archived_state.lists[archive_lane] = {
+            "id": archive_lane, "board_id": board, "kind": "archive",
+        }
+        ok(
+            existing_for(move_entry, archived_state, {}, {}) is not None,
+            "an archived card supersedes a journal move to an earlier lane",
+        )
+        archived_state.cards[card].pop("archived_at")
+        ok(
+            existing_for(move_entry, archived_state, {}, {}) is None,
+            "an unstamped card in another lane is still a real move",
+        )
+
+        # 8c. A pending closure gate is not a decision. The close_request readback must
         # record the gate's real state; a fabricated "approved" row makes the decide that
         # follows skip, leaves the closure asset draft, and the destructive gate then
         # refuses its evidence (replay finding, 2026-11-23).
