@@ -1,9 +1,10 @@
 # The native acceptance contract (S14 P3.1, conveyor#8).
 #
 # `scripts/acceptance.py` reads this file and refuses to call a release reachable on partial
-# evidence: every required context below must conclude its declared `conclusion` on the commit
-# under test, every surface must answer its declared status, and every command must select at
-# least `min_tests` tests. The repository's own required-check authority (the `main` ruleset,
+# evidence: every required context below must conclude its declared `conclusion` (or one of its
+# declared `conclusions`, for a context whose correct value differs by ref) on the commit under
+# test, every surface must answer its declared status, and every command must select at least
+# `min_tests` tests. The repository's own required-check authority (the `main` ruleset,
 # measured 2026-11-24) must not name a context this file omits.
 #
 # 401 is declared only where authentication is the correct answer (`/mcp`, `/api/me`); it is
@@ -38,13 +39,13 @@ conclusion = "success"
 name = "secret-scan"
 conclusion = "success"
 
-# `dco` is required by the `main` ruleset but only runs on pull requests, so on a main-push sha
-# its check-run concludes `skipped` (measured 2026-11-24 on f4c2947: `dco=skipped`, with the
-# ref's pull-request run reporting `dco=success`). Declaring the conclusion it actually has keeps
-# the reconciliation honest instead of weakening it.
+# `dco` is required by the `main` ruleset but only runs on pull requests, so its check-run's
+# conclusion depends on the ref: `skipped` on a main-push sha (measured 2026-11-24 on f4c2947)
+# and `success` on a PR sha (measured 2026-11-25 on 434aa8fa, the #716 dispatch). Both are the
+# context's real contract; a `failure` is accepted by neither.
 [[contexts]]
 name = "dco"
-conclusion = "skipped"
+conclusions = ["success", "skipped"]
 
 # The deployed surfaces. A 404, a 422 or any 5xx is a refusal, never a pass.
 [[probes]]

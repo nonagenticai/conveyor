@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T19F — Project brief · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T19F — Project brief</h1>
+<p>One page: what this project changes, what it reuses, and how it is accepted.</p>
+<h2>Outcome</h2>
+<p>After T19F, a forum policy changes only through the reviewed authoring route (publishing a new
+immutable <code>meeting_type</code> version while an in-flight meeting keeps its pinned version), a board
+subject decision is taken in a sitting whose per-seat decisions are recorded <code>via='meeting'</code>, and
+a cadence row materialises exactly one meeting — with T19's primitives and the direct board path
+unchanged.</p>
+<h2>Boundary</h2>
+<p>In: the authoring publish hook and the two policy reads, the <code>governance_body</code> and
+<code>programme_cadence</code> bindings, the board-sitting actions, the cadence materialisation, the mock-UI
+and real-app panels, the programme record and the live proof.</p>
+<p>Out: a second decision store, a chat/AV/transcript system, a rebuild of T9/T10 or the approval
+primitive, a change to the direct <code>board_decide</code> path, the T18 shell/nav, the homepage mirror, the
+tranche 2→4 retrospective chain (#526), and programme-wide conformance debt.</p>
+<h2>Reuse sources</h2>
+<ul>
+<li>T17's authoring route (<code>authoring.intake/draft/review/publish</code>) — the only policy writer.</li>
+<li>T19's meeting aggregate and <code>close_item_tx</code> — the only decision arithmetic.</li>
+<li>T9's <code>governance_body</code> — the sitting's convener and body.</li>
+<li>T10's <code>programme_cadence</code> — the materialised forum.</li>
+<li><code>docs/SPEC_V2.md</code> §6.8 and §12 T19F — the gate.</li>
+</ul>
+<h2>Inception units</h2>
+<ul>
+<li><code>docs/plans/T19F/inception-analysis.md</code> — stakeholders, risks and the R1–R8 requirements.</li>
+<li><code>docs/plans/T19/closure-review.md</code> — the two open items this project closes.</li>
+<li><code>docs/plans/T19F/architecture-design.md</code> — PSA + HLD.</li>
+</ul>
+<h2>Dependencies</h2>
+<ul>
+<li>blocked-by #683 — the implementation (merged in #700, <code>eb0deb61</code>).</li>
+<li>acceptance-blocked-by — the deployed image carrying migration 0073 (rolled out and verified).</li>
+<li>related #526 — tranche authorisation; T19F stays <code>active</code> until the tranche-6 review.</li>
+<li>related #655 — the authoring route's own unit.</li>
+<li>related #650 — the T19 close-out this project follows.</li>
+</ul>
+<h2>Acceptance</h2>
+<ul>
+<li>Given a live meeting pinned to v1, when a reviewed policy asset publishes v2, then the meeting
+still resolves v1 and the type list carries both versions.</li>
+<li>Given a board subject and a bound forum type, when the sitting's chair records a position and
+the item is decided, then the approval carries one <code>via='meeting'</code> decision row per seat.</li>
+<li>Given a cadence row with a type, when materialise runs twice, then exactly one non-cancelled
+meeting exists with the bound type and the slot.</li>
+<li>Given T19F's record, when the governance chain checks, then seven artefacts, both contracts,
+both Phase-G reviews, B7 read-not-overwritten and the published architecture-artifact exist.</li>
+</ul>
+<h2>Capabilities</h2>
+<ul>
+<li>B1 Governed tenant assets — T17's route extended with the policy payload.</li>
+<li>B2 Deliberated decisions — T19's meeting reused by the board sitting.</li>
+<li>B3 Cadence-driven forums — T10's cadence row bound to a meeting type.</li>
+</ul>
+<h2>Plan</h2>
+<p><code>docs/plans/T19F-meeting-bindings.md</code>, delivered as #682 (plan and artefacts), #683
+(implementation, merged <code>eb0deb61</code>) and #684 (live proof and publication).</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision-forum governance (follow-on) · conveyor output · published 2026-11-25T03:46:32.319854100+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -45,14 +45,16 @@ authoring route and the T9/T10 binding are the T19F follow-on (below). T19 is in
 (the UI lane); it consumes T1/T2/T3 and the built T9/T10 seams. The meeting ruling is D66 because
 D64–D65 are the real-UI rulings.
 
-**T19F added 2026-11-24, proposed.** Decision-forum governance is the follow-on T19's closure
-review named (`docs/SPEC_V2.md` §12 T19F; `docs/plans/T19F-meeting-bindings.md`): a policy change
-is a reviewed authoring asset that publishes the next immutable `meeting_type` version, a board
-subject decision can be taken in a sitting with per-seat `via='meeting'` decisions, and a cadence
-row materialises exactly one meeting. **#682** carries the plan and the MSP/TOGAF/SAFe artefact
-set, **#683** the implementation, **#684** the deployment-gated live proof. The project is
-`active` at tranche 6 by the coverage graph (T19 tranche 4, T17 tranche 5); its closure review
-defers closure to the tranche-6 review rather than manufacturing an unledgered P0.
+**T19F added 2026-11-24, built 2026-11-25.** Decision-forum governance is the follow-on T19's
+closure review named (`docs/SPEC_V2.md` §12 T19F; `docs/plans/T19F-meeting-bindings.md`): a policy
+change is a reviewed authoring asset that publishes the next immutable `meeting_type` version, a
+board subject decision can be taken in a sitting with per-seat `via='meeting'` decisions, and a
+cadence row materialises exactly one meeting. **#682** carried the plan and the MSP/TOGAF/SAFe
+artefact set (PR #686), **#683** the implementation (PR #700), **#684** the deployment-gated live
+proof (PR #711); **#722** recorded the human review and took the live gate to 12/12. The project
+is `active` at tranche 6 by the coverage graph (T19 tranche 4, T17 tranche 5); its closure review
+defers closure to the tranche-6 review rather than manufacturing an unledgered P0, and the strict
+conformance remediation is the follow-on unit.
 
 ## Programme `conveyor-buildout`
 

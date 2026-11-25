@@ -432,6 +432,13 @@ pub struct ApprovalOut {
     /// The input the approved call will run with (`meta.proposed_input`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub proposed_input: Option<Value>,
+    /// The typed evidence the gate resolved (`meta.evidence`): `[{kind, id}]`.
+    ///
+    /// A gate asked to resolve evidence records what it resolved (T3), so an approver reads the
+    /// record the gate protects, not only the requester's description. Absent on a gate that
+    /// carried none — never an empty list pretending the question was asked.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub evidence: Vec<Value>,
     /// Who posed the gate, when a person did.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub requested_by: Option<String>,
