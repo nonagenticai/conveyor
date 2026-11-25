@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d35-7bd1-945d-cea12c5dfd6d\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "T9-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "",
       "stdout": ""
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "20 mandatory artefact package(s) open: std-togaf-phase-g-t9-g:T9, v1-p81-5:T9, v1-w2a-3:T9, v1-w2a-4:T9, std-pmp-project-baseline-t9:T9, std-pmp-project-registers-t9:T9, std-togaf-architecture-artifact-instance-01a2027e-b3fc-7af8-a4d2-53e0ba2cca67:T9, std-togaf-architecture-artifact-instance-01a2027e-e784-7a23-9098-ca96a7610047:T9, +12 more",
+      "detail": "20 mandatory artefact package(s) open: v1-p81-5:T9, v1-w2a-3:T9, v1-w2a-4:T9, std-pmp-project-baseline-t9:T9, std-pmp-project-registers-t9:T9, std-togaf-architecture-artifact-instance-01a2027e-b3fc-7af8-a4d2-53e0ba2cca67:T9, std-togaf-architecture-artifact-instance-01a2027e-e784-7a23-9098-ca96a7610047:T9, std-togaf-architecture-artifact-instance-01a2027f-1a9a-78d0-bddb-1f7d1898d3f8:T9, +12 more",
       "id": "T9-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -151,7 +151,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "4 unresolved P0/P1 package(s): std-togaf-phase-g-t9-g:T9 (P1), v1-p81-5:T9 (P1), v1-w2a-3:T9 (P1), v1-w2a-4:T9 (P1)",
+      "detail": "3 unresolved P0/P1 package(s): v1-p81-5:T9 (P1), v1-w2a-3:T9 (P1), v1-w2a-4:T9 (P1)",
       "id": "T9-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -160,7 +160,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T9-charter' did not pass; the gate check 'T9-artefact-standard' did not pass; the gate check 'T9-rework' did not pass",
+      "detail": "the gate check 'T9-artefact-standard' did not pass; the gate check 'T9-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -177,14 +177,13 @@
     }
   ],
   "failures": [
-    "T9-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-    "T9-artefact-standard (P1): 20 mandatory artefact package(s) open: std-togaf-phase-g-t9-g:T9, v1-p81-5:T9, v1-w2a-3:T9, v1-w2a-4:T9, std-pmp-project-baseline-t9:T9, std-pmp-project-registers-t9:T9, std-togaf-architecture-artifact-instance-01a2027e-b3fc-7af8-a4d2-53e0ba2cca67:T9, std-togaf-architecture-artifact-instance-01a2027e-e784-7a23-9098-ca96a7610047:T9, +12 more",
-    "T9-rework (P0): 4 unresolved P0/P1 package(s): std-togaf-phase-g-t9-g:T9 (P1), v1-p81-5:T9 (P1), v1-w2a-3:T9 (P1), v1-w2a-4:T9 (P1)",
-    "gate (P0): the gate check 'T9-charter' did not pass; the gate check 'T9-artefact-standard' did not pass; the gate check 'T9-rework' did not pass",
+    "T9-artefact-standard (P1): 20 mandatory artefact package(s) open: v1-p81-5:T9, v1-w2a-3:T9, v1-w2a-4:T9, std-pmp-project-baseline-t9:T9, std-pmp-project-registers-t9:T9, std-togaf-architecture-artifact-instance-01a2027e-b3fc-7af8-a4d2-53e0ba2cca67:T9, std-togaf-architecture-artifact-instance-01a2027e-e784-7a23-9098-ca96a7610047:T9, std-togaf-architecture-artifact-instance-01a2027f-1a9a-78d0-bddb-1f7d1898d3f8:T9, +12 more",
+    "T9-rework (P0): 3 unresolved P0/P1 package(s): v1-p81-5:T9 (P1), v1-w2a-3:T9 (P1), v1-w2a-4:T9 (P1)",
+    "gate (P0): the gate check 'T9-artefact-standard' did not pass; the gate check 'T9-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "an architecture project passes Preliminary and A\u2013F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata",
-  "generated_at": "2026-11-25T08:48:08.242864+00:00",
+  "generated_at": "2026-11-25T09:41:06.125640+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T9.toml",
   "name": "TOGAF ADM capability",

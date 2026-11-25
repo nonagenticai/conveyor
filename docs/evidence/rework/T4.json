@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d33-7e7e-890e-b437b0c78db9\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "T4-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "",
       "stdout": ""
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "15 mandatory artefact package(s) open: std-togaf-phase-g-t4-g:T4, std-pmp-project-baseline-t4:T4, std-pmp-project-registers-t4:T4, std-togaf-architecture-artifact-instance-01a2028c-33a0-76d6-acd6-57365a79dd10:T4, std-togaf-architecture-artifact-instance-01a2028c-6415-7dbb-bb08-ef2baa58aaa4:T4, std-togaf-architecture-artifact-instance-01a2028c-94d6-7e50-9d94-9e94feda14aa:T4, std-togaf-architecture-artifact-instance-01a2028c-c575-749c-a0c8-82c44effa477:T4, std-togaf-architecture-artifact-instance-01a2028c-f584-75ea-90cd-b929dd945aa4:T4, +7 more",
+      "detail": "15 mandatory artefact package(s) open: std-pmp-project-baseline-t4:T4, std-pmp-project-registers-t4:T4, std-togaf-architecture-artifact-instance-01a2028c-33a0-76d6-acd6-57365a79dd10:T4, std-togaf-architecture-artifact-instance-01a2028c-6415-7dbb-bb08-ef2baa58aaa4:T4, std-togaf-architecture-artifact-instance-01a2028c-94d6-7e50-9d94-9e94feda14aa:T4, std-togaf-architecture-artifact-instance-01a2028c-c575-749c-a0c8-82c44effa477:T4, std-togaf-architecture-artifact-instance-01a2028c-f584-75ea-90cd-b929dd945aa4:T4, std-togaf-architecture-artifact-instance-01a2028d-27ab-7464-918c-e0e07c1a43dc:T4, +7 more",
       "id": "T4-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -151,7 +151,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "2 unresolved P0/P1 package(s): seed_live_drift:T4 (P1), std-togaf-phase-g-t4-g:T4 (P1)",
+      "detail": "1 unresolved P0/P1 package(s): seed_live_drift:T4 (P1)",
       "id": "T4-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -173,7 +173,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T4-charter' did not pass; the gate check 'T4-review' did not pass; the gate check 'T4-artefact-standard' did not pass; the gate check 'T4-rework' did not pass",
+      "detail": "the gate check 'T4-review' did not pass; the gate check 'T4-artefact-standard' did not pass; the gate check 'T4-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -181,14 +181,13 @@
     }
   ],
   "failures": [
-    "T4-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "T4-review (P0): the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver",
-    "T4-artefact-standard (P1): 15 mandatory artefact package(s) open: std-togaf-phase-g-t4-g:T4, std-pmp-project-baseline-t4:T4, std-pmp-project-registers-t4:T4, std-togaf-architecture-artifact-instance-01a2028c-33a0-76d6-acd6-57365a79dd10:T4, std-togaf-architecture-artifact-instance-01a2028c-6415-7dbb-bb08-ef2baa58aaa4:T4, std-togaf-architecture-artifact-instance-01a2028c-94d6-7e50-9d94-9e94feda14aa:T4, std-togaf-architecture-artifact-instance-01a2028c-c575-749c-a0c8-82c44effa477:T4, std-togaf-architecture-artifact-instance-01a2028c-f584-75ea-90cd-b929dd945aa4:T4, +7 more",
-    "T4-rework (P0): 2 unresolved P0/P1 package(s): seed_live_drift:T4 (P1), std-togaf-phase-g-t4-g:T4 (P1)",
-    "gate (P0): the gate check 'T4-charter' did not pass; the gate check 'T4-review' did not pass; the gate check 'T4-artefact-standard' did not pass; the gate check 'T4-rework' did not pass"
+    "T4-artefact-standard (P1): 15 mandatory artefact package(s) open: std-pmp-project-baseline-t4:T4, std-pmp-project-registers-t4:T4, std-togaf-architecture-artifact-instance-01a2028c-33a0-76d6-acd6-57365a79dd10:T4, std-togaf-architecture-artifact-instance-01a2028c-6415-7dbb-bb08-ef2baa58aaa4:T4, std-togaf-architecture-artifact-instance-01a2028c-94d6-7e50-9d94-9e94feda14aa:T4, std-togaf-architecture-artifact-instance-01a2028c-c575-749c-a0c8-82c44effa477:T4, std-togaf-architecture-artifact-instance-01a2028c-f584-75ea-90cd-b929dd945aa4:T4, std-togaf-architecture-artifact-instance-01a2028d-27ab-7464-918c-e0e07c1a43dc:T4, +7 more",
+    "T4-rework (P0): 1 unresolved P0/P1 package(s): seed_live_drift:T4 (P1)",
+    "gate (P0): the gate check 'T4-review' did not pass; the gate check 'T4-artefact-standard' did not pass; the gate check 'T4-rework' did not pass"
   ],
   "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata",
-  "generated_at": "2026-11-25T08:48:07.861984+00:00",
+  "generated_at": "2026-11-25T09:41:02.019366+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T4.toml",
   "name": "Kanban coach",

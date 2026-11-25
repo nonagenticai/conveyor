@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d38-76fb-9394-b75934d16fcd\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "T16-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "",
       "stdout": ""
     },
     {
@@ -160,7 +160,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T16-charter' did not pass; the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-artefact-standard' did not pass; the gate check 'T16-rework' did not pass",
+      "detail": "the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-artefact-standard' did not pass; the gate check 'T16-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -168,15 +168,14 @@
     }
   ],
   "failures": [
-    "T16-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
     "T16-contract (P0): no live board-approved delivery contract",
     "T16-review (P0): no Phase-G compliance review for the project's live contract",
     "T16-artefact-standard (P1): 13 mandatory artefact package(s) open: contract_missing:T16, std-togaf-phase-g-t16-g:T16, std-pmp-project-baseline-t16:T16, std-pmp-project-registers-t16:T16, std-togaf-architecture-artifact-instance-01a211c9-201c-701d-bc1e-056eefbdc8da:T16, std-togaf-architecture-artifact-instance-01a211c9-20a5-752e-a91d-c5b7ee790855:T16, std-togaf-architecture-artifact-instance-01a211c9-212a-70d4-bbbf-17c3c5038409:T16, std-togaf-architecture-artifact-instance-01a211c9-21b3-7d90-a789-8de4b76a8105:T16, +5 more",
     "T16-rework (P0): 3 unresolved P0/P1 package(s): seed_live_drift:T16 (P1), contract_missing:T16 (P1), std-togaf-phase-g-t16-g:T16 (P1)",
-    "gate (P0): the gate check 'T16-charter' did not pass; the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-artefact-standard' did not pass; the gate check 'T16-rework' did not pass"
+    "gate (P0): the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-artefact-standard' did not pass; the gate check 'T16-rework' did not pass"
   ],
   "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds",
-  "generated_at": "2026-11-25T08:48:07.342231+00:00",
+  "generated_at": "2026-11-25T09:40:44.461458+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T16.toml",
   "name": "SOP, RDF/OWL and process-document ingestion",
