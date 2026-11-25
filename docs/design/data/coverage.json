@@ -2162,8 +2162,8 @@
       "track": "v2",
       "tranche": 6,
       "units": {
-        "blocked": 1,
-        "claimed": 0,
+        "blocked": 0,
+        "claimed": 1,
         "numbers": [
           682,
           683,

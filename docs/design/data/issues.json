@@ -110,15 +110,15 @@
       "title": "proof: T19F \u2014 the live gate, the published programme record and the closure review",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/684",
-      "updatedAt": "2026-11-25T01:54:41Z",
+      "updatedAt": "2026-11-25T03:14:20Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -303,7 +303,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-25T02:31:34Z",
+      "updatedAt": "2026-11-25T03:39:01Z",
       "labels": [
         {
           "name": "programme",
