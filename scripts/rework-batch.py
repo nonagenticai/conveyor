@@ -340,7 +340,8 @@ def plan_member(project: dict, msp: dict, content_dir: Path, number: int,
                 states: dict[int, str]) -> dict:
     key = str(project.get("key"))
     path = content_path(content_dir, key)
-    closes = closes_project(project, states)
+    content = load_json(path) if path else None
+    closes = closes_project(project, states, content)
     plan = {
         "key": key,
         "status": project.get("status"),
@@ -463,13 +464,18 @@ def issue_states(snapshot: Path) -> dict[int, str]:
     return states
 
 
-def closes_project(project: dict, states: dict[int, str]) -> bool:
-    """A closed project closes again only when every linked issue is closed.
+def closes_project(project: dict, states: dict[int, str], content: dict | None) -> bool:
+    """The pack declares the close; every linked issue must be closed.
 
-    `meta.issues` lists linked numbers, not states. Treating the list's presence as "open" kept
-    four closed tranche-4 members active and would fail their own `project` check.
+    The live status is not the plan. A retrospective that was refused its close on a red
+    manifest leaves the row active (measured: T9) while the programme's seed and its closed
+    issues still say closed; planning from the live row demanded a stay-active pack for a
+    project that must close once green, and the checker refused the authored pack. The pack
+    states this tranche's intent — closure and closure_review present — and an open linked
+    issue vetoes it. `meta.issues` lists numbers, not states, so the registry at the
+    snapshot's sha supplies the states.
     """
-    if project.get("status") != "closed":
+    if not content or not content.get("closure") or not content.get("closure_review"):
         return False
     numbers = (project.get("meta") or {}).get("issues") or []
     return all(states.get(int(number)) == "CLOSED" for number in numbers)
@@ -508,9 +514,14 @@ def execute(args: argparse.Namespace) -> int:
         ]
         plan = preflight(plan, snapshot, args.dry_run)
 
+        def record(entry: dict) -> None:
+            # A dry run writes nothing: its journal entries would make the real run resume-skip
+            # members it never acted on.
+            if not args.dry_run:
+                journal_append(journal, entry)
+
         for member in plan:
-            journal_append(
-                journal,
+            record(
                 {
                     "key": member["key"],
                     "tranche": args.tranche,
@@ -518,20 +529,19 @@ def execute(args: argparse.Namespace) -> int:
                     "state": "PREFLIGHTED",
                     "blocked": member.get("blocked"),
                     "content": member.get("content"),
-                },
+                }
             )
         blocked = [member for member in plan if member.get("blocked")]
         if blocked:
             for member in blocked:
-                journal_append(
-                    journal,
+                record(
                     {
                         "key": member["key"],
                         "tranche": args.tranche,
                         "snapshot_sha": sha,
                         "state": "BLOCKED",
                         "reason": member["blocked"],
-                    },
+                    }
                 )
             print(
                 f"rework-batch: {len(blocked)} of {len(plan)} blocked before the first act; "
@@ -544,18 +554,16 @@ def execute(args: argparse.Namespace) -> int:
             if member.get("blocked"):
                 results.append({"key": member["key"], "state": "BLOCKED", "gaps": []})
                 continue
-            journal_append(
-                journal,
+            record(
                 {
                     "key": member["key"],
                     "tranche": args.tranche,
                     "snapshot_sha": sha,
                     "state": "RUNNING",
-                },
+                }
             )
             result = run_one(member, msp, args.tranche, snapshot, args.dry_run, args.publish)
-            journal_append(
-                journal,
+            record(
                 {
                     "key": member["key"],
                     "tranche": args.tranche,
@@ -564,7 +572,7 @@ def execute(args: argparse.Namespace) -> int:
                     "factory_exit": result["factory_exit"],
                     "gaps": result["gaps"],
                     "log": result["log"],
-                },
+                }
             )
             results.append(result)
             print(f"rework-batch: {member['key']} {result['state']}")
@@ -663,10 +671,16 @@ def self_test() -> None:
             pass
         else:
             raise SystemExit("self-test: a member with no WSJF was not refused")
-        assert closes_project({"status": "closed", "meta": {"issues": [1]}}, {1: "CLOSED"})
-        assert not closes_project({"status": "closed", "meta": {"issues": [2]}}, {2: "OPEN"})
-        assert not closes_project({"status": "closed", "meta": {"issues": [3]}}, {})
-        assert not closes_project({"status": "active", "meta": {"issues": []}}, {})
+        closing = {"closure": {"decision": "close"}, "closure_review": {"decision": "approve"}}
+        # The pinned defect: T9's live row is active because its close was refused on a red
+        # manifest, while the pack and the closed issues still plan the close.
+        assert closes_project({"status": "active", "meta": {"issues": [1]}}, {1: "CLOSED"}, closing)
+        assert not closes_project({"status": "active", "meta": {"issues": [2]}}, {2: "OPEN"}, closing)
+        assert not closes_project({"status": "active", "meta": {"issues": [3]}}, {}, closing)
+        assert not closes_project({"status": "closed", "meta": {"issues": []}}, {}, {})
+        assert not closes_project(
+            {"status": "closed", "meta": {"issues": [4]}}, {4: "CLOSED"}, {"closure": {}}
+        )
 
         journal = root / "run.jsonl"
         for entry in (
