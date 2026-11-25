@@ -3,8 +3,9 @@
 Issue #697 · branch `issue/697-s21-execution-loop` · ADR `0020-release-knowledge-layers` ·
 CONTRACT §30 · S21 §23 P4 · migration `0074` · resolves rework `v1-w1a-2`
 
-**State: built.** Measured at `8eef79ba` (the branch merged with `main@9ace4e81`) on 2026-11-25,
-before the PR. The merge is the lane's last CI run; nothing here is claimed for `main` yet.
+**State: merged** (PR #713, `e7aa67b7`, 2026-11-25). Measured at `8eef79ba` on the branch that
+merged with `main@9ace4e81`; the fixture-contract rewrite is `a21c1965` and the migration-ledger pin
+`20efce1c`. The required CI contexts were green at the head `28401de2`.
 
 ## What changes at this level
 
