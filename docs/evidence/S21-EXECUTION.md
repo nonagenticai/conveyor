@@ -3,8 +3,8 @@
 Issue #697 · branch `issue/697-s21-execution-loop` · ADR `0019-accepted-draft-and-prompt-receipts`
 · CONTRACT §29 · S21 §23 · resolves rework `v1-p77-1`, `v1-p77-2`
 
-**State: built.** Measured at `54c51a63` on 2026-11-24, before the PR. The merge is the lane's last
-CI run; nothing here is claimed for `main` yet.
+**State: built.** Measured at `8eef79ba` (the branch merged with `main@9ace4e81`) on 2026-11-25,
+before the PR. The merge is the lane's last CI run; nothing here is claimed for `main` yet.
 
 ## What changes at this level
 
@@ -21,7 +21,7 @@ activation, readiness and execution, and every recorded call carries a 64-hex `p
 `prompt_recipes.create` writes the recipe's `budget_chars`, so the measured refusal is reachable
 from an authored recipe.
 
-## Measured suites (exact head `54c51a63`)
+## Measured suites (exact head `8eef79ba`)
 
 | Suite | Result |
 |---|---|

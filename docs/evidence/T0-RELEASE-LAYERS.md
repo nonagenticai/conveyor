@@ -3,7 +3,7 @@
 Issue #697 · branch `issue/697-s21-execution-loop` · ADR `0020-release-knowledge-layers` ·
 CONTRACT §30 · S21 §23 P4 · migration `0074` · resolves rework `v1-w1a-2`
 
-**State: built.** Measured on 2026-11-24 at the code of `b7722710` (the suites at `54c51a63`),
+**State: built.** Measured at `8eef79ba` (the branch merged with `main@9ace4e81`) on 2026-11-25,
 before the PR. The merge is the lane's last CI run; nothing here is claimed for `main` yet.
 
 ## What changes at this level
@@ -21,7 +21,7 @@ required kind has no value. The snapshot carries every resolved value with its l
 sorted, so two identical publishes hash identically. `organisation_layers.set|list` author and read
 the rows; no new scope.
 
-## Measured suites (code `b7722710`, suites at `54c51a63`)
+## Measured suites (exact head `8eef79ba`)
 
 | Suite | Result |
 |---|---|
