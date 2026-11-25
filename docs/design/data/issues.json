@@ -135,7 +135,7 @@
       "title": "add: T19F \u2014 forum-policy authoring, the board sitting and cadence materialisation",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/683",
-      "updatedAt": "2026-11-25T00:05:34Z",
+      "updatedAt": "2026-11-25T00:50:24Z",
       "labels": [
         {
           "name": "unit",
@@ -303,7 +303,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-25T00:10:31Z",
+      "updatedAt": "2026-11-25T00:55:56Z",
       "labels": [
         {
           "name": "programme",
@@ -966,15 +966,15 @@
       "title": "T18-5: Architecture capability, System architecture, Knowledge and the T12 acceptance",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/566",
-      "updatedAt": "2026-11-22T07:12:08Z",
+      "updatedAt": "2026-11-25T00:55:40Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "programme",
@@ -989,9 +989,9 @@
     {
       "number": 565,
       "title": "T18-4: Tools, Metering, Operations and Improve",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/565",
-      "updatedAt": "2026-11-25T00:17:33Z",
+      "updatedAt": "2026-11-25T00:55:31Z",
       "labels": [
         {
           "name": "unit",
