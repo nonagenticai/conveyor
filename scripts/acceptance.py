@@ -5,7 +5,9 @@ One checked-in manifest (`acceptance/native.toml`) and one command that refuses 
 release reachable on partial evidence:
 
   * **contexts** — every required CI context must be present on the commit under test and
-    conclude its declared `conclusion` (defaulting to `success`); the repository's own
+    conclude a declared `conclusion` (defaulting to `success`), or one of the row's
+    `conclusions` where the same context legitimately differs by ref (`dco` is
+    pull_request-only: `success` on a PR sha, `skipped` on a main push); the repository's own
     required-check authority (ruleset, else branch protection) must not name a context the
     manifest omits;
   * **probes** — every declared surface must answer its declared status; 404/422/5xx are never
@@ -102,6 +104,19 @@ def required_contexts(repo: str, branch: str) -> set[str]:
     return names
 
 
+def context_conclusions(row: dict) -> set[str]:
+    """The conclusions this context may legitimately carry on the commit under test.
+
+    One value by default. A row may declare a set instead, for a context whose conclusion is
+    correct in more than one spelling: `dco` is pull_request-only, so the same repository
+    shows `skipped` on a main push and `success` on a PR sha. A failure is never in a set.
+    """
+    declared = row.get("conclusions")
+    if declared is None:
+        return {str(row.get("conclusion", "success"))}
+    return {str(value) for value in declared}
+
+
 def check_contexts(manifest: dict, repo: str, sha: str) -> bool:
     """Every manifest context is success on the sha; the authority names nothing omitted."""
     passed = True
@@ -117,17 +132,18 @@ def check_contexts(manifest: dict, repo: str, sha: str) -> bool:
     declared = {row["name"] for row in manifest["contexts"]}
     for row in manifest["contexts"]:
         name = row["name"]
-        expected = row.get("conclusion", "success")
+        expected = context_conclusions(row)
+        expected_display = next(iter(expected)) if len(expected) == 1 else sorted(expected)
         found = by_name.get(name) or []
         conclusions = {check.get("conclusion") for check in found}
         if not found:
             fail(f"contexts: {name!r} has no check run on {sha[:12]}")
             passed = False
-        elif expected not in conclusions:
-            fail(f"contexts: {name!r} on {sha[:12]} concluded {sorted(c for c in conclusions if c)}, expected {expected!r}")
+        elif not (expected & conclusions):
+            fail(f"contexts: {name!r} on {sha[:12]} concluded {sorted(c for c in conclusions if c)}, expected {expected_display!r}")
             passed = False
         else:
-            ok(f"contexts: {name!r} is {expected}")
+            ok(f"contexts: {name!r} is {', '.join(sorted(expected & conclusions))}")
     omitted = sorted(authority - declared)
     if omitted:
         fail(f"contexts: the repository requires {omitted} but the manifest does not declare them")
@@ -220,9 +236,11 @@ def check_commands(manifest: dict) -> bool:
 def self_test() -> int:
     """Each refusal is proved against synthetic input; a harness that cannot refuse is a pass."""
     failures = 0
+    total = 0
 
     def expect(condition: bool, label: str) -> None:
-        nonlocal failures
+        nonlocal failures, total
+        total += 1
         if condition:
             print(f"acceptance self-test: ok — {label}")
         else:
@@ -243,7 +261,16 @@ def self_test() -> int:
     )
     expect(selected_tests("libtest", "no summary at all") == 0, "unparseable libtest is zero, never a pass")
     expect(selected_tests("playwright", "not json") is None, "unparseable playwright is unknown")
-    print(f"acceptance self-test: {8 - failures}/8 refusals and readings")
+    expect(context_conclusions({"name": "checks"}) == {"success"}, "a context defaults to success")
+    expect(
+        context_conclusions({"name": "dco", "conclusions": ["success", "skipped"]}) == {"success", "skipped"},
+        "a context may declare the conclusions that are correct by ref",
+    )
+    expect(
+        "failure" not in context_conclusions({"name": "dco", "conclusions": ["success", "skipped"]}),
+        "a declared conclusion set still refuses a failure",
+    )
+    print(f"acceptance self-test: {total - failures}/{total} refusals and readings")
     return 0 if failures == 0 else 1
 
 

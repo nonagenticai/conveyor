@@ -58,6 +58,14 @@ pub enum Verb {
 
 impl Verb {
     /// The spelling the client sends and the agent matches.
+    ///
+    /// ```
+    /// use conveyor_host_agent::Verb;
+    ///
+    /// assert_eq!(Verb::Status.as_str(), "status");
+    /// assert_eq!(Verb::Logs.as_str(), "logs");
+    /// assert_eq!(Verb::Restart.as_str(), "restart");
+    /// ```
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Status => "status",
@@ -97,6 +105,14 @@ impl Refusal {
     }
 
     /// The JSON body the binary prints for this refusal.
+    ///
+    /// ```
+    /// use conveyor_host_agent::Refusal;
+    ///
+    /// let body = Refusal::new("shell_refused", "a shell was requested").to_json();
+    /// assert_eq!(body["error"]["code"], "shell_refused");
+    /// assert_eq!(body["error"]["message"], "a shell was requested");
+    /// ```
     pub fn to_json(&self) -> Value {
         json!({"error": {"code": self.code, "message": self.message}})
     }
@@ -122,6 +138,18 @@ impl std::error::Error for Refusal {}
 ///
 /// An empty command is a shell request (the forced-command key passes no command when a person
 /// types `ssh host`), and it is refused: the agent runs nothing and exits non-zero.
+///
+/// ```
+/// use conveyor_host_agent::{Verb, parse_command};
+///
+/// let call = parse_command("logs api --lines 50").expect("a well-formed call");
+/// assert_eq!(call.verb, Verb::Logs);
+/// assert_eq!(call.unit, "api");
+/// assert_eq!(call.lines, 50);
+///
+/// // A bare shell request is a refusal, never a run.
+/// assert!(parse_command("").is_err());
+/// ```
 pub fn parse_command(command: &str) -> Result<Invocation, Refusal> {
     let mut words = command.split_whitespace();
     let verb = match words.next() {
@@ -186,6 +214,13 @@ pub enum Mechanism {
 
 impl Mechanism {
     /// The spelling the registry row and the agent's config share.
+    ///
+    /// ```
+    /// use conveyor_host_agent::Mechanism;
+    ///
+    /// assert_eq!(Mechanism::Launchctl.as_str(), "launchctl");
+    /// assert_eq!(Mechanism::Systemctl.as_str(), "systemctl");
+    /// ```
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Launchctl => "launchctl",

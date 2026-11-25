@@ -7,6 +7,13 @@
 #
 # Scheduled daily so a surface that starts answering 401/404 (a broken route, a stale volume)
 # is an alarm, not a discovery at the next cutover. Manual dispatch runs the full suite.
+#
+# The executable checks need the environment the suite passes in CI, so a dispatch provisions it
+# below. The authority for the toolchain, the Postgres/Redis flags and the cargo-nextest pin is
+# ci-public.yml's `checks-shard` (and the public archetype it copies,
+# nonagenticai/ci-workflows/.github/workflows/rust-service.yml): the pin and the flags move
+# together with it. A reusable job cannot host this harness — the archetype's `test_command` path
+# skips the nextest install, and its job has no `checks: read` permission for the contexts half.
 name: acceptance
 
 on:
@@ -28,10 +35,88 @@ jobs:
   acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 180
+    env:
+      # The suite's environment, exactly as ci-public.yml's `checks-shard` exports it.
+      CARGO_PROFILE_DEV_DEBUG: "0"
+      TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+      REDIS_URL: redis://127.0.0.1:6379/
+      # Public images, named once: a literal `name:tag` in a `docker` line trips the upstream-ref
+      # lint; a variable is the pattern ci-public.yml uses too.
+      PG_IMAGE: postgres:18
+      REDIS_IMAGE: library/redis:8.10.1-alpine
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
+
+      # The setup below runs only when the executable checks will run: the schedule passes
+      # --skip-commands, so its cost is unchanged.
+      - name: toolchain follows rust-toolchain.toml; assert the Dockerfile agrees
+        if: ${{ github.event_name == 'workflow_dispatch' && !inputs.skip_commands }}
+        run: |
+          set -euo pipefail
+          rustup show
+          rustc --version
+          want=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)
+          got=$(sed -n 's/^ARG RUST_TOOLCHAIN=\(.*\)/\1/p' Dockerfile | head -1)
+          if [ "$want" != "$got" ]; then
+            echo "::error::Dockerfile ARG RUST_TOOLCHAIN=$got != rust-toolchain.toml channel=$want"
+            exit 1
+          fi
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        if: ${{ github.event_name == 'workflow_dispatch' && !inputs.skip_commands }}
+        with:
+          prefix-key: v1-rust
+          # The same key ci-public.yml's shards use: restore the dependency cache main saved.
+          shared-key: checks
+          cache-all-crates: "false"
+          cache-on-failure: "false"
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+          env-vars: CARGO_PROFILE_DEV_DEBUG
+
+      - name: start Postgres 18 and Redis (the archetype's postgres_image / redis_image)
+        if: ${{ github.event_name == 'workflow_dispatch' && !inputs.skip_commands }}
+        run: |
+          set -euo pipefail
+          # Both storage choices are load-bearing and are different resources: /dev/shm's 64 MB
+          # default makes Postgres parallel workers fail with `53100 could not resize shared
+          # memory segment`, while a tmpfs data directory is RAM-capped and fills under the
+          # per-test migrated databases. Copied from ci-public.yml's `checks-shard`.
+          docker run -d --rm --name ci-pg \
+            -e POSTGRES_PASSWORD=postgres \
+            --shm-size=1g \
+            -p 127.0.0.1:5432:5432 \
+            "$PG_IMAGE" -c fsync=off -c max_connections=300
+          docker run -d --name ci-redis \
+            --tmpfs /data -p 127.0.0.1:6379:6379 \
+            "$REDIS_IMAGE"
+          for _ in $(seq 1 60); do
+            docker exec ci-pg pg_isready -h 127.0.0.1 -U postgres >/dev/null 2>&1 && break
+            sleep 1
+          done
+          docker exec ci-pg pg_isready -h 127.0.0.1 -U postgres
+          for _ in $(seq 1 60); do
+            docker exec ci-redis redis-cli ping >/dev/null 2>&1 && break
+            sleep 1
+          done
+          docker exec ci-redis redis-cli ping
+
+      - name: install cargo-nextest 0.9.150 (pinned, sha256-verified)
+        if: ${{ github.event_name == 'workflow_dispatch' && !inputs.skip_commands }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -o "$RUNNER_TEMP/nextest.tgz" \
+            "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.150/cargo-nextest-0.9.150-x86_64-unknown-linux-gnu.tar.gz"
+          echo "b0959bc64232974224cf9fb22c915845398c0e8668fa7831eb5b43fb1eef781f  $RUNNER_TEMP/nextest.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/nextest.tgz" -C "$RUNNER_TEMP" cargo-nextest
+          # Next to the cargo the harness's `bash -lc` already resolves. $GITHUB_PATH is not
+          # guaranteed to survive a login shell, and /usr/local/bin is not writable here.
+          cargo_bin="$(dirname "$(command -v cargo)")"
+          install -m 0755 "$RUNNER_TEMP/cargo-nextest" "$cargo_bin/cargo-nextest" \
+            || sudo install -m 0755 "$RUNNER_TEMP/cargo-nextest" "$cargo_bin/cargo-nextest"
+          cargo nextest --version
+
       - name: the harness can refuse
         run: python3 scripts/acceptance.py --self-test
       - name: the release is reachable
