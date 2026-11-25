@@ -298,10 +298,14 @@ def run_command(command: list[str], log: Path | None = None, dry_run: bool = Fal
     result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=False)
     if log is not None:
         log.parent.mkdir(parents=True, exist_ok=True)
-        log.write_text(
-            "$ " + " ".join(command) + "\n\n" + result.stdout + "\n" + result.stderr,
-            encoding="utf-8",
-        )
+        # Append, never overwrite: one member runs several commands, and the failing one's
+        # output must survive the later ones (measured: the publisher's usage error erased
+        # the factory's real refusal).
+        with log.open("a", encoding="utf-8") as handle:
+            handle.write(
+                "$ " + " ".join(command) + "\n\n" + result.stdout + "\n" + result.stderr
+                + f"\n[exit {result.returncode}]\n\n"
+            )
     if result.stdout:
         print(result.stdout.rstrip())
     if result.returncode != 0 and result.stderr:
@@ -395,6 +399,8 @@ def preflight(plan: list[dict], snapshot: Path, dry_run: bool) -> list[dict]:
 def run_one(member: dict, msp: dict, number: int, snapshot: Path, dry_run: bool, publish: bool) -> dict:
     key = member["key"]
     log = EVIDENCE / "batch" / f"tranche-{number}" / f"{key}.log"
+    if not dry_run:
+        log.unlink(missing_ok=True)
     factory = [
         sys.executable,
         str(FACTORY),
@@ -413,22 +419,36 @@ def run_one(member: dict, msp: dict, number: int, snapshot: Path, dry_run: bool,
     if code != 0:
         member["factory_exit"] = code
     if publish and not dry_run:
-        run_command(
+        # The publisher refuses without its snapshot, its outputs directory and the record
+        # binary. A publish that cannot run is a recorded failure, never a silently skipped
+        # step: measured, the batch ran ten members with the publisher erroring out each time.
+        code = run_command(
             [
                 sys.executable,
                 str(PUBLISHER),
                 "--apply",
                 "--project",
                 key,
+                "--snapshot",
+                str(snapshot),
+                "--outputs-dir",
+                str(snapshot.parent / "docs"),
+                "--bodies-out",
+                str(EVIDENCE / "batch" / f"tranche-{number}" / f"{key}-bodies"),
+                "--local-bin",
+                os.environ.get("PROGRAMME_RECORD_BIN", ""),
             ],
             log=log,
             dry_run=False,
         )
+        if code != 0:
+            member["publish_exit"] = code
     verdict, gaps = verify_member(key, snapshot, dry_run)
     return {
         "key": key,
         "state": verdict,
         "factory_exit": member.get("factory_exit", 0),
+        "publish_exit": member.get("publish_exit", 0),
         "gaps": gaps,
         "log": str(log.relative_to(ROOT)),
     }
