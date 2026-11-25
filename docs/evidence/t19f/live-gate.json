@@ -1,0 +1,26 @@
+{
+  "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "board_id": "01a210ba-b766-753d-a807-d5248d0818c2",
+  "list_id": "01a210ba-b7f4-71d2-84f3-f0c9f72c1dce",
+  "approver_id": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+  "operator_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+  "policy": {
+    "type_key": "t19f_live_gate_forum",
+    "asset_key": "t19f-live-gate-policy-v2",
+    "v1_meeting_id": "01a210c2-a327-7dc7-bab4-5a402a8497a8",
+    "v2_version": 1,
+    "review_blocked": "authoring.review refused: the approval has no human decision (the admin CLI records `service`); a person must approve it in the console, then re-run"
+  },
+  "sitting": {
+    "body_id": "01a210c8-579b-7808-bc32-aef8899b0b7a",
+    "contract_id": "01a210c8-7ea8-7dc9-8104-700ecfe2905b",
+    "meeting_id": "01a210c8-94ee-73ba-9147-88f2b4729ae0",
+    "agenda_item_id": "01a210c8-97c5-7850-8270-16b37a07d8ce",
+    "approval_id": "01a210c8-9273-7964-9b97-0f3dd810bcf3"
+  },
+  "cadence": {
+    "cadence_id": "01a210c9-0d47-7473-8339-7ea7648e59e9",
+    "meeting_id": "01a210c9-2397-73f1-8d07-7e8e807e524f"
+  }
+}

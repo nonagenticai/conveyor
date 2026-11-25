@@ -2,95 +2,95 @@
   "feedback_url": "https://github.com/nonagenticai/conveyor/discussions",
   "files": [
     {
-      "bytes": 1784978,
+      "bytes": 1822128,
       "path": "architecture.json",
-      "records": 520,
-      "sha256": "b1fb3dad9b49d15f65ae4d1cecf2dde6200015cded1fb38cccd6767be258b737"
+      "records": 541,
+      "sha256": "fe127d02e1b8e033c3e513c6169b339a3db08e6b328c02b65d46d99237a06ddc"
     },
     {
-      "bytes": 134357,
+      "bytes": 135629,
       "path": "artefacts.json",
-      "records": 283,
-      "sha256": "901f4d102844d4cb4eed4736db8fa4255dae99bae4da8f81dea6be1b88d2e27e"
+      "records": 286,
+      "sha256": "e7414f61354514a88e617c023ae221ad953917a6d09976ca310ae994e430f0f5"
     },
     {
-      "bytes": 1832901,
+      "bytes": 1832917,
       "path": "config.json",
       "records": 2256,
-      "sha256": "24e99e8930b39c7ddef6d2ca208615e1d681f152a4af37ec4cdf34cfe20773eb"
+      "sha256": "b7cabcb1620c4dddc9ea0a3d62ade80704f0fb4dd6a24eb38821729ac40a206e"
     },
     {
-      "bytes": 30152,
+      "bytes": 109,
       "path": "evidence.json",
-      "records": 172,
-      "sha256": "34669fb204852cbcde990576f9313f2ab1ca7ef6a646176bffaf55d26067924e"
+      "records": 0,
+      "sha256": "db9e6759c2b0c377dfeb865385175bbdd9e10ae7cfd80df6c17beded325aa375"
     },
     {
-      "bytes": 95,
+      "bytes": 110,
       "path": "feedback.json",
       "records": 0,
-      "sha256": "3f0173faca7c2002daa537bbf076d4a71ea5ba47f2e5518835cb9a1b909dba38"
+      "sha256": "2ba2b5682cd98bec611e8272aa17e453df2ea015d4f90bc3ff5737efd2ddd779"
     },
     {
-      "bytes": 4193,
+      "bytes": 4552,
       "path": "measure.json",
       "records": 0,
-      "sha256": "8b446e798789d7c41c7e0d3dc839ba3814912c88e424e20e4d9ee5aa7ccf5e68"
+      "sha256": "939d18187f33a6be6529f6efc6430b261441ffc8fd48434cb0637fdf8e66f02f"
     },
     {
-      "bytes": 454065,
+      "bytes": 455648,
       "path": "msp.json",
-      "records": 173,
-      "sha256": "c09a7ee989c2723617b2ca7033fb3545f11261ab5602a3046b694a79617063c3"
+      "records": 175,
+      "sha256": "8ba65bff70b66b13aac5ddfd1666dccb89beb587e50cd4a968de6726fe5349e0"
     },
     {
-      "bytes": 1016,
+      "bytes": 1031,
       "path": "ops.json",
       "records": 1,
-      "sha256": "6254ba2f1790261e5c0b09d3177be373b7561417e1e4383abfc447537405589d"
+      "sha256": "aa704f4c797e6531636e45c1590f097ccba8a89e8cecbd3b8614411ae0994456"
     },
     {
-      "bytes": 16697,
+      "bytes": 16712,
       "path": "organisation.json",
       "records": 34,
-      "sha256": "b4dd64ba8679b5d0123dcd0447eee2fc398e90b499378d3bc91e1255cd3c0b31"
+      "sha256": "ac9f2f2a8c9747efae61e99627b0127be35da7a57210fa16a140adca53d5a7af"
     },
     {
-      "bytes": 235409,
+      "bytes": 244831,
       "path": "programme.json",
-      "records": 53,
-      "sha256": "4590d309dc7d01445428bd2e2d614155120f836d7eeb7f676239b9620805a026"
+      "records": 54,
+      "sha256": "b96a39748db93451e58654def31c49fa8f97ac19650d3bf913e44be73acced30"
     },
     {
-      "bytes": 1402741,
+      "bytes": 1422771,
       "path": "rework.json",
-      "records": 429,
-      "sha256": "14c90581c4fc055bfbff0668e0ff71d0ef55eb00bed5a629397c6cd17edf341a"
+      "records": 438,
+      "sha256": "48033baab197506fca12d50982701afbd113ed9a072464c65fe6325f6a160d9b"
     },
     {
-      "bytes": 211,
+      "bytes": 226,
       "path": "secrets.json",
       "records": 0,
-      "sha256": "ea34fcf362f707bdf255638de2ee24993dcc8f07a5d9352ca755b3d79735966a"
+      "sha256": "5647b431898385dc245393b70e8e870e0192a209f4d641ee89a2a6aa715688e3"
     },
     {
-      "bytes": 5099352,
+      "bytes": 5447338,
       "path": "snapshot.js",
       "records": 0,
-      "sha256": "a8b7f047ddf49679f0802357b655e56d4f6be7c0a99d3bb6a73b536b06c90b7d"
+      "sha256": "88d8553c867117e73c52f163a91c5fb88c3afe778dcd6fb488d0c2d49e603232"
     },
     {
-      "bytes": 1215090,
+      "bytes": 1600336,
       "path": "work.json",
-      "records": 2180,
-      "sha256": "7fdcfe10e42f15b5e1ad587edb5351dbadff0db73618080e7bd94bd54942639b"
+      "records": 2632,
+      "sha256": "c0d2e7c5e91f85c581f074d369ffefc918bc19ffd2761b203ac78414892d8c1e"
     }
   ],
-  "generated_at": "2026-11-24T16:30:00Z",
-  "git_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+  "generated_at": "2026-11-25T03:46:32.319854100+00:00",
+  "git_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
   "migration": {
-    "description": "tool authoring",
-    "version": 70
+    "description": "meeting bindings",
+    "version": 73
   },
   "redaction": "no secret values, no encryption key ids, no emails, no OIDC subjects, no session or licence tokens",
   "schema": "design-snapshot/v1",

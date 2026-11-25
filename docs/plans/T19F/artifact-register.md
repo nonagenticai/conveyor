@@ -27,8 +27,8 @@ published document. Links use `derivation | realization | reuse | dependency`.
 | T19F-A4 | SAFe epic (features, enablers, WSJF, PI) | epic | F / HLD | draft | 1 | programme-manager | SRO | 2026-12-01 | `docs/plans/T19F/safe-epic.md` |
 | T19F-A5 | Follow-on plan | plan | E–F / HLD | proposed | 1 | programme-architect | Architecture Board | 2026-12-01 | `docs/plans/T19F-meeting-bindings.md` |
 | T19F-A6 | This register | catalog | A–F / PSA+HLD | draft | 1 | programme-architect | Architecture Board | 2026-12-01 | this file |
-| T19F-A7 | Implementation evidence | evidence | G / capability | to create | 1 | programme-manager | Architecture Board | 2026-12-01 | `docs/plans/T19F/evidence.md` (to create in #684) |
-| T19F-A8 | Closure review | closure-review | G / capability | to create | 1 | programme-manager | Architecture Board | 2026-12-01 | `docs/plans/T19F/closure-review.md` (to create in #684) |
+| T19F-A7 | Implementation evidence | evidence | G / capability | published | 2 | programme-manager | Architecture Board | 2026-12-01 | `docs/plans/T19F/evidence.md`; published output `01a210cb-6308-7552-861c-dad6bc5a3b9f` |
+| T19F-A8 | Closure review | closure-review | G / capability | draft | 1 | programme-manager | Architecture Board | 2026-12-01 | `docs/plans/T19F/closure-review.md` (created in #684) |
 
 ## Typed TOGAF rows (to create in the live chain, #684)
 

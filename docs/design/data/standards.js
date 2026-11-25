@@ -5,7 +5,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b1.html",
-        "sha256": "8e569c1649a71fc5cf782bcf46841f77186f5fc388b16e89823ef4cca9e5379e"
+        "sha256": "3c6cab5cf0425c83e7f9799757cec202e33c8f0bb244acd617806dcfaf25de8c"
       },
       "gate": {
         "approval_id": "",
@@ -158,7 +158,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b2.html",
-        "sha256": "9d5313ce9146eb0f64b49133464c65d4166f68d3b78089eb6c353d76318b2b56"
+        "sha256": "0d5191d211d5dd5ff7cebbffb5acd057a6cf1ae2082c1e2b591da9599a1ed81d"
       },
       "gate": {
         "approval_id": "",
@@ -311,7 +311,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b3.html",
-        "sha256": "a768af9ec5d3c26e431ce010bee8e239975154fddf64a6520734c3aa2a57d321"
+        "sha256": "ec926a7c7d98fa2e62a62fbf404419851b3d8189f4f6ee6964a4c66c1b7e5c48"
       },
       "gate": {
         "approval_id": "",
@@ -464,7 +464,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b4.html",
-        "sha256": "e406ce42a9d0043df182f26b36424e3cddb678c4364a96d8c306716208b2ab68"
+        "sha256": "7c916cd040d25efb82814c59aa8e4abf5c62f17c581882d1038d2e02af99be04"
       },
       "gate": {
         "approval_id": "",
@@ -617,7 +617,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b5.html",
-        "sha256": "4cdcf4333db182e2043c5ce906e07a5adf936d45591db58ff1ac622faee9c85a"
+        "sha256": "89533f1109725443ed221c7a52c3982b7c98881a9fff58bcf4d56b81257e7b94"
       },
       "gate": {
         "approval_id": "",
@@ -770,7 +770,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b6.html",
-        "sha256": "06ef224a3ce86696499a458814dcb7103d67c8dc2d674af47e4aea35571f8178"
+        "sha256": "b81e929e223755f0424b02be7416778ffe49b32f254096d6321ae362e28c29e6"
       },
       "gate": {
         "approval_id": "",
@@ -923,7 +923,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-profile-b7.html",
-        "sha256": "d7d7785fe567a9533bec84b7deb370fc5dfbf48bd04fd02b9f62df8465f07d64"
+        "sha256": "ecd6063d4d08e8d02289cf9b91d3d985821aaace0c040c244cd6f64b6147a2dd"
       },
       "gate": {
         "approval_id": "",
@@ -1077,7 +1077,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b1.html",
-        "sha256": "ec7206f446138d3f3b0e0a8e43f2a4eb4d332d55719e3cbcfc7230fb479b10d7"
+        "sha256": "c0f0e2d5d8208371eaa126cded8efd54f557c2b4854ebaba0cd23d9d39a3c4b3"
       },
       "gate": {
         "approval_id": "",
@@ -1192,7 +1192,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b2.html",
-        "sha256": "5a6b3c8d9ead6eb313b684abaf2fa3f8eebc168bdffe722af003cea5d62e3310"
+        "sha256": "60452fa65c5bb886eef67d1961fb51d4cae64d475c418e22c0ea8f40aca13d28"
       },
       "gate": {
         "approval_id": "",
@@ -1307,7 +1307,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b3.html",
-        "sha256": "c1077e8cf6b4fadec7cd47b1331719c117e79b2c60486035c00575c1571cc774"
+        "sha256": "882d48918fa3c70a66162b10fb9b84ab425f06d334a5346e7ca028e6c745a31c"
       },
       "gate": {
         "approval_id": "",
@@ -1422,7 +1422,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b4.html",
-        "sha256": "342a8c2570d04609fafa894eff087d6bd6a9f06581a706dc982945801dea1f1f"
+        "sha256": "a4fb958edc92fd82ac0b6ef6d0662fb4cf9548439edd493cc78dca2d21f999e4"
       },
       "gate": {
         "approval_id": "",
@@ -1537,7 +1537,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b5.html",
-        "sha256": "d13207f83cc99500666c2a5cef78727c1985ea875592caea476c633c722b211e"
+        "sha256": "84bb2745c397d464964c42994ba858077a0566b77847e78eeb581dc1b88406be"
       },
       "gate": {
         "approval_id": "",
@@ -1652,7 +1652,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b6.html",
-        "sha256": "c121f3bbc234746a3455cb85dbc7db4c3e8f7fba2dfed37c0a2966aeda3adb85"
+        "sha256": "749d5323f502c2ffc956ebb20a1cde8ea3d86660db7a2f97eee2f7f9ef4eb244"
       },
       "gate": {
         "approval_id": "",
@@ -1767,7 +1767,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b7.html",
-        "sha256": "e52398243739369216e2e4ded09a4ed5cd61222db2fe88c4c1aefff97902d22d"
+        "sha256": "cc1a9b9fc88edad90268536945116f3ff2f8c6e4c949daf3b1cb82264527d926"
       },
       "gate": {
         "approval_id": "",
@@ -1881,7 +1881,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefits-map-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "9dc42b0266b59270bdb1d958c35e6c9c764fde6a8728001b6c10eb6b9b3bfd33"
+        "sha256": "1a206494a8612ac470994a5421480b49e26b029e325ba77b18656bf1f3c686dc"
       },
       "gate": {
         "approval_id": "",
@@ -1899,7 +1899,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 8,
+              "count": 9,
               "items": [
                 {
                   "id": "01a1e9df-6063-783c-a130-075067d33a17",
@@ -1940,6 +1940,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20c80-c297-738d-bbfa-c19412e7be69",
                   "status": "",
                   "title": "01a20c80-c297-738d-bbfa-c19412e7be69"
+                },
+                {
+                  "id": "01a210ba-c02c-7c91-8ab1-6c51070af1f4",
+                  "status": "",
+                  "title": "01a210ba-c02c-7c91-8ab1-6c51070af1f4"
                 }
               ],
               "kind": "computed",
@@ -1953,7 +1958,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 8,
+              "count": 9,
               "file": "msp.json",
               "items": [
                 {
@@ -1995,6 +2000,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20c80-c297-738d-bbfa-c19412e7be69",
                   "status": "",
                   "title": "01a20c80-c297-738d-bbfa-c19412e7be69"
+                },
+                {
+                  "id": "01a210ba-c02c-7c91-8ab1-6c51070af1f4",
+                  "status": "",
+                  "title": "01a210ba-c02c-7c91-8ab1-6c51070af1f4"
                 }
               ],
               "kind": "rows",
@@ -2008,7 +2018,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 8,
+              "count": 9,
               "items": [
                 {
                   "id": "01a1e9df-6063-783c-a130-075067d33a17",
@@ -2049,6 +2059,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20c80-c297-738d-bbfa-c19412e7be69",
                   "status": "",
                   "title": "01a20c80-c297-738d-bbfa-c19412e7be69"
+                },
+                {
+                  "id": "01a210ba-c02c-7c91-8ab1-6c51070af1f4",
+                  "status": "",
+                  "title": "01a210ba-c02c-7c91-8ab1-6c51070af1f4"
                 }
               ],
               "kind": "computed",
@@ -2077,7 +2092,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefits-strategy-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "0cc3bf25a42816d33e43144ff32721f57263ada558ea718e92993c581a6f527d"
+        "sha256": "51d69a9ce9a9fc10db2da958dba2f26158ffc56c4612ba603abafe8c078f2107"
       },
       "gate": {
         "approval_id": "",
@@ -2195,7 +2210,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "94a62eff02651e6b5d5bb28b64f253e4da5eab9c2e7d376c3c6190934aded46e"
+        "sha256": "6c8872ff9abc1fa1886553faaf58adce6cde9d824ef535ad0c530c6b4634e486"
       },
       "gate": {
         "approval_id": "",
@@ -2261,7 +2276,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-brief-template-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "1fe4a05096f58e572a0ec85beb4ad4207d469d6e45300681766eb95f08b34392"
+        "sha256": "88bd6ea659c19585996d6b838fbcdb065fef278d003dc2532b180938791f71d6"
       },
       "gate": {
         "approval_id": "",
@@ -2320,7 +2335,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "6a23fee3a8226c416c1cc1ad25f0abd6690b8122b22cd4057083fef248dea399"
+        "sha256": "6170993bbaf4e2788fbeca7c330f061b2df83e2d2101934d68d7d859c0d69d2f"
       },
       "gate": {
         "approval_id": "",
@@ -2426,7 +2441,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "cf2450501c123ab20341aa1eb6ecd6a6f8828b30c124304a7cf30602bc1b98c8"
+        "sha256": "027734c82710592a79b06d475bb2803ae145e969fa0b606f6a37be769898b60d"
       },
       "gate": {
         "approval_id": "",
@@ -2492,7 +2507,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "programme_baselines",
       "document": {
         "path": "docs/standards/std-msp-programme-baselines-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "2d3ec50bcadfb6f2f0080bac429bd207c714e0921917b59b3545eb2d3f9abafc"
+        "sha256": "cce4ddafe957e2409c84e10236c144e8eae32f784b11fa6fa6347c87c595a6c1"
       },
       "gate": {
         "approval_id": "",
@@ -2586,7 +2601,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-programme-brief-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "51f75f673ae86dbbea891aee85ac7847514647d0adf6cfe4b1fd2771afc09106"
+        "sha256": "89a963965c0d1283bc388a8f41c96b8f788db9e85e01f7bf1d803dfe360ad7d7"
       },
       "gate": {
         "approval_id": "",
@@ -2645,7 +2660,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 50,
+              "count": 51,
               "file": "programme.json",
               "items": [
                 {
@@ -2736,7 +2751,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "031750ebfa7283b0ac797b4fc1741c66c44e65986159ff1f1e1164f2466e1ee3"
+        "sha256": "8b7375cf57b650a6959a7078d8574040a051c00995924dcbf9e95ab3facfb780"
       },
       "gate": {
         "approval_id": "",
@@ -2802,7 +2817,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-programme-report-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "2a8ac9d491a817783d3cc3ed657a964fb1fe05ea1985a3b7049ea8281f42952a"
+        "sha256": "f4e55d3f5810ae64775a4d6dfd7207d17fee25f0af7671cd70ebbb796bd86b4b"
       },
       "gate": {
         "approval_id": "",
@@ -2959,7 +2974,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "946bc57d6a722b465add513c0af0ed582f133c28c0e0fb02912376d5d08e2000"
+        "sha256": "923f921789c6d36d5ea3a3b127981b9435f1a60e7164bdf9cfd8ab5d57782cfd"
       },
       "gate": {
         "approval_id": "",
@@ -3138,7 +3153,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "dc783ffd6317c7ac7ef8804570bc90fad8c5294d3ac1c21ea1499ee2182cefde"
+        "sha256": "99945cf87bd1e435f51364285236efeb911c5f46f08454a69b3805e7cd5defac"
       },
       "gate": {
         "approval_id": "",
@@ -3156,7 +3171,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 50,
+              "count": 51,
               "file": "programme.json",
               "items": [
                 {
@@ -3231,7 +3246,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 50,
+              "count": 51,
               "file": "programme.json",
               "items": [
                 {
@@ -3377,7 +3392,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-realization-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "e67a0b0763ba85ad19a8973f2ef70d303608a6948ab8cedb484d8a645658852c"
+        "sha256": "00927e27733b7611433e4c2bb36a98a1dcb5d657a7b31728229f88b23a306fe0"
       },
       "gate": {
         "approval_id": "",
@@ -3495,7 +3510,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "9581d3e4e1b2dc77d3835ff49266ac9082ff2fae3c8be22a6ad60a5b4fb91340"
+        "sha256": "8e3f166d8e6a03df063c0aad30f3eaea65cdcfc35920162fc7852769ca6cbe07"
       },
       "gate": {
         "approval_id": "",
@@ -3545,7 +3560,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-stakeholder-profiles-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "6bc971b1b4ea01aa9725fb4be86176bf9b71666e99ad2d9eb5ea9edbdaca54a2"
+        "sha256": "09badb79fa5fd85ab17923ff1a10319725d470605223fcaf7ad8e4dc71c16c88"
       },
       "gate": {
         "approval_id": "",
@@ -3803,7 +3818,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "ce166a57bc71d4b738dcdb1d22771ea8090db94b7a9ca4801d388177390a8699"
+        "sha256": "5b02a68f0a7f3fb65467a2bb3955f671190d3b4090eef79b8e3d6b489d6f96cb"
       },
       "gate": {
         "approval_id": "",
@@ -4136,7 +4151,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-0.html",
-        "sha256": "5cc19988df4101e01b0384ed3ca4fadd71ae92a9cedfa1f4044dd2bb473e4c03"
+        "sha256": "359dd9c2a3d7a322106344bfa08e2662844767d6fc78886e5e711ffa5b05aae8"
       },
       "gate": {
         "approval_id": "",
@@ -4289,7 +4304,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-1.html",
-        "sha256": "653c4d8fcc1d1f02c7280bacacc90d48bb1afd63a775e08680f9ac428fd6bbbf"
+        "sha256": "360c27ef1a64ab165eeaa6af1650a8ec6813e011ae31aebeebdbd4a0dfafe4b4"
       },
       "gate": {
         "approval_id": "",
@@ -4442,7 +4457,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-10.html",
-        "sha256": "aa67524f0e4d92deba1d00ebd59d1c1640327e585ba3bd24902590e980f45c98"
+        "sha256": "d2a9a3e01fbb1b2815e5af500053cb0f8e92041174443bd095fcc370c3250882"
       },
       "gate": {
         "approval_id": "",
@@ -4619,7 +4634,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-11.html",
-        "sha256": "a7daad69f2694a761d73c07ec9c746d0d8daa005e53a1e5a8da602267e7439ae"
+        "sha256": "7201b05e9c88c0e3e627afdc316f66d848cf15c213d14b47b3c25a007aafb669"
       },
       "gate": {
         "approval_id": "",
@@ -4796,7 +4811,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-12.html",
-        "sha256": "ac7cdff13c11297b25c9b59428226f721dd9e3652a005d48f0c67c5710d7d3b5"
+        "sha256": "8aa5c91f14f6b1e6aebd61fe89989c0074e91d696010baeadbccfd09c57af302"
       },
       "gate": {
         "approval_id": "",
@@ -4973,7 +4988,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-13.html",
-        "sha256": "875265842914fa61c05b89fde06d623b81710472f6dccf4b79fbb39e6cec07a2"
+        "sha256": "a218c13775e8ba59b3018a994c107196c7b08e552d6ffa71f6ae0db9bb9534df"
       },
       "gate": {
         "approval_id": "",
@@ -5150,7 +5165,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-2.html",
-        "sha256": "a14f5b6888e40ffec8d3b65ada64e272a58bbaf1de239bf9d607deabc7dfcc40"
+        "sha256": "30dd28d9cb79fd389e89d88ea138491d802464965d40b778590b95e3a4bfaa7b"
       },
       "gate": {
         "approval_id": "",
@@ -5313,7 +5328,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-3.html",
-        "sha256": "7c304a390a58c94146f3a6721c828895b24cc75661be4459f029cc4050686e24"
+        "sha256": "9dd5816ee038c2112f0d2a154c3c5cdb7c04259bc4a92e758ae886e1f4355a0b"
       },
       "gate": {
         "approval_id": "",
@@ -5490,7 +5505,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-4.html",
-        "sha256": "f19e8e92530d61d6a0afcc6aeb9275a147aacc78f37444ffb484c5e886043e4a"
+        "sha256": "d708c928c31f5932d71f24b902721eb86d4a4de910ed32f297a9c7f18f59fccb"
       },
       "gate": {
         "approval_id": "",
@@ -5667,7 +5682,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-5.html",
-        "sha256": "8ba6afa47d85882c4dd28e08e9ded7bb0158e9fb1db304dac1d1577052be86a5"
+        "sha256": "42480d2ea85b3245fa6c7ce1db9487644445db2e8bcaf6e3967a9b8bc7d03cae"
       },
       "gate": {
         "approval_id": "",
@@ -5844,7 +5859,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-6.html",
-        "sha256": "5c07e191cda93269af1b7c9f1335800bd416537b6b520d74086e68889a8d8bd9"
+        "sha256": "c2f59e73fb38dad596416705a9913d275826cf7cc4442eb9a3e4a459b6efaace"
       },
       "gate": {
         "approval_id": "",
@@ -6021,7 +6036,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-7.html",
-        "sha256": "306148d449abd96ee6d915a1fbb499a0e1c46cb6eb1e4f33b708fec00da48567"
+        "sha256": "007b76e31377f75ad78ff3bf41cabf1dfeb30d015c3f971f5a932e6dc30a92c6"
       },
       "gate": {
         "approval_id": "",
@@ -6198,7 +6213,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-8.html",
-        "sha256": "2f9c3d20e3188e4a604a507bd66967de01119f2a742f0b3fc3148f33230235cf"
+        "sha256": "c8b55687c280813d7e62adbfba390ff9eea42170447dbc938022c2b197d6ab53"
       },
       "gate": {
         "approval_id": "",
@@ -6375,7 +6390,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-tranche-review-tranche-9.html",
-        "sha256": "fe9b7b8f84b69c1aea42a43274498ee06bb7640d221cd3892757b6d812053b03"
+        "sha256": "6c1763beef135c0a7a52b3d9776fb69cecf38fedbe86b7bb75d0637f311a7614"
       },
       "gate": {
         "approval_id": "",
@@ -6552,7 +6567,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "860db731fe7f7d73533e0690ed081cf17a5f5a5f963422dbd3a306c704f5b935"
+        "sha256": "58515bdd4c5293dc2f9dd535935c3654967ca9bf94133407735ac9e2ceb230e8"
       },
       "gate": {
         "approval_id": "",
@@ -6669,7 +6684,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-design-publish.html",
-        "sha256": "b7f4c450afc6476b3b63698180810610c697e854136449f52275e2e0f8374f71"
+        "sha256": "fba7a4262b5f11a41040fb5e76e44a02f079d7db3c2a9e74ffc19eb9b3d2cf14"
       },
       "gate": {
         "approval_id": "01a1ff3f-cc40-7000-bce5-85f41c4c0b13",
@@ -6762,7 +6777,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-p0.html",
-        "sha256": "4b06d1770f757c317f542bae7346cd988d56bbc3e200645329b54fe7396fd999"
+        "sha256": "0f0a1d21d1feb841ee6cbaac0f691e0486e0f2cb54da94d50d1276a5b249bda6"
       },
       "gate": {
         "approval_id": "01a1ffa9-76b2-7956-98ba-c1d0be651017",
@@ -6855,7 +6870,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-platform.html",
-        "sha256": "b6629cfd6dc6d4dad6936c3c187f9f398783534e282a8cbf0a77d007fd24f4ec"
+        "sha256": "416a35cbe3adc9621ea887f619201d7cb22e97a4ee17d17eb650f0f2777ae860"
       },
       "gate": {
         "approval_id": "01a1fdd8-d052-7532-8e66-944a4db595ab",
@@ -6963,7 +6978,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s00.html",
-        "sha256": "a93193058bbf5d50fa9ef9330a7acf545978e891af3c6f9e3aec8665454ae17b"
+        "sha256": "7b901667ca2383d4a4bc19e503ab55eb8ff2e643105b46e6c1a5aa0a4d9e8b77"
       },
       "gate": {
         "approval_id": "01a1ff3b-1a6d-7952-be39-4a4f470ad5c3",
@@ -7056,7 +7071,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s01.html",
-        "sha256": "e4759dfaa9d54c90c3df4df175eeb215bfad277acd5ef5e313a9c0d8c3cddc9a"
+        "sha256": "037224f9ab2cc3a7502cbe666286ab54e481469cc52edf1d2f371f16b90ba934"
       },
       "gate": {
         "approval_id": "01a1ff34-00a1-75eb-9022-02be586d0bb3",
@@ -7149,7 +7164,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s02.html",
-        "sha256": "7cde6f940f64dbd1ac628bf32ad8370f84367755d13eec0da76c7ac58055180a"
+        "sha256": "e2b9c22c8b8ff4b20b6ab9931dbbf328ecfb76f55ec9273975e51bca90350c7e"
       },
       "gate": {
         "approval_id": "01a1ffa6-62ce-747b-abac-c41e9679dde8",
@@ -7242,7 +7257,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s03.html",
-        "sha256": "5cffa07fb5410d0a5868e3878228adba29cdfdcabc37036e03988fcfe8170fd3"
+        "sha256": "3ce84abc8b2a3b56a04a52e953454df305514fcc84064209936b2a359332aad0"
       },
       "gate": {
         "approval_id": "01a20222-df0f-77b5-ad70-b53bcea5ecb9",
@@ -7335,7 +7350,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s04.html",
-        "sha256": "9ac114bae886273a626a4f68285df39b81598d7e1e4c16f32b84277e48a0625e"
+        "sha256": "9502869b629fb72625b483dc6722ad8f4cce8a9da6096c3c4fd5c3cf297ac9f0"
       },
       "gate": {
         "approval_id": "01a20256-466e-7670-9a2b-5fad19bc3e08",
@@ -7428,7 +7443,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-spec-v2.html",
-        "sha256": "afee6091eccd6295b27120769e1ea0269d3070acf8b26a83c0757fd73deae102"
+        "sha256": "eb4df92037a33f351cba811ba175017fe4e5bfca7e7f8a732215b9ee39e508aa"
       },
       "gate": {
         "approval_id": "01a1ff44-4454-72c4-803f-78cbc73dfbe0",
@@ -7521,7 +7536,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t0.html",
-        "sha256": "dd60a30d30d2380410c03f8d0a23519ee50bdc0ec074c645ea1b579f97b9943c"
+        "sha256": "5111057aed6e28946822bf6d04b8bf257d3922c4ea0f8ca4f71fab2ca5c29254"
       },
       "gate": {
         "approval_id": "01a1ff48-c258-72af-9643-1c830af6b92f",
@@ -7614,7 +7629,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t1.html",
-        "sha256": "77a1548ca8d294330fe021df66907c345cdda923335b0ed45521584d92f34172"
+        "sha256": "b24f507478e6ac12f3e8230b6a5d6973d9cc28c2bfa3d4fab209d5035d06a31c"
       },
       "gate": {
         "approval_id": "01a20231-0d43-74ad-80ca-42088a1be984",
@@ -7707,7 +7722,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t11.html",
-        "sha256": "cec809b275f3ef5e0dea8daa8bb4fcf1413d84640ac70d458cadcef51363b625"
+        "sha256": "db8c4f7b2efc995479b5c682b55f8dec9b525adab81e86d2aebc4477a4234fdb"
       },
       "gate": {
         "approval_id": "01a20232-12d8-70ff-afc9-320a80c262d6",
@@ -7800,7 +7815,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t13.html",
-        "sha256": "550e1bdab492d097a150d20a0db469e0b8ec9d250b7472c913523ec86d36331a"
+        "sha256": "2bb28a711c17e905481eaaa1174f81239709fd46078eb7cf8bef5a4b129ab8ab"
       },
       "gate": {
         "approval_id": "01a202c2-eae1-76ac-8d64-6a548051cc27",
@@ -7893,7 +7908,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t2.html",
-        "sha256": "4785bb511b98aeb5fd6116bf4f29ade65f8d7d7acfd8235701e83590a8e6bed7"
+        "sha256": "0479adcaf576e40cc8a994c8f7dec49d287037edd7c91850af85d296ad680304"
       },
       "gate": {
         "approval_id": "01a20223-29bf-734c-9b5f-2543c7f2abed",
@@ -7986,7 +8001,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-design-publish.html",
-        "sha256": "134edfefdab54ba0092c5008287ad5bf89eba6a62c30a21af1c7ebcbf6eefe59"
+        "sha256": "d7e957c222c6547415c07ffacb5fbd2eea97a42ae4953908c0fbfec8910f4342"
       },
       "gate": {
         "approval_id": "01a1ff3f-cc40-7000-bce5-85f41c4c0b13",
@@ -8104,7 +8119,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-p0.html",
-        "sha256": "cacb3e1643f2180e9b2e30b421daab231ea3a8bfddd8cd135c7d17256d7ec678"
+        "sha256": "131f494918992699d9126a0bf5cc4ed07a60088a35118e3ad82b0b8ff004e094"
       },
       "gate": {
         "approval_id": "01a1ffa9-76b2-7956-98ba-c1d0be651017",
@@ -8170,7 +8185,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s00.html",
-        "sha256": "553b6ea9cf3c6c5bd0ff7125cd9903f3c8713e5813ef0e2edc60774c2e0d6fa1"
+        "sha256": "8493fb819468038714b606e407c395d50398fc31195a35bf115b2d2ab10d5085"
       },
       "gate": {
         "approval_id": "01a1ff3b-1a6d-7952-be39-4a4f470ad5c3",
@@ -8287,7 +8302,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s01.html",
-        "sha256": "140a27837a169426c538f602fe3e8f733d7862151b7c8797ba6f2956640da15f"
+        "sha256": "4d997eb0c7c2122143eeff7d712620804644af12db673bf37b94c1a297426ad6"
       },
       "gate": {
         "approval_id": "01a1ff34-00a1-75eb-9022-02be586d0bb3",
@@ -8404,7 +8419,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-s03.html",
-        "sha256": "af08a0a98aac9d97380b9e21932647312b5930014474cb4cff36acf5654a5fac"
+        "sha256": "d227119c45c6f93dfcbb44989d9cf4f0cad1e1a32ee2f0cb6bf538638f427847"
       },
       "gate": {
         "approval_id": "01a20222-df0f-77b5-ad70-b53bcea5ecb9",
@@ -8520,125 +8535,8 @@ window.CONVEYOR_STANDARDS = {
       "category": "closure-review",
       "covered_rule": "closed_without_closure_review",
       "document": {
-        "path": "docs/standards/std-pmp-closure-review-spec-v2.html",
-        "sha256": "e7fd8859548689ebeffd24ed87f9b46442a7adbc8e2bad14d002191d71829ff5"
-      },
-      "gate": {
-        "approval_id": "01a1ff44-4454-72c4-803f-78cbc73dfbe0",
-        "kind": "closure",
-        "state": "approved"
-      },
-      "id": "std-pmp-closure-review-spec-v2",
-      "level": "project",
-      "mandatory": true,
-      "owner_project": "SPEC-V2",
-      "package_key": "std-pmp-closure-review-spec-v2:SPEC-V2",
-      "sections": [
-        {
-          "heading": "Outcome vs acceptance",
-          "missing": [],
-          "sources": [
-            {
-              "category": "closure-review",
-              "count": 1,
-              "file": "artefacts.json",
-              "items": [
-                {
-                  "id": "01a1ff42-e535-700c-a69d-2eed86524486",
-                  "title": "Closure review — SPEC-V2 (retrospective, 2026-11-21)"
-                }
-              ],
-              "kind": "documents",
-              "pointer": "/documents",
-              "scope": "subject"
-            }
-          ],
-          "status": "evidenced"
-        },
-        {
-          "heading": "Evidence",
-          "missing": [],
-          "sources": [
-            {
-              "category": "closure-review",
-              "count": 1,
-              "file": "artefacts.json",
-              "items": [
-                {
-                  "id": "01a1ff42-e535-700c-a69d-2eed86524486",
-                  "title": "Closure review — SPEC-V2 (retrospective, 2026-11-21)"
-                }
-              ],
-              "kind": "documents",
-              "pointer": "/documents",
-              "scope": "subject"
-            }
-          ],
-          "status": "evidenced"
-        },
-        {
-          "heading": "Open items",
-          "missing": [],
-          "sources": [
-            {
-              "category": "closure-review",
-              "count": 1,
-              "file": "artefacts.json",
-              "items": [
-                {
-                  "id": "01a1ff42-e535-700c-a69d-2eed86524486",
-                  "title": "Closure review — SPEC-V2 (retrospective, 2026-11-21)"
-                }
-              ],
-              "kind": "documents",
-              "pointer": "/documents",
-              "scope": "subject"
-            }
-          ],
-          "status": "evidenced"
-        },
-        {
-          "heading": "Decision",
-          "missing": [],
-          "sources": [
-            {
-              "category": "closure-review",
-              "count": 1,
-              "file": "artefacts.json",
-              "items": [
-                {
-                  "id": "01a1ff42-e535-700c-a69d-2eed86524486",
-                  "title": "Closure review — SPEC-V2 (retrospective, 2026-11-21)"
-                }
-              ],
-              "kind": "documents",
-              "pointer": "/documents",
-              "scope": "subject"
-            }
-          ],
-          "status": "evidenced"
-        }
-      ],
-      "spec": "§8.4",
-      "standard": "PMP",
-      "status": "evidenced",
-      "subject": {
-        "id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
-        "key": "SPEC-V2",
-        "kind": "project",
-        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
-        "project_key": "SPEC-V2",
-        "title": "Programme-level unit (plan: docs/SPEC_V2.md)"
-      },
-      "subject_kind": "project",
-      "title": "Closure Review — Programme-level unit (plan: docs/SPEC_V2.md)"
-    },
-    {
-      "category": "closure-review",
-      "covered_rule": "closed_without_closure_review",
-      "document": {
         "path": "docs/standards/std-pmp-closure-review-t0.html",
-        "sha256": "5a3dd03d0e055a87090bf4f65480c940396fd9ee3b3c1604dbb20a498ea3a2a7"
+        "sha256": "974b4e65ffde8829f5378b9f9760e9456595a6dd2ece479ef0a55c97f67aa0f4"
       },
       "gate": {
         "approval_id": "01a1ff48-c258-72af-9643-1c830af6b92f",
@@ -8755,7 +8653,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t1.html",
-        "sha256": "bf7a450f920e20a9a37ff2e65bf297705696725a2dda5a0c30820cfdbd487722"
+        "sha256": "3ff2321d77b7e4e9235abb79c7cc2327342d774f6dd5a332d27e93cb0a8a5c52"
       },
       "gate": {
         "approval_id": "01a20231-0d43-74ad-80ca-42088a1be984",
@@ -8872,7 +8770,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t10.html",
-        "sha256": "e7518c6cc4db3201aec94b39a9e8b57867e91f6fbdd48450cc793b70679fcdc2"
+        "sha256": "40cec990a2cf2c35647167a54f07e8a248ff15291654dd8c9d031c2bc485b811"
       },
       "gate": {
         "approval_id": "01a20289-7d0e-7f76-87e9-f4ffd042a582",
@@ -8989,7 +8887,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t11.html",
-        "sha256": "628e906fb44487850774b76afd59c4a18dfaef42f2dcb2cc8132613952493191"
+        "sha256": "0800983b05986d72fed1beec155860649a5bf06a388df7e5d7a8d503b5de87e0"
       },
       "gate": {
         "approval_id": "01a20232-12d8-70ff-afc9-320a80c262d6",
@@ -9103,11 +9001,78 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "closure-review",
+      "covered_key": "closed_without_closure_review:T15",
+      "covered_rule": "closed_without_closure_review",
+      "document": {
+        "path": "docs/standards/std-pmp-closure-review-t15.html",
+        "sha256": "75d12c55016ab36bfc61328d1d5bf2f54ccb6f6016af8e0d550780e10f798c26"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-pmp-closure-review-t15",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T15",
+      "package_key": "closed_without_closure_review:T15",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Outcome vs acceptance",
+          "missing": [
+            "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [
+            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Open items",
+          "missing": [
+            "No row or document satisfies 'Open items'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Decision",
+          "missing": [
+            "No row or document satisfies 'Decision'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.4",
+      "standard": "PMP",
+      "status": "absent",
+      "subject": {
+        "id": "01a1d039-0d37-7f20-9959-979c31daeb5e",
+        "key": "T15",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T15",
+        "title": "SPEC_V2 slice T15 (docs/SPEC_V2.md §12)"
+      },
+      "subject_kind": "project",
+      "title": "Closure Review — SPEC_V2 slice T15 (docs/SPEC_V2.md §12)"
+    },
+    {
+      "category": "closure-review",
       "covered_key": "closed_without_closure_review:T16",
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t16.html",
-        "sha256": "b95ba473864d07d3a41fdf7e0991ff04c05faca37e939b153ba6ea75e519cf3e"
+        "sha256": "c544788b18b7e132338dd738fa4118d376796780f71e2e3cfafed2d70979a717"
       },
       "gate": {
         "approval_id": "",
@@ -9170,10 +9135,77 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "closure-review",
+      "covered_key": "closed_without_closure_review:T17",
+      "covered_rule": "closed_without_closure_review",
+      "document": {
+        "path": "docs/standards/std-pmp-closure-review-t17.html",
+        "sha256": "4f22f981c7d93e320d44a39274b8f0785dcc4b9da06602499f42c12a97cf670a"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-pmp-closure-review-t17",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T17",
+      "package_key": "closed_without_closure_review:T17",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Outcome vs acceptance",
+          "missing": [
+            "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [
+            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Open items",
+          "missing": [
+            "No row or document satisfies 'Open items'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Decision",
+          "missing": [
+            "No row or document satisfies 'Decision'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.4",
+      "standard": "PMP",
+      "status": "absent",
+      "subject": {
+        "id": "01a1d039-0d38-7db1-b685-d76bd4cebf47",
+        "key": "T17",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T17",
+        "title": "SPEC_V2 slice T17 (docs/SPEC_V2.md §12)"
+      },
+      "subject_kind": "project",
+      "title": "Closure Review — SPEC_V2 slice T17 (docs/SPEC_V2.md §12)"
+    },
+    {
+      "category": "closure-review",
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t19.html",
-        "sha256": "ad9556f259a8fadf171758d0c875109c9e996012c715d7e6a4ab6454a59ff255"
+        "sha256": "76bed7649121391405a56181643ca207ee0e75bc6e16499bd8f40856cf3d475b"
       },
       "gate": {
         "approval_id": "01a20c8c-1428-79d4-a64e-fdeaa033a182",
@@ -9290,7 +9322,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t2.html",
-        "sha256": "1c72eec4f50b3beec063447d35e8c7514a5b1d91304e3e23139b47345970d25e"
+        "sha256": "d6f86868f83fe08f6645654ac0229cee2083ef1b46c2356df134d33f3e13d34d"
       },
       "gate": {
         "approval_id": "01a20223-29bf-734c-9b5f-2543c7f2abed",
@@ -9408,7 +9440,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t3.html",
-        "sha256": "db92e6f5a5e4fcc34815c43d580d2ceb1eff259f50a574e65af84f7d612d8d63"
+        "sha256": "de1c3dce0b5c58f0e193474aeab7e0320525ebd3d5c1f905f66945009af678ec"
       },
       "gate": {
         "approval_id": "",
@@ -9474,7 +9506,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t4.html",
-        "sha256": "d1894b9cee907571d6d88ab225f0d19e74f7011e0a818aeee9c05fa8685e7365"
+        "sha256": "c09f1a423385a28e661b8a5325e0646bce754331b5cf55666ab74076cd68cec9"
       },
       "gate": {
         "approval_id": "01a2028d-e2ad-71fb-b3a9-656be39ce8ba",
@@ -9588,11 +9620,145 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "closure-review",
+      "covered_key": "closed_without_closure_review:T5",
+      "covered_rule": "closed_without_closure_review",
+      "document": {
+        "path": "docs/standards/std-pmp-closure-review-t5.html",
+        "sha256": "b318995f81f7d5b058ca52b048893cfed522480ab0efa11c69c76e0104c318a1"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-pmp-closure-review-t5",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T5",
+      "package_key": "closed_without_closure_review:T5",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Outcome vs acceptance",
+          "missing": [
+            "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [
+            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Open items",
+          "missing": [
+            "No row or document satisfies 'Open items'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Decision",
+          "missing": [
+            "No row or document satisfies 'Decision'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.4",
+      "standard": "PMP",
+      "status": "absent",
+      "subject": {
+        "id": "01a1d039-0d34-73db-975e-5d178d729cef",
+        "key": "T5",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T5",
+        "title": "SPEC_V2 slice T5 (docs/SPEC_V2.md §12)"
+      },
+      "subject_kind": "project",
+      "title": "Closure Review — SPEC_V2 slice T5 (docs/SPEC_V2.md §12)"
+    },
+    {
+      "category": "closure-review",
+      "covered_key": "closed_without_closure_review:T6",
+      "covered_rule": "closed_without_closure_review",
+      "document": {
+        "path": "docs/standards/std-pmp-closure-review-t6.html",
+        "sha256": "750237b916b942bb20ff2626eb11a9b28e79693007884c51dfa32df668e387ac"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-pmp-closure-review-t6",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T6",
+      "package_key": "closed_without_closure_review:T6",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Outcome vs acceptance",
+          "missing": [
+            "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [
+            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Open items",
+          "missing": [
+            "No row or document satisfies 'Open items'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Decision",
+          "missing": [
+            "No row or document satisfies 'Decision'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.4",
+      "standard": "PMP",
+      "status": "absent",
+      "subject": {
+        "id": "01a1d039-0d34-7973-8989-0b83246fc888",
+        "key": "T6",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T6",
+        "title": "SPEC_V2 slice T6 (docs/SPEC_V2.md §12)"
+      },
+      "subject_kind": "project",
+      "title": "Closure Review — SPEC_V2 slice T6 (docs/SPEC_V2.md §12)"
+    },
+    {
+      "category": "closure-review",
       "covered_key": "closed_without_closure_review:T7",
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t7.html",
-        "sha256": "2d3fb5e1f046ecf1b0d5915575943a3b4e961226c4d8b5347fcd9df260613556"
+        "sha256": "6e837b3af547f580d420188cc31dcd398b1ff060f54125fcd82500ea33c7b63f"
       },
       "gate": {
         "approval_id": "",
@@ -9655,10 +9821,77 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "closure-review",
+      "covered_key": "closed_without_closure_review:T8",
+      "covered_rule": "closed_without_closure_review",
+      "document": {
+        "path": "docs/standards/std-pmp-closure-review-t8.html",
+        "sha256": "9177ef5fb66202dadc45808c3dbbbb258bd7b6f1e485486908d324bdede1d610"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-pmp-closure-review-t8",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T8",
+      "package_key": "closed_without_closure_review:T8",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Outcome vs acceptance",
+          "missing": [
+            "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [
+            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Open items",
+          "missing": [
+            "No row or document satisfies 'Open items'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Decision",
+          "missing": [
+            "No row or document satisfies 'Decision'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.4",
+      "standard": "PMP",
+      "status": "absent",
+      "subject": {
+        "id": "01a1d039-0d35-76bb-a22e-be49e3e95d16",
+        "key": "T8",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T8",
+        "title": "SPEC_V2 slice T8 (docs/SPEC_V2.md §12)"
+      },
+      "subject_kind": "project",
+      "title": "Closure Review — SPEC_V2 slice T8 (docs/SPEC_V2.md §12)"
+    },
+    {
+      "category": "closure-review",
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-t9.html",
-        "sha256": "dc7941ac4f8b7478ee20683800ff1d758d22ede5bd73e5958b4e062935562301"
+        "sha256": "df71cf7b4d31098ed503e181dccd9caf756655a3e6b4b6da0126c9873b9f45f0"
       },
       "gate": {
         "approval_id": "01a20280-7305-7fe4-b40c-998a13c392fc",
@@ -9775,7 +10008,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t1.html",
-        "sha256": "60cdb96d626b50b386a909ab7045f4e67de74c9e7f337f8061f598a39070c4fc"
+        "sha256": "c68b21d166b1373cd9a8a7f55e2f49bd5227a524df59405963c4bfa80069ba2d"
       },
       "gate": {
         "approval_id": "01a20231-0d43-74ad-80ca-42088a1be984",
@@ -9892,7 +10125,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t12.html",
-        "sha256": "61a35848034c51c1094d605021f5b4a0622586b5f63571547a993b8a207942e2"
+        "sha256": "6b9e43ebf8b06e8643692c41ac6a627774c1af6dc9306978a226df5d7db5e231"
       },
       "gate": {
         "approval_id": "",
@@ -10009,7 +10242,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t13.html",
-        "sha256": "0a9d7d4e10a4ee7c0903f5cf98a1d5f520062c58063c96f6f23ef84d62c77eff"
+        "sha256": "9e93554f05e99f25af2c64b06f244fe35a469f3914846478a7c5e9d38e27cbea"
       },
       "gate": {
         "approval_id": "01a202c2-eae1-76ac-8d64-6a548051cc27",
@@ -10126,7 +10359,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t15.html",
-        "sha256": "372d6ce4454ab7ecc0dbe6aa034dda9019107d0cb999849d291c7acc33d7f9b9"
+        "sha256": "691219cd20d2c474df1bf72b5ed7aaae5606491b9039aab5562657eb97f74495"
       },
       "gate": {
         "approval_id": "",
@@ -10243,7 +10476,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t17.html",
-        "sha256": "aca352101871e6240bd90448ad9551ae6eef2d13b1db129e3fa36706fdee14d8"
+        "sha256": "0ddb7231120e76ede8a72e3e5a25ff44a67dd878c6cec6d6a42bfc9c2c8e4d97"
       },
       "gate": {
         "approval_id": "",
@@ -10360,7 +10593,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t18.html",
-        "sha256": "30fe87fd2d6be1678830d52ee7ca22faa30bca11c3c10071465c8d8f8d911ab3"
+        "sha256": "65ac7c9d5837020bfa76621a02ac975176c826165f849af5cbb26bbb440cd15c"
       },
       "gate": {
         "approval_id": "",
@@ -10426,7 +10659,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t19.html",
-        "sha256": "6823033842e260d669e1af9d8be259ee39fdefb8a14fb8d863a01d6925256d5d"
+        "sha256": "3b2419d7fec3795dae959a54dbb381ead808ef32ba3441078a300fb8e786187e"
       },
       "gate": {
         "approval_id": "01a20c8c-1428-79d4-a64e-fdeaa033a182",
@@ -10543,7 +10776,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t5.html",
-        "sha256": "1ac6e5814fb274622c00ef700be4fb707c6fdd9814e7e8bad22486f8b186bff9"
+        "sha256": "1f0a8bb9bd5d5cbd152fe477ca762d720032c3fb9bab693c1a7cc83698211f7e"
       },
       "gate": {
         "approval_id": "",
@@ -10660,7 +10893,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t6.html",
-        "sha256": "676a4b7f6950b86c7204a9a68c013ac80a2454a301f6022572fb2714b376e192"
+        "sha256": "d7eacb39e51a88d54bf2f6298315f44c986bae088d21101e9723d18edf0dc512"
       },
       "gate": {
         "approval_id": "",
@@ -10777,7 +11010,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-inception-analysis-t9.html",
-        "sha256": "7f2336d80cf0fbea9898bde2667d61a452887adce3b15518b99b10f695632c94"
+        "sha256": "0ff12d972f5089779268d4277569b81668e3ebd091f892dd1df67a7405f67455"
       },
       "gate": {
         "approval_id": "01a20280-7305-7fe4-b40c-998a13c392fc",
@@ -10894,7 +11127,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-design-publish.html",
-        "sha256": "6c9f4a513e6ab8ec5bf33ad1e63e574c09615d667d44cf723e334c61ba435101"
+        "sha256": "9e0f4ca31ebe95a97e3aeffda2869fef604e7666521d5c016b937d57d238637c"
       },
       "gate": {
         "approval_id": "01a1ff3f-cc40-7000-bce5-85f41c4c0b13",
@@ -11007,7 +11240,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-p0.html",
-        "sha256": "999d319df7075b025469a66b3ff9865f723daca365238790bcffc96887ae8f76"
+        "sha256": "f24ca5e1c303e018b88b41794245f4e1a4580565fdadddfd89a078840dcd19d7"
       },
       "gate": {
         "approval_id": "01a1ffa9-76b2-7956-98ba-c1d0be651017",
@@ -11120,7 +11353,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-platform.html",
-        "sha256": "226c4bbab41db26a03e164a6adec15b4196f3216619fae75b0f36e5e8a1b12cf"
+        "sha256": "97603288343fd6e904c35d8642d6be5af10a48a9ac31047ca6dc6092826fa13c"
       },
       "gate": {
         "approval_id": "01a1fdd8-d052-7532-8e66-944a4db595ab",
@@ -11233,7 +11466,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s00.html",
-        "sha256": "e4abd6b201bd2c4d3419391277743acfbec9aaabe035a10f632e3eebbf4d8c48"
+        "sha256": "7b4d5aa20582bf211974606be69034dc246e1be613e76a71b3eb533e71a31627"
       },
       "gate": {
         "approval_id": "01a1ff3b-1a6d-7952-be39-4a4f470ad5c3",
@@ -11346,7 +11579,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s01.html",
-        "sha256": "057e289a4967d7be5c2f403fae62716decd438f2656bfb13368d11bc343691ca"
+        "sha256": "737784fb92c1886031ab91c0b060f07291b47e4aab834c9de1baa051f71427b6"
       },
       "gate": {
         "approval_id": "01a1ff34-00a1-75eb-9022-02be586d0bb3",
@@ -11459,7 +11692,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s02.html",
-        "sha256": "6a5aee8730a155f5214a16f10f9c984170faee21f2a36e37e7fa28c7dc935d1b"
+        "sha256": "9e5ea021f33750eb00cd3c210ae585c172e035625680403982151fd54dc88126"
       },
       "gate": {
         "approval_id": "01a1ffa6-62ce-747b-abac-c41e9679dde8",
@@ -11572,7 +11805,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s03.html",
-        "sha256": "c86f9ad55c6f3f51d5e3eeda8ce87764cf6ec729529e77dd990503959f204885"
+        "sha256": "96b728303f24d03c73e9124c6ee33ac387e881e6f82d915f9c6aee2d9ddd79e1"
       },
       "gate": {
         "approval_id": "01a20222-df0f-77b5-ad70-b53bcea5ecb9",
@@ -11685,7 +11918,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s04.html",
-        "sha256": "de8e4f7e254b48a8e2423be666202c5f0ba38b8e25a5d45e6c49acea1936fac1"
+        "sha256": "75a1a600f8183ac7d9755f316a2d5391b7b00110da0b996a0b0803323d0e4774"
       },
       "gate": {
         "approval_id": "01a20256-466e-7670-9a2b-5fad19bc3e08",
@@ -11798,7 +12031,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-spec-v2.html",
-        "sha256": "943da3f1eb0b319710263500a9a88a6b17e6c660a97f303e0f272feb292a3cdd"
+        "sha256": "a864c55265ebfd02d4ffab2bff66a3e91a74861206f90103160040edc4b15f46"
       },
       "gate": {
         "approval_id": "01a1ff44-4454-72c4-803f-78cbc73dfbe0",
@@ -11911,7 +12144,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t0.html",
-        "sha256": "d60411f987e8f25d37949cd1fa299788e9a636679552cf5e1663af6e24e8638c"
+        "sha256": "c867175ca12b83734ddefaa3a9b42f4fe6b8fa5768e3355f0eea48c6738c7dda"
       },
       "gate": {
         "approval_id": "01a1ff48-c258-72af-9643-1c830af6b92f",
@@ -12024,7 +12257,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t1.html",
-        "sha256": "d44ae2dc3c4308501bb92854bb93b1949463217b0624e603fc42506ca764f7fd"
+        "sha256": "5cfc5000e144a9210399ded60ce281ba5534a78c2f56cf4f8c54e0117f42c321"
       },
       "gate": {
         "approval_id": "01a20231-0d43-74ad-80ca-42088a1be984",
@@ -12137,7 +12370,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t10.html",
-        "sha256": "c1563fde3b38c65c5045726539eff6ab1f01a96a24b1787c9f9ca7b93e45ca5a"
+        "sha256": "ac914f1ff3e1351ac75d572eb8e901a7a6a3cefe733ca310510569fd002c37aa"
       },
       "gate": {
         "approval_id": "01a20289-7d0e-7f76-87e9-f4ffd042a582",
@@ -12250,7 +12483,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t11.html",
-        "sha256": "76c17195449e42278e995dbab2212ce6ceb9afd3f150f1e6d19abcbabcd2ea43"
+        "sha256": "02918453b9866f0233018d2cac23e39305861650794a0bf31bf01ee486b168c0"
       },
       "gate": {
         "approval_id": "01a20232-12d8-70ff-afc9-320a80c262d6",
@@ -12363,7 +12596,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t13.html",
-        "sha256": "627d893d6e428ff29880e4abbcff7df8157d55ef74cb71f1b58a920693642c9a"
+        "sha256": "4d85c03946d23133794537ede9dba70c8e27d781aafc4a34865cf84f6de2dd99"
       },
       "gate": {
         "approval_id": "01a202c2-eae1-76ac-8d64-6a548051cc27",
@@ -12496,7 +12729,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t2.html",
-        "sha256": "74f5d8de1fd9e81587342ad2b95805079b3919331fae04808a557ef2d6e0e0fa"
+        "sha256": "28cf871b3a90c27584eb81800b2439bd2ff01fb78b155fe7babad63093f585ca"
       },
       "gate": {
         "approval_id": "01a20223-29bf-734c-9b5f-2543c7f2abed",
@@ -12609,7 +12842,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t4.html",
-        "sha256": "a1eacabed59b7f2ecb582612c012c62f2105f44319938217e5cd83dfe870ea7c"
+        "sha256": "5c404fe3ebbb528d8bc90a560b3120e18d4106ba96dea089489b1fc951d81cb0"
       },
       "gate": {
         "approval_id": "01a2028d-e2ad-71fb-b3a9-656be39ce8ba",
@@ -12722,7 +12955,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t9.html",
-        "sha256": "0ee735d6f270c1cfad0070b31a4a2a968158ed4b980302f19595afcb0cdad619"
+        "sha256": "1c9e0558d40d3bd03cb37746caf73a9969052674684171d92ae437d7028e50f0"
       },
       "gate": {
         "approval_id": "01a20280-7305-7fe4-b40c-998a13c392fc",
@@ -12835,7 +13068,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-design-publish.html",
-        "sha256": "397707c411bcad433be568fc682ed2739fe1e2837b87991b4ccfe9e984d2bae5"
+        "sha256": "1a273724e8a7cd40957d2d7e58158be2ab6c8859c5e6a33b3b4bb457807b37b3"
       },
       "gate": {
         "approval_id": "01a1ff3f-cc40-7000-bce5-85f41c4c0b13",
@@ -13036,7 +13269,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-platform.html",
-        "sha256": "afcb7703c72667807ac04d3a77d8f5dd3765486b29072bab1c4770c199fb817c"
+        "sha256": "176c6a4e9eed694fa55e82ba7cdbf91cc5d3fdaaffe48fbee3196726e8d003a3"
       },
       "gate": {
         "approval_id": "01a1fdd8-d052-7532-8e66-944a4db595ab",
@@ -13237,7 +13470,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s00.html",
-        "sha256": "fcead7c4796c46c66e265e00e531303846fcade0c0bda5aa625e1c4308445fdc"
+        "sha256": "46c4fd20cbae8e788283ef8689ae2f09a9a0f9cf44a070745c21bef1a876aaa3"
       },
       "gate": {
         "approval_id": "01a1ff3b-1a6d-7952-be39-4a4f470ad5c3",
@@ -13438,7 +13671,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s01.html",
-        "sha256": "1fac433074d9a5edef4d1f8304899ad9135a1667da419c5fefeb94c3b30113ef"
+        "sha256": "8fbb73a770c2b773faa3cb2ab681442fc4c1fe9c580552daaa37b51b78b0cf7d"
       },
       "gate": {
         "approval_id": "01a1ff34-00a1-75eb-9022-02be586d0bb3",
@@ -13639,7 +13872,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s02.html",
-        "sha256": "a105962c4279d7504457c9b275a58fd3d9921fd73f74bddb98896be093bf1433"
+        "sha256": "ffee7a2ae658c6517644284800f109ae659b3790c0322a75eeb7cdce2bc3f0c7"
       },
       "gate": {
         "approval_id": "01a1ffa6-62ce-747b-abac-c41e9679dde8",
@@ -13840,7 +14073,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s03.html",
-        "sha256": "f0036728f6608bf0408e9e42391851f9013cd200c266872e71d39554d006cb67"
+        "sha256": "aeab076835dce9a8c722a1dbe2b933c137457295db3269a5babece6a572cd7f8"
       },
       "gate": {
         "approval_id": "01a20222-df0f-77b5-ad70-b53bcea5ecb9",
@@ -14042,7 +14275,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s04.html",
-        "sha256": "11c76b983975c9e6aea0cbbaaa184d3a017dbe0eac3d78c314f0c6006207f41f"
+        "sha256": "c73410dace3e65b7cb64ef982e31ae3172ef235ff3cd3b9339e691f29f492f1e"
       },
       "gate": {
         "approval_id": "01a20256-466e-7670-9a2b-5fad19bc3e08",
@@ -14141,7 +14374,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s05.html",
-        "sha256": "b5361697fe79737785d86439be15dba4646180ff519c0e6665d3ec26415a07b4"
+        "sha256": "c0442cf79aa40f076b266b522ac0fc1bb5fe500fcce29c7dc1ab376a5cad40fc"
       },
       "gate": {
         "approval_id": "",
@@ -14240,7 +14473,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06.html",
-        "sha256": "36bdd19715da6042f59b2c59650082fc9331c5fb8db5f376024f8b5fb35026ab"
+        "sha256": "0c4303f6076f89ee6e87ee26c99643a976dadef91a991baecafc3a5076ff4919"
       },
       "gate": {
         "approval_id": "",
@@ -14339,7 +14572,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06a.html",
-        "sha256": "ce3f83bc94e34e95690bbacf41acc6d1f8397b5d187cb74979e1b6f9fe820e32"
+        "sha256": "1b49af2c0cade0815014b30954c47b7b328ed678464ca6c222e8c50ee5901c0c"
       },
       "gate": {
         "approval_id": "",
@@ -14438,7 +14671,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06b.html",
-        "sha256": "d869321dd1115d66eb2030ee78480b427dd4441b9e5e313359a60d8e461ca8bd"
+        "sha256": "8449bbf3c64558f74fce3b6b471cff11c31bbaa0fff02e5ad67b97958c7dcb89"
       },
       "gate": {
         "approval_id": "",
@@ -14537,7 +14770,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06c.html",
-        "sha256": "600c7b103c13d5f1a85ff56fb7522ce5cca4e677b77b1c7a071b048efc5a8d31"
+        "sha256": "09f3f3c7b8783550060c84b240c3f617a7ecce8cb83d84dddc0543579923173e"
       },
       "gate": {
         "approval_id": "",
@@ -14636,7 +14869,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06d.html",
-        "sha256": "517bc6fed8fbb533689347ac15fd4c47440202dc53e5dd4324d773562bf0e1c1"
+        "sha256": "58eeedd026f2cc99eba34a8b0f33aa7c660660d5ad9af0fb27e29264bd793fa4"
       },
       "gate": {
         "approval_id": "",
@@ -14735,7 +14968,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s07.html",
-        "sha256": "6389e15e66d36b2b6041aa01db4be802503a95962f9085806f3f91f8be110086"
+        "sha256": "de64e861ade84c89069e18eac14895db1c36f4858e11abe4c10059a61b6e076c"
       },
       "gate": {
         "approval_id": "",
@@ -14834,7 +15067,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s08.html",
-        "sha256": "7639501ff855aea887c021b746fe24c1d507313ebe7f7d69806e86673c786e51"
+        "sha256": "a535fd255ddbd7593823ba65936dc74d1e6a903ff7038d137ba26475a1513c95"
       },
       "gate": {
         "approval_id": "",
@@ -14933,7 +15166,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s09.html",
-        "sha256": "d175ca4c912fee52d125e7f52ba307943b4f5c4bee5e1d936e74946e8b20936e"
+        "sha256": "60630dd6681a41e9c1b21e1bb8958e701b2acfc38c8d1b63a7ce93a6f2542689"
       },
       "gate": {
         "approval_id": "",
@@ -15032,7 +15265,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s10.html",
-        "sha256": "d4e4499e126b00ca65018890b3ba45eee94432cb4d4e432ff8332a9fc74bdb97"
+        "sha256": "bcbc51eb892a8c92d519369d04809be959e592d63255f339a90f548a2bff974b"
       },
       "gate": {
         "approval_id": "",
@@ -15131,7 +15364,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s11.html",
-        "sha256": "69e6c98d994267a49d01561343d9f13d732276ce5e41b12b02955a34b6277655"
+        "sha256": "85c6574cb4200d76c50ec7beb0f535477cabd14844410daaf7ba0c2b87552096"
       },
       "gate": {
         "approval_id": "",
@@ -15230,7 +15463,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s12.html",
-        "sha256": "dddced079117fa0da71c2e3b405a393e534c4041e77ff0e8f45a3d980025b8ae"
+        "sha256": "4ed536538572ec44f27017ec2474b971332bee8e6b84ba0dd0bde664226ccb51"
       },
       "gate": {
         "approval_id": "",
@@ -15329,7 +15562,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s13.html",
-        "sha256": "d7245cd9359644f570029964379d839923ea08a88bb210543212ffa1ae964d79"
+        "sha256": "a6cc77dbcb61ae39ae1639f62c8e3bcdcd3607e3e940f2b0850b64ad3bb1d87e"
       },
       "gate": {
         "approval_id": "",
@@ -15428,7 +15661,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s14.html",
-        "sha256": "3200b5a98edb362081a43bdfd231ac18d899feecdd0391de4e20ff4aebd0800d"
+        "sha256": "0a87f38de8e604bb5cc0f1290f6a2394d6355a67c664490595b99605c6b3ff1d"
       },
       "gate": {
         "approval_id": "",
@@ -15527,7 +15760,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s15.html",
-        "sha256": "638a811fe00b073f41706aa0465db21ec7ccc77d2c4a11a7985bd78f68097fd8"
+        "sha256": "c2775112538c948e1964f9f1fa1c8e8dd0420f54159bec7ccd6de32916f3e8b5"
       },
       "gate": {
         "approval_id": "",
@@ -15626,7 +15859,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s16.html",
-        "sha256": "334be3e5b50531bce36e2871f226fa14f5ecf7ccadc4997a87d24bc44385e6e0"
+        "sha256": "357d4fd090eaab75e2594e47839955371f5b45b5edba38487b938abfc1af42cb"
       },
       "gate": {
         "approval_id": "",
@@ -15725,7 +15958,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s17.html",
-        "sha256": "8f370cd60c6fb9e3975cf5e5b1ffa31a626c221997a9f5fbf4b809bf40215eb2"
+        "sha256": "9b730d2ff5b9a66f2e4bffd606d800a67d1c9983c8c7c3e82df4039c95fbbe08"
       },
       "gate": {
         "approval_id": "",
@@ -15824,7 +16057,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s18.html",
-        "sha256": "eb92dfb6ec6cf6e677e62b99903a48a012a7980191df1a5b5c7d92ce698f22ac"
+        "sha256": "eff541b667ec62266637c32c9bdf02c72c7a5fd39f2c425e0313f674128d7916"
       },
       "gate": {
         "approval_id": "",
@@ -15923,7 +16156,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s19.html",
-        "sha256": "548fa65b02ec86fbecfd094d7999336f2060c8de89abeda0c5d50cfc3c953d8b"
+        "sha256": "c4fb850ae5f24c0273afd0dc116d87ca5b2725927f55e28a552abd7f7fcc8a41"
       },
       "gate": {
         "approval_id": "",
@@ -16022,7 +16255,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s20.html",
-        "sha256": "10ceec98150405f368be113e12fc7a65643400c69a41d4b28940af94541788d1"
+        "sha256": "bcba2ec4b72b2a1c59289fcd3234212c78219ec1a5acbbfd41fb7c042da9716f"
       },
       "gate": {
         "approval_id": "",
@@ -16121,7 +16354,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s21.html",
-        "sha256": "a54009ba2ef31c094453c6223c97238c906e9bfca773223b5e12aaf5614353df"
+        "sha256": "78c6b4f7582d49cca378c30f691375490a6dd64b858534d7cb5c552bf07de9fe"
       },
       "gate": {
         "approval_id": "",
@@ -16219,7 +16452,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t0.html",
-        "sha256": "6dc88f45b25607eb4d66d7900b63383ea5bf036594fa88b8d4648937c24c5454"
+        "sha256": "e6dc69860f8923c91f3b046049593ddea4efe164a979c8a31b793d25e6c4f9d0"
       },
       "gate": {
         "approval_id": "01a1ff48-c258-72af-9643-1c830af6b92f",
@@ -16420,7 +16653,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t1.html",
-        "sha256": "0ef0c5e4f7e17513d2fd365311a80dc3ce003d1b9fbb00a6531bd27f10d58300"
+        "sha256": "141f35e270a07cd30a73ff735c1564c76b97783cc8de9ee5868da8111d415e86"
       },
       "gate": {
         "approval_id": "01a20231-0d43-74ad-80ca-42088a1be984",
@@ -16621,7 +16854,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t10.html",
-        "sha256": "86c5c7fc0884830afa7d9c3d726698711a5ef46eb7e3301594499d25403b10be"
+        "sha256": "372bf07a23f9783f386f18586ec78ef71c9a4d687f4abe3907ca8fe89688e3fa"
       },
       "gate": {
         "approval_id": "01a20289-7d0e-7f76-87e9-f4ffd042a582",
@@ -16822,7 +17055,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t11.html",
-        "sha256": "53f848f4ea3733e730e4ed075ba45969cc0b651e849717f8648106457303750e"
+        "sha256": "edd051439ef7d4550da3b30e3b44a2ea73f3f5cf63dbee0b9633f90ba05f5b6a"
       },
       "gate": {
         "approval_id": "01a20232-12d8-70ff-afc9-320a80c262d6",
@@ -17023,7 +17256,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t12.html",
-        "sha256": "2abcfe6618ebdd6e15aa3c30b60949e3b19055ee0b780f863084d132934f827e"
+        "sha256": "535ba08d112d0d4ede5df2da79cebc5392f733d3cafd4f67ad5cbc96caec1b6c"
       },
       "gate": {
         "approval_id": "",
@@ -17224,7 +17457,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t13.html",
-        "sha256": "8605cb6bb373de3be0af7e0bbf18cd858f34e0c2185f21d20bef0f466a3687bf"
+        "sha256": "48292908551be8039208d60246a63e17d09f40000bc6dd97aa199adeeffbf194"
       },
       "gate": {
         "approval_id": "01a202c2-eae1-76ac-8d64-6a548051cc27",
@@ -17426,7 +17659,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t14.html",
-        "sha256": "ec27a68e4c46b3804a11b5183e6172a89c6cf476ad6b758caad080a6d8a2e88d"
+        "sha256": "8261edff583aa74ea3ddf1627e8b1ba9ef7831c2697f73f9451c516dafb665c6"
       },
       "gate": {
         "approval_id": "",
@@ -17524,7 +17757,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t15.html",
-        "sha256": "6f8e8688b929c56719ae3940c5d4c76765ac7f60fdf006a1e58c9da9fc1382ae"
+        "sha256": "4c36b12d82b5ddccefb0b6314109c2399d27a10d87269525bf026f9daaf7a6a2"
       },
       "gate": {
         "approval_id": "",
@@ -17726,7 +17959,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t16.html",
-        "sha256": "80a5de8b58a8569e7c958608a5fdc960521ca6b9340c5325e548e6fcc808ffd5"
+        "sha256": "cebdb74ad45cd24995e0672e26858e264914fab095c970b562cd43a467fd545a"
       },
       "gate": {
         "approval_id": "",
@@ -17824,7 +18057,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t17.html",
-        "sha256": "b00dd1223287f911c71abbbc3764cc872b5f9a21da90d98589421ca5cdae9905"
+        "sha256": "540462b7da2ba0d609ad1b6d4ea652d25bc72f72198c1e23badd52b61d631bb2"
       },
       "gate": {
         "approval_id": "",
@@ -18026,7 +18259,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t18.html",
-        "sha256": "40006ac961f3ade7233116b5324a7edaa69cd10f5b7872300455b914b2d49491"
+        "sha256": "78b19c5ac355239ce26646177a053a953737bb3b4b3dd5e0f05ad898c15a45fb"
       },
       "gate": {
         "approval_id": "",
@@ -18124,7 +18357,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t19.html",
-        "sha256": "c452f343ec595f792b3badf4ebf54a6656c234e4bb5be1c5adb831de641a247d"
+        "sha256": "18866d153deb26da0023f75cad31926242f020d8652be790202bec602917fd3f"
       },
       "gate": {
         "approval_id": "01a20c8c-1428-79d4-a64e-fdeaa033a182",
@@ -18324,8 +18557,209 @@ window.CONVEYOR_STANDARDS = {
       "category": "project-brief",
       "covered_rule": "unpublished_declared_output",
       "document": {
+        "path": "docs/standards/std-pmp-project-brief-t19f.html",
+        "sha256": "ca5804ecf7d60e772c6ae461208b3e11491e88a6b5d8555335f2cb85492f1e41"
+      },
+      "gate": {
+        "approval_id": "01a210c3-9007-75f4-927c-d1dc32f54c6b",
+        "kind": "authoring.review",
+        "state": "approved"
+      },
+      "id": "std-pmp-project-brief-t19f",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T19F",
+      "package_key": "std-pmp-project-brief-t19f:T19F",
+      "sections": [
+        {
+          "heading": "Outcome",
+          "missing": [],
+          "sources": [
+            {
+              "category": "project-brief",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a210c1-5e0b-73a0-8369-4e02145395e2",
+                  "title": "T19F — Project brief"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Boundary",
+          "missing": [],
+          "sources": [
+            {
+              "category": "project-brief",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a210c1-5e0b-73a0-8369-4e02145395e2",
+                  "title": "T19F — Project brief"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Reuse sources",
+          "missing": [],
+          "sources": [
+            {
+              "category": "project-brief",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a210c1-5e0b-73a0-8369-4e02145395e2",
+                  "title": "T19F — Project brief"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Inception units",
+          "missing": [],
+          "sources": [
+            {
+              "category": "project-brief",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a210c1-5e0b-73a0-8369-4e02145395e2",
+                  "title": "T19F — Project brief"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Dependencies",
+          "missing": [],
+          "sources": [
+            {
+              "category": "project-brief",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a210c1-5e0b-73a0-8369-4e02145395e2",
+                  "title": "T19F — Project brief"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Acceptance",
+          "missing": [],
+          "sources": [
+            {
+              "category": "project-brief",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a210c1-5e0b-73a0-8369-4e02145395e2",
+                  "title": "T19F — Project brief"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Capabilities",
+          "missing": [],
+          "sources": [
+            {
+              "category": "project-brief",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a210c1-5e0b-73a0-8369-4e02145395e2",
+                  "title": "T19F — Project brief"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Plan",
+          "missing": [],
+          "sources": [
+            {
+              "category": "project-brief",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a210c1-5e0b-73a0-8369-4e02145395e2",
+                  "title": "T19F — Project brief"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        }
+      ],
+      "spec": "§8.4",
+      "standard": "PMP",
+      "status": "evidenced",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+        "key": "T19F",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+      },
+      "subject_kind": "project",
+      "title": "Project Brief — Follow-on: docs/plans/T19F-meeting-bindings.md"
+    },
+    {
+      "category": "project-brief",
+      "covered_rule": "unpublished_declared_output",
+      "document": {
         "path": "docs/standards/std-pmp-project-brief-t2.html",
-        "sha256": "3688990994a8f7b0156e38dd52e47032ae3e5fa8e644cc13f936844eef62ddd2"
+        "sha256": "394719ded4bc817f53a41041cd4bb421858926e7126da9b544fc177194b34c7a"
       },
       "gate": {
         "approval_id": "01a20223-29bf-734c-9b5f-2543c7f2abed",
@@ -18527,7 +18961,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t3.html",
-        "sha256": "b98c9cef3b4e8174be3778b265b15e7f02de32b2dfa5b98d8f18c7f3f3c8bf64"
+        "sha256": "466449d6be0ed7e66834fbb2a06a9a510a43ec29ea5307a02b79efd62825e3bb"
       },
       "gate": {
         "approval_id": "",
@@ -18625,7 +19059,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t4.html",
-        "sha256": "a82faf04cbc50a642455dc5c21ab11a9cf45878b4749fa3d67803a88652aafe4"
+        "sha256": "8a06c0851702f3f1ce2a055cdbdebe463126534a56275b8cf85038be50113720"
       },
       "gate": {
         "approval_id": "01a2028d-e2ad-71fb-b3a9-656be39ce8ba",
@@ -18826,7 +19260,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t5.html",
-        "sha256": "410c934dab4ba682a0c3ea2af5ca93791ab525c4b31e128e82276e96309101f8"
+        "sha256": "3e4e4afd65af2ac5b52deaf12d6c45570cb773099d04ee1245c05c61e37c56a3"
       },
       "gate": {
         "approval_id": "",
@@ -19027,7 +19461,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t6.html",
-        "sha256": "47ff4705574ac173de392b8ec3da94a4a8aad07c39ee63acef34c188a08986fc"
+        "sha256": "53f3889c139484fedccc4432a0debf8695d32972feac8313c5a88dbaae74a2ef"
       },
       "gate": {
         "approval_id": "",
@@ -19229,7 +19663,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t7.html",
-        "sha256": "eb29aadc1f7ef4d348b7c0c3ce735b5d475cd7e9b923da5a0ed14f1f37b77e15"
+        "sha256": "e2f756ea7994d882fd741deaf73db6db934d60b80925cd0fc837d45fc0484985"
       },
       "gate": {
         "approval_id": "",
@@ -19328,7 +19762,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t8.html",
-        "sha256": "022732e7603750fbfbec1c02ee45c52e1df571096cccaba43bdce7a2cb7b4601"
+        "sha256": "160be26324e501cbfd77f0ab635a7ed995587e4f844269c9066239ff505b2c14"
       },
       "gate": {
         "approval_id": "",
@@ -19426,7 +19860,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t9.html",
-        "sha256": "ba30096b2bddb6f757907f03a6277863e1172ab7f9645f18c622cc4ee74b15f6"
+        "sha256": "c00bfdc2415d21ca2bdfb9042b7c43ecb407041676863a8ff44b3c1a77287159"
       },
       "gate": {
         "approval_id": "01a20280-7305-7fe4-b40c-998a13c392fc",
@@ -19628,7 +20062,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-design-publish.html",
-        "sha256": "b9ba7c020f50ba4339438aeb6fae1fa00788d6df1edb1378cf2b75ae513bfe0b"
+        "sha256": "4fa3801e4e42b568d1406c760a583548fee49ab26fffacdebdb231fffe10f503"
       },
       "gate": {
         "approval_id": "01a1ff3f-cc40-7000-bce5-85f41c4c0b13",
@@ -19763,7 +20197,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-p0.html",
-        "sha256": "87d4f15217aec7fdc9100af35c92fe8a84cac93b7fd1f57ea84dfedfd73464c9"
+        "sha256": "d9b81177bd6f9837aaef45540be2a5579c8eb9b21422ca9a3676125f46c5c096"
       },
       "gate": {
         "approval_id": "01a1ffa9-76b2-7956-98ba-c1d0be651017",
@@ -19902,7 +20336,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-platform.html",
-        "sha256": "3713bff571cfca678bdb46de0364c22fc704cc225b3a8224b2c293312bab7abd"
+        "sha256": "7882dc8a3e4e135047d663baa62175a31817ba9af453f27d6051e239c652857b"
       },
       "gate": {
         "approval_id": "01a1fdd8-d052-7532-8e66-944a4db595ab",
@@ -20060,7 +20494,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s00.html",
-        "sha256": "f72152a53ffa49d08f8d4c1713db9f88199955c335c5645984809fa3725e87c4"
+        "sha256": "732e604fed59375742ec0fd9c5ff295c2bfda5ca545ce11516eb29ca3c98d77d"
       },
       "gate": {
         "approval_id": "01a1ff3b-1a6d-7952-be39-4a4f470ad5c3",
@@ -20195,7 +20629,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s01.html",
-        "sha256": "8b6fbc00e2a389887f4a7906ce1e6271eb0b6523bea015b444d387c80532dd50"
+        "sha256": "0d365be77427235643bcc7d076881133dd44accee19e9d1df647d35130749ccc"
       },
       "gate": {
         "approval_id": "01a1ff34-00a1-75eb-9022-02be586d0bb3",
@@ -20330,7 +20764,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s02.html",
-        "sha256": "05822626595c0e96e0f0cc894cb043f0fecefab4e178c5ab3b8a7f0c3c08da63"
+        "sha256": "7e3596366a33f5678f0d5c9bb468fe992d7bbfd3a6f01bff63b5f18d4cbea0ea"
       },
       "gate": {
         "approval_id": "01a1ffa6-62ce-747b-abac-c41e9679dde8",
@@ -20465,7 +20899,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s03.html",
-        "sha256": "1b6876877193f412de8b33ed482768eb66b70b169536f7c932587007fd3cb163"
+        "sha256": "a13ebd499fe11d35af029d477997b279e168e9e6d86097097b158f7a0949bcdb"
       },
       "gate": {
         "approval_id": "01a20222-df0f-77b5-ad70-b53bcea5ecb9",
@@ -20604,7 +21038,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s04.html",
-        "sha256": "d93ae8038a9ba9d57ca82ac2a590c64fa37e4152bcbab5c211469db367c711c2"
+        "sha256": "a414676be223d63ca669e335baa67955871928f50e4341f55585e2e8df4ce501"
       },
       "gate": {
         "approval_id": "01a20256-466e-7670-9a2b-5fad19bc3e08",
@@ -20739,7 +21173,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s05.html",
-        "sha256": "d02965e54fdb309947de246cfc8d097449d9c2e29df587a2e1b30adb59ba4697"
+        "sha256": "8a6d1cd574d29d823803fef52c2bf10abe76533529f4d3a2a4d0a97d0b5dd757"
       },
       "gate": {
         "approval_id": "",
@@ -20874,7 +21308,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s06b.html",
-        "sha256": "850978816a913bc57f95c78300051dd410f49aec1cfc20b73258a604b9f703b1"
+        "sha256": "e53e1d8e4a1e239210250f9aa19a5c9b9a4cc9935df60b380d746ea6e806de83"
       },
       "gate": {
         "approval_id": "",
@@ -21009,7 +21443,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s06c.html",
-        "sha256": "91a2d1ac495c1e89e16d3342c417bb58c03d4d790c4851d77202aaaf5f2c2713"
+        "sha256": "7fe5a13edf42015491b2d88137dc6e7ca339434026e21608d3f662cb009c6f2e"
       },
       "gate": {
         "approval_id": "",
@@ -21144,7 +21578,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s06d.html",
-        "sha256": "fc328b71965d4143f92d30f677e1e64eae09654623dd5162a514cb81811c0871"
+        "sha256": "4603e28c655b39a8d303bd4ff1b544919dc6ae042b1de36ee0d93039f0beaa69"
       },
       "gate": {
         "approval_id": "",
@@ -21279,7 +21713,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s07.html",
-        "sha256": "eb9059ade5f0c303b8c01da088e9017787505db52087af823d513fb94c2f7463"
+        "sha256": "7965dc10bbcb8a4c95d947fb104613a837e28d532672023770a3dcc3644c5e13"
       },
       "gate": {
         "approval_id": "",
@@ -21414,7 +21848,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s08.html",
-        "sha256": "b7a60e5ba02a1b9b2057cf68f1d199f7fc0b47d5d97c18d24322c0c9264c1b15"
+        "sha256": "44c192bab62df29b1e2702a9594f8a7ada7284eafe3f8d52cb9bf3b594c23b55"
       },
       "gate": {
         "approval_id": "",
@@ -21549,7 +21983,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s09.html",
-        "sha256": "ead22098f3819deaeb2329c10af44bc722e09a4ae09e3413ee4363509051feee"
+        "sha256": "d8266e793a9c51d558a7349a2ef2e1df75fbe50adfb0daac72d28dca35c7399e"
       },
       "gate": {
         "approval_id": "",
@@ -21684,7 +22118,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s10.html",
-        "sha256": "150a2f2676338d5bc48877f68530828caff61428efa78236a94ca8b75b382b02"
+        "sha256": "a7aa029482895686b1fcdc0a3c3a8f2662b77d7baad602bd8a0723b410fadddb"
       },
       "gate": {
         "approval_id": "",
@@ -21819,7 +22253,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s11.html",
-        "sha256": "c5818095c984bb7e75e7f7be1d816df0ecf6a6f63f08bfa0e0ec595e4dc1b283"
+        "sha256": "a4fd0ea48d2ac4f764d7affd10d818230eb47550990b33b5d3f7c3ac15d559b4"
       },
       "gate": {
         "approval_id": "",
@@ -21954,7 +22388,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s14.html",
-        "sha256": "a0084300dcb5c69bc8c1f40d2f9499daa6ef8693d5b36f1e859be84f854b9f6c"
+        "sha256": "5a2e040a42ca329337a54a146bed9b03e7e17c30b51b46f6a6fbb80d55f88bce"
       },
       "gate": {
         "approval_id": "",
@@ -22089,7 +22523,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s16.html",
-        "sha256": "1f19e587ecd6815bceb857b1ab30aac32483fc7fe066332e4d3749e5f7273871"
+        "sha256": "dd31a1a10992632beec3b0d28c63a71f1e23abcfa6725fa320023feba9ea22e9"
       },
       "gate": {
         "approval_id": "",
@@ -22224,7 +22658,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-spec-v2.html",
-        "sha256": "a126ef99d2737b0e9eb6640215296d7e2453da2fb8e9a53da042d0476bd2833d"
+        "sha256": "b7f910f7ee443c60d610c77a8574a9dc6798c3ae05d3188952ad182c7273112b"
       },
       "gate": {
         "approval_id": "01a1ff44-4454-72c4-803f-78cbc73dfbe0",
@@ -22359,7 +22793,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t0.html",
-        "sha256": "a5593805d0fe00caf911ff107855e363fd04b742f96f47653709117facd47b08"
+        "sha256": "7c5ec67baa136eb144ee3f901e97cf3bfe859bf6dd0999f73f4c5044f0833f54"
       },
       "gate": {
         "approval_id": "01a1ff48-c258-72af-9643-1c830af6b92f",
@@ -22494,7 +22928,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t1.html",
-        "sha256": "14bfe39e89cbdc33726ce604b3a5904bc83e8f6ba4ec1ba13a6d402fe3c6d484"
+        "sha256": "33f38251dbd82b9caa36859bc5bdfd7f728a589f3dc96e4c7e264823c9ead9be"
       },
       "gate": {
         "approval_id": "01a20231-0d43-74ad-80ca-42088a1be984",
@@ -22633,7 +23067,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t10.html",
-        "sha256": "d47d08248f1cc7fd550a0d14e407d6eb60cb4d4aa4dd45b231f23dfbdd6f09cd"
+        "sha256": "8727d03881b615ba6a4cee7b6070a87d1255b5f0bb2ed435bdc7a1bc4a1362b0"
       },
       "gate": {
         "approval_id": "01a20289-7d0e-7f76-87e9-f4ffd042a582",
@@ -22768,7 +23202,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t11.html",
-        "sha256": "d8441d8841811b873dece0a60d9c307df327d58b2481017e9ec692a35b7e06b8"
+        "sha256": "f73a19045921e4618895412940fa52bfac8f3af2822dc542a8464971719ce97a"
       },
       "gate": {
         "approval_id": "01a20232-12d8-70ff-afc9-320a80c262d6",
@@ -22903,7 +23337,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t13.html",
-        "sha256": "94f0f08e5b92fb0e1e0d9c21e6cdb8346ab28ddbadd162e20ba62aa5b15c1a9a"
+        "sha256": "2f1aa8350074c0a7972a5b83f1c3d29231637f7f6199db610f8be69c3c684e7b"
       },
       "gate": {
         "approval_id": "01a202c2-eae1-76ac-8d64-6a548051cc27",
@@ -23042,7 +23476,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t14.html",
-        "sha256": "686a5844a2bb600474b27ffdcdd9c0957e596ffa4ca18c7b26a4e5f86f0be0f3"
+        "sha256": "1d6c2361e233377722283f876de06ba34e105a493a54bf1ef1babf4c9058c383"
       },
       "gate": {
         "approval_id": "",
@@ -23177,7 +23611,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t2.html",
-        "sha256": "bddaa00c65122040ce3cbb4f7833efc894be65439da2be060fda68d891d9b09f"
+        "sha256": "8359e7e44a7056aa99ed39001c05137b274b3803a4a80e98a8e80925563327d5"
       },
       "gate": {
         "approval_id": "01a20223-29bf-734c-9b5f-2543c7f2abed",
@@ -23316,7 +23750,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t3.html",
-        "sha256": "3077233b3c3cbbff77b15a6cf1a5551c67816137952f92bc78ad7e3a51455792"
+        "sha256": "7695ff03352622b9794e6582e8318db4262400bd7cf73f2e43454e2e503f8531"
       },
       "gate": {
         "approval_id": "",
@@ -23451,7 +23885,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t4.html",
-        "sha256": "1734b5f8dea8e4e2ab7f713534fe52de1248781f3f8859e71446211fab2ff474"
+        "sha256": "5bf62f835032dc05aca73fc537736b8b47023d09e167325fbf53451a297d0245"
       },
       "gate": {
         "approval_id": "01a2028d-e2ad-71fb-b3a9-656be39ce8ba",
@@ -23586,7 +24020,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t9.html",
-        "sha256": "fade1bbd21ff84841207d045131ce0a5d466c35d08c94f7ad8f9113d0566c0d5"
+        "sha256": "84e20ac4adbc7b541317e3d432852a8b1039d439cdb15e8213665e68000e70d4"
       },
       "gate": {
         "approval_id": "01a20280-7305-7fe4-b40c-998a13c392fc",
@@ -23720,7 +24154,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-design-publish.html",
-        "sha256": "21f9214df969ab02e720e3edc793a533dd8b1b2cb64d9f4fb99db4415f733360"
+        "sha256": "cbf71eb4f1491f87a3a985cc26a7abe7cd290ff7977e3136ccd84c3cbb86b290"
       },
       "gate": {
         "approval_id": "01a1ff3f-cc40-7000-bce5-85f41c4c0b13",
@@ -23813,7 +24247,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-p0.html",
-        "sha256": "e56626e8e0b1e3cd503de8638c8e03f51bcb0d4be93d287e2542dcb647d1e99f"
+        "sha256": "97e66c0c0287655effc188aeab4bcd2589e1c90030c4dcb69cd7c01703f0328b"
       },
       "gate": {
         "approval_id": "01a1ffa9-76b2-7956-98ba-c1d0be651017",
@@ -23906,7 +24340,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-platform.html",
-        "sha256": "907fcc9fd1fccfe084ee1712a05475643d219e4a1e6e7e489dffd02474639084"
+        "sha256": "eeaa9eec94eecf192d5a5c119fc86ac9da1182fc77606f2f64dd44defcc3e8a0"
       },
       "gate": {
         "approval_id": "01a1fdd8-d052-7532-8e66-944a4db595ab",
@@ -24059,7 +24493,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s00.html",
-        "sha256": "64025bb4f174cab8f97061d99795f59e2e238f9d772802a2b459593b6d71e253"
+        "sha256": "9c136330f8a3b0aedd2c0e582b6ddd3bffad87091773373ef2623858cb1c80a0"
       },
       "gate": {
         "approval_id": "01a1ff3b-1a6d-7952-be39-4a4f470ad5c3",
@@ -24152,7 +24586,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s01.html",
-        "sha256": "080621649b76b72ca886cc28e11834a1e2e2d184b36c10fb57da2cedd0529345"
+        "sha256": "626ac719a47b8d7941017442b2bd886f60ffb0764d1b1ed1ee5fcbf29f329932"
       },
       "gate": {
         "approval_id": "01a1ff34-00a1-75eb-9022-02be586d0bb3",
@@ -24245,7 +24679,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s02.html",
-        "sha256": "86761c362171af233bc0cca38cc2e07043115037077f08f35bc5feca63bbe87b"
+        "sha256": "3014bea4b0a026aba51d1faf58817f2de940071a000c670cf7163102da42558c"
       },
       "gate": {
         "approval_id": "01a1ffa6-62ce-747b-abac-c41e9679dde8",
@@ -24338,7 +24772,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s03.html",
-        "sha256": "07ea9d500832acd28bbc2479c267746b177d48664e5a6f5f79a745e02c376139"
+        "sha256": "147bc4a4a0a445d91472a75f99c29d0a62dd8455125d18549aede31e9228f139"
       },
       "gate": {
         "approval_id": "01a20222-df0f-77b5-ad70-b53bcea5ecb9",
@@ -24431,7 +24865,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s04.html",
-        "sha256": "92fe21120f0cbc0ab89015160a864002872abb8f08b053cdfb05ef501c0b9a8a"
+        "sha256": "bb6bcd865b25b08c25da8d3111e8bb1ab950b4204a75ff8c8f037a23198bf46d"
       },
       "gate": {
         "approval_id": "01a20256-466e-7670-9a2b-5fad19bc3e08",
@@ -24674,7 +25108,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-spec-v2.html",
-        "sha256": "a6761519c810b3e8512237c02826016215d709f694c9bea8f0c5d9c14b01460b"
+        "sha256": "399f267d7777c4c9bfbbcfa96c2eeea53a3538fb1a5e915b352a014aa86658e0"
       },
       "gate": {
         "approval_id": "01a1ff44-4454-72c4-803f-78cbc73dfbe0",
@@ -24767,7 +25201,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t0.html",
-        "sha256": "7ec9402a36235121f2998aabb61ea98b6ae20c7b3820c3de09a4d5ae99b966f7"
+        "sha256": "a0d07c36d27ce5b37d0f673d04bd4bf05852071ca3c656bde9d9ed77f1fa502f"
       },
       "gate": {
         "approval_id": "01a1ff48-c258-72af-9643-1c830af6b92f",
@@ -24860,7 +25294,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t1.html",
-        "sha256": "6404c9a04eebcda15b788f97c18eb169140c13c1874857b68d32a080a1992158"
+        "sha256": "0c21a6a42f13a0c295032917f06c96fbff8c78ad8f528c4c834dcf0810399777"
       },
       "gate": {
         "approval_id": "01a20231-0d43-74ad-80ca-42088a1be984",
@@ -24953,7 +25387,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t10.html",
-        "sha256": "440f13a162a0f29046bdad898e7c8d85c95fc9e88a5834884b8b003dcd59ca64"
+        "sha256": "4e4e4ec09fa7c161c9141e5fc55a4bd84b02a0a00b3fac5a9f2fd823864bef94"
       },
       "gate": {
         "approval_id": "01a20289-7d0e-7f76-87e9-f4ffd042a582",
@@ -25046,7 +25480,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t11.html",
-        "sha256": "bc2d2e56327230113c37bebec57747044424987895536c9acf8bc138a6f0da96"
+        "sha256": "1fdb860b85bd74ab803298997361968569902279656fbaabf2849869f96c276a"
       },
       "gate": {
         "approval_id": "01a20232-12d8-70ff-afc9-320a80c262d6",
@@ -25139,7 +25573,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t13.html",
-        "sha256": "5ba3d0b1a7829c5b43be5a47db53db77791f62d7bd5e649520a3edfc37e7a78f"
+        "sha256": "03633df07ed1c9b95a2bcd93dfbe78b057eb1b2ddbf2162bcee26b6f362b6960"
       },
       "gate": {
         "approval_id": "01a202c2-eae1-76ac-8d64-6a548051cc27",
@@ -25247,7 +25681,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t2.html",
-        "sha256": "6dc5bdb1feb6cbdbc4a0eaaa3c050016d2968ef1f9ac3365f6a1673bc2671290"
+        "sha256": "5dec3298f856ff705ca799fd20c65d855890cb7869497e98e7414ce92c87fca0"
       },
       "gate": {
         "approval_id": "01a20223-29bf-734c-9b5f-2543c7f2abed",
@@ -25340,7 +25774,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t4.html",
-        "sha256": "aae1613261ac0bb1e86b459d15656aa79d08b4677849f65be5c858192fbf8535"
+        "sha256": "53d56ce693d27920f3ead91c61c8bb87589b81d8a673d4b68550078f088fbbee"
       },
       "gate": {
         "approval_id": "01a2028d-e2ad-71fb-b3a9-656be39ce8ba",
@@ -25433,7 +25867,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t9.html",
-        "sha256": "33f710d176683f646917fc6268d6cc7635b2624f38eeb2e0b3ef40b10af42922"
+        "sha256": "7cad43aa9f4ad2211eb91cafe3d411903a48fb0fc41b4a39f0237d988803482a"
       },
       "gate": {
         "approval_id": "01a20280-7305-7fe4-b40c-998a13c392fc",
@@ -25526,7 +25960,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "7cc8bcf791791976c93f3ffe43dfef83493e241b1ec07c5b00062aaa52cdeac8"
+        "sha256": "31c15f79916dbdad5be2d421a0526f34ee3216eb97ee4288d305e172aeed4f4e"
       },
       "gate": {
         "approval_id": "",
@@ -25673,7 +26107,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "63876891b8947e2d9a31c589b3a36e7697dd624e80994674beb6145fd09f6ce3"
+        "sha256": "91a8b1cf3c935867efabd6e299023179c400606234b90b6bd0bc962a334b9a22"
       },
       "gate": {
         "approval_id": "",
@@ -25691,9 +26125,14 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 5,
+              "count": 6,
               "file": "msp.json",
               "items": [
+                {
+                  "id": "01a210c9-0d47-7473-8339-7ea7648e59e9",
+                  "status": "planned",
+                  "title": "01a210c9-0d47-7473-8339-7ea7648e59e9"
+                },
                 {
                   "id": "01a1ff21-33f0-7e5a-bafc-b09b6fc73c13",
                   "status": "planned",
@@ -25811,7 +26250,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 63,
+              "count": 72,
               "file": "work.json",
               "items": [
                 {
@@ -25901,7 +26340,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-safe-portfolio-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "a1985d345bfea83e77989562f893ac37d8196ad8418a1fdd84d3195e0902d47f"
+        "sha256": "87381bf7225294bf1a6138da668719be481f1dccac27f20b7911a8583afc2612"
       },
       "gate": {
         "approval_id": "",
@@ -25988,7 +26427,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 8,
+              "count": 9,
               "file": "msp.json",
               "items": [
                 {
@@ -26030,6 +26469,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20c80-c297-738d-bbfa-c19412e7be69",
                   "status": "",
                   "title": "01a20c80-c297-738d-bbfa-c19412e7be69"
+                },
+                {
+                  "id": "01a210ba-c02c-7c91-8ab1-6c51070af1f4",
+                  "status": "",
+                  "title": "01a210ba-c02c-7c91-8ab1-6c51070af1f4"
                 }
               ],
               "kind": "rows",
@@ -26058,7 +26502,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-spec-spec-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "f2fa088593e9684b32b04eca6023ef4e8d454d6410ea49304050e55840945624"
+        "sha256": "f97dab22880ffb219d8d617ac528c545aa0735ca746c2bf5aeb75b8f45548d2a"
       },
       "gate": {
         "approval_id": "",
@@ -26175,7 +26619,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-adm-profile-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "089f3496f94394e5ce9a54fcc90480534bc293c278fa7f9f38f17317550b0d23"
+        "sha256": "48d294a429b3c20f2926d8550fee66a7be26d893a0da4c7c93f44de468caf9b9"
       },
       "gate": {
         "approval_id": "",
@@ -26193,7 +26637,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -26267,7 +26711,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -26341,7 +26785,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -26415,7 +26859,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -26504,7 +26948,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-capability-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "8d90deaef9ebf09ea8a46b7c4bb48ea151b41d017ec9414c7ffe9ca48c536d90"
+        "sha256": "1978a7314e95d03409a30a79e2c96e97d7d78019173abf31c360e4ac649b37a4"
       },
       "gate": {
         "approval_id": "",
@@ -26522,7 +26966,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -26596,7 +27040,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -26670,7 +27114,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -26744,7 +27188,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -26818,7 +27262,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -26892,7 +27336,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -26981,7 +27425,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "dede538364c3079d1991776d601f4baaa4fd1ab381700d4fdc1e86b1459ec927"
+        "sha256": "65eb705d05458959ab68599d7ba40d4d3d23515e46507df1ccb73a96d0df3575"
       },
       "gate": {
         "approval_id": "",
@@ -27000,13 +27444,18 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 1,
+              "count": 2,
               "file": "architecture.json",
               "items": [
                 {
                   "id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
                   "status": "active",
                   "title": "Conveyor Architecture Board"
+                },
+                {
+                  "id": "01a210c8-579b-7808-bc32-aef8899b0b7a",
+                  "status": "active",
+                  "title": "T19F live-gate board"
                 }
               ],
               "kind": "rows",
@@ -27020,9 +27469,19 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 21,
+              "count": 23,
               "file": "architecture.json",
               "items": [
+                {
+                  "id": "01a210be-4ded-728e-96ba-d4805b5f9b29",
+                  "status": "",
+                  "title": "01a210be-4ded-728e-96ba-d4805b5f9b29"
+                },
+                {
+                  "id": "01a210be-3a02-75f3-b39d-5309d7a2cd92",
+                  "status": "",
+                  "title": "01a210be-3a02-75f3-b39d-5309d7a2cd92"
+                },
                 {
                   "id": "01a20ceb-66b2-75a4-ac9f-6ceae8ab187d",
                   "status": "",
@@ -27072,16 +27531,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20066-3107-7b16-8835-6b6cd2aa8c84",
                   "status": "",
                   "title": "01a20066-3107-7b16-8835-6b6cd2aa8c84"
-                },
-                {
-                  "id": "01a2005d-20eb-72af-a5de-4606c0b16008",
-                  "status": "",
-                  "title": "01a2005d-20eb-72af-a5de-4606c0b16008"
-                },
-                {
-                  "id": "01a1ff90-4e19-7bcf-acbf-3f29d980572e",
-                  "status": "",
-                  "title": "01a1ff90-4e19-7bcf-acbf-3f29d980572e"
                 }
               ],
               "kind": "rows",
@@ -27126,7 +27575,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-principles-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "307efe6972b76fc62c21bb394790a03311b66fa363b3b1940ea2ae07bce68d57"
+        "sha256": "884997026861866e7ea589fa8cca89cd1c294b3389436853df4bdbe1d30aefa5"
       },
       "gate": {
         "approval_id": "",
@@ -27144,7 +27593,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -27283,7 +27732,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-artifact-standard-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "a224daa21549b3709d08557007301a61b17d6fbb4e7cb59422757f83f2985dcd"
+        "sha256": "c646d46e381ec587c22032364a0971273f8bbc50edcbb80d509e7bfacf8f7cf3"
       },
       "gate": {
         "approval_id": "",
@@ -27301,7 +27750,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -27375,7 +27824,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -27449,7 +27898,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -27523,7 +27972,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -27597,7 +28046,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -27672,7 +28121,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 258,
+              "count": 265,
               "file": "architecture.json",
               "items": [
                 {
@@ -27762,7 +28211,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-maturity-assessment-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "ac6e4a7e79ec65141751638c68240291875498c617542d4eb33c78b612e5be82"
+        "sha256": "3d4e1b436a7a5c8ae9e4f7852a705cc3a28e3b7e071362b214d5b08e5b0860e3"
       },
       "gate": {
         "approval_id": "",
@@ -28095,7 +28544,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-preliminary-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "47b7b6dc7e89053c50bb7d83973e7fca54bbfd7e4e7bffeadc2b0e2afb57983a"
+        "sha256": "12aceeb53f003f47e834a1e171684b81beed134ee8cf645096f507ed3e73b688"
       },
       "gate": {
         "approval_id": "",
@@ -28113,7 +28562,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 108,
+              "count": 112,
               "items": [
                 {
                   "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
@@ -28187,13 +28636,18 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 1,
+              "count": 2,
               "file": "architecture.json",
               "items": [
                 {
                   "id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
                   "status": "active",
                   "title": "Conveyor Architecture Board"
+                },
+                {
+                  "id": "01a210c8-579b-7808-bc32-aef8899b0b7a",
+                  "status": "active",
+                  "title": "T19F live-gate board"
                 }
               ],
               "kind": "rows",
@@ -28280,7 +28734,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "de107056858474b45e0105f186eafb796d197344051dba3cd7cb57ccf90c19a9"
+        "sha256": "bbd574b2aabc6fc5720529e6eddd169608ff57e3e943c198e4101c641b66a8bb"
       },
       "gate": {
         "approval_id": "",
@@ -28298,7 +28752,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 47,
+              "count": 48,
               "items": [
                 {
                   "id": "01a1ff3d-2d6f-74d9-8d40-93519c0ab130",
@@ -28372,7 +28826,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 47,
+              "count": 48,
               "items": [
                 {
                   "id": "01a1ff3d-2d6f-74d9-8d40-93519c0ab130",
@@ -28446,7 +28900,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -28536,7 +28990,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-reuse-map-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "b4d6c4fbf9f13e8f0cf22325c888c93612d6955da02dbc93033041014ec94a87"
+        "sha256": "0aa983d8b2a4399712a610b22489018a0ab0f4c598c9704a54d0ff4065909d3a"
       },
       "gate": {
         "approval_id": "",
@@ -28594,7 +29048,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-skills-assessment-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "d6f889f6897206b2c65ed7bbed66846d25b3a41325450e126e65b3d0253dc4d6"
+        "sha256": "4a82306ecf3085e3020289cb5e3f98e7230ac06b1f6a22ef1751f7bce8dad8af"
       },
       "gate": {
         "approval_id": "",
@@ -28927,7 +29381,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-design-publish.html",
-        "sha256": "3226db406ab3c186f0bdbc96bc179eb431295ea4dae5af8d19e5ee3b3f7639b8"
+        "sha256": "defb456964c0909cb6c9212bc4e05e1f6450d2ce0debf3b8a9fe06b2cb907b51"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -28993,7 +29447,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-p0.html",
-        "sha256": "e2ecfb59638bca58563aaf2092bc58e960b32fccb83164135a90780ec0b216c3"
+        "sha256": "94a0f91bebda0e8764b263ca0ff4374b52bc5e1a45c9222a86546ec25d74464e"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -29059,7 +29513,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-platform.html",
-        "sha256": "7a75239f5051e44de34011186cb04b2d1b17fc044f337c01d3507a8023bbcdc7"
+        "sha256": "3e907ae56d78b21e80c967060ba409a81dcb45c51048b2c1d8963ed712241b78"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -29125,7 +29579,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s00.html",
-        "sha256": "d9d251da1c368d96b0254d608bf42f798dbc676cf664ca61fcad29fae8f1b1f3"
+        "sha256": "1c9c0a07415e65ee89ec6cfaceb84f0436869fe2a45588c2cf858aab6dc79cad"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -29191,7 +29645,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s01.html",
-        "sha256": "53d118750af3e247e167c12f9ebb5302bfb88b0f255221d16f453c6041e90b90"
+        "sha256": "2be4dd97fd3eea03c6470e11064ea9a6ddbd9ac35b2e635ca5c3619453862f59"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -29257,7 +29711,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s02.html",
-        "sha256": "6f48a95e0201a8c3c3c039eee7e6f91f053ad45e30b3a07a92fd5741cced3f6c"
+        "sha256": "5f0ac9b797acf41a0f15e4b87e957a3782afe0b7526adbce917239ace2d6e46c"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -29323,7 +29777,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s03.html",
-        "sha256": "562014d82c70bbdda4434141288df3b7daca6ca63ec474f911209864a3481a21"
+        "sha256": "3d1df81c944ab67ff5c52b07f60d4d6ede76d7934cb7d87df991e3bd1b860b1a"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -29389,7 +29843,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-s04.html",
-        "sha256": "cd8758ab41cf5ddec1833b7770124e79af0e78f8ca732d57632cc49aa4f53ed5"
+        "sha256": "6181ce00a55b78e496314a5d7f13b66518a0f79bbf3f88bc044b88de9f8ce1df"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -29455,7 +29909,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-spec-v2.html",
-        "sha256": "5ed34efdf18dcdcb3ebd32e1094b940436757fa26b8f1a22766ddefd61c6a8c3"
+        "sha256": "a7a9f54b6a7464f010bbc155e9d01be1a4f6894abc6c6ddaed918ad6a46a52d4"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -29521,7 +29975,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t0.html",
-        "sha256": "76fccd5d77d23aa1a1258d4137b39dc7327dd9322e84ecc077f63748b736ba01"
+        "sha256": "7ab06683d1fec2ec1eba055220326715b495aed498e4443d39ecc477a46bf0a7"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -29587,7 +30041,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t1.html",
-        "sha256": "ff323ae47658470ec51a87729d91a9a8dc6d1e67f0483facbfba791c68e06cf9"
+        "sha256": "f38c6cc7a0da4f6e1db1f7e5fde163749b580f97cac6c504d99ebd05a1fe1714"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -29653,7 +30107,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t10.html",
-        "sha256": "b32f10c50d3b36e5fc3d13f68f1a8080dfc558a66f212233754fb893e8b38e80"
+        "sha256": "2695158a3e28abe5c451c2ca073f2662c6ae13fcf705800ddf003a16453f2990"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -29719,7 +30173,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t11.html",
-        "sha256": "c6c14f22d21d4811612da3550dd46f0b2fd37944330e0befe3a98ff772609a0b"
+        "sha256": "c90a95e546d3b79b3c4407cf981b06e05934309f6c1c13bf0744ec20ee2b5f87"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -29785,7 +30239,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t13.html",
-        "sha256": "3b1b841238a47c92de838a851d16c3366f3dd6eab5d8c1722fdd93ad5017e9db"
+        "sha256": "7848ef40498395e214409502a7ae81390b3d71fc6a88b54d7093f37ae7cfca03"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -29851,7 +30305,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t19.html",
-        "sha256": "b6509835940828b6179d953e6744981cb825a786f6b30d8b7dc70cc9f8c79d0a"
+        "sha256": "ec4f486c687f6c1a7b8587c84eb48eb36d3b3550862517798f19220cd62c1ad5"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -29916,8 +30370,74 @@ window.CONVEYOR_STANDARDS = {
       "category": "architecture-analysis",
       "covered_rule": "",
       "document": {
+        "path": "docs/standards/std-togaf-architecture-analysis-t19f.html",
+        "sha256": "5e5d759f6ef9ba70e29b699aeab79720f00365816e32180a649c8e8a04d288d1"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-architecture-analysis-t19f",
+      "level": "project",
+      "mandatory": false,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-architecture-analysis-t19f:T19F",
+      "package_published": false,
+      "sections": [
+        {
+          "heading": "Current state",
+          "missing": [
+            "No row or document satisfies 'Current state'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Options considered",
+          "missing": [
+            "No row or document satisfies 'Options considered'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Risks",
+          "missing": [
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Dependency map",
+          "missing": [
+            "No row or document satisfies 'Dependency map'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+        "key": "T19F",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+      },
+      "subject_kind": "project",
+      "title": "Architecture Analysis — Follow-on: docs/plans/T19F-meeting-bindings.md"
+    },
+    {
+      "category": "architecture-analysis",
+      "covered_rule": "",
+      "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t2.html",
-        "sha256": "bad0ba4df72c828ad796df2daa89b14a5b3859de58abae5c7f71f6eab9710423"
+        "sha256": "ab87d9305d2470300d7ee5ef16ba0d3f86a56e82e098e64978c79b1c84b054fa"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -29983,7 +30503,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t4.html",
-        "sha256": "3399ae9b16baa81ca73f778d7fa99ca6a2a67df451342798ffa21a5c37a9e66e"
+        "sha256": "174b1c453755167775d6ecb660e1884ba21839e189dd7a4d8863aee9fd8850f8"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -30049,7 +30569,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-analysis-t9.html",
-        "sha256": "a995a98d747bc4742254e805196e40a000a6ac8149b0a128b11676595651b0cb"
+        "sha256": "b2662f92242e73632fccbf84958c443e55b49b1e1e3fd6bbd4be7084e42ac473"
       },
       "gate": {
         "approval_id": "",
@@ -30116,7 +30636,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-3-2.html",
-        "sha256": "5e998c80965b94b25d3de13560052550e31caf5d2009f469a190cec1ff4468fb"
+        "sha256": "19bd7596dd7516526232202e7056b04a127dffa8e6c2dc2574c5f7abf79e66b4"
       },
       "gate": {
         "approval_id": "",
@@ -30167,7 +30687,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -30276,7 +30796,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-aaa-ui-proof-285-2026-11-19t07-4.html",
-        "sha256": "9b4011a8066ebbadc53e2832e1b86ac6f945bab9dc6884fbe0ce268c4680a64e"
+        "sha256": "1b6961fcba3e4abe5ea561d9bb7db1ef9b756210f36900655b9208cb0c865b54"
       },
       "gate": {
         "approval_id": "",
@@ -30327,7 +30847,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -30436,7 +30956,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-design-publish.html",
-        "sha256": "8517425c442d39a254e2840f513caec80c7978735b1a15a136bc7411f4d770ae"
+        "sha256": "950e51e6a50b15b6e3d3b111531ca619c581ae160d42ab241f4b1c21e001060f"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -30605,7 +31125,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -30714,7 +31234,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-p0.html",
-        "sha256": "1332cc78cc9aea93ddef6ec3f8367deb7e00634c8e995df02657ce1a731c8fff"
+        "sha256": "3fcb62edef06343cf19a96f287d54ca880c68caa0c6f0c00cf4089e1a1a1181f"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -30883,7 +31403,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -30992,7 +31512,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-platform.html",
-        "sha256": "180b97af1abcd00774487fb94f762b915cddb3857db5192d055f326c618c2b01"
+        "sha256": "b4e7c25b159ce57f399634adb75f05c9362c7cde108b7ad05845cacfbfcb82d4"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -31043,7 +31563,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -31152,7 +31672,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s00.html",
-        "sha256": "746b33605cbdd3672db6a87f59f56e27e172bb1d6409d68a213285b4aed92e76"
+        "sha256": "cae59014f058056c199f0e3a1871499d79d01591af8d2dcf0b9c74067f12830d"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -31321,7 +31841,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -31430,7 +31950,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s01.html",
-        "sha256": "38a4a22b56bf76fcc82e6676bcd67776f71f6af041b3b3e397543e7a84bf162c"
+        "sha256": "e9bdf54b6fee6997bf7079b370d2d3a4f0eb81d14d0ebf5475fe60c816e7de7a"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -31599,7 +32119,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -31708,7 +32228,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s02.html",
-        "sha256": "f8d5b6d4dbcf4a201cc847399ef9e8ccbda8d7de5f27c9e065cba05d1cc70d20"
+        "sha256": "de09b3c9af72a8dcc34840eddd20ee1942947ebc6392fb3f43e34dcfb0790bbf"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -31877,7 +32397,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -31986,7 +32506,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s03.html",
-        "sha256": "65d54dca338761afdf70de4a255be235e657841577de254249b65356ca7ecfb0"
+        "sha256": "9cd47525726985280bc38705194413dbbc2979502ea175e2b17f67436428019c"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -32155,7 +32675,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -32264,7 +32784,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s04.html",
-        "sha256": "5ffe5b29f8f96c61a3d2f52fbfcbdc17fbf63f98acb3827b87bf87dc8513931a"
+        "sha256": "503de431bf2c66bf4530a5a5a0bcdb2e44ab044dde774c96c5434f024008479c"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -32383,7 +32903,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -32492,7 +33012,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s05.html",
-        "sha256": "f2f70f7a39971e49bc365720ff1803bf7071b525f92c33974fabf2c6376d74ab"
+        "sha256": "36882af8fc3f4f0cf24cf694c6d4ae257fdf8542d73a618ed516d7ee496103c0"
       },
       "gate": {
         "approval_id": "",
@@ -32543,7 +33063,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -32652,7 +33172,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s06.html",
-        "sha256": "490e9f2e8814d4081bfa01294f824c41e3121ab85e67507005354e5a3d4a0081"
+        "sha256": "dcba0f47d502742c4548236d8861eb4842463c9a46ba6951583998f8b55cef14"
       },
       "gate": {
         "approval_id": "",
@@ -32703,7 +33223,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -32812,7 +33332,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s06a.html",
-        "sha256": "c0e0eeeedf7cd75930eed9d35d99040a6a57b2c3bd95dcee2025e7ca427691d9"
+        "sha256": "adc16bd4d06c6a33eb09d1836153ac833c06e7b56746464029bf702d76729b7e"
       },
       "gate": {
         "approval_id": "",
@@ -32863,7 +33383,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -32972,7 +33492,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s06b.html",
-        "sha256": "579fe494f2c0c8639eb2c21368139aa538c6bb657d851ffd2bc499a1e83cf4dc"
+        "sha256": "1eff12922b939f8dece27041bf39769ef2e1254c9138f98fb031fa5ae93a844b"
       },
       "gate": {
         "approval_id": "",
@@ -33023,7 +33543,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -33132,7 +33652,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s06c.html",
-        "sha256": "6364403dfd2b7698f5f353232cd660d1a4a4456469fa2d47505e909535bc1634"
+        "sha256": "c0f35068a9458872479fc7322e3021fd441934af349eec9c5c57e5bace79aa70"
       },
       "gate": {
         "approval_id": "",
@@ -33183,7 +33703,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -33292,7 +33812,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s06d.html",
-        "sha256": "1d8b30aa7aa959593c4d86844ff2daeb255115cc14de893c37428644d2766a76"
+        "sha256": "167a22864f4d8281f38a3cdaabc77069df1ac746d7a4e3fa66ed015db2e93522"
       },
       "gate": {
         "approval_id": "",
@@ -33343,7 +33863,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -33452,7 +33972,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s07.html",
-        "sha256": "ba348151d956ddd3a5b1e14e7bccafe82907cf3f0869379a392765d90fb1a934"
+        "sha256": "608ae1de84993e295a4385110de4f557ea2afbdd0d9e51b1d0969aecb5a4777a"
       },
       "gate": {
         "approval_id": "",
@@ -33503,7 +34023,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -33612,7 +34132,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s08.html",
-        "sha256": "97545e5d7cd8cc35a9ae16c865cd2551408e562e8ebb2b82a3867019b9ef4b5a"
+        "sha256": "e00da0be31ac9699cd58332d6dc44cd7d62ec727f41f623142ceb61e1bc45704"
       },
       "gate": {
         "approval_id": "",
@@ -33663,7 +34183,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -33772,7 +34292,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s09.html",
-        "sha256": "fd9fbf3bf215cbe8471b00a8f34edb2012ad9795a1414de255e24d7d7f9d9674"
+        "sha256": "d1e5ee9eb745ea3eda58085e2d591201ea0c799efa0cb3a9c23aa93e441679e0"
       },
       "gate": {
         "approval_id": "",
@@ -33823,7 +34343,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -33932,7 +34452,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s10.html",
-        "sha256": "b1c106078a51e97cf36a80cef443259f5afd9da2b57ec588faf463da9973c22e"
+        "sha256": "4e43961762ffa06c035dbace9bd3e7fc222552f0f6e3049efeef34800976804e"
       },
       "gate": {
         "approval_id": "",
@@ -33983,7 +34503,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -34092,7 +34612,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s11.html",
-        "sha256": "0fe96a76dbc69a9b485ae4d4a6e422c653d2d11c5342076d1c1ca710ba17133d"
+        "sha256": "68a90822907474ad46a337f205c7b95e246b34bb39fc96d234d58e460947c0a6"
       },
       "gate": {
         "approval_id": "",
@@ -34143,7 +34663,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -34252,7 +34772,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s12.html",
-        "sha256": "696a3beb3471b1f80672ae4b459b51d1be425aca1528a8b7a3fa411a62df5ff9"
+        "sha256": "4ee02f8e1966f20b24da90daddf68c4d5a7043dbcdfda6a38722c82e468abb1a"
       },
       "gate": {
         "approval_id": "",
@@ -34303,7 +34823,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -34412,7 +34932,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s13.html",
-        "sha256": "cb0225dd4582648d11bd5b70361678e3447167f9fce41d7affb54d0429673b93"
+        "sha256": "9648b0ed3046b675873d3fedb1660f86885b421f5f26ddec4b7210c83dc1faa6"
       },
       "gate": {
         "approval_id": "",
@@ -34463,7 +34983,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -34572,7 +35092,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s14.html",
-        "sha256": "0bd291d0f8b8ffee843c534ca97a3b9b0939dbc4b48e35337812cd8ab0c85115"
+        "sha256": "58c7fcb020c3cae5d2076d55ca6bf1f1feba89dc9caf40564e43f2f008d44d05"
       },
       "gate": {
         "approval_id": "",
@@ -34623,7 +35143,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -34732,7 +35252,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s15.html",
-        "sha256": "4f938efbb898d0b5df44471c651cce6676e806fc79774057189c198d50270888"
+        "sha256": "2cd222204b99f601954da1759e9496dc7e09538e87f58020acf73ac4bb56d4a7"
       },
       "gate": {
         "approval_id": "",
@@ -34783,7 +35303,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -34892,7 +35412,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s16.html",
-        "sha256": "43647628352110273ccf45c85e33d1fdbe8faa1dddeef9c23300c9258c516794"
+        "sha256": "f98e8ec7476a2447278f374f91491fcc8125da13f2109dbcf4f117655f0427d0"
       },
       "gate": {
         "approval_id": "",
@@ -34943,7 +35463,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -35052,7 +35572,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s17.html",
-        "sha256": "5aaddeca9b9e71a6f22d437254fff19052af8092fb7672803f1974155c5aa009"
+        "sha256": "85a23eb7f03b495aee452a269fcb7505e133c039ade7fd846b04e1b5aa29b17c"
       },
       "gate": {
         "approval_id": "",
@@ -35103,7 +35623,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -35212,7 +35732,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s18.html",
-        "sha256": "16876383c19ecc441efab140334c134914fe10dbae9c70092ab8dcc93c19c680"
+        "sha256": "6dcd496ac890b3e36db3a4c3e6f3d74d6b467c9a0086cbe4a9ccc688d6d294da"
       },
       "gate": {
         "approval_id": "",
@@ -35263,7 +35783,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -35372,7 +35892,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s19.html",
-        "sha256": "6de653d696749486bd267981493c93d1b5b8817fbb23fbe82621283ea7107ee9"
+        "sha256": "4d495ff96da90a3c3f1ecd62de20090f2317a8898218136f6045cb031a40648d"
       },
       "gate": {
         "approval_id": "",
@@ -35423,7 +35943,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -35532,7 +36052,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s20.html",
-        "sha256": "155dc8908ad5e8261077a9e2e356a315606c67df344773e9432ea7ed13d3e6cc"
+        "sha256": "71220eb46db08401d0025a6222039795b064ebadaf669c571fd866cc54d4d99f"
       },
       "gate": {
         "approval_id": "",
@@ -35583,7 +36103,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -35692,7 +36212,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-s21.html",
-        "sha256": "ddc441175ee37ce8d4d856556e065b720ec2587b73fe122092398e4e106c292a"
+        "sha256": "631bd6bd17891206cc54c21fe52cdddab4ac7dc47ae010cdc2f8bae5ae9c98cd"
       },
       "gate": {
         "approval_id": "",
@@ -35743,7 +36263,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -35852,7 +36372,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-spec-v2.html",
-        "sha256": "37ab1708ebf1d14a647be0a89dfd3067500831c31ca6e707e1f8f7d65f06c1e3"
+        "sha256": "156a1e3d58c25b57bfb2f105f37de3da14f85d4574edc385e9e4675af329f8d5"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -36021,7 +36541,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -36130,7 +36650,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t0.html",
-        "sha256": "ed161559be5ef80206ac796fd25a5ff1b74a2a185e8efcdff042f2e0f595ef29"
+        "sha256": "f5102a6c69664b5df8155727dbc0fcaf3f8a0bdf191e4215ca011bf479fe1bd6"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -36299,7 +36819,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -36408,7 +36928,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t1.html",
-        "sha256": "6b68cce83a1409d72046d3682cd62138d51051fc2ecc5c62693c745b5a1577d4"
+        "sha256": "e034c5418688d38aa42237fc1c87f6b875cb99384ae6e5366a862e906a668c32"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -36577,7 +37097,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -36686,7 +37206,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t10.html",
-        "sha256": "9958a667aec874aee0c65ebbd18d861c10062d986b1470a6d7d531cab8adb445"
+        "sha256": "d2e9c97bafc53494536b6a699dc4c090b0fbc4638e4a6666ad1804b555691a8e"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -36805,7 +37325,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -36914,7 +37434,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t11.html",
-        "sha256": "e1e6e38b11cbdce8401142ca41c9ee9ff1da4e50a221d433dd5d4a92a99b9bc3"
+        "sha256": "b0bffe031e4112c05aa78f094771794f3b4811d9b98f8fa1177601b8011f1e5b"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -37083,7 +37603,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -37192,7 +37712,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t12.html",
-        "sha256": "e3f9833721bc4f57eec60576e8c402bd300897a6cf6386cbc7fe88412e12bb2f"
+        "sha256": "fedf7e2b9c4374be7ca036ef3e959f7b99b4d17cf627ba30e192bb60bd006589"
       },
       "gate": {
         "approval_id": "",
@@ -37243,7 +37763,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -37352,7 +37872,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t13.html",
-        "sha256": "c90bd7d9fe0574ec27d4713a8ef2947914107af314170747ac7b4f8008804d59"
+        "sha256": "b68b2a5e13b9c684c706420c5e7f2fa357e13f1564bc44f03fd727f67414f6f1"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -37471,7 +37991,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -37580,7 +38100,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t14.html",
-        "sha256": "f37ee96b649faa84defcd7cc9fa5b90bfc6b23987d8e42f574c0f4d943b64c25"
+        "sha256": "7a94026f208c18ac301053572d6f766184769b21e647c9baf646d0e08205b14e"
       },
       "gate": {
         "approval_id": "",
@@ -37631,7 +38151,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -37740,7 +38260,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t15.html",
-        "sha256": "34f7f998e1815b0a3a1ef55e5b140b02319b467e837e09461b2b2a6f39b17b4d"
+        "sha256": "4598514309c86804d9be98782e4f0f35493fc114539db4d36b41e1b0ff8cbe23"
       },
       "gate": {
         "approval_id": "",
@@ -37791,7 +38311,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -37900,7 +38420,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t16.html",
-        "sha256": "92a983a4d29a9878b28969f2d9d46aa008260f7d09ab90de484b8a83962104cd"
+        "sha256": "2aa46f756b3dde0ec1436a6e2d15ed12e17306b59df6125e3aca511596d8d18c"
       },
       "gate": {
         "approval_id": "",
@@ -37951,7 +38471,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -38060,7 +38580,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t17.html",
-        "sha256": "59652ec71e04234e6e28b2b0ea5cf334f2bf6e448dcd3eb60482cd85d53b749c"
+        "sha256": "870783041850981818f7411a77e577c798cefa18a24a8215c571b871a0af8122"
       },
       "gate": {
         "approval_id": "",
@@ -38111,7 +38631,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -38220,7 +38740,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t18.html",
-        "sha256": "74a529bf305edea20d7f4d4a10313acced89a64cef88d11c392a502d7ff4ab7a"
+        "sha256": "ea13affae6c9e10377e79e3bac00a0c588368fe3014a1c2f583b805575278c47"
       },
       "gate": {
         "approval_id": "",
@@ -38271,7 +38791,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -38379,7 +38899,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t19.html",
-        "sha256": "4c438b15c5f09f3f1f1ac12a0534d46394df6166f00b08c1df9ec9d0bffdfefd"
+        "sha256": "8e530d43ba4d53f9f6b07f795570b3f74fe483fb2df71053a43ec6f79814de11"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -38497,7 +39017,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -38605,11 +39125,240 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "architecture-artifact",
+      "covered_rule": "mandatory_artefacts",
+      "document": {
+        "path": "docs/standards/std-togaf-architecture-artifact-t19f.html",
+        "sha256": "16d578d99cfa98f641b5c5763f72dcff0c2d8bcc8f42a8b2977fda0c43a1ae5f"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-architecture-artifact-t19f",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-architecture-artifact-t19f:T19F",
+      "sections": [
+        {
+          "heading": "Metadata",
+          "missing": [],
+          "sources": [
+            {
+              "count": 7,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+                  "status": "approved",
+                  "title": "T19F — Drivers, goals and objectives"
+                },
+                {
+                  "id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+                  "status": "approved",
+                  "title": "T19F — Requirements catalog"
+                },
+                {
+                  "id": "01a210bc-465a-7d83-b9c6-7c7b089d8b02",
+                  "status": "approved",
+                  "title": "T19F — Solution concept"
+                },
+                {
+                  "id": "01a210bb-cfc9-72ec-85f5-619bf730fff9",
+                  "status": "approved",
+                  "title": "T19F — Stakeholder map"
+                },
+                {
+                  "id": "01a210bc-6b09-7785-ab85-5e72fc64997a",
+                  "status": "approved",
+                  "title": "T19F — Business capability map"
+                },
+                {
+                  "id": "01a210bc-92bd-71d7-964f-8d9761e78baa",
+                  "status": "approved",
+                  "title": "T19F — Data entity catalog"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/artifacts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Entries",
+          "missing": [],
+          "sources": [
+            {
+              "count": 7,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+                  "status": "approved",
+                  "title": "T19F — Drivers, goals and objectives"
+                },
+                {
+                  "id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+                  "status": "approved",
+                  "title": "T19F — Requirements catalog"
+                },
+                {
+                  "id": "01a210bc-465a-7d83-b9c6-7c7b089d8b02",
+                  "status": "approved",
+                  "title": "T19F — Solution concept"
+                },
+                {
+                  "id": "01a210bb-cfc9-72ec-85f5-619bf730fff9",
+                  "status": "approved",
+                  "title": "T19F — Stakeholder map"
+                },
+                {
+                  "id": "01a210bc-6b09-7785-ab85-5e72fc64997a",
+                  "status": "approved",
+                  "title": "T19F — Business capability map"
+                },
+                {
+                  "id": "01a210bc-92bd-71d7-964f-8d9761e78baa",
+                  "status": "approved",
+                  "title": "T19F — Data entity catalog"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/artifacts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Links",
+          "missing": [],
+          "sources": [
+            {
+              "count": 90,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a2024e-cd30-7d63-bd93-d205437a6f40",
+                  "status": "",
+                  "title": "01a2024e-cd30-7d63-bd93-d205437a6f40"
+                },
+                {
+                  "id": "01a2024f-63e2-7110-a747-18959dba4894",
+                  "status": "",
+                  "title": "01a2024f-63e2-7110-a747-18959dba4894"
+                },
+                {
+                  "id": "01a2024d-0735-7180-9559-835e2cce862e",
+                  "status": "",
+                  "title": "01a2024d-0735-7180-9559-835e2cce862e"
+                },
+                {
+                  "id": "01a2024d-5680-7185-8d82-4b168bac1a97",
+                  "status": "",
+                  "title": "01a2024d-5680-7185-8d82-4b168bac1a97"
+                },
+                {
+                  "id": "01a2024f-1887-77ee-b729-79f93dd974da",
+                  "status": "",
+                  "title": "01a2024f-1887-77ee-b729-79f93dd974da"
+                },
+                {
+                  "id": "01a2024d-a147-7ce0-b1d7-e2d50ce8d75f",
+                  "status": "",
+                  "title": "01a2024d-a147-7ce0-b1d7-e2d50ce8d75f"
+                },
+                {
+                  "id": "01a2024e-8168-7c92-9618-075610bc6d79",
+                  "status": "",
+                  "title": "01a2024e-8168-7c92-9618-075610bc6d79"
+                },
+                {
+                  "id": "01a2024d-ec12-7a07-8de9-6af88ec17e3e",
+                  "status": "",
+                  "title": "01a2024d-ec12-7a07-8de9-6af88ec17e3e"
+                },
+                {
+                  "id": "01a2024e-3669-795c-8d13-2244bb655fd6",
+                  "status": "",
+                  "title": "01a2024e-3669-795c-8d13-2244bb655fd6"
+                },
+                {
+                  "id": "01a2024c-c0d1-7b48-b518-f484ab6e58e4",
+                  "status": "",
+                  "title": "01a2024c-c0d1-7b48-b518-f484ab6e58e4"
+                },
+                {
+                  "id": "01a2024c-78e3-7bc8-aed1-116fa2b9c6a9",
+                  "status": "",
+                  "title": "01a2024c-78e3-7bc8-aed1-116fa2b9c6a9"
+                },
+                {
+                  "id": "01a2025b-5101-77bb-92c2-5e046c21eb0d",
+                  "status": "",
+                  "title": "01a2025b-5101-77bb-92c2-5e046c21eb0d"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/links"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Document",
+          "missing": [],
+          "sources": [
+            {
+              "category": "architecture-artifact",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a210be-6a72-77d4-ae4f-9ab9fa3c7f2a",
+                  "title": "T19F — Architecture artifact (the typed TOGAF set)"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "evidenced",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+        "key": "T19F",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+      },
+      "subject_kind": "project",
+      "title": "Architecture Artifact — Follow-on: docs/plans/T19F-meeting-bindings.md"
+    },
+    {
+      "category": "architecture-artifact",
       "covered_key": "mandatory_artefacts:T2",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t2.html",
-        "sha256": "26f664c9e8e9114d7c53e0639bfcd244d4cdbe3a8bb406053875bc84fe884819"
+        "sha256": "c126eb074a212974b7c178c4790308e4317c73f275b56315463ca16e4640874d"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -38778,7 +39527,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -38887,7 +39636,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t3.html",
-        "sha256": "755fbcd13a52ff0b0d5f5340c6a49c25556c4ce8cba9aa4dd1de70387a0a64a4"
+        "sha256": "ce328b0b8e6c8f601a07172a6b6e002be65121d578d7018a90a95adab89fcc9a"
       },
       "gate": {
         "approval_id": "",
@@ -38938,7 +39687,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -39047,7 +39796,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t4.html",
-        "sha256": "0159b7fcff025626f99eb9df49d23e937b3d048347e4731303b18a3561dd5f1e"
+        "sha256": "78357eb6e840bb4485f8777dfdc5d416f670edca603e8c4137d548515ac28f9b"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -39166,7 +39915,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -39275,7 +40024,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t5.html",
-        "sha256": "597ca2e6091af203c97a826d8738d0e28823aeb7a84d2e0b833c039059da11ce"
+        "sha256": "50fd25f1cf058ba313d497fba0a15042539ba3d356bceb065b1d1a0f749c1de8"
       },
       "gate": {
         "approval_id": "",
@@ -39326,7 +40075,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -39435,7 +40184,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t6.html",
-        "sha256": "74a9c0a322b1c8819b4044747970e3bdd8f1f977b9cbee438124f481362b49ed"
+        "sha256": "3ec9747db3c485b68b005dc369e936e795a3232a64af6f50e3c1ae94bdff4144"
       },
       "gate": {
         "approval_id": "",
@@ -39486,7 +40235,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -39595,7 +40344,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t7.html",
-        "sha256": "c69f31e3ea0574bdc09dcca2b2f752655b54945e39484917b5a456dd7d491506"
+        "sha256": "32d344772ddaf5d88f0a52165426a61ab270a4150fa94660fc87d6ebcec8ebc3"
       },
       "gate": {
         "approval_id": "",
@@ -39646,7 +40395,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -39755,7 +40504,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t8.html",
-        "sha256": "fc0662653c18faf46ed8051e9ffdea303cb700cb2d5cd405984104a1bb1ed8b3"
+        "sha256": "ec1627399aa2901c8b614d48017407b863f1bc0031688f10f1ba8a308b0b3443"
       },
       "gate": {
         "approval_id": "",
@@ -39806,7 +40555,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -39914,7 +40663,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t9.html",
-        "sha256": "b2749abbf8ac320b4ea15093a94ca2ab846adf20373839e691382dec10185393"
+        "sha256": "ea90227bf6e4571a3749f74b45e09b6c2343aa7b983612b902abdcccc5e50ada"
       },
       "gate": {
         "approval_id": "",
@@ -40032,7 +40781,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 83,
+              "count": 90,
               "file": "architecture.json",
               "items": [
                 {
@@ -40143,7 +40892,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-design-publish.html",
-        "sha256": "8d529b221aaea72908720f28d73f3cf63679935ffd78ec540d2b26f01a9263d2"
+        "sha256": "addfd125e4c44d8962ec64cf1d17265d7f1f1c3d4dcbb337f340183c8736b75c"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -40217,7 +40966,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-p0.html",
-        "sha256": "8a2060c98a95f40c1c16342d424287e3d62ef0c69e320ece20f02d54214eb30f"
+        "sha256": "1a25ee3107f63eddfafd391e838263fdb1a67afc656a1ad160b0ec6ed1c6c745"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -40291,7 +41040,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-platform.html",
-        "sha256": "e9200c5d64bbf86f9410bf94cacbbbf2836c734042c4e5bbd77296a4215d8d9d"
+        "sha256": "0d5f1a8cd34b9bc5376f4e83668947bc5803568a0d7de33c8c7e2cd571338b7b"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -40365,7 +41114,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s00.html",
-        "sha256": "e5956982b8891de13c92b0580b4182490ffab69e138ac5950869278a104909ed"
+        "sha256": "eaec52495be07f27e39fe123b412d3311318f636efb5df808affbd9fe71935f8"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -40439,7 +41188,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s01.html",
-        "sha256": "5de327dea90d6a7da458d38b4629ee05471c6cc65e21c597e6cfbd5685f96580"
+        "sha256": "ebb26256d5b36d91e495bddeb1c2b4c6be9739976b162d939b6bb37077f238b9"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -40513,7 +41262,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s02.html",
-        "sha256": "23c1324a081550bae356b83de287defa4915fa846be52ffad17af94c21e437ea"
+        "sha256": "58999a29e5b72021c25eca59f7b49a7d12624d6ba55f65a7e0096afc7be75fa2"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -40587,7 +41336,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s03.html",
-        "sha256": "c5ef2357784eb1ed277285986f71a624f0ad7100aafa50b0ce12a089f744428e"
+        "sha256": "6525d5b49020ccf345f5d289dff255509678d6931ac66ae1fa450127289db8b0"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -40661,7 +41410,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-s04.html",
-        "sha256": "7573d89daa6ad7790650ffbd57851b160ce80d1237ac1ee83c8a8b1c96d3e200"
+        "sha256": "cbcede8a1cb07224a4928d3486c1d928342f8cb54f0e87e94d8205c442106df7"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -40735,7 +41484,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-spec-v2.html",
-        "sha256": "0020be7425bb12433e5dd774ef3bb858f219f5488faf52368c27b90c18d7d2f0"
+        "sha256": "9cdf0128b08d47f0bfafabac08a7c8cedfe9e8225b271c099c080857b27a91e1"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -40809,7 +41558,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t0.html",
-        "sha256": "f340963ddd1ca2a5b351c1b208547cbacb007a02ab091a3ef50bcb1bc8ebb2e3"
+        "sha256": "07c18b51da76e18f210954c707412005b164345b9a4861fa7b9d2f6d0d8e00a3"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -40883,7 +41632,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t1.html",
-        "sha256": "6a4ee3f5b675d1eb7b108841e75a9a611a09cf5e5eec4974d7c41733dcba5e99"
+        "sha256": "6a28f968bc2137d1236f897e2be65179885f4f33f1284d19d55c7419e2f4294c"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -41009,7 +41758,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t10.html",
-        "sha256": "d1059aceecbb20843abad5783d58f5dc4a214d31d1845b4adb712dedcc8346de"
+        "sha256": "19e82ad1d458171f99fb38727334ce094579613efb290e6e8b259e00ef2d24db"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -41083,7 +41832,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t11.html",
-        "sha256": "39bb71ae014bd3d2ad5d121bcd27c776122d2f25487893463ced0f35cd7d213c"
+        "sha256": "9002e14781c9a37a268b5d3dd68710a0868417b7d6a8bdff7ba12de44fbd2386"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -41157,7 +41906,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t12.html",
-        "sha256": "e32fe6359324cf98537bfb16bb86184969e02f2e59e5a0d17f42b166280f9e40"
+        "sha256": "9503091a68a70d1ea038f4f00e1d15a0aada07a1014ec7f5fb23e7f555d2cd45"
       },
       "gate": {
         "approval_id": "",
@@ -41295,7 +42044,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t13.html",
-        "sha256": "bc0680438df6a3124ec6c936bbc9c670d0c8dd091f1bc43ef5d4daab6695275f"
+        "sha256": "148be6b3ee618bb3d9e380da790dc677258c12e7c4bdb281b4b89f3f8d4fc7b3"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -41433,7 +42182,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t15.html",
-        "sha256": "02e5d9b2d360a1b7b34d57731130de0f28abd4705c1489a93ab9b900f470182d"
+        "sha256": "76facb81d5200c244dd88d4f4ddb8cef694315c14c445b78212a5e7710621f6f"
       },
       "gate": {
         "approval_id": "",
@@ -41571,7 +42320,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t17.html",
-        "sha256": "45de9e497a6608c08aeedae05aa5612409a8e71ec5d427d42a65ef4b3b58bcd0"
+        "sha256": "6dbb0271d773c87b5461ebe0d4c0aa06af082a199f29dfb58e7f3b1fb3c9de2f"
       },
       "gate": {
         "approval_id": "",
@@ -41709,7 +42458,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t18.html",
-        "sha256": "20f9d6c8906672c338e0cc1bd5b395317db666faddb5af2ee53b8cb9a11b3800"
+        "sha256": "721ed43a33cff981924ccf7fa3b5dcab7fdcfc904b85dd50a8685ecbea0800e6"
       },
       "gate": {
         "approval_id": "",
@@ -41783,7 +42532,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t19.html",
-        "sha256": "6e410565907dd9d4ce09aa5ef4c9dc2dd99679dc6838752d9e6ba8fcc06d3d13"
+        "sha256": "96e24e55fc56b3f39174d9638224e0f4cab7e142253ec1758d969c13d4b8e4c0"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -41920,8 +42669,82 @@ window.CONVEYOR_STANDARDS = {
       "category": "architecture-design",
       "covered_rule": "",
       "document": {
+        "path": "docs/standards/std-togaf-architecture-design-t19f.html",
+        "sha256": "eb2944f976c8bb6058a7543856ed6b940468f1d239121628b43279a9824895ff"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-architecture-design-t19f",
+      "level": "project",
+      "mandatory": false,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-architecture-design-t19f:T19F",
+      "package_published": false,
+      "sections": [
+        {
+          "heading": "Context and boundary",
+          "missing": [
+            "No row or document satisfies 'Context and boundary'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Aggregates, tables and actions",
+          "missing": [
+            "No row or document satisfies 'Aggregates, tables and actions'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Decisions",
+          "missing": [
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Acceptance",
+          "missing": [
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Architecture artefacts",
+          "missing": [
+            "No row or document satisfies 'Architecture artefacts'; a document exists but lacks the heading"
+          ],
+          "sources": [],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+        "key": "T19F",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+      },
+      "subject_kind": "project",
+      "title": "Architecture Design — Follow-on: docs/plans/T19F-meeting-bindings.md"
+    },
+    {
+      "category": "architecture-design",
+      "covered_rule": "",
+      "document": {
         "path": "docs/standards/std-togaf-architecture-design-t2.html",
-        "sha256": "9d063c5d7062254cef746114d38bcef73daff8cb5b8cccfb41fb5d5fc9190040"
+        "sha256": "853d9db1a313dea1cce3074631f4cf69dd1fe516f66cfe0b76d5a9f058e9a879"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -41995,7 +42818,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t4.html",
-        "sha256": "6f0355670490800a6c5f5e766393ae6327270152ca3d1c7ce5e16599362a454c"
+        "sha256": "134e590b1a853522db67d47dcef5604f68855bc80dab97a230dc71a7f3a2b412"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -42069,7 +42892,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t5.html",
-        "sha256": "6eab3413cf83c93303bee0451ce2b1d9d3fe2844d06c6465512a2518a179c21e"
+        "sha256": "7b7a4cdc534ef6ed07022256ba3ca45269311b53ad6a74d3ae58ac30d335253a"
       },
       "gate": {
         "approval_id": "",
@@ -42207,7 +43030,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t6.html",
-        "sha256": "b40f465ce64c2dae93588798f1409ca285d876af480ff0cb382ba21d3eb868b9"
+        "sha256": "394861bdde1394cdce32bdd77764a8956f4b002cefa16058729a7238d6fa4690"
       },
       "gate": {
         "approval_id": "",
@@ -42345,7 +43168,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-design-t9.html",
-        "sha256": "78d6b6ee131a787c96736302e799e5105a8f0ee5a699d43af6cfeebde022ef2f"
+        "sha256": "93462e4eb77f53f069329bdd5a7cebcb2e2dcc77ddaa779a3a090de9df370a8c"
       },
       "gate": {
         "approval_id": "",
@@ -42484,7 +43307,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-design-publish.html",
-        "sha256": "53efc514cca963147fb7d756b582497293d0582c8ce7f6ff950ca1eeb1973f24"
+        "sha256": "1faa5aee69d6cd414f02b4e8d3870d35c065da5d23606fc146cdc62be1319b23"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -42595,7 +43418,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-p0.html",
-        "sha256": "a8751d1b069ec7f0b21abd86647cd84ac84e6dd592e2c4b345298c22b3d69fe2"
+        "sha256": "401ae39cfb66557a622e3a627e88f20a84b51ebd69b84321d9ad550a46d8ad64"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -42705,7 +43528,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-platform.html",
-        "sha256": "30c8168bc2a657385c6a9cd91d7d9df03f01aab0f2d5f480742a20199ef29e62"
+        "sha256": "d99fcaf9f3949c95b1a07d77e3fc953bde0bc35f9ec2fd7233984e80e2fc67e6"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -42827,7 +43650,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s00.html",
-        "sha256": "fca8780d1d7766ebbf1803ad8b1ae12200fb3109253f07e222caed03c6e32899"
+        "sha256": "37c2bd02cd3c1776a47258cb6855f876e0fee0d0f3b9e3cedbea35a7e5d3e9fb"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -42938,7 +43761,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s01.html",
-        "sha256": "6be4b2447cd936f9d3ea7abf20b30894bf232990f6baf4eb05098ef328cf52e2"
+        "sha256": "38d50059a7fcdd19f1983025705700f8fd97c029a2c93deb7657a614a68f958f"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -43049,7 +43872,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s02.html",
-        "sha256": "167e97359cb307eceaa9c4611708a7d6a2950d93bcbe1f6304f24f23317ae6c8"
+        "sha256": "2ebc60c353d30ffe64db9d6a91bfca95e24ec63976aa93d40562d6fb2ec440cd"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -43160,7 +43983,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s03.html",
-        "sha256": "7356fbc7b52685d8de8857afeae29e76ce18318ae3a5776cbf4fe0c388e39e47"
+        "sha256": "7e8213419a30d1717cd5235c48d938f30464db70df87a90b8b3ae70fad18d448"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -43271,7 +44094,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-s04.html",
-        "sha256": "6c8be6a595a6a10a977fcac8627d4922d98b3b5e7bb97e1217fe93992cdfc40c"
+        "sha256": "0c5911c527c89eb08151d9d165885d7187aa1f5050256ce91976f01765e39124"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -43382,7 +44205,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-spec-v2.html",
-        "sha256": "d8d2a6da7c5ee235ade146d15db2002f58365bc8732a2360941e48d905dc11be"
+        "sha256": "b9c9994598715ed07e75996420987671bd376eabba33b2251e4201a29ec6afee"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -43493,7 +44316,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t0.html",
-        "sha256": "60b73804b536f18a48fd343d6e75e32e9ae88e0ca96207e9c5e9c4a90d407f9e"
+        "sha256": "5a7b65604047a141af28e6d707bf5f72d23d8c682a5a47d181276d16ab91857f"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -43604,7 +44427,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t1.html",
-        "sha256": "57cca9204ca84bd000ee5a922ce29dcb7174eb94ad5049675c65216e92ee5c1a"
+        "sha256": "e897e7db3755ec4881c44c7b877737b18293ea01a00073242c5d0713a293f3be"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -43715,7 +44538,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t10.html",
-        "sha256": "1020c819b8198053719d44487c6ac470756e32da0744f464b0c591a1e190b124"
+        "sha256": "f21c5c34a58e2a21ca79cc9aa9c33f393556f23ee285696e5c47500cb2f59557"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -43826,7 +44649,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t11.html",
-        "sha256": "865cc9d9458bdb1cb55e29dcb8baeab836d7f13525e6f0efe4220d748a3ad90b"
+        "sha256": "b8d9df15b50b0bc7bc3410e729be88aacd16fa4068fbfe9950a4a5d7f176878d"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -43937,7 +44760,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t13.html",
-        "sha256": "7ac3ff51eef829f9a787f943e36ee7fb72a1490e7f39e241bc371423f888119f"
+        "sha256": "fbca12303d5321d139c2fd33833614514e140dc41fc6f0b251a843464fc2c552"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -44048,7 +44871,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t19.html",
-        "sha256": "ba9df0619f84b20d7be5ac70ac40b7b3fed44b70268e7aac6bfae34f1ca269c7"
+        "sha256": "fedab7965dad90de2f78023df4db647fd59ddf1a8e4e859076d16ec203bddf1e"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -44170,11 +44993,137 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "compliance-review",
+      "covered_key": "",
+      "covered_rule": "compliance_review_missing",
+      "document": {
+        "path": "docs/standards/std-togaf-compliance-review-t19f.html",
+        "sha256": "a00c43b4c1998204cd3f81f76addcdd95cf2765ded1ed67cb1d9cbf7f0261550"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-compliance-review-t19f",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-compliance-review-t19f:T19F",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Relationship",
+          "missing": [],
+          "sources": [
+            {
+              "count": 2,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a210be-4ded-728e-96ba-d4805b5f9b29",
+                  "status": "",
+                  "title": "01a210be-4ded-728e-96ba-d4805b5f9b29"
+                },
+                {
+                  "id": "01a210be-3a02-75f3-b39d-5309d7a2cd92",
+                  "status": "",
+                  "title": "01a210be-3a02-75f3-b39d-5309d7a2cd92"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Findings",
+          "missing": [],
+          "sources": [
+            {
+              "count": 2,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a210be-4ded-728e-96ba-d4805b5f9b29",
+                  "status": "",
+                  "title": "01a210be-4ded-728e-96ba-d4805b5f9b29"
+                },
+                {
+                  "id": "01a210be-3a02-75f3-b39d-5309d7a2cd92",
+                  "status": "",
+                  "title": "01a210be-3a02-75f3-b39d-5309d7a2cd92"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Waivers",
+          "missing": [
+            "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/waivers"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Decision",
+          "missing": [],
+          "sources": [
+            {
+              "count": 2,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a210be-4ded-728e-96ba-d4805b5f9b29",
+                  "status": "",
+                  "title": "01a210be-4ded-728e-96ba-d4805b5f9b29"
+                },
+                {
+                  "id": "01a210be-3a02-75f3-b39d-5309d7a2cd92",
+                  "status": "",
+                  "title": "01a210be-3a02-75f3-b39d-5309d7a2cd92"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/compliance_reviews"
+            }
+          ],
+          "status": "evidenced"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "partial",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+        "key": "T19F",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+      },
+      "subject_kind": "project",
+      "title": "Compliance Review — Follow-on: docs/plans/T19F-meeting-bindings.md"
+    },
+    {
+      "category": "compliance-review",
       "covered_key": "compliance_review_missing:T2",
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t2.html",
-        "sha256": "dbdbd9b8c643d6c4afc617c6abf67b789b682b03ca57d5f6e53f9a80c65b0050"
+        "sha256": "7c0ae494edc13ae5307f2989002c9b685260a99f8358e1de44f6f9063945d9ac"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -44300,7 +45249,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t4.html",
-        "sha256": "56560e7b9b2b65d3b2bbfc0126addaff658f24df3f4320e900ce5a7396d75018"
+        "sha256": "e5c75bfe0945fad97fc9fbc8c719d399e2e4aa6b7ab45bde0fb4fe2a2749c115"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -44410,7 +45359,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "compliance_review_missing",
       "document": {
         "path": "docs/standards/std-togaf-compliance-review-t9.html",
-        "sha256": "401cfb3e1bd7e922cd0e78a12c478392045c9918dff4edabc3c549bb9efa0c64"
+        "sha256": "5f418f91da514af4683f347ae4ee1a377250f158f409c57b85af50aa7510a270"
       },
       "gate": {
         "approval_id": "",
@@ -44546,7 +45495,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-design-publish.html",
-        "sha256": "51ee9ff4044ea73e5a1b9e4e2b600a87302d2bd9863d45f97629cb1f30c1a16f"
+        "sha256": "a918cd61b282bc72d16a849de884577071832604cc684575e4d7f9d053676266"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -44639,7 +45588,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-p0.html",
-        "sha256": "bbbba1724152129ab602dce05203479ea08017d332e0f915a3ffbd83dc86569d"
+        "sha256": "199c6075ba4b68f6bf11dc886939790da58b32c452fff78d0983ba12a3e56075"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -44733,7 +45682,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-platform.html",
-        "sha256": "1b4475bc2a4dc34336b0bb71b29b6cd9db492b87430d253553431c369d6e0ab9"
+        "sha256": "f963d772216ab02f67bee67ebdd1875bc39f12b616d744e958ea7d896208dd9e"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -44815,7 +45764,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s00.html",
-        "sha256": "a0489f1a38d531346e5046ea21c229f9f9f7834cdb561803f850ec5a60c801e1"
+        "sha256": "7ba5d464cfa6c9ab020ed35b9e0912a9138a1b85c337682b58e6e1893406df3f"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -44908,7 +45857,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s01.html",
-        "sha256": "5164251bf4659f145b824eecbf298352d7e6e24c9473abb919e962b855bc08d6"
+        "sha256": "d1a8c828e40469272dd214e1ef1596f0366cfec1c4f1372e37b4007c4b913a41"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -45001,7 +45950,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s02.html",
-        "sha256": "3c7e439fe5c139e1169dbc9248102e56c64920f79d5019ea3e4f78347f3de3e0"
+        "sha256": "200cd8c5163ecfcff74f87bf2c6849047a3991fc4b1bcdd0f516a1c6a058bba6"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -45094,7 +46043,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s03.html",
-        "sha256": "dc2826ad1c5020773416eef3a1a87d38da6f047a0114dd15995752daf2350429"
+        "sha256": "a1cea4ff4f6176bc2f6f65b404278e761ffc5d9b79350c7c636e1197b180f6a2"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -45188,7 +46137,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s04.html",
-        "sha256": "00d99ea7744496c7c50c4f775f8275b56c67981753617c7ba1af79b94c9e00b4"
+        "sha256": "0b2fc30040d40fa047368ee460da093fc600a65b3110360ed21c59e620ea89c0"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -45270,7 +46219,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-spec-v2.html",
-        "sha256": "afdef05de74f774d14fc550a109fd96f54b8c141f091d78b3f8c5ab78f3c4e1e"
+        "sha256": "eb53ff5f0e46b8f578c1f5cda8cff9d998f15f597a0a2ac29cad7243723eb190"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -45363,7 +46312,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t0.html",
-        "sha256": "14fcb45a9ff3ef285608aabd9a96f6f366ee72e3be8c699b348eb2ab2f90f925"
+        "sha256": "72159038bf30ab3937d036d07f6cf476eea4b43e5a4fa52d7e52c92a399e273d"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -45456,7 +46405,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t1.html",
-        "sha256": "5c44147fe46ec31937a06d73fbef6556f46449e9a3ac5bef74a03cfd154d4acb"
+        "sha256": "7e70fba2262804a5c9a496904accbb39cda3bde9299668da6986fb997b8616c3"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -45549,7 +46498,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t10.html",
-        "sha256": "a8582b3ff0a804abc4de5cfe3494305fee226bd72a9fc7b35a21994297049f2a"
+        "sha256": "d95dd5c6f5c5aba91341188431390c24837496d80ecb7c2d24e7654a0e3486ac"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -45642,7 +46591,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t11.html",
-        "sha256": "4bf8bcc960228555377b056002a565c9b9a69acd159e5ad89ad37360a9e2b8d9"
+        "sha256": "5f41894206a691eee5fc50edbfdc64e84e1be67593e3cbe08c337be9b673645e"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -45735,7 +46684,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t13.html",
-        "sha256": "0bf8285fc8b66d7aeb5c84505ff08fb20a9667f270de313c7911aa4c0def77dc"
+        "sha256": "ea5b1fe8a55150f15ecdf70a8c0ffc5de3da6e660ab4e34085e72a8ff1624c07"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -45828,7 +46777,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t19.html",
-        "sha256": "7ee30e8ab326f2a6c96fe53b44e78b10917d761f92f3f76c503e1b29dbf7efa2"
+        "sha256": "8388b85fd0d1eb71fe2a2f18b1a3d96fe3d0bcb96567a7f08f957816d3735925"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -45920,8 +46869,116 @@ window.CONVEYOR_STANDARDS = {
       "category": "delivery-contract",
       "covered_rule": "contract_missing",
       "document": {
+        "path": "docs/standards/std-togaf-delivery-contract-t19f.html",
+        "sha256": "90649027baef2d2558456fbac444dc9a26b6ff3f4793bb5d002f59deaa1383e6"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-delivery-contract-t19f",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-delivery-contract-t19f:T19F",
+      "sections": [
+        {
+          "heading": "Commitments",
+          "missing": [],
+          "sources": [
+            {
+              "count": 2,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a210bd-f408-778a-b67e-9b6cf36ca62a",
+                  "status": "live",
+                  "title": "Delivery contract — T19F forum bindings (2026-11-25)"
+                },
+                {
+                  "id": "01a210c8-7ea8-7dc9-8104-700ecfe2905b",
+                  "status": "draft",
+                  "title": "T19F live gate — the sitting subject"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Compliance method",
+          "missing": [],
+          "sources": [
+            {
+              "count": 2,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a210bd-f408-778a-b67e-9b6cf36ca62a",
+                  "status": "live",
+                  "title": "Delivery contract — T19F forum bindings (2026-11-25)"
+                },
+                {
+                  "id": "01a210c8-7ea8-7dc9-8104-700ecfe2905b",
+                  "status": "draft",
+                  "title": "T19F live gate — the sitting subject"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Approval",
+          "missing": [],
+          "sources": [
+            {
+              "count": 2,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a210bd-f408-778a-b67e-9b6cf36ca62a",
+                  "status": "live",
+                  "title": "Delivery contract — T19F forum bindings (2026-11-25)"
+                },
+                {
+                  "id": "01a210c8-7ea8-7dc9-8104-700ecfe2905b",
+                  "status": "draft",
+                  "title": "T19F live gate — the sitting subject"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "evidenced"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "evidenced",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+        "key": "T19F",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+      },
+      "subject_kind": "project",
+      "title": "Delivery Contract — Follow-on: docs/plans/T19F-meeting-bindings.md"
+    },
+    {
+      "category": "delivery-contract",
+      "covered_rule": "contract_missing",
+      "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t2.html",
-        "sha256": "fc99a140f63167f222d4d1a3b8042cab4337da0d8b61e0187b97005d49d6e01d"
+        "sha256": "b92399e963e2ac80a17cb1efdc6fe9ea8db37412450031f60a7b75295aa19b47"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -46029,7 +47086,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t4.html",
-        "sha256": "1bb15e30c41b1480569e6f57974cbaa639151fa689850a3f934a06a003f88d3f"
+        "sha256": "6fd9b21e4207e5423be236c1fe64f660244c84df491cbe1e1dad4d160254de7a"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -46122,7 +47179,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t9.html",
-        "sha256": "72124541bf5c02fdb74dd615f8f29886c3fb2fef2250815832da8885a79546a4"
+        "sha256": "94204970eff84901b04e5c8f5cd4268426d5ca15aee4515b0d50d1799e434350"
       },
       "gate": {
         "approval_id": "",
@@ -46215,7 +47272,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-design-publish-a.html",
-        "sha256": "7dce000fc70afbab00302218b6340be601514a6a60f4f6ce0f28be91ca34db6a"
+        "sha256": "f7e2f169b56bc6aa15c86ca4ac5ef7d4342ca9a6d21f12167c801a368ea71295"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -46267,7 +47324,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -46342,7 +47399,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -46441,7 +47498,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-p0-a.html",
-        "sha256": "dc96d96260f773cc8fa4d34946b4501b398275380bdf1e3c37f6fd88da4ec3ed"
+        "sha256": "22f034413cd13fc14ece3a2421bea4ebf125d7592da83e8532da09bbd1fe1043"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -46493,7 +47550,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -46568,7 +47625,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -46667,7 +47724,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-platform-a.html",
-        "sha256": "e0d70ad670bd82a75e677dcea2964643fac37a9ce1cf16ebe36afc7b7b271cd6"
+        "sha256": "780a77daf62087b8c34920275d75924dd94acb32ee3cf46835680c70bfbcce30"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -46719,7 +47776,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -46794,7 +47851,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -46893,7 +47950,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s00-a.html",
-        "sha256": "0fe035b73f4a4caf101c059baf3f52e0f90929e550d55358770e9872e3af34db"
+        "sha256": "0fdbddced5bc065e7e03039faa6d5048b5c8bfcd6bbe707ed13b0a7acd3f025b"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -46945,7 +48002,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -47020,7 +48077,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -47119,7 +48176,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s01-a.html",
-        "sha256": "00786c29b53ad85afe534bf609c8dd2ff3f6d4fa4f6d887ab4109262f360d7af"
+        "sha256": "41c85ab0a6b8104c7b6ecab79b164677c25725f9f4dfbb5a9de009bfe19188a3"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -47171,7 +48228,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -47246,7 +48303,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -47345,7 +48402,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s02-a.html",
-        "sha256": "db3b4131b04aa5cd42910461b48cad5f51d3f56c333671908d9c49009a938456"
+        "sha256": "e0fed798c57fd4e178182e056da723f92f43b390d3f6680535202a4dc74a53e7"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -47397,7 +48454,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -47472,7 +48529,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -47571,7 +48628,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s03-a.html",
-        "sha256": "d8f3bcd578703f1beac2e9495ab8dc75c9aee19347fd5f8bf9a7b26718c8fa7a"
+        "sha256": "8335b363e7b55e6d377c4280cdb90960055364f1f54fe46b9bedde72e338683c"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -47623,7 +48680,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -47698,7 +48755,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -47797,7 +48854,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-s04-a.html",
-        "sha256": "4024a540c6120abfd9b8ce5b54ef031a9c113475cb0f23cbeae988fe8251b952"
+        "sha256": "a96887705219ddf6689102f376f9853f4de314becf0f8a01f3f8fc612e1b6248"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -47849,7 +48906,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -47924,7 +48981,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -48023,7 +49080,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-spec-v2-a.html",
-        "sha256": "7954ad3ab46e57ac900085204fd2e85e4306ac2ef06df7b3ae74af2ae762b958"
+        "sha256": "38cc8b71727cd5eba37976c128b12efb86c8e8efc6aee0687f9eb37222817eef"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -48075,7 +49132,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -48150,7 +49207,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -48249,7 +49306,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t0-a.html",
-        "sha256": "e6309b8af6dd4e17cb1104928506b39878d288f38b0d5dd8a71d63c4a4d5748f"
+        "sha256": "b255a91b7fa368e6466ee1501140e33243ee2633418f3e64f270378b241f5c17"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -48301,7 +49358,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -48376,7 +49433,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -48475,7 +49532,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t1-a.html",
-        "sha256": "158a531ca4fd8f6eccaf831a6ea794fa0620c9f8d0afa7a8550a9dda6c81d28f"
+        "sha256": "39c73fdcff098c260914fd278598e3259d158aa9d17aa3917a4a4f02a7c12449"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -48527,7 +49584,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -48602,7 +49659,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -48701,7 +49758,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t10-a.html",
-        "sha256": "d44f7b9f5044f8c3b449c10d482bc480525fe57b99341fcc7fed388c44bee6d9"
+        "sha256": "387b7925c80d2b568a90477fdc7e1dc59a933f6d966da273afbf9ab3c7957d6e"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -48753,7 +49810,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -48828,7 +49885,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -48927,7 +49984,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t11-a.html",
-        "sha256": "78d74a98ccb2f58b0f57aa0c593268ab1667a5fec3dcaea5811340ffa4d90697"
+        "sha256": "3f128e306dea5f624ffce94a54b5be4d43b008c371da37a6abed4046942d3264"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -48979,7 +50036,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -49054,7 +50111,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -49153,7 +50210,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t13-a.html",
-        "sha256": "a0b618128f9b70c13fe0b2224ac2743d3c470aefd3c4fdae6c5b3e4041ac513b"
+        "sha256": "b42d93e6c1264b983a9953bee9b76b739b5d7127581c7009c866773bc33349c4"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -49205,7 +50262,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -49280,7 +50337,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -49379,7 +50436,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t19-a.html",
-        "sha256": "84cad1f5bb2507981c7117c8591ff92406f5e1b58819fc9e9d804873a505b72e"
+        "sha256": "4a704012cdf53b4dc5474209c98bb6849be3ea028027291842ec5212437158a1"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -49431,7 +50488,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -49506,7 +50563,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -49604,19 +50661,19 @@ window.CONVEYOR_STANDARDS = {
       "category": "phase-a",
       "covered_rule": "mandatory_artefacts",
       "document": {
-        "path": "docs/standards/std-togaf-phase-a-t2-a.html",
-        "sha256": "76f573e84c36296f8060553a1f5ec538e49f0004607004270754df2142c22c46"
+        "path": "docs/standards/std-togaf-phase-a-t19f-a.html",
+        "sha256": "c69de99c59df490bc9bfd6004fbadb7c2f088ffb33f45d25806610719b8a1d63"
       },
       "gate": {
-        "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
         "kind": "statement_of_architecture_work",
         "state": "live"
       },
-      "id": "std-togaf-phase-a-t2-a",
+      "id": "std-togaf-phase-a-t19f-a",
       "level": "project",
       "mandatory": true,
-      "owner_project": "T2",
-      "package_key": "std-togaf-phase-a-t2-a:T2",
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-a-t19f-a:T19F",
       "sections": [
         {
           "heading": "Mandatory artefacts",
@@ -49657,7 +50714,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -49732,7 +50789,233 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1ff3c-f7c4-7582-9d5e-b0f5e32dd093",
+                  "status": "superseded",
+                  "title": "Driver / Goal / Objective Catalog — DESIGN-PUBLISH"
+                },
+                {
+                  "id": "01a1ff4c-1169-73a5-919d-e30622ebda79",
+                  "status": "superseded",
+                  "title": "Driver / Goal / Objective Catalog — DESIGN-PUBLISH"
+                },
+                {
+                  "id": "01a2020b-3d2f-732f-8513-b5c142fc0460",
+                  "status": "approved",
+                  "title": "Driver / Goal / Objective Catalog — DESIGN-PUBLISH"
+                },
+                {
+                  "id": "01a1ff84-b2bd-7741-ba51-db2e7c686957",
+                  "status": "superseded",
+                  "title": "Driver / Goal / Objective Catalog — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff95-2388-7501-bc3f-2dbef09106f2",
+                  "status": "superseded",
+                  "title": "Driver / Goal / Objective Catalog — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a2020b-c9a5-78a2-a4e7-9ccd5c3bc255",
+                  "status": "approved",
+                  "title": "Driver / Goal / Objective Catalog — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff41-85e9-705d-bdc6-ba4503876982",
+                  "status": "superseded",
+                  "title": "Driver, goal and objective catalog — SPEC-V2 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff4d-af78-72b8-8ac4-b9e13b5cdfd7",
+                  "status": "superseded",
+                  "title": "Driver, goal and objective catalog — SPEC-V2 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a2020a-d420-7324-8275-20598acd2584",
+                  "status": "approved",
+                  "title": "Driver, goal and objective catalog — SPEC-V2 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1fdd3-a386-7391-9598-1927726a516f",
+                  "status": "superseded",
+                  "title": "Driver, goal and objective catalogue — P0 (retrospective, U5a)"
+                },
+                {
+                  "id": "01a20209-a7ee-7429-9d43-6b85b61d755e",
+                  "status": "approved",
+                  "title": "Driver, goal and objective catalogue — P0 (retrospective, U5a)"
+                },
+                {
+                  "id": "01a20062-31ed-76bc-986f-e232533a823b",
+                  "status": "superseded",
+                  "title": "Driver/Goal/Objective Catalog — S03 Domain and schema (Phase A)"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/artifacts"
+            },
+            {
+              "category": "architecture-artifact",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "evidenced",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:a",
+        "key": "T19F/a",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — A"
+      },
+      "subject_kind": "phase",
+      "title": "Phase A — T19F — A"
+    },
+    {
+      "category": "phase-a",
+      "covered_rule": "mandatory_artefacts",
+      "document": {
+        "path": "docs/standards/std-togaf-phase-a-t2-a.html",
+        "sha256": "01850fa90aa1efa1fc8a811dd075a304ff37c5c03b6a877766408b6307fc0ec0"
+      },
+      "gate": {
+        "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-phase-a-t2-a",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T2",
+      "package_key": "std-togaf-phase-a-t2-a:T2",
+      "sections": [
+        {
+          "heading": "Mandatory artefacts",
+          "missing": [],
+          "sources": [
+            {
+              "count": 4,
+              "items": [
+                {
+                  "id": "",
+                  "status": "",
+                  "title": "Stakeholder Map"
+                },
+                {
+                  "id": "",
+                  "status": "",
+                  "title": "Driver/Goal/Objective Catalog"
+                },
+                {
+                  "id": "",
+                  "status": "",
+                  "title": "Requirements Catalog"
+                },
+                {
+                  "id": "",
+                  "status": "",
+                  "title": "Solution Concept Diagram"
+                }
+              ],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Contract and gate",
+          "missing": [],
+          "sources": [
+            {
+              "count": 20,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1f2c2-0e1a-787f-9011-46b424d1ec71",
+                  "status": "superseded",
+                  "title": "Statement of Architecture Work — the TOGAF ADM capability (T9)"
+                },
+                {
+                  "id": "01a1fdd2-5041-7f80-8032-3305751d498c",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — P0 programme definition (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff2e-7974-74cd-be6d-377e3c0071a4",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S01 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S00 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff3c-7aad-7dda-820e-1c7d85fe70a8",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — DESIGN-PUBLISH: the published studio design pack"
+                },
+                {
+                  "id": "01a1ff41-19f9-77bb-aa4a-f416f0d758e3",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — SPEC-V2, the organisational operating model (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T0 Model and contracts (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff84-4425-75d9-8772-08e09cf71069",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff89-02bd-7b6d-902e-ffa5902cc7f5",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T1 Plan spine (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff8d-a0ad-7a91-b026-d9a2575daa3f",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T11 Metrics, metering and maturity (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a2005a-7886-7f2d-9b49-53d174544ee9",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T2 Decision ladder (retrospective, U5a)"
+                },
+                {
+                  "id": "01a20061-bd73-7a89-b08c-bd8b867eb061",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S03 Domain and schema (retrospective, 2026-11-21)"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [],
+          "sources": [
+            {
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -49831,7 +51114,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t4-a.html",
-        "sha256": "ae924b008c264ded26bd69a1dab213145a5c04c1a2a7e9ade1127ec30b8f10cf"
+        "sha256": "4e1b3c8ad234946f8afab35083d035edf1cd91b4c22f92b3f70a267c0c053cd9"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -49883,7 +51166,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -49958,7 +51241,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -50057,7 +51340,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t9-a.html",
-        "sha256": "6dc9b6df769c6bfd7a9a3500938ed732e16b67d41203b050e8dec0990b9e4ce1"
+        "sha256": "db1634ca7f232e443b878809aecb528532b0070d9b9aba233d5297f5537b5676"
       },
       "gate": {
         "approval_id": "",
@@ -50109,7 +51392,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -50184,7 +51467,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 144,
+              "count": 148,
               "file": "architecture.json",
               "items": [
                 {
@@ -50284,7 +51567,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-design-publish-b.html",
-        "sha256": "98441d84a83b4dd278c4bc244c33e386ac770226ee1bc360474944f5d0b6752e"
+        "sha256": "9156cd87c9eb12f7812aa134f946fb59c978282ea977836c8d4e82b3192b99bf"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -50338,7 +51621,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -50438,7 +51721,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-p0-b.html",
-        "sha256": "9b9f02f2a5142e76d49d42b4609e6bde7239ee59be33b360ad2e1b455dd7d324"
+        "sha256": "94e5565044035edfe97555257ab87a9a02ba6af90ab12b09033c7193d6072cc2"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -50492,7 +51775,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -50592,7 +51875,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-platform-b.html",
-        "sha256": "00b4a0cad021bf9e6607eb878080975b45fb2a9c52bc8ee9ec281a529231e7e6"
+        "sha256": "49ff77452b7341fb8969f1f4f803ed5a7adb9096ed9c65e4131ee375758644a4"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -50646,7 +51929,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -50746,7 +52029,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s00-b.html",
-        "sha256": "bdf54d1b14310c6e6216e642c2def1e91907f209d86679171e6b158355c4acac"
+        "sha256": "9976519fdeaf5f28dc66c4c1a6866f6c3f38c4500b7624af1e9c23c851e9c11e"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -50800,7 +52083,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -50900,7 +52183,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s01-b.html",
-        "sha256": "dff401de743a0abceea82578b50415c459352267ce61dda0db23b0f971c6b1c7"
+        "sha256": "76ce68b23eafabb6880f1885fd9a3401ccf9115e1420fb12bbca7bc2656a7be5"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -50954,7 +52237,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -51054,7 +52337,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s02-b.html",
-        "sha256": "d63db8a799565b1f35325f89ca14ccca5b911e27232dc6ccc8996cc0e21fe6be"
+        "sha256": "615b517d852e10dc3796f33338a12382c7b36e091afc8793abb9aa5642250ab7"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -51108,7 +52391,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -51208,7 +52491,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s03-b.html",
-        "sha256": "c5f12599cd5d35a2cfed6f276fb52d41ab5fd8da159c4ebc75402d4f0bf54289"
+        "sha256": "5bbece7dea8ed515f03ca38d21010adb734ab267e17bc547dc38805ce611d146"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -51262,7 +52545,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -51362,7 +52645,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-s04-b.html",
-        "sha256": "3aee182110dd33b82c840c9f586cbf12c5a0b77b54386bc454009e53fcb1e281"
+        "sha256": "ed55527e66db74722119c0ffb603a7c82059bbcd1e4357a75776c6ffafe432d4"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -51416,7 +52699,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -51516,7 +52799,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-spec-v2-b.html",
-        "sha256": "315346ccc3cd892ce66ae7012340bc437c9254b51ffee636fbb43cb2073e9564"
+        "sha256": "fdf1d2d3d9974861c9fd9458c3dad309a3493492fcc5e2fa0318beb7f6ea06a3"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -51570,7 +52853,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -51670,7 +52953,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t0-b.html",
-        "sha256": "709420de186d5552b6c5efdda62d2df5e69d17b833a245db623f4f72715ebb7a"
+        "sha256": "271a02ddbb5903213ca1f4dd092c576ce49c660a0a993d8c34eb7fea78beac86"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -51724,7 +53007,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -51824,7 +53107,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t1-b.html",
-        "sha256": "a6f2748720cc84fce01a7d4d3e76e05ed65aecc92e63661dc854e88a3413d4c3"
+        "sha256": "1a41e642d19ba482f1fc8ca4eb8ba78cde09dd99f94ef38129fefd9b02f5f06f"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -51878,7 +53161,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -51978,7 +53261,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t10-b.html",
-        "sha256": "5432a884809d82a1f3c1786c3670cf54d32efe6284116151c41650723f4ba077"
+        "sha256": "190b876304b123649feb803d2d717a239962980b077f6d209b5209f9ce79fc8c"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -52032,7 +53315,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -52132,7 +53415,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t11-b.html",
-        "sha256": "41670ae1cdbf9e4acf836e740faff4bec8f71da77ad49a00678a088ed3fed1be"
+        "sha256": "418d7ed65a5218d79eef8fd5a2478966912dfa525e3f8a6d0b3d55ad45e0461c"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -52186,7 +53469,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -52286,7 +53569,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t13-b.html",
-        "sha256": "64ac80082e410ef520fa23ae68bbca87c638b701eade89b16d41682d0641bd45"
+        "sha256": "a79e4a82dc266e2e146fc5872a02b7d864e1e6d5f351cc4e79bf96ff807e8761"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -52340,7 +53623,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -52440,7 +53723,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t19-b.html",
-        "sha256": "124c4a6f2f22c1695afa71150b5696e8b664eedc4220ca6ca12bfc516dabdc66"
+        "sha256": "821d803f015926c307e1e7da6125d807d7db31eb5ce3f52c65738daf14259fcc"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -52494,7 +53777,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -52590,11 +53873,165 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "phase-b",
+      "covered_key": "",
+      "covered_rule": "mandatory_artefacts",
+      "document": {
+        "path": "docs/standards/std-togaf-phase-b-t19f-b.html",
+        "sha256": "3b0fe71bb045fd021f880de5ade70028a123954b4855a9169b22e3206e388019"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-phase-b-t19f-b",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-b-t19f-b:T19F",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Mandatory artefacts",
+          "missing": [],
+          "sources": [
+            {
+              "count": 1,
+              "items": [
+                {
+                  "id": "",
+                  "status": "",
+                  "title": "Business Capability Map"
+                }
+              ],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Contract and gate",
+          "missing": [
+            "No row or document satisfies 'Contract and gate'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [],
+          "sources": [
+            {
+              "count": 37,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1ff85-319b-7264-9716-f74f2488c843",
+                  "status": "superseded",
+                  "title": "Business Capability Map — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff95-d75c-73b8-aa6d-a17bc8ba6298",
+                  "status": "superseded",
+                  "title": "Business Capability Map — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a2023b-20c8-7fd2-be29-311752bc241a",
+                  "status": "approved",
+                  "title": "Business Capability Map — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a20062-b2fa-7322-b13d-f5c14b641c31",
+                  "status": "superseded",
+                  "title": "Business Capability Map — S03 Domain and schema (Phase B)"
+                },
+                {
+                  "id": "01a2023b-d046-7965-aaf6-65047dabedb6",
+                  "status": "approved",
+                  "title": "Business Capability Map — S03 Domain and schema (Phase B)"
+                },
+                {
+                  "id": "01a1ff46-93a7-7bb4-8ab0-93f094edd051",
+                  "status": "superseded",
+                  "title": "Business Capability Map — T0 Model and contracts (Phase B)"
+                },
+                {
+                  "id": "01a1ff51-e5d8-7453-a7c7-5fcdaf03ff46",
+                  "status": "superseded",
+                  "title": "Business Capability Map — T0 Model and contracts (Phase B)"
+                },
+                {
+                  "id": "01a2023d-3076-76e9-9d03-4e96cd16fbea",
+                  "status": "approved",
+                  "title": "Business Capability Map — T0 Model and contracts (Phase B)"
+                },
+                {
+                  "id": "01a1ff89-f352-796c-bbc9-b815484fd6d0",
+                  "status": "superseded",
+                  "title": "Business Capability Map — T1 Plan spine (Phase B)"
+                },
+                {
+                  "id": "01a1ff99-8813-7c96-8cd1-0a7c292659c0",
+                  "status": "superseded",
+                  "title": "Business Capability Map — T1 Plan spine (Phase B)"
+                },
+                {
+                  "id": "01a2023e-a2b1-75a0-be60-db63bb552acd",
+                  "status": "approved",
+                  "title": "Business Capability Map — T1 Plan spine (Phase B)"
+                },
+                {
+                  "id": "01a20288-849f-713b-890d-abd4806f8761",
+                  "status": "approved",
+                  "title": "Business Capability Map — T10 SAFe cadence and MSP tranches (Phase B)"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/artifacts"
+            },
+            {
+              "category": "architecture-artifact",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "partial",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:b",
+        "key": "T19F/b",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — B"
+      },
+      "subject_kind": "phase",
+      "title": "Phase B — T19F — B"
+    },
+    {
+      "category": "phase-b",
       "covered_key": "mandatory_artefacts:T2",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t2-b.html",
-        "sha256": "9902d9791da93ac93daee77e6d9e20a5501bf35e6a50192002819a8e149633d6"
+        "sha256": "8c33da945eadd10c0add9b1dccd28edae764bec5bed4146e029731211eac6ec2"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -52648,7 +54085,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -52748,7 +54185,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t4-b.html",
-        "sha256": "7abc50b51906f0515320d30fd51ddaf17c180e71a53b48a9d012e6f836bcea13"
+        "sha256": "1f857a06199f08867db592c974563ae10fbe5a992fff56328758de58a17f1a7a"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -52802,7 +54239,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -52902,7 +54339,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t9-b.html",
-        "sha256": "6ea317b87121df8eceef632829c0396bb86b8615956a34b1c822bf78d427b034"
+        "sha256": "76e061cfd74be1c06ed500834ffbf8b257010ef4b89c68da0b5293e92685345e"
       },
       "gate": {
         "approval_id": "",
@@ -52956,7 +54393,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -53056,7 +54493,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-design-publish-c.html",
-        "sha256": "faa0269f59ec27216ee8a056655a119fa4e3f47b5cc25635e4ff9a67a6785447"
+        "sha256": "e94c6ee14111b9cb2227cd63810972c1fe72bb351d2ecee5a5958451e7967e84"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -53110,7 +54547,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -53210,7 +54647,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-p0-c.html",
-        "sha256": "61438ae39602327f9f7eb658fb88cb935af7db0ca37893d39d75f2739a86c423"
+        "sha256": "bc6bec029798e478add2b4c11872ff3ae1d94442d410bae5721bb326c7dd3b97"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -53264,7 +54701,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -53364,7 +54801,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-platform-c.html",
-        "sha256": "aba7587814beea6f9f110ab5bfaa38f6e69105d9021b4d16686dd1bbbf479cf7"
+        "sha256": "2a6ea5506b960bf59bf6aa63b9614645f9dff4d1c38a13707131fbee3f9c1e87"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -53418,7 +54855,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -53518,7 +54955,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s00-c.html",
-        "sha256": "1e999c4a4c98d3c34bc2969d5731a45d0269e724884cebea5487200fa5e19e9a"
+        "sha256": "eb3a639c746dec3db973c8a8e8d5d7999d1bf2910248d8540275a22f2f7b0678"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -53572,7 +55009,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -53672,7 +55109,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s01-c.html",
-        "sha256": "0bf6db18cbf67526ddebf5dad29f54a56c1d583e6d1ccf9b53d2c09fb07a60a4"
+        "sha256": "8cca24b30739662b9830a7da2c1ac8eb8a7e16d3db3b770c65cbd6fccfd58117"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -53726,7 +55163,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -53826,7 +55263,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s02-c.html",
-        "sha256": "d2fe258fd04fab8295df0ad66bc832f9c11e35e0fb2b553a4d07d09c9418d1ac"
+        "sha256": "c8b5555cf442089031674d6d07f52f19845b3cec719bda9c9c6916b933dde398"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -53880,7 +55317,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -53980,7 +55417,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s03-c.html",
-        "sha256": "8c591969aa780cd6383a7bffa2f86cda10da44463651889f58105bd4f952c31e"
+        "sha256": "64dae109dc3e30f9db521b2ee858b1013decb419252c0ece6f1bf10e4af02f51"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -54034,7 +55471,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -54134,7 +55571,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-s04-c.html",
-        "sha256": "7175e38c256a5414747c332ab52beb7ea85876c09cc9bff7bd5979cb7ee30aa5"
+        "sha256": "454f99f8c52709826288f328a8218363a9863ec82132a3e0da894aecabaee446"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -54188,7 +55625,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -54288,7 +55725,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-spec-v2-c.html",
-        "sha256": "40e601bfb9bd9b3090d34db42899a2443c4edead37f4a555209f0ff9968ee431"
+        "sha256": "698190741b29a37d40281ab01db03aca0eb510696389f5a02682d7d877d40dff"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -54342,7 +55779,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -54442,7 +55879,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t0-c.html",
-        "sha256": "d5310a8c9d4243c7f80df76d3bd666b441b12728d3b6e24ae43475e00c9a47b6"
+        "sha256": "2111dda5e55a799ed1e7131766d92022c3f85cb51961ba84ef42ef59f41ed337"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -54496,7 +55933,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -54596,7 +56033,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t1-c.html",
-        "sha256": "b0d3d57d598fd21daaac4c1f833a44cf298fef56dcc96e39d6fc823a248774a8"
+        "sha256": "e15ddf2e3f0e26547d0f2cc86433b08b269190bd479f44d42c6df1d09bcd7af1"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -54650,7 +56087,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -54750,7 +56187,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t10-c.html",
-        "sha256": "9b44d7066997090f498e6b036a6868d80b46f916a4d0e48731bb76fc2cff4cff"
+        "sha256": "4c275dafd763b07c7e34257b983f4a208db6a8e85b21335b794eece478473d12"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -54804,7 +56241,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -54904,7 +56341,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t11-c.html",
-        "sha256": "ebfa6be71737ba7fff4efc7896d34dc4b60e6ccba27d55180ed85afd96e0e2b6"
+        "sha256": "6e553c9183b4b80ebd18d50cdc5a2fedd31aa1e3f7d8c14197d48f8b6501d698"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -54958,7 +56395,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -55058,7 +56495,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t13-c.html",
-        "sha256": "278e14ba1eec3d712a4d2625f730d2d4b2f9a4b5a2d7a02e338dc9f4634248de"
+        "sha256": "dfe2492085c20ca3e1c66d695c19d899f5727c9c4786f2cfb72cad5bdf0c2f3d"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -55112,7 +56549,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -55212,7 +56649,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t19-c.html",
-        "sha256": "c66b670327f4d592921cc99360afdf6de96b9d0e53c9f6f6348609b4a72c1664"
+        "sha256": "552738eb32daf0c7eda09a8cd4d882197ff4cc13c07da284a3db643550d44f32"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -55266,7 +56703,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -55362,11 +56799,165 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "phase-c",
+      "covered_key": "",
+      "covered_rule": "mandatory_artefacts",
+      "document": {
+        "path": "docs/standards/std-togaf-phase-c-t19f-c.html",
+        "sha256": "de28f640d98e7f95f4844ef79d5805bc0dfe7e688a83afdc9814b34513cf0c52"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-phase-c-t19f-c",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-c-t19f-c:T19F",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Mandatory artefacts",
+          "missing": [],
+          "sources": [
+            {
+              "count": 1,
+              "items": [
+                {
+                  "id": "",
+                  "status": "",
+                  "title": "Data Entity/Data Component Catalog"
+                }
+              ],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Contract and gate",
+          "missing": [
+            "No row or document satisfies 'Contract and gate'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [],
+          "sources": [
+            {
+              "count": 37,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1ff85-5f11-7475-880b-ed6a47a7bdb1",
+                  "status": "superseded",
+                  "title": "Data Entity / Data Component Catalog — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff96-1543-70cf-973b-7b9ff110675b",
+                  "status": "superseded",
+                  "title": "Data Entity / Data Component Catalog — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a20242-cf14-7421-9c41-e27616f9689f",
+                  "status": "approved",
+                  "title": "Data Entity / Data Component Catalog — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a20276-82e4-7594-b73b-60590e969803",
+                  "status": "approved",
+                  "title": "Data Entity Catalogue — T13 Tool platform (Phase C, retrospective)"
+                },
+                {
+                  "id": "01a20062-dc87-769e-acf6-a9ceb66d1a25",
+                  "status": "superseded",
+                  "title": "Data Entity/Data Component Catalog — S03 Domain and schema (Phase C)"
+                },
+                {
+                  "id": "01a20243-4b8e-743d-bd3a-9e62015f32fe",
+                  "status": "approved",
+                  "title": "Data Entity/Data Component Catalog — S03 Domain and schema (Phase C)"
+                },
+                {
+                  "id": "01a1ff46-b96e-74d6-a337-ebb3195ba4ad",
+                  "status": "superseded",
+                  "title": "Data Entity/Data Component Catalog — T0 Model and contracts (Phase C)"
+                },
+                {
+                  "id": "01a1ff51-ab0e-77f4-b8b4-68bd357b9e77",
+                  "status": "superseded",
+                  "title": "Data Entity/Data Component Catalog — T0 Model and contracts (Phase C)"
+                },
+                {
+                  "id": "01a20243-b153-728c-b4b8-5cb0f270a3dd",
+                  "status": "approved",
+                  "title": "Data Entity/Data Component Catalog — T0 Model and contracts (Phase C)"
+                },
+                {
+                  "id": "01a1ff8a-1a24-7755-a5dd-a5238bc1d8d4",
+                  "status": "superseded",
+                  "title": "Data Entity/Data Component Catalog — T1 Plan spine (Phase C)"
+                },
+                {
+                  "id": "01a1ff99-c5a5-798e-a669-29d3ed2d3332",
+                  "status": "superseded",
+                  "title": "Data Entity/Data Component Catalog — T1 Plan spine (Phase C)"
+                },
+                {
+                  "id": "01a20244-86e2-7ab3-9ab7-c7cf4a5fc695",
+                  "status": "approved",
+                  "title": "Data Entity/Data Component Catalog — T1 Plan spine (Phase C)"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/artifacts"
+            },
+            {
+              "category": "architecture-artifact",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "partial",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:c",
+        "key": "T19F/c",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — C"
+      },
+      "subject_kind": "phase",
+      "title": "Phase C — T19F — C"
+    },
+    {
+      "category": "phase-c",
       "covered_key": "mandatory_artefacts:T2",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t2-c.html",
-        "sha256": "a35e7f893007384bf397b31d871833b0b5b654178e63a10a4d9bdf0aad621cfe"
+        "sha256": "f21b203e830136f8b27a06bd6d4aa83a03755308bce79ac1f69a689a46be76a1"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -55420,7 +57011,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -55520,7 +57111,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t4-c.html",
-        "sha256": "039565500e8345a4c3bb6cc6c953c6768c15ef02c9fb00905a9653f3821ae048"
+        "sha256": "e67d0d7f0a5f535366da8b193971ba6edc3d742c23b1a78f482a85f4e293a08d"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -55574,7 +57165,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -55674,7 +57265,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t9-c.html",
-        "sha256": "f3b2fb70d08d96b49ee64e44613b9750e357dcbedfee6f8c55dac066ecb3e8ec"
+        "sha256": "f48efe33024b20d8b7dd137feca841e9ed9d26dea758079792148606edac466c"
       },
       "gate": {
         "approval_id": "",
@@ -55728,7 +57319,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -55828,7 +57419,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-design-publish-d.html",
-        "sha256": "1e5b39ba9697c41b934d14aca7326a2e18229ab8f29cbd9e633055f273e1c4d3"
+        "sha256": "7f244d8f3fc4287e1cb571b6747c49f5798416ea9c1c4f45066b868b6a0e638d"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -55882,7 +57473,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -55894,6 +57485,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -55939,11 +57535,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -55982,7 +57573,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-p0-d.html",
-        "sha256": "d4f3d1e77ea80aac23a3b3421659c6ff0ae919ce0c486da75e2a07db384d3cdb"
+        "sha256": "2d12df874a5144db2eb14fabb4d951637a38ad67de4bef54532d2ff4e187e01f"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -56036,7 +57627,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -56048,6 +57639,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -56093,11 +57689,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -56136,7 +57727,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-platform-d.html",
-        "sha256": "14cca8364a650c13506aad96b0e6e4dd930affd1f9ef2107e731c779adfeb1a0"
+        "sha256": "af313d925a50619619be5b1ea870988dca36fe6a41a6b1a951ff1e42bad39c4d"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -56190,7 +57781,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -56202,6 +57793,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -56247,11 +57843,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -56290,7 +57881,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s00-d.html",
-        "sha256": "07d0ceea4e052a74eb8b475e967074f914d6da12c1422b92e1977a664bd50c73"
+        "sha256": "2ef3cd7d6102f465760ae3881e3947d3af9a00817e4fa409d4deb9ea94e8c5ec"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -56344,7 +57935,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -56356,6 +57947,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -56401,11 +57997,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -56444,7 +58035,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s01-d.html",
-        "sha256": "06fd3ead2f07c808884d4fe88599a238c042c1fbb690b8a35e840c0d2eae6cd6"
+        "sha256": "37e2ad571f17fcc8aa0beb178773f59c82792e941aaf3cf5221e1b06954b411f"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -56498,7 +58089,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -56510,6 +58101,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -56555,11 +58151,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -56598,7 +58189,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s02-d.html",
-        "sha256": "7671228fcead87ad609ac5783e793d50445259ec7f6bd8a3ddadd81a82e2f455"
+        "sha256": "887bce4ef2e9037369792279ab5f5b129748200d10b2afd719f811c54cf64000"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -56652,7 +58243,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -56664,6 +58255,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -56709,11 +58305,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -56752,7 +58343,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s03-d.html",
-        "sha256": "e26ebbe0ea3f7762a4ebebd37e0cd1907023699f7c23eb5bf1cf372fdebb07bd"
+        "sha256": "60ca3a6811b21f76f24ea37323ff50d119ad7e2093680ce94c2bdd94558faebf"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -56806,7 +58397,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -56818,6 +58409,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -56863,11 +58459,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -56906,7 +58497,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-s04-d.html",
-        "sha256": "29e2662723591b187f1e052e83c64c2ebbc7c4d62ea4f99107a40435a662b241"
+        "sha256": "d09571b1e252f030c235945639bac992fb6df29ea193faf61823f477342fb30c"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -56960,7 +58551,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -56972,6 +58563,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -57017,11 +58613,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -57060,7 +58651,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-spec-v2-d.html",
-        "sha256": "ccd4863cc6db6a714e0b54c1b39d7cd93d46d5a878e64ec216c2e0b9e71f3ca0"
+        "sha256": "88cd99924496a1d3249da4d9c29c91c95dc3db689063eae6dc6882e80501c120"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -57114,7 +58705,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -57126,6 +58717,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -57171,11 +58767,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -57214,7 +58805,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t0-d.html",
-        "sha256": "7c056a12aeb0fab45bee94c97c13a0407ad1f939a0bda279817dc2de92c910b1"
+        "sha256": "ccc2dd25cd4a1e44b05c0f5f000d83afcf8c114d59ad265a58cf790aeaaaa9ec"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -57268,7 +58859,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -57280,6 +58871,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -57325,11 +58921,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -57368,7 +58959,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t1-d.html",
-        "sha256": "03c9d3ef03d7c39b11263f94b78b497eabf3b68cc2f2181354fa0bc61ad36638"
+        "sha256": "4052a1036c461628f3c2294f1bd92336044bb3eec9da449fb683bf8fba8be54a"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -57422,7 +59013,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -57434,6 +59025,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -57479,11 +59075,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -57522,7 +59113,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t10-d.html",
-        "sha256": "16a702adafcc875b5330ea872822065233dd0fd5b1222ca70f2303fe93995f0a"
+        "sha256": "49c5f8eefb6e3edf23e1142767e7d9302bb0dca1bcd03545fca710452176a9eb"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -57576,7 +59167,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -57588,6 +59179,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -57633,11 +59229,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -57676,7 +59267,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t11-d.html",
-        "sha256": "edea58be4ea72267a59b51426ba7e65ad4163122968da6f9d141cc2d22168481"
+        "sha256": "bac747b4a438f6fd4103b9ff5ff60cd3519f7b4caa48ea0bf5f09216a7772417"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -57730,7 +59321,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -57742,6 +59333,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -57787,11 +59383,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -57830,7 +59421,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t13-d.html",
-        "sha256": "6a1d7634319c2abe7d979f3232ba62e70a6d29b1251cf061dc347d30276d3d3a"
+        "sha256": "60041a60470d0327b246f42150a774da96909707111ed336379962841c8bf95e"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -57884,7 +59475,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -57896,6 +59487,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -57941,11 +59537,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -57984,7 +59575,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t19-d.html",
-        "sha256": "f7e7aa235622ade5869a2fd1d6a29c32b6490f7bc206ee0830bad568a9e4e45a"
+        "sha256": "279cd1d7d6fafe6957c97f61c49f7ad2d2535c9fed0661122e90c30a7dd8b611"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -58038,7 +59629,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -58050,6 +59641,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -58095,11 +59691,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -58134,11 +59725,165 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "phase-d",
+      "covered_key": "",
+      "covered_rule": "mandatory_artefacts",
+      "document": {
+        "path": "docs/standards/std-togaf-phase-d-t19f-d.html",
+        "sha256": "1f6ce65eb3a4adba9c7af9301ffdd1785bbf732cc9f0d9a66a7e0905e36bd89b"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-phase-d-t19f-d",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-d-t19f-d:T19F",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Mandatory artefacts",
+          "missing": [],
+          "sources": [
+            {
+              "count": 1,
+              "items": [
+                {
+                  "id": "",
+                  "status": "",
+                  "title": "Technology Standards Catalog"
+                }
+              ],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Contract and gate",
+          "missing": [
+            "No row or document satisfies 'Contract and gate'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [],
+          "sources": [
+            {
+              "count": 37,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a2025b-0be1-76c6-ad8d-00ee61b681b6",
+                  "status": "approved",
+                  "title": "S04 Technology Standards Catalogue"
+                },
+                {
+                  "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
+                  "status": "approved",
+                  "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
+                },
+                {
+                  "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
+                  "status": "superseded",
+                  "title": "Technology Standards Catalog — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff96-4e54-7284-a3d2-2152c26ba061",
+                  "status": "superseded",
+                  "title": "Technology Standards Catalog — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a20246-9794-76be-849b-1902e3020e31",
+                  "status": "approved",
+                  "title": "Technology Standards Catalog — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a20063-070c-703c-8c65-e459697181d5",
+                  "status": "superseded",
+                  "title": "Technology Standards Catalog — S03 Domain and schema (Phase D)"
+                },
+                {
+                  "id": "01a20247-100c-7dae-ae0b-449bd57b13da",
+                  "status": "approved",
+                  "title": "Technology Standards Catalog — S03 Domain and schema (Phase D)"
+                },
+                {
+                  "id": "01a1ff46-e0c5-78d8-ae10-490c8f2ac3e7",
+                  "status": "superseded",
+                  "title": "Technology Standards Catalog — T0 Model and contracts (Phase D)"
+                },
+                {
+                  "id": "01a1ff51-726a-7dc3-832a-df5941a7b988",
+                  "status": "superseded",
+                  "title": "Technology Standards Catalog — T0 Model and contracts (Phase D)"
+                },
+                {
+                  "id": "01a20247-822f-74be-b5a6-0e0e160eb317",
+                  "status": "approved",
+                  "title": "Technology Standards Catalog — T0 Model and contracts (Phase D)"
+                },
+                {
+                  "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
+                  "status": "superseded",
+                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/artifacts"
+            },
+            {
+              "category": "architecture-artifact",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "evidenced"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "partial",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:d",
+        "key": "T19F/d",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — D"
+      },
+      "subject_kind": "phase",
+      "title": "Phase D — T19F — D"
+    },
+    {
+      "category": "phase-d",
       "covered_key": "mandatory_artefacts:T2",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t2-d.html",
-        "sha256": "44dfd40520ed6bca4172a34b12311718e07f123ffbeb6e33de428cedbe05352a"
+        "sha256": "fba3fa1044ce40c59462850c06ec86e9b0f59a855670cdaf6670a8b2407cebcf"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -58192,7 +59937,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -58204,6 +59949,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -58249,11 +59999,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -58292,7 +60037,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t4-d.html",
-        "sha256": "c7cccd749be9106dfe953dfcd1e2b8708583dd511a96a50f1f78540cd55c1bb5"
+        "sha256": "29c68b992f3f7548f94fe5071e7bd9e1c44237d737c1d2db9f243f5756ea5c65"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -58346,7 +60091,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -58358,6 +60103,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -58403,11 +60153,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -58446,7 +60191,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t9-d.html",
-        "sha256": "fd6f88f59fe74331b74939749cda1ca153d5245fb2cba0a5c044e801164fe24a"
+        "sha256": "4030bf96284138188fb309e965f2b167fe12cece99ef9d96a12a18437240847b"
       },
       "gate": {
         "approval_id": "",
@@ -58500,7 +60245,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 36,
+              "count": 37,
               "file": "architecture.json",
               "items": [
                 {
@@ -58512,6 +60257,11 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
                   "status": "approved",
                   "title": "T19 — Technology standards"
+                },
+                {
+                  "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+                  "status": "approved",
+                  "title": "T19F — Technology standards"
                 },
                 {
                   "id": "01a1ff85-8831-7684-9055-4d7efe4d8ca4",
@@ -58557,11 +60307,6 @@ window.CONVEYOR_STANDARDS = {
                   "id": "01a1ff8a-4400-74c3-a502-7fe6416fe3ec",
                   "status": "superseded",
                   "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
-                },
-                {
-                  "id": "01a1ff99-ff78-7f6c-80f9-97a728b26d45",
-                  "status": "superseded",
-                  "title": "Technology Standards Catalog — T1 Plan spine (Phase D)"
                 }
               ],
               "kind": "rows",
@@ -58600,7 +60345,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-design-publish-e.html",
-        "sha256": "27324c634116fd433ac368e574942ff6569d69688a125d301474a52908f22ee4"
+        "sha256": "cefedd649d2e1dad81a60d8ddf0bd7dd6fdd20a0e434bc28290f78e287e16e3f"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -58691,7 +60436,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-p0-e.html",
-        "sha256": "ef676cc06af598e6c7d45c0b20f07b6d03db4ea2aeb69736fb277d96de6bab7d"
+        "sha256": "94f763641c8eb90095c7c84ea9f542e2a2ef4cdfa57391ceb5553e631b8dccfb"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -58782,7 +60527,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-platform-e.html",
-        "sha256": "2a97cc70f0dfcef4741a1562d2294bcbd9d7645daa11b58a8789e5426abf6dea"
+        "sha256": "9065515fd8637a4f20340dd17fef8cdcc71276fc7fb370a17a5144d044028d5b"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -58873,7 +60618,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-s00-e.html",
-        "sha256": "8c2e7a86714f3315ddfd5f81ed036b819116db4be28655f5265f97e5ceb6651f"
+        "sha256": "d9558d37b4a98f23daf165ed7bfe758197c754ef45c9d2b943fef358c99d4c09"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -58964,7 +60709,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-s01-e.html",
-        "sha256": "726433524d66eff0c2357813f3c3d211076eeb9e453d43657c55986569a092ba"
+        "sha256": "2fdd9e0469b013a04ee21387aeab306a329baf3854495c2bc94f59bf7b04aaea"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -59055,7 +60800,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-s02-e.html",
-        "sha256": "05d038b06fc2b92f54bf82913da8744968a4387cfe39c2e888f8163e509aa78f"
+        "sha256": "4175c4701578134f4e8fcbebf082c507feaa0f854bfabe6847e34cd90f69e01d"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -59146,7 +60891,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-s03-e.html",
-        "sha256": "abebc316a16f422b1f31fcbf895c67d94c7322996af56a81458a4a7014dc1f6e"
+        "sha256": "ed06b8b067b07210c290a7d54b0d44d5c6efc60b9e5370a986c9ea8c03943e09"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -59237,7 +60982,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-s04-e.html",
-        "sha256": "91528bc6bef71bc824bbe59a4de052f9e9adcec5b307f9e96c3c1a00e7ffa52b"
+        "sha256": "5ed3c6a972cc4b1dd280344de2e0c301a0b4352a3d1d4dc45d46db89b4549e7d"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -59328,7 +61073,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-spec-v2-e.html",
-        "sha256": "24f2f31b27e2bb0334032aeec0104c08e5063614095c0d40d217fed8ac396cec"
+        "sha256": "4f2f7b0b25213b1a6bbeae5aa4d0545bf277431772d1ba8a927861dcdd92f4a2"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -59419,7 +61164,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-t0-e.html",
-        "sha256": "789a0df17f770475fd51da08f15d0d96715675d1285c29724c9e4cb5f8b3c1d8"
+        "sha256": "5f3269c73e8796c6024eaeec6df08c25738a326148942f0fbb9c48f70dd4369e"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -59510,7 +61255,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-t1-e.html",
-        "sha256": "2a6669a7b52a0f77401e0460b934a64ead0fd357de05de0664483af571fc126f"
+        "sha256": "cae5072b1774044969e8270d058d159f92208a5a768e2509f24c950ad6b26125"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -59601,7 +61346,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-t10-e.html",
-        "sha256": "622293894fb11f13845ed6603857671bffcf91392d391592086ce4b582cf6188"
+        "sha256": "4fc19f41bfc33592bd9d805975f6fc0bbcdd438079b465c2f9a297d892f4b47b"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -59692,7 +61437,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-t11-e.html",
-        "sha256": "18f691e6d94ae7177911fd661b081606ef2d8cb3ba9ddbfba33c13a0031fc3e2"
+        "sha256": "0fe58f0445a64a295bbc18c151214c6583cc71f7550a1232819cae9f6f30d659"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -59783,7 +61528,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-t13-e.html",
-        "sha256": "0fe6b2d1cdd67fd2a4a4cd3fad05801704df9b97edb12dd868f2cf69bbfd4945"
+        "sha256": "c3c15e8bafb2f8d8db621aff41316848413eda86d09ede141f6f8d49a76e65c5"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -59874,7 +61619,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-t19-e.html",
-        "sha256": "42ec3860f57343279a977dbd0314bb01ab8d7baf8b18dcd5a3480480ddcb4f95"
+        "sha256": "af1102634578c42d45630efb39feda672ce7846d207c3514b4f7cde102e8a314"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -59961,11 +61706,102 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "phase-e",
+      "covered_key": "",
+      "covered_rule": "mandatory_artefacts",
+      "document": {
+        "path": "docs/standards/std-togaf-phase-e-t19f-e.html",
+        "sha256": "bd48168a8476835e8f1c7e1eaf56207c57b459d4cce96357bb7afeb1bcc584f7"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-phase-e-t19f-e",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-e-t19f-e:T19F",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Contract and gate",
+          "missing": [
+            "No row or document satisfies 'Contract and gate'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [
+            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/artifacts"
+            },
+            {
+              "category": "architecture-artifact",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:e",
+        "key": "T19F/e",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — E"
+      },
+      "subject_kind": "phase",
+      "title": "Phase E — T19F — E"
+    },
+    {
+      "category": "phase-e",
       "covered_key": "mandatory_artefacts:T2",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-t2-e.html",
-        "sha256": "7965b8b913680ceecf741f1aa1db8bc80d63bfdb3723ac2db7eb01c560514458"
+        "sha256": "9bf2d406657b3d12ceb27e24db51ec55b7a397b459b83cc2d94dbf3906cd0012"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -60056,7 +61892,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-t4-e.html",
-        "sha256": "8147c30e4395d14edfe571bf980b813e0ef298464da001821fbb1e282a57afeb"
+        "sha256": "04e6db7abec10c04de3db477d71f4d334e3c973d3de7c2c25f9cdd7d912c51fb"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -60147,7 +61983,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-t9-e.html",
-        "sha256": "d8468e91c48d932acbd5c6b613844b5720557f250afc95de42b3b11fc1df1cbe"
+        "sha256": "e3310cc65341b87a0ca18b47289971a256ed73b614e8f475a685ce5152c11b12"
       },
       "gate": {
         "approval_id": "",
@@ -60238,7 +62074,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-design-publish-f.html",
-        "sha256": "307cfa5b6b8795cc902998cb13dd79e49ecf75cd36c1c05bc984dd5225f2255f"
+        "sha256": "934070ef6caa6fdb338a6372ab74b87f42ec729b5351c650fa10b29fb5e96905"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -60272,7 +62108,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -60388,7 +62224,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-p0-f.html",
-        "sha256": "b6441c9ad0ff69da372fa297ebd1943998c0a3e4af194270ae87d00f16976eff"
+        "sha256": "203afcdff9e8bdebbce2dbfcd41e6370d05111e5d5b008901b8f7ec941ab1dd4"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -60422,7 +62258,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -60538,7 +62374,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-platform-f.html",
-        "sha256": "7f06128ba81e634e5dc9aa3a3adfd0a0f2370941a46ec7d267c8ca33f652516d"
+        "sha256": "c70c0d2adc2f4041bcf2b99f3f434ef0d5d7eefee5e500760b0566aad5970fb1"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -60572,7 +62408,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -60688,7 +62524,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-s00-f.html",
-        "sha256": "2c834b64c5ac64d35c315e413325863f743d6ad6a2e7ddd69fee9bcc965881c7"
+        "sha256": "c47e6a6f928a86600f27cca8d383a0cd02903e3b41c3c40a7f11f60d9ec10211"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -60722,7 +62558,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -60838,7 +62674,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-s01-f.html",
-        "sha256": "30fe2dc321455aadd04ae6a51652759bdf5c468ffbe41f1ec7b4b78370c37b6f"
+        "sha256": "e076376cac479c3709c5bbd8918cb62669136e3fba59b61e827fbb84de7a2db1"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -60872,7 +62708,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -60988,7 +62824,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-s02-f.html",
-        "sha256": "170345b1f553cc40d320951fd7d69f1ef1015c29ece76ea6ae64740343424201"
+        "sha256": "166e7f89366326d52afe2333da6078f7e7a6cdf0874701bd90fedf95157efc6f"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -61022,7 +62858,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -61138,7 +62974,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-s03-f.html",
-        "sha256": "614d009c8404c8fa1712626740469cddbb67692b0a827c855641871009b97132"
+        "sha256": "c51be79803c290db810f08d32ab6b4ed4b4c9a8876a02a7cefcefbd9a96f22fa"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -61172,7 +63008,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -61288,7 +63124,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-s04-f.html",
-        "sha256": "3cb3ae55dc6baff2b601a3279e6ee4fd6a9f9484620ca024379acb818080bf53"
+        "sha256": "54c92e94c7a82cf8bc7dfca2f116c4a0446fe8326fbbbafe79a551fccd553440"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -61322,7 +63158,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -61438,7 +63274,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-spec-v2-f.html",
-        "sha256": "5e36e56fde82b3c97e1424132b7e8ca97f70da3c04d092d896e80232d2216a46"
+        "sha256": "e40ebdc88a1b605ab2b82d5053616494387b4f166d7d1fb80bef659a9bb6e938"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -61472,7 +63308,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -61588,7 +63424,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-t0-f.html",
-        "sha256": "419276f3ebec25b693ede96437a4f64fcf3d9a68b062fa33f0cfd0ebddd3e1b7"
+        "sha256": "80514f41fca6dfe4a1cab1d38f182117f014f8b0a43e450a117af50be91af8c7"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -61622,7 +63458,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -61738,7 +63574,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-t1-f.html",
-        "sha256": "334dda9926f8b3e6dbda9722b7d2ba2f1e6d8e169ed43ceed7c1913050cecb55"
+        "sha256": "78ee6cba3da3975c39f2a77d69656b711563586f525b3dca22f5495b60d3f3e3"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -61772,7 +63608,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -61888,7 +63724,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-t10-f.html",
-        "sha256": "e10d56fcf1cdb7706d9b2d72d173f76b92860bbb703f31e013b0a5e8e2b53552"
+        "sha256": "a710412cebfbd30cbdf96f8a5b9834c6346cca12dbd705136e004d2b9769ef80"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -61922,7 +63758,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -62038,7 +63874,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-t11-f.html",
-        "sha256": "3bdf4d8b3de2f34b550768619ee865c888b9ba971d4127f8990fbef1c259a92d"
+        "sha256": "0949c31efa8e00d169b31b5997a7a3ef99ab80f8a177e4dc4133f51400a898cb"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -62072,7 +63908,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -62188,7 +64024,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-t13-f.html",
-        "sha256": "1817e4ffbdddd43c62ef191fcc8b74fd03b1ad2c5272563e0921002c40e33e52"
+        "sha256": "249b1593d5d02baafb265cb9be5de23fa569d08ac90d56a18d43d7616a3fc928"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -62222,7 +64058,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -62338,7 +64174,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-t19-f.html",
-        "sha256": "776fc1913ce6a925e8c7c5ccb5a499e4c1a24f1c87fe6e5dbd6afa29b7986825"
+        "sha256": "915853e7205b012777d837184c051f6034c88cb331af4dcdd318f1176c0a13b3"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -62372,7 +64208,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -62484,11 +64320,161 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "phase-f",
+      "covered_key": "",
+      "covered_rule": "mandatory_artefacts",
+      "document": {
+        "path": "docs/standards/std-togaf-phase-f-t19f-f.html",
+        "sha256": "e6375716c28488f4b0c9e207bbc115be009f610fc582c772c5ab70f4393a0f3d"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-phase-f-t19f-f",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-f-t19f-f:T19F",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Contract and gate",
+          "missing": [],
+          "sources": [
+            {
+              "count": 19,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1fdd4-ab0f-7802-b7a7-2541a2902e6b",
+                  "status": "live",
+                  "title": "Delivery contract — P0 programme definition (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff31-30fe-7003-8d62-59278699d128",
+                  "status": "live",
+                  "title": "Delivery contract — S01 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738",
+                  "status": "live",
+                  "title": "Delivery contract — S00 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff3e-0f21-7e12-888d-1a54e7a90c9d",
+                  "status": "live",
+                  "title": "Delivery contract — DESIGN-PUBLISH: the published studio design pack"
+                },
+                {
+                  "id": "01a1ff42-7bd0-7d9e-883a-1059368cd356",
+                  "status": "live",
+                  "title": "Delivery contract — SPEC-V2, retrospective acceptance of the organisational operating model (2026-11-21)"
+                },
+                {
+                  "id": "01a1ff47-1159-707b-a737-582f894cc956",
+                  "status": "live",
+                  "title": "Delivery contract — T0 Model and contracts (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff85-bda3-7671-a5b1-42eae3b0e6ee",
+                  "status": "live",
+                  "title": "Delivery Contract — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff8a-754f-70de-a63a-fa8d00596433",
+                  "status": "live",
+                  "title": "Delivery contract — T1 Plan spine (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff8f-08ee-7bc5-bb39-81304d03c4ef",
+                  "status": "live",
+                  "title": "Delivery contract — T11 Metrics, metering and maturity (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a2005c-18e4-75a7-9c20-2d83728194e0",
+                  "status": "superseded",
+                  "title": "Delivery contract — T2 Decision ladder (retrospective, U5a)"
+                },
+                {
+                  "id": "01a20063-3a7d-7e67-a437-2e0884f6c46a",
+                  "status": "live",
+                  "title": "Delivery contract — S03 Domain and schema (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a2009a-7bce-7a8f-96fd-f5159286a09e",
+                  "status": "live",
+                  "title": "Delivery contract — T2 Decision ladder (re-review at the fixed P0)"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [
+            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/artifacts"
+            },
+            {
+              "category": "architecture-artifact",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "partial",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:f",
+        "key": "T19F/f",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — F"
+      },
+      "subject_kind": "phase",
+      "title": "Phase F — T19F — F"
+    },
+    {
+      "category": "phase-f",
       "covered_key": "mandatory_artefacts:T2",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-t2-f.html",
-        "sha256": "de6fd5a4041f523ab5c880ebb340ea5bd5090cf2a663bbf5b406facb606008a0"
+        "sha256": "a2cbe288ae8f36b85575d4056ba06a1e9940d8eed949454cea2ce635ce16f708"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -62522,7 +64508,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -62638,7 +64624,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-t4-f.html",
-        "sha256": "591906c85fa7f8791a5bbff69efbfa5065d4967308f35693231acce477719f9f"
+        "sha256": "1d67c79efc59a16c6a0d5a7d4901a1cf1eb04de982151a38c7aa0bbe8ec06616"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -62672,7 +64658,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -62788,7 +64774,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-t9-f.html",
-        "sha256": "7756c3993373a7e5002a92c72fca238590f666cb4521bc124eedee5bbbfa49ea"
+        "sha256": "7d491d37bab863f48fa11fee9838cb83d2f7df83a95f0575f38c32977da7d46a"
       },
       "gate": {
         "approval_id": "",
@@ -62822,7 +64808,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 17,
+              "count": 19,
               "file": "architecture.json",
               "items": [
                 {
@@ -62938,7 +64924,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-design-publish-g.html",
-        "sha256": "150b7247512906336b186f8fbdf96afeaae4cd2d762a01e4da69c3eaea330464"
+        "sha256": "77602607044bb557b061b09252348a9f9dac0b880d741606f6d932ebcb0febef"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -63029,7 +65015,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-p0-g.html",
-        "sha256": "d479adbcc372ae63bc2c650244b6779d8b77a86c1fa61c5b2ec756f41448c5d3"
+        "sha256": "d3c523508f9dbc1186718578e2e730cfed23233914ee32f907d515911fc583ed"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -63120,7 +65106,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-platform-g.html",
-        "sha256": "24c0938e5015944d9222613067317236bf1f0d790058a2f020b2c96cd3812dc3"
+        "sha256": "61f1d724246067f0bd5d84034c4fd082fefe51818e040eefe9b993e4c1df4f44"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -63211,7 +65197,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s00-g.html",
-        "sha256": "7cd5b2ffd54ef2ecfb9d90e3352c5adc726cf4b2d27813b4f2d74ac1a77dc335"
+        "sha256": "4ad0f63c8b1c922c2ad6b6fc564b7be7c3cbd34765672ce26f2f5203822b103d"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -63302,7 +65288,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s01-g.html",
-        "sha256": "4ee5069935b7f520869f5b6ac77328a4c7370f2dca1836faefe1a5aa226ab84e"
+        "sha256": "bf87bff0e39dcf5d92e91754e62c01f75b744746a6838198cd09e1600e1173a8"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -63393,7 +65379,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s02-g.html",
-        "sha256": "30ed92f9727458e1b79f6fe6f60b5854cf45de68091b68f8e36ad429ddbe2b4a"
+        "sha256": "9ad4068b8cc5dab4910f2aac15ce12f77db01d995db3da736a8636d704afc5c5"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -63484,7 +65470,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s03-g.html",
-        "sha256": "27f398fe853aa1980770d89c5a1ba7836d337242590917d4d8464c71593c2e04"
+        "sha256": "f722bc0f8663c945fe72e8a746005b6030531a31184db07c4fda7e96ed7e6618"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -63575,7 +65561,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s04-g.html",
-        "sha256": "fe7c6066b58c4463b9ca2774225612747beff087a384acad6905a69b324ed8ed"
+        "sha256": "c1b93578cc30e3c388e9f260945d827e5adf1e34f8940368abf06b894137ed55"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -63666,7 +65652,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-spec-v2-g.html",
-        "sha256": "f97cdf8ad66444b4c84403eb068c537ab3715a38db36945f314d0ef8a6cfd70d"
+        "sha256": "0a807e5edcced889212f236a2c210e7a75de8d4bd3710df5e3d95cf29e73f71a"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -63757,7 +65743,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t0-g.html",
-        "sha256": "5c6b64e982ebb23d788c0bf7d15b776eec68b72303b28bfaa0ef1c017d404ee2"
+        "sha256": "f1d713dc38fd5c34ab5714e4d4e5e29eefa0a29ff6cfc3772e41bd7e68877b97"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -63848,7 +65834,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t1-g.html",
-        "sha256": "df17839cf93840eee1903da2d827627599ef5995900831ad67e17d4a72a71977"
+        "sha256": "8b003c0b54fe751c16e61ebef21266ad4eb3b59f6fa53758b611d58c8591e6d4"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -63939,7 +65925,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t10-g.html",
-        "sha256": "654258cb33eeafb13de31987b395492b6710daccfccdcc4f87ef4c7a21f785f6"
+        "sha256": "cbdcc31b447f3f5e22b5cafabe04ee490a2b0e670d8da13302f7b6203a6b9a89"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -64030,7 +66016,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t11-g.html",
-        "sha256": "10cc3b9d74ea1acc7be180cf33d806dc20ad4230e371cf2186e491bab5898775"
+        "sha256": "f261e1551b34aaefea645d9762aa74e8e1c8aa424cbff8b06d0c53b874c40c6c"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -64121,7 +66107,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t13-g.html",
-        "sha256": "a10c4c5280e73c9d4397fdd05b811cac63cd4e4b2e94812dda29ec907317da48"
+        "sha256": "fd99d3350296e78779422b2323331f11c2ec7d5b082ee168b9d5a9b115cbe298"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -64212,7 +66198,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t19-g.html",
-        "sha256": "9b99a113c2459af9f3cca067e463b58d894e8b2e0ddf362c4d6030d41e64ffb7"
+        "sha256": "aa86775ac8f2c782efcd39a96bdb4eed3034bc3a62d16f70ecd1d6bf29b9752f"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -64299,11 +66285,102 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "phase-g",
+      "covered_key": "",
+      "covered_rule": "mandatory_artefacts",
+      "document": {
+        "path": "docs/standards/std-togaf-phase-g-t19f-g.html",
+        "sha256": "db88ccc11a488d9e317f768074b28598a2dc1de7d3db22193399ab841b2ce91a"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-phase-g-t19f-g",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-g-t19f-g:T19F",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Contract and gate",
+          "missing": [
+            "No row or document satisfies 'Contract and gate'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [
+            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/artifacts"
+            },
+            {
+              "category": "architecture-artifact",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:g",
+        "key": "T19F/g",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — G"
+      },
+      "subject_kind": "phase",
+      "title": "Phase G — T19F — G"
+    },
+    {
+      "category": "phase-g",
       "covered_key": "mandatory_artefacts:T2",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t2-g.html",
-        "sha256": "2052cdc34bd545e4477377d6ea4f4cc87c81be8d15eed3af75393d9dd2411abb"
+        "sha256": "82ef8ff68449b6a479336e01bbe42cd9ecb419b3ea8c0cb90dd61addedc5105f"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -64394,7 +66471,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t4-g.html",
-        "sha256": "a183f910cc7e3f88d455e262cc90063e5dbb052d5bf13f44ae48cdca699d8b7f"
+        "sha256": "987f0c0bcdc2fe7237214d6585ef0a88b61dcb839c7e890d3d254eef58fa6ffe"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -64485,7 +66562,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t9-g.html",
-        "sha256": "ab36a0d8243a9519de242efcea091694f2d0674acba53d28eb2fba88d8c176a4"
+        "sha256": "de08594d876a9a6f2bc1f80f531033755d12226876a926ddbc64e7c50f8adabf"
       },
       "gate": {
         "approval_id": "",
@@ -64576,7 +66653,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-design-publish-h.html",
-        "sha256": "23a47365c73492963aa742660decd10542c5838fbd666d8144d02680af2a733c"
+        "sha256": "60b231846a07a3dc1ac0f862af098ecf2c8dd5435b592c32e40232bfd12f0d0a"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -64667,7 +66744,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-p0-h.html",
-        "sha256": "11417bdcbca3155733c7f2fd887f80ed9df1afc6f178466c1ddd10c126e2a73e"
+        "sha256": "01c169efa417bb3dcd8c686de4220e21aadabae23b79e66a1e5c278cf528d28d"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -64758,7 +66835,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-platform-h.html",
-        "sha256": "a7a9a077fc08678fcb376803f4284b229387dd1241c0e052c2a89bcdf6a467f1"
+        "sha256": "e4c71a4bbdc6064fca9f27dcbf4f871981d88678f0b72ebd9af3008c952f0249"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -64849,7 +66926,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-s00-h.html",
-        "sha256": "33973afb620867de610aad3bb0c90679d7f8ec8cbce306ad8a2f1878a266774c"
+        "sha256": "3fa7579c9a4b5946b93aaba04205725f8fd574b8c579de6817638a39aa303796"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -64940,7 +67017,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-s01-h.html",
-        "sha256": "650ab119f1f373c3ea7d250f637436855cf7c058bd956d0e871e4f7702cca97c"
+        "sha256": "1cb079605240f904e20731a13d5f91eb6fd24443bacb0b4f9c4eedf3413ebb33"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -65031,7 +67108,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-s02-h.html",
-        "sha256": "cba19cae466fbf41ea8d00c4d855611cb586e31d6aa10d099635b8dd28dede80"
+        "sha256": "e4d5f8aacb27ccbdab0a92aa3345d75f97adb6bea5551621dba9c69c4bf78dc8"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -65122,7 +67199,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-s03-h.html",
-        "sha256": "63550ddbf08603081245b5c1c7476afc5e77a5dd46c9845e28118136109b0b3c"
+        "sha256": "f752c0cf1777a926dc00d9c37f6387dacf8ab4dd9665e1b30aa0073db92a25a8"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -65213,7 +67290,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-s04-h.html",
-        "sha256": "272a7f4dc86e1300770c7a00867113eef578805db425fe76cfb8396d63d5b249"
+        "sha256": "d4006b82c9531589db17d4840bb64921ec63a4a219d2a76491daa858e8059741"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -65304,7 +67381,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-spec-v2-h.html",
-        "sha256": "070616a8044c38d8b25559f7a8a2f77aa3ccbba5936f638287eec0cb0b51dc75"
+        "sha256": "17371caad31f44d424932beb882c240d7c773fb4f5adaf235cc2b9338d085ca0"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -65395,7 +67472,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-t0-h.html",
-        "sha256": "3ac71a7f60350877e8c71841e45a2b4542399c707642834cc321e7f67792dbd5"
+        "sha256": "b33570b69247fd6c23b78c046005921eeef88812d54a529125d212a3802be5f7"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -65486,7 +67563,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-t1-h.html",
-        "sha256": "7ea9a667e4dbb80509fd4cd65a345d149b18851a8ea2f7a0bd250790d2af48f1"
+        "sha256": "f0b94f47fbdc9585b58b5036403723d0a7033009409a24d47134ca5b945eccd2"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -65577,7 +67654,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-t10-h.html",
-        "sha256": "335fbbe92a28078588bc73d2155e7a544908fa365e3c993572b527c69d87e11f"
+        "sha256": "dd0ae4380571c86bd846740defad332ae9d850f2e43572751a2dac4ed1c7c134"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -65668,7 +67745,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-t11-h.html",
-        "sha256": "010b2af9db8dae455c923a0b599dba111589e246b60507a0f409ba2bd3eabb0b"
+        "sha256": "8daec569ea139462df3f189fccdb57b06ca5ef56c04dd56f0d82a2ca5949854a"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -65759,7 +67836,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-t13-h.html",
-        "sha256": "c6cce59f91046152294be1043d3bc49f02ead12a7ca7208a6e00fdb29dcf47ec"
+        "sha256": "f91f2738f4106bb0c0893509050dfdea122dc1ef9973fd1d1d50e6967e22522b"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -65850,7 +67927,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-t19-h.html",
-        "sha256": "301c708e81de2d6205e1c5cd0076bd098eee60752053e24d7f1969d896d05770"
+        "sha256": "2719eacceac767b241506a487dfb6000fc88cee198e237897db17375d76b6a5d"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -65937,11 +68014,102 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "phase-h",
+      "covered_key": "",
+      "covered_rule": "mandatory_artefacts",
+      "document": {
+        "path": "docs/standards/std-togaf-phase-h-t19f-h.html",
+        "sha256": "e75938032b2545223bf9a442ac2b9022fe32f9c9d0ec855a0e8da25321adcbf7"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-phase-h-t19f-h",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-h-t19f-h:T19F",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Mandatory artefacts",
+          "missing": [
+            "No row or document satisfies 'Mandatory artefacts'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "phase_artefacts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Contract and gate",
+          "missing": [
+            "No row or document satisfies 'Contract and gate'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Evidence",
+          "missing": [
+            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/artifacts"
+            },
+            {
+              "category": "architecture-artifact",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:h",
+        "key": "T19F/h",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — H"
+      },
+      "subject_kind": "phase",
+      "title": "Phase H — T19F — H"
+    },
+    {
+      "category": "phase-h",
       "covered_key": "mandatory_artefacts:T2",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-t2-h.html",
-        "sha256": "8f80ef059958a630e8fde61ac23e41260797f9e83191c11a75c89a6b606572b4"
+        "sha256": "d46f8f09f88e5143b1c0d0d2aa10d0083e56e4544ff9c939bec50ad73e9fe8ad"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -66032,7 +68200,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-t4-h.html",
-        "sha256": "d4b1c5075569ba48074ca028b70fdb9f9cdcffdedf82475a26b9b61762bb650a"
+        "sha256": "04711701a49159c0f7dbd08489f710b3eec3a894316d74d113c9f06eacb1c0a2"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -66123,7 +68291,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-t9-h.html",
-        "sha256": "b257e3c114ead32b4bde0e82eba8424ba919f9cd76793ef184ca8e80b054c27d"
+        "sha256": "4208f7524c4975a38a3bc545855b0aa0afc21a528bfd0540efcb247e1990b560"
       },
       "gate": {
         "approval_id": "",
@@ -66213,7 +68381,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-design-publish.html",
-        "sha256": "48f1179a66a101f367a7e67b6e7d855608b43dbff48a72625e03a4efad4552d7"
+        "sha256": "fcfaeb2dd89ac57436f59bd9ee5d8ac6ccc588e9037516a2258cb3ee9d8370d7"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -66295,7 +68463,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-p0.html",
-        "sha256": "9091a92128b7f9f75ef5731e4a25e29bb52cee7abbd7b69775ead8ce212d60b1"
+        "sha256": "aafe944dc68720fedb252eb00a5dba7b3601d4e33a53036daeb7663562179fff"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -66377,7 +68545,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-platform.html",
-        "sha256": "793ef5865c8cf3e72c64ffd2ce2bcc8e4869bf98a0fed2dcca40359a60d42e64"
+        "sha256": "89bd51e7b991d0017e700ea1cb8a300bafae6e3c4687c7d8b8f2da8213dbdbe6"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -66459,7 +68627,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-s00.html",
-        "sha256": "51c1760dde73d14dd9bfac9e047ca0f69f978c99910409f1d6109e345ddc88e1"
+        "sha256": "a7d23333d1382a5929cb0f44807b0bcdf13962b38f13df9ec406eacc4e8c8602"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -66541,7 +68709,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-s01.html",
-        "sha256": "950e40b703ffc48d9b83da7a6a35ed4c367002671accfd3dddfa9bd345dfc7e6"
+        "sha256": "6a2aa9692aed85b066fa24e2b7742f767fbc0bb3ff0a7c1262f7f5ed7510b282"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -66623,7 +68791,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-s02.html",
-        "sha256": "8c95a52e5c2ff56d793749e56dcf869287fab5e452ec63666dbd832892fccdb8"
+        "sha256": "45cb91d3ce746c9c755d9313c41a8b9719f5c42ddef7a8b334f6d5c49b6d75a8"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -66705,7 +68873,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-s03.html",
-        "sha256": "eb37f0dfe27a797fa9849696184addad3b1bcf457f5170918886dc4cacecf52d"
+        "sha256": "7724469dc73a16d0c4922c01c20a15d46059112ec904187c96c149af7bf10521"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -66787,7 +68955,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-s04.html",
-        "sha256": "70cf43c47199777a12e75efc51d91dbe1f7504c9edc8f58aa47e9784cae65e79"
+        "sha256": "f9f81fd5b08c479615fe9e9064ceaa9a549d6bfd286f9a527238a09683a5f214"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -66869,7 +69037,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-spec-v2.html",
-        "sha256": "df46d4b36c3a0a7c2edc84172fa1b50288d131f4912b2d9848df2004d9fd7c2c"
+        "sha256": "771aaed8b81f78343b15c42b6eefcf077eacc2e220c345030a5bd52df27955c1"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -66951,7 +69119,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-t0.html",
-        "sha256": "667b4cb7ca6b7f5a72c84cbe5d8df1dbe2df877b59f421f10c237aa2c81e5146"
+        "sha256": "df76b1c09707c9e0a1a9bf2847835e59a05cadaea7f6b6b81d3bf6a3d45a3635"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -67033,7 +69201,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-t1.html",
-        "sha256": "049ac06b8bf8b64185a2e4cdc2c72879e3c1cfc61dd47128e35f52ff3bbfaf69"
+        "sha256": "f7be2b7c5439d566bc35ebd5f952d217330e4af8954be725498ddd5f1e68c157"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -67115,7 +69283,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-t10.html",
-        "sha256": "f08f6c0c257e3c50796f7a4faa85ddce425a67cc1cc21f7bbdabbc90aeb11ec2"
+        "sha256": "198f5e35f4ee1aaf70e5f290055e6c2a3e86fcac1aed8bbfc3a890701291cddb"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -67197,7 +69365,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-t11.html",
-        "sha256": "24c9bf58806f5d763ae01d381e395fa1c4a5824c923eb466e4c795577dfbc240"
+        "sha256": "2650211dc9b3e0c1a1e4c844015fae1d476bf8a107e305b4b666ead64fe424af"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -67279,7 +69447,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-t13.html",
-        "sha256": "e4bf266b1a52679547056ead4e3f494b7fd1e641dec99909079bda71f938dfa9"
+        "sha256": "79218e73837c7c998a008ad961731e2f82f04335c1de26277ccac8628e9d4834"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -67361,7 +69529,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-t19.html",
-        "sha256": "4c2438af7702b0c9d6a3dd092a8cd48a54db1515ff8759ee653ee99dcf219283"
+        "sha256": "da85e0dbb088d63c90136c80aa4bc424c782084ad3fdc720adb2dd8094ee5d20"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -67442,8 +69610,90 @@ window.CONVEYOR_STANDARDS = {
       "category": "request-for-architecture-work",
       "covered_rule": "",
       "document": {
+        "path": "docs/standards/std-togaf-request-for-architecture-work-t19f.html",
+        "sha256": "523fb4da0f22f621760ceb994733b9f942fe342cabc21ccc7de25fb00c8bab50"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-request-for-architecture-work-t19f",
+      "level": "project",
+      "mandatory": false,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-request-for-architecture-work-t19f:T19F",
+      "package_published": false,
+      "sections": [
+        {
+          "heading": "Purpose",
+          "missing": [
+            "No row or document satisfies 'Purpose'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Scope",
+          "missing": [
+            "No row or document satisfies 'Scope'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Decision",
+          "missing": [
+            "No row or document satisfies 'Decision'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "absent"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+        "key": "T19F",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+      },
+      "subject_kind": "project",
+      "title": "Request For Architecture Work — Follow-on: docs/plans/T19F-meeting-bindings.md"
+    },
+    {
+      "category": "request-for-architecture-work",
+      "covered_rule": "",
+      "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-t2.html",
-        "sha256": "ac99162019684ec86649696ccfb92b8f3417a34ff9ae244426aebb5e1e03d63d"
+        "sha256": "11275b550e941b71a50109021255cdebd294ee0a6743756d829198c881700719"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -67525,7 +69775,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-t4.html",
-        "sha256": "8156ccb2999761f7a576d82ce91ea913c3bb5691be6c49bc412e581569be3855"
+        "sha256": "77371c3347d0e9abf484972d6e2ece1102e58537fd6b43a50f7fb2992692ffcc"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -67607,7 +69857,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-request-for-architecture-work-t9.html",
-        "sha256": "f3007dadfe5391801995b939c4e6662c412c86385d30e294f2ad5c148093fb31"
+        "sha256": "e49e5db6363c3987651e1baee69922eecb157a6363cb23fa249519ce5c99acfe"
       },
       "gate": {
         "approval_id": "",
@@ -67689,7 +69939,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-aaa-ui-proof-285-2026-11-19t07-3-2.html",
-        "sha256": "20f1d2d50d1bd3c5907ed52e1b162fc6175726e0f4cecad69fc8236eb2a3e8fa"
+        "sha256": "bb79fbc50e723b382bfa26fc5e3f29b1e088e312e82a0b1ef5ca4975690d974d"
       },
       "gate": {
         "approval_id": "",
@@ -67707,7 +69957,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -67782,7 +70032,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -67857,7 +70107,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -67932,7 +70182,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -68007,7 +70257,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -68097,7 +70347,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-aaa-ui-proof-285-2026-11-19t07-4.html",
-        "sha256": "376e27b794a358416cdd9764b9f9d4089314f91c7dfa7dff501d85776ba81b76"
+        "sha256": "ecf0fca07deac08113bd3395b81326ffd47496c3dd44d0cf12888eaaf608c461"
       },
       "gate": {
         "approval_id": "",
@@ -68115,7 +70365,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -68190,7 +70440,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -68265,7 +70515,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -68340,7 +70590,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -68415,7 +70665,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -68505,7 +70755,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-design-publish.html",
-        "sha256": "d50b6c039e4436a2a3ec6ca62a4f0e5bb6b85c5c5c418bd6db23f780ae1d2648"
+        "sha256": "202259fc11ef19b5be466118f2d35d95e9470db40a6a54822affa8e2ea108a2e"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -68523,7 +70773,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -68598,7 +70848,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -68673,7 +70923,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -68748,7 +70998,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -68823,7 +71073,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -68913,7 +71163,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-p0.html",
-        "sha256": "f1e4e1986adaeca13126fba4dfa2ee5224e9d138b95e0d5856cbe4706f4f588b"
+        "sha256": "b7e254349e21c27b1a8e5b11815813cc5a828521ddbe724a1ec7c73f76bd2c6b"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -68931,7 +71181,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69006,7 +71256,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69081,7 +71331,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69156,7 +71406,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69231,7 +71481,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69321,7 +71571,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-platform.html",
-        "sha256": "c49e7d3ffbdaa2a1ab3895a553586443e32a04468144b333b04f343d9e887674"
+        "sha256": "d8f3fe16941d8461f8f113c2970f6b73787b0615dcd057b3fcef25fe5dab8bb9"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -69339,7 +71589,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69414,7 +71664,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69489,7 +71739,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69564,7 +71814,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69639,7 +71889,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69729,7 +71979,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s00.html",
-        "sha256": "1dac8c6b46a9726544585e4526ef78f912adc0d900e149373e1498a729da6981"
+        "sha256": "bf7ee7e8889092165b35aef1a0bd4aae33c31ed6785c5fab0eedf29c1fd5af68"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -69747,7 +71997,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69822,7 +72072,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69897,7 +72147,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -69972,7 +72222,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -70047,7 +72297,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -70137,7 +72387,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s01.html",
-        "sha256": "836fad257b507d2f54b96db7c759f11d0b8883530d95ab5e819868828273533c"
+        "sha256": "270201ffb456f8896c7c919c579d42f040f3b9e787bb01e180ddfe9b70252a9e"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -70155,7 +72405,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -70230,7 +72480,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -70305,7 +72555,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -70380,7 +72630,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -70455,7 +72705,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -70545,7 +72795,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s02.html",
-        "sha256": "e01a3fe48e05839ff59342f03e98d07063f40df9ff9c15531a960d8f5c303e37"
+        "sha256": "81fb8c15b4b1fc81f88fc824e59afd21ccea30b665f3bc0354a2f3b83eb5ad23"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -70563,7 +72813,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -70638,7 +72888,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -70713,7 +72963,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -70788,7 +73038,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -70863,7 +73113,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -70953,7 +73203,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s03.html",
-        "sha256": "d439590ed87210dc8f7f2603f085b13c119ed562cc5ce24d2a74143f112a23ad"
+        "sha256": "e43905374f09e84f4dca7c2d943450a488f50217cd6a691e3f33f9a3920f375f"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -70971,7 +73221,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -71046,7 +73296,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -71121,7 +73371,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -71196,7 +73446,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -71271,7 +73521,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -71361,7 +73611,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s04.html",
-        "sha256": "3b6764fdc134f8d7eac51c51dfa9c276eae6c226dd90778eaade1f151dc0d0cc"
+        "sha256": "fef50eb3d60584333e83e25fb29b0b6c999cfb1d086303e82086e069e6428240"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -71379,7 +73629,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -71454,7 +73704,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -71529,7 +73779,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -71604,7 +73854,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -71679,7 +73929,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -71769,7 +74019,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s05.html",
-        "sha256": "1032e2fdf6b68fe46edf42d17ed7b84a44dfa5ef4347b74457a278709f829854"
+        "sha256": "4762b856e10ad402858fc2ba131e680f5778e885ceaa555678ef9cf6d355ff92"
       },
       "gate": {
         "approval_id": "",
@@ -71787,7 +74037,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -71862,7 +74112,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -71937,7 +74187,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72012,7 +74262,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72087,7 +74337,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72177,7 +74427,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s06.html",
-        "sha256": "83530ed1df9ef0279a10aa11e72bdaaf32531c6107aa8e1f4589cb0e68d4e1a2"
+        "sha256": "ec0ef909de68c38f869b351235f79edce451ebd189243c1956e742c16dc53a22"
       },
       "gate": {
         "approval_id": "",
@@ -72195,7 +74445,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72270,7 +74520,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72345,7 +74595,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72420,7 +74670,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72495,7 +74745,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72585,7 +74835,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s06a.html",
-        "sha256": "7897b2211a462ac921da41e33fb8e451041966075ef05104d53a76732e0c5e87"
+        "sha256": "7ba724114eeccb1c666f097a0d48c6d763c7e4763d52dbb0b339fab33fd306fa"
       },
       "gate": {
         "approval_id": "",
@@ -72603,7 +74853,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72678,7 +74928,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72753,7 +75003,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72828,7 +75078,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72903,7 +75153,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -72993,7 +75243,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s06b.html",
-        "sha256": "5be88a4eac3ed85025091cb10c70505b91091ee1709ac6f05bacce4e33f1ecaf"
+        "sha256": "ba375631c5aba4f9fa0a8d65c1b5ad113b8d26a3131a9e88f6279cf0175fabff"
       },
       "gate": {
         "approval_id": "",
@@ -73011,7 +75261,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -73086,7 +75336,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -73161,7 +75411,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -73236,7 +75486,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -73311,7 +75561,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -73401,7 +75651,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s06c.html",
-        "sha256": "d4b179b309f8ceb493360a1b804c40323e927a17d1f12996534301d9629e3ccb"
+        "sha256": "cc9b3ace10463d10c7c567b1f096d6dede66b2dd7e40bcfa7622dd48a4334a5c"
       },
       "gate": {
         "approval_id": "",
@@ -73419,7 +75669,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -73494,7 +75744,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -73569,7 +75819,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -73644,7 +75894,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -73719,7 +75969,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -73809,7 +76059,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s06d.html",
-        "sha256": "d540d76f5d7c6a386b88663fbc98fb4b6cdb232503d2258ff739d57903202377"
+        "sha256": "f90199f1613c782405de9b6a91cb12013773fcbd80a1ed929497f6f692b2978e"
       },
       "gate": {
         "approval_id": "",
@@ -73827,7 +76077,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -73902,7 +76152,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -73977,7 +76227,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -74052,7 +76302,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -74127,7 +76377,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -74217,7 +76467,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s07.html",
-        "sha256": "931910506cacc5afe74e90c2e308f24fe0221860b98326cc46af6aabb9351ec3"
+        "sha256": "643352bcd91872f1e4455e3e87011e23037ad7b8ddcae6f98f766e380b2ec69b"
       },
       "gate": {
         "approval_id": "",
@@ -74235,7 +76485,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -74310,7 +76560,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -74385,7 +76635,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -74460,7 +76710,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -74535,7 +76785,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -74625,7 +76875,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s08.html",
-        "sha256": "3dbf31a9d4a627dcdb4310fa784a297fc9a258fad96454999a0a487b13549a2e"
+        "sha256": "5708a28a8ed8984c639d04e19971fc88b10d5fe6d468708d783266f158c7d7df"
       },
       "gate": {
         "approval_id": "",
@@ -74643,7 +76893,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -74718,7 +76968,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -74793,7 +77043,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -74868,7 +77118,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -74943,7 +77193,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -75033,7 +77283,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s09.html",
-        "sha256": "d75e5ede7bd9abee40e2870d99aef6d4e64eac8b229ce4e9d40687fc718e2e34"
+        "sha256": "861e2344ec316e43deafdef176be28759bfff2abec54d2853617eb2ff517aca2"
       },
       "gate": {
         "approval_id": "",
@@ -75051,7 +77301,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -75126,7 +77376,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -75201,7 +77451,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -75276,7 +77526,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -75351,7 +77601,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -75441,7 +77691,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s10.html",
-        "sha256": "fed7023f2dedc39af103ec1b3777ac36b46e9baf7d9d1ba77a757231cfcf1e88"
+        "sha256": "0bb1513929e1f714c4a8ca68ad22dd7793f6f2582dd5fadc685c78170099e43c"
       },
       "gate": {
         "approval_id": "",
@@ -75459,7 +77709,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -75534,7 +77784,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -75609,7 +77859,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -75684,7 +77934,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -75759,7 +78009,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -75849,7 +78099,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s11.html",
-        "sha256": "2e15c5f35e22e3092ecc2d64c70f0cff142030b07e0c084dd4b0f4351b011bda"
+        "sha256": "81fb4d31275b299d13de7e8705c83c0ad125ca7d5d63e98d34dbf97ddd00782b"
       },
       "gate": {
         "approval_id": "",
@@ -75867,7 +78117,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -75942,7 +78192,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76017,7 +78267,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76092,7 +78342,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76167,7 +78417,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76257,7 +78507,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s12.html",
-        "sha256": "12f0dcc9dcf8b3a04e4ae346c41460f9a900a008e86be28ec4309be434a62721"
+        "sha256": "1f16b9b9e9c31b0467d29a1d54509089bf91d84e76b07772bee10b37b4458bfa"
       },
       "gate": {
         "approval_id": "",
@@ -76275,7 +78525,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76350,7 +78600,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76425,7 +78675,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76500,7 +78750,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76575,7 +78825,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76665,7 +78915,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s13.html",
-        "sha256": "51895a61a38a8dde8967fda83176c0f38393c48bf3da2671a1cf3fee6a9742d9"
+        "sha256": "35699adc6589503a3288e2d29a110ccee69bed39aa5c83413ce558e4259d24b3"
       },
       "gate": {
         "approval_id": "",
@@ -76683,7 +78933,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76758,7 +79008,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76833,7 +79083,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76908,7 +79158,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -76983,7 +79233,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -77073,7 +79323,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s14.html",
-        "sha256": "186857d20dba6f6e079e76f68ad8da670630624a8b3ef4a967f54739920b6323"
+        "sha256": "a318e178d8b87b33fcee94e5bc8536fd24b63305320ecd1a2902c790aa95081a"
       },
       "gate": {
         "approval_id": "",
@@ -77091,7 +79341,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -77166,7 +79416,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -77241,7 +79491,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -77316,7 +79566,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -77391,7 +79641,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -77481,7 +79731,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s15.html",
-        "sha256": "b58fee5147299b664b72abbe41088b74f842e9944241bb99b4a248e8d5cb9544"
+        "sha256": "e5f58245af9495166058cd261c8436e6db40a321703632f3c118777379069ad4"
       },
       "gate": {
         "approval_id": "",
@@ -77499,7 +79749,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -77574,7 +79824,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -77649,7 +79899,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -77724,7 +79974,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -77799,7 +80049,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -77889,7 +80139,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s16.html",
-        "sha256": "f9e818c5a2e97a18f4b12cc74a1ec19d29af506f2a224669372b1567d4a8f680"
+        "sha256": "0656896129321b26441e99f2fcd3a8842f5520bb6b0ecba3173858b3795d4b22"
       },
       "gate": {
         "approval_id": "",
@@ -77907,7 +80157,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -77982,7 +80232,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -78057,7 +80307,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -78132,7 +80382,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -78207,7 +80457,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -78297,7 +80547,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s17.html",
-        "sha256": "e81771119b7fa4607c038fff3fe0a1045d4f2b51beee967eaf8cd89e6db714de"
+        "sha256": "e490107f422c9a7ae1e1d60bd2e13febc1b7f1cd8bbd5259524aba2d33f7edcf"
       },
       "gate": {
         "approval_id": "",
@@ -78315,7 +80565,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -78390,7 +80640,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -78465,7 +80715,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -78540,7 +80790,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -78615,7 +80865,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -78705,7 +80955,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s18.html",
-        "sha256": "7af1c6476378677fc424b19db895c8efe08f5415928cc782e70525b9af952045"
+        "sha256": "8399f801077022132e3f1365e02c0f0e83a5667ffcff6797e1f68bde6fd81a4e"
       },
       "gate": {
         "approval_id": "",
@@ -78723,7 +80973,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -78798,7 +81048,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -78873,7 +81123,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -78948,7 +81198,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -79023,7 +81273,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -79113,7 +81363,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s19.html",
-        "sha256": "679317b4f27dc4e3f7a019817255c9f24535e201949bfed9a88eeadb7616eb78"
+        "sha256": "f1f3c7db8790d688d781b84a52b0aeea3e2a63a9695ab40e84cfbc18e23049e5"
       },
       "gate": {
         "approval_id": "",
@@ -79131,7 +81381,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -79206,7 +81456,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -79281,7 +81531,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -79356,7 +81606,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -79431,7 +81681,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -79521,7 +81771,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s20.html",
-        "sha256": "eb96221d35d5440c74d0782552ebc35fd4c79f25b40cb578391321c65eb64f72"
+        "sha256": "3baf4dee2d063d1893f17e368878604361a04d2ea03212f3dd16697ef6d6b239"
       },
       "gate": {
         "approval_id": "",
@@ -79539,7 +81789,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -79614,7 +81864,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -79689,7 +81939,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -79764,7 +82014,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -79839,7 +82089,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -79929,7 +82179,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-s21.html",
-        "sha256": "ce38871104361d328bf391408bab7414e4dc622061bf9b13cc97f30968022e57"
+        "sha256": "220190f7281928e141aea37eb29df0e11a59543e01e17b1e2b62e3afcff45aeb"
       },
       "gate": {
         "approval_id": "",
@@ -79947,7 +82197,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80022,7 +82272,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80097,7 +82347,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80172,7 +82422,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80247,7 +82497,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80337,7 +82587,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-spec-v2.html",
-        "sha256": "2260a679397d6ad9329c24b755b7acfebec2a5b1a2c55beb6a9c8a8348abecfe"
+        "sha256": "d190670363bc58dbc843b38ac49abfe6afb47b5cef5f6b04a94358abb5543b66"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -80355,7 +82605,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80430,7 +82680,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80505,7 +82755,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80580,7 +82830,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80655,7 +82905,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80745,7 +82995,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t0.html",
-        "sha256": "4da93e863cf908a1b19bcd229a4dde00b063af3e5598153d4faba200a354078f"
+        "sha256": "e9a9f8c941c4a2b1a28b79e72325ebd48a76ad676e4cdf213f1e30456f404aa7"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -80763,7 +83013,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80838,7 +83088,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80913,7 +83163,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -80988,7 +83238,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -81063,7 +83313,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -81153,7 +83403,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t1.html",
-        "sha256": "38ba3086a962099a60d2af9d05adfa3d0f2ff2d331c0c330568ce0131d00c33b"
+        "sha256": "34689d59c9e1fd1df3f3c90eac6a5c3e3ab9fcb4161c93f37dae80a3ebab7781"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -81171,7 +83421,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -81246,7 +83496,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -81321,7 +83571,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -81396,7 +83646,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -81471,7 +83721,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -81561,7 +83811,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t10.html",
-        "sha256": "0f6d5b0370a4e99ca9f32a26535242c3cba6be170347ff7ea50646e34dc39ec5"
+        "sha256": "90bd62e476a389b6a1234d08f9c16cbc5c6641f0967c17e3be896e8441b35036"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -81579,7 +83829,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -81654,7 +83904,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -81729,7 +83979,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -81804,7 +84054,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -81879,7 +84129,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -81969,7 +84219,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t11.html",
-        "sha256": "ed8db39da9b153f957db3d1566f949a007f902ab5c6265f5fcc8c67e49c39fa5"
+        "sha256": "005b0a5a4c8a8d056020c6fb013070c0e385306b6fa82233e66d28a74ad8fed5"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -81987,7 +84237,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -82062,7 +84312,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -82137,7 +84387,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -82212,7 +84462,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -82287,7 +84537,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -82377,7 +84627,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t12.html",
-        "sha256": "ffe5ee694019716f8c7b5a03c17783b22b955d9b0479d4fc3d46c992a6a9d1a1"
+        "sha256": "92d121d5d564c41f57c6418ca23feca0aad445fa9603f1533aade6e9b8c5aba0"
       },
       "gate": {
         "approval_id": "",
@@ -82395,7 +84645,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -82470,7 +84720,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -82545,7 +84795,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -82620,7 +84870,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -82695,7 +84945,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -82785,7 +85035,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t13.html",
-        "sha256": "919dd57971bfdda6b8e80a74aa88a4e093cf2f90dc5d7c12773b50a898353021"
+        "sha256": "997aa57485a7a4025f2050a2ab46f251bf00b6024809591f711513b845491777"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -82803,7 +85053,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -82878,7 +85128,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -82953,7 +85203,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -83028,7 +85278,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -83103,7 +85353,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -83193,7 +85443,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t14.html",
-        "sha256": "025ba8f2e294cdc8245cdfd243530b0fe5964c72c061753bf1d3504d4a5deeba"
+        "sha256": "920cf9fcee8fd094b5713167f9cec7b578552b2fbdc0458bfe9fb649e542f6d0"
       },
       "gate": {
         "approval_id": "",
@@ -83211,7 +85461,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -83286,7 +85536,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -83361,7 +85611,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -83436,7 +85686,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -83511,7 +85761,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -83601,7 +85851,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t15.html",
-        "sha256": "ee72a4da88fd0d1a6c23afa33dc774e6814d743b3c4182512130fab9b6470d4b"
+        "sha256": "d0693f747639bd255b3a77bf59ec88bc83548584147abb2506ba9ab52a0359ba"
       },
       "gate": {
         "approval_id": "",
@@ -83619,7 +85869,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -83694,7 +85944,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -83769,7 +86019,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -83844,7 +86094,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -83919,7 +86169,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84009,7 +86259,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t16.html",
-        "sha256": "4fe96af7629314fe336772bc870f6c31732109d629c5f5cace86b8132a09d465"
+        "sha256": "93c513b751963a252fe60df23bbbdd9ded9b79ba7da3d0fa32d1d6d4289312b8"
       },
       "gate": {
         "approval_id": "",
@@ -84027,7 +86277,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84102,7 +86352,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84177,7 +86427,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84252,7 +86502,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84327,7 +86577,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84417,7 +86667,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t17.html",
-        "sha256": "89c4bf746f386e4212bd67127246874836662c4d24cca161e72943f14468cf0f"
+        "sha256": "72aa1e9ee5315b88ecea30ce3c2d82344335d8244768cfe6ba63d6261e23cc4b"
       },
       "gate": {
         "approval_id": "",
@@ -84435,7 +86685,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84510,7 +86760,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84585,7 +86835,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84660,7 +86910,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84735,7 +86985,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84825,7 +87075,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t18.html",
-        "sha256": "0a0e1e393d313c6752fd5a71a280e26f64f2c0f0894c182e2c5f4874098f6acd"
+        "sha256": "7be15dc729c46975e94264ebef8c22ddc12233695aaeb5605efe3fe6a002d1ff"
       },
       "gate": {
         "approval_id": "",
@@ -84843,7 +87093,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84918,7 +87168,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -84993,7 +87243,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -85068,7 +87318,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -85143,7 +87393,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -85233,7 +87483,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t19.html",
-        "sha256": "3c08aca4abdb0fe8244cb5b90022015c734e1608f2e79c0748f28df48b5a6e58"
+        "sha256": "b3c19c1c1a11ebb33e36c2d6608fa60bd55f8832c75c14f4cd5b15c3f80787fa"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -85251,7 +87501,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -85326,7 +87576,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -85401,7 +87651,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -85476,7 +87726,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -85551,7 +87801,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -85640,26 +87890,26 @@ window.CONVEYOR_STANDARDS = {
       "category": "statement-of-architecture-work",
       "covered_rule": "contract_missing",
       "document": {
-        "path": "docs/standards/std-togaf-statement-of-architecture-work-t2.html",
-        "sha256": "f19fac0448f6de94fc7110bd9d15100b4ac37910cecadae3912932d97a375d80"
+        "path": "docs/standards/std-togaf-statement-of-architecture-work-t19f.html",
+        "sha256": "662b3e0275c8caed1b1f534b4f2e70f4e300c711b082d6aa2dd75c1b69bef9aa"
       },
       "gate": {
-        "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
         "kind": "statement_of_architecture_work",
         "state": "live"
       },
-      "id": "std-togaf-statement-of-architecture-work-t2",
+      "id": "std-togaf-statement-of-architecture-work-t19f",
       "level": "project",
       "mandatory": true,
-      "owner_project": "T2",
-      "package_key": "std-togaf-statement-of-architecture-work-t2:T2",
+      "owner_project": "T19F",
+      "package_key": "std-togaf-statement-of-architecture-work-t19f:T19F",
       "sections": [
         {
           "heading": "Assignment",
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -85734,7 +87984,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -85809,7 +88059,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -85884,7 +88134,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -85959,7 +88209,415 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1f2c2-0e1a-787f-9011-46b424d1ec71",
+                  "status": "superseded",
+                  "title": "Statement of Architecture Work — the TOGAF ADM capability (T9)"
+                },
+                {
+                  "id": "01a1fdd2-5041-7f80-8032-3305751d498c",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — P0 programme definition (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff2e-7974-74cd-be6d-377e3c0071a4",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S01 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S00 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff3c-7aad-7dda-820e-1c7d85fe70a8",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — DESIGN-PUBLISH: the published studio design pack"
+                },
+                {
+                  "id": "01a1ff41-19f9-77bb-aa4a-f416f0d758e3",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — SPEC-V2, the organisational operating model (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T0 Model and contracts (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff84-4425-75d9-8772-08e09cf71069",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff89-02bd-7b6d-902e-ffa5902cc7f5",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T1 Plan spine (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff8d-a0ad-7a91-b026-d9a2575daa3f",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T11 Metrics, metering and maturity (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a2005a-7886-7f2d-9b49-53d174544ee9",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T2 Decision ladder (retrospective, U5a)"
+                },
+                {
+                  "id": "01a20061-bd73-7a89-b08c-bd8b867eb061",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S03 Domain and schema (retrospective, 2026-11-21)"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "evidenced"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "evidenced",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+        "key": "T19F",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+      },
+      "subject_kind": "project",
+      "title": "Statement Of Architecture Work — Follow-on: docs/plans/T19F-meeting-bindings.md"
+    },
+    {
+      "category": "statement-of-architecture-work",
+      "covered_rule": "contract_missing",
+      "document": {
+        "path": "docs/standards/std-togaf-statement-of-architecture-work-t2.html",
+        "sha256": "c1166468922e0672077bf3163a3a5a19bb6852e6c9f467f5fa1e80685090593b"
+      },
+      "gate": {
+        "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-statement-of-architecture-work-t2",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T2",
+      "package_key": "std-togaf-statement-of-architecture-work-t2:T2",
+      "sections": [
+        {
+          "heading": "Assignment",
+          "missing": [],
+          "sources": [
+            {
+              "count": 20,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1f2c2-0e1a-787f-9011-46b424d1ec71",
+                  "status": "superseded",
+                  "title": "Statement of Architecture Work — the TOGAF ADM capability (T9)"
+                },
+                {
+                  "id": "01a1fdd2-5041-7f80-8032-3305751d498c",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — P0 programme definition (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff2e-7974-74cd-be6d-377e3c0071a4",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S01 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S00 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff3c-7aad-7dda-820e-1c7d85fe70a8",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — DESIGN-PUBLISH: the published studio design pack"
+                },
+                {
+                  "id": "01a1ff41-19f9-77bb-aa4a-f416f0d758e3",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — SPEC-V2, the organisational operating model (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T0 Model and contracts (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff84-4425-75d9-8772-08e09cf71069",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff89-02bd-7b6d-902e-ffa5902cc7f5",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T1 Plan spine (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff8d-a0ad-7a91-b026-d9a2575daa3f",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T11 Metrics, metering and maturity (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a2005a-7886-7f2d-9b49-53d174544ee9",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T2 Decision ladder (retrospective, U5a)"
+                },
+                {
+                  "id": "01a20061-bd73-7a89-b08c-bd8b867eb061",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S03 Domain and schema (retrospective, 2026-11-21)"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Scope",
+          "missing": [],
+          "sources": [
+            {
+              "count": 20,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1f2c2-0e1a-787f-9011-46b424d1ec71",
+                  "status": "superseded",
+                  "title": "Statement of Architecture Work — the TOGAF ADM capability (T9)"
+                },
+                {
+                  "id": "01a1fdd2-5041-7f80-8032-3305751d498c",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — P0 programme definition (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff2e-7974-74cd-be6d-377e3c0071a4",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S01 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S00 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff3c-7aad-7dda-820e-1c7d85fe70a8",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — DESIGN-PUBLISH: the published studio design pack"
+                },
+                {
+                  "id": "01a1ff41-19f9-77bb-aa4a-f416f0d758e3",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — SPEC-V2, the organisational operating model (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T0 Model and contracts (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff84-4425-75d9-8772-08e09cf71069",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff89-02bd-7b6d-902e-ffa5902cc7f5",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T1 Plan spine (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff8d-a0ad-7a91-b026-d9a2575daa3f",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T11 Metrics, metering and maturity (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a2005a-7886-7f2d-9b49-53d174544ee9",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T2 Decision ladder (retrospective, U5a)"
+                },
+                {
+                  "id": "01a20061-bd73-7a89-b08c-bd8b867eb061",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S03 Domain and schema (retrospective, 2026-11-21)"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Responsibilities",
+          "missing": [],
+          "sources": [
+            {
+              "count": 20,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1f2c2-0e1a-787f-9011-46b424d1ec71",
+                  "status": "superseded",
+                  "title": "Statement of Architecture Work — the TOGAF ADM capability (T9)"
+                },
+                {
+                  "id": "01a1fdd2-5041-7f80-8032-3305751d498c",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — P0 programme definition (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff2e-7974-74cd-be6d-377e3c0071a4",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S01 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S00 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff3c-7aad-7dda-820e-1c7d85fe70a8",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — DESIGN-PUBLISH: the published studio design pack"
+                },
+                {
+                  "id": "01a1ff41-19f9-77bb-aa4a-f416f0d758e3",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — SPEC-V2, the organisational operating model (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T0 Model and contracts (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff84-4425-75d9-8772-08e09cf71069",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff89-02bd-7b6d-902e-ffa5902cc7f5",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T1 Plan spine (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff8d-a0ad-7a91-b026-d9a2575daa3f",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T11 Metrics, metering and maturity (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a2005a-7886-7f2d-9b49-53d174544ee9",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T2 Decision ladder (retrospective, U5a)"
+                },
+                {
+                  "id": "01a20061-bd73-7a89-b08c-bd8b867eb061",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S03 Domain and schema (retrospective, 2026-11-21)"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Acceptance criteria",
+          "missing": [],
+          "sources": [
+            {
+              "count": 20,
+              "file": "architecture.json",
+              "items": [
+                {
+                  "id": "01a1f2c2-0e1a-787f-9011-46b424d1ec71",
+                  "status": "superseded",
+                  "title": "Statement of Architecture Work — the TOGAF ADM capability (T9)"
+                },
+                {
+                  "id": "01a1fdd2-5041-7f80-8032-3305751d498c",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — P0 programme definition (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff2e-7974-74cd-be6d-377e3c0071a4",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S01 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S00 (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff3c-7aad-7dda-820e-1c7d85fe70a8",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — DESIGN-PUBLISH: the published studio design pack"
+                },
+                {
+                  "id": "01a1ff41-19f9-77bb-aa4a-f416f0d758e3",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — SPEC-V2, the organisational operating model (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T0 Model and contracts (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff84-4425-75d9-8772-08e09cf71069",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S02 Skeleton (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a1ff89-02bd-7b6d-902e-ffa5902cc7f5",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T1 Plan spine (retrospective, U5a)"
+                },
+                {
+                  "id": "01a1ff8d-a0ad-7a91-b026-d9a2575daa3f",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T11 Metrics, metering and maturity (retrospective, 2026-11-21)"
+                },
+                {
+                  "id": "01a2005a-7886-7f2d-9b49-53d174544ee9",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — T2 Decision ladder (retrospective, U5a)"
+                },
+                {
+                  "id": "01a20061-bd73-7a89-b08c-bd8b867eb061",
+                  "status": "live",
+                  "title": "Statement of Architecture Work — S03 Domain and schema (retrospective, 2026-11-21)"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Contract",
+          "missing": [],
+          "sources": [
+            {
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -86049,7 +88707,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t3.html",
-        "sha256": "c9ff3be9e0d1e389aa394365bac8440198e6da6cdac85091c87df5838e083583"
+        "sha256": "184418188144a63165bee4cbe123c52023cf48bb99e3ca780261952842d42594"
       },
       "gate": {
         "approval_id": "",
@@ -86067,7 +88725,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -86142,7 +88800,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -86217,7 +88875,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -86292,7 +88950,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -86367,7 +89025,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -86457,7 +89115,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t4.html",
-        "sha256": "f2522c251b3c1390bc319dad5d36286b68c1c3ec017bbb6c978aac234efaa26a"
+        "sha256": "a2443a23fd24342654d6a4de0251991a375ba3baf9d890df24313a0631f54a3a"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -86475,7 +89133,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -86550,7 +89208,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -86625,7 +89283,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -86700,7 +89358,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -86775,7 +89433,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -86865,7 +89523,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t5.html",
-        "sha256": "37337133275229a959f83e33c655cef3f764e1f89b43f95a3f554423432a4ad8"
+        "sha256": "620b1294081c7afe53b1f2c7d6567e359d47f9e896ecabf36f2d062b5998e08f"
       },
       "gate": {
         "approval_id": "",
@@ -86883,7 +89541,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -86958,7 +89616,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87033,7 +89691,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87108,7 +89766,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87183,7 +89841,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87273,7 +89931,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t6.html",
-        "sha256": "a0b293582f9e3df20a63ce662d1961e449423ebf44c7e911d1db9e6aada77e6f"
+        "sha256": "b30de8f31d1c41b70c4a0d519e1cd2ba5ac729f220e5232b8b5f4ee6fa54e0b3"
       },
       "gate": {
         "approval_id": "",
@@ -87291,7 +89949,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87366,7 +90024,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87441,7 +90099,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87516,7 +90174,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87591,7 +90249,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87681,7 +90339,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t7.html",
-        "sha256": "fdedfb58b66ec08a3b7fc09d93b6f3b7292dc8d5b1e7f7b5e05e84c94ef32d0d"
+        "sha256": "7524df46b5b9d1574077cfb2a3acea44cf14dd54563386d3f6366b7dfc14c495"
       },
       "gate": {
         "approval_id": "",
@@ -87699,7 +90357,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87774,7 +90432,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87849,7 +90507,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87924,7 +90582,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -87999,7 +90657,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -88089,7 +90747,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t8.html",
-        "sha256": "bfadc82e98abcfbcd0afb9cd08d21a48927da8269d08e40a7046160c56b74f21"
+        "sha256": "8d47d8cd0b84dc172c96595c6d8cd574e1ac93b20d5df9b6b6ecb69afb1f445b"
       },
       "gate": {
         "approval_id": "",
@@ -88107,7 +90765,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -88182,7 +90840,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -88257,7 +90915,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -88332,7 +90990,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -88407,7 +91065,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -88497,7 +91155,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-architecture-work-t9.html",
-        "sha256": "48316308041d5d3ea126de583c5b71bc07b1febb58560ecfee1dbb86f3489a3e"
+        "sha256": "4583bd491f3209f08374cd06ab031f2a408be00e9f9e4c4a9d093507e0d18200"
       },
       "gate": {
         "approval_id": "",
@@ -88515,7 +91173,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -88590,7 +91248,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -88665,7 +91323,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -88740,7 +91398,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -88815,7 +91473,7 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 19,
+              "count": 20,
               "file": "architecture.json",
               "items": [
                 {
@@ -88905,7 +91563,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-design-publish.html",
-        "sha256": "48fedd1c8fb5627ca57998eef40e8d0809901eeadae4cf71bbf873ecb0726ad6"
+        "sha256": "868987247e4f8e9d7641f4be4b603ddb5574a507741cb8bc6560c4b7091aaf32"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -88987,7 +91645,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-p0.html",
-        "sha256": "f32cb338161313849d7afc098a24bb88567f8936b76d0113a8665446815917b9"
+        "sha256": "b137967e5fe249a1c51d6564acec9af1d58f9cf8efcf4844ab373ea63c81c8b9"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -89069,7 +91727,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-platform.html",
-        "sha256": "1e6d16c4c52a1993c1c35dd0182a69fa837e0db440044263c820504b218d2eb6"
+        "sha256": "764a1ad9918158bd539d90445328308383e2673314029b9a905accfe226411a8"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -89151,7 +91809,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s00.html",
-        "sha256": "21a695f81c95b2f4819df0f261b93c6ddbfe49d39d2559cc4b417c0439e9186e"
+        "sha256": "5df2e992ebea11a59bafac5c60c130b382e7b51323e5c052693d7b8829a4033e"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -89233,7 +91891,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s01.html",
-        "sha256": "b5c61bf24d228dcb215f411e9f3c67482071572b4cb972e11a0aabceb222b7a1"
+        "sha256": "35dca46aff6639ee476fc84751805fbf9dabfadb09a5d55934296c416b3ade1a"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -89315,7 +91973,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s02.html",
-        "sha256": "baf83b5388bac8aa6d8585f81c5d36ddfde103f877b2f92649c89d23d0fefdf2"
+        "sha256": "4a975f2852a1fb22337d9ffd623416e271b6e21cc20bad71bd9be77c7a44b45a"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -89397,7 +92055,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s03.html",
-        "sha256": "d24653d062dcffc175c9151f534d4699bfb1fa57dcd2915bce22ee9d3073b3c8"
+        "sha256": "6503ae6733f52b2d892b0fbd403f9761d5c519ad685a23f9431f740343fa63ff"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -89479,7 +92137,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-s04.html",
-        "sha256": "8ce0d6cee3374320a07a924e329bec72876c0c67a25a5b896dad2db4e83c6053"
+        "sha256": "08adb3fb966710ddb627a59b987be74a2bb47359922927f03a54968ffbd47f5a"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -89561,7 +92219,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-spec-v2.html",
-        "sha256": "dd0ea2ca3df94be13b31bd990a483ba4e216da3600bc6b75c7979252e2c78e30"
+        "sha256": "e244c26608a590658d0ee15b2191243d9709bef6e50ddc7c57ca44f392921a3d"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -89643,7 +92301,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t0.html",
-        "sha256": "9aec67c83aaf3e0b93bf1db8eea24e6975d6610f1a9bcb4bd25deb789de66e0e"
+        "sha256": "f16ac6ae4b8e62b0bb70269412e1812b82b17d08c91fb63579204c326bac7418"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -89725,7 +92383,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t1.html",
-        "sha256": "6b8f7fce54ad941bbfcc63013396bedea3aedb12eee78a16ed7ffaa3851f7466"
+        "sha256": "a8a8be38cea84a4e628408b1b591d25435f1ddbedf418fb4fd032104f4d96daa"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -89807,7 +92465,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t10.html",
-        "sha256": "6c83a80040e9d0f69dc655c11af35032dc3f658136c527596b40398f23d488aa"
+        "sha256": "cad9babc996449b36bb0eb50021368152e4481801b16b52cdc953b3de3fb7940"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -89889,7 +92547,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t11.html",
-        "sha256": "e5506407f78b1cdf2944c2a3efacd705f6cb30bc2614d6a322ea4b4491f49e17"
+        "sha256": "039e58e58a21a39b17ea1d34522ea57a07ee60266d1682553bba8dec6e9a2a1f"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -89971,7 +92629,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t13.html",
-        "sha256": "807d5fb47c7add2faada80bf3c0073859325ade8779701f6741c08d18a542aaa"
+        "sha256": "065f7dfdb8df047b5f82dae630f903d31c3c8fba657ca34837069e0067d22de2"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -90053,7 +92711,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t19.html",
-        "sha256": "7d4f953de7a5111cda35ec3cef5a289d50b80421a83cf455b4e5613ad2cc30e5"
+        "sha256": "22f836e8d20263a2e508ae2ec864a74fea6252794383a0bf67705aaa23cba43f"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -90134,8 +92792,90 @@ window.CONVEYOR_STANDARDS = {
       "category": "statement-of-intent",
       "covered_rule": "",
       "document": {
+        "path": "docs/standards/std-togaf-statement-of-intent-t19f.html",
+        "sha256": "c9068a1fe64f445d4e043b1a0cce43e548b39268494f8e2eb0cfabb1c4c80ee7"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-statement-of-intent-t19f",
+      "level": "project",
+      "mandatory": false,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-statement-of-intent-t19f:T19F",
+      "package_published": false,
+      "sections": [
+        {
+          "heading": "Intended use",
+          "missing": [
+            "No row or document satisfies 'Intended use'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Ownership",
+          "missing": [
+            "No row or document satisfies 'Ownership'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Measures of effectiveness",
+          "missing": [
+            "No row or document satisfies 'Measures of effectiveness'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/contracts"
+            }
+          ],
+          "status": "absent"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+        "key": "T19F",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+      },
+      "subject_kind": "project",
+      "title": "Statement Of Intent — Follow-on: docs/plans/T19F-meeting-bindings.md"
+    },
+    {
+      "category": "statement-of-intent",
+      "covered_rule": "",
+      "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t2.html",
-        "sha256": "c7d387b7ebf010edd309490708cea4023604a5fe163882b5561ac11136a9578a"
+        "sha256": "329a844b6a54c63b2161ad134c1066f067165d6daaf4af5e3b07112232c00056"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -90217,7 +92957,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t4.html",
-        "sha256": "87cd3eb60255ae91c98c0e0044ee4e115c09d4e478067ac6cb857efb2707f06d"
+        "sha256": "030c57b7860c1b2b767c2758ff32bde8486ca273cb03694aef89b04acff873c7"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -90299,7 +93039,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-statement-of-intent-t9.html",
-        "sha256": "50c5f8c11e43769b61ebe1e1cc5b9671d185536ed485432070d7da3caf0ee340"
+        "sha256": "1bb9850f88deb3306ae9a208ee468e5597627583e4d14b64dd3cd196ba42d72f"
       },
       "gate": {
         "approval_id": "",
@@ -90381,7 +93121,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-design-publish.html",
-        "sha256": "486a0b77166817d0d0e256c5da0c04adc56e44d8dabcf3816647464e89d95b01"
+        "sha256": "6a1d0675605a93ecb092d25463dff4c634d6bf4edefd2d41d901e680ca356d2d"
       },
       "gate": {
         "approval_id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
@@ -90479,7 +93219,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-p0.html",
-        "sha256": "e6969103bf9b0a097a05a417b55138a97c850aa6621300a7d5e1a19340043bf4"
+        "sha256": "b2d387945d5b2e2f8b62d95fbf5dde0623e856b25cee70a7036b6a445b7fb6ce"
       },
       "gate": {
         "approval_id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
@@ -90577,7 +93317,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-platform.html",
-        "sha256": "cf36c658dae337c8aac1f1a6f57ff0499e27ed84396abbc91af9b32ee8be1418"
+        "sha256": "0b6c4f1b5c4423ad9ea94fcb403155da9fc75a488d77f16b86f0d40bf9c33263"
       },
       "gate": {
         "approval_id": "01a20204-34e9-7eea-87d1-5b8265816c62",
@@ -90675,7 +93415,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s00.html",
-        "sha256": "d601b660fc6ba2a19d1523697a43a323495929f3cc9df2092e5e018661e091e8"
+        "sha256": "8ed599695044b7c9c61f6ae529ebd5f915a02972c823ece34a7f50e70bb23392"
       },
       "gate": {
         "approval_id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
@@ -90773,7 +93513,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s01.html",
-        "sha256": "d2b8a7e03d03952c1776132ebd17a1cc5e81e3d41e769657be5e0ebf0d804e5c"
+        "sha256": "f8db4751a26eb492f98408ce4323dd5193efc5069ab28383e5ddfded76d9d81d"
       },
       "gate": {
         "approval_id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
@@ -90871,7 +93611,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s02.html",
-        "sha256": "d89e5cb64c319f7294a89e2db47ce3ce09608fd4014ae84f8f2ee826f20c3ab3"
+        "sha256": "f8a4078e8c6f12ad0cf4a369d308219b246568586887660df33af28f824d2ac4"
       },
       "gate": {
         "approval_id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
@@ -90969,7 +93709,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s03.html",
-        "sha256": "86984533f84ca7042a7e077aef19389bcfe7bc8f7b0b20d0bc5f4fd516c4b29c"
+        "sha256": "9082e0a3142dd66d0e5c5f96da987e670d15386f7ddf1d94869dc45b7c6d53cf"
       },
       "gate": {
         "approval_id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
@@ -91067,7 +93807,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-s04.html",
-        "sha256": "bf38365bfd7dcd4f6f6980cd81692587f5876c9ec7fbd01755865cfe125469fe"
+        "sha256": "874bff112efb9c8775e52959d81126af9690cfbf546c3da0f85b11c02f5d9cbb"
       },
       "gate": {
         "approval_id": "01a20256-80ac-72f0-a310-d114488f1d7c",
@@ -91165,7 +93905,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-spec-v2.html",
-        "sha256": "e105b843c5201fb2f9fb9c971288a768fbc7bc0548ef3a9443257deee047d77a"
+        "sha256": "10bf12e8c254ab101da01cba05d450978ee40bb3ee2e68ba862c7a6540474a90"
       },
       "gate": {
         "approval_id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
@@ -91263,7 +94003,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t0.html",
-        "sha256": "3cd04a9e0e4bb602b700e48605fc1cd1c7d92ba0f25a87dd9c9ca7255cbac7a0"
+        "sha256": "fb0a32a61313b12c753d2d6718ee3e967013cf6ff0b8733967b1496e93a86e21"
       },
       "gate": {
         "approval_id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
@@ -91361,7 +94101,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t1.html",
-        "sha256": "0ca355affe39cc51f1a657eec7f7e75f2c766b243c004e39fb9237048df9c766"
+        "sha256": "637ce12a66f63693ac777d72245e43528c044a56dd03464205a08ba1e1bdec15"
       },
       "gate": {
         "approval_id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
@@ -91459,7 +94199,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t10.html",
-        "sha256": "f139d23fffeb5f7bb639f39f419af15606359ce0a1ad0b1c0b639e247c641328"
+        "sha256": "0e5808f984825e76314422f12c70452c5574c21dc0c2da742e3cb276ab0fbd7e"
       },
       "gate": {
         "approval_id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
@@ -91557,7 +94297,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t11.html",
-        "sha256": "76b549aba4e670bed51796875f9130f5ef6bd710f2915988822d01a93f62ddd2"
+        "sha256": "e31c2d91b20aa044b381de7f08007e9f86d8ad826b7006369307fb0784aff78b"
       },
       "gate": {
         "approval_id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
@@ -91655,7 +94395,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t13.html",
-        "sha256": "50b3dc7482ce90f4ee1ed5692c2e22e6291e7984dc1e9f5fd8ab9799570f390f"
+        "sha256": "7d2574f8d87c926fb95382cbafec90af1d903f94e8579ab6a39571d38e76474c"
       },
       "gate": {
         "approval_id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
@@ -91753,7 +94493,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t19.html",
-        "sha256": "5ad0e79708a9273bc66c4da14e6303520e803d2602a61de639254db6efa7b08c"
+        "sha256": "9697eb71f12bbc45221f21614dc8a2ca3a0837b8caf70fc17141bcafe893047e"
       },
       "gate": {
         "approval_id": "01a20ce0-644d-7340-a696-1af10fa8c61e",
@@ -91850,8 +94590,106 @@ window.CONVEYOR_STANDARDS = {
       "category": "waiver",
       "covered_rule": "",
       "document": {
+        "path": "docs/standards/std-togaf-waiver-t19f.html",
+        "sha256": "c38306ad5aaefd23cc6ebe41d5b0ca4f11099ad381563f134876185c9e3f52c5"
+      },
+      "gate": {
+        "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-waiver-t19f",
+      "level": "project",
+      "mandatory": false,
+      "owner_project": "T19F",
+      "package_key": "std-togaf-waiver-t19f:T19F",
+      "package_published": false,
+      "sections": [
+        {
+          "heading": "Deviation",
+          "missing": [
+            "No row or document satisfies 'Deviation'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/waivers"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Accepting owner",
+          "missing": [
+            "No row or document satisfies 'Accepting owner'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/waivers"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Reason and impact",
+          "missing": [
+            "No row or document satisfies 'Reason and impact'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/waivers"
+            }
+          ],
+          "status": "absent"
+        },
+        {
+          "heading": "Reassessment",
+          "missing": [
+            "No row or document satisfies 'Reassessment'"
+          ],
+          "sources": [
+            {
+              "count": 0,
+              "file": "architecture.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/waivers"
+            }
+          ],
+          "status": "absent"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+        "key": "T19F",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+      },
+      "subject_kind": "project",
+      "title": "Waiver — Follow-on: docs/plans/T19F-meeting-bindings.md"
+    },
+    {
+      "category": "waiver",
+      "covered_rule": "",
+      "document": {
         "path": "docs/standards/std-togaf-waiver-t2.html",
-        "sha256": "75a92c70df6a47bb9b00c8b432bb196b3b6ee66d3ca783445d963c9bdb9bd3b6"
+        "sha256": "1ed358c1e748a3718559179e633bca9683e2c012f11484c6e334a6e06b9246ac"
       },
       "gate": {
         "approval_id": "01a2005a-8c6e-708a-84df-ab16d175072e",
@@ -91949,7 +94787,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t4.html",
-        "sha256": "00d1b686e47fed9b683a32f274e301ac2d98f239a370fb9b38a271bf06e5e61d"
+        "sha256": "e5d73291397338cef2585aedc34c7ac8cae0057796e1b2a88813e004f8f01ede"
       },
       "gate": {
         "approval_id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
@@ -92047,7 +94885,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-waiver-t9.html",
-        "sha256": "2d6f5f76220e8d527ae248f677548db092a0bb654a70972413a7ac0d72f140d3"
+        "sha256": "25d66bb5b9dc5e69ef6a466b88b1a1ff1fe60ba56fe11aba1d2c9ceeb01e2648"
       },
       "gate": {
         "approval_id": "",
@@ -92149,8 +94987,8 @@ window.CONVEYOR_STANDARDS = {
       "partial": 3
     },
     "PMP": {
-      "absent": 33,
-      "artefacts": 153,
+      "absent": 38,
+      "artefacts": 158,
       "evidenced": 90,
       "partial": 30
     },
@@ -92167,22 +95005,22 @@ window.CONVEYOR_STANDARDS = {
       "partial": 0
     },
     "TOGAF": {
-      "absent": 144,
-      "artefacts": 390,
-      "evidenced": 106,
-      "partial": 140
+      "absent": 152,
+      "artefacts": 407,
+      "evidenced": 110,
+      "partial": 145
     }
   },
-  "generated_at": "2026-11-24T16:30:00Z",
-  "git_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
-  "payload_sha256": "a6579cc6aff188983ad3c644b8379f83eb474f426fc07582743798ff1f135f1f",
+  "generated_at": "2026-11-25T03:46:32.319854100+00:00",
+  "git_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+  "payload_sha256": "2e79e77693605b0bd35dd7579bf3921c6ed419500d844f9e4cf1d47de35ba07e",
   "schema": "design-standards/v1",
   "summary": {
-    "absent": 189,
-    "artefacts": 592,
-    "evidenced": 230,
-    "findings": 216,
-    "mandatory": 481,
-    "partial": 173
+    "absent": 202,
+    "artefacts": 614,
+    "evidenced": 234,
+    "findings": 224,
+    "mandatory": 498,
+    "partial": 178
   }
 };

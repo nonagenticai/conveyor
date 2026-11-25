@@ -1,240 +1,166 @@
-//! Operations — the estate's operational read (SPEC_V2 §10.5, destination **Operations**).
+//! Operations — incidents, the cluster and host reads, gated writes and the andon cord
+//! (SPEC_V2 §10.5.4; T18-4, #565).
 //!
-//! Four reads and no write. `workers.list` returns the conveyor's own durable queue (one row
-//! per kind and status) and the hosts it may dispatch to; `providers.list` returns the provider
-//! surfaces this tenant has configured. The Cluster panel reads `ops.pods` and `ops.deployments`
-//! in the conveyor's own namespace through the worker's service account, and an unavailable
-//! cluster answers with the action's own refusal — rendered here verbatim.
+//! Every read is an existing `ops.*` read and every write an existing `ops.*`/`andon.*` action.
+//! A destructive write goes through the console's one gate path (`approvals::run_destructive`),
+//! so an unapproved flip opens a gate and changes nothing — it never bypasses the engine.
 //!
-//! Incidents are recorded by the governed `ops.incident` action (`ops.triage`, `ops.mitigate`,
-//! `ops.resolve` and `ops.postmortem` follow the same lifecycle), not on this screen; runbooks,
-//! on-call and the andon cord are governed actions too. This screen is the read side only.
+//! Measured gap, named rather than faked: there is no incident-list, runbook-list or on-call
+//! read in the registry (T7 exposes the incident writes and the cluster reads only), so those
+//! panels say so and the incident forms take the ids they operate on.
 
 use leptos::prelude::*;
-use serde::Deserialize;
-use serde_json::json;
+use serde_json::{Value, json};
+use wasm_bindgen::JsCast;
 
 use crate::api::{ApiError, InvokeOptions};
-use crate::components::{Empty, ErrorPanel, Planned, StatusPill, Tile};
+use crate::approvals::{Destructive, run_destructive};
+use crate::components::{Empty, Planned, StatusPill};
+use crate::screens::v2_data::{int, rows, text};
 use crate::state::AppCtx;
 
-/// The namespace the cluster sub-reads name: the conveyor's own deployment namespace
-/// (`deploy_namespace: conveyor`, S14). A namespace picker is not this read's to invent.
-const CONVEYOR_NAMESPACE: &str = "conveyor";
-
-/// One `(kind, status)` bucket of the conveyor's durable queue.
-#[derive(Clone, Debug, Deserialize)]
-struct QueueRow {
-    kind: String,
-    status: String,
-    count: i64,
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Tab {
+    Incidents,
+    Cluster,
+    Flags,
+    Andon,
 }
 
-/// One host the conveyor's agent may reach; the screen shows it without its credentials.
-#[derive(Clone, Debug, Deserialize)]
-struct HostRow {
-    name: String,
-    role: String,
-    mechanism: String,
-    enabled: bool,
+const TABS: [(Tab, &str); 4] = [
+    (Tab::Incidents, "Incidents"),
+    (Tab::Cluster, "Cluster & host"),
+    (Tab::Flags, "Flag changes"),
+    (Tab::Andon, "Andon"),
+];
+
+#[derive(Clone, Copy)]
+struct Form {
+    // Cluster & host
+    namespace: RwSignal<String>,
+    host: RwSignal<String>,
+    unit: RwSignal<String>,
+    // Incidents
+    incident_id: RwSignal<String>,
+    board_id: RwSignal<String>,
+    list_id: RwSignal<String>,
+    service: RwSignal<String>,
+    severity: RwSignal<String>,
+    title: RwSignal<String>,
+    action: RwSignal<String>,
+    action_input: RwSignal<String>,
+    postmortem_title: RwSignal<String>,
+    postmortem_body: RwSignal<String>,
+    // Flags
+    deployment: RwSignal<String>,
+    flag: RwSignal<String>,
+    value: RwSignal<String>,
+    // Andon
+    reason: RwSignal<String>,
 }
 
-/// `workers.list` — the queue's depth and the registered hosts.
-#[derive(Clone, Debug, Deserialize)]
-struct WorkersOut {
-    queue: Vec<QueueRow>,
-    hosts: Vec<HostRow>,
-}
-
-/// One provider surface this tenant has configured.
-#[derive(Clone, Debug, Deserialize)]
-struct ProviderRow {
-    key: String,
-    #[serde(default)]
-    destination: Option<String>,
-}
-
-/// `providers.list` — the tenant's provider inventory.
-#[derive(Clone, Debug, Deserialize)]
-struct ProvidersOut {
-    providers: Vec<ProviderRow>,
-}
-
-/// `ops.pods` / `ops.deployments` — the read's declared shape; the objects themselves are
-/// returned untouched and are not projected by this screen.
-#[derive(Clone, Debug, Deserialize)]
-struct ListOut {
-    namespace: String,
-    resource: String,
-    count: usize,
-}
-
-fn parse<T: serde::de::DeserializeOwned>(
-    value: serde_json::Value,
-    what: &str,
-) -> Result<T, ApiError> {
-    serde_json::from_value(value).map_err(|error| ApiError::Network(format!("{what}: {error}")))
-}
-
-fn load_workers(ctx: AppCtx) -> LocalResource<Result<WorkersOut, ApiError>> {
-    LocalResource::new(move || {
-        let _tenant = ctx.tenant.get();
-        async move {
-            parse(
-                ctx.invoke("workers.list", json!({}), InvokeOptions::default())
-                    .await?
-                    .output,
-                "workers",
-            )
+impl Form {
+    fn new() -> Self {
+        Self {
+            namespace: RwSignal::new("default".to_owned()),
+            host: RwSignal::new(String::new()),
+            unit: RwSignal::new(String::new()),
+            incident_id: RwSignal::new(String::new()),
+            board_id: RwSignal::new(String::new()),
+            list_id: RwSignal::new(String::new()),
+            service: RwSignal::new(String::new()),
+            severity: RwSignal::new("sev3".to_owned()),
+            title: RwSignal::new(String::new()),
+            action: RwSignal::new("restart".to_owned()),
+            action_input: RwSignal::new("{}".to_owned()),
+            postmortem_title: RwSignal::new(String::new()),
+            postmortem_body: RwSignal::new(String::new()),
+            deployment: RwSignal::new(String::new()),
+            flag: RwSignal::new(String::new()),
+            value: RwSignal::new("true".to_owned()),
+            reason: RwSignal::new(String::new()),
         }
-    })
-}
-
-fn load_providers(ctx: AppCtx) -> LocalResource<Result<ProvidersOut, ApiError>> {
-    LocalResource::new(move || {
-        let _tenant = ctx.tenant.get();
-        async move {
-            parse(
-                ctx.invoke("providers.list", json!({}), InvokeOptions::default())
-                    .await?
-                    .output,
-                "providers",
-            )
-        }
-    })
-}
-
-fn load_list(ctx: AppCtx, action: &'static str) -> LocalResource<Result<ListOut, ApiError>> {
-    LocalResource::new(move || {
-        let _tenant = ctx.tenant.get();
-        async move {
-            parse(
-                ctx.invoke(
-                    action,
-                    json!({"namespace": CONVEYOR_NAMESPACE}),
-                    InvokeOptions::default(),
-                )
-                .await?
-                .output,
-                action,
-            )
-        }
-    })
-}
-
-/// The queued tile: the sum of the queue buckets that are waiting, or `—` until the read has
-/// answered (and when it failed — the panels below say why).
-fn queued_count(workers: Option<Result<WorkersOut, ApiError>>) -> String {
-    match workers {
-        Some(Ok(workers)) => workers
-            .queue
-            .iter()
-            .filter(|row| matches!(row.status.as_str(), "pending" | "queued"))
-            .map(|row| row.count)
-            .sum::<i64>()
-            .to_string(),
-        _ => "—".to_owned(),
     }
 }
 
-/// The running tile: the sum of the queue buckets in `running`.
-fn running_count(workers: Option<Result<WorkersOut, ApiError>>) -> String {
-    match workers {
-        Some(Ok(workers)) => workers
-            .queue
-            .iter()
-            .filter(|row| row.status == "running")
-            .map(|row| row.count)
-            .sum::<i64>()
-            .to_string(),
-        _ => "—".to_owned(),
-    }
+fn input_value(event: &web_sys::Event) -> String {
+    event
+        .target()
+        .and_then(|target| target.dyn_into::<web_sys::HtmlInputElement>().ok())
+        .map(|input| input.value())
+        .unwrap_or_default()
 }
 
-/// The hosts tile: the registry's length, enabled or not.
-fn host_count(workers: Option<Result<WorkersOut, ApiError>>) -> String {
-    match workers {
-        Some(Ok(workers)) => workers.hosts.len().to_string(),
-        _ => "—".to_owned(),
-    }
+fn area_value(event: &web_sys::Event) -> String {
+    event
+        .target()
+        .and_then(|target| target.dyn_into::<web_sys::HtmlTextAreaElement>().ok())
+        .map(|area| area.value())
+        .unwrap_or_default()
 }
 
-/// The providers tile: the configured surfaces' count.
-fn provider_count(providers: Option<Result<ProvidersOut, ApiError>>) -> String {
-    match providers {
-        Some(Ok(providers)) => providers.providers.len().to_string(),
-        _ => "—".to_owned(),
-    }
+fn error_text(error: &ApiError) -> String {
+    error.to_string()
 }
 
-/// A provider destination, or the platform default when the tenant has registered none.
-fn destination(value: &Option<String>) -> String {
-    value
-        .as_deref()
-        .filter(|text| !text.trim().is_empty())
-        .unwrap_or("platform default")
-        .to_owned()
-}
-
-/// One cluster sub-read: the action's own refusal when it fails, the read's declared shape when
-/// it answers. The object bodies stay untouched — no field this screen was not told is guessed.
-fn cluster_read(
+/// Invoke one write, surface its outcome and refetch what the panel shows.
+fn run_write(
+    ctx: AppCtx,
     action: &'static str,
-    label: &'static str,
-    noun: &'static str,
-    read: LocalResource<Result<ListOut, ApiError>>,
-) -> AnyView {
-    match read.get() {
-        None => view! { <p class="muted">{format!("Reading {label}…")}</p> }.into_any(),
-        Some(Err(error)) => view! {
-            <div class="callout warn" role="status">
-                <p>{format!("{action}: {error}")}</p>
-            </div>
+    input: Value,
+    notice: RwSignal<Option<String>>,
+    done_message: &'static str,
+) {
+    leptos::task::spawn_local(async move {
+        match ctx.invoke(action, input, InvokeOptions::default()).await {
+            Ok(invocation) => {
+                let created = text(&invocation.output, "id");
+                let suffix = if created == "—" {
+                    String::new()
+                } else {
+                    format!(" ({created})")
+                };
+                notice.set(Some(format!("{done_message}{suffix}")));
+            }
+            Err(error) => notice.set(Some(format!("{action} refused: {}", error_text(&error)))),
         }
-        .into_any(),
-        Some(Ok(out)) if out.count == 0 => view! {
-            <Empty message=format!("No {noun} in the conveyor namespace.") />
+    });
+}
+
+/// A JSON document input: parse or say why not.
+fn parse_json(field: &str, text: &str, notice: RwSignal<Option<String>>) -> Option<Value> {
+    match serde_json::from_str::<Value>(text) {
+        Ok(value) if value.is_object() => Some(value),
+        Ok(_) => {
+            notice.set(Some(format!("{field} must be a JSON object")));
+            None
         }
-        .into_any(),
-        Some(Ok(out)) => view! {
-            <div class="tablewrap">
-                <table class="table">
-                    <thead><tr>
-                        <th>"Namespace"</th><th>"Resource"</th><th class="n">"Count"</th>
-                    </tr></thead>
-                    <tbody><tr>
-                        <td class="mono">{out.namespace}</td>
-                        <td>{out.resource}</td>
-                        <td class="n">{out.count.to_string()}</td>
-                    </tr></tbody>
-                </table>
-            </div>
+        Err(error) => {
+            notice.set(Some(format!("{field} is not JSON: {error}")));
+            None
         }
-        .into_any(),
     }
 }
 
 #[component]
 pub fn Operations() -> impl IntoView {
     let ctx = expect_context::<AppCtx>();
-    let workers = load_workers(ctx);
-    let providers = load_providers(ctx);
-    let pods = load_list(ctx, "ops.pods");
-    let deployments = load_list(ctx, "ops.deployments");
+    let tab = RwSignal::new(Tab::Incidents);
+    let notice = RwSignal::new(Option::<String>::None);
+    let cluster = RwSignal::new(Option::<Result<(String, Vec<Value>), String>>::None);
+    let host_status = RwSignal::new(Option::<Value>::None);
+    let host_logs = RwSignal::new(Option::<String>::None);
+    let andon = RwSignal::new(Option::<Value>::None);
+    let form = Form::new();
 
     view! {
-        <section class="screen">
+        <section class="screen" aria-labelledby="operations-title">
             {move || {
-                let missing = ["workers.list", "providers.list"]
-                    .into_iter()
-                    .filter(|action| !ctx.has_action(action))
-                    .collect::<Vec<_>>()
-                    .join(" / ");
-                if !missing.is_empty() {
+                if !ctx.has_action("ops.incident") {
                     return view! {
                         <Planned
                             title="Operations is planned".to_owned()
-                            detail=format!("{missing} not in this role's manifest — the screen appears when the actions land, not before.")
+                            detail="ops.incident is not in this role's manifest; the screen appears when it lands.".to_owned()
                         />
                     }
                     .into_any();
@@ -242,121 +168,552 @@ pub fn Operations() -> impl IntoView {
                 view! {
                     <header class="screen-head">
                         <div>
-                            <h1>"Operations"</h1>
+                            <h1 id="operations-title">"Operations"</h1>
                             <p class="muted">
-                                "The queue, its hosts and the configured providers are this tenant's own rows; a cluster read that is unavailable says why in its own words."
+                                "incidents, the cluster and host reads, gated flag changes and the andon cord. Every write is an engine action; a destructive one opens its approval gate and changes nothing until that gate is approved."
                             </p>
                         </div>
                     </header>
-                    {move || {
-                        let queued = queued_count(workers.get());
-                        let running = running_count(workers.get());
-                        let hosts = host_count(workers.get());
-                        let providers_value = provider_count(providers.get());
-                        view! {
-                            <div class="tiles">
-                                <Tile label="Queued".to_owned() value=queued detail="jobs waiting in this tenant's durable queue".to_owned()/>
-                                <Tile label="Running".to_owned() value=running detail="jobs the queue is executing now".to_owned()/>
-                                <Tile label="Hosts".to_owned() value=hosts detail="registered hosts, enabled or not".to_owned()/>
-                                <Tile label="Providers".to_owned() value=providers_value detail="provider surfaces this tenant has configured".to_owned()/>
-                            </div>
-                        }
+                    {move || notice.get().map(|message| view! {
+                        <p class="notice" role="alert" data-testid="operations-notice">{message}</p>
+                    })}
+                    <div class="filterbar" role="tablist">
+                        {TABS.into_iter().map(|(entry, label)| view! {
+                            <button
+                                class="btn small"
+                                class:primary=move || tab.get() == entry
+                                role="tab"
+                                aria-selected=move || (tab.get() == entry).to_string()
+                                on:click=move |_| tab.set(entry)
+                            >
+                                {label}
+                            </button>
+                        }).collect_view()}
+                    </div>
+                    {move || match tab.get() {
+                        Tab::Incidents => incidents_panel(form, ctx, notice),
+                        Tab::Cluster => cluster_panel(form, ctx, notice, cluster, host_status, host_logs),
+                        Tab::Flags => flags_panel(form, ctx, notice),
+                        Tab::Andon => andon_panel(form, ctx, notice, andon),
                     }}
-                    <h2>"Queue"</h2>
-                    {move || match workers.get() {
-                        None => view! { <p class="muted">"Reading the queue…"</p> }.into_any(),
-                        Some(Err(error)) => view! {
-                            <ErrorPanel error=error on_retry=Callback::new(move |_| workers.refetch())/>
-                        }.into_any(),
-                        Some(Ok(workers)) if workers.queue.is_empty() => view! {
-                            <Empty message="No job in this tenant's queue — work is enqueued by a run or a job, not here.".to_owned()/>
-                        }.into_any(),
-                        Some(Ok(workers)) => view! {
-                            <div class="tablewrap">
-                                <table class="table">
-                                    <thead><tr>
-                                        <th>"Kind"</th><th>"Status"</th><th class="n">"Count"</th>
-                                    </tr></thead>
-                                    <tbody>
-                                        {workers.queue.into_iter().map(|row| view! {
-                                            <tr>
-                                                <td><StatusPill status=row.kind/></td>
-                                                <td><StatusPill status=row.status/></td>
-                                                <td class="n">{row.count.to_string()}</td>
-                                            </tr>
-                                        }).collect_view()}
-                                    </tbody>
-                                </table>
-                            </div>
-                        }.into_any(),
-                    }}
-                    <h2>"Hosts"</h2>
-                    {move || match workers.get() {
-                        None => view! { <p class="muted">"Reading hosts…"</p> }.into_any(),
-                        Some(Err(error)) => view! {
-                            <ErrorPanel error=error on_retry=Callback::new(move |_| workers.refetch())/>
-                        }.into_any(),
-                        Some(Ok(workers)) if workers.hosts.is_empty() => view! {
-                            <Empty message="No host is registered — the conveyor's host registry adds one, not this screen.".to_owned()/>
-                        }.into_any(),
-                        Some(Ok(workers)) => view! {
-                            <div class="tablewrap">
-                                <table class="table">
-                                    <thead><tr>
-                                        <th>"Name"</th><th>"Role"</th><th>"Mechanism"</th><th>"Enabled"</th>
-                                    </tr></thead>
-                                    <tbody>
-                                        {workers.hosts.into_iter().map(|host| view! {
-                                            <tr>
-                                                <td class="mono">{host.name}</td>
-                                                <td>{host.role}</td>
-                                                <td>{host.mechanism}</td>
-                                                <td><StatusPill status=if host.enabled { "ok".to_owned() } else { "bad".to_owned() }/></td>
-                                            </tr>
-                                        }).collect_view()}
-                                    </tbody>
-                                </table>
-                            </div>
-                        }.into_any(),
-                    }}
-                    <h2>"Providers"</h2>
-                    {move || match providers.get() {
-                        None => view! { <p class="muted">"Reading providers…"</p> }.into_any(),
-                        Some(Err(error)) => view! {
-                            <ErrorPanel error=error on_retry=Callback::new(move |_| providers.refetch())/>
-                        }.into_any(),
-                        Some(Ok(providers)) if providers.providers.is_empty() => view! {
-                            <Empty message="No provider is configured — the conveyor reports the tenant's inference destination; `inference_endpoint.set` registers it, not here.".to_owned()/>
-                        }.into_any(),
-                        Some(Ok(providers)) => view! {
-                            <div class="tablewrap">
-                                <table class="table">
-                                    <thead><tr>
-                                        <th>"Key"</th><th>"Destination"</th>
-                                    </tr></thead>
-                                    <tbody>
-                                        {providers.providers.into_iter().map(|provider| view! {
-                                            <tr>
-                                                <td class="mono">{provider.key}</td>
-                                                <td>{destination(&provider.destination)}</td>
-                                            </tr>
-                                        }).collect_view()}
-                                    </tbody>
-                                </table>
-                            </div>
-                        }.into_any(),
-                    }}
-                    <h2>"Cluster"</h2>
-                    <p class="muted">
-                        "Pods and deployments in the conveyor's own namespace (`conveyor`), read with the worker's service account. Each read returns its objects exactly as the Kubernetes API did; this panel shows the read's declared shape, not their fields — and an unavailable cluster says why in its own words."
-                    </p>
-                    <h3>"Pods"</h3>
-                    {move || cluster_read("ops.pods", "pods", "pod", pods)}
-                    <h3>"Deployments"</h3>
-                    {move || cluster_read("ops.deployments", "deployments", "deployment", deployments)}
                 }
                 .into_any()
             }}
         </section>
     }
+}
+
+fn incidents_panel(form: Form, ctx: AppCtx, notice: RwSignal<Option<String>>) -> AnyView {
+    let open = move |_event: web_sys::MouseEvent| {
+        let board = form.board_id.get().trim().to_owned();
+        let list = form.list_id.get().trim().to_owned();
+        let service = form.service.get().trim().to_owned();
+        let severity = form.severity.get();
+        let title = form.title.get().trim().to_owned();
+        if board.is_empty() || list.is_empty() || service.is_empty() {
+            notice.set(Some(
+                "An incident needs the board, its lane and the service".to_owned(),
+            ));
+            return;
+        }
+        let payload = json!({
+            "board_id": board,
+            "list_id": list,
+            "service": service,
+            "severity": severity,
+            "title": (!title.is_empty()).then_some(title),
+        });
+        run_write(ctx, "ops.incident", payload, notice, "Incident opened");
+    };
+
+    let incident = move || form.incident_id.get().trim().to_owned();
+
+    let triage = move |_event: web_sys::MouseEvent| {
+        let id = incident();
+        if id.is_empty() {
+            notice.set(Some("Name the incident first".to_owned()));
+            return;
+        }
+        run_write(
+            ctx,
+            "ops.triage",
+            json!({
+                "incident_id": id,
+                "severity": form.severity.get(),
+                "runbook_procedure_id": form.action.get(),
+            }),
+            notice,
+            "Incident triaged",
+        );
+    };
+
+    let mitigate = move |_event: web_sys::MouseEvent| {
+        let id = incident();
+        if id.is_empty() {
+            notice.set(Some("Name the incident first".to_owned()));
+            return;
+        }
+        let Some(input) = parse_json("The mitigation input", &form.action_input.get(), notice)
+        else {
+            return;
+        };
+        run_write(
+            ctx,
+            "ops.mitigate",
+            json!({
+                "incident_id": id,
+                "action": form.action.get(),
+                "input": input,
+            }),
+            notice,
+            "Mitigation recorded",
+        );
+    };
+
+    let resolve = move |_event: web_sys::MouseEvent| {
+        let id = incident();
+        if id.is_empty() {
+            notice.set(Some("Name the incident first".to_owned()));
+            return;
+        }
+        run_write(
+            ctx,
+            "ops.resolve",
+            json!({ "incident_id": id }),
+            notice,
+            "Incident resolved",
+        );
+    };
+
+    let postmortem = move |_event: web_sys::MouseEvent| {
+        let id = incident();
+        if id.is_empty() {
+            notice.set(Some("Name the incident first".to_owned()));
+            return;
+        }
+        let title = form.postmortem_title.get().trim().to_owned();
+        let body = form.postmortem_body.get().trim().to_owned();
+        if title.is_empty() || body.is_empty() {
+            notice.set(Some(
+                "A postmortem needs its title and its blameless body".to_owned(),
+            ));
+            return;
+        }
+        run_write(
+            ctx,
+            "ops.postmortem",
+            json!({
+                "incident_id": id,
+                "evidence": json!({}),
+                "postmortem": { "title": title, "body": body, "systemic": false },
+            }),
+            notice,
+            "Postmortem recorded",
+        );
+    };
+
+    view! {
+        <div class="grid-2" style="margin-top:12px">
+            <section class="panel" data-testid="operations-incidents">
+                <div class="ph"><span>"Incident"</span><span class="muted">"one card, its triage, mitigation and postmortem"</span></div>
+                <label class="field"><span>"Incident id"</span>
+                    <input class="inp" prop:value=move || form.incident_id.get()
+                        on:input=move |event| form.incident_id.set(input_value(&event))/></label>
+                <div class="grid-2">
+                    <label class="field"><span>"Board id"</span>
+                        <input class="inp" prop:value=move || form.board_id.get()
+                            on:input=move |event| form.board_id.set(input_value(&event))/></label>
+                    <label class="field"><span>"Lane (list) id"</span>
+                        <input class="inp" prop:value=move || form.list_id.get()
+                            on:input=move |event| form.list_id.set(input_value(&event))/></label>
+                </div>
+                <div class="grid-2">
+                    <label class="field"><span>"Service"</span>
+                        <input class="inp" prop:value=move || form.service.get()
+                            on:input=move |event| form.service.set(input_value(&event))/></label>
+                    <label class="field"><span>"Severity"</span>
+                        <select aria-label="Severity" prop:value=move || form.severity.get()
+                            on:change=move |event| {
+                                let value = event.target().and_then(|t| t.dyn_into::<web_sys::HtmlSelectElement>().ok()).map(|s| s.value()).unwrap_or_default();
+                                form.severity.set(value);
+                            }>
+                            <option value="sev1">"sev1"</option>
+                            <option value="sev2">"sev2"</option>
+                            <option value="sev3">"sev3"</option>
+                            <option value="sev4">"sev4"</option>
+                        </select></label>
+                </div>
+                <label class="field"><span>"Title"</span>
+                    <input class="inp" prop:value=move || form.title.get()
+                        on:input=move |event| form.title.set(input_value(&event))/></label>
+                <div class="filterbar">
+                    <button class="btn primary" on:click=open>"Open the incident"</button>
+                </div>
+                <p class="muted">
+                    "T7 exposes the incident writes; there is no incident-list, runbook-list or on-call read in the registry, so this panel takes the ids it operates on rather than inventing a list."
+                </p>
+            </section>
+            <section class="panel">
+                <div class="ph"><span>"Act on the incident"</span><span class="muted">"T7's five writes"</span></div>
+                <label class="field"><span>"Runbook / procedure id (triage) or action (mitigate)"</span>
+                    <input class="inp" prop:value=move || form.action.get()
+                        on:input=move |event| form.action.set(input_value(&event))/></label>
+                <label class="field"><span>"Mitigation input (a JSON object)"</span>
+                    <textarea class="inp" rows="3" prop:value=move || form.action_input.get()
+                        on:input=move |event| form.action_input.set(area_value(&event))></textarea></label>
+                <div class="filterbar">
+                    <button class="btn small" on:click=triage>"Triage"</button>
+                    <button class="btn small" on:click=mitigate>"Mitigate"</button>
+                    <button class="btn small" on:click=resolve>"Resolve"</button>
+                </div>
+                <label class="field"><span>"Postmortem title"</span>
+                    <input class="inp" prop:value=move || form.postmortem_title.get()
+                        on:input=move |event| form.postmortem_title.set(input_value(&event))/></label>
+                <label class="field"><span>"Postmortem body"</span>
+                    <textarea class="inp" rows="4" prop:value=move || form.postmortem_body.get()
+                        on:input=move |event| form.postmortem_body.set(area_value(&event))></textarea></label>
+                <button class="btn small" on:click=postmortem>"Record the postmortem"</button>
+            </section>
+        </div>
+    }
+    .into_any()
+}
+
+fn cluster_panel(
+    form: Form,
+    ctx: AppCtx,
+    notice: RwSignal<Option<String>>,
+    cluster: RwSignal<Option<Result<(String, Vec<Value>), String>>>,
+    host_status: RwSignal<Option<Value>>,
+    host_logs: RwSignal<Option<String>>,
+) -> AnyView {
+    let read_pods = move |_event: web_sys::MouseEvent| {
+        let namespace = form.namespace.get().trim().to_owned();
+        cluster.set(None);
+        leptos::task::spawn_local(async move {
+            match ctx
+                .invoke(
+                    "ops.pods",
+                    json!({ "namespace": namespace }),
+                    InvokeOptions::default(),
+                )
+                .await
+            {
+                Ok(invocation) => {
+                    cluster.set(Some(Ok(("pods".to_owned(), rows(&invocation.output)))))
+                }
+                Err(error) => cluster.set(Some(Err(error_text(&error)))),
+            }
+        });
+    };
+    let read_deployments = move |_event: web_sys::MouseEvent| {
+        let namespace = form.namespace.get().trim().to_owned();
+        cluster.set(None);
+        leptos::task::spawn_local(async move {
+            match ctx
+                .invoke(
+                    "ops.deployments",
+                    json!({ "namespace": namespace }),
+                    InvokeOptions::default(),
+                )
+                .await
+            {
+                Ok(invocation) => cluster.set(Some(Ok((
+                    "deployments".to_owned(),
+                    rows(&invocation.output),
+                )))),
+                Err(error) => cluster.set(Some(Err(error_text(&error)))),
+            }
+        });
+    };
+    let read_host = move |_event: web_sys::MouseEvent| {
+        let host = form.host.get().trim().to_owned();
+        let unit = form.unit.get().trim().to_owned();
+        host_status.set(None);
+        host_logs.set(None);
+        leptos::task::spawn_local(async move {
+            match ctx
+                .invoke(
+                    "ops.host_status",
+                    json!({ "host": host, "unit": unit }),
+                    InvokeOptions::default(),
+                )
+                .await
+            {
+                Ok(invocation) => host_status.set(Some(invocation.output)),
+                Err(error) => notice.set(Some(format!(
+                    "ops.host_status refused: {}",
+                    error_text(&error)
+                ))),
+            }
+        });
+    };
+    let tail_logs = move |_event: web_sys::MouseEvent| {
+        let host = form.host.get().trim().to_owned();
+        let unit = form.unit.get().trim().to_owned();
+        host_logs.set(None);
+        leptos::task::spawn_local(async move {
+            match ctx
+                .invoke(
+                    "ops.host_logs",
+                    json!({ "host": host, "unit": unit }),
+                    InvokeOptions::default(),
+                )
+                .await
+            {
+                Ok(invocation) => host_logs.set(Some(text(&invocation.output, "log"))),
+                Err(error) => notice.set(Some(format!(
+                    "ops.host_logs refused: {}",
+                    error_text(&error)
+                ))),
+            }
+        });
+    };
+
+    view! {
+        <div class="grid-2" style="margin-top:12px">
+            <section class="panel" data-testid="operations-cluster">
+                <div class="ph"><span>"Cluster reads"</span><span class="muted">"the estate integration's own view"</span></div>
+                <label class="field"><span>"Namespace"</span>
+                    <input class="inp" prop:value=move || form.namespace.get()
+                        on:input=move |event| form.namespace.set(input_value(&event))/></label>
+                <div class="filterbar">
+                    <button class="btn small" on:click=read_pods>"Read pods"</button>
+                    <button class="btn small" on:click=read_deployments>"Read deployments"</button>
+                </div>
+                {move || match cluster.get() {
+                    None => view! { <p class="muted">"No cluster read yet in this session."</p> }.into_any(),
+                    Some(Err(error)) => view! {
+                        <div class="panel problem" role="alert"><p>{error}</p></div>
+                    }.into_any(),
+                    Some(Ok((what, rows))) => view! {
+                        <div class="tablewrap">
+                            <table class="table">
+                                <thead><tr><th>{what}</th><th>"Namespace"</th></tr></thead>
+                                <tbody>
+                                    {rows.into_iter().map(|row| {
+                                        let name = row
+                                            .get("metadata")
+                                            .and_then(|meta| meta.get("name"))
+                                            .and_then(Value::as_str)
+                                            .unwrap_or("—")
+                                            .to_owned();
+                                        let namespace = row
+                                            .get("metadata")
+                                            .and_then(|meta| meta.get("namespace"))
+                                            .and_then(Value::as_str)
+                                            .unwrap_or("—")
+                                            .to_owned();
+                                        view! { <tr><td class="mono">{name}</td><td class="mono">{namespace}</td></tr> }
+                                    }).collect_view()}
+                                </tbody>
+                            </table>
+                        </div>
+                    }.into_any(),
+                }}
+                <p class="muted">
+                    "The reads name a closed operation — never a URL — and answer with whatever the estate's Kubernetes integration returns. When it is not configured the action's own refusal is shown unchanged."
+                </p>
+            </section>
+            <section class="panel">
+                <div class="ph"><span>"Host unit"</span><span class="muted">"status and a bounded log tail"</span></div>
+                <div class="grid-2">
+                    <label class="field"><span>"Host"</span>
+                        <input class="inp" prop:value=move || form.host.get()
+                            on:input=move |event| form.host.set(input_value(&event))/></label>
+                    <label class="field"><span>"Unit"</span>
+                        <input class="inp" prop:value=move || form.unit.get()
+                            on:input=move |event| form.unit.set(input_value(&event))/></label>
+                </div>
+                <div class="filterbar">
+                    <button class="btn small" on:click=read_host>"Read the status"</button>
+                    <button class="btn small" on:click=tail_logs>"Tail the logs"</button>
+                </div>
+                {move || host_status.get().map(|status| view! {
+                    <dl class="kv" data-testid="host-status">
+                        <dt>"Host"</dt><dd class="mono">{text(&status, "host")}</dd>
+                        <dt>"Unit"</dt><dd class="mono">{text(&status, "unit")}</dd>
+                        <dt>"Mechanism"</dt><dd>{text(&status, "mechanism")}</dd>
+                        <dt>"State"</dt><dd><StatusPill status=text(&status, "state")/></dd>
+                        <dt>"Detail"</dt><dd class="muted">{text(&status, "detail")}</dd>
+                    </dl>
+                })}
+                {move || host_logs.get().map(|log| view! {
+                    <pre class="log" data-testid="host-logs">{log}</pre>
+                })}
+            </section>
+        </div>
+    }
+    .into_any()
+}
+
+fn flags_panel(form: Form, ctx: AppCtx, notice: RwSignal<Option<String>>) -> AnyView {
+    let flip = move |_event: web_sys::MouseEvent| {
+        let namespace = form.namespace.get().trim().to_owned();
+        let deployment = form.deployment.get().trim().to_owned();
+        let flag = form.flag.get().trim().to_owned();
+        let value = form.value.get().trim().to_owned();
+        if namespace.is_empty() || deployment.is_empty() || flag.is_empty() {
+            notice.set(Some(
+                "A flag change needs its namespace, deployment and flag".to_owned(),
+            ));
+            return;
+        }
+        notice.set(Some("Attempting the flip…".to_owned()));
+        let input = json!({
+            "namespace": namespace,
+            "deployment": deployment,
+            "flag": flag,
+            "value": value,
+            "dry_run": false,
+        });
+        run_destructive(
+            ctx,
+            "ops.flag_flip",
+            input,
+            InvokeOptions::default(),
+            move |outcome| match outcome {
+                Destructive::Done => {
+                    notice.set(Some("The flag was flipped and read back.".to_owned()))
+                }
+                Destructive::Waiting { approval_id } => notice.set(Some(format!(
+                    "Blocked: a gate ({}) is waiting for someone else. Nothing was written.",
+                    crate::components::short_id(Some(&approval_id))
+                ))),
+                Destructive::Failed(error) => notice.set(Some(format!(
+                    "Refused: {}. Nothing was written.",
+                    error_text(&error)
+                ))),
+            },
+            || {},
+        );
+    };
+
+    view! {
+        <div class="grid-2" style="margin-top:12px">
+            <section class="panel" data-testid="operations-flags">
+                <div class="ph"><span>"Set one environment flag"</span><span class="muted">"destructive · gated"</span></div>
+                <div class="grid-2">
+                    <label class="field"><span>"Namespace"</span>
+                        <input class="inp" prop:value=move || form.namespace.get()
+                            on:input=move |event| form.namespace.set(input_value(&event))/></label>
+                    <label class="field"><span>"Deployment"</span>
+                        <input class="inp" prop:value=move || form.deployment.get()
+                            on:input=move |event| form.deployment.set(input_value(&event))/></label>
+                </div>
+                <div class="grid-2">
+                    <label class="field"><span>"Flag (environment variable)"</span>
+                        <input class="inp" placeholder="FEATURE_X" prop:value=move || form.flag.get()
+                            on:input=move |event| form.flag.set(input_value(&event))/></label>
+                    <label class="field"><span>"Value"</span>
+                        <input class="inp" prop:value=move || form.value.get()
+                            on:input=move |event| form.value.set(input_value(&event))/></label>
+                </div>
+                <button class="btn primary" on:click=flip>"Flip the flag"</button>
+                <p class="muted">
+                    "ops.flag_flip has effect `destructive`: the console asks the tenant's policy, requests a gate that names this deployment, this flag and this value, and invokes nothing. A person who is not the requester decides the gate on the approvals screen; only then does the retry carry it."
+                </p>
+            </section>
+            <section class="panel">
+                <div class="ph"><span>"What the gate protects"</span></div>
+                <ul class="steps">
+                    <li><span class="muted">"The approval target is the deployment, the flag and its value — a gate for `FEATURE_X=true` never authorises `FEATURE_X=false`."</span></li>
+                    <li><span class="muted">"The request is the whole containers list, read first, so no other container is dropped."</span></li>
+                    <li><span class="muted">"A refusal is the engine's own sentence; the screen never pre-empts or hides it."</span></li>
+                </ul>
+                <div class="ph"><span>"Not in this read"</span></div>
+                <p class="muted">
+                    "There is no flag-inventory or deployment-config read; the form names the workload. The read would belong to T7."
+                </p>
+            </section>
+        </div>
+    }
+    .into_any()
+}
+
+fn andon_panel(
+    form: Form,
+    ctx: AppCtx,
+    notice: RwSignal<Option<String>>,
+    andon: RwSignal<Option<Value>>,
+) -> AnyView {
+    let engage = move |_event: web_sys::MouseEvent| {
+        let reason = form.reason.get().trim().to_owned();
+        if reason.is_empty() {
+            notice.set(Some("The cord needs a reason".to_owned()));
+            return;
+        }
+        leptos::task::spawn_local(async move {
+            match ctx
+                .invoke(
+                    "andon.engage",
+                    json!({ "reason": reason }),
+                    InvokeOptions::default(),
+                )
+                .await
+            {
+                Ok(invocation) => {
+                    andon.set(Some(invocation.output));
+                    notice.set(Some("The cord is engaged.".to_owned()));
+                }
+                Err(error) => notice.set(Some(format!(
+                    "andon.engage refused: {}",
+                    error_text(&error)
+                ))),
+            }
+        });
+    };
+    let release = move |_event: web_sys::MouseEvent| {
+        leptos::task::spawn_local(async move {
+            match ctx
+                .invoke("andon.release", json!({}), InvokeOptions::default())
+                .await
+            {
+                Ok(invocation) => {
+                    andon.set(Some(invocation.output));
+                    notice.set(Some("The cord is released.".to_owned()));
+                }
+                Err(error) => notice.set(Some(format!(
+                    "andon.release refused: {}",
+                    error_text(&error)
+                ))),
+            }
+        });
+    };
+
+    view! {
+        <div class="grid-2" style="margin-top:12px">
+            <section class="panel" data-testid="operations-andon">
+                <div class="ph"><span>"Andon cord"</span><span class="muted">"tenant-wide stop"</span></div>
+                <label class="field"><span>"Reason"</span>
+                    <textarea class="inp" rows="3" prop:value=move || form.reason.get()
+                        on:input=move |event| form.reason.set(area_value(&event))></textarea></label>
+                <div class="filterbar">
+                    <button class="btn primary" on:click=engage>"Pull the cord"</button>
+                    <button class="btn" on:click=release>"Release the cord"</button>
+                </div>
+                {move || andon.get().map(|state| {
+                    let engaged = state.get("engaged").and_then(Value::as_bool).unwrap_or(false);
+                    view! {
+                        <dl class="kv" data-testid="andon-state">
+                            <dt>"Engaged"</dt><dd><StatusPill status=(if engaged { "engaged" } else { "released" }).to_owned()/></dd>
+                            <dt>"Reason"</dt><dd>{text(&state, "reason")}</dd>
+                            <dt>"Since"</dt><dd class="muted">{text(&state, "engaged_at")}</dd>
+                            <dt>"Version"</dt><dd>{int(&state, "version").to_string()}</dd>
+                        </dl>
+                    }
+                })}
+                {move || andon.get().is_none().then(|| view! {
+                    <Empty message="No cord state read in this session; pull or release it, and the action's own row is shown.".to_owned()/>
+                })}
+            </section>
+            <section class="panel">
+                <div class="ph"><span>"What the cord does"</span></div>
+                <p class="muted">
+                    "An engaged cord refuses runs.create with 409 andon-engaged and stops the worker claiming anything except the two exempt kinds. It is a per-tenant singleton: a second pull is a 409, never a re-stamp."
+                </p>
+            </section>
+        </div>
+    }
+    .into_any()
 }

@@ -129,74 +129,6 @@ async fn check_spend_budget(
     Ok(())
 }
 
-/// The declared verification a 2xx write failed, when the tool declares a synchronous path
-/// (`verdict` + `checks`). A `read_back`-only tool verifies later, through the read tool.
-///
-/// A successful external call reaches the broker wrapped in the invocation envelope
-/// (`{"output": <destination document>, …}`), so the declared members are read from the
-/// destination's own document; a body with no `output` member is judged as itself.
-fn write_verification_failure(tool: &store::tool::ResolvedTool, body: &Value) -> Option<String> {
-    // The declaration is data on the pinned version: a read tool has nothing to judge here, and a
-    // write tool that only names a `read_back` proves its effect through a later read.
-    if tool.effect != "write" && tool.effect != "destructive" {
-        return None;
-    }
-    let verdict = tool.verify.get("verdict").and_then(Value::as_str);
-    let checks = tool.verify.get("checks").and_then(Value::as_str);
-    if verdict.is_none() && checks.is_none() {
-        return None;
-    }
-    let document = body.get("output").unwrap_or(body);
-    if let Some(verdict) = verdict {
-        let Some(value) = document.get(verdict) else {
-            return Some(format!("the destination returned no `{verdict}` verdict"));
-        };
-        let passed = value.as_bool() == Some(true)
-            || value.as_str().is_some_and(|word| {
-                word.eq_ignore_ascii_case("ok")
-                    || word.eq_ignore_ascii_case("pass")
-                    || word.eq_ignore_ascii_case("passed")
-            });
-        if !passed {
-            return Some(format!("the destination's `{verdict}` verdict is {value}"));
-        }
-    }
-    if let Some(checks) = checks {
-        let Some(entries) = document.get(checks).and_then(Value::as_array) else {
-            return Some(format!("the destination returned no `{checks}` list"));
-        };
-        let mut failed = Vec::new();
-        for entry in entries {
-            // A check declares its outcome in whichever member its service uses; any of the three
-            // is a failure, so a service cannot drift to a spelling the broker treats as a pass.
-            let ok = entry.get("ok").and_then(Value::as_bool);
-            let pass = entry.get("pass").and_then(Value::as_bool);
-            let status = entry.get("status").and_then(Value::as_str);
-            let entry_failed = ok == Some(false)
-                || pass == Some(false)
-                || status.is_some_and(|status| {
-                    status.eq_ignore_ascii_case("fail") || status.eq_ignore_ascii_case("failed")
-                });
-            if entry_failed {
-                failed.push(
-                    entry
-                        .get("name")
-                        .and_then(Value::as_str)
-                        .unwrap_or("unnamed")
-                        .to_owned(),
-                );
-            }
-        }
-        if !failed.is_empty() {
-            return Some(format!(
-                "the write failed its read-back checks: {}",
-                failed.join(", ")
-            ));
-        }
-    }
-    None
-}
-
 /// Resolve, check, validate, gate, call and ledger one tool call.
 pub(crate) async fn invoke_broker(
     pool: &PgPool,
@@ -560,22 +492,6 @@ async fn invoke_call(
             }
         }
         Err(error) => Err(error),
-    };
-
-    // SPEC_V2 §11.3: a 2xx is not "ok" when the tool's own declared verdict or checks say the
-    // effect did not happen. The ordinary 422 mapping below ledgers this `check_failed`.
-    let outcome = match outcome {
-        Ok(outcome) if (200..=299).contains(&outcome.status) => {
-            match write_verification_failure(&tool, &outcome.body) {
-                Some(detail) => Err(ActionError::new(
-                    422,
-                    "write_not_verified",
-                    format!("{}: {detail}", call.tool),
-                )),
-                None => Ok(outcome),
-            }
-        }
-        other => other,
     };
 
     // The response size of a refusal that came from the broker itself is the problem document's.

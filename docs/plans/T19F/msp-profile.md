@@ -49,7 +49,7 @@ the two joins (the authored policy and the cadence slot) and writes nothing at r
 |---|---|---|
 | R20 (T19, carried) | a never-decided forum | the T19 retirement flag; T19F adds the sitting's own decision evidence |
 | R21 | a policy change published without evidence | `authoring.review` requires an approved approval; the plan tests the refusal |
-| R22 | a cadence slot gets a second meeting | the partial unique index; the action is idempotent |
+| R22 | a cadence slot gets a second meeting | the cadence row is locked before the existing-instance lookup; the action is idempotent |
 | R23 | the board's direct path is broken by the sitting | the direct path is unchanged; the test proves it |
 
 ## Stakeholders

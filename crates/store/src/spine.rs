@@ -3341,11 +3341,14 @@ pub struct CadenceRecord {
     pub state: String,
     /// Free-form metadata.
     pub meta: Value,
+    /// The forum type this cadence instance materialises; NULL until bound.
+    pub meeting_type_key: Option<String>,
     /// The If-Match version.
     pub version: i64,
 }
 
-const CADENCE_COLUMNS: &str = "id, programme_id, kind, period, state, meta, version";
+const CADENCE_COLUMNS: &str =
+    "id, programme_id, kind, period, state, meta, meeting_type_key, version";
 
 /// The closed set of `programme_cadence.state` values (0064's CHECK), in lifecycle order.
 ///
@@ -3397,13 +3400,15 @@ pub async fn insert_cadence_tx(
     kind: &str,
     period: &str,
     meta: &Value,
+    meeting_type_key: Option<&str>,
 ) -> Result<CadenceRecord, PlanStoreError> {
     ensure_parent_tx(&mut *conn, tenant, Parent::Programme, programme_id)
         .await
         .map_err(PlanStoreError::Parent)?;
     let sql = format!(
-        "INSERT INTO programme_cadence (tenant_id, programme_id, kind, period, meta)
-         VALUES ($1, $2, $3, $4, $5) RETURNING {CADENCE_COLUMNS}"
+        "INSERT INTO programme_cadence
+            (tenant_id, programme_id, kind, period, meta, meeting_type_key)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING {CADENCE_COLUMNS}"
     );
     Ok(sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
@@ -3411,6 +3416,7 @@ pub async fn insert_cadence_tx(
         .bind(kind)
         .bind(period)
         .bind(meta)
+        .bind(meeting_type_key)
         .fetch_one(&mut *conn)
         .await?)
 }
@@ -3457,6 +3463,8 @@ pub struct CadencePatch {
     pub state: Option<String>,
     /// Free-form metadata.
     pub meta: Option<Value>,
+    /// The forum type the cadence instance materialises.
+    pub meeting_type_key: Option<String>,
 }
 
 /// Edit a cadence row.
@@ -3496,6 +3504,7 @@ pub async fn update_cadence_tx(
             period = coalesce($4, period),
             state = coalesce($5, state),
             meta = coalesce($6, meta),
+            meeting_type_key = coalesce($7, meeting_type_key),
             version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2 AND version = $3
           RETURNING {CADENCE_COLUMNS}"
@@ -3507,6 +3516,7 @@ pub async fn update_cadence_tx(
         .bind(&patch.period)
         .bind(&patch.state)
         .bind(&patch.meta)
+        .bind(&patch.meeting_type_key)
         .fetch_optional(&mut *conn)
         .await?;
     row.ok_or(PlanStoreError::Stale {

@@ -10,7 +10,7 @@
       "title": "add: S21 step 11 \u2014 the execution level closes: apply-on-accept, prompt receipts, release knowledge layers",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/697",
-      "updatedAt": "2026-11-24T22:52:34Z",
+      "updatedAt": "2026-11-24T23:17:30Z",
       "labels": [
         {
           "name": "unit",
@@ -33,9 +33,9 @@
     {
       "number": 696,
       "title": "fix: the acceptance manifest declares the dco context the main ruleset requires",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/696",
-      "updatedAt": "2026-11-24T22:53:09Z",
+      "updatedAt": "2026-11-24T23:40:31Z",
       "labels": [
         {
           "name": "bug",
@@ -71,9 +71,9 @@
     {
       "number": 691,
       "title": "fix: T17's coverage row is built \u2014 its delivery unit and authoring surface are complete on main",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/691",
-      "updatedAt": "2026-11-24T22:21:07Z",
+      "updatedAt": "2026-11-24T23:03:58Z",
       "labels": [
         {
           "name": "bug",
@@ -115,15 +115,15 @@
       "title": "proof: T19F \u2014 the live gate, the published programme record and the closure review",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/684",
-      "updatedAt": "2026-11-24T20:02:13Z",
+      "updatedAt": "2026-11-25T03:14:20Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -138,17 +138,17 @@
     {
       "number": 683,
       "title": "add: T19F \u2014 forum-policy authoring, the board sitting and cadence materialisation",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/683",
-      "updatedAt": "2026-11-24T22:44:50Z",
+      "updatedAt": "2026-11-25T03:04:59Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -209,9 +209,9 @@
     {
       "number": 680,
       "title": "fix: the materialise transport parses the first JSON document, not the whole stdout",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/680",
-      "updatedAt": "2026-11-24T22:56:44Z",
+      "updatedAt": "2026-11-24T23:22:02Z",
       "labels": [
         {
           "name": "bug",
@@ -308,7 +308,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-24T22:44:43Z",
+      "updatedAt": "2026-11-25T03:39:01Z",
       "labels": [
         {
           "name": "programme",
@@ -480,15 +480,15 @@
       "title": "T18-3c: the run inspector's executor kind, binding pin and tools panel",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/630",
-      "updatedAt": "2026-11-24T07:30:28Z",
+      "updatedAt": "2026-11-25T00:10:24Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "T13",
@@ -971,15 +971,15 @@
       "title": "T18-5: Architecture capability, System architecture, Knowledge and the T12 acceptance",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/566",
-      "updatedAt": "2026-11-22T07:12:08Z",
+      "updatedAt": "2026-11-25T00:55:40Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "programme",
@@ -994,9 +994,9 @@
     {
       "number": 565,
       "title": "T18-4: Tools, Metering, Operations and Improve",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/565",
-      "updatedAt": "2026-11-24T20:03:02Z",
+      "updatedAt": "2026-11-25T00:55:31Z",
       "labels": [
         {
           "name": "unit",
@@ -1182,9 +1182,9 @@
     {
       "number": 557,
       "title": "add: binding and catalogue actions, and the full published tool contract",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/557",
-      "updatedAt": "2026-11-24T22:40:16Z",
+      "updatedAt": "2026-11-25T00:10:14Z",
       "labels": [
         {
           "name": "unit",
@@ -1369,7 +1369,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-24T22:56:29Z",
+      "updatedAt": "2026-11-24T23:47:41Z",
       "labels": [
         {
           "name": "unit",
@@ -5671,7 +5671,7 @@
       "title": "CI cost: merge-run tree equality (deferred, measurement-gated)",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/22",
-      "updatedAt": "2026-11-24T19:59:18Z",
+      "updatedAt": "2026-11-25T00:56:10Z",
       "labels": [
         {
           "name": "unit",

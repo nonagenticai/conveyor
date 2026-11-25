@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-24T16:30:00Z",
+  "generated_at": "2026-11-25T03:46:32.319854100+00:00",
   "inference": {
     "by_caller": [
       {
@@ -9,7 +9,7 @@
       },
       {
         "caller_kind": "other",
-        "calls": 14,
+        "calls": 17,
         "total_tokens": 2718
       }
     ],
@@ -68,6 +68,14 @@
     "by_model": [
       {
         "cache_hits": 0,
+        "calls": 1,
+        "completion_tokens": 0,
+        "model": "asr",
+        "prompt_tokens": 0,
+        "total_tokens": 0
+      },
+      {
+        "cache_hits": 0,
         "calls": 81,
         "completion_tokens": 9429,
         "model": "claude-sonnet-5-5",
@@ -76,7 +84,7 @@
       },
       {
         "cache_hits": 0,
-        "calls": 4,
+        "calls": 5,
         "completion_tokens": 0,
         "model": "image_gen",
         "prompt_tokens": 0,
@@ -105,6 +113,14 @@
         "model": "tier-medium",
         "prompt_tokens": 281,
         "total_tokens": 403
+      },
+      {
+        "cache_hits": 0,
+        "calls": 1,
+        "completion_tokens": 0,
+        "model": "tts",
+        "prompt_tokens": 0,
+        "total_tokens": 0
       }
     ],
     "by_project": [
@@ -141,14 +157,14 @@
     ],
     "totals": {
       "cache_hit_calls": 0,
-      "cache_miss_calls": 642,
+      "cache_miss_calls": 643,
       "cache_write_calls": 0,
-      "calls": 646,
+      "calls": 649,
       "completion_tokens": 127874,
       "non_ok_calls": 0,
       "prompt_tokens": 9422929,
       "total_tokens": 9550803,
-      "unknown_cache_calls": 4
+      "unknown_cache_calls": 6
     }
   },
   "note": "tokens are stored; cost is derived by the app from the pinned price version and is not stored in the ledger. `totals`, `by_model` and `by_caller` are tenant-wide; `by_project` and `by_card` cover only the rows this snapshot publishes, so the differences are the boundary, not a missing call",

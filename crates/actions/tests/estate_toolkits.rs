@@ -553,6 +553,40 @@ async fn the_zero_use_report_flags_only_uncalled_tools() {
     assert_eq!(code, 422, "a zero-day window is refused: {refused}");
 }
 
+#[test]
+fn a_write_tool_without_its_contract_is_refused() {
+    let mut manifest = conveyor_actions::toolkits::manifest::manifests()
+        .expect("the manifests validate")[0]
+        .clone();
+    assert_eq!(manifest.key, "coding");
+    manifest.tools[0].idempotency = None;
+    manifest.tools[0].verification = None;
+    let error =
+        conveyor_actions::toolkits::publish::check_contract(&manifest).expect_err("refused");
+    let message = format!("{error:?}");
+    assert!(
+        message.contains("jobs_create"),
+        "the refusal names the tool: {message}"
+    );
+}
+
+#[tokio::test]
+async fn the_published_tool_carries_its_contract() {
+    let fixture = Fixture::new().await;
+    fixture.publish().await;
+    let (status, body) = fixture
+        .invoke(
+            "tools.get",
+            json!({"toolkit": "coding", "tool": "jobs_create"}),
+        )
+        .await;
+    assert_eq!(status, 200, "tools.get: {body}");
+    assert_eq!(body["output"]["idempotency"], "required", "{body}");
+    assert_eq!(body["output"]["verification"], "jobs_get", "{body}");
+    assert!(body["output"]["output_schema"].is_object(), "{body}");
+    assert!(body["output"]["redact"].is_array(), "{body}");
+}
+
 // ── #561: the research and Lean wave ─────────────────────────────────────────────────────
 
 /// #561 P4.3: the research and Lean manifests publish once, each as a draft; a draft resolves no
