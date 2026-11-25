@@ -14,7 +14,7 @@ use serde_json::{Value, json};
 use wasm_bindgen::JsCast;
 
 use crate::api::{ApiError, InvokeOptions};
-use crate::approvals::{Destructive, run_destructive};
+use crate::approvals::{Destructive, EvidenceRef, run_destructive_with_evidence};
 use crate::components::{Empty, Planned, StatusPill};
 use crate::screens::v2_data::{int, rows, text};
 use crate::state::AppCtx;
@@ -55,6 +55,10 @@ struct Form {
     deployment: RwSignal<String>,
     flag: RwSignal<String>,
     value: RwSignal<String>,
+    /// The typed evidence the gate protects (#572): a query, its approved hits, and the pick.
+    asset_query: RwSignal<String>,
+    asset_hits: RwSignal<Vec<Value>>,
+    asset_pick: RwSignal<Option<(String, String)>>,
     // Andon
     reason: RwSignal<String>,
 }
@@ -78,6 +82,9 @@ impl Form {
             deployment: RwSignal::new(String::new()),
             flag: RwSignal::new(String::new()),
             value: RwSignal::new("true".to_owned()),
+            asset_query: RwSignal::new(String::new()),
+            asset_hits: RwSignal::new(Vec::new()),
+            asset_pick: RwSignal::new(None),
             reason: RwSignal::new(String::new()),
         }
     }
@@ -548,6 +555,47 @@ fn cluster_panel(
 }
 
 fn flags_panel(form: Form, ctx: AppCtx, notice: RwSignal<Option<String>>) -> AnyView {
+    // The gate's evidence (#572): search the approved governed assets, then attach one. The
+    // server resolves the reference before the gate opens; nothing is attached by default.
+    let find_assets = move |_event: web_sys::MouseEvent| {
+        let q = form.asset_query.get().trim().to_owned();
+        if q.is_empty() {
+            notice.set(Some(
+                "Type a word to find an approved governed asset.".to_owned(),
+            ));
+            return;
+        }
+        notice.set(Some("Searching approved governed assets…".to_owned()));
+        leptos::task::spawn_local(async move {
+            match ctx
+                .invoke(
+                    "search.query",
+                    json!({
+                        "q": q,
+                        "types": ["governed_asset"],
+                        "status": "approved",
+                        "limit": 10,
+                    }),
+                    InvokeOptions::default(),
+                )
+                .await
+            {
+                Ok(invocation) => {
+                    let hits = rows(&invocation.output);
+                    notice.set(Some(if hits.is_empty() {
+                        "No approved governed asset matches that word.".to_owned()
+                    } else {
+                        format!("{} approved asset(s) found.", hits.len())
+                    }));
+                    form.asset_hits.set(hits);
+                }
+                Err(error) => notice.set(Some(format!(
+                    "search.query refused: {}",
+                    error_text(&error)
+                ))),
+            }
+        });
+    };
     let flip = move |_event: web_sys::MouseEvent| {
         let namespace = form.namespace.get().trim().to_owned();
         let deployment = form.deployment.get().trim().to_owned();
@@ -567,10 +615,17 @@ fn flags_panel(form: Form, ctx: AppCtx, notice: RwSignal<Option<String>>) -> Any
             "value": value,
             "dry_run": false,
         });
-        run_destructive(
+        let evidence = form
+            .asset_pick
+            .get()
+            .map(|(id, _)| EvidenceRef::governed_asset(id))
+            .into_iter()
+            .collect::<Vec<_>>();
+        run_destructive_with_evidence(
             ctx,
             "ops.flag_flip",
             input,
+            evidence,
             InvokeOptions::default(),
             move |outcome| match outcome {
                 Destructive::Done => {
@@ -609,6 +664,35 @@ fn flags_panel(form: Form, ctx: AppCtx, notice: RwSignal<Option<String>>) -> Any
                         <input class="inp" prop:value=move || form.value.get()
                             on:input=move |event| form.value.set(input_value(&event))/></label>
                 </div>
+                <div class="ph" style="margin-top:12px"><span>"Evidence the gate protects"</span><span class="muted">"approved governed assets"</span></div>
+                <div class="grid-2">
+                    <label class="field"><span>"Search approved assets"</span>
+                        <input class="inp" aria-label="Evidence search" placeholder="e.g. retention policy"
+                            prop:value=move || form.asset_query.get()
+                            on:input=move |event| form.asset_query.set(input_value(&event))/></label>
+                    <div class="field"><span>" "</span>
+                        <button class="btn" on:click=find_assets>"Find approved assets"</button></div>
+                </div>
+                <ul class="steps" data-testid="evidence-hits">
+                    {move || form.asset_hits.get().into_iter().map(|hit| {
+                        let id = hit.get("id").and_then(Value::as_str).unwrap_or_default().to_owned();
+                        let title = hit.get("title").and_then(Value::as_str).unwrap_or("(untitled)").to_owned();
+                        let key = hit.get("key").and_then(Value::as_str).unwrap_or_default().to_owned();
+                        let pick = (id, title.clone());
+                        view! {
+                            <li>
+                                <button class="btn small" on:click=move |_| form.asset_pick.set(Some(pick.clone()))>"Attach"</button>
+                                <span class="muted">{format!(" {title} ({key})")}</span>
+                            </li>
+                        }
+                    }).collect_view()}
+                </ul>
+                <p class="muted" data-testid="evidence-attached">
+                    {move || match form.asset_pick.get() {
+                        Some((id, title)) => format!("Attached: {title} ({id})"),
+                        None => "No evidence attached — the gate records none.".to_owned(),
+                    }}
+                </p>
                 <button class="btn primary" on:click=flip>"Flip the flag"</button>
                 <p class="muted">
                     "ops.flag_flip has effect `destructive`: the console asks the tenant's policy, requests a gate that names this deployment, this flag and this value, and invokes nothing. A person who is not the requester decides the gate on the approvals screen; only then does the retry carry it."

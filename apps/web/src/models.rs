@@ -432,6 +432,9 @@ pub struct ApprovalOut {
     /// The input the approved call will run with.
     #[serde(default)]
     pub proposed_input: Option<Value>,
+    /// The typed evidence the gate resolved (`meta.evidence`): `[{kind, id}]`.
+    #[serde(default)]
+    pub evidence: Vec<Value>,
     /// Who posed the gate, and their label.
     #[serde(default)]
     pub requested_by: Option<String>,

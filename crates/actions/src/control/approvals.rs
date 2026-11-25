@@ -908,6 +908,12 @@ pub fn approval_out(record: &store::approval::ApprovalRecord) -> ApprovalOut {
             .map(str::to_owned),
         allowed_decisions: record.meta.get("allowed_decisions").cloned(),
         proposed_input: record.meta.get("proposed_input").cloned(),
+        evidence: record
+            .meta
+            .get("evidence")
+            .and_then(Value::as_array)
+            .cloned()
+            .unwrap_or_default(),
         requested_by: record.requested_by.map(|id| id.to_string()),
         requested_by_label: record.requested_by_label.clone(),
         required_decisions: approval.required_decisions,
