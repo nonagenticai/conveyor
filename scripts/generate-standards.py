@@ -1510,6 +1510,39 @@ def declarative(template: dict[str, Any]) -> list[str]:
     return list(template.get("required") or []) + list(template.get("optional") or [])
 
 
+def phase_requirements(snapshot: dict[str, Any], phase: str) -> dict[str, Any]:
+    """The artefact types the tailored ADM profile requires at one phase."""
+    architecture = snapshot.get("architecture") or {}
+    profile = (architecture.get("profiles") or [{}])[0]
+    return (profile.get("artifact_requirements") or {}).get(str(phase)) or {}
+
+
+def section_not_applicable(
+    heading: str,
+    template: dict[str, Any],
+    subject: dict[str, Any],
+    snapshot: dict[str, Any],
+) -> bool:
+    """A phase-artefact section over a phase the tailored profile requires nothing at.
+
+    The ADM tailoring (owner decision 2026-11-24) declares the artefact set per phase; a phase
+    with no required type is not a gap, and rendering the projection would demand a record the
+    standard does not ask for — a permanent false red no record can close. Section-level, so a
+    profile that later requires a type at the phase brings the section back and it resolves like
+    any other.
+    """
+    if subject.get("kind") != "phase":
+        return False
+    sources = (template.get("sources") or {}).get(heading) or []
+    if not sources or any(
+        source.get("kind") != "computed" or source.get("name") != "phase_artefacts"
+        for source in sources
+    ):
+        return False
+    phase = str(sources[0].get("phase") or subject.get("phase") or "")
+    return not phase_requirements(snapshot, phase)
+
+
 def applies(
     template: dict[str, Any],
     category: str,
@@ -1649,6 +1682,8 @@ def build_instances(
                 sections: list[dict[str, Any]] = []
                 document_missing = False
                 for heading in required:
+                    if section_not_applicable(heading, template, subject, snapshot):
+                        continue
                     section = resolve_section(
                         heading, template, category, subject, snapshot, outputs_dir,
                         programme_projects, register=register,
@@ -1656,7 +1691,9 @@ def build_instances(
                     section["required"] = True
                     sections.append(section)
                 for heading in template.get("optional") or []:
-                    if heading in (template.get("sources") or {}):
+                    if heading in (template.get("sources") or {}) and not section_not_applicable(
+                        heading, template, subject, snapshot
+                    ):
                         section = resolve_section(
                             heading, template, category, subject, snapshot, outputs_dir,
                             programme_projects, register=register,
@@ -2905,6 +2942,40 @@ def self_test_section_cause(outputs: Path, fixture: dict[str, Any]) -> None:
     print("generate-standards: self-test case section-cause-decides-kind OK")
 
 
+def self_test_phase_requirements(outputs: Path, std: dict[str, Any]) -> None:
+    """The ADM tailoring governs the phase-artefact section: no profile requirement, no section.
+
+    Measured before the rule existed: every project's phase-G page was permanently `partial` on
+    "Mandatory artefacts" because the tailored profile requires no type at g, so no record could
+    ever evidence it. The negative control flips the profile and the section must come back.
+    """
+    fixture = self_test_fixture()
+    fixture["programme"]["projects"][0]["meta"]["adm_phase"] = "g"
+    document, _ = generate(std, fixture, outputs, covered_keys=set())
+    page = next(
+        (item for item in document["artefacts"] if item["id"] == "std-togaf-phase-g-p0-g"), None,
+    )
+    assert page is not None, "the declared phase-G subject must instance its page"
+    headings = [section["heading"] for section in page["sections"]]
+    assert "Mandatory artefacts" not in headings, (
+        f"a phase with no profile requirement must not project its artefact set: {headings}"
+    )
+    assert "Contract and gate" in headings and "Evidence" in headings, headings
+    fixture["architecture"]["profiles"][0].setdefault("artifact_requirements", {})["g"] = {
+        "hld": ["compliance_review"]
+    }
+    document, _ = generate(std, fixture, outputs, covered_keys=set())
+    page = next(
+        (item for item in document["artefacts"] if item["id"] == "std-togaf-phase-g-p0-g"), None,
+    )
+    assert page is not None
+    headings = [section["heading"] for section in page["sections"]]
+    assert "Mandatory artefacts" in headings, (
+        f"a phase the profile requires an artefact at must still render its section: {headings}"
+    )
+    print("generate-standards: self-test case phase-requirements-tailored OK")
+
+
 def self_test_broken_source_finding(outputs: Path, std: dict[str, Any]) -> None:
     """A source that cannot resolve is a STANDARD finding, and `--check` refuses it.
 
@@ -3067,6 +3138,7 @@ def self_test() -> int:
         self_test_demo_and_lessons_mandatory(outputs, std)
         self_test_gap_analysis(outputs, std)
         self_test_section_cause(outputs, fixture)
+        self_test_phase_requirements(outputs, std)
         self_test_broken_source_finding(outputs, std)
     print(f"generate-standards: self-test OK ({len(document['artefacts'])} artefact instances)")
     return 0
