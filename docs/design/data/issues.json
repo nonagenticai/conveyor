@@ -135,7 +135,7 @@
       "title": "add: T19F \u2014 forum-policy authoring, the board sitting and cadence materialisation",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/683",
-      "updatedAt": "2026-11-24T23:23:38Z",
+      "updatedAt": "2026-11-25T00:05:34Z",
       "labels": [
         {
           "name": "unit",
@@ -1177,9 +1177,9 @@
     {
       "number": 557,
       "title": "add: binding and catalogue actions, and the full published tool contract",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/557",
-      "updatedAt": "2026-11-24T22:40:16Z",
+      "updatedAt": "2026-11-25T00:10:14Z",
       "labels": [
         {
           "name": "unit",
@@ -1364,7 +1364,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-24T23:32:41Z",
+      "updatedAt": "2026-11-24T23:47:41Z",
       "labels": [
         {
           "name": "unit",

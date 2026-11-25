@@ -1824,14 +1824,14 @@
       "tranche": 3,
       "units": {
         "blocked": 1,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           76,
           556,
           557,
           630
         ],
-        "open": 2,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
