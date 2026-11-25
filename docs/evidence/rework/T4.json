@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a20fbb-1fd6-78dd-8f36-172552863bb3 decided by a distinct approver",
+      "detail": "latest closure gate 01a20e7e-c3b7-79ac-b2b0-dcc6e1e595c0 decided by a distinct approver",
       "id": "T4-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -124,7 +124,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a20fba-ccfe-7e9a-81f3-c8e89cf78ac9 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a20e7e-6ede-7f85-97a8-e857b4b0e187 carries a statement and evidence from the tranche-4 retro",
       "id": "T4-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -151,7 +151,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): std-togaf-phase-g-t4-g:T4 (P1)",
+      "detail": "2 unresolved P0/P1 package(s): seed_live_drift:T4 (P1), std-togaf-phase-g-t4-g:T4 (P1)",
       "id": "T4-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -183,20 +183,20 @@
   "failures": [
     "T4-review (P0): the live contract's review's delegation_ref is missing or unpublished, or its level is non-conformant/irrelevant without an active waiver",
     "T4-artefact-standard (P1): 15 mandatory artefact package(s) open: std-togaf-phase-g-t4-g:T4, std-pmp-project-baseline-t4:T4, std-pmp-project-registers-t4:T4, std-togaf-architecture-artifact-instance-01a2028c-33a0-76d6-acd6-57365a79dd10:T4, std-togaf-architecture-artifact-instance-01a2028c-6415-7dbb-bb08-ef2baa58aaa4:T4, std-togaf-architecture-artifact-instance-01a2028c-94d6-7e50-9d94-9e94feda14aa:T4, std-togaf-architecture-artifact-instance-01a2028c-c575-749c-a0c8-82c44effa477:T4, std-togaf-architecture-artifact-instance-01a2028c-f584-75ea-90cd-b929dd945aa4:T4, +7 more",
-    "T4-rework (P0): 1 unresolved P0/P1 package(s): std-togaf-phase-g-t4-g:T4 (P1)",
+    "T4-rework (P0): 2 unresolved P0/P1 package(s): seed_live_drift:T4 (P1), std-togaf-phase-g-t4-g:T4 (P1)",
     "gate (P0): the gate check 'T4-review' did not pass; the gate check 'T4-artefact-standard' did not pass; the gate check 'T4-rework' did not pass"
   ],
   "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata",
-  "generated_at": "2026-11-24T22:51:49.684964+00:00",
+  "generated_at": "2026-11-25T07:24:43.374136+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T4.toml",
   "name": "Kanban coach",
   "project": "T4",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-24T22:44:10.403624+00:00",
-    "git_sha": "902e34af0cd8fe55bd609b79467ba67d85734ef4",
-    "path": "retained-snapshot/902e34af0cd8fe55bd609b79467ba67d85734ef4"
+    "generated_at": "2026-11-24T22:54:29.947376+00:00",
+    "git_sha": "f726f48a3830c4682f4baba14dd09a91c5f26b7e",
+    "path": "retained-snapshot/f726f48a3830c4682f4baba14dd09a91c5f26b7e"
   },
   "verdict": "red",
   "warnings": []

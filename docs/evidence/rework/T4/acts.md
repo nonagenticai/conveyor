@@ -17,3 +17,5 @@ kata as a run id without measurement; WBS deliverable accepted.
 baseline decision.
 
 T4: 32 acts in `transcript.jsonl`; the last run recorded 2.
+
+T4: 46 acts in `transcript.jsonl`; the last run recorded 7.
