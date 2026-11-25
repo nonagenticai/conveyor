@@ -415,6 +415,10 @@ class Runner:
             str(row.get("id")): row.get("document_id")
             for row in (self.snapshot_json("architecture.json").get("artifacts") or [])
         }
+        snapshot_entries = {
+            str(row.get("id")): len(row.get("entries") or [])
+            for row in (self.snapshot_json("architecture.json").get("artifacts") or [])
+        }
         for index, artefact in enumerate(self.content["artifacts"]):
             key = artefact_keys[index]
             if artefact["title"] in titles:
@@ -422,7 +426,14 @@ class Runner:
                 meta = dict(row.get("meta") or {})
                 document_id = snapshot_documents.get(str(row.get("id"))) or row.get("document_id")
                 needs_key = meta.get("artifact_key") != key
-                if not needs_key and document_id:
+                # A supersede copies the row but not its entries: a re-versioned artefact whose
+                # pack carries entries and whose row has none is repaired in place (measured on
+                # T9's seven artefacts, 2026-11-25: every Entries section resolved to zero).
+                needs_entries = (
+                    bool(artefact.get("entries"))
+                    and snapshot_entries.get(str(row.get("id")), 0) == 0
+                )
+                if not needs_key and document_id and not needs_entries:
                     artefact_ids[artefact["title"]] = str(row["id"])
                     print(f"  artefact: {artefact['title']} already present")
                     continue
@@ -447,7 +458,12 @@ class Runner:
                 )
                 draft = self.invoke(
                     "architecture.artifacts_update",
-                    {"id": draft["id"], "meta": meta, "document_id": document_id},
+                    {
+                        "id": draft["id"],
+                        "meta": meta,
+                        "document_id": document_id,
+                        "entries": artefact.get("entries") or [],
+                    },
                     read_action="architecture.artifacts_get",
                     read_input={"id": draft["id"]},
                     if_match=draft.get("version", 1),
