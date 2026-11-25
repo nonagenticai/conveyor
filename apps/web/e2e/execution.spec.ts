@@ -104,23 +104,23 @@ test("the tools panel names the tool version, credential alias and outcome", asy
     "toolkits.list",
     { page: { limit: 200 }, status: "published" },
   );
-  const toolkit = toolkits.items.find((row) => row.key === "lean4");
-  expect(toolkit, "toolkits.publish makes the Lean toolkit readable").toBeTruthy();
+  const toolkit = toolkits.items.find((row) => row.key === "coding");
+  expect(toolkit, "toolkits.publish makes the coding toolkit readable").toBeTruthy();
   await invoke(request, "tool_bindings.create", {
     job_binding_id: pinned.id,
     toolkit_id: toolkit!.id,
     effect_ceiling: "read",
-    credential_alias: "lean4.tenant",
+    credential_alias: "coding.tenant",
   });
 
-  // `lean4.check` declares no required input, so `{}` reaches the broker's ledger. The dev
-  // estate has no Lean destination URL, so the call's outcome is its failure — still a ledger
-  // row naming the tool version, the grant alias and the outcome.
+  // `coding.jobs_get` takes one string id, so this input passes the broker's schema check and
+  // reaches the destination. The dev estate has no coding service URL, so the call fails at the
+  // transport — still a ledger row naming the tool version, the grant alias and the outcome.
   try {
     await invoke(request, "tools.call", {
       run_id: run.id,
-      tool: "lean4.check",
-      input: {},
+      tool: "coding.jobs_get",
+      input: { id: "e2e" },
     });
   } catch {
     // The failure is asserted through the ledger row below.
@@ -134,8 +134,8 @@ test("the tools panel names the tool version, credential alias and outcome", asy
 
   const panel = page.getByTestId("execution-tool-calls");
   await expect(panel).toBeVisible();
-  await expect(panel).toContainText("lean4.check");
-  await expect(panel).toContainText("lean4.tenant");
+  await expect(panel).toContainText("coding.jobs_get");
+  await expect(panel).toContainText("coding.tenant");
   await expect(panel.locator("tbody tr").first()).not.toBeEmpty();
   await expect(page.locator(".problem")).toHaveCount(0);
 });
