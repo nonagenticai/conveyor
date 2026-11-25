@@ -12,7 +12,10 @@
 //!   request also carries `Authorization: Bearer <service licence>` that introspects active AND
 //!   whose `subject_id` is on `MEDIA_DISCOVERY_ONBEHALF_SUBJECTS` (CSV; empty ⇒ fail-closed). The
 //!   vouch never re-labels: the tenant served is the one the header named, never the licence's own.
-//! * **No tenant header** — `401`. The reference shipped a `DEFAULT_TENANT_ID` fallback (a real
+//! * **No `X-Tenant-Id`, `Authorization: Bearer <licence>`** — the licence's tenant. This is the
+//!   conveyor's external action engine: `HandlerRef::External` can send only `Authorization`, so
+//!   the licence bearer is the credential when no tenant header is present.
+//! * **No credential** — `401`. The reference shipped a `DEFAULT_TENANT_ID` fallback (a real
 //!   customer) that its own deployment closed with `ALLOW_TRUSTED_NETWORK_DEFAULT_TENANT=false`;
 //!   this port never had a default, so the closed behaviour is the only one it can express.
 //!
@@ -66,12 +69,29 @@ impl FromRequestParts<AppState> for Tenant {
             .unwrap_or("");
 
         if let Some(token) = bearer_value(raw) {
-            return licence_tenant(state, token).await;
+            // The router's first precedence: a licence in X-Tenant-Id wins. When Authorization
+            // also carries a licence, a disagreement is recorded, never refused.
+            let chosen = active_licence(state, token).await?;
+            if let Some(asserted) = authorization_bearer(parts)
+                && asserted != token
+                && let Ok(other) = active_licence(state, asserted).await
+            {
+                record_tenant_mismatch(&chosen, &other);
+            }
+            return tenant_of(&chosen);
         }
         // A `Bearer …`-shaped value that carries no token is not a tenant either. The reference
         // blanked it and took its (closed) fallback; this port answers the same 401.
-        if raw.to_ascii_lowercase().starts_with("bearer") || raw.is_empty() {
+        if raw.to_ascii_lowercase().starts_with("bearer") {
             return Err(ApiError::authentication_required(MISSING_CONTEXT));
+        }
+        if raw.is_empty() {
+            // No X-Tenant-Id: a licence in Authorization is the credential. This is the path the
+            // conveyor's external action engine uses — it can send only Authorization.
+            let Some(token) = authorization_bearer(parts) else {
+                return Err(ApiError::authentication_required(MISSING_CONTEXT));
+            };
+            return licence_tenant(state, token).await;
         }
 
         let tenant = Uuid::parse_str(raw).map_err(|_| ApiError::invalid_tenant(INVALID_TENANT))?;
@@ -127,21 +147,50 @@ fn is_active(payload: &Value) -> bool {
     payload.get("active").and_then(Value::as_bool) == Some(true)
 }
 
-/// The licence-token path: the tenant is the ACTIVE licence's own.
-async fn licence_tenant(state: &AppState, token: &str) -> Result<Tenant, ApiError> {
+/// The ACTIVE licence payload, or the reference's 401.
+async fn active_licence(state: &AppState, token: &str) -> Result<Value, ApiError> {
     let Some(payload) = introspect(state, token).await else {
         return Err(ApiError::authentication_required(INVALID_LICENCE));
     };
     if !is_active(&payload) {
         return Err(ApiError::authentication_required(INVALID_LICENCE));
     }
-    let tenant = payload
+    Ok(payload)
+}
+
+/// The tenant the ACTIVE licence names. A licence without one is refused.
+fn tenant_of(payload: &Value) -> Result<Tenant, ApiError> {
+    payload
         .get("tenant_id")
         .and_then(Value::as_str)
-        .and_then(|raw| Uuid::parse_str(raw.trim()).ok());
-    tenant
+        .and_then(|raw| Uuid::parse_str(raw.trim()).ok())
         .map(Tenant)
         .ok_or_else(|| ApiError::authentication_required(LICENCE_MISSING_TENANT))
+}
+
+/// The licence-token path: the tenant is the ACTIVE licence's own.
+async fn licence_tenant(state: &AppState, token: &str) -> Result<Tenant, ApiError> {
+    tenant_of(&active_licence(state, token).await?)
+}
+
+/// A second licence that names another tenant is a count, not a refusal: the X-Tenant-Id licence
+/// is the credential, and the disagreement is recorded for the operator.
+fn record_tenant_mismatch(chosen: &Value, asserted: &Value) {
+    fn tenant(payload: &Value) -> Option<&str> {
+        payload
+            .get("tenant_id")
+            .and_then(Value::as_str)
+            .map(str::trim)
+    }
+    if let (Some(chosen_tenant), Some(asserted_tenant)) = (tenant(chosen), tenant(asserted))
+        && !chosen_tenant.eq_ignore_ascii_case(asserted_tenant)
+    {
+        tracing::warn!(
+            chosen_tenant = %chosen_tenant,
+            asserted_tenant = %asserted_tenant,
+            "media: the X-Tenant-Id licence wins over a mismatched Authorization licence"
+        );
+    }
 }
 
 /// The on-behalf vouch: a bare tenant is honoured only with an active, allowlisted service token.

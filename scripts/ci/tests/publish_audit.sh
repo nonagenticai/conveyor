@@ -18,8 +18,51 @@ mkdir -p "$tmp/docs/design/scripts" "$tmp/docs/design/docs" "$tmp/docs/design/da
   "$tmp/homepage/design" "$tmp/fixture" "$tmp/fixture-docs" "$tmp/bin"
 
 cp "$repo/docs/design/scripts/publish-data.sh" "$tmp/docs/design/scripts/publish-data.sh"
-printf '# no-op: the publish test does not rebuild the pack\n' > "$tmp/docs/design/scripts/build-docs.py"
-printf '#!/usr/bin/env bash\nprintf %%s "{\\"issues\\": []}" > "$1"\n' > "$tmp/scripts/fetch-issues.sh"
+# Order-proving stand-ins: the real generators read the whole tree, so the test proves the
+# ORDER — the docs index hashes the INSTALLED conformance.md, and the seed follows the INSTALLED
+# registry — with stubs that record the hashes they see. A stub that cannot find its input fails
+# the publish, which is the assertion.
+cat > "$tmp/docs/design/scripts/build-docs.py" <<'PY'
+#!/usr/bin/env python3
+import hashlib, json, pathlib
+root = pathlib.Path(__file__).resolve().parents[3]
+installed = root / "docs/design/data/conformance.md"
+digest = hashlib.sha256(installed.read_bytes()).hexdigest() if installed.exists() else None
+out = root / "docs/design/docs"
+out.mkdir(parents=True, exist_ok=True)
+document = {"conformance_sha256": digest}
+(out / "documents.json").write_text(json.dumps(document, sort_keys=True) + "\n")
+(out / "documents.js").write_text(
+    "window.CONVEYOR_DOCUMENTS = " + json.dumps(document, sort_keys=True) + ";\n"
+)
+PY
+cat > "$tmp/scripts/build-programme-seed.py" <<'PY'
+#!/usr/bin/env python3
+import hashlib, json, pathlib
+root = pathlib.Path(__file__).resolve().parents[1]
+registry = (root / "docs/design/data/issues.json").read_bytes()
+document = {"projects": [], "registry_sha256": hashlib.sha256(registry).hexdigest()}
+(root / "seed/programme.json").write_text(json.dumps(document, sort_keys=True) + "\n")
+PY
+cat > "$tmp/scripts/build-coverage.py" <<'PY'
+#!/usr/bin/env python3
+import hashlib, json, pathlib, sys
+root = pathlib.Path(__file__).resolve().parents[1]
+if "--check" in sys.argv:
+    sys.exit(0)
+registry = (root / "docs/design/data/issues.json").read_bytes()
+document = {"registry_sha256": hashlib.sha256(registry).hexdigest()}
+(root / "docs/design/data/coverage.json").write_text(json.dumps(document, sort_keys=True) + "\n")
+PY
+cat > "$tmp/scripts/build-v2-coverage.py" <<'PY'
+#!/usr/bin/env python3
+import sys
+sys.exit(0)
+PY
+cat > "$tmp/scripts/fetch-issues.sh" <<'SH'
+#!/usr/bin/env bash
+printf '%s' '{"issues": [{"number": 9001, "title": "fetched registry", "state": "OPEN", "labels": []}]}' > "$1"
+SH
 cp "$repo/scripts/audit-programme-conformance.py" "$tmp/scripts/audit-programme-conformance.py"
 cp "$repo/scripts/generate-standards.py" "$tmp/scripts/generate-standards.py"
 cp "$repo/scripts/redact-public-register.py" "$tmp/scripts/redact-public-register.py"
@@ -53,9 +96,8 @@ JSON
 cat > "$tmp/fixture/coverage.json" <<'JSON'
 {"projects": []}
 JSON
-cat > "$tmp/fixture/issues.json" <<'JSON'
-{"issues": []}
-JSON
+# No fixture issues.json: the fetched registry is the pack's copy, and the stub snapshot must not
+# overwrite it (the order assertion below reads the installed file).
 cat > "$tmp/fixture-docs/outputs.js" <<'JSON'
 window.CONVEYOR_OUTPUTS = {"schema": "design-outputs/v1", "generated_at": "2026-11-20T00:00:00Z", "outputs": []};
 JSON
@@ -172,6 +214,31 @@ titles = [package.get("title") for package in register.get("packages", [])]
 assert "publish fixture finding" in titles, titles
 PY
   echo "FAIL: the published register dropped the checked-in v1 findings ledger" >&2
+  exit 1
+}
+# P1 — the docs index is derived from the INSTALLED conformance.md. The stub build-docs records
+# the hash it read; rendering before the install would leave the pre-publish hash here.
+python3 - "$tmp" <<'PY' || {
+import hashlib, json, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+index = json.loads((root / "docs/design/docs/documents.json").read_text(encoding="utf-8"))
+installed = (root / "docs/design/data/conformance.md").read_bytes()
+assert index.get("conformance_sha256") == hashlib.sha256(installed).hexdigest(), index
+PY
+  echo "FAIL: the docs index did not hash the installed conformance.md" >&2
+  exit 1
+}
+# P2 — the programme seed is derived from the INSTALLED (fetched) registry, not the committed
+# fixture: the stub records the hash of the registry it saw, and the fetched one is distinctive.
+python3 - "$tmp" <<'PY' || {
+import hashlib, json, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+installed = (root / "docs/design/data/issues.json").read_bytes()
+assert b"9001" in installed, installed[:120]
+seed = json.loads((root / "seed/programme.json").read_text(encoding="utf-8"))
+assert seed.get("registry_sha256") == hashlib.sha256(installed).hexdigest(), seed
+PY
+  echo "FAIL: the programme seed was not derived from the installed registry" >&2
   exit 1
 }
 echo "publish_audit: OK"
