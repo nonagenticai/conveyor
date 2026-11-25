@@ -427,7 +427,7 @@ class Runner:
                     read_id_from_output="id",
                     if_match=row.get("version", 1),
                 )
-                meta = dict(draft.get("meta") or {})
+                meta = dict(draft.get("meta") or {}) if not self.dry_run else {}
                 meta.update(
                     {
                         "retrospective": True,
