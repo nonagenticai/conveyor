@@ -852,16 +852,19 @@ def _package_due(package: dict[str, Any], planned: set[int]) -> bool:
 def _gate_owner(package: dict[str, Any]) -> str:
     """The project whose manifest gates this package.
 
-    A project-scope package is the project's own obligation and gates its own manifest. A
-    tranche- or programme-scope package is shared work: the rule's `owner_project` is the
-    programme role accountable for the standard, while `apply_to` is the project that must act.
-    Gating the acting project is what makes the tranche pipeline executable; the accountable
-    role stays on the package for reporting, and the final acceptance still sees every package.
+    A project-scope package is the project's own obligation and gates the subject the audit
+    scopes it to. `owner_project` names the accountable standard owner and `apply_to` names
+    where a shared card is created; neither may move a subject's package onto another project's
+    manifest (that defect put every subject's `mandatory_artefacts:*` card on the standard
+    owner's manifest). A tranche- or programme-scope package is shared work: `apply_to` is the
+    project that must act, and gating the acting project is what makes the tranche pipeline
+    executable. The accountable role stays on the package for reporting, and the final
+    acceptance still sees every package.
     """
     scope = str(package.get("scope") or "")
     if scope == "programme" or scope.startswith("tranche-"):
         return str(package.get("apply_to") or package.get("owner_project") or "")
-    return str(package.get("owner_project") or "")
+    return scope or str(package.get("owner_project") or "")
 
 
 def check_artefact_standard(
@@ -2162,7 +2165,9 @@ severity = "P0"
     )
     register_case(
         "standard-project-scope-still-due",
-        [standard_package("mandatory_artefacts:Z9", "P1", scope="Z9")],
+        [standard_package(
+            "mandatory_artefacts:TEST", "P1", scope="TEST", owner_project="OTHER",
+        )],
         check_artefact_standard,
         False,
         msp=planned_msp,
@@ -2199,11 +2204,23 @@ severity = "P0"
     register_case(
         "standard-project-scope-own-obligation",
         [standard_package(
-            "mandatory_artefacts:Z9", "P1",
-            scope="Z9", owner_project="TEST", apply_to="OTHER",
+            "mandatory_artefacts:TEST", "P1",
+            scope="TEST", owner_project="OTHER", apply_to="OTHER",
         )],
         check_artefact_standard,
         False,
+    )
+    # The live defect this pins: the register writes owner_project as the standard's
+    # accountable role (T9) and apply_to as the delivery track (PLATFORM); the subject is the
+    # scope. Gating by either field put every subject's package on the owner's manifest.
+    register_case(
+        "standard-subject-not-owner",
+        [standard_package(
+            "mandatory_artefacts:Z9", "P1",
+            scope="Z9", owner_project="TEST", apply_to="PLATFORM",
+        )],
+        check_artefact_standard,
+        True,
     )
 
     register_case("resolution-open-p1", [standard_package("pkg-1", "P1")], check_rework_resolution, False)
@@ -2261,6 +2278,24 @@ severity = "P0"
         check_rework_resolution,
         False,
         msp=authorised_msp,
+    )
+    register_case(
+        "resolution-subject-not-owner",
+        [standard_package(
+            "mandatory_artefacts:Z9", "P1",
+            scope="Z9", owner_project="TEST", apply_to="PLATFORM",
+        )],
+        check_rework_resolution,
+        True,
+    )
+    register_case(
+        "resolution-project-scope-own-obligation",
+        [standard_package(
+            "mandatory_artefacts:TEST", "P1",
+            scope="TEST", owner_project="OTHER", apply_to="OTHER",
+        )],
+        check_rework_resolution,
+        False,
     )
     register_case(
         "resolution-expired",
