@@ -535,7 +535,12 @@
    ],
    "failure_scenario": "A client creates an artefact with null type and project (invisible to every gate), then links two artefacts from different projects or tenants; the repository reports a trace edge that crosses governance boundaries.",
    "acceptance": "artifacts_create requires non-null project_id and artifact_type_id (422 otherwise); link_artifacts_tx refuses when from/to differ in tenant or project, implemented as a JOIN in the INSERT/SELECT and covered by cross-tenant and cross-project tests.",
-   "owner_project": "T9"
+   "owner_project": "T9",
+   "resolved_by": {
+    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "test": "crates/actions/tests/togaf_artifact_requirements.rs::an_artefact_without_a_project_is_refused",
+    "evidence": "artifacts_create refuses 422 before any write when project_id or artifact_type_id is absent (crates/actions/src/architecture.rs); link_artifacts_tx is an INSERT..SELECT that joins both ends on tenant+project, so a cross-project or cross-tenant edge writes nothing and a legacy cross-project row is refused on replay. Suites at this commit: togaf_artifact_requirements 5/5, architecture_artifacts 8/8, architecture_board 7/7."
+   }
   },
   {
    "id": "v1-p81-6",
@@ -569,7 +574,12 @@
    ],
    "failure_scenario": "Two contracts each record a change outcome, or a G review carries an outcome; phase h advances with two typed outcomes, so the change/kata decision is ambiguous.",
    "acceptance": "H advance returns 409 unless exactly one review row with an outcome exists for the project and that review belongs to a live delivery contract; a second outcome row is refused by constraint; tests cover zero, two and G-attached outcomes.",
-   "owner_project": "T9"
+   "owner_project": "T9",
+   "resolved_by": {
+    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "test": "crates/store/tests/architecture_board.rs::a_second_phase_h_outcome_is_refused_by_its_index",
+    "evidence": "Phase H advance requires exactly one outcome-bearing compliance review for the project whose contract is live AND kind=delivery_contract (advance_phase_tx); 0107_architecture_integrity.sql adds the partial unique index architecture_compliance_review_one_outcome. Suites: architecture_board 7/7, togaf_h_change 6/6."
+   }
   },
   {
    "id": "v1-p83-1",
@@ -729,7 +739,12 @@
    ],
    "failure_scenario": "A project with no outputs closes with neither approval nor closure record; the programme closes on a draft plan whose only post-closure content is the owner string.",
    "acceptance": "Every close requires an approved closure asset and gate; programme close requires an approved, published realisation plan naming measured post-closure ownership (a job), not free text.",
-   "owner_project": "T10"
+   "owner_project": "T10",
+   "resolved_by": {
+    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "test": "crates/actions/tests/programme_close.rs::programmes_update_runs_the_closure_gate_before_closing",
+    "evidence": "update_programme_tx runs the closure gate on a status='closed' transition (assert_programme_can_close_tx: an approved closure asset AND an approved/published realisation plan whose post_closure_owner parses as a job row id — free text is refused). Suites: programme_close 26/26, benefit_transition 6/6."
+   }
   },
   {
    "id": "v1-p83-6",
@@ -748,7 +763,12 @@
    ],
    "failure_scenario": "A programme project closes with an empty WBS, no schedule/cost baseline and empty registers, provided its charter and scope baseline exist.",
    "acceptance": "Closure refuses unless approved scope, schedule and cost baselines exist, at least one accepted WBS deliverable exists, and the register kinds required by the project's standard are populated.",
-   "owner_project": "T10"
+   "owner_project": "T10",
+   "resolved_by": {
+    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "test": "crates/actions/tests/programme_close.rs::close_refuses_without_a_schedule_baseline",
+    "evidence": "assert_project_can_close now requires approved schedule and cost baselines besides scope, at least one accepted WBS deliverable, and non-empty risk/issue/assumption/dependency registers; each has its own refusal test (schedule, cost, deliverable, register kind). Suite: programme_close 26/26."
+   }
   },
   {
    "id": "v1-p6-1",
@@ -1072,7 +1092,12 @@
    ],
    "failure_scenario": "A two-project programme plans only the board's project; the other project's deliverables never enter the PI.",
    "acceptance": "Backlog selection spans every project whose programme_id matches the cadence programme, with a two-project test.",
-   "owner_project": "T10"
+   "owner_project": "T10",
+   "resolved_by": {
+    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "test": "crates/store/tests/programme_cadence.rs::the_backlog_spans_the_programme",
+    "evidence": "The PI backlog query joins project on the cadence's programme_id instead of pinning the board's project, so a two-project programme drafts from both; still WSJF-ordered and card-free. Suite: programme_cadence 6/6."
+   }
   },
   {
    "id": "v1-p82-6",
@@ -1091,7 +1116,12 @@
    ],
    "failure_scenario": "Unverifiable lessons accrue and systemic retro findings never reach the kata loop.",
    "acceptance": "Lesson insert refuses empty evidence and a systemic retro finding emits a typed kata candidate with review state.",
-   "owner_project": "T10"
+   "owner_project": "T10",
+   "resolved_by": {
+    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "test": "crates/actions/tests/demo_credit.rs::a_systemic_finding_opens_one_kata_candidate",
+    "evidence": "propose_lesson_tx refuses an empty evidence array; a systemic retro finding carrying a job binding and a pre-registered prediction emits exactly one typed kata candidate (open_retro_candidate_tx, idempotent per signature) in the close transaction. Suites: demo_credit 13/13, retro 4/4."
+   }
   },
   {
    "id": "v1-p105-1",
@@ -2030,7 +2060,12 @@
    ],
    "failure_scenario": "Call `architecture.profile_tailor {key: \"default\", name: \"Default\", phase_set: [...], artifact_requirements: {...}, contract_kinds: {...}, adopt_with_decision_id: \"<any random uuid>\"}`. The profile returns 200 with status 'adopted' and no approval row exists anywhere in the tenant. The recorded capability baseline now claims board adoption, and every later phase gate runs against a profile whose adoption decision cannot be produced.",
    "acceptance": "Adoption refuses unless the id names an approval row with gate='architecture_board', status='approved', subject_kind='adm_profile' and subject_id = this profile id; the migration carries the FK and a NOT NULL board_decision_id for status='adopted'.",
-   "owner_project": "T9"
+   "owner_project": "T9",
+   "resolved_by": {
+    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "test": "crates/store/tests/architecture_board.rs::an_adopted_profile_needs_an_existing_board_decision",
+    "evidence": "The action-level check already required an approved architecture_board decision about the profile; 0107_architecture_integrity.sql now carries it at the table: adm_profile_board_decision_fk references approval(id) and adm_profile_adopted_needs_decision refuses status='adopted' with no decision. Verified viable against the single live adopted profile before adding. Suite: architecture_board 7/7."
+   }
   },
   {
    "id": "v1-w2a-4",
@@ -2049,7 +2084,12 @@
    ],
    "failure_scenario": "Project P2 holds its live delivery_contract C2. A caller issues `architecture.contracts_request {project_id: P1, kind: \"statement_of_architecture_work\", phase_code: \"a\", title: \"SAW\", supersedes_id: C2}`. C2 flips to status='superseded' and its superseded_by_id now points at P1's SAW. P2's close gate then answers closure_contract_missing and `architecture.phases_advance` on G answers architecture_contract_not_live — two gates broken by a write to a different project.",
    "acceptance": "A superseded contract must belong to the same project (and kind/phase) as the new one, else 409; a failed check writes neither the retirement nor the new row.",
-   "owner_project": "T9"
+   "owner_project": "T9",
+   "resolved_by": {
+    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "test": "crates/store/tests/architecture_board.rs::a_supersede_across_projects_is_refused_and_writes_neither_row",
+    "evidence": "request_contract_tx now reads the superseded contract's project before any write and refuses a mismatch (409) so neither the retirement nor the replacement is written; the same-project revision path is unchanged. Suite: architecture_board 7/7."
+   }
   },
   {
    "id": "v1-w2a-6",
@@ -2078,7 +2118,12 @@
    ],
    "failure_scenario": "Create one artefact with `phase_code: \"c\"` and leave it in `draft` (or supersede an approved one), then read the snapshot: the project's phase_progress marks C `state: \"evidenced\"` and `next_required` moves to D, while `architecture.phases_advance {phase_code: \"c\"}` returns 409 architecture_artifact_missing. The Architecture destination and the gate disagree about the same phase.",
    "acceptance": "phase_progress counts only status='approved' artefacts and status='live' contracts (matching advance_phase_tx), so a phase reported `evidenced` is one the gate would also close.",
-   "owner_project": "T9"
+   "owner_project": "T9",
+   "resolved_by": {
+    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "test": "crates/store/tests/snapshot_measure.rs::only_approved_artefacts_and_live_contracts_evidence_a_phase",
+    "evidence": "phase_progress counts only status='approved' artefacts and status='live' contracts (matching advance_phase_tx); project listing still reads every contract. Suite: snapshot_measure 7/7."
+   }
   },
   {
    "id": "v1-w2b-2",
@@ -2296,7 +2341,12 @@
    ],
    "failure_scenario": "A team starts architecture-governed work (project meta marks it governed), creates the work package and card, and runs it with no requirement/architecture edge. The work is ungoverned and no run can be attributed to an approved requirement; nothing refuses the creation and no report flags the orphan.",
    "acceptance": "Creation of a work package/card for an architecture-governed project refuses with 409 unless it carries a trace link to an approved requirement or architecture asset, writing the edge in the same transaction; a test asserts the orphan is refused and the linked creation succeeds.",
-   "owner_project": "S07"
+   "owner_project": "S07",
+   "resolved_by": {
+    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "test": "crates/api/tests/s07_requests.rs::an_orphan_card_in_a_governed_project_is_refused_and_writes_nothing",
+    "evidence": "cards.create on a board whose project type is 'architecture' refuses 409 card_trace_link_required unless it carries a trace link to an APPROVED governed requirement/ADR (card_trace_link_unapproved otherwise), and writes the edge in the card's transaction. System records (coach cards, ops/reconciliation incidents) are exempt through non-serialisable internal flags, not through anything a public caller can set. Suites: s07_requests 15/15."
+   }
   },
   {
    "id": "v1-w3a-1",
@@ -2338,22 +2388,22 @@
    "evidence": [
     {
      "path": "crates/actions/src/ops/incidents.rs",
-     "line": 710,
+     "line": 713,
      "quote": "    if meta.get(META_MITIGATED_AT).is_none() {"
     },
     {
      "path": "crates/actions/src/ops/incidents.rs",
-     "line": 712,
+     "line": 717,
      "quote": "            \"a postmortem follows a mitigation; none has been recorded\","
     },
     {
      "path": "crates/actions/src/ops/incidents.rs",
-     "line": 847,
+     "line": 850,
      "quote": "    if meta.get(META_MITIGATED_AT).is_none() {"
     },
     {
      "path": "crates/actions/src/ops/incidents.rs",
-     "line": 852,
+     "line": 857,
      "quote": "    if meta.get(META_POSTMORTEM).is_none() {"
     }
    ],
@@ -3475,7 +3525,12 @@
    ],
    "failure_scenario": "Stale project requests never expire or promote; S06 §5.3's timer is replaced by nothing.",
    "acceptance": "Implement the timeout job with its window and add the project_request test.",
-   "owner_project": "S07"
+   "owner_project": "S07",
+   "resolved_by": {
+    "commit": "c6f14b5967090f034aa85f4fedffc22b1b72f064",
+    "test": "apps/server/tests/project_request_timeout.rs::the_timeout_expires_a_stale_draft_once_and_never_a_fresh_one",
+    "evidence": "project_request.timeout is a five-minute schedule entry that expires a 'draft' intake older than TIMEOUT_HOURS=24 in place (status='expired', version bumped, one project_request.expired event per row); the widened status CHECK is 0106_project_request_expired.sql. Suites: project_request_timeout 1/1, project_request 4/4, prune 17/17."
+   }
   },
   {
    "id": "v1-s08-1",
