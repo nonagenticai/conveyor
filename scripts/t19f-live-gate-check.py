@@ -422,6 +422,8 @@ def apply(project_id_arg: str | None) -> int:
 
 
 def check() -> int:
+    if not STATE.exists():
+        raise RuntimeError(f"{STATE} is missing; run --apply first")
     state = json.loads(STATE.read_text(encoding="utf-8"))
     failures: list[str] = []
 
