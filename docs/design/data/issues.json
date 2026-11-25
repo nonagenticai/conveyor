@@ -3,9 +3,9 @@
     {
       "number": 734,
       "title": "docs: S21's records state step 11 merged, and its migration as 0074",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/734",
-      "updatedAt": "2026-11-25T11:12:27Z",
+      "updatedAt": "2026-11-25T11:55:49Z",
       "labels": [
         {
           "name": "documentation",
@@ -62,9 +62,9 @@
     {
       "number": 726,
       "title": "rework: strict conformance \u2014 the published closure records, the T19F deferral and a green strict publish",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/726",
-      "updatedAt": "2026-11-25T11:15:03Z",
+      "updatedAt": "2026-11-25T12:09:03Z",
       "labels": [
         {
           "name": "unit",
@@ -442,7 +442,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-25T11:22:11Z",
+      "updatedAt": "2026-11-25T12:08:22Z",
       "labels": [
         {
           "name": "programme",
@@ -612,9 +612,9 @@
     {
       "number": 630,
       "title": "T18-3c: the run inspector's executor kind, binding pin and tools panel",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/630",
-      "updatedAt": "2026-11-25T10:52:41Z",
+      "updatedAt": "2026-11-25T12:27:06Z",
       "labels": [
         {
           "name": "unit",
@@ -1503,7 +1503,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-25T09:46:08Z",
+      "updatedAt": "2026-11-25T11:48:49Z",
       "labels": [
         {
           "name": "unit",
