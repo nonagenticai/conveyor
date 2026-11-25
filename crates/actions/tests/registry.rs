@@ -146,7 +146,6 @@ use serde_json::{Value, json};
 /// #656 `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` are retired
 /// with their handlers, so they do not appear here. T11's `metrics.reconciliation` read adds
 /// one internal action and T11's billing shim adds one external read (`billing.rollup`):
-/// **The merged main (2026-11-25) adds 9 internal**: `tools.list|get`, `toolkits.list`, `tool_calls.list`, the T19F `meetings.type_get|type_list`, `architecture.board_sit_open|decide` and `cadences.materialise`; #656's `ladder.case|precheck` and `decision_option_sets.get|set` stay retired.
 /// **619: 594 internal, 25 external**.
 const EXPECTED: [&str; 619] = [
     "actions.describe",
@@ -869,7 +868,7 @@ fn the_registry_is_exactly_the_declared_set() {
     // `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` with their handlers.
     // T11's `metrics.reconciliation` read adds one internal action.
     // T11's billing shim adds one external read (`billing.rollup`).
-    // Final: 585 internal + 25 external = 610.
+    // Final: 594 internal + 25 external = 619.
     assert_eq!((internal, external), (594, 25));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",

@@ -3895,7 +3895,6 @@ fn plan_approval_out(
     confirm = "none",
     tenancy = "tenant"
 )]
-
 async fn cadences_approve_plan(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
@@ -4090,7 +4089,6 @@ pub struct CadenceMaterialiseIn {
     confirm = "none",
     tenancy = "tenant"
 )]
-
 async fn cadences_materialise(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
@@ -4387,6 +4385,7 @@ async fn retros_close(
         period: None,
         state: Some("closed".to_owned()),
         meta: None,
+        meeting_type_key: None,
     };
     let record = store::spine::update_cadence_tx(
         &mut *tx,

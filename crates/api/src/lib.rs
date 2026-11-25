@@ -429,10 +429,8 @@ mod tests {
         // four more: T12's kata.standardise|stretch|sustain (3) and #655's authoring.intakes (1).
         // S21 step 10's ladder.case, ladder.precheck and decision_option_sets.get|set are retired
         // with the duplicate ladder path. T11's metrics.reconciliation read adds one internal
-        // action and T11's billing shim adds one external read (`billing.rollup`). The merged
-        // main (2026-11-25) adds nine internal actions (`tools.list|get`, `toolkits.list`,
-        // `tool_calls.list`, `meetings.type_get|type_list`, `architecture.board_sit_open|decide`,
-        // `cadences.materialise`) — the registry is 619: 594 internal, 25 external.
+        // action and T11's billing shim adds one external read (`billing.rollup`) — the merged
+        // registry is 619: 594 internal, 25 external after the main merge.
         assert_eq!(
             registry.len(),
             619,
@@ -482,8 +480,7 @@ mod tests {
              authoring.intakes; S21 step 10's ladder.case, ladder.precheck and \
              decision_option_sets.get|set are retired with the duplicate ladder path; T11's \
              metrics.reconciliation read is the 604th action; T11's billing shim adds one \
-             external read (`billing.rollup`), and the merged main's nine catalog/meeting/board \
-             actions are the 619th (619: 594 internal, 25 external). \
+             external read (`billing.rollup`), the 619th (619: 594 internal, 25 external). \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
         );

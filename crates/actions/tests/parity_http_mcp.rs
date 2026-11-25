@@ -2373,7 +2373,7 @@ async fn seed_arch_board(pg: &support::Pg, ctx: &Ctx) -> Uuid {
                 charter: "parity charter".to_owned(),
                 commissioning_authority: "parity programme".to_owned(),
                 decision_limits: json!({}),
-                members: json!([]),
+                members: json!([{ "role": "parity architect" }]),
                 meeting_type_key: None,
             },
         )
@@ -7302,8 +7302,8 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             plain(
                 "tool_bindings.create",
                 json!({
-                    "toolkit_id": "018f3f7c-0000-7000-8000-0000000000f1",
-                    "run_id": "018f3f7c-0000-7000-8000-0000000000ff"
+                    "toolkit_key": "parity_unknown",
+                    "run_id": "018f3f7c-0000-7000-8000-0000000000ff",
                 }),
                 None,
             ),
@@ -7312,7 +7312,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         expecting(
             plain(
                 "tool_bindings.update",
-                json!({"id": "018f3f7c-0000-7000-8000-0000000000f2"}),
+                json!({"id": "018f3f7c-0000-7000-8000-0000000000ff", "enabled": false}),
                 None,
             ),
             404,
@@ -7320,7 +7320,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         expecting(
             plain(
                 "tool_bindings.retire",
-                json!({"id": "018f3f7c-0000-7000-8000-0000000000f3"}),
+                json!({"id": "018f3f7c-0000-7000-8000-0000000000ff"}),
                 None,
             ),
             404,
