@@ -179,11 +179,11 @@ pub fn ExecutionScreen() -> impl IntoView {
                             Some(Err(error)) => view! {
                                 <ErrorPanel error=error on_retry=retry_detail/>
                             }.into_any(),
-                            Some(Ok(run)) => run_detail(run, tools.get()),
+                            Some(Ok(run)) => run_detail(run),
                         }}
                         <section class="panel" data-testid="execution-tools">
                             <h2>"Tools"</h2>
-                            {match tools {
+                            {match tools.get() {
                                 None => view! {
                                     <p class="muted">"Reading the run's tool calls…"</p>
                                 }.into_any(),
@@ -241,7 +241,7 @@ pub fn ExecutionScreen() -> impl IntoView {
     }
 }
 
-fn run_detail(run: RunGet, tools: Option<Result<Vec<ToolCallOut>, ApiError>>) -> AnyView {
+fn run_detail(run: RunGet) -> AnyView {
     let row = run.run.clone();
     let steps = run.steps;
     let approvals = run.approvals;
