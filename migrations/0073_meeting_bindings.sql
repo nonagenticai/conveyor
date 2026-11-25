@@ -36,9 +36,8 @@ ALTER TABLE programme_cadence
     ADD CONSTRAINT programme_cadence_meeting_type_key_not_blank
     CHECK (meeting_type_key IS NULL OR btrim(meeting_type_key) <> '');
 
--- One cadence row materialises one non-cancelled meeting. T19's `uq_meeting_live` covers only
--- status='live'; this is the stronger instance rule the materialise action is idempotent
--- against. A cancelled instance may be replaced.
-CREATE UNIQUE INDEX uq_meeting_cadence_instance
-    ON meeting (tenant_id, cadence_slot)
-    WHERE cadence_slot IS NOT NULL AND status <> 'cancelled';
+-- No new index on `meeting`. T19's `uq_meeting_live` is the slot rule: a second *live* meeting
+-- is refused, while a second *scheduled* meeting in the slot stays legal (`meetings_policy`
+-- proves it). The one-instance guarantee for `cadences.materialise` is therefore enforced in
+-- `materialise_cadence_tx` by locking the cadence row (`SELECT ... FOR UPDATE`) before the
+-- existing-instance lookup, not by a stronger unique index that would change T19's contract.

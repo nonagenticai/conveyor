@@ -83,7 +83,7 @@ Nothing else is added.
 | Entity | Change |
 |---|---|
 | `meeting_type` | no schema change; the writer and the reads are new |
-| `meeting` | no column; the cadence-slot partial unique index is new |
+| `meeting` | no change; T19's `uq_meeting_live` stays the slot rule, and materialise serialises on the cadence row |
 | `governance_body` | `meeting_type_key` |
 | `programme_cadence` | `meeting_type_key` |
 | `authoring_asset` | `published_meeting_type_id` |

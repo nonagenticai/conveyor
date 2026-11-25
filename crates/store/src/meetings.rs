@@ -636,6 +636,20 @@ pub async fn materialise_cadence_tx(
             detail: "the cadence row names no meeting type; set meeting_type_key first".into(),
         });
     };
+    // Serialise concurrent materialisations on the cadence row itself. T19's slot rule
+    // (`uq_meeting_live`) refuses a second *live* meeting but permits a second *scheduled* one,
+    // so the one-instance guarantee for materialise must not be a stronger unique index; the
+    // row lock gives it without changing what `meetings.schedule` allows.
+    let locked: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM programme_cadence WHERE tenant_id = $1 AND id = $2 FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence.id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    if locked.is_none() {
+        return Err(MeetingStoreError::NotFound("cadence"));
+    }
     let existing: Option<Uuid> = sqlx::query_scalar(
         "SELECT id FROM meeting
           WHERE tenant_id = $1 AND cadence_slot = $2 AND status <> 'cancelled'

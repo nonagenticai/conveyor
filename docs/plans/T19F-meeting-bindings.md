@@ -89,9 +89,10 @@ one arithmetic T19 already proves. A quorum miss defers `inquorate`; it is not a
 
 `programme_cadence.meeting_type_key` names the forum type for PI planning, the demo, the retro or a
 refinement. `cadences.materialise` resolves the latest non-retired version, schedules the meeting
-with the slot, and returns the existing non-cancelled instance on a repeat. A partial unique index
-on `(tenant_id, cadence_slot)` for non-cancelled meetings makes "one cadence row, one meeting" the
-database's promise; a cancelled instance may be replaced.
+with the slot, and returns the existing non-cancelled instance on a repeat. The one-instance
+promise is enforced by locking the cadence row (`SELECT … FOR UPDATE`) before the existing-instance
+lookup, because T19's `uq_meeting_live` already owns the slot rule and permits a second *scheduled*
+meeting; a stronger unique index would change that contract. A cancelled instance may be replaced.
 
 ### 4.4 What does not change
 
@@ -133,7 +134,7 @@ Migration `0073_meeting_bindings.sql`; the `authoring.publish` hook; `meetings.t
 
 ### P3 — The cadence materialisation
 
-`programme_cadence.meeting_type_key`; the one-instance index; `cadences.materialise`.
+`programme_cadence.meeting_type_key`; the materialise row lock; `cadences.materialise`.
 
 - Given a cadence row with a type, when materialise is called twice, then one non-cancelled meeting
   exists with the bound type and the slot.
@@ -179,7 +180,7 @@ governance chain, the live gate and the strict programme publish.
 | `authoring_asset` | `published_meeting_type_id uuid NULL REFERENCES meeting_type(id)`, `CHECK (published_meeting_type_id IS NULL OR kind = 'policy')`, partial unique index on the column |
 | `governance_body` | `meeting_type_key text NULL`, `CHECK (IS NULL OR btrim(...) <> '')` |
 | `programme_cadence` | `meeting_type_key text NULL`, same blank check |
-| `meeting` | `CREATE UNIQUE INDEX uq_meeting_cadence_instance ON meeting (tenant_id, cadence_slot) WHERE cadence_slot IS NOT NULL AND status <> 'cancelled'` |
+| `meeting` | none — T19's `uq_meeting_live` is unchanged; `materialise_cadence_tx` locks the cadence row so the one-instance rule does not become a stronger scheduling rule |
 
 No new table. No FK on a versioned key: the actions resolve the latest non-retired version.
 
