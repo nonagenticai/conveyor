@@ -95,7 +95,7 @@
 <p>The direct board path, the approval primitive, T19's outcome arithmetic, the meeting DoD, the minutes gate, the metering roll-up and the never-decided retirement flag are untouched. The tenancy, RLS and audit rules are the existing rows'.</p>
 <h2 id="5-deliverables">5. Deliverables</h2>
 <h3 id="p1--the-policy-authoring-route">P1 — The policy authoring route</h3>
-<p>Migration <code>0072_meeting_bindings.sql</code>; the <code>authoring.publish</code> hook; <code>meetings.type_list/get</code>.</p>
+<p>Migration <code>0073_meeting_bindings.sql</code>; the <code>authoring.publish</code> hook; <code>meetings.type_list/get</code>.</p>
 <ul>
 <li>Given a live meeting pinned to a policy's v1, when a reviewed <code>kind=policy</code> asset for the same key is published, then a v2 row exists and the meeting still resolves v1. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_authoring policy_publish_versions_meeting_type</code></li>
 <li>Given an unreviewed policy asset, when it is published, then the publish is refused. <code>Verify:</code> <code>cargo test -p conveyor-api --test meetings_authoring policy_publish_requires_review</code></li>
@@ -131,7 +131,7 @@
 <li>Given the live snapshot, when the strict publish runs, then no new T19F P0/P1 exists and the pack carries T19F. <code>Verify:</code> <code>CONFORMANCE_STRICT=1 docs/design/scripts/publish-data.sh</code></li>
 </ul>
 <h2 id="6-data-model">6. Data model</h2>
-<p><code>migrations/0072_meeting_bindings.sql</code>, additive only:</p>
+<p><code>migrations/0073_meeting_bindings.sql</code>, additive only:</p>
 <table>
 <thead>
 <tr>

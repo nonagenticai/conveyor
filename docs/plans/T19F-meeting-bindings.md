@@ -103,7 +103,7 @@ RLS and audit rules are the existing rows'.
 
 ### P1 — The policy authoring route
 
-Migration `0072_meeting_bindings.sql`; the `authoring.publish` hook; `meetings.type_list/get`.
+Migration `0073_meeting_bindings.sql`; the `authoring.publish` hook; `meetings.type_list/get`.
 
 - Given a live meeting pinned to a policy's v1, when a reviewed `kind=policy` asset for the same key
   is published, then a v2 row exists and the meeting still resolves v1.
@@ -172,7 +172,7 @@ governance chain, the live gate and the strict programme publish.
 
 ## 6. Data model
 
-`migrations/0072_meeting_bindings.sql`, additive only:
+`migrations/0073_meeting_bindings.sql`, additive only:
 
 | Object | Change |
 |---|---|

@@ -1,4 +1,4 @@
--- 0072_meeting_bindings.sql — T19F: forum-policy authoring and the T9/T10 binding.
+-- 0073_meeting_bindings.sql — T19F: forum-policy authoring and the T9/T10 binding.
 --
 -- SPEC_V2 §6.8, §12 T19F; the plan is docs/plans/T19F-meeting-bindings.md.
 --

@@ -2134,11 +2134,11 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "action meetings.type_list, action meetings.type_get, action architecture.board_sit_open, action architecture.board_sit_decide, action cadences.materialise",
+      "gap": null,
       "key": "T19F",
       "measured": {
         "actions": [
-          0,
+          5,
           5
         ],
         "modules": [
@@ -2158,7 +2158,7 @@
         "S11"
       ],
       "plan": "docs/plans/T19F-meeting-bindings.md",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 6,
       "units": {
@@ -2780,10 +2780,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 46,
+        "built": 47,
         "partial": 1,
         "planned": 0,
-        "proposed": 2,
+        "proposed": 1,
         "standing": 1
       },
       "total": 51,
