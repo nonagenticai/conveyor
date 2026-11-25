@@ -7767,6 +7767,48 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         note(
           "The same <span class='mono'>meeting_type</span> mechanism serves all three frameworks. A forum whose instances produce no decision over a cadence cycle is flagged and retired.",
         ),
+    )}<div class="grid two">${panel(
+      "Forum policies",
+      table(
+        ["Key", "Version", "Decision rule", "Quorum", "Evidence minimum", "Status"],
+        [
+          ["architecture_board", "v3", "majority", "4", "2", "active"],
+          ["programme_board", "v2", "chair", "3", "1", "active"],
+          ["pi_planning", "v1", "majority", "3", "0", "active"],
+        ].map(
+          (row) =>
+            `<tr>${row.map((cell) => `<td>${E(cell)}</td>`).join("")}</tr>`,
+        ),
+      ) +
+        note(
+          "A policy change is a new version through the authoring route; in-flight meetings keep the version they pinned.",
+        ),
+    )}${panel(
+      "Board sitting",
+      kv([
+        ["Policy", "architecture_board · v3 — majority, quorum 4"],
+        ["Linked approval", "APR-014 — the T9 contract is unapproved"],
+        ["Subject", "the T9 interface contract, contract version 2"],
+        ["Seats", "chair · enterprise architect · head of operations · audit (observer)"],
+      ]) +
+        note(
+          "Every qualifying seat writes one <span class='mono'>approval_decision</span> with <span class='mono'>via='meeting'</span>; an observer's position is kept and never counted.",
+        ),
+    )}</div>${panel(
+      "Cadence",
+      table(
+        ["Cadence row", "Meeting type", "Next occurrence", "Materialises"],
+        [
+          ["Architecture Board — monthly", "architecture_board v3", "2026-12-03 14:00 UTC", "one meeting"],
+          ["PI planning — quarterly", "pi_planning v1", "2026-12-07 09:00 UTC", "one meeting"],
+        ].map(
+          (row) =>
+            `<tr>${row.map((cell) => `<td>${E(cell)}</td>`).join("")}</tr>`,
+        ),
+      ) +
+        note(
+          "A cadence row names its <span class='mono'>meeting_type</span>; <span class='mono'>cadences.materialise</span> materialises exactly one meeting for that occurrence.",
+        ),
     )}</div>`;
   }
 

@@ -1546,15 +1546,13 @@
         ],
         "plan_status": "proposed",
         "status_source": "github issue state > measured coverage > plan frontmatter",
-        "measured_status": "proposed",
+        "measured_status": "built",
         "tranche": 6,
         "expected_outputs": [
           "project-brief",
-          "inception-analysis",
-          "architecture-design"
+          "evidence"
         ],
         "closure_outputs": [
-          "evidence",
           "closure-review"
         ],
         "adm_phase": "G",

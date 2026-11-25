@@ -137,7 +137,7 @@ use serde_json::{Value, json};
 /// **#557 adds 8 internal**: `tool_bindings.create|update|retire|list`, `tools.list|get`,
 /// `toolkits.list` and `tool_calls.list` — 574 → **582**, internal 550 → 558, external
 /// stays 24.
-const EXPECTED: [&str; 582] = [
+const EXPECTED: [&str; 587] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -167,6 +167,8 @@ const EXPECTED: [&str; 582] = [
     "architecture.board_get",
     "architecture.board_list",
     "architecture.board_open",
+    "architecture.board_sit_decide",
+    "architecture.board_sit_open",
     "architecture.contracts_approve",
     "architecture.contracts_get",
     "architecture.contracts_list",
@@ -220,6 +222,7 @@ const EXPECTED: [&str; 582] = [
     "cadences.create",
     "cadences.delete",
     "cadences.list",
+    "cadences.materialise",
     "cadences.update",
     "capabilities.bind_knowledge",
     "capabilities.get",
@@ -449,6 +452,8 @@ const EXPECTED: [&str; 582] = [
     "meetings.position",
     "meetings.respond",
     "meetings.schedule",
+    "meetings.type_get",
+    "meetings.type_list",
     "memory.recall",
     "memory.remember",
     "metrics.flow",
@@ -845,7 +850,10 @@ fn the_registry_is_exactly_the_declared_set() {
     // #557 adds eight internal actions (`tool_bindings.create|update|retire|list`,
     // `tools.list|get`, `toolkits.list`, `tool_calls.list`): internal 550 -> 558;
     // external stays 24.
-    assert_eq!((internal, external), (558, 24));
+    // T19F (#683) adds five internal actions (`meetings.type_get|type_list`,
+    // `architecture.board_sit_open|board_sit_decide`, `cadences.materialise`):
+    // internal 558 -> 563; external stays 24.
+    assert_eq!((internal, external), (563, 24));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

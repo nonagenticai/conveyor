@@ -2653,6 +2653,8 @@ pub struct CadenceOut {
     pub state: String,
     /// Free-form metadata.
     pub meta: Value,
+    /// The forum type this cadence instance materialises; `null` until bound.
+    pub meeting_type_key: Option<String>,
     /// The If-Match version.
     pub version: i64,
 }
@@ -2665,6 +2667,7 @@ fn cadence_out(record: &CadenceRecord) -> CadenceOut {
         period: record.period.clone(),
         state: record.state.clone(),
         meta: record.meta.clone(),
+        meeting_type_key: record.meeting_type_key.clone(),
         version: record.version,
     }
 }
@@ -2680,6 +2683,9 @@ pub struct CadenceCreateIn {
     pub period: String,
     /// Free-form metadata.
     pub meta: Option<Value>,
+    /// The forum type the cadence instance materialises.
+    #[serde(default)]
+    pub meeting_type_key: Option<String>,
 }
 
 /// `cadences.update`; `If-Match` is required.
@@ -2693,6 +2699,9 @@ pub struct CadenceUpdateIn {
     pub state: Option<String>,
     /// Free-form metadata.
     pub meta: Option<Value>,
+    /// The forum type the cadence instance materialises.
+    #[serde(default)]
+    pub meeting_type_key: Option<String>,
 }
 
 /// `cadences.list`.
@@ -2831,6 +2840,32 @@ pub struct StakeholderListIn {
     pub programme_id: Uuid,
 }
 
+/// Validate an optional forum binding: blank is none, an unknown key is a 422.
+async fn require_meeting_type_key(
+    conn: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    key: Option<String>,
+) -> Result<Option<String>, ActionError> {
+    let Some(key) = key
+        .map(|key| key.trim().to_owned())
+        .filter(|key| !key.is_empty())
+    else {
+        return Ok(None);
+    };
+    let exists = store::meetings::latest_meeting_type_tx(conn, tenant, &key)
+        .await
+        .map_err(|_| ActionError::internal())?
+        .is_some();
+    if !exists {
+        return Err(invalid(
+            "meeting_type_key",
+            "unknown_meeting_type",
+            format!("no active meeting type {key:?}"),
+        ));
+    }
+    Ok(Some(key))
+}
+
 /// Create a cadence row.
 #[crate::action(
     name = "cadences.create",
@@ -2863,6 +2898,8 @@ async fn cadences_create(
     if period.is_empty() {
         return Err(invalid("period", "required", "a period label is required"));
     }
+    let meeting_type_key =
+        require_meeting_type_key(&mut *tx, ctx.tenant, input.meeting_type_key).await?;
     let record = store::spine::insert_cadence_tx(
         &mut *tx,
         ctx.tenant,
@@ -2870,6 +2907,7 @@ async fn cadences_create(
         &kind,
         &period,
         &input.meta.unwrap_or_else(|| serde_json::json!({})),
+        meeting_type_key.as_deref(),
     )
     .await
     .map_err(|error| spine_error(error, ctx.action))?;
@@ -2939,6 +2977,8 @@ async fn cadences_update(
         }
         None => None,
     };
+    let meeting_type_key =
+        require_meeting_type_key(&mut *tx, ctx.tenant, input.meeting_type_key).await?;
     let record = store::spine::update_cadence_tx(
         &mut *tx,
         ctx.tenant,
@@ -2948,12 +2988,61 @@ async fn cadences_update(
             period,
             state: input.state,
             meta: input.meta,
+            meeting_type_key,
         },
     )
     .await
     .map_err(|error| spine_error(error, ctx.action))?;
     emit_spine_event(&mut *tx, &ctx, "programme_cadence", record.id, "updated").await?;
     Ok(HandlerOutput::ok(cadence_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// `cadences.materialise` — schedule the meeting the cadence row names, once.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CadenceMaterialiseIn {
+    /// The cadence row.
+    pub id: Uuid,
+    /// The lane the meeting card is placed in.
+    pub list_id: Uuid,
+    /// The board; derived from the list when omitted.
+    #[serde(default)]
+    pub board_id: Option<Uuid>,
+}
+
+#[crate::action(
+    name = "cadences.materialise",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn cadences_materialise(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CadenceMaterialiseIn,
+) -> Result<HandlerOutput<crate::meetings::MeetingOut>, ActionError> {
+    let cadence = store::spine::get_cadence_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    let meeting = store::meetings::materialise_cadence_tx(
+        &mut *tx,
+        ctx.tenant,
+        store::meetings::MeetingActor {
+            id: ctx.actor_id,
+            role: ctx.role.as_str(),
+        },
+        &cadence,
+        input.list_id,
+        input.board_id,
+    )
+    .await
+    .map_err(|error| crate::meetings::meeting_error(error, ctx.action))?;
+    Ok(HandlerOutput::created(meeting.into()))
 }
 
 /// `cadences.delete`'s approval target: what the gate authorises, computed from the input alone.

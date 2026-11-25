@@ -33,7 +33,7 @@
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
-use serde_json::Value;
+use serde_json::{Value, json};
 use sqlx::{AssertSqlSafe, PgConnection};
 use uuid::Uuid;
 
@@ -64,7 +64,8 @@ pub const FORBIDDEN_PAYLOAD_KEYS: [&str; 4] = [
 
 /// The columns every asset read returns.
 const ASSET_COLUMNS: &str = "id, intake_id, kind, key, payload, depends_on, status, \
-    review_approval_id, published_at, version, created_by, created_at, updated_at";
+    review_approval_id, published_at, published_meeting_type_id, version, created_by, \
+    created_at, updated_at";
 
 /// The columns every intake read returns.
 const INTAKE_COLUMNS: &str =
@@ -113,6 +114,8 @@ pub struct AssetRecord {
     pub review_approval_id: Option<Uuid>,
     /// When the row was published; NULL until then.
     pub published_at: Option<DateTime<Utc>>,
+    /// The `meeting_type` version this policy asset published; NULL for every other kind.
+    pub published_meeting_type_id: Option<Uuid>,
     /// The change counter (a review and a publish each bump it).
     pub version: i64,
     /// Who drafted it.
@@ -179,6 +182,12 @@ pub enum AuthoringError {
     /// A row of this kind and key is already published.
     #[error("an asset of this kind and key is already published")]
     AlreadyPublished,
+    /// A policy payload the meeting-type writer refused.
+    #[error("{detail}")]
+    PolicyInvalid {
+        /// The refusal, verbatim.
+        detail: String,
+    },
 }
 
 /// Why an authoring read or write failed.
@@ -483,7 +492,32 @@ pub async fn asset_publish_tx(
         .fetch_optional(&mut *conn)
         .await;
     match outcome {
-        Ok(Some(row)) => Ok(row),
+        Ok(Some(row)) => {
+            // A published policy asset writes the next immutable `meeting_type` version in the
+            // same transaction; the asset records the output so the version has provenance.
+            let Some(policy) = meeting_type_policy(&row.payload, &row.key)? else {
+                return Ok(row);
+            };
+            let meeting_type =
+                crate::meetings::create_meeting_type_tx(&mut *conn, tenant, &policy.as_new())
+                    .await
+                    .map_err(|error| AuthoringError::PolicyInvalid {
+                        detail: error.to_string(),
+                    })?;
+            let sql = format!(
+                "UPDATE authoring_asset
+                    SET published_meeting_type_id = $3, updated_at = now()
+                  WHERE tenant_id = $1 AND id = $2
+                  RETURNING {ASSET_COLUMNS}"
+            );
+            let linked: AssetRecord = sqlx::query_as(AssertSqlSafe(sql))
+                .bind(tenant.as_uuid())
+                .bind(row.id)
+                .bind(meeting_type.id)
+                .fetch_one(&mut *conn)
+                .await?;
+            Ok(linked)
+        }
         // The row was locked above, so this is unreachable while the lock is held.
         Ok(None) => Err(AuthoringError::NotReviewed {
             status: "changed".to_owned(),
@@ -494,6 +528,159 @@ pub async fn asset_publish_tx(
         }
         Err(error) => Err(error.into()),
     }
+}
+
+/// One policy payload, owned so the borrowed [`crate::meetings::NewMeetingType`] can live for
+/// the insert.
+struct OwnedPolicy {
+    key: String,
+    name: String,
+    purpose: String,
+    agenda_sources: Value,
+    required_participation: Value,
+    quorum: i32,
+    decision_rule: String,
+    evidence_minimum: i32,
+    decision_window_seconds: i64,
+    timebox_seconds: i64,
+    allowed_outcomes: Vec<String>,
+    convener_authority: Value,
+}
+
+impl OwnedPolicy {
+    fn as_new(&self) -> crate::meetings::NewMeetingType<'_> {
+        crate::meetings::NewMeetingType {
+            key: &self.key,
+            name: &self.name,
+            purpose: &self.purpose,
+            agenda_sources: &self.agenda_sources,
+            required_participation: &self.required_participation,
+            quorum: self.quorum,
+            decision_rule: &self.decision_rule,
+            evidence_minimum: self.evidence_minimum,
+            decision_window_seconds: self.decision_window_seconds,
+            timebox_seconds: self.timebox_seconds,
+            allowed_outcomes: &self.allowed_outcomes,
+            convener_authority: &self.convener_authority,
+        }
+    }
+}
+
+const POLICY_OUTCOMES: [&str; 5] = [
+    "decision",
+    "commitment",
+    "action",
+    "information",
+    "deferred",
+];
+
+/// The `meeting_type` payload of a policy asset. A payload without it publishes as before; a
+/// malformed one is refused before the version is written.
+fn meeting_type_policy(
+    payload: &Value,
+    asset_key: &str,
+) -> Result<Option<OwnedPolicy>, AuthoringError> {
+    let Some(raw) = payload.get("meeting_type") else {
+        return Ok(None);
+    };
+    let Some(object) = raw.as_object() else {
+        return Err(AuthoringError::PolicyInvalid {
+            detail: "payload.meeting_type must be an object".to_owned(),
+        });
+    };
+    let key = object
+        .get("meeting_type_key")
+        .or_else(|| object.get("key"))
+        .and_then(Value::as_str)
+        .unwrap_or(asset_key)
+        .trim()
+        .to_owned();
+    if key.is_empty() {
+        return Err(AuthoringError::PolicyInvalid {
+            detail: "the meeting_type key is blank".to_owned(),
+        });
+    }
+    let decision_rule = object
+        .get("decision_rule")
+        .and_then(Value::as_str)
+        .unwrap_or("majority")
+        .to_owned();
+    if !matches!(decision_rule.as_str(), "unanimous" | "majority" | "chair") {
+        return Err(AuthoringError::PolicyInvalid {
+            detail: "decision_rule must be unanimous, majority or chair".to_owned(),
+        });
+    }
+    let allowed_outcomes: Vec<String> = object
+        .get("allowed_outcomes")
+        .and_then(Value::as_array)
+        .map(|values| {
+            values
+                .iter()
+                .filter_map(|value| value.as_str())
+                .filter(|outcome| POLICY_OUTCOMES.contains(outcome))
+                .map(str::to_owned)
+                .collect::<Vec<_>>()
+        })
+        .filter(|values| !values.is_empty())
+        .unwrap_or_else(|| {
+            POLICY_OUTCOMES
+                .iter()
+                .map(|outcome| (*outcome).to_owned())
+                .collect()
+        });
+    let name = object
+        .get("name")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|name| !name.is_empty())
+        .unwrap_or(key.as_str())
+        .to_owned();
+    Ok(Some(OwnedPolicy {
+        key,
+        name,
+        purpose: object
+            .get("purpose")
+            .and_then(Value::as_str)
+            .unwrap_or("")
+            .to_owned(),
+        agenda_sources: object
+            .get("agenda_sources")
+            .filter(|value| value.is_array())
+            .cloned()
+            .unwrap_or_else(|| json!([])),
+        required_participation: object
+            .get("required_participation")
+            .filter(|value| value.is_array())
+            .cloned()
+            .unwrap_or_else(|| json!([])),
+        quorum: object
+            .get("quorum")
+            .and_then(Value::as_i64)
+            .unwrap_or(1)
+            .clamp(1, i64::from(i32::MAX)) as i32,
+        decision_rule,
+        evidence_minimum: object
+            .get("evidence_minimum")
+            .and_then(Value::as_i64)
+            .unwrap_or(0)
+            .clamp(0, i64::from(i32::MAX)) as i32,
+        decision_window_seconds: object
+            .get("decision_window_seconds")
+            .and_then(Value::as_i64)
+            .filter(|seconds| *seconds > 0)
+            .unwrap_or(7 * 24 * 60 * 60),
+        timebox_seconds: object
+            .get("timebox_seconds")
+            .and_then(Value::as_i64)
+            .filter(|seconds| *seconds > 0)
+            .unwrap_or(60 * 60),
+        allowed_outcomes,
+        convener_authority: object
+            .get("convener_authority")
+            .filter(|value| value.is_object())
+            .cloned()
+            .unwrap_or_else(|| json!({})),
+    }))
 }
 
 /// List the tenant's assets, newest `updated_at` first.

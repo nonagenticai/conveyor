@@ -83,7 +83,7 @@ Nothing else is added.
 | Entity | Change |
 |---|---|
 | `meeting_type` | no schema change; the writer and the reads are new |
-| `meeting` | no column; the cadence-slot partial unique index is new |
+| `meeting` | no change; T19's `uq_meeting_live` stays the slot rule, and materialise serialises on the cadence row |
 | `governance_body` | `meeting_type_key` |
 | `programme_cadence` | `meeting_type_key` |
 | `authoring_asset` | `published_meeting_type_id` |
@@ -104,7 +104,7 @@ Nothing else is added.
 
 | Standard | Use |
 |---|---|
-| Rust + sqlx, AdditiveForward migrations | migration 0068 |
+| Rust + sqlx, AdditiveForward migrations | migration 0073 |
 | One ActionSpec per action | HTTP + MCP + OpenAPI + generated client |
 | RLS and tenant scoping | every altered table keeps `ENABLE`+`FORCE ROW LEVEL SECURITY` |
 | Deterministic generators | seed, coverage and docs are regenerated, never hand-edited |
