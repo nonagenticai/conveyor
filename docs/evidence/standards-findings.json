@@ -28859,6 +28859,90 @@
       "title": "TOGAF artefact partial: architecture-artifact"
     },
     {
+      "acceptance": "std-togaf-architecture-artifact-t19: evidence the missing section(s) Document of Architecture Artifact — SPEC_V2 slice T19 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-t19",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-t19",
+      "kind": "RECORD",
+      "missing": [
+        "Document"
+      ],
+      "owner_project": "T19",
+      "package_key": "std-togaf-architecture-artifact-t19:T19",
+      "problem": "The architecture-artifact artefact for SPEC_V2 slice T19 (docs/SPEC_V2.md §12) is partial; missing required sections: Document. Not yet due: tranche 4 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+        "key": "T19",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19",
+        "title": "SPEC_V2 slice T19 (docs/SPEC_V2.md §12)"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "std-togaf-architecture-artifact-t19f: evidence the missing section(s) Document of Architecture Artifact — Follow-on: docs/plans/T19F-meeting-bindings.md from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-artifact",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-t19f",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-t19f",
+      "kind": "RECORD",
+      "missing": [
+        "Document"
+      ],
+      "owner_project": "T19F",
+      "package_key": "std-togaf-architecture-artifact-t19f:T19F",
+      "problem": "The architecture-artifact artefact for Follow-on: docs/plans/T19F-meeting-bindings.md is partial; missing required sections: Document. Not yet due: tranche 6 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+        "key": "T19F",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
       "acceptance": "std-togaf-architecture-artifact-t2: evidence the missing section(s) Document of Architecture Artifact — SPEC_V2 slice T2 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "architecture-artifact",
       "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
@@ -28956,7 +29040,7 @@
       "title": "TOGAF artefact partial: architecture-artifact"
     },
     {
-      "acceptance": "std-togaf-architecture-artifact-t9: evidence the missing section(s) Links of Architecture Artifact — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from seed/output-standard.json#architecture-artifact, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-architecture-artifact-t9: evidence the missing section(s) Links, Document of Architecture Artifact — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "architecture-artifact",
       "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
@@ -28972,17 +29056,30 @@
             ]
           ],
           "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-t9",
+          "section": "Document",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
         }
       ],
       "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
       "id": "std-togaf-architecture-artifact-t9",
       "kind": "RECORD",
       "missing": [
-        "Links"
+        "Links",
+        "Document"
       ],
       "owner_project": "T9",
       "package_key": "std-togaf-architecture-artifact-t9:T9",
-      "problem": "The architecture-artifact artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is partial; missing required sections: Links. Not yet due: tranche 4 is planned.",
+      "problem": "The architecture-artifact artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is partial; missing required sections: Links, Document. Not yet due: tranche 4 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",

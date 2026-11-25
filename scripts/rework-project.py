@@ -708,6 +708,52 @@ class Runner:
         else:
             print("  baseline approval: none pending")
 
+        # 10c. every project carries at least one approved change. The standard's change-control
+        # and project-registers documents read a `change` row, and the close gate names
+        # change-control among its mandatory artefacts. The acceptance path opens one when it
+        # rewrites the frozen plan; a project whose deliverable was already accepted records the
+        # retrospective rework itself as the change (measured on S05/S07/S09/T19, 2026-11-25).
+        changes = [
+            row
+            for row in self._read(
+                "registers.list", {"project_id": self.project_id}
+            ).get("items", [])
+            if row.get("kind") == "change"
+        ]
+        if changes:
+            print(f"  change control: {len(changes)} change row(s) present")
+        else:
+            baseline = None
+            for row in self._read(
+                "baselines.list", {"project_id": self.project_id}
+            ).get("items", []):
+                if str(row.get("kind") or "scope") == "scope" and row.get("approved_by"):
+                    baseline = row
+                    break
+            if baseline is None:
+                fail(f"{self.project}: no approved scope baseline for the retrospective change")
+            change = self.invoke(
+                "changes.request",
+                {
+                    "project_id": self.project_id,
+                    "baseline_id": baseline["id"],
+                    "title": f"The retrospective rework of {self.project}",
+                    "body": (
+                        "The retrospective MSP/TOGAF/SAFe rework changed this project's record: "
+                        "its artefacts were re-versioned with documents and links, its register "
+                        "was written, and its schedule and cost baselines were taken. This change "
+                        "records that rework against the frozen scope baseline."
+                    ),
+                    "impact": {"scope": "the retrospective rework's record acts"},
+                },
+                read_action="registers.get",
+                read_id_from_output="change_id",
+            )
+            self.decide(
+                change["approval_id"],
+                "approve the change that records the retrospective rework",
+            )
+
         # 11. closure request -> decision -> the destructive close gate -> close
         row = self.project_row()
         if not self.closes_project():
