@@ -29,6 +29,7 @@ fn body(key: &str, charter: &str, authority: &str, members: Value) -> NewBody {
         commissioning_authority: authority.to_owned(),
         decision_limits: json!({}),
         members,
+        meeting_type_key: None,
     }
 }
 
