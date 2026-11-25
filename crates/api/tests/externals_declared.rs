@@ -3,9 +3,12 @@
 //! Two properties, both checked against the registry rather than against a service (which may be down, and whose
 //! unavailability must never be the reason a rule is not tested):
 //!
-//! - **No `reqwest::` outside the executor.** A handler that calls a service directly bypasses the timeout, the
-//!   breaker, the idempotency claim and the audit row — so the source is scanned for one, and the only permitted
-//!   file is `invoke.rs`, which owns the engine's call.
+//! - **No ad-hoc HTTP inside the actions crate.** A handler that calls a service directly bypasses the
+//!   timeout, the breaker, the idempotency claim and the audit row — so `crates/actions/src` is scanned
+//!   for one, and the only permitted files are the declared transports below. This test is the
+//!   actions-crate half of property f; the WORKSPACE-wide half (auth, api, server and every app) is
+//!   `scripts/check-egress.py --check`, run by `scripts/ci/gate.sh`, because this file's scan scope
+//!   never included those trees (v1-s09-1 measured exactly that gap).
 //! - **A display never writes.** `workers.*`, `providers.*`, `artifacts.*`, `billing.*` and
 //!   `retrieval.*` must all be `effect = read`. Absorption by accretion (S09 trap 4) starts with one
 //!   write. Since #450 the first four are internal reads of conveyor state; the rule is unchanged.

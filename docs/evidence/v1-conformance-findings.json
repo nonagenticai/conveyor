@@ -3523,11 +3523,11 @@
     {
      "path": "docs/plans/slices/S09-documents-integrations.md",
      "line": 219,
-     "quote": "| f | externals — `GET /api/actions` shows `timeout_ms` on every external; zero `reqwest::` outside the executor |"
+     "quote": "| f | externals — `GET /api/actions` shows `timeout_ms` on every external; across the **whole workspace** every `reqwest::` reference is a declared transport — the exact allowlist and its scope are enforced by `python3 scripts/check-egress.py --check` (40 declared transports over 767 source files; a planted offender fails its `--self-test`) |"
     },
     {
      "path": "crates/api/tests/externals_declared.rs",
-     "line": 36,
+     "line": 39,
      "quote": "        .join(\"actions/src\");"
     },
     {
@@ -3905,13 +3905,13 @@
     },
     {
      "path": "tests/load/board.js",
-     "line": 27,
-     "quote": "    http_req_duration: ['p(95)<=120'],"
+     "line": 45,
+     "quote": "    'http_req_duration{name:board_cards}': ['p(95)<=120'],"
     },
     {
      "path": "tests/load/board.js",
-     "line": 38,
-     "quote": "  const response = http.get(`${BASE_URL}/api/boards/${BOARD_ID}/cards?limit=200`, {"
+     "line": 65,
+     "quote": "  const response = http.get(`${BASE_URL}/api/boards/${BOARD_ID}/cards?limit=${PAGE}`, {"
     }
    ],
    "failure_scenario": "A cursor regression rescans or sorts the 1,000-card board per page: first-page p95 stays under 120 ms so the gate stays green, while paging all five pages exceeds 500 ms.",
@@ -6035,7 +6035,12 @@
    ],
    "failure_scenario": "A tenant governing a programme or architecture through a meeting cannot convene one: there is no meeting_type to select, no meeting card to open, no agenda item resolving an approval, no participant position or quorum arithmetic, and no minutes asset. The decision survives only as the approval row §6.8 says is insufficient.",
    "acceptance": "The T19 tables, actions, events, module and /meetings route exist; a three-department meeting decides by recorded majority with a recorded dissent; an inquorate item is deferred and cannot be decided; minutes publish behind the chair's gate; every action becomes a card.",
-   "owner_project": "T19"
+   "owner_project": "T19",
+   "resolved_by": {
+    "commit": "3880d28ab0bed259b61dcb6f634e6c83dc089842",
+    "test": "crates/api/tests/meetings_decision.rs::majority_records_each_seat_and_keeps_dissent",
+    "evidence": "The module exists: migrations/0065_meetings.sql (meeting_type, meeting, agenda, attendance, position, minutes) and 0073_meeting_bindings.sql; the meetings.* family is served (crates/actions/src/meetings.rs) and apps/web mounts /meetings and /meetings/:id. Every acceptance clause has a named test: meetings_decision.rs::majority_records_each_seat_and_keeps_dissent, meetings_attendance.rs::a_missing_department_defers_inquorate ('an inquorate item writes no decision row'), meetings_outcomes.rs::minutes_need_the_chair_and_match_the_rows and ::an_action_becomes_a_card. Live proof: docs/evidence/t19f/evidence-output.md (governance chain 24/24, live gate 11/12) at the deployed engine. The finding was measured 2026-11-23 against a tree that predates #640."
+   }
   },
   {
    "id": "v1-delegated-rule-gate-1",

@@ -77,7 +77,12 @@
       "title": "verify-slices parses SPEC §12 T0-T17, not T18",
       "evidence": "scripts/verify-slices.py's extractor matches the T0-T17 rows; T18 (the V2 UI, #559) is absent from the verdict table.",
       "acceptance": "T18 is in the harness and its gate executes (or the harness records it as out-of-scope with a named manifest)",
-      "artifact": "scripts/verify-slices.py"
+      "artifact": "scripts/verify-slices.py",
+      "resolved_by": {
+        "commit": "0350a6cc7202b79517133e9983c7ed52a4124c49",
+        "test": "scripts/verify-slices.py",
+        "evidence": "SPEC_V2 section 12's T18 row was added by this commit (#567); parse_spec_gates now returns T0-T19 and `python3 scripts/verify-slices.py --slice T18` exits 0 with SPEC gate 'yes' at audited sha b597b7e8 (snapshot 37f99108). The finding was measured 2026-11-23 against the pre-#567 SPEC, where the row was absent."
+      }
     }
   ]
 }
