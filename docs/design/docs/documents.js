@@ -1437,8 +1437,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/03-DELIVERY.html",
       "source": "docs/plans/03-DELIVERY.md",
       "section": "Plans",
-      "sha256": "9413f92167d008328c5d294de4abbb6f33784b0a30ca6bcfb31832257fcc4533",
-      "bytes": 25084,
+      "sha256": "fc4c0d0b74daec0a08083342993b3d481409ed6e0d5334a22ba6f14777905882",
+      "bytes": 25579,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
     },
     {
