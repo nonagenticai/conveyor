@@ -2436,6 +2436,11 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             ctx.push("ladder.evaluate.policy", policy);
             seed_parity_laya(pg, ctx).await;
         }
+        "ladder.case" => {
+            let policy = seed_parity_policy(pg, ctx, "parity.case", "parity_gate").await;
+            ctx.push("ladder.case.policy", policy);
+            seed_parity_laya(pg, ctx).await;
+        }
         "ladder.record" => {
             let policy = seed_parity_policy(pg, ctx, "parity.record", "parity_gate").await;
             ctx.push("ladder.record.policy", policy);
@@ -2600,6 +2605,64 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
                     ("solution", json!({"candidate_ref": "process:parity:v2"})),
                 ],
                 Some(instrument),
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        // T12 (#88): the kata's last three Gets are recorded after the person's adoption.
+        "kata.standardise" => {
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "adopted",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("solution", json!({"candidate_ref": "process:parity:v2"})),
+                ],
+                None,
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.sustain" => {
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "adopted",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("solution", json!({"candidate_ref": "process:parity:v2"})),
+                    (
+                        "standardisation",
+                        json!({"standard_ref": "process:parity:v2"}),
+                    ),
+                ],
+                None,
+            )
+            .await;
+            ctx.push(sample.name, kata);
+        }
+        "kata.stretch" => {
+            let kata = seed_parity_kata(
+                pg,
+                ctx,
+                "adopted",
+                &[
+                    ("observe", json!({})),
+                    ("analyse", json!({})),
+                    ("solution", json!({"candidate_ref": "process:parity:v2"})),
+                    (
+                        "standardisation",
+                        json!({"standard_ref": "process:parity:v2"}),
+                    ),
+                    (
+                        "sustainability",
+                        json!({"monitoring": "the eval each cycle"}),
+                    ),
+                ],
+                None,
             )
             .await;
             ctx.push(sample.name, kata);
@@ -3849,6 +3912,42 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample.input = Box::new(|_ctx: &Ctx| json!({"kata_id": Uuid::nil(), "note": "parity"}));
             expecting(sample, 404)
         },
+        // ── T12 (#88): the last three Gets ───────────────────────────────────────────────
+        {
+            let mut sample = plain("kata.standardise", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.standardise"),
+                    "standard_ref": "process:parity:v2",
+                    "description": "parity standardisation",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.sustain", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.sustain"),
+                    "monitoring": "the held-out eval each cadence cycle",
+                    "regression_guard": "the eval regression reopens the kata",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.stretch", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.stretch"),
+                    "targets": ["delivery", "operations"],
+                })
+            });
+            expecting(sample, 200)
+        },
         // ── T8: organisational memory (#79) ──────────────────────────────────────────────
         // The proposal names the stable anchor card plus a fresh failed run each round: two
         // distinct referenced objects, and a statement unique to this execution.
@@ -5073,6 +5172,13 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("scientific_stats.trend", json!({}), None),
         plain("scientific_formal.translate", json!({}), None),
         plain("scientific_formal.verify", json!({}), None),
+        // T14 (#561): the webscraper and Lean reads. An empty body is refused by each closed
+        // input schema on both transports (422 / `isError`), so no call leaves the process.
+        plain("webscraper.scrape_url", json!({}), None),
+        plain("webscraper.scrape_bulk", json!({}), None),
+        plain("lean4.check", json!({}), None),
+        plain("lean4.elaborate", json!({}), None),
+        plain("lean4.prove", json!({}), None),
         // S10: the copilot's model call. The stub's catch-all answers the router's path, so the two
         // transports receive the same document — this proves the declaration, not a model.
         plain(
@@ -5860,6 +5966,21 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("eval_grades.create", json!({}), None),
         plain("eval_grades.get", json!({}), None),
         plain("laya.judge", json!({}), None),
+        plain(
+            "ladder.precheck",
+            json!({
+                "model": "system-1",
+                "state": "parity",
+                "questions": {
+                    "accept": {
+                        "type": "score",
+                        "instructions": "parity",
+                        "criteria": ["rejected", "accepted"]
+                    }
+                }
+            }),
+            None,
+        ),
         // ── S15's capability/memory surface ────────────────────────────────────────────────
         {
             // The anchor capability binds no packs, so this is a deterministic empty-hit read
@@ -6406,6 +6527,47 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         expecting(plain("toolkits.publish", json!({}), None), 200),
         expecting(plain("tools.probe", json!({"dry_run": true}), None), 200),
         expecting(plain("tools.usage", json!({"window_days": 30}), None), 200),
+        // ── T13/T14 (#557): the bindings and the catalogue reads ──────────────────────────
+        // The reads answer an empty page; the by-id and by-name refusals are the typed 404.
+        expecting(plain("tools.list", json!({}), None), 200),
+        expecting(plain("toolkits.list", json!({}), None), 200),
+        expecting(plain("tool_calls.list", json!({}), None), 200),
+        expecting(plain("tool_bindings.list", json!({}), None), 200),
+        expecting(
+            plain(
+                "tools.get",
+                json!({"toolkit": "missing", "tool": "missing"}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "tool_bindings.create",
+                json!({
+                    "toolkit_id": "018f3f7c-0000-7000-8000-0000000000f1",
+                    "run_id": "018f3f7c-0000-7000-8000-0000000000ff"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "tool_bindings.update",
+                json!({"id": "018f3f7c-0000-7000-8000-0000000000f2"}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "tool_bindings.retire",
+                json!({"id": "018f3f7c-0000-7000-8000-0000000000f3"}),
+                None,
+            ),
+            404,
+        ),
         // ── T15 (#86): tool authoring and BYO ──────────────────────────────────────────────
         // The import and the manual draft are closed read operations against a destination
         // that is registered but never called here; both are writes whose rows are unique per
@@ -7198,6 +7360,7 @@ fn authoring_samples() -> Vec<Sample> {
             ),
             201,
         ),
+        expecting(plain("authoring.intakes", json!({"limit": 50}), None), 200),
         {
             let mut sample = plain("authoring.draft", json!({}), None);
             sample.prepare = true;
@@ -7285,6 +7448,9 @@ fn ladder_samples() -> Vec<Sample> {
         ),
         expecting(plain("laya_configs.list", json!({}), None), 200),
         {
+            // A claim no engine call backs: both transports must refuse it identically. The
+            // verified happy path is `crates/actions/tests/ladder_laya.rs`'s, not a parity
+            // sample — a parity sample cannot make an external call to a real laya.
             let mut sample = plain("ladder.evaluate", json!({}), None);
             sample.prepare = true;
             sample.input = Box::new(|ctx: &Ctx| {
@@ -7292,12 +7458,53 @@ fn ladder_samples() -> Vec<Sample> {
                 json!({
                     "kind": format!("parity.evaluate.{}", policy.as_str().unwrap_or_default()),
                     "gate": "parity_gate",
-                    "answer": "pass",
-                    "confidence": 0.9,
-                    "input": {"subject": "parity"}
+                    "output": {"draft": "parity"},
+                    "criteria": [{"criterion": "names the change"}],
+                    "call_key": "parity-unverified-claim"
                 })
             });
-            expecting(sample, 201)
+            expecting(sample, 422)
+        },
+        expecting(
+            plain(
+                "decision_option_sets.set",
+                json!({
+                    "kind": "parity.options.set",
+                    "gate": "parity_gate",
+                    "options": [
+                        {"key": "accept", "label": "Accept", "payload": {"outcome": "accepted"}},
+                        {"key": "refuse", "label": "Refuse", "payload": {"outcome": "refused"}}
+                    ]
+                }),
+                None,
+            ),
+            200,
+        ),
+        {
+            // The set was authored by the sample above, earlier in this round: both transports
+            // read the same row. A deterministic sample cannot use `prepare` — that branch of the
+            // harness runs no prepare at all.
+            let mut sample = plain(
+                "decision_option_sets.get",
+                json!({"kind": "parity.options.set", "gate": "parity_gate"}),
+                None,
+            );
+            sample.deterministic = true;
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("ladder.case", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                let policy = ctx.pop("ladder.case.policy");
+                json!({
+                    "kind": format!("parity.case.{}", policy.as_str().unwrap_or_default()),
+                    "gate": "parity_gate",
+                    "output": {"draft": "parity"},
+                    "criteria": [{"criterion": "names the change"}]
+                })
+            });
+            expecting(sample, 200)
         },
         {
             let mut sample = plain("ladder.record", json!({}), None);

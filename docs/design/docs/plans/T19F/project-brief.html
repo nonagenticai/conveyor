@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F — Decision-forum governance: project brief · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/project-brief.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f--decision-forum-governance-project-brief">T19F — Decision-forum governance: project brief</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Close the two seams T19 left open: a forum policy can be created but not changed through a governed route, and the T9 board and T10 cadence rows do not name the meeting types they use. The project makes the policy a versioned release through the tenant's authoring route, and makes the board sitting and the cadence materialisation first-class consumers of T19's meeting arithmetic.</p>
+<h2 id="outcome">Outcome</h2>
+<p>After T19F:</p>
+<ul>
+<li>a policy change is a reviewed authoring asset that publishes a new immutable <code>meeting_type</code> version; an in-flight meeting keeps the version it pinned;</li>
+<li>a board subject decision can be taken in a sitting whose per-seat decisions are recorded <code>via='meeting'</code>, with the same quorum, department, evidence and conflict rules as T19;</li>
+<li>a cadence row names its meeting type and materialises exactly one meeting, idempotently;</li>
+<li>the direct board path and every T19 primitive are unchanged;</li>
+<li>T19F is a live programme row with its MSP/TOGAF/SAFe artefacts, evidence and a closure review that defers closure to the tranche-6 review.</li>
+</ul>
+<h2 id="scope-boundary">Scope boundary</h2>
+<p>In: the authoring hook, the two read actions, the binding columns, the board-sitting actions, the cadence materialisation, the mock-UI and real-app panels, the programme record and the live proof.</p>
+<p>Out: a second decision store, a chat/AV/transcript system, a rebuild of T9/T10 or the approval primitive, a change to the direct <code>board_decide</code> path, the T18 shell/nav, the homepage mirror, the tranche 2→4 retrospective chain (#526).</p>
+<h2 id="stakeholders">Stakeholders</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Interest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Programme sponsor / SRO</td>
+<td>a governed forum policy and a board record that shows its deliberation</td>
+</tr>
+<tr>
+<td>Programme manager</td>
+<td>T19F's tranche-6 evidence and the B7 realisation increment</td>
+</tr>
+<tr>
+<td>Programme architect / Architecture Board</td>
+<td>the sitting path, the contract, the artefact set</td>
+</tr>
+<tr>
+<td>BCM</td>
+<td>B7's measurement across board sittings and materialised cadences</td>
+</tr>
+<tr>
+<td>Department heads and job owners</td>
+<td>seats that are invited and counted by department</td>
+</tr>
+<tr>
+<td>Delivery teams</td>
+<td>the unchanged direct paths and the existing meetings</td>
+</tr>
+</tbody>
+</table>
+<h2 id="constraints">Constraints</h2>
+<ul>
+<li>The authoring route is T17's; no parallel policy store.</li>
+<li><code>meeting_type</code> versions are immutable; a meeting pins its version.</li>
+<li>The board's decision arithmetic stays T19's <code>close_item_tx</code>; no second calculation.</li>
+<li>The cadence instance rule is a database constraint, not an action convention.</li>
+<li>No local Rust compile; the compile/test verdict is <code>preflight.yml</code> and the PR's CI.</li>
+<li>T19F stays <code>active</code> while its tranche is planned; closure is a programme decision.</li>
+</ul>
+<h2 id="acceptance">Acceptance</h2>
+<p>The follow-on plan's P1–P5 scenarios (<code>docs/plans/T19F-meeting-bindings.md</code> §5) pass at the PR head or on the deployed engine; the migration ledger reaches 68; the programme record carries T19F and B7; the strict conformance publish is green with no new T19F finding.</p>
+<h2 id="risks">Risks</h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A policy change is smuggled through <code>meetings.schedule</code></td>
+<td>the schedule refuses a policy when the key exists; the authoring route is the only version writer</td>
+</tr>
+<tr>
+<td>A board sitting lowers dual control</td>
+<td><code>close_item_tx</code> applies the linked approval's stricter policy; the sitting adds no second path</td>
+</tr>
+<tr>
+<td>A cadence slot gets two meetings</td>
+<td>the partial unique index on the slot; the action returns the existing instance</td>
+</tr>
+<tr>
+<td>T17's authoring route is mid-flight (#655)</td>
+<td>the hook is additive and signature-stable; rebase or coordinate with the T17 lane</td>
+</tr>
+<tr>
+<td>T19F closes in a planned tranche</td>
+<td>it stays active; the closure review defers closure to the tranche-6 review</td>
+</tr>
+</tbody>
+</table>
+<h2 id="approval">Approval</h2>
+<p>The brief is reviewed with the inception, architecture, MSP and SAFe artefacts on 2026-12-01; the Approval of the plan is the programme manager's, the architecture review is the Architecture Board's.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T19F/project-brief.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

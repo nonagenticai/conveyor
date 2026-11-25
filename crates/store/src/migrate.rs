@@ -331,7 +331,12 @@ mod tests {
                 // T15 (#86): the tool_draft governed-asset kind, the registered tool sources, the
                 // binding-scoped subset, the ledger's binding pin, the promotion record and the
                 // publication quorum (0070_tool_authoring.sql, SPEC_V2 §11.3–§11.6, D42/D43/D50).
-                (70, "tool authoring".to_owned())
+                (70, "tool authoring".to_owned()),
+                // S21 step 10 (#656): the authored option set and the policy's fire_when
+                // (0071_ladder_option_sets.sql, SPEC_V2 §7.2, §7.3).
+                (71, "ladder option sets".to_owned()),
+                // #557: the per-tool verification declaration (0072_tool_meta.sql, SPEC_V2 §11.3).
+                (72, "tool meta".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

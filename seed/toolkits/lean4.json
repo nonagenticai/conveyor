@@ -1,0 +1,15 @@
+{
+  "key": "lean4",
+  "service": "lean4",
+  "title": "Lean 4 prover",
+  "owner": "research",
+  "auth_adapter": "sealed-profile",
+  "licence_app": null,
+  "status": "draft",
+  "health_path": "/health",
+  "tools": [
+    { "key": "check", "action": "lean4.check" },
+    { "key": "elaborate", "action": "lean4.elaborate" },
+    { "key": "prove", "action": "lean4.prove" }
+  ]
+}

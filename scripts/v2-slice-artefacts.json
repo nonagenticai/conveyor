@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "What each V2 slice (SPEC_V2 \u00a712) must deliver, so the programme measures it instead of assuming `proposed`. A slice with `tables`/`actions`/`modules` is measured against migrations, the compiled registry dump and the tree. A behavioural slice with no named schema object carries an explicit `evidence` + `gap` row and stays curated. Credit only what the slice FIRST delivers: an artefact a V1 slice already declared is not re-credited (its extension is the concept map's `extend` verdict), and the generator refuses a cross-track duplicate. The decision-ladder TABLES are T0's (SPEC \u00a712's T0 row) and are never T2's.",
+  "note": "What each V2 slice (SPEC_V2 §12) must deliver, so the programme measures it instead of assuming `proposed`. A slice with `tables`/`actions`/`modules` is measured against migrations, the compiled registry dump and the tree. A behavioural slice with no named schema object carries an explicit `evidence` + `gap` row and stays curated. Credit only what the slice FIRST delivers: an artefact a V1 slice already declared is not re-credited (its extension is the concept map's `extend` verdict), and the generator refuses a cross-track duplicate. The decision-ladder TABLES are T0's (SPEC §12's T0 row) and are never T2's.",
   "slices": {
     "T0": {
       "tables": [
@@ -127,7 +127,10 @@
         "kata.measure",
         "kata.observe",
         "kata.open",
-        "kata.propose"
+        "kata.propose",
+        "kata.standardise",
+        "kata.stretch",
+        "kata.sustain"
       ],
       "modules": [
         "kata"
@@ -300,10 +303,14 @@
       "gap": null
     },
     "T12": {
-      "evidence": [
-        "docs/SPEC_V2.md"
+      "modules": [
+        "apps/server/tests/organisation_loop.rs"
       ],
-      "gap": "the one-organisation acceptance loop is not built"
+      "evidence": [
+        "docs/SPEC_V2.md",
+        "apps/server/tests/organisation_loop.rs"
+      ],
+      "gap": null
     },
     "T13": {
       "tables": [
@@ -371,10 +378,28 @@
       ]
     },
     "T17": {
+      "tables": [
+        "authoring_intake",
+        "authoring_asset"
+      ],
+      "actions": [
+        "authoring.intake",
+        "authoring.draft",
+        "authoring.review",
+        "authoring.publish",
+        "authoring.assets",
+        "authoring.intakes"
+      ],
+      "modules": [
+        "authoring"
+      ],
       "evidence": [
+        "crates/actions/src/authoring/mod.rs",
+        "crates/store/src/authoring.rs",
+        "migrations/0064_authoring.sql",
         "docs/SPEC_V2.md"
       ],
-      "gap": "no tenant asset authoring intake or review queue"
+      "gap": null
     },
     "T18": {
       "status": "proposed",
@@ -418,6 +443,24 @@
         "docs/SPEC_V2.md"
       ],
       "gap": null
+    },
+    "T19F": {
+      "status": "proposed",
+      "tables": [],
+      "actions": [
+        "meetings.type_list",
+        "meetings.type_get",
+        "architecture.board_sit_open",
+        "architecture.board_sit_decide",
+        "cadences.materialise"
+      ],
+      "modules": [],
+      "evidence": [
+        "docs/plans/T19F-meeting-bindings.md",
+        "docs/plans/T19F/architecture-design.md",
+        "docs/SPEC_V2.md"
+      ],
+      "gap": "the five actions are the implementation (#683); none is measured before it lands"
     }
   }
 }

@@ -1467,6 +1467,41 @@ The handoff is the level's entry (SPEC_V2 §6.6.1–5): the card names the bindi
 the run starts. It is not a lane move — `cards.move` changes no run and writes no memory. It accepts
 no `release_hash` (the binding is the pin) and writes no `run_step`; the run's first step is the
 executor's own (S21 step 4).
+### 2.30 The L1 laya evaluation — S21 step 10 (migration `0071`)
+
+The ladder stops trusting its caller: the case is built by the ladder and the verdict comes from a
+recorded laya exchange. Two tables and one column, all new; no existing row changes shape.
+
+| Object | What it is |
+|---|---|
+| `decision_option_set` | one live authored set per `(tenant_id, kind, gate)`; `version` is monotonic, and an edit is a new version, never an in-place update |
+| `decision_option_set_option` | the set's rows: `key`, `label`, `payload` (with `payload.outcome ∈ accepted | refused | escalated`) and a position for the ordered menu |
+| `decision_policy.fire_when` | nullable structured expression (`all_of` / `any_of` over `{kind, gate, field}` predicates); `NULL` fires always |
+
+| Row | What the L1 path reads or writes |
+|---|---|
+| `decision_policy` | **read**: threshold, `fail_policy`, `action`, `fire_when`; **pinned**: `policy_version` |
+| `decision_policy_refinement` | **read**: the tenant's override; **pinned**: `refinement_version` |
+| `laya_inference_config` | **read**: `model_ref`, `params`, `timeout_ms`; **pinned**: `laya_config_version` |
+| `decision_option_set` + `_option` | **read**: the authored menu and its version — the question's labels and the answer's legal keys |
+| `idempotency_key` | **read**: the engine's record of the `ladder.precheck` call — `request_hash` must equal the case hash, `status_code` must be 2xx, `response` is the answer document |
+| `action_invocation` | **read**: the invocation named by the key, for its `outcome` and measured `duration_ms` |
+| `decision` | **write**: one row with `rung='laya'`, the response-derived answer/confidence/probabilities, the measured latency, the pins, and `meta.laya_call_key` / `meta.laya_invocation_id` / `meta.case_sha256` |
+| `decision_option` | **write**: the authored rows the decision chose between, with their set version |
+| `event` | **write**: `decision.evaluated` |
+
+**Authoring a set is one row's version bump, never a second row.** `decision_option_sets.set` updates
+the existing header (`version = version + 1`) and replaces its children inside the same transaction,
+so the partial unique indexes in `0071` are never asked to hold two live sets and a reader never sees
+a half-replaced menu. Old labels survive only in `decision_option` — the per-decision record of what
+that decision chose between; a decision is reproducible from its own row plus its set version.
+
+**The call itself writes no conveyor row of ours beyond the engine's own bookkeeping.** The laya
+service is external: `ladder.precheck` is dispatched with the tenant's sealed `laya.token`, and the
+engine records the claim (`idempotency_key`), the invocation (`action_invocation`) and the response
+body that the `idempotency_key.response` column already holds. That record is the provenance: the
+decision cites it rather than restating it, so nothing in `decision` can be written from a request
+body.
 
 ## 3. State machines and enforcement
 

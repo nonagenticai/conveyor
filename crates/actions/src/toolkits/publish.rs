@@ -17,6 +17,7 @@ use sqlx::PgConnection;
 
 use super::manifest::{self, ToolkitManifest};
 use crate::invoke::{ActionError, HandlerCtx};
+use crate::spec::{Effect, FieldError};
 use crate::views::EmptyIn;
 
 /// One toolkit's outcome.
@@ -71,6 +72,8 @@ async fn publish_one(
     ctx: HandlerCtx,
     entry: &ToolkitManifest,
 ) -> Result<PublishedToolkit, ActionError> {
+    // Refuse before `latest_toolkit`: a refused contract must not write a version row.
+    check_contract(entry)?;
     let hash = manifest::content_hash(entry);
     let latest = store::tool::latest_toolkit(&mut *tx, ctx.tenant, &entry.key)
         .await
@@ -136,6 +139,65 @@ async fn publish_one(
     }
 }
 
+/// Refuse a write or destructive tool that does not declare its full contract.
+///
+/// The manifest parser has already checked the declaration's shape and that the verification
+/// sibling is a read. This is the publication rule (SPEC_V2 §11.3, §11.6): a write without an
+/// idempotency key or a read-back path cannot be published. The error names the tool; it is
+/// returned before `latest_toolkit`, so no version row is written.
+pub fn check_contract(entry: &ToolkitManifest) -> Result<(), ActionError> {
+    for tool in &entry.tools {
+        let Some(spec) = crate::registry::registry().get(tool.action.as_str()) else {
+            continue;
+        };
+        if !matches!(spec.effect, Effect::Write | Effect::Destructive) {
+            continue;
+        }
+        if tool.idempotency.as_deref() != Some("required") {
+            return Err(ActionError::invalid_input(vec![FieldError {
+                field: format!("tools[{}].idempotency", tool.key),
+                code: "write_contract".to_owned(),
+                detail: format!(
+                    "{} is {} and must declare idempotency = \"required\"",
+                    tool.key,
+                    spec.effect.as_str()
+                ),
+            }]));
+        }
+        let Some(verification) = tool.verification.as_deref() else {
+            return Err(ActionError::invalid_input(vec![FieldError {
+                field: format!("tools[{}].verification", tool.key),
+                code: "write_contract".to_owned(),
+                detail: format!(
+                    "{} is {} and must name a read-back tool",
+                    tool.key,
+                    spec.effect.as_str()
+                ),
+            }]));
+        };
+        let Some(sibling) = entry
+            .tools
+            .iter()
+            .find(|candidate| candidate.key == verification)
+        else {
+            return Err(ActionError::invalid_input(vec![FieldError {
+                field: format!("tools[{}].verification", tool.key),
+                code: "write_contract".to_owned(),
+                detail: format!("{verification:?} is not a tool in this toolkit"),
+            }]));
+        };
+        let sibling_spec = crate::registry::registry().get(sibling.action.as_str());
+        if !sibling_spec.is_some_and(|candidate| candidate.effect == Effect::Read) {
+            return Err(ActionError::invalid_input(vec![FieldError {
+                field: format!("tools[{}].verification", tool.key),
+                code: "write_contract".to_owned(),
+                detail: format!("{verification:?} is not a read-back tool"),
+            }]));
+        }
+    }
+    Ok(())
+}
+
 /// Insert one toolkit version and its tool rows, schemas taken from the registry.
 async fn insert_version(
     tx: &mut PgConnection,
@@ -177,6 +239,15 @@ async fn insert_version(
             tracing::error!(%error, action = %tool.action, "publish: project the input schema");
             ActionError::internal()
         })?;
+        let output_schema = serde_json::to_value((spec.output)()).map_err(|error| {
+            tracing::error!(%error, action = %tool.action, "publish: project the output schema");
+            ActionError::internal()
+        })?;
+        let redact = serde_json::to_value(&tool.redact).unwrap_or_else(|_| json!([]));
+        let meta = match tool.verification.as_deref() {
+            Some(verification) => json!({ "verification": verification }),
+            None => json!({}),
+        };
         let timeout_secs = i32::try_from(spec.timeout_ms.div_ceil(1000))
             .unwrap_or(300)
             .clamp(1, 300);
@@ -188,8 +259,12 @@ async fn insert_version(
                 key: &tool.key,
                 handler_action: &tool.action,
                 input_schema: &schema,
+                output_schema: &output_schema,
                 effect: spec.effect.as_str(),
+                idempotency: tool.idempotency.as_deref().unwrap_or("optional"),
                 timeout_secs,
+                redact: &redact,
+                meta: &meta,
             },
         )
         .await

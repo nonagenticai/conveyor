@@ -1029,3 +1029,70 @@ automatic apply of an L1-accepted draft; no budget mechanism (§24's note stands
 project-level (card-less) run; no parent-run memory; no new event kind; no migration.
 `cards.update`'s `job_binding_id` remains a plain edit: it never starts a run, writes no memory, and
 is not live-run guarded (ADR 0017 decision 7).
+## 28. The L1 laya evaluation (added 2026-11-24; S21 step 10, issue #656; implements SPEC_V2 §7.2, §7.3, §4.5)
+
+**The ladder owns the case.** A laya case is `{model, state, questions}` (SPEC_V2 §7.2). The ladder
+builds all three: `model` from the tenant's `laya_inference_config`, `state` from the caller's
+declared facts, and each `questions.<qid>` as `{type, instructions, criteria}` from the effective
+`decision_policy` and the authored option set. `ladder.case` returns the exact
+`{case, case_hash, laya_call_key}` a caller must post; in-process callers use the same builder.
+A caller supplies facts, never a verdict: `ladder.evaluate` has no `answer`, `confidence`,
+`probabilities`, `latency_ms` or `options`, and a request carrying one is `422
+caller_supplied_verdict`.
+
+**The engine makes the call.** `ladder.precheck` is an external action — `POST /v1/systemone`,
+service `laya`, bearer from the sealed `laya.token`, `governance:write`, tenant-scoped, effect
+`read`, `captures_usage` off. It runs outside any transaction: a handler holds one, and no
+transaction here spans an HTTP request. `laya.judge` stays the SOP step judge (CONTRACT §21); the
+two actions ask different questions and answer to different callers.
+
+**Only a verified exchange becomes a decision.** `ladder.evaluate` takes `{kind, gate, project_id?,
+card_id?, question?, output, criteria, facts?, call_key, meta?}` and rebuilds the case from the same
+facts. It
+records a decision only when the engine's record of the call proves all of:
+
+- `idempotency_key` for `(tenant, scope='ladder.precheck', key)` exists, its `request_hash` equals
+  `store::idempotency::request_hash(case)` (a key naming another body is `422
+  laya_call_unverified`), and its stored `status_code` is 2xx;
+- `action_invocation` names the call (`store::actions::find_invocation_by_key`) with `outcome='ok'`.
+
+The answer, confidence and probabilities are parsed from the stored response; latency is the
+invocation's measured `duration_ms`. The decision records `meta.laya_call_key`,
+`meta.laya_invocation_id`, `meta.case_sha256` and the option-set version, so §7.2's "a decision is
+reproducible from the row" holds. A missing, in-flight, expired or mismatched key is `422
+laya_call_unverified` and writes nothing.
+
+**Options are authored, versioned rows.** One live option set per `(tenant, kind, gate)`, versioned;
+each row carries `key`, `label`, `payload` and `payload.outcome ∈ accepted | refused | escalated`.
+`decision_option_sets.set` authors a set (the one row's version increments and its children are
+replaced in the same transaction); `decision_option_sets.get` reads it. A policy declares
+`meta.question_type = "choice"` (absent means the SOP judge's `score`); a `choice` question's
+criteria are the authored keys and its instructions list `key — label`. An answer outside the set is
+`422 laya_answer_not_in_options`; a declared choice with no authored set is `409 option_set_missing`.
+Inline options are `422 invalid_input`. `decision_option` remains the per-decision record and is
+written from the authored rows.
+
+**`Unavailable` follows the fail policy.** An outage — the service unreachable, the call never
+completed — leaves no recorded exchange, so `ladder.evaluate` writes no decision and the caller (the
+executor) applies `domain::ladder::unavailable(fail_policy, action)`: `closed` refuses; `open` applies
+the policy's action (`handover` escalates, `block` refuses, `annotate` proceeds with the note). A
+*recorded* call that completed without a readable answer is the one case the action records: the
+decision is `unavailable` with `meta.gate_unavailable = true`, following the same policy. It is never
+a pass and never a silent refusal — the mapping is `domain::ladder::unavailable`, the same function
+every caller reads.
+
+**`fire_when` decides whether the case is asked.** A policy's nullable `fire_when` is evaluated when
+the case resolves; when it does not hold, no request is made, no decision is written, and the step
+proceeds. The expression is structured (`all_of` / `any_of` over `{kind, gate, field}` predicates),
+where `field` names a member of the case's fact document `{output, criteria, facts}` that must be
+present and non-null; an unparseable policy is refused at authoring time (`422
+invalid_fire_when`), not at evaluation.
+
+**The executor is a client of this path.** `internal_agent`'s `gate.precheck` builds the case with
+the shared builder, invokes `ladder.precheck`, then `ladder.evaluate` with the returned key. It
+makes exactly one laya request per gate and consumes the decision's outcome; it no longer parses a
+verdict nor re-derives the fail policy.
+
+**Refusal order.** `422 caller_supplied_verdict` (a verdict in the request) → `409
+option_set_missing` → `422 laya_call_unverified` → `422 laya_answer_not_in_options`. Every refusal
+precedes the decision write.

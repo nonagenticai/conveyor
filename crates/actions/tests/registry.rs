@@ -128,8 +128,16 @@ use serde_json::{Value, json};
 /// organisational-memory lifecycle. 548 → **551**. **T15 (#86) adds 10 internal**:
 /// `toolkits.import_openapi|register_mcp|discover_mcp`, `tool_authoring.draft|validate|test|`
 /// `review|publish|promote` and the broker's registered-destination dispatch `tools.dispatch`
-/// — 551 → **561**.
-const EXPECTED: [&str; 561] = [
+/// — 551 → **561**; T12 (#88) adds the three remaining kata Gets → **564**; #655 (T17b) adds
+/// `authoring.intakes` → **565**. **S21 step 10 (#656) adds 4**: `ladder.case` and
+/// `decision_option_sets.get|set` (internal) and `ladder.precheck` (external) — 565 → **569**,
+/// internal 547 → 550, external 18 → 19.
+/// **T14 (#561) adds 5 external reads**: `webscraper.scrape_url|scrape_bulk` and
+/// `lean4.check|elaborate|prove` — 569 → **574**, external 19 → 24.
+/// **#557 adds 8 internal**: `tool_bindings.create|update|retire|list`, `tools.list|get`,
+/// `toolkits.list` and `tool_calls.list` — 574 → **582**, internal 550 → 558, external
+/// stays 24.
+const EXPECTED: [&str; 582] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -180,6 +188,7 @@ const EXPECTED: [&str; 561] = [
     "authoring.assets",
     "authoring.draft",
     "authoring.intake",
+    "authoring.intakes",
     "authoring.publish",
     "authoring.review",
     "baselines.get",
@@ -269,6 +278,8 @@ const EXPECTED: [&str; 561] = [
     "decisions.transition",
     "decisions.update",
     "decks.render",
+    "decision_option_sets.get",
+    "decision_option_sets.set",
     "decision_policies.create",
     "decision_policies.list",
     "decision_policies.update",
@@ -379,17 +390,26 @@ const EXPECTED: [&str; 561] = [
     "kata.observe",
     "kata.open",
     "kata.propose",
+    "kata.standardise",
+    "kata.stretch",
+    "kata.sustain",
     "knowledge.query",
     "labels.create",
     "labels.delete",
     "labels.update",
     "ladder.apply_draft",
+    "ladder.case",
     "ladder.evaluate",
     "ladder.list",
+    "ladder.precheck",
     "ladder.record",
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
+    // T14 (#561): the Lean prover's three read actions.
+    "lean4.check",
+    "lean4.elaborate",
+    "lean4.prove",
     // T8 (#79): the organisational-memory lifecycle — propose with independent evidence,
     // a person's review, and promotion to a governed-asset source draft.
     "lessons.promote",
@@ -643,12 +663,20 @@ const EXPECTED: [&str; 561] = [
     "tool_authoring.review",
     "tool_authoring.test",
     "tool_authoring.validate",
+    "tool_bindings.create",
+    "tool_bindings.list",
+    "tool_bindings.retire",
+    "tool_bindings.update",
+    "tool_calls.list",
     "toolkits.discover_mcp",
     "toolkits.import_openapi",
+    "toolkits.list",
     "toolkits.publish",
     "toolkits.register_mcp",
     "tools.call",
     "tools.dispatch",
+    "tools.get",
+    "tools.list",
     "tools.probe",
     "tools.usage",
     "trace_links.create",
@@ -677,6 +705,9 @@ const EXPECTED: [&str; 561] = [
     "webhooks.delete",
     "webhooks.test",
     "webhooks.update",
+    // T14 (#561): the webscraper's two read actions.
+    "webscraper.scrape_bulk",
+    "webscraper.scrape_url",
     "workers.list",
     "workflows.create",
     "workflows.get",
@@ -802,7 +833,19 @@ fn the_registry_is_exactly_the_declared_set() {
     // `tool_authoring.draft|validate|test|review|publish|promote`, `tools.dispatch`):
     // internal 533 -> 543; external stays 18 — an authored tool dispatches through the broker's
     // registered-destination arm, not a new external declaration.
-    assert_eq!((internal, external), (543, 18));
+    // T12 (#88) adds three internal kata Gets (`kata.standardise|sustain|stretch`):
+    // internal 543 -> 546; external stays 18.
+    // #655 (T17b) adds one internal read (`authoring.intakes`): internal 546 -> 547;
+    // external stays 18 — the queue reads this tenant's own intake rows.
+    // S21 step 10 (#656) adds three internal actions (`ladder.case`, `decision_option_sets.get|set`)
+    // and one external (`ladder.precheck`): internal 547 -> 550, external 18 -> 19.
+    // T14 (#561) adds five external reads (`webscraper.scrape_url|scrape_bulk`,
+    // `lean4.check|elaborate|prove`): internal stays 550, external 19 -> 24 — each call
+    // dispatches to a Rust service, not a new internal action.
+    // #557 adds eight internal actions (`tool_bindings.create|update|retire|list`,
+    // `tools.list|get`, `toolkits.list`, `tool_calls.list`): internal 550 -> 558;
+    // external stays 24.
+    assert_eq!((internal, external), (558, 24));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

@@ -160,8 +160,15 @@ programme at the stated date:
   standing delegation, not by the owner personally. `docs/plans/T19/closure-review.md` records the
   decision; the one remaining T19-labelled audit finding is the programme's tranche-4
   authorisation (P0), which belongs to the #526 retrospective chain; the `meeting_type` authoring
-  route and the T9/T10 binding remain follow-ups. The T18 UI lane (#562–#566) is in flight and
-  independent.
+  route and the T9/T10 binding are the T19F follow-on (below). The T18 UI lane (#562–#566) is in
+  flight and independent.
+- **T19F (decision-forum governance) is proposed at tranche 6** — the follow-on T19's closure
+  review named. The plan and the MSP/TOGAF/SAFe artefact set are
+  `docs/plans/T19F-meeting-bindings.md` and `docs/plans/T19F/`; **#683** implements the versioned
+  policy authoring through T17's route, the board sitting and the cadence materialisation;
+  **#684** proves them on the deployed engine. The project stays `active`: its closure review
+  defers closure to the tranche-6 review, so no unledgered P0 is manufactured. T19's ledgered
+  tranche-4 P0 remains the #526 chain's.
 - **Architecture contracts remain a large open gap, one project smaller.** Twelve delivery
   projects (T3, T5–T8, T12, T14–T19) had no live contract at the last audit; T19 now carries one,
   live and board-approved, so the count is eleven. The board's approval is the authority act, and
@@ -197,8 +204,10 @@ plan), `docs/plans/T19/project-brief.md` and `inception-analysis.md` (the projec
 `docs/plans/T19/architecture-design.md` (the PSA and HLD set), `docs/plans/T19/msp-profile.md`
 (B7, R20 and the tranche-4 evidence), `docs/plans/T19/safe-epic.md` (features, enablers, WSJF and
 PI objectives) and `docs/plans/T19/artifact-register.md` (the typed catalogue). The
-`governance_body` and `programme_cadence` rows are the consumer seams; their binding to T19's
-meeting types follows the slice.
+`governance_body` and `programme_cadence` rows are the consumer seams; T19F
+(`docs/plans/T19F-meeting-bindings.md` and its artefact set) binds them explicitly: the body names
+its standing type, the cadence row names its forum and materialises one meeting, and a policy
+change is a reviewed authoring release.
 
 ## 6. The measurement and refusal discipline
 
