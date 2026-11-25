@@ -1,8 +1,25 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-25T09:58:16.505745364+00:00",
+  "generated_at": "2026-11-25T10:28:43.209125320+00:00",
   "issue_registry": {
     "issues": [
+      {
+        "labels": [
+          {
+            "color": "d73a4a",
+            "name": "bug"
+          },
+          {
+            "color": "0E8A16",
+            "name": "status:ready"
+          }
+        ],
+        "number": 733,
+        "state": "OPEN",
+        "title": "ci: the web suite's board and evals specs fail a different test on every run under load",
+        "updatedAt": "2026-11-25T10:21:35Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/733"
+      },
       {
         "labels": [
           {
@@ -15,9 +32,9 @@
           }
         ],
         "number": 729,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "design: build-docs must preserve the published outputs index — main's design-pack is red",
-        "updatedAt": "2026-11-25T09:40:51Z",
+        "updatedAt": "2026-11-25T10:26:59Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/729"
       },
       {
@@ -38,7 +55,7 @@
         "number": 726,
         "state": "OPEN",
         "title": "rework: strict conformance — the published closure records, the T19F deferral and a green strict publish",
-        "updatedAt": "2026-11-25T09:37:22Z",
+        "updatedAt": "2026-11-25T10:01:12Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/726"
       },
       {
@@ -80,7 +97,7 @@
         "number": 716,
         "state": "CLOSED",
         "title": "fix: the acceptance job provisions the environment its commands need",
-        "updatedAt": "2026-11-25T09:01:18Z",
+        "updatedAt": "2026-11-25T10:19:35Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/716"
       },
       {
@@ -408,7 +425,7 @@
         "number": 660,
         "state": "OPEN",
         "title": "conveyor-buildout — the SPEC_V2 programme",
-        "updatedAt": "2026-11-25T08:27:54Z",
+        "updatedAt": "2026-11-25T10:02:38Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/660"
       },
       {
@@ -596,7 +613,7 @@
         "number": 630,
         "state": "OPEN",
         "title": "T18-3c: the run inspector's executor kind, binding pin and tools panel",
-        "updatedAt": "2026-11-25T09:47:11Z",
+        "updatedAt": "2026-11-25T10:05:52Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/630"
       },
       {
@@ -3565,9 +3582,9 @@
           }
         ],
         "number": 222,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "docs: repair the four broken relative links in docs/design/legacy/UI-SPEC.md",
-        "updatedAt": "2026-11-25T09:14:24Z",
+        "updatedAt": "2026-11-25T10:02:27Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/222"
       },
       {

@@ -1,12 +1,12 @@
 # Conveyor workspace UI study
 
-**Follow-up:** [studio.html](studio.html) and [STUDIO-SPEC.md](STUDIO-SPEC.md) extend this study
+**Follow-up:** [studio.html](../studio.html) and [STUDIO-SPEC.md](../STUDIO-SPEC.md) extend this study
 with the tenant-wide project portfolio, tenant configuration hierarchy, real coding catalogue,
 governed-asset CRUD and model/view creation requested in the subsequent review. This file
 continues to describe the preserved `web-ui.html` study.
 
 **Status:** interactive HTML design study, 2026-11-10. The binding product contract remains
-[`../SPEC.md`](../SPEC.md) and [`../plans/`](../plans/). This document proposes an interaction
+[`../../SPEC.md`](../../SPEC.md) and [`../../plans/`](../../plans/). This document proposes an interaction
 model; it does not claim that a pictured feature is implemented in the Rust application.
 
 Open [`web-ui.html`](web-ui.html) directly in a browser. Its CSS, JavaScript and fonts are local.

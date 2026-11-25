@@ -1,6 +1,6 @@
 window.CONVEYOR_REWORK = {
-  "generated_at": "2026-11-25T09:58:04.690966065+00:00",
-  "git_sha": "da865627a5083121e1c26e9d3d2143db8d7fc947",
+  "generated_at": "2026-11-25T10:28:30.611204818+00:00",
+  "git_sha": "eb70b1cebb0248394b968cbbd050dad8735ff7de",
   "packages": [
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T16",
@@ -41752,7 +41752,7 @@ window.CONVEYOR_REWORK = {
       "suppressed": 0
     }
   },
-  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.QYF6cZ98F8/data",
+  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.P4kWgq5U5n/data",
   "summary": {
     "by_severity": {
       "P0": 28,
