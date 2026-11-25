@@ -173,16 +173,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "A tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant.",
-  "generated_at": "2026-11-25T09:45:24.265680+00:00",
+  "generated_at": "2026-11-25T10:37:53.970839+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T17.toml",
   "name": "Tenant asset authoring",
   "project": "T17",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

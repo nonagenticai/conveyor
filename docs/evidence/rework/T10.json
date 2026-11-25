@@ -52,7 +52,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a211c9-1a1a-7fac-9b11-7dae24af7b9a (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+      "detail": "review 01a21242-33e2-7084-b233-7344c7de1cca (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T10-review",
       "kind": "snapshot",
       "result": "pass",
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a21213-f4d2-7fcb-899f-6b372e9ad616 decided by a distinct approver",
+      "detail": "latest closure gate 01a21242-371b-7e87-b6e4-58abe60e45ca decided by a distinct approver",
       "id": "T10-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -142,58 +142,44 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "23 mandatory artefact package(s) open: v1-p83-5:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, std-togaf-architecture-artifact-instance-01a20287-be6f-76c8-8024-2bf280f120e7:T10, std-togaf-architecture-artifact-instance-01a20287-ef55-75a2-9520-b7cb2b48958a:T10, std-togaf-architecture-artifact-instance-01a20288-20d5-713d-ac36-3f02673fdb32:T10, std-togaf-architecture-artifact-instance-01a20288-525a-714d-98bc-69c7a43b3c86:T10, +15 more",
+      "detail": "no open standard artefact package for this project",
       "id": "T10-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): v1-p83-5:T10 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "T10-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T10-artefact-standard' did not pass; the gate check 'T10-rework' did not pass",
+      "detail": "gate discharged by executable checks: T10-project, T10-baseline, T10-charter, T10-closure-outputs, T10-contract, T10-review, T10-closure-gate, T10-waivers, T10-pi-cadence, T10-pi-plan, T10-pi-objectives, T10-wsjf, T10-demo-credits, T10-lessons, T10-product, T10-artefact-standard, T10-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T10-artefact-standard (P1): 23 mandatory artefact package(s) open: v1-p83-5:T10, v1-p83-6:T10, v1-p82-5:T10, v1-p82-6:T10, std-togaf-architecture-artifact-instance-01a20287-be6f-76c8-8024-2bf280f120e7:T10, std-togaf-architecture-artifact-instance-01a20287-ef55-75a2-9520-b7cb2b48958a:T10, std-togaf-architecture-artifact-instance-01a20288-20d5-713d-ac36-3f02673fdb32:T10, std-togaf-architecture-artifact-instance-01a20288-525a-714d-98bc-69c7a43b3c86:T10, +15 more",
-    "T10-rework (P0): 1 unresolved P0/P1 package(s): v1-p83-5:T10 (P1)",
-    "gate (P0): the gate check 'T10-artefact-standard' did not pass; the gate check 'T10-rework' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
-  ],
+  "failures": [],
   "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized",
-  "generated_at": "2026-11-25T09:45:23.633271+00:00",
+  "generated_at": "2026-11-25T11:44:18.533614+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T10.toml",
   "name": "SAFe cadence and MSP tranches",
   "project": "T10",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T09:43:27.927052+00:00",
+    "git_sha": "676f798242fd24b7d8f5672501635e0e2e8f0447",
+    "path": "retained-snapshot/676f798242fd24b7d8f5672501635e0e2e8f0447"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }

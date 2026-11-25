@@ -175,16 +175,16 @@
     "gate (P0): the gate check 'T3-contract' did not pass; the gate check 'T3-review' did not pass; the gate check 'T3-artefact-standard' did not pass; the gate check 'T3-rework' did not pass"
   ],
   "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request",
-  "generated_at": "2026-11-25T09:45:24.602681+00:00",
+  "generated_at": "2026-11-25T10:37:54.289730+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T3.toml",
   "name": "PM job",
   "project": "T3",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

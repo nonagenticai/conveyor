@@ -115,7 +115,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "23 mandatory artefact package(s) open: mandatory_artefacts:T0, std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-instance-01a1ff45-f703-7150-992d-f61c4ce23ca5:T0, std-togaf-architecture-artifact-instance-01a1ff46-1dc2-7a7d-8245-dccdf9a8b037:T0, std-togaf-architecture-artifact-instance-01a1ff46-45c3-74fe-9fd8-7f3077dd0512:T0, std-togaf-architecture-artifact-instance-01a1ff46-6cc1-7119-b56f-1d58c6226ac0:T0, std-togaf-architecture-artifact-instance-01a1ff46-93a7-7bb4-8ab0-93f094edd051:T0, +15 more",
+      "detail": "6 mandatory artefact package(s) open: mandatory_artefacts:T0, std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-t0:T0, std-togaf-delivery-contract-t0:T0, std-togaf-phase-g-t0-g:T0",
       "id": "T0-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -150,22 +150,22 @@
     }
   ],
   "failures": [
-    "T0-artefact-standard (P1): 23 mandatory artefact package(s) open: mandatory_artefacts:T0, std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-instance-01a1ff45-f703-7150-992d-f61c4ce23ca5:T0, std-togaf-architecture-artifact-instance-01a1ff46-1dc2-7a7d-8245-dccdf9a8b037:T0, std-togaf-architecture-artifact-instance-01a1ff46-45c3-74fe-9fd8-7f3077dd0512:T0, std-togaf-architecture-artifact-instance-01a1ff46-6cc1-7119-b56f-1d58c6226ac0:T0, std-togaf-architecture-artifact-instance-01a1ff46-93a7-7bb4-8ab0-93f094edd051:T0, +15 more",
+    "T0-artefact-standard (P1): 6 mandatory artefact package(s) open: mandatory_artefacts:T0, std-pmp-project-baseline-t0:T0, std-pmp-project-registers-t0:T0, std-togaf-architecture-artifact-t0:T0, std-togaf-delivery-contract-t0:T0, std-togaf-phase-g-t0-g:T0",
     "T0-rework (P0): 1 unresolved P0/P1 package(s): mandatory_artefacts:T0 (P1)",
     "gate (P0): the gate check 'T0-artefact-standard' did not pass; the gate check 'T0-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The A\u2013D set is approved; the project re-closes through the one gate.",
-  "generated_at": "2026-11-25T09:45:23.435234+00:00",
+  "generated_at": "2026-11-25T10:37:53.199142+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T0.toml",
   "name": "Model and contracts",
   "project": "T0",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

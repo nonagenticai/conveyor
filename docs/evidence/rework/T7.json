@@ -175,16 +175,16 @@
     "gate (P0): the gate check 'T7-contract' did not pass; the gate check 'T7-review' did not pass; the gate check 'T7-artefact-standard' did not pass; the gate check 'T7-rework' did not pass"
   ],
   "gate": "An injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable.",
-  "generated_at": "2026-11-25T09:45:25.041614+00:00",
+  "generated_at": "2026-11-25T10:37:54.669166+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T7.toml",
   "name": "Operations",
   "project": "T7",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

@@ -165,16 +165,16 @@
     "gate (P0): the gate check 'S19-baseline' did not pass; the gate check 'S19-charter' did not pass; the gate check 'S19-contract' did not pass; the gate check 'S19-review' did not pass; the gate check 'S19-pi-cadence' did not pass; the gate check 'S19-pi-plan' did not pass; the gate check 'S19-pi-objectives' did not pass; the gate check 'S19-lessons' did not pass; the gate check 'S19-wsjf' did not pass; the gate check 'S19-demo-credits' did not pass; the gate check 'S19-artefact-standard' did not pass; the gate check 'S19-rework' did not pass"
   ],
   "gate": "S19 is accepted when its twelve-step gate is green: ten tables RLS-forced and `0026` in the ledger, the second pending sign-off refused, no run without both sign-offs, the answer key unreachable from the subject input, the held-out wall enforced by access, a failed attempt unable to occupy its `(case,rep)` slot, cost derived with no cost column, the oracle \u2248100% and null \u22480% controls, the variant grammar and grade shape enforced as database invariants, no answer-key or sign-off action machine-reachable, the served surface matching the lock, and `rbuild --gate`.",
-  "generated_at": "2026-11-25T09:45:23.025875+00:00",
+  "generated_at": "2026-11-25T10:37:52.829417+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S19.toml",
   "name": "Eval builder",
   "project": "S19",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

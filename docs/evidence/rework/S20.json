@@ -176,16 +176,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "S20 is accepted when its gate is green: one RLS-forced table with `0029` in the ledger and no spend column, no round before the plan is signed, the train/test split immovable by a climb, a grader fix re-grading stored transcripts into a new run, the comparison refusing across versions, graders or splits, the revert rules in the domain machine, a fourth content round refused after a stall, the cost walk's gates registered before round 1, the final report naming the winner, the served surface matching the lock, and `rbuild --gate`.",
-  "generated_at": "2026-11-25T09:45:23.122283+00:00",
+  "generated_at": "2026-11-25T10:37:52.922278+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S20.toml",
   "name": "Eval hillclimb",
   "project": "S20",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

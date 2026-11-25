@@ -70,7 +70,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "64 mandatory artefact package(s) open: benefit_baseline_placeholder:programme, dr-w4-prog-mandate-probe-row:PLATFORM, dr-w4-prog-risk-owners:PLATFORM, std-msp-benefit-transition-b1:PLATFORM, std-msp-benefit-transition-b2:PLATFORM, std-msp-benefit-transition-b3:PLATFORM, std-msp-benefit-transition-b4:PLATFORM, std-msp-benefit-transition-b5:PLATFORM, +56 more (4 not yet due: tranche planned)",
+      "detail": "61 mandatory artefact package(s) open: benefit_baseline_placeholder:programme, dr-w4-prog-mandate-probe-row:PLATFORM, dr-w4-prog-risk-owners:PLATFORM, std-msp-benefit-transition-b1:PLATFORM, std-msp-benefit-transition-b2:PLATFORM, std-msp-benefit-transition-b3:PLATFORM, std-msp-benefit-transition-b4:PLATFORM, std-msp-benefit-transition-b5:PLATFORM, +53 more (4 not yet due: tranche planned)",
       "id": "PLATFORM-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -96,21 +96,21 @@
     }
   ],
   "failures": [
-    "PLATFORM-artefact-standard (P1): 64 mandatory artefact package(s) open: benefit_baseline_placeholder:programme, dr-w4-prog-mandate-probe-row:PLATFORM, dr-w4-prog-risk-owners:PLATFORM, std-msp-benefit-transition-b1:PLATFORM, std-msp-benefit-transition-b2:PLATFORM, std-msp-benefit-transition-b3:PLATFORM, std-msp-benefit-transition-b4:PLATFORM, std-msp-benefit-transition-b5:PLATFORM, +56 more (4 not yet due: tranche planned)",
+    "PLATFORM-artefact-standard (P1): 61 mandatory artefact package(s) open: benefit_baseline_placeholder:programme, dr-w4-prog-mandate-probe-row:PLATFORM, dr-w4-prog-risk-owners:PLATFORM, std-msp-benefit-transition-b1:PLATFORM, std-msp-benefit-transition-b2:PLATFORM, std-msp-benefit-transition-b3:PLATFORM, std-msp-benefit-transition-b4:PLATFORM, std-msp-benefit-transition-b5:PLATFORM, +53 more (4 not yet due: tranche planned)",
     "PLATFORM-rework (P0): 26 unresolved P0/P1 package(s): benefit_baseline_placeholder:programme (P1), dr-w4-prog-mandate-probe-row:PLATFORM (P1), dr-w4-prog-risk-owners:PLATFORM (P1), std-msp-benefit-transition-b1:PLATFORM (P1), std-msp-benefit-transition-b2:PLATFORM (P1), std-msp-benefit-transition-b3:PLATFORM (P1), std-msp-benefit-transition-b4:PLATFORM (P1), std-msp-benefit-transition-b5:PLATFORM (P1), +18 more (4 not yet due: tranche planned)",
     "gate (P0): the gate check 'PLATFORM-artefact-standard' did not pass; the gate check 'PLATFORM-rework' did not pass"
   ],
   "gate": "The standing platform row carries an approved charter and a baseline; it does not close.",
-  "generated_at": "2026-11-25T09:45:20.811562+00:00",
+  "generated_at": "2026-11-25T10:37:50.775692+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/PLATFORM.toml",
   "name": "CI, runners and platform",
   "project": "PLATFORM",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []
