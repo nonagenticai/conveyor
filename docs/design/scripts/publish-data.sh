@@ -107,6 +107,11 @@ else
 fi
 cp "$tmp/conformance/conformance-gap-register.json" "$tmp/data/conformance.json"
 cp "$tmp/conformance/conformance-gap-register.md" "$tmp/data/conformance.md"
+# The evidence copy is the input `scripts/generate-standards.py --check` reads for its covered
+# keys; it must be the register this publish is judged by, or the committed standards record can
+# never be reproduced from the pack (the design-pack job's `--check`).
+cp "$tmp/conformance/conformance-gap-register.json" "$root/docs/evidence/conformance-gap-register.json"
+cp "$tmp/conformance/conformance-gap-register.md" "$root/docs/evidence/conformance-gap-register.md"
 
 # 3d. Pass 2 of the standards generator writes the published artefact record and one page per
 #     artefact. It runs only after the strict gate, so the register it names is the one the gate
