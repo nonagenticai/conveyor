@@ -749,6 +749,25 @@ fn mandatory_artefacts_exempt(project: &Project) -> bool {
     )
 }
 
+/// The project's ADM track, from the same two facts the generator uses: `meta.adm_profile`
+/// naming an architecture profile wins; otherwise `meta.track == "programme"`.
+///
+/// The owner's tailoring (2026-11-24) gives the delivery track Preliminary, A-D and the Phase-G
+/// review; E-H belong to the architecture track. `mandatory_artefacts` applies this so a
+/// delivery project is not asked for artefacts the standard never instanced for it.
+fn architecture_track(meta: &Value) -> bool {
+    if let Some(named) = meta.get("adm_profile").and_then(Value::as_str) {
+        let named = named.trim().to_ascii_lowercase();
+        if !named.is_empty() {
+            return named.contains("architecture")
+                || matches!(named.as_str(), "programme" | "a-h" | "ah");
+        }
+    }
+    meta.get("track")
+        .and_then(Value::as_str)
+        .is_some_and(|track| track.trim().eq_ignore_ascii_case("programme"))
+}
+
 /// The document categories and typed rows the standard requires of `project`.
 ///
 /// The output standard's first matching class is read for every project, so no project can
@@ -782,9 +801,17 @@ fn mandatory_artefacts(project: &Project, governed: bool) -> (Vec<String>, bool,
                 continue;
             }
             let named = template["standard"].as_str().unwrap_or_default();
+            let declared_here = declared.iter().any(|slot| slot == key);
+            // The TOGAF set follows the ADM tailoring: a delivery project owes the contract and
+            // its review (enforced by the Phase-G block, and skipped below) and the outputs its
+            // class declares, not the architecture track's E/F artefacts. Demanding the whole
+            // governed set put four categories on delivery projects that the standard's own
+            // `applies()` never instanced for them (measured 2026-11-25).
             let applies = named == "PMP"
-                || (named == "TOGAF" && governed)
-                || declared.iter().any(|slot| slot == key);
+                || (named == "TOGAF"
+                    && governed
+                    && (declared_here || architecture_track(&project.meta)))
+                || declared_here;
             if !applies {
                 continue;
             }
@@ -960,7 +987,21 @@ fn is_met(status: &str) -> bool {
 mod tests {
     use serde_json::json;
 
-    use super::{closure_outputs, dependency_keys};
+    use super::{architecture_track, closure_outputs, dependency_keys};
+
+    #[test]
+    fn the_adm_track_follows_the_owner_tailoring() {
+        assert!(architecture_track(&json!({"track": "programme"})));
+        assert!(architecture_track(
+            &json!({"adm_profile": "architecture-capability"})
+        ));
+        assert!(architecture_track(&json!({"adm_profile": "a-h"})));
+        assert!(!architecture_track(&json!({"track": "v2"})));
+        assert!(!architecture_track(&json!({})));
+        assert!(!architecture_track(
+            &json!({"adm_profile": "", "track": "v2"})
+        ));
+    }
 
     #[test]
     fn dependency_keys_trims_dedupes_and_ignores_non_strings() {
