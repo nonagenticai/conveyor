@@ -5,8 +5,8 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | the real route and its Playwright spec exist | 62 |
-| `extend` | a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner | 4 |
+| `exists` | the real route and its Playwright spec exist | 63 |
+| `extend` | a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner | 3 |
 | `new` | neither the route nor an ancestor exists | 3 |
 
 ## Rows
@@ -60,7 +60,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:authoring` | §10.4 | actions | authoring | `exists` | actions: authoring.* found (authoring.assets, authoring.draft, authoring.intake…) |
 | `actions:approvals` | §10.4 | actions | approvals | `exists` | actions: approval_policies.* found (approval_policies.get, approval_policies.list, approval_policies.set)<br>actions: approvals.* found (approvals.decide, approvals.list, approvals.request) |
 | `actions:meetings` | §10.4 | actions | meetings | `exists` | actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…)<br>actions: meetings.* found (meetings.agenda_add, meetings.close, meetings.close_item…) |
-| `actions:decision` | §10.4 | actions | decision | `new` | actions: approvals.* found (approvals.decide, approvals.list, approvals.request)<br>actions: decision_options.* absent<br>actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)<br>actions: laya_configs.* found (laya_configs.create, laya_configs.list)<br>actions: refinements.* found (refinements.list, refinements.publish)<br>*V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).* |
+| `actions:decision` | §10.4 | actions | decision | `new` | actions: approvals.* found (approvals.decide, approvals.list, approvals.request)<br>actions: decision_options.* absent<br>actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: ladder.* found (ladder.apply_draft, ladder.case, ladder.evaluate…)<br>actions: laya_configs.* found (laya_configs.create, laya_configs.list)<br>actions: refinements.* found (refinements.list, refinements.publish)<br>*V1's decisions.* actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).* |
 | `actions:PM` | §10.4 | actions | PM | `exists` | actions: pm.* found (pm.charter, pm.close, pm.get…) |
 | `actions:coach` | §10.4 | actions | coach | `exists` | actions: coach.* found (coach.escalate, coach.interrupt, coach.remedy…) |
 | `actions:kata` | §10.4 | actions | kata | `new` | actions: kata.* found (kata.adopt, kata.analyse, kata.get…)<br>*V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5.* |
@@ -68,7 +68,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:operations` | §10.4 | actions | operations | `exists` | actions: ops.* found (ops.ci_status, ops.deployments, ops.events…) |
 | `actions:analysis` | §10.4 | actions | analysis | `exists` | actions: analyse.* found (analyse.site, analyse.video) |
 | `actions:production` | §10.4 | actions | production | `exists` | actions: produce.* found (produce.script) |
-| `actions:tools` | §10.4 | actions | tools | `extend` | actions: tool_authoring.* found (tool_authoring.draft, tool_authoring.promote, tool_authoring.publish…)<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* found (toolkits.discover_mcp, toolkits.import_openapi, toolkits.publish…)<br>actions: tools.* found (tools.probe, tools.usage) |
+| `actions:tools` | §10.4 | actions | tools | `exists` | actions: tool_authoring.* found (tool_authoring.draft, tool_authoring.promote, tool_authoring.publish…)<br>actions: tool_bindings.* found (tool_bindings.create, tool_bindings.list, tool_bindings.retire…)<br>actions: tool_calls.* found (tool_calls.list)<br>actions: toolkits.* found (toolkits.discover_mcp, toolkits.import_openapi, toolkits.list…)<br>actions: tools.* found (tools.get, tools.list, tools.probe…) |
 | `actions:memory` | §10.4 | actions | memory | `exists` | actions: lessons.* found (lessons.promote, lessons.propose, lessons.review) |
 | `actions:metrics` | §10.4 | actions | metrics | `exists` | actions: metrics.* found (metrics.flow, metrics.job, metrics.maturity…) |
 | `destination:Organisation` | §10.5 | destination | Organisation | `exists` | apps/web/src/app.rs: route '/organisation' found<br>apps/web/e2e/organisation.spec.ts: present<br>docs/design/v2.js: page 'organisation' — design reference, not implementation<br>*The mock page is a design study; the app's /organisation route renders the T0/T2 organisation reads, and the write verbs remain T0/T2's.* |

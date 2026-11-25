@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "2c944b95a7cd14b570996d8a6997766ddf3d1dfef0ad44eac867a258a557581e",
-      "bytes": 196503,
+      "sha256": "56d237d16db41a74c8c7474d28a3ac1a9ba9c6875a3e904d826003010ac80ab2",
+      "bytes": 197298,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -191,12 +191,21 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0017-card-handoff.md"
     },
     {
+      "title": "0018 — The L1 laya gate makes its own call",
+      "path": "docs/decisions/0018-l1-laya-provenance.html",
+      "source": "docs/decisions/0018-l1-laya-provenance.md",
+      "section": "Decisions",
+      "sha256": "b15b88dc01f9d8823a0d250fbfefc9e9b7f593c5ae52966b13783ef4d22a1860",
+      "bytes": 9583,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0018-l1-laya-provenance.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
       "section": "Design",
-      "sha256": "b534cd0891d6cdf0923586016878c357274a5a80e4c5f0708e2bc3f66b5f1b91",
-      "bytes": 18121,
+      "sha256": "a5ce762378364acf2866183f5ee384e2f20417f48f90958cda2bacfa831cb7df",
+      "bytes": 18895,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md"
     },
     {
@@ -222,8 +231,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/data/conformance.html",
       "source": "docs/design/data/conformance.md",
       "section": "Design",
-      "sha256": "6679e33aa06451668e2c1882e14af92e616d674c190aa9e1ac096c7e7d0fccfb",
-      "bytes": 24244,
+      "sha256": "0b90fd258c3d8161d8c4f55b0a6aef78f286605c785bdf648a013c18e6be6163",
+      "bytes": 24325,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
     {
@@ -495,6 +504,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "452b7a1da7ba507706a804c221cdb73fb73a045ee1944e943e8f2a950c7b9af2",
       "bytes": 6021,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-HANDOFF.md"
+    },
+    {
+      "title": "S21 step 10 — the L1 laya gate: receipt",
+      "path": "docs/evidence/S21-LAYA.html",
+      "source": "docs/evidence/S21-LAYA.md",
+      "section": "Evidence",
+      "sha256": "51f55a2134c4dc5b9030081e7733c172b10b9da50ad0b1139d231811633eb557",
+      "bytes": 8164,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-LAYA.md"
     },
     {
       "title": "S21 step 7 — the run's episodic memory",
@@ -915,8 +933,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "195be6558e65bfb6bb2d1e418299d1d817b1bbe3db33ee161b25004a7c2b01f4",
-      "bytes": 14873,
+      "sha256": "90e64669d04caac0f2bcc44b47d89bd6b8c5a7c1d9148cb555c98eb1575c30d8",
+      "bytes": 14967,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -924,8 +942,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "9a4e6f8a35a1b40feb9ddc59fe3a892576fd5ceae64439c4cf95b92cfa1c9261",
-      "bytes": 258086,
+      "sha256": "36eca2e9475876120ccc695318ed827ef80c34130b3c3abe2a0e17edf9a61dba",
+      "bytes": 260000,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -933,8 +951,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "0b38c7c6257b40030579b9a276794968ce448e6d1ccd56a3f362dd5e4770699b",
-      "bytes": 85381,
+      "sha256": "24c093ecc71b23d40f9e5b37bc8f314f66fc60058cddb0221dfbaaaf025692d3",
+      "bytes": 90260,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -942,8 +960,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "77e80ec2e18a0bac679ee84ded7452fb19ccca8c228664b85e8cd51cec0b39ea",
-      "bytes": 152574,
+      "sha256": "1dce63a65f1f0a11d922dc8782a448805d3ff3db25b9aec35c920d888e8c73ff",
+      "bytes": 155537,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -1152,6 +1170,69 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "c4cd154bc3d1047bdb8bcfb9aec7f62d96580fcdb99b046305b76ed070a2763b",
       "bytes": 5420,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/safe-epic.md"
+    },
+    {
+      "title": "T19F — Decision-forum governance (follow-on)",
+      "path": "docs/plans/T19F-meeting-bindings.html",
+      "source": "docs/plans/T19F-meeting-bindings.md",
+      "section": "Plans",
+      "sha256": "b55d45b97942b6e8e99c48c3ec83d10cd7a978ada2ea1c2915ee60f3750a11eb",
+      "bytes": 14656,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F-meeting-bindings.md"
+    },
+    {
+      "title": "T19F — Architecture design (PSA + HLD)",
+      "path": "docs/plans/T19F/architecture-design.html",
+      "source": "docs/plans/T19F/architecture-design.md",
+      "section": "Plans",
+      "sha256": "56e9beb0b754d87260d1e61e8611f6344343c844f862b1dbfbb316f95cb035fe",
+      "bytes": 6276,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/architecture-design.md"
+    },
+    {
+      "title": "T19F — Artefact register",
+      "path": "docs/plans/T19F/artifact-register.html",
+      "source": "docs/plans/T19F/artifact-register.md",
+      "section": "Plans",
+      "sha256": "0da8389f33a51f2ab6b2c78032cac8fe6841a4717c4e38172882a92f5b35ebdd",
+      "bytes": 4256,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/artifact-register.md"
+    },
+    {
+      "title": "T19F — Inception analysis",
+      "path": "docs/plans/T19F/inception-analysis.html",
+      "source": "docs/plans/T19F/inception-analysis.md",
+      "section": "Plans",
+      "sha256": "d8411fc4348cd72f7ff0b296713cb37c9f263376c6c91198ec41ad1d694ed76d",
+      "bytes": 5821,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/inception-analysis.md"
+    },
+    {
+      "title": "T19F — MSP profile",
+      "path": "docs/plans/T19F/msp-profile.html",
+      "source": "docs/plans/T19F/msp-profile.md",
+      "section": "Plans",
+      "sha256": "8155ee18056e6ea7d037c8b12e274bcc2d01d32d5cd1d3687cbf6cb221f40816",
+      "bytes": 2961,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/msp-profile.md"
+    },
+    {
+      "title": "T19F — Decision-forum governance: project brief",
+      "path": "docs/plans/T19F/project-brief.html",
+      "source": "docs/plans/T19F/project-brief.md",
+      "section": "Plans",
+      "sha256": "320d632de45aa02035273e0e5c8363e2d448cba9211c65408f18e99be7e4dca6",
+      "bytes": 4039,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/project-brief.md"
+    },
+    {
+      "title": "T19F — SAFe epic",
+      "path": "docs/plans/T19F/safe-epic.html",
+      "source": "docs/plans/T19F/safe-epic.md",
+      "section": "Plans",
+      "sha256": "6e87daefcbd4af476cabaf74e96a16e19f4762ac5b526ba9f338009c9d961bac",
+      "bytes": 2699,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/safe-epic.md"
     },
     {
       "title": "T9 — TOGAF ADM capability",
@@ -1554,8 +1635,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "4c90dacf0b3752e0f30a6349b8424ca032fb6866c33040233b850531f86fd40d",
-      "bytes": 53018,
+      "sha256": "0dca766d1d244ee9e415c15077ec2311311571636f3b81877b08a25eca7e11c8",
+      "bytes": 58188,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

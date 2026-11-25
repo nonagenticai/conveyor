@@ -37,12 +37,12 @@
 <tr>
 <td><code>exists</code></td>
 <td>the real route and its Playwright spec exist</td>
-<td>62</td>
+<td>63</td>
 </tr>
 <tr>
 <td><code>extend</code></td>
 <td>a V1 ancestor exists, the V2 route has no spec, or the route renders a gate naming its owner</td>
-<td>4</td>
+<td>3</td>
 </tr>
 <tr>
 <td><code>new</code></td>
@@ -446,7 +446,7 @@
 <td>actions</td>
 <td>decision</td>
 <td><code>new</code></td>
-<td>actions: approvals.* found (approvals.decide, approvals.list, approvals.request)<br>actions: decision_options.* absent<br>actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)<br>actions: laya_configs.* found (laya_configs.create, laya_configs.list)<br>actions: refinements.* found (refinements.list, refinements.publish)<br><em>V1's decisions.</em> actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).*</td>
+<td>actions: approvals.* found (approvals.decide, approvals.list, approvals.request)<br>actions: decision_options.* absent<br>actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)<br>actions: decisions.* found (decisions.create, decisions.get, decisions.list…)<br>actions: ladder.* found (ladder.apply_draft, ladder.case, ladder.evaluate…)<br>actions: laya_configs.* found (laya_configs.create, laya_configs.list)<br>actions: refinements.* found (refinements.list, refinements.publish)<br><em>V1's decisions.</em> actions write governance ADRs (governed_asset kind=adr). The V2 decision ladder (decision/decision_option/decision_policy/refinement) is absent (T2).*</td>
 </tr>
 <tr>
 <td><code>actions:PM</code></td>
@@ -509,8 +509,8 @@
 <td>§10.4</td>
 <td>actions</td>
 <td>tools</td>
-<td><code>extend</code></td>
-<td>actions: tool_authoring.* found (tool_authoring.draft, tool_authoring.promote, tool_authoring.publish…)<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* found (toolkits.discover_mcp, toolkits.import_openapi, toolkits.publish…)<br>actions: tools.* found (tools.probe, tools.usage)</td>
+<td><code>exists</code></td>
+<td>actions: tool_authoring.* found (tool_authoring.draft, tool_authoring.promote, tool_authoring.publish…)<br>actions: tool_bindings.* found (tool_bindings.create, tool_bindings.list, tool_bindings.retire…)<br>actions: tool_calls.* found (tool_calls.list)<br>actions: toolkits.* found (toolkits.discover_mcp, toolkits.import_openapi, toolkits.list…)<br>actions: tools.* found (tools.get, tools.list, tools.probe…)</td>
 </tr>
 <tr>
 <td><code>actions:memory</code></td>
