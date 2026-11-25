@@ -1,6 +1,31 @@
 {
   "issues": [
     {
+      "number": 734,
+      "title": "docs: S21's records state step 11 merged, and its migration as 0074",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/734",
+      "updatedAt": "2026-11-25T11:12:27Z",
+      "labels": [
+        {
+          "name": "documentation",
+          "color": "0075ca"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S21",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
       "number": 733,
       "title": "ci: the web suite's board and evals specs fail a different test on every run under load",
       "state": "OPEN",
@@ -22,7 +47,7 @@
       "title": "design: build-docs must preserve the published outputs index \u2014 main's design-pack is red",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/729",
-      "updatedAt": "2026-11-25T10:26:59Z",
+      "updatedAt": "2026-11-25T10:58:30Z",
       "labels": [
         {
           "name": "unit",
@@ -39,7 +64,7 @@
       "title": "rework: strict conformance \u2014 the published closure records, the T19F deferral and a green strict publish",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/726",
-      "updatedAt": "2026-11-25T10:33:12Z",
+      "updatedAt": "2026-11-25T11:15:03Z",
       "labels": [
         {
           "name": "unit",
