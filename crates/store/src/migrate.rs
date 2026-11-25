@@ -335,9 +335,12 @@ mod tests {
                 // S21 step 10 (#656): the authored option set and the policy's fire_when
                 // (0071_ladder_option_sets.sql, SPEC_V2 §7.2, §7.3).
                 (71, "ladder option sets".to_owned()),
+                // #557: the per-tool verification declaration (0072_tool_meta.sql, SPEC_V2 §11.3).
+                (72, "tool meta".to_owned()),
+                (73, "meeting bindings".to_owned()),
                 // S21 step 11 (#697): the release knowledge layers the compiler resolves
-                // (0072_organisation_layers.sql, SPEC_V2 §4.1).
-                (72, "organisation layers".to_owned())
+                // (0074_organisation_layers.sql, SPEC_V2 §4.1).
+                (74, "organisation layers".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

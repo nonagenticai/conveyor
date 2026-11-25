@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F delivery contract — the Board's decision · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/delivery-contract-board-decision.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f-delivery-contract--the-boards-decision">T19F delivery contract — the Board's decision</h1>
+<p>Action <code>architecture.board_decide</code> by the Architecture Board on contract 01a210bd-f408-778a-b67e-9b6cf36ca62a, citing the standing delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3.</p>
+<pre><code>== write: architecture.board_decide ==
+{
+  &quot;approval_id&quot;: &quot;01a210be-08ae-77ff-8656-fd9da2828264&quot;
+}
+== read-back: architecture.board_get ==
+{
+  &quot;charter&quot;: &quot;The board governs the conveyor programme&#39;s architecture. It adopts the principles catalogue and the tailored ADM profile, approves architecture contracts, and accepts or rejects waivers. It cannot approve a gate it requested and cannot waive a deviation it owns. It meets at each tranche review and on a contract request. Quorum: the chair. Every decision is recorded with the evidence it was taken on.&quot;,
+  &quot;commissioning_authority&quot;: &quot;The programme owner (the sponsor and decision-maker; P0&#39;s governance row)&quot;,
+  &quot;decision_limits&quot;: {
+    &quot;approves&quot;: [
+      &quot;principles_catalog&quot;,
+      &quot;adm_profile&quot;,
+      &quot;architecture_contract&quot;,
+      &quot;architecture_waiver&quot;
+    ],
+    &quot;cannot&quot;: [
+      &quot;approve a gate it requested&quot;,
+      &quot;waive a deviation it owns&quot;
+    ],
+    &quot;quorum&quot;: &quot;the chair&quot;
+  },
+  &quot;id&quot;: &quot;01a1f2c0-b22a-7e27-a6cc-1a8e48db327e&quot;,
+  &quot;key&quot;: &quot;conveyor-architecture-board&quot;,
+  &quot;kind&quot;: &quot;architecture_board&quot;,
+  &quot;meeting_type_key&quot;: null,
+  &quot;members&quot;: {
+    &quot;chair&quot;: &quot;programme owner&quot;,
+    &quot;note&quot;: &quot;positions, not persons; the programme architect position is held by the maintainer sessions under the owner&#39;s authority&quot;,
+    &quot;positions&quot;: [
+      &quot;programme architect&quot;,
+      &quot;domain architect&quot;,
+      &quot;delivery lead&quot;
+    ]
+  },
+  &quot;name&quot;: &quot;Conveyor Architecture Board&quot;,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;version&quot;: 2
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19f/gov/delivery-contract-board-decision.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

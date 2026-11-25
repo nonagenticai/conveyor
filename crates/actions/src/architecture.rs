@@ -75,6 +75,7 @@ fn arch_error(error: ArchitectureStoreError, action: &str) -> ActionError {
                 }
             }
         }
+        ArchitectureStoreError::Meeting(error) => crate::meetings::meeting_error(error, action),
     }
 }
 
@@ -1533,6 +1534,8 @@ pub struct GovernanceBodyOut {
     pub decision_limits: Value,
     /// Members.
     pub members: Value,
+    /// The forum type this body's sittings use; `null` falls back to the body key.
+    pub meeting_type_key: Option<String>,
     /// draft | active | retired.
     pub status: String,
     /// The If-Match version.
@@ -1549,6 +1552,7 @@ fn body_out(record: &GovernanceBodyRecord) -> GovernanceBodyOut {
         commissioning_authority: record.commissioning_authority.clone(),
         decision_limits: record.decision_limits.clone(),
         members: record.members.clone(),
+        meeting_type_key: record.meeting_type_key.clone(),
         status: record.status.clone(),
         version: record.version,
     }
@@ -1588,6 +1592,9 @@ pub struct BoardOpenIn {
     /// Members.
     #[serde(default = "empty_members")]
     pub members: Value,
+    /// The forum type the body's sittings use; the body's key when omitted.
+    #[serde(default)]
+    pub meeting_type_key: Option<String>,
 }
 
 #[crate::action(
@@ -1606,6 +1613,7 @@ async fn architecture_board_open(
     ctx: HandlerCtx,
     input: BoardOpenIn,
 ) -> Result<HandlerOutput<GovernanceBodyOut>, ActionError> {
+    let meeting_type_key = input.meeting_type_key.or_else(|| Some(input.key.clone()));
     let new = NewBody {
         kind: input.kind,
         key: input.key,
@@ -1614,6 +1622,7 @@ async fn architecture_board_open(
         commissioning_authority: input.commissioning_authority,
         decision_limits: input.decision_limits,
         members: input.members,
+        meeting_type_key,
     };
     let record = store::architecture::open_body_tx(&mut *tx, ctx.tenant, &new)
         .await
@@ -1804,6 +1813,140 @@ fn delegated_decider_kind(actor_kind: &str) -> String {
         _ => "human",
     }
     .to_owned()
+}
+
+/// A board sitting opened (or resumed) over one subject.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BoardSitOpenIn {
+    /// The governing body.
+    pub body_id: Uuid,
+    /// contract | artifact | adm_profile | waiver.
+    pub subject_kind: String,
+    /// The subject row.
+    pub subject_id: Uuid,
+    /// The lane the sitting card is placed in.
+    pub list_id: Uuid,
+    /// The evidence the subject is decided on, as an array.
+    #[serde(default)]
+    pub evidence: Value,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BoardSitOpenOut {
+    /// The sitting meeting.
+    pub meeting_id: String,
+    /// The pending approval its agenda item decides.
+    pub approval_id: String,
+}
+
+/// The decision a sitting item resolved to.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BoardSitDecideIn {
+    /// The governing body.
+    pub body_id: Uuid,
+    /// The sitting.
+    pub meeting_id: Uuid,
+    /// The item to close.
+    pub agenda_item_id: Uuid,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BoardSitDecideOut {
+    /// The sitting.
+    pub meeting_id: String,
+    /// The closed item.
+    pub agenda_item_id: String,
+    /// The approval the item decided.
+    pub approval_id: String,
+    /// The approval's derived status.
+    pub approval_status: Option<String>,
+    /// The decision rows written, one per qualifying seat.
+    pub decisions_written: usize,
+    /// The positions that counted after the rule and the conflict exclusion.
+    pub counted_positions: usize,
+    /// The attendance quorum the type required.
+    pub quorum: usize,
+}
+
+/// `architecture.board_sit_open` — the body sits over a subject: a pending approval, a live
+/// meeting with the body's standing type, and the approval as its deciding item.
+#[crate::action(
+    name = "architecture.board_sit_open",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_board_sit_open(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BoardSitOpenIn,
+) -> Result<HandlerOutput<BoardSitOpenOut>, ActionError> {
+    let evidence = if input.evidence.is_null() {
+        json!([])
+    } else {
+        input.evidence
+    };
+    let sitting = store::architecture::open_board_sitting_tx(
+        &mut *tx,
+        ctx.tenant,
+        store::meetings::MeetingActor {
+            id: ctx.actor_id,
+            role: ctx.role.as_str(),
+        },
+        input.body_id,
+        &input.subject_kind,
+        input.subject_id,
+        input.list_id,
+        &evidence,
+    )
+    .await
+    .map_err(|error| arch_error(error, ctx.action))?;
+    Ok(HandlerOutput::created(BoardSitOpenOut {
+        meeting_id: sitting.meeting_id.to_string(),
+        approval_id: sitting.approval_id.to_string(),
+    }))
+}
+
+/// `architecture.board_sit_decide` — close the sitting's item through T19's arithmetic.
+#[crate::action(
+    name = "architecture.board_sit_decide",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_board_sit_decide(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BoardSitDecideIn,
+) -> Result<HandlerOutput<BoardSitDecideOut>, ActionError> {
+    let result = store::architecture::decide_board_sitting_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.body_id,
+        input.meeting_id,
+        input.agenda_item_id,
+    )
+    .await
+    .map_err(|error| arch_error(error, ctx.action))?;
+    Ok(HandlerOutput::ok(BoardSitDecideOut {
+        meeting_id: input.meeting_id.to_string(),
+        agenda_item_id: input.agenda_item_id.to_string(),
+        approval_id: result.item.resolved_id.to_string(),
+        approval_status: result.approval_status,
+        decisions_written: result.decisions_written,
+        counted_positions: result.counted_positions,
+        quorum: result.quorum,
+    }))
 }
 
 /// One dimension or category score.

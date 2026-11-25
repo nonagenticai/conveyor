@@ -32,10 +32,10 @@ from an authored recipe.
 | `crates/actions/tests/agent_run_resolved.rs` | **16 passed** |
 | `crates/actions/tests/prompt_recipes.rs` | **10 passed** |
 | `crates/actions/tests/prompt_compile.rs` | **7 passed** |
-| `crates/actions/tests/registry.rs` | **12 passed** — 571 actions (552 internal, 19 external) |
+| `crates/actions/tests/registry.rs` | **12 passed** — 589 actions (565 internal, 24 external) |
 | `crates/actions/tests/parity_http_mcp.rs` | **7 passed** — both layer actions sampled over HTTP and MCP |
 | `clippy -D warnings` (domain, store, actions, api, server; all targets) / `fmt --check` | **exit 0** |
-| `served-spec.lock.json` | **602 operations**, `--check-lock` exit 0 |
+| `served-spec.lock.json` | **620 operations**, `--check-lock` exit 0 |
 | design-pack gate (coverage ×2, seed, docs, data, board dry-run) | **all pass** |
 | rework audit `--rework-check v1-p77-1`, `-2` | **each prints "is cleared"** |
 

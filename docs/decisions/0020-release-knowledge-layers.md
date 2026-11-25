@@ -5,7 +5,7 @@ implements SPEC_V2 §4.1, §4.2
 
 ## Decision
 
-1. **One table holds every layer.** Migration `0072` adds `organisation_layer`: `tenant_id`,
+1. **One table holds every layer.** Migration `0074` adds `organisation_layer`: `tenant_id`,
    `level ∈ base | industry | department_archetype | department | job`, exactly one scope column per
    level (`industry_id`, `department_id` or `job_id`, enforced by a CHECK), `kind`, `value` (jsonb),
    `required` (bool), `version`, timestamps, RLS enabled and forced. One live row per
@@ -76,7 +76,7 @@ validate a release." One table, one writer, one resolver.
 
 ## Consequences
 
-- Migration `0072` adds one table; no existing table changes shape.
+- Migration `0074` adds one table; no existing table changes shape.
 - Two actions join the registry (`569 → 571` at the issue's baseline measure); the served-spec lock
   moves by their operations; `jobs:read|write` are reused, so no new scope.
 - A publish after this unit carries a `layers` member in its snapshot, so a test asserting a

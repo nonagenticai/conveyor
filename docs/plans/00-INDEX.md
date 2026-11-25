@@ -1047,7 +1047,7 @@ no table. The compiler reads and writes nothing.
 and the nullable `decision_policy.fire_when`. No existing row changes shape; `decision_option`
 keeps its meaning (what this decision chose between) and is written from the authored set.
 
-**S21 step 11 (#697) ships migration `0072`.** It adds `organisation_layer` — one row per
+**S21 step 11 (#697) ships migration `0074`.** It adds `organisation_layer` — one row per
 `(tenant, level, scope, kind)` at base, industry, department archetype, department and job — which
 the release compile resolves in order. `department` and `job_release` do not change shape; a new
 publish carries a `layers` member in its existing snapshot and existing release rows are never

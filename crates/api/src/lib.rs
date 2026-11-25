@@ -425,11 +425,18 @@ mod tests {
         // #655 (T17b) adds one internal read (`authoring.intakes`): 564 -> 565.
         // S21 step 10 (#656) adds `ladder.case`, `decision_option_sets.get|set` and
         // `ladder.precheck`: 565 -> 569.
-        // S21 step 11 (#697) adds `organisation_layers.get|set` for the release knowledge
-        // layers: 569 -> 571.
+        // T14 (#561) adds five external reads (`webscraper.scrape_url|scrape_bulk`,
+        // `lean4.check|elaborate|prove`): 569 -> 574.
+        // #557 adds eight internal binding/catalogue actions
+        // (`tool_bindings.create|update|retire|list`, `tools.list|get`, `toolkits.list` and
+        // `tool_calls.list`): 574 -> 582; internal 550 -> 558, external stays 24.
+        // T19F (#683) adds five internal actions (`meetings.type_get|type_list`,
+        // `architecture.board_sit_open|board_sit_decide`, `cadences.materialise`):
+        // 582 -> 587; internal 558 -> 563, external stays 24.
+        // S21 step 11 (#697) adds `organisation_layers.list|set`: 587 -> 589.
         assert_eq!(
             registry.len(),
-            571,
+            589,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -463,7 +470,8 @@ mod tests {
              scientific_formal.translate|verify) (513) + T15's ten authoring/BYO actions \
              (toolkits.import_openapi|register_mcp|discover_mcp, \
              tool_authoring.draft|validate|test|review|publish|promote, tools.dispatch) — the \
-             registry total is 569 with the T6, T8, T12, #655 and S21-step-10 increments above
+             registry total is 587 with the T6, T8, T12, #655, S21-step-10, #561, #557 and #683 \
+             increments above
              it. \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."

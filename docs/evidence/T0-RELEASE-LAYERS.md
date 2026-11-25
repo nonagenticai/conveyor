@@ -1,7 +1,7 @@
 # T0 — the release compiles the knowledge layers: receipt
 
 Issue #697 · branch `issue/697-s21-execution-loop` · ADR `0020-release-knowledge-layers` ·
-CONTRACT §30 · S21 §23 P4 · migration `0072` · resolves rework `v1-w1a-2`
+CONTRACT §30 · S21 §23 P4 · migration `0074` · resolves rework `v1-w1a-2`
 
 **State: built.** Measured on 2026-11-24 at the code of `b7722710` (the suites at `54c51a63`),
 before the PR. The merge is the lane's last CI run; nothing here is claimed for `main` yet.
@@ -13,7 +13,7 @@ industry and the placement rows. No code read a knowledge layer, so an unresolve
 could not stop a publish and two sibling departments could disagree silently; neither
 `release_not_ready` nor `department_conflict` existed anywhere under `crates/`.
 
-After: migration `0072` adds `organisation_layer` (base, industry, department archetype, each
+After: migration `0074` adds `organisation_layer` (base, industry, department archetype, each
 department in declared `ordinal`, job). The publish resolves each kind in that order, tightens
 `required` downward only, refuses `422 department_conflict` for disagreeing siblings unless a
 job-layer row resolves it, and refuses `409 release_not_ready` naming the kind and department when a
@@ -27,10 +27,10 @@ the rows; no new scope.
 |---|---|
 | `crates/store/tests/organisation.rs` (five new layer tests) | **14 passed** |
 | `crates/actions/tests/parity_http_mcp.rs` | **7 passed** — `organisation_layers.set\|list` sampled over HTTP and MCP |
-| `crates/actions/tests/registry.rs` | **12 passed** — 571 actions (552 internal, 19 external) |
+| `crates/actions/tests/registry.rs` | **12 passed** — 589 actions (565 internal, 24 external) |
 | `clippy -D warnings` (store, actions; all targets) / `fmt --check` | **exit 0** |
-| `crates/store/src/migrate.rs` — the embedded set | **asserts 72**; the `organisation` fixture applied `0072` |
-| `served-spec.lock.json` | **602 operations**, `--check-lock` exit 0 |
+| `crates/store/src/migrate.rs` — the embedded set | **asserts 74**; the `organisation` fixture applied `0074` |
+| `served-spec.lock.json` | **620 operations**, `--check-lock` exit 0 |
 | rework audit `--rework-check v1-w1a-2` | **prints "is cleared"** |
 
 ## Scenarios

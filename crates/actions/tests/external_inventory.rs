@@ -75,6 +75,16 @@ const DESTINATIONS: &[Destination] = &[
         runtime: "Rust",
         evidence: "apps/scientific (Rust, absorbed by #105); deployment at zero replicas — 2026-11-22",
     },
+    Destination {
+        service: "webscraper",
+        runtime: "Rust",
+        evidence: "apps/research (Rust, `conveyor-research`); public /api/scrape/* — 2026-11-24",
+    },
+    Destination {
+        service: "lean4",
+        runtime: "Rust",
+        evidence: "apps/lean4-prover (Rust); licence-gated /api/* behind a sealed bearer — 2026-11-24",
+    },
 ];
 
 fn external_services(registry: &Registry) -> BTreeSet<&'static str> {

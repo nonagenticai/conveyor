@@ -132,7 +132,16 @@ use serde_json::{Value, json};
 /// `authoring.intakes` → **565**. **S21 step 10 (#656) adds 4**: `ladder.case` and
 /// `decision_option_sets.get|set` (internal) and `ladder.precheck` (external) — 565 → **569**,
 /// internal 547 → 550, external 18 → 19.
-const EXPECTED: [&str; 571] = [
+/// **T14 (#561) adds 5 external reads**: `webscraper.scrape_url|scrape_bulk` and
+/// `lean4.check|elaborate|prove` — 569 → **574**, external 19 → 24.
+/// **#557 adds 8 internal**: `tool_bindings.create|update|retire|list`, `tools.list|get`,
+/// `toolkits.list` and `tool_calls.list` — 574 → **582**, internal 550 → 558, external
+/// stays 24.
+/// **T19F (#683) adds 5 internal**: `meetings.type_get|type_list`,
+/// `architecture.board_sit_open|board_sit_decide`, `cadences.materialise` — 582 → **587**.
+/// **S21 step 11 (#697) adds 2 internal**: `organisation_layers.list|set` — 587 → **589**,
+/// internal 563 → 565, external stays 24.
+const EXPECTED: [&str; 589] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -162,6 +171,8 @@ const EXPECTED: [&str; 571] = [
     "architecture.board_get",
     "architecture.board_list",
     "architecture.board_open",
+    "architecture.board_sit_decide",
+    "architecture.board_sit_open",
     "architecture.contracts_approve",
     "architecture.contracts_get",
     "architecture.contracts_list",
@@ -215,6 +226,7 @@ const EXPECTED: [&str; 571] = [
     "cadences.create",
     "cadences.delete",
     "cadences.list",
+    "cadences.materialise",
     "cadences.update",
     "capabilities.bind_knowledge",
     "capabilities.get",
@@ -401,6 +413,10 @@ const EXPECTED: [&str; 571] = [
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
+    // T14 (#561): the Lean prover's three read actions.
+    "lean4.check",
+    "lean4.elaborate",
+    "lean4.prove",
     // T8 (#79): the organisational-memory lifecycle — propose with independent evidence,
     // a person's review, and promotion to a governed-asset source draft.
     "lessons.promote",
@@ -440,6 +456,8 @@ const EXPECTED: [&str; 571] = [
     "meetings.position",
     "meetings.respond",
     "meetings.schedule",
+    "meetings.type_get",
+    "meetings.type_list",
     "memory.recall",
     "memory.remember",
     "metrics.flow",
@@ -656,12 +674,20 @@ const EXPECTED: [&str; 571] = [
     "tool_authoring.review",
     "tool_authoring.test",
     "tool_authoring.validate",
+    "tool_bindings.create",
+    "tool_bindings.list",
+    "tool_bindings.retire",
+    "tool_bindings.update",
+    "tool_calls.list",
     "toolkits.discover_mcp",
     "toolkits.import_openapi",
+    "toolkits.list",
     "toolkits.publish",
     "toolkits.register_mcp",
     "tools.call",
     "tools.dispatch",
+    "tools.get",
+    "tools.list",
     "tools.probe",
     "tools.usage",
     "trace_links.create",
@@ -690,6 +716,9 @@ const EXPECTED: [&str; 571] = [
     "webhooks.delete",
     "webhooks.test",
     "webhooks.update",
+    // T14 (#561): the webscraper's two read actions.
+    "webscraper.scrape_bulk",
+    "webscraper.scrape_url",
     "workers.list",
     "workflows.create",
     "workflows.get",
@@ -821,9 +850,18 @@ fn the_registry_is_exactly_the_declared_set() {
     // external stays 18 — the queue reads this tenant's own intake rows.
     // S21 step 10 (#656) adds three internal actions (`ladder.case`, `decision_option_sets.get|set`)
     // and one external (`ladder.precheck`): internal 547 -> 550, external 18 -> 19.
-    // S21 step 11 (#697) adds two internal actions (`organisation_layers.get|set`): internal
-    // 550 -> 552; external stays 19 — both read and write this tenant's own layer rows.
-    assert_eq!((internal, external), (552, 19));
+    // T14 (#561) adds five external reads (`webscraper.scrape_url|scrape_bulk`,
+    // `lean4.check|elaborate|prove`): internal stays 550, external 19 -> 24 — each call
+    // dispatches to a Rust service, not a new internal action.
+    // #557 adds eight internal actions (`tool_bindings.create|update|retire|list`,
+    // `tools.list|get`, `toolkits.list`, `tool_calls.list`): internal 550 -> 558;
+    // external stays 24.
+    // T19F (#683) adds five internal actions (`meetings.type_get|type_list`,
+    // `architecture.board_sit_open|board_sit_decide`, `cadences.materialise`):
+    // internal 558 -> 563; external stays 24.
+    // S21 step 11 (#697) adds two internal actions (`organisation_layers.list|set`):
+    // internal 563 -> 565; external stays 24 — both read and write this tenant's own layer rows.
+    assert_eq!((internal, external), (565, 24));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

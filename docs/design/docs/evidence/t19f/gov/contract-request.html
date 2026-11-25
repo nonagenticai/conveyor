@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Statement of Architecture Work — T19F forum bindings (2026-11-25) · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/contract-request.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="statement-of-architecture-work--t19f-forum-bindings-2026-11-25">Statement of Architecture Work — T19F forum bindings (2026-11-25)</h1>
+<p>Action <code>architecture.contracts_request</code> for project T19F, kind statement_of_architecture_work, phase a. Requested by the operator's default tenant actor; approved by a distinct seat.</p>
+<pre><code>== write: architecture.contracts_request ==
+{
+  &quot;approval_id&quot;: null,
+  &quot;approved_at&quot;: null,
+  &quot;approved_by&quot;: null,
+  &quot;body&quot;: {
+    &quot;acceptance_criteria&quot;: &quot;The T19F plan&#39;s P1\u2013P5 scenarios, the live gate recorded in docs/plans/T19F/evidence.md, and the closure review in docs/plans/T19F/closure-review.md that defers project closure to the tranche-6 review.&quot;,
+    &quot;assignment&quot;: &quot;Build T19F \u2014 the forum bindings \u2014 to the plan&#39;s P1\u2013P5: a meeting_type version is written only by the reviewed authoring route, a board subject is decided in a sitting with via=&#39;meeting&#39; rows, and a cadence row materialises its own meeting exactly once.&quot;,
+    &quot;delegation_ref&quot;: &quot;01a1fb9f-ac2d-732d-b274-1079be3dd2b3&quot;,
+    &quot;responsibilities&quot;: &quot;The programme architect owns the artefact set; the Architecture Board reviews and approves; the programme manager owns B7&#39;s measurement; the SRO accepts the tranche-6 evidence.&quot;,
+    &quot;scope&quot;: &quot;Migration 0073; the authoring publish hook and meetings.type_list/type_get; architecture.board_sit_open/board_sit_decide; cadences.materialise; the mock-UI and real-app surfaces; the programme record and its evidence.&quot;
+  },
+  &quot;id&quot;: &quot;01a210bd-ba25-78c1-a363-3eea5aa71335&quot;,
+  &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+  &quot;phase_code&quot;: &quot;a&quot;,
+  &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+  &quot;requested_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;requester_unknown&quot;: false,
+  &quot;status&quot;: &quot;draft&quot;,
+  &quot;superseded_by_id&quot;: null,
+  &quot;supersedes_id&quot;: null,
+  &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T19F forum bindings (2026-11-25)&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: architecture.contracts_get ==
+{
+  &quot;approval_id&quot;: null,
+  &quot;approved_at&quot;: null,
+  &quot;approved_by&quot;: null,
+  &quot;body&quot;: {
+    &quot;acceptance_criteria&quot;: &quot;The T19F plan&#39;s P1\u2013P5 scenarios, the live gate recorded in docs/plans/T19F/evidence.md, and the closure review in docs/plans/T19F/closure-review.md that defers project closure to the tranche-6 review.&quot;,
+    &quot;assignment&quot;: &quot;Build T19F \u2014 the forum bindings \u2014 to the plan&#39;s P1\u2013P5: a meeting_type version is written only by the reviewed authoring route, a board subject is decided in a sitting with via=&#39;meeting&#39; rows, and a cadence row materialises its own meeting exactly once.&quot;,
+    &quot;delegation_ref&quot;: &quot;01a1fb9f-ac2d-732d-b274-1079be3dd2b3&quot;,
+    &quot;responsibilities&quot;: &quot;The programme architect owns the artefact set; the Architecture Board reviews and approves; the programme manager owns B7&#39;s measurement; the SRO accepts the tranche-6 evidence.&quot;,
+    &quot;scope&quot;: &quot;Migration 0073; the authoring publish hook and meetings.type_list/type_get; architecture.board_sit_open/board_sit_decide; cadences.materialise; the mock-UI and real-app surfaces; the programme record and its evidence.&quot;
+  },
+  &quot;id&quot;: &quot;01a210bd-ba25-78c1-a363-3eea5aa71335&quot;,
+  &quot;kind&quot;: &quot;statement_of_architecture_work&quot;,
+  &quot;phase_code&quot;: &quot;a&quot;,
+  &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+  &quot;requested_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;requester_unknown&quot;: false,
+  &quot;status&quot;: &quot;draft&quot;,
+  &quot;superseded_by_id&quot;: null,
+  &quot;supersedes_id&quot;: null,
+  &quot;title&quot;: &quot;Statement of Architecture Work \u2014 T19F forum bindings (2026-11-25)&quot;,
+  &quot;version&quot;: 1
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19f/gov/contract-request.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

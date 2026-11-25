@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import os
 import subprocess
 import sys
@@ -261,8 +262,36 @@ def select(
 # ── the action engine ───────────────────────────────────────────────────────────────
 
 
+LOGGER = logging.getLogger("materialise-rework")
+
+
 class ActionError(RuntimeError):
     pass
+
+
+def response_document(stdout: str) -> dict[str, Any]:
+    """Return the first JSON object in the CLI's stdout, ignoring any log lines around it.
+
+    The CLI writes a log line to stdout as well as its response; on conveyor#545 a WARN line
+    after the document made `json.loads` raise "Extra data", so a committed create was recorded
+    as failed and the retry duplicated cards. The response is the first complete JSON object;
+    text before or after it is log output and is reported at debug level only.
+    """
+    decoder = json.JSONDecoder()
+    for index, character in enumerate(stdout):
+        if character != "{":
+            continue
+        try:
+            document, end = decoder.raw_decode(stdout, index)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(document, dict):
+            continue
+        remainder = (stdout[:index] + stdout[end:]).strip()
+        if remainder:
+            LOGGER.debug("ignoring text around the CLI's JSON document: %r", remainder)
+        return document
+    raise ValueError("no JSON object in the CLI's stdout")
 
 
 def invoke(
@@ -301,8 +330,8 @@ def invoke(
     if completed.returncode != 0:
         raise ActionError(f"{name}: {completed.stderr.strip() or completed.stdout.strip()}")
     try:
-        document = json.loads(completed.stdout)
-    except json.JSONDecodeError as error:
+        document = response_document(completed.stdout)
+    except ValueError as error:
         raise ActionError(f"{name}: the CLI did not return JSON ({error})") from error
     return document.get("output", document)
 
@@ -619,6 +648,57 @@ def self_test() -> None:
         ]
         if suppressed:
             raise SystemExit("self-test: a suppressed package entered the plan")
+
+        # The transport parses the FIRST JSON object and ignores log lines around it: on
+        # conveyor#545 a trailing WARN line on stdout marked a committed create as failed.
+        def fake_cli(name: str, body: str) -> str:
+            path = Path(temporary) / name
+            path.write_text("#!/bin/sh\n" + body, encoding="utf-8")
+            path.chmod(0o755)
+            return str(path)
+
+        trailing = fake_cli(
+            "cli-json-then-log",
+            "printf '%s\\n' '{\"output\": {\"id\": \"card-json-first\"}}'\n"
+            "printf '%s\\n' 'WARN conveyor: a log line after the document'\n"
+            "exit 0\n",
+        )
+        result = invoke(trailing, "test", "postgres://unused", "cards.create", {}, None)
+        if result != {"id": "card-json-first"}:
+            raise SystemExit(f"self-test: a trailing log line broke the transport: {result!r}")
+
+        leading = fake_cli(
+            "cli-log-then-json",
+            "printf '%s\\n' 'WARN conveyor: a log line before the document'\n"
+            "printf '%s\\n' '{\"output\": {\"id\": \"card-log-first\"}}'\n"
+            "exit 0\n",
+        )
+        result = invoke(leading, "test", "postgres://unused", "cards.create", {}, None)
+        if result != {"id": "card-log-first"}:
+            raise SystemExit(f"self-test: a leading log line hid the document: {result!r}")
+
+        refused = fake_cli(
+            "cli-refused",
+            "printf '%s\\n' '{\"output\": {\"id\": \"never\"}}'\n"
+            "printf '%s\\n' 'the tenant is locked' >&2\n"
+            "exit 3\n",
+        )
+        try:
+            invoke(refused, "test", "postgres://unused", "cards.create", {}, None)
+        except ActionError as error:
+            if "the tenant is locked" not in str(error):
+                raise SystemExit(f"self-test: the refusal lost its stderr: {error}")
+        else:
+            raise SystemExit("self-test: a non-zero exit was not refused")
+
+        silent = fake_cli("cli-no-json", "printf '%s\\n' 'INFO no document here'\nexit 0\n")
+        try:
+            invoke(silent, "test", "postgres://unused", "cards.create", {}, None)
+        except ActionError as error:
+            if "did not return JSON" not in str(error):
+                raise SystemExit(f"self-test: the no-JSON error changed: {error}")
+        else:
+            raise SystemExit("self-test: a stdout with no JSON object was accepted")
     print("materialise-rework: self-test OK")
 
 

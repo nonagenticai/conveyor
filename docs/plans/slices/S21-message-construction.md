@@ -837,7 +837,7 @@ call's `prompt_sha256` is asserted 64-hex.
 already exists; the test proves it is reachable from an authored recipe and that no model call is
 made when the ceiling is exceeded.
 
-**P4 — the release compiles its knowledge layers.** Migration `0072` adds one `organisation_layer`
+**P4 — the release compiles its knowledge layers.** Migration `0074` adds one `organisation_layer`
 table: base, industry, department archetype, each department in declared order, job. `required`
 tightens downward only; two sibling departments disagreeing on a kind is `422 department_conflict`
 unless a job-layer row resolves it; a required kind with no leaf is `409 release_not_ready` naming

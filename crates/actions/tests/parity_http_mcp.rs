@@ -1976,6 +1976,7 @@ async fn seed_arch_board(pg: &support::Pg, ctx: &Ctx) -> Uuid {
                 commissioning_authority: "parity programme".to_owned(),
                 decision_limits: json!({}),
                 members: json!([]),
+                meeting_type_key: None,
             },
         )
         .await
@@ -5187,6 +5188,13 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("scientific_stats.trend", json!({}), None),
         plain("scientific_formal.translate", json!({}), None),
         plain("scientific_formal.verify", json!({}), None),
+        // T14 (#561): the webscraper and Lean reads. An empty body is refused by each closed
+        // input schema on both transports (422 / `isError`), so no call leaves the process.
+        plain("webscraper.scrape_url", json!({}), None),
+        plain("webscraper.scrape_bulk", json!({}), None),
+        plain("lean4.check", json!({}), None),
+        plain("lean4.elaborate", json!({}), None),
+        plain("lean4.prove", json!({}), None),
         // S10: the copilot's model call. The stub's catch-all answers the router's path, so the two
         // transports receive the same document — this proves the declaration, not a model.
         plain(
@@ -6535,6 +6543,47 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         expecting(plain("toolkits.publish", json!({}), None), 200),
         expecting(plain("tools.probe", json!({"dry_run": true}), None), 200),
         expecting(plain("tools.usage", json!({"window_days": 30}), None), 200),
+        // ── T13/T14 (#557): the bindings and the catalogue reads ──────────────────────────
+        // The reads answer an empty page; the by-id and by-name refusals are the typed 404.
+        expecting(plain("tools.list", json!({}), None), 200),
+        expecting(plain("toolkits.list", json!({}), None), 200),
+        expecting(plain("tool_calls.list", json!({}), None), 200),
+        expecting(plain("tool_bindings.list", json!({}), None), 200),
+        expecting(
+            plain(
+                "tools.get",
+                json!({"toolkit": "missing", "tool": "missing"}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "tool_bindings.create",
+                json!({
+                    "toolkit_id": "018f3f7c-0000-7000-8000-0000000000f1",
+                    "run_id": "018f3f7c-0000-7000-8000-0000000000ff"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "tool_bindings.update",
+                json!({"id": "018f3f7c-0000-7000-8000-0000000000f2"}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "tool_bindings.retire",
+                json!({"id": "018f3f7c-0000-7000-8000-0000000000f3"}),
+                None,
+            ),
+            404,
+        ),
         // ── T15 (#86): tool authoring and BYO ──────────────────────────────────────────────
         // The import and the manual draft are closed read operations against a destination
         // that is registered but never called here; both are writes whose rows are unique per
@@ -6788,6 +6837,33 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             });
             expecting(sample, 201)
         },
+        // T19F: an unknown body is the deterministic refusal on both transports; the sitting's
+        // lifecycle is exercised by the meetings_binding suite.
+        expecting(
+            plain(
+                "architecture.board_sit_open",
+                json!({
+                    "body_id": uuid::Uuid::nil(),
+                    "subject_kind": "contract",
+                    "subject_id": uuid::Uuid::nil(),
+                    "list_id": uuid::Uuid::nil(),
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "architecture.board_sit_decide",
+                json!({
+                    "body_id": uuid::Uuid::nil(),
+                    "meeting_id": uuid::Uuid::nil(),
+                    "agenda_item_id": uuid::Uuid::nil(),
+                }),
+                None,
+            ),
+            404,
+        ),
         {
             let mut sample = plain("architecture.contracts_request", json!({}), None);
             sample.prepare = true;
@@ -6907,6 +6983,11 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         // the aggregate's lifecycle. `schedule` refuses before the list lookup because the type
         // has no policy to create.
         expecting(plain("meetings.list", json!({"limit": 5}), None), 200),
+        expecting(plain("meetings.type_list", json!({}), None), 200),
+        expecting(
+            plain("meetings.type_get", json!({"id": uuid::Uuid::nil()}), None),
+            404,
+        ),
         expecting(
             plain(
                 "meetings.get",
@@ -7740,6 +7821,14 @@ fn spine_samples() -> Vec<Sample> {
             sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("cadences.list")}));
             expecting(sample, 200)
         },
+        expecting(
+            plain(
+                "cadences.materialise",
+                json!({"id": uuid::Uuid::nil(), "list_id": uuid::Uuid::nil()}),
+                None,
+            ),
+            404,
+        ),
         {
             let mut sample = plain("stakeholders.profile_create", json!({}), None);
             sample.prepare = true;

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F live gate — the chair's position · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/14-sitting-position.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f-live-gate--the-chairs-position">T19F live gate — the chair's position</h1>
+<p>Action <code>meetings.position</code> on item 01a210c8-97c5-7850-8270-16b37a07d8ce, stance <code>approve</code>, surface <code>web</code>.</p>
+<pre><code>== write: meetings.position ==
+{
+  &quot;agenda_item_id&quot;: &quot;01a210c8-97c5-7850-8270-16b37a07d8ce&quot;,
+  &quot;commitment&quot;: null,
+  &quot;conditions&quot;: [],
+  &quot;id&quot;: &quot;01a210c8-e169-7f7d-8155-0323c8dc20fd&quot;,
+  &quot;meeting_id&quot;: &quot;01a210c8-94ee-73ba-9147-88f2b4729ae0&quot;,
+  &quot;participant_id&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+  &quot;participant_kind&quot;: &quot;app_user&quot;,
+  &quot;rationale&quot;: &quot;&quot;,
+  &quot;recorded_at&quot;: &quot;2026-11-25T03:38:49.615372Z&quot;,
+  &quot;stance&quot;: &quot;approve&quot;,
+  &quot;surface&quot;: &quot;web&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: meetings.get ==
+{
+  &quot;agenda&quot;: [
+    {
+      &quot;closed_at&quot;: null,
+      &quot;defer_reason&quot;: null,
+      &quot;evidence_refs&quot;: [
+        {
+          &quot;kind&quot;: &quot;document&quot;,
+          &quot;ref&quot;: &quot;docs/plans/T19F/architecture-design.md&quot;
+        }
+      ],
+      &quot;id&quot;: &quot;01a210c8-97c5-7850-8270-16b37a07d8ce&quot;,
+      &quot;meeting_id&quot;: &quot;01a210c8-94ee-73ba-9147-88f2b4729ae0&quot;,
+      &quot;outcome&quot;: null,
+      &quot;outcome_ref&quot;: null,
+      &quot;participating_departments&quot;: [],
+      &quot;resolved_id&quot;: &quot;01a210c8-9273-7964-9b97-0f3dd810bcf3&quot;,
+      &quot;resolved_kind&quot;: &quot;approval&quot;,
+      &quot;sequence&quot;: 1,
+      &quot;version&quot;: 1
+    }
+  ],
+  &quot;attendance&quot;: [
+    {
+      &quot;delegated_from&quot;: null,
+      &quot;department_id&quot;: null,
+      &quot;id&quot;: &quot;01a210c8-abed-7041-bc49-fd6654c430fe&quot;,
+      &quot;invitation_state&quot;: &quot;accepted&quot;,
+      &quot;meeting_id&quot;: &quot;01a210c8-94ee-73ba-9147-88f2b4729ae0&quot;,
+      &quot;participant_id&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;participant_kind&quot;: &quot;app_user&quot;,
+      &quot;response_state&quot;: &quot;accepted&quot;,
+      &quot;seat&quot;: &quot;chair&quot;,
+      &quot;version&quot;: 2
+    }
+  ],
+  &quot;instruments&quot;: {
+    &quot;action_closure&quot;: 0.0,
+    &quot;agenda_conversion&quot;: 0.0,
+    &quot;commitment_slippage&quot;: 0,
+    &quot;decision_latency_seconds&quot;: null,
+    &quot;decisions&quot;: 0,
+    &quot;decisions_per_meeting&quot;: 0.0,
+    &quot;items&quot;: 1,
+    &quot;open_items&quot;: 1,
+    &quot;participant_hours&quot;: 0.0,
+    &quot;person_hours_per_decision&quot;: 0.0,
+    &quot;quorum_miss_rate&quot;: 0.0
+  },
+  &quot;meeting&quot;: {
+    &quot;cadence_slot&quot;: null,
+    &quot;card_id&quot;: &quot;01a210c8-94b3-7ff9-abc1-0016f67329f0&quot;,
+    &quot;card_name&quot;: &quot;T19F live-gate board sitting&quot;,
+    &quot;closed_at&quot;: null,
+    &quot;convener_id&quot;: &quot;01a210c8-579b-7808-bc32-aef8899b0b7a&quot;,
+    &quot;convener_kind&quot;: &quot;governance_body&quot;,
+    &quot;decision_rule&quot;: &quot;chair&quot;,
+    &quot;decision_window_end&quot;: &quot;2026-12-02T03:38:29.527298Z&quot;,
+    &quot;id&quot;: &quot;01a210c8-94ee-73ba-9147-88f2b4729ae0&quot;,
+    &quot;meeting_type&quot;: &quot;t19f_live_gate_forum&quot;,
+    &quot;meeting_type_name&quot;: &quot;T19F live-gate forum v1&quot;,
+    &quot;meeting_type_version&quot;: 1,
+    &quot;opens_at&quot;: &quot;2026-11-25T03:38:29.527298Z&quot;,
+    &quot;retirement_candidate&quot;: false,
+    &quot;status&quot;: &quot;live&quot;,
+    &quot;version&quot;: 2
+  },
+  &quot;meeting_type&quot;: {
+    &quot;agenda_sources&quot;: [],
+    &quot;allowed_outcomes&quot;: [
+      &quot;decision&quot;,
+      &quot;commitment&quot;,
+      &quot;action&quot;,
+      &quot;information&quot;,
+      &quot;deferred&quot;
+    ],
+    &quot;convener_authority&quot;: {},
+    &quot;decision_rule&quot;: &quot;chair&quot;,
+    &quot;decision_window_seconds&quot;: 604800,
+    &quot;evidence_minimum&quot;: 0,
+    &quot;id&quot;: &quot;01a210c2-a0f2-77d6-b5cd-f90e4d257131&quot;,
+    &quot;key&quot;: &quot;t19f_live_gate_forum&quot;,
+    &quot;name&quot;: &quot;T19F live-gate forum v1&quot;,
+    &quot;purpose&quot;: &quot;&quot;,
+    &quot;quorum&quot;: 1,
+    &quot;required_participation&quot;: [],
+    &quot;status&quot;: &quot;active&quot;,
+    &quot;timebox_seconds&quot;: 3600,
+    &quot;version&quot;: 1
+  },
+  &quot;positions&quot;: [
+    {
+      &quot;agenda_item_id&quot;: &quot;01a210c8-97c5-7850-8270-16b37a07d8ce&quot;,
+      &quot;commitment&quot;: null,
+      &quot;conditions&quot;: [],
+      &quot;id&quot;: &quot;01a210c8-e169-7f7d-8155-0323c8dc20fd&quot;,
+      &quot;meeting_id&quot;: &quot;01a210c8-94ee-73ba-9147-88f2b4729ae0&quot;,
+      &quot;participant_id&quot;: &quot;01a1e8a7-8b23-76a9-9114-aafb95f7a545&quot;,
+      &quot;participant_kind&quot;: &quot;app_user&quot;,
+      &quot;rationale&quot;: &quot;&quot;,
+      &quot;recorded_at&quot;: &quot;2026-11-25T03:38:49.615372Z&quot;,
+      &quot;stance&quot;: &quot;approve&quot;,
+      &quot;surface&quot;: &quot;web&quot;,
+      &quot;version&quot;: 1
+    }
+  ]
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19f/gate/14-sitting-position.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

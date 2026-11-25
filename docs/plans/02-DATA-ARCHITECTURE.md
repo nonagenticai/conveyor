@@ -1524,7 +1524,7 @@ Two existing columns become writable contracts; no row changes shape.
 executor records `apply_skipped: no_card` in the step judge and finishes succeeded. No document row
 is written.
 
-### 2.32 The release knowledge layers — S21 step 11 (migration `0072`)
+### 2.32 The release knowledge layers — S21 step 11 (migration `0074`)
 
 One table carries every layer SPEC_V2 §4.1 defines; nothing else changes shape.
 

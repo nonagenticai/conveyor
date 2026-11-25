@@ -1124,7 +1124,7 @@ would exceed the ceiling makes no model call.
 
 ## 30. The release knowledge layers (added 2026-11-24; S21 step 11, issue #697; implements SPEC_V2 §4.1, §4.2)
 
-**One table, five levels.** Migration `0072` adds `organisation_layer`: `level ∈ base | industry |
+**One table, five levels.** Migration `0074` adds `organisation_layer`: `level ∈ base | industry |
 department_archetype | department | job`, exactly one scope id per level (`industry_id`,
 `department_id` or `job_id`), `kind`, `value` (jsonb), `required`, `version`. One live row per
 `(tenant, level, scope, kind)`; a change is a version bump. `organisation_layers.set`
