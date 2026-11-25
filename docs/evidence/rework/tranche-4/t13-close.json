@@ -1,0 +1,45 @@
+{
+ "action": "projects.close",
+ "approval": {
+  "gate": "projects.close",
+  "id": "01a211c8-fc46-7db5-951b-dbe5ec92e0f5",
+  "status": "approved"
+ },
+ "cleared_gates": [
+  {
+   "cards": [
+    "01a1ffeb-311e-708e-a994-83eb40fd3a69 (archived, superseded)",
+    "01a20e94-a9b1-78e3-b9d3-5774904ef9b0 (moved to done)"
+   ],
+   "finding": "v1-w4a-1",
+   "resolved_by": {
+    "commit": "8f1e57706a3c1efea6092a3f7b7edd0facc594",
+    "test": "crates/actions/tests/tool_budget.rs"
+   }
+  },
+  {
+   "cards": [
+    "01a1ffeb-3da6-7093-a936-be6c79576976 (archived, superseded)",
+    "01a20e94-c4bb-78de-a8ea-b733228371b7 (moved to done)"
+   ],
+   "finding": "v1-w4a-2",
+   "resolved_by": {
+    "commit": "78bb25d5b018751c67dd298089ced9edf16c3db8",
+    "test": "crates/actions/tests/tool_platform.rs"
+   }
+  }
+ ],
+ "project": {
+  "id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+  "key": "T13"
+ },
+ "read_back": {
+  "action": "projects.get",
+  "matches": [
+   "id=01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+   "status=closed"
+  ]
+ },
+ "reason": "Rework complete through tr3; closure review published; open items named and not waived.",
+ "schema": "conveyor-record-act/v1"
+}
