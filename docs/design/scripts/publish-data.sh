@@ -38,9 +38,11 @@ trap 'rm -rf "$tmp"' EXIT
 mkdir -p "$tmp/data" "$tmp/docs" "$tmp/conformance"
 
 # 1. The issue registry is the only GitHub-derived input the snapshot needs. The programme seed
-#    is an IMAGE INPUT (`include_str!`), so it changes only in a repository PR and never during a
-#    publish. The plan seed is retired: execution state (boards, cards, runs) is never seeded, so
-#    there is no plan document to regenerate. Refresh the registry only.
+#    is an IMAGE INPUT (`include_str!`): it is committed in a repository PR, and step 3e
+#    regenerates it from the registry this publish fetches, so the tree a publish leaves is
+#    consistent without waiting for the next registry refresh. The plan seed is retired:
+#    execution state (boards, cards, runs) is never seeded, so there is no plan document to
+#    regenerate. Refresh the registry only.
 "$root/scripts/fetch-issues.sh" "$tmp/data/issues.json"
 
 # 2. The rows come from the live database, not from a fixture.
@@ -131,20 +133,39 @@ test -f "$tmp/docs/standards/index.html" || {
   exit 1
 }
 
-# 3e. Markdown -> standalone HTML. This writes the pack's document pages, so it runs only after
-#     the gate: a failed publish leaves both the data and the documents untouched.
-python3 "$pack/scripts/build-docs.py"
-
-# 4. Only now does the fresh pack replace the published one. The standards directory is replaced
-#    wholesale: a page for an artefact that no longer exists must not survive the publish.
-rsync -a --delete "$tmp/docs/standards/" "$pack/docs/standards/"
+# 3e. The derived data follows the bytes this publish installs. The order is load-bearing:
+#     - the snapshot data goes in first, `conformance.md` included;
+#     - the programme seed and the measured coverage are regenerated from the INSTALLED registry
+#       to their fixpoint — the same loop the registry refresh runs — so the tree the publish
+#       leaves is self-consistent (without this, a publish whose registry moved left
+#       `build-programme-seed --check` and `programme_state --check` red until the next refresh;
+#       measured on #545, repaired by hand there);
+#     - the Markdown pages are rendered from the installed tree, because `build-docs.py` hashes
+#       the SOURCE documents: rendering before the install left the committed index one publish
+#       behind (`conformance.md changed since the index was generated`, measured on #545);
+#     - `build-docs.py` replaces `docs/design/docs` wholesale, so the publish-time pages (the
+#       platform outputs and the standards pack) are restored from `$tmp` afterwards.
+#     The strict gate above has already passed; every step here is deterministic and re-runnable,
+#     and a failure stops the publish before anything is mirrored to the homepage.
 rsync -a "$tmp/data/" "$data/"
-rsync -a "$tmp/docs/" "$pack/docs/"
 # The canonical register is an evidence ledger as well as a published row: the committed-pack
 # publish (`publish-standards.sh`) compares its build against this copy.
 cp "$tmp/conformance/rework.json" "$root/docs/evidence/rework-register.json"
+for _ in 1 2 3; do
+  python3 "$root/scripts/build-programme-seed.py"
+  python3 "$root/scripts/build-coverage.py"
+  if python3 "$root/scripts/build-coverage.py" --check; then
+    break
+  fi
+done
+python3 "$root/scripts/build-coverage.py" --check
+python3 "$root/scripts/build-v2-coverage.py"
+python3 "$root/scripts/build-v2-coverage.py" --check
+python3 "$pack/scripts/build-docs.py"
+rsync -a --delete "$tmp/docs/standards/" "$pack/docs/standards/"
+rsync -a "$tmp/docs/" "$pack/docs/"
 
-# 5. Mirror the pack (including data/ and docs/) and let the homepage's own gate decide.
+# 4. Mirror the pack (including data/ and docs/) and let the homepage's own gate decide.
 # `issues.json` is an INPUT to the snapshot (the redacted registry is inside programme.json).
 # It is not mirrored: the published data is the snapshot, not the raw GitHub export.
 # `--delete` removes files that are no longer part of the pack (the retired v1 studies, stale
