@@ -272,7 +272,42 @@ window.CONVEYOR_OUTPUTS = null;
 
 def write_outputs_placeholder() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "outputs.js").write_text(OUTPUTS_PLACEHOLDER, encoding="utf-8")
+    path = OUT / "outputs.js"
+    # The published index is the live publish's object. This writer is called from the write path
+    # AND from `write_index`, so without this guard the second call clears a just-restored index.
+    if path.exists() and path.read_text(encoding="utf-8") != OUTPUTS_PLACEHOLDER:
+        return
+    path.write_text(OUTPUTS_PLACEHOLDER, encoding="utf-8")
+
+
+# The live publish (`publish-data.sh` §3e) and the pack publish (`publish-standards.sh`) install
+# these under OUT. This renderer replaces OUT wholesale, so it must carry them across or it deletes
+# another producer's output. Measured twice: #515/#516 restored the T16 pages by hand, and #723
+# left the null placeholder over the published index, which moved the conformance audit's gap
+# register and redded main's design-pack (run 45577495051).
+PUBLISHED_ENTRIES = ("outputs.js", "output-*.html", "standards")
+
+
+def snapshot_published() -> dict[str, bytes]:
+    saved: dict[str, bytes] = {}
+    if not OUT.exists():
+        return saved
+    for pattern in PUBLISHED_ENTRIES:
+        for path in sorted(OUT.glob(pattern)):
+            if path.is_file():
+                saved[path.name] = path.read_bytes()
+            elif path.is_dir():
+                for child in sorted(path.rglob("*")):
+                    if child.is_file():
+                        saved[str(child.relative_to(OUT))] = child.read_bytes()
+    return saved
+
+
+def restore_published(saved: dict[str, bytes]) -> None:
+    for rel, data in saved.items():
+        target = OUT / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
 
 
 def read_index() -> dict | None:
@@ -329,6 +364,7 @@ def main() -> int:
     if args.check:
         return check(sources, published)
 
+    saved = snapshot_published()
     if OUT.exists():
         shutil.rmtree(OUT)
     OUT.mkdir(parents=True, exist_ok=True)
@@ -339,6 +375,7 @@ def main() -> int:
             print("  " + error, file=sys.stderr)
         return 1
     write_outputs_placeholder()
+    restore_published(saved)
     if args.verify_render:
         snapshot = {
             path.relative_to(OUT): path.read_bytes()
@@ -352,6 +389,7 @@ def main() -> int:
             print("build-docs: unresolved links on re-render: " + "; ".join(errors), file=sys.stderr)
             return 1
         write_outputs_placeholder()
+        restore_published(saved)
         drift = [
             str(rel)
             for rel, data in snapshot.items()
