@@ -1,21 +1,26 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `7edea5b80ede2a245d297ef7931bd60090d3482b` generated `2026-11-24T10:10:00Z` from `docs/design/data`.
+Snapshot: `b51896a61b28cec6ca8e87d0fc9617fa43dafe7d` generated `2026-11-25T03:46:32.319854100+00:00` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.mnMK5M1bkK/data`.
 
 | Severity | Count |
 |---|---:|
-| P0 | 26 |
-| P1 | 142 |
-| P2 | 42 |
+| P0 | 34 |
+| P1 | 137 |
+| P2 | 37 |
 | P3 | 0 |
 
 ## P0 and P1
 
 | Rule | Subject | Severity | Detail |
 |---|---|---|---|
+| `closed_without_closure_review` | `T15` | P0 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `T16` | P0 | project is closed but its closure review is not published |
+| `closed_without_closure_review` | `T17` | P0 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `T3` | P0 | project is closed but its closure review is not published |
+| `closed_without_closure_review` | `T5` | P0 | project is closed but its closure review is not published |
+| `closed_without_closure_review` | `T6` | P0 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `T7` | P0 | project is closed but its closure review is not published |
+| `closed_without_closure_review` | `T8` | P0 | project is closed but its closure review is not published |
 | `compliance_review_missing` | `T4` | P0 | a non-conformant review has no active waiver |
 | `project_in_unauthorised_tranche` | `S05` | P0 | project is closed in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S06b` | P0 | project is closed in tranche 6 whose state is 'planned' |
@@ -30,14 +35,17 @@ Snapshot: `7edea5b80ede2a245d297ef7931bd60090d3482b` generated `2026-11-24T10:10
 | `project_in_unauthorised_tranche` | `S13` | P0 | project is closed in tranche 8 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S16` | P0 | project is closed in tranche 7 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S17` | P0 | project is closed in tranche 5 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `S18` | P0 | project is closed in tranche 9 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S20` | P0 | project is closed in tranche 9 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `S21` | P0 | project is closed in tranche 9 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T10` | P0 | project is closed in tranche 4 whose state is 'planned' |
+| `project_in_unauthorised_tranche` | `T15` | P0 | project is closed in tranche 12 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T16` | P0 | project is closed in tranche 4 whose state is 'planned' |
+| `project_in_unauthorised_tranche` | `T17` | P0 | project is closed in tranche 5 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T19` | P0 | project is closed in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T4` | P0 | project is closed in tranche 4 whose state is 'planned' |
+| `project_in_unauthorised_tranche` | `T5` | P0 | project is closed in tranche 10 whose state is 'planned' |
+| `project_in_unauthorised_tranche` | `T6` | P0 | project is closed in tranche 11 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T7` | P0 | project is closed in tranche 5 whose state is 'planned' |
+| `project_in_unauthorised_tranche` | `T8` | P0 | project is closed in tranche 11 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T9` | P0 | project is closed in tranche 4 whose state is 'planned' |
 | `benefit_baseline_placeholder` | `B1` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
 | `benefit_baseline_placeholder` | `B2` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
@@ -59,9 +67,7 @@ Snapshot: `7edea5b80ede2a245d297ef7931bd60090d3482b` generated `2026-11-24T10:10
 | `closed_without_closure_review` | `S13` | P1 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `S16` | P1 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `S17` | P1 | project is closed but its closure review is not published |
-| `closed_without_closure_review` | `S18` | P1 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `S20` | P1 | project is closed but its closure review is not published |
-| `closed_without_closure_review` | `S21` | P1 | project is closed but its closure review is not published |
 | `closure_outputs_undeclared` | `P0` | P1 | project is closed but declares no closure_outputs |
 | `closure_outputs_undeclared` | `S00` | P1 | project is closed but declares no closure_outputs |
 | `closure_outputs_undeclared` | `S01` | P1 | project is closed but declares no closure_outputs |
@@ -79,10 +85,7 @@ Snapshot: `7edea5b80ede2a245d297ef7931bd60090d3482b` generated `2026-11-24T10:10
 | `closure_outputs_undeclared` | `S13` | P1 | project is closed but declares no closure_outputs |
 | `closure_outputs_undeclared` | `S16` | P1 | project is closed but declares no closure_outputs |
 | `closure_outputs_undeclared` | `S17` | P1 | project is closed but declares no closure_outputs |
-| `closure_outputs_undeclared` | `S18` | P1 | project is closed but declares no closure_outputs |
 | `closure_outputs_undeclared` | `S20` | P1 | project is closed but declares no closure_outputs |
-| `closure_outputs_undeclared` | `S21` | P1 | project is closed but declares no closure_outputs |
-| `closure_outputs_undeclared` | `SPEC-V2` | P1 | project is closed but declares no closure_outputs |
 | `compliance_review_missing` | `T1` | P1 | closed delivery project has no Phase-G compliance review |
 | `compliance_review_missing` | `T10` | P1 | closed delivery project has no Phase-G compliance review |
 | `compliance_review_missing` | `T11` | P1 | closed delivery project has no Phase-G compliance review |
@@ -142,18 +145,13 @@ Snapshot: `7edea5b80ede2a245d297ef7931bd60090d3482b` generated `2026-11-24T10:10
 | `project_in_unauthorised_tranche` | `S06` | P1 | project is active in tranche 5 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S14` | P1 | project is active in tranche 11 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S15` | P1 | project is active in tranche 7 whose state is 'planned' |
+| `project_in_unauthorised_tranche` | `S18` | P1 | project is active in tranche 9 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S19` | P1 | project is active in tranche 8 whose state is 'planned' |
+| `project_in_unauthorised_tranche` | `S21` | P1 | project is active in tranche 9 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T12` | P1 | project is active in tranche 13 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T14` | P1 | project is active in tranche 4 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `T15` | P1 | project is active in tranche 12 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `T17` | P1 | project is active in tranche 5 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T18` | P1 | project is active in tranche 4 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `T5` | P1 | project is active in tranche 10 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `T6` | P1 | project is active in tranche 11 whose state is 'planned' |
-| `project_in_unauthorised_tranche` | `T8` | P1 | project is active in tranche 11 whose state is 'planned' |
-| `seed_live_drift` | `T5` | P1 | seed status 'closed' != live status 'active' |
-| `seed_live_drift` | `T6` | P1 | seed status 'closed' != live status 'active' |
-| `seed_live_drift` | `T8` | P1 | seed status 'closed' != live status 'active' |
+| `project_in_unauthorised_tranche` | `T19F` | P1 | project is active in tranche 6 whose state is 'planned' |
 | `unpublished_declared_output` | `S04` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S05` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S06` | P1 | declared outputs are not published: project-brief |
@@ -175,12 +173,17 @@ Snapshot: `7edea5b80ede2a245d297ef7931bd60090d3482b` generated `2026-11-24T10:10
 | `unpublished_declared_output` | `S19` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S20` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S21` | P1 | declared outputs are not published: project-brief |
+| `unpublished_declared_output` | `T12` | P1 | declared outputs are not published: evidence |
 | `unpublished_declared_output` | `T14` | P1 | declared outputs are not published: evidence, project-brief |
+| `unpublished_declared_output` | `T15` | P1 | declared outputs are not published: closure-review, evidence |
 | `unpublished_declared_output` | `T16` | P1 | declared outputs are not published: closure-review, evidence, project-brief |
+| `unpublished_declared_output` | `T17` | P1 | declared outputs are not published: closure-review, evidence |
 | `unpublished_declared_output` | `T18` | P1 | declared outputs are not published: architecture-design, inception-analysis, project-brief |
 | `unpublished_declared_output` | `T3` | P1 | declared outputs are not published: closure-review, evidence, project-brief |
+| `unpublished_declared_output` | `T5` | P1 | declared outputs are not published: closure-review, evidence |
+| `unpublished_declared_output` | `T6` | P1 | declared outputs are not published: closure-review, evidence |
 | `unpublished_declared_output` | `T7` | P1 | declared outputs are not published: closure-review, evidence, project-brief |
-| `unpublished_declared_output` | `T8` | P1 | declared outputs are not published: project-brief |
+| `unpublished_declared_output` | `T8` | P1 | declared outputs are not published: closure-review, project-brief |
 
 ## Projects
 
@@ -213,28 +216,29 @@ Snapshot: `7edea5b80ede2a245d297ef7931bd60090d3482b` generated `2026-11-24T10:10
 | S15 | active | 7 | 0 | 3 | 1 | 0 |
 | S16 | closed | 7 | 1 | 4 | 0 | 0 |
 | S17 | closed | 5 | 1 | 4 | 0 | 0 |
-| S18 | closed | 9 | 1 | 4 | 0 | 0 |
+| S18 | active | 9 | 0 | 3 | 1 | 0 |
 | S19 | active | 8 | 0 | 3 | 1 | 0 |
 | S20 | closed | 9 | 1 | 4 | 0 | 0 |
-| S21 | closed | 9 | 1 | 4 | 1 | 0 |
-| SPEC-V2 | closed | 0 | 0 | 1 | 0 | 0 |
+| S21 | active | 9 | 0 | 3 | 1 | 0 |
+| SPEC-V2 | active | 0 | 0 | 0 | 0 | 0 |
 | T0 | closed | 0 | 0 | 1 | 0 | 0 |
 | T1 | closed | 1 | 0 | 2 | 2 | 0 |
 | T10 | closed | 4 | 1 | 1 | 2 | 0 |
 | T11 | closed | 1 | 0 | 2 | 2 | 0 |
-| T12 | active | 13 | 0 | 3 | 2 | 0 |
+| T12 | active | 13 | 0 | 4 | 1 | 0 |
 | T13 | active | 3 | 0 | 0 | 2 | 0 |
 | T14 | active | 4 | 0 | 4 | 1 | 0 |
-| T15 | active | 12 | 0 | 3 | 1 | 0 |
+| T15 | closed | 12 | 2 | 3 | 0 | 0 |
 | T16 | closed | 4 | 2 | 3 | 0 | 0 |
-| T17 | active | 5 | 0 | 3 | 2 | 0 |
-| T18 | active | 4 | 0 | 4 | 2 | 0 |
-| T19 | closed | 4 | 1 | 0 | 3 | 0 |
+| T17 | closed | 5 | 2 | 3 | 0 | 0 |
+| T18 | active | 4 | 0 | 4 | 1 | 0 |
+| T19 | closed | 4 | 1 | 0 | 2 | 0 |
+| T19F | active | 6 | 0 | 1 | 3 | 0 |
 | T2 | closed | 2 | 0 | 2 | 2 | 0 |
 | T3 | closed | 3 | 1 | 3 | 0 | 0 |
 | T4 | closed | 4 | 2 | 1 | 2 | 0 |
-| T5 | active | 10 | 0 | 4 | 1 | 0 |
-| T6 | active | 11 | 0 | 4 | 1 | 0 |
+| T5 | closed | 10 | 2 | 3 | 0 | 0 |
+| T6 | closed | 11 | 2 | 3 | 0 | 0 |
 | T7 | closed | 5 | 2 | 3 | 0 | 0 |
-| T8 | active | 11 | 0 | 5 | 1 | 0 |
+| T8 | closed | 11 | 2 | 3 | 0 | 0 |
 | T9 | closed | 4 | 1 | 1 | 2 | 0 |

@@ -217,6 +217,71 @@ async fn a_licence_token_names_the_tenant() {
 }
 
 #[tokio::test]
+async fn a_licence_bearer_resolves_the_tenant() {
+    let db = seeded().await;
+    let app = app(db.pool.clone());
+
+    // No X-Tenant-Id: the licence in Authorization is the credential — the conveyor's path.
+    let licence = format!("Bearer licence-{TENANT}");
+    let (status, _, body) = get(
+        &app,
+        &format!("/api/items/{ITEM}"),
+        &[("authorization", &licence)],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK, "{body}");
+    assert_eq!(body["tenant_id"], TENANT);
+    assert_eq!(body["title"], "Synthetic video one");
+
+    // The licence names its own tenant: another tenant's licence cannot read this row.
+    let other = format!("Bearer licence-{OTHER_TENANT}");
+    let (status, _, body) = get(
+        &app,
+        &format!("/api/items/{ITEM}"),
+        &[("authorization", &other)],
+    )
+    .await;
+    assert_eq!(status, StatusCode::NOT_FOUND, "{body}");
+}
+
+#[tokio::test]
+async fn an_invalid_licence_bearer_is_401() {
+    let db = seeded().await;
+    let (status, headers, body) = get(
+        &app(db.pool.clone()),
+        &format!("/api/items/{ITEM}"),
+        &[("authorization", "Bearer expired-token")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::UNAUTHORIZED, "{body}");
+    assert_eq!(body["error"]["code"], "AUTHENTICATION_REQUIRED", "{body}");
+    assert_eq!(
+        headers
+            .get(header::WWW_AUTHENTICATE)
+            .and_then(|v| v.to_str().ok()),
+        Some("Bearer"),
+        "a 401 without the challenge tells a client to retry with nothing"
+    );
+}
+
+#[tokio::test]
+async fn the_licence_tenant_wins_over_a_mismatched_header() {
+    let db = seeded().await;
+    let chosen = format!("Bearer licence-{TENANT}");
+    let asserted = format!("Bearer licence-{OTHER_TENANT}");
+    let (status, _, body) = get(
+        &app(db.pool.clone()),
+        &format!("/api/items/{ITEM}"),
+        &[("x-tenant-id", &chosen), ("authorization", &asserted)],
+    )
+    .await;
+    // The X-Tenant-Id licence wins; the extractor logs the disagreement. The other tenant's item
+    // would be 404, so a 200 with THIS tenant proves which licence won.
+    assert_eq!(status, StatusCode::OK, "{body}");
+    assert_eq!(body["tenant_id"], TENANT);
+}
+
+#[tokio::test]
 async fn a_malformed_tenant_is_a_400() {
     let db = seeded().await;
     // The reference's measured case: a slug where the column is a uuid.

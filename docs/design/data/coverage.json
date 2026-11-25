@@ -333,8 +333,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 1,
-        "claimed": 3,
+        "blocked": 0,
+        "claimed": 4,
         "numbers": [
           16,
           17,
@@ -354,6 +354,7 @@
           223,
           224,
           225,
+          395,
           435,
           476,
           526,
@@ -362,10 +363,11 @@
           660,
           669,
           681,
-          693
+          693,
+          716
         ],
-        "open": 15,
-        "ready": 7,
+        "open": 17,
+        "ready": 8,
         "unknown": 0
       }
     },
@@ -1378,13 +1380,13 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           12,
           30
         ],
         "open": 1,
-        "ready": 0,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1783,12 +1785,12 @@
       "tranche": 13,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           88
         ],
         "open": 1,
-        "ready": 0,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1875,7 +1877,7 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           83,
           558,
@@ -1884,7 +1886,7 @@
           688
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2163,13 +2165,13 @@
       "tranche": 6,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           682,
           683,
           684
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2788,8 +2790,8 @@
       },
       "total": 51,
       "uncovered": [],
-      "with_open_units": 15,
-      "without_open_units": 36
+      "with_open_units": 14,
+      "without_open_units": 37
     },
     "screens": {
       "actions_invoked": 39,
