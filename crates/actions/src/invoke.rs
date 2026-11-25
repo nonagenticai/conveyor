@@ -1824,6 +1824,12 @@ async fn invoke_external(
             );
         }
     }
+    // The caller's Idempotency-Key is the mutation's dedupe contract (CONTRACT §5). A declared
+    // destination that implements the same contract (the coding service) refuses a call without
+    // the header, so the engine forwards the key it already claimed.
+    if let Some(key) = request.idempotency_key.as_deref() {
+        builder = builder.header("Idempotency-Key", key);
+    }
     if let Some(token) = &bearer {
         builder = builder.bearer_auth(token);
     }

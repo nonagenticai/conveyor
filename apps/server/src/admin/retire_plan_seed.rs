@@ -129,6 +129,7 @@ async fn archive_one(
             json!({ "id": card }),
             Some(version),
             Some(approval_id),
+            None,
         )
         .await
         .map(|_| ())

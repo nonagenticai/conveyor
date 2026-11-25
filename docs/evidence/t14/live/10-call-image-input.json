@@ -1,0 +1,10 @@
+{
+ "input": {
+  "run_id": "01a21278-2eb3-7af4-9169-e5ce96f55271",
+  "tool": "image_gen.generate",
+  "input": {
+   "prompt": "a plain grey square",
+   "steps": 8
+  }
+ }
+}

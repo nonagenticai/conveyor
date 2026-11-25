@@ -320,6 +320,11 @@ enum ActionCommand {
         /// without this flag a destructive invoke from the CLI could never satisfy its gate.
         #[arg(long)]
         approval_id: Option<uuid::Uuid>,
+        /// The caller's `Idempotency-Key` (CONTRACT §5). It is a property of the CALL: the
+        /// engine claims it for the mutation and forwards it to a declared external destination
+        /// that demands one (the coding service).
+        #[arg(long = "idempotency-key")]
+        idempotency_key: Option<String>,
         /// Act as this active member instead of the tenant's first active member.
         ///
         /// A governance act must be performed by a DISTINCT approver, and the tenant carries a
@@ -1128,6 +1133,7 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                     name,
                     input,
                     approval_id,
+                    idempotency_key,
                     actor_id,
                     if_match,
                 },
@@ -1142,7 +1148,7 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                     .await
                     .map_err(|error| RunError::Refused(error.to_string()))?;
             let output = caller
-                .call_gated(&name, input, if_match, approval_id)
+                .call_gated(&name, input, if_match, approval_id, idempotency_key)
                 .await
                 .map_err(|error| RunError::Refused(error.to_string()))?;
             println!("{}", serde_json::to_string_pretty(&output)?);

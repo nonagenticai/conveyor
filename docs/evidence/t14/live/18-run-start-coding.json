@@ -1,0 +1,14 @@
+{
+ "attempt": 1,
+ "card_id": "01a21277-78f7-7293-812d-84ebe22de70a",
+ "created_at": "2026-11-25T11:29:09.386299Z",
+ "error_class": null,
+ "error_message": null,
+ "finished_at": null,
+ "id": "01a21277-790e-7b62-b518-c8c2420bf3b4",
+ "output": null,
+ "project_id": "01a1d039-0d37-7896-adfb-fa7bd2279dfd",
+ "started_at": "2026-11-25T11:29:09.409085Z",
+ "status": "running",
+ "version": 2
+}

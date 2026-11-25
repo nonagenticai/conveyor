@@ -81,7 +81,7 @@ impl<'a> ActionCaller<'a> {
         input: Value,
         precondition: Option<i64>,
     ) -> Result<Value, CallError> {
-        self.call_gated(name, input, precondition, None).await
+        self.call_gated(name, input, precondition, None, None).await
     }
 
     /// As [`call`], for a destructive action whose approval the caller names (#282).
@@ -95,6 +95,7 @@ impl<'a> ActionCaller<'a> {
         input: Value,
         precondition: Option<i64>,
         approval_id: Option<Uuid>,
+        idempotency_key: Option<String>,
     ) -> Result<Value, CallError> {
         let spec = registry()
             .get(name)
@@ -111,7 +112,7 @@ impl<'a> ActionCaller<'a> {
                 action: name.to_owned(),
                 input,
                 precondition: precondition.map(conveyor_actions::Precondition::Version),
-                idempotency_key: None,
+                idempotency_key,
                 approval_id,
                 actor_id: self.actor,
                 actor_kind: "service".to_owned(),

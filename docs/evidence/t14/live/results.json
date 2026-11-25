@@ -1,0 +1,18 @@
+{
+ "speech": {
+  "status": null,
+  "document": null
+ },
+ "transcription": {
+  "skipped": "no speech document"
+ },
+ "image_gen": {
+  "status": null
+ },
+ "scientific": {
+  "note": "see 15-call-scientific.json: the service answered 401 (tenant context required); the action sends no credential"
+ },
+ "coding": {
+  "status": null
+ }
+}
