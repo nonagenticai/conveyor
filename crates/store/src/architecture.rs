@@ -1290,6 +1290,9 @@ fn board_subject_table(kind: &str) -> Option<&'static str> {
 /// Open (or resume) the board's sitting over one subject: a pending approval, a live meeting
 /// with the body's standing type, and the approval as its deciding agenda item. Idempotent:
 /// an existing pending approval on a scheduled or live sitting is returned unchanged.
+// The caller's transaction, tenant and actor plus the five subject/sitting fields; grouping
+// them would only move the tuple.
+#[allow(clippy::too_many_arguments)]
 pub async fn open_board_sitting_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
