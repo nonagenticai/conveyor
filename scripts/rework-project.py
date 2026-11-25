@@ -713,10 +713,22 @@ class Runner:
             ]
             if approved_closure:
                 print("  closure gate: already approved")
-                # The closure asset that gate approved is the evidence; no read action
-                # projects `meta.closure_asset_id`, so a resumed run takes the operator's
-                # `--closure-asset` — read from the record, never invented.
+                # The closure asset that gate approved is the evidence. `approvals.list` does
+                # not project `meta.closure_asset_id`, but the snapshot's approval row carries
+                # it (step 9 refreshed the snapshot), so a resumed run reads the record instead
+                # of demanding an operator id. The live gate id is the key: the newest approval
+                # the close action will read is the one whose decision names the asset.
                 closure_asset = self.closure_asset
+                if not closure_asset:
+                    snapshots = {
+                        str(row.get("id")): row
+                        for row in self.snapshot_json("work.json").get("approvals") or []
+                    }
+                    for approval in approved_closure:
+                        asset = (snapshots.get(str(approval.get("id"))) or {}).get("meta") or {}
+                        if asset.get("closure_asset_id"):
+                            closure_asset = str(asset["closure_asset_id"])
+                            break
             else:
                 closure = self.invoke(
                     "projects.close_request",
