@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T5 — Kata: evidence · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T5/evidence.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t5--kata-evidence">T5 — Kata: evidence</h1>
+<h2 id="claim">Claim</h2>
+<p>T5 delivers the kata loop: a planned procedure change opens a kata whose prediction is recorded before its measurement, the measurement runs on a held-out split, a measured regression reverts the candidate, a flat or incomparable result adopts nothing, the kata cannot approve its own adoption, and the open/adopt gates refuse the documented cases.</p>
+<h2 id="evidence">Evidence</h2>
+<ul>
+<li><code>crates/actions/tests/kata_gets.rs::the_prediction_is_recorded_before_the_measurement</code></li>
+<li><code>crates/actions/tests/kata_measure.rs::a_procedure_change_is_measured_on_the_held_out_split</code></li>
+<li><code>crates/actions/tests/kata_revert.rs::a_measured_regression_reverts_the_candidate</code>, <code>::a_flat_or_incomparable_result_adopts_nothing</code></li>
+<li><code>crates/actions/tests/kata_adopt.rs::the_kata_cannot_approve_its_own_adoption</code></li>
+<li><code>crates/actions/tests/kata_open.rs::a_kata_without_an_instrument_is_not_opened</code>, <code>::a_second_kata_for_an_open_signature_is_refused</code></li>
+<li>Migrations <code>0066_kata.sql</code> and <code>0067_kata_gate.sql</code>; merges <code>7e617673</code> (PR #636) and <code>f8c82c68</code> (PR #654).</li>
+</ul>
+<h2 id="verification">Verification</h2>
+<p>Run the suite on a checked-out main: <code>cargo test -p conveyor-actions --test kata_adopt --test kata_gets --test kata_measure --test kata_open --test kata_revert</code>. The CI equivalent is the PR's <code>preflight</code> and <code>ci-public</code> at the merge commits above.</p>
+<h2 id="links">Links</h2>
+<ul>
+<li><code>docs/plans/inception/T5/00-project-brief.md</code>, <code>01-inception-analysis.md</code>, <code>02-architecture-design.md</code></li>
+<li>Issues #77 and #653; PRs #636 and #654.</li>
+</ul>
+<h2 id="gap">Gap</h2>
+<p>The tranche-10 authorisation is not evidenced here and is not claimed — it is the #526 programme chain's act. No delivery gap is claimed by the issue record.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T5/evidence.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

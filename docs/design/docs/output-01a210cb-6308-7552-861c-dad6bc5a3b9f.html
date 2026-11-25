@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
     <meta name="description" content="A conveyor platform output, rendered at publish time." />
-    <title>T19F — Evidence · conveyor documents</title>
+    <title>Evidence — T19F Forum bindings · conveyor documents</title>
     <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../assets/plex-sans.css" />
     <link rel="stylesheet" href="../assets/plex-mono.css" />
@@ -23,72 +23,100 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>T19F — Evidence</h1>
-<p>What was claimed, what was measured, and what remains a gap.</p>
+    <main class="doc-body"><hr />
+<h2>document: T19F/evidence
+version: 4
+status: published
+project: T19F
+category: evidence
+owner: programme-manager
+reviewer: Architecture Board
+review_date: 2026-12-01
+artifact_kind: evidence
+phase: G
+plateau: capability</h2>
+<h1>T19F — Forum bindings: evidence</h1>
 <h2>Claim</h2>
-<p>The T19F forum bindings are delivered on <code>main</code> (<code>eb0deb61</code>) and proven on the deployed engine: a
-meeting stays pinned to forum-policy v1 while the v2 route is exercised, a board subject is decided
-in a sitting whose per-seat decision row carries <code>via.surface='meeting'</code>, and a cadence row
-materialises exactly one meeting. The policy v2 itself awaits one human review decision, which the
-product's authoring gate refuses to let a machine supply.</p>
-<h2>Evidence</h2>
-<ul>
-<li>Construction: PR #700 merged as <code>eb0deb61</code>; migration 0073 applied on the live database
-(<code>_sqlx_migrations</code> max 73); the deployed image carries it (pod digest <code>9c80514d…</code>).</li>
-<li>Programme row: project <code>T19F</code> <code>01a210ba-b6cb-76cc-82a3-a2b45cfb498f</code> on its board, <code>programmes.refresh</code>
-reports <code>created 0, skipped 52</code>.</li>
-<li>Governance chain: <code>scripts/governance-chain.py --project T19F --check</code> passes 24/24 on the
-published snapshot — seven approved artefacts, seven links, a live Statement of Architecture Work
-and a live phase-F delivery contract (requester ≠ approver), B7's baseline read back and not
-overwritten, one Phase-G compliance review per contract (level <code>conformant</code>), and the published
-<code>architecture-artifact</code> document with its Metadata/Entries/Links/Document headings.</li>
-<li>Live gate: <code>scripts/t19f-live-gate-check.py --check</code> passes 11 of 12 invariants:
-<ul>
-<li>the meeting <code>01a210c2-a327-7dc7-bab4-5a402a8497a8</code> is pinned at policy <code>t19f_live_gate_forum</code>
-version 1; the pinned meeting still resolves v1 after the v2 route was exercised;</li>
-<li>the sitting body <code>01a210c8-579b-7808-bc32-aef8899b0b7a</code> decided contract
-<code>01a210c8-7ea8-7dc9-8104-700ecfe2905b</code> in meeting <code>01a210c8-94ee-73ba-9147-88f2b4729ae0</code>;
-approval <code>01a210c8-9273-7964-9b97-0f3dd810bcf3</code> is <code>approved</code> with exactly one decision row
-carrying <code>via.surface='meeting'</code> and naming the chair (<code>conveyor-approver</code>); the agenda item
-closed as <code>decision</code>;</li>
-<li>cadence <code>01a210c9-0d47-7473-8339-7ea7648e59e9</code> materialised twice to the same meeting
-<code>01a210c9-2397-73f1-8d07-7e8e807e524f</code>, carrying the bound forum type and the slot and not
-cancelled.</li>
-</ul>
-</li>
-</ul>
-<h2>Verification</h2>
-<pre><code>python3 scripts/governance-chain.py --project T19F --check      # 24/24 PASS
-python3 scripts/t19f-live-gate-check.py --check                  # 11/12 PASS, 1 blocked
-</code></pre>
-<p>The transports are <code>scripts/programme-record.py</code> (the deployed action surface) and, for the
-snapshot, <code>docs/design/scripts/publish-data.sh</code>. Raw read-backs and acts are under
-<code>docs/evidence/t19f/</code> (<code>gate/</code>, <code>gov/</code>, <code>live-gate.json</code>, <code>live-gate-check.txt</code>,
-<code>publish-report-only.log</code>).</p>
-<h2>Links</h2>
-<ul>
-<li>Plan: <code>docs/plans/T19F-meeting-bindings.md</code>; artefacts under <code>docs/plans/T19F/</code>.</li>
-<li>Implementation: PR #700 (<code>Closes #683</code>), merge <code>eb0deb61</code>.</li>
-<li>This unit: issue #684.</li>
-</ul>
-<h2>Gap</h2>
-<ul>
-<li><strong>The policy v2 publish is blocked on one human review.</strong> <code>authoring.review</code> requires the
-approval's last decision to be <code>human</code>; the admin CLI records <code>service</code> by design, so the gate
-refuses it verbatim (<code>BLOCKED policy v2: …</code>). A person must approve the review gate in the
-console, after which re-running <code>--apply</code> publishes v2 and the twelfth invariant passes. The
-asset <code>01a210c3-7c34-7338-89f2-6c7a6e40bea7</code> and its approved gate
-<code>01a210c3-9007-75f4-927c-d1dc32f54c6b</code> are in place for that click.</li>
-<li>The strict conformance publish is red on programme-wide debt that predates this unit (T5, T6,
-T8, T15 and T17 closed since the accepted baseline; their new/worsened P0s and the S18/S21/
-SPEC-V2 ledger rows). The T19F finding is <code>project_in_unauthorised_tranche</code> P1 — T19F is active
-in tranche 6, whose authorisation is #526's unit; the plan requires T19F to stay active until
-the tranche-6 review, so this is the declared state, not a regression. The pack was therefore
-published report-only with the exact findings in <code>publish-report-only.log</code>.</li>
-</ul>
+<p>Issue #683 implements the two T19 follow-ups on <code>main</code> (merge <code>eb0deb61</code>): a <code>meeting_type</code>
+version is written only by the reviewed authoring route, a governance body decides a subject in a
+sitting whose seats write <code>via='meeting'</code> decision rows, and a cadence row materialises its own
+meeting once. Issue #684 runs the live chain and gate on the deployed engine and records the
+programme publication.</p>
+<p>The construction evidence below is at <code>eb0deb61</code>; the live rows are recorded by
+<code>scripts/t19f-live-gate-check.py --apply</code> and re-read by <code>--check</code>.</p>
+<h2>Construction evidence (issue #683)</h2>
+<table><thead><tr><th>Part</th><th>Scenario</th><th>Evidence</th><th>Result</th></tr></thead><tbody>
+<tr><td>P1.1</td><td>policy v2 publishes; the in-flight v1 meeting still resolves v1</td><td><code>crates/api/tests/meetings_authoring.rs::policy_publish_versions_meeting_type</code></td><td>pass</td></tr>
+<tr><td>P1.2</td><td>an unreviewed policy asset is refused</td><td><code>meetings_authoring.rs::policy_publish_requires_review</code></td><td>pass</td></tr>
+<tr><td>P1.3</td><td>a reused authoring asset key is refused</td><td><code>meetings_authoring.rs::a_reused_asset_key_is_refused</code></td><td>pass</td></tr>
+<tr><td>P1.4</td><td>the type reads return the versions in order</td><td><code>meetings_authoring.rs::type_list_and_get_read_versions</code></td><td>pass</td></tr>
+<tr><td>P2.1</td><td>the sitting closes through <code>close_item_tx</code> with <code>via='meeting'</code> rows</td><td><code>crates/api/tests/meetings_binding.rs::board_sitting_uses_close_item</code></td><td>pass</td></tr>
+<tr><td>P2.2</td><td>a body with no bound type refuses a sitting <code>422</code></td><td><code>meetings_binding.rs::a_body_without_a_type_refuses_a_sitting</code></td><td>pass</td></tr>
+<tr><td>P2.3</td><td>a quorum miss defers <code>inquorate</code></td><td><code>meetings_binding.rs::a_quorum_miss_defers_inquorate</code></td><td>pass</td></tr>
+<tr><td>P2.4</td><td>the direct <code>board_decide</code> path is unchanged</td><td><code>meetings_binding.rs::the_direct_board_decide_path_still_works</code></td><td>pass</td></tr>
+<tr><td>P3.1</td><td>materialise is idempotent</td><td><code>meetings_binding.rs::cadence_materialise_is_idempotent</code></td><td>pass</td></tr>
+<tr><td>P3.2</td><td>a cadence with no type is refused <code>422 cadence_type_missing</code></td><td><code>meetings_binding.rs::a_cadence_without_a_type_is_refused</code></td><td>pass</td></tr>
+<tr><td>P3.3</td><td>the cadence agenda item resolves the slot</td><td><code>meetings_binding.rs::the_cadence_item_resolves</code></td><td>pass</td></tr>
+<tr><td>P3.4</td><td>T19's slot rule is unchanged (a second scheduled meeting is legal)</td><td><code>crates/api/tests/meetings_policy.rs::a_second_live_meeting_in_a_slot_is_refused</code></td><td>pass</td></tr>
+<tr><td>P4.1</td><td>the mock UI carries the policy, sitting and cadence panels</td><td><code>node docs/design/scripts/check-v2.cjs</code></td><td>pass (281 checks)</td></tr>
+<tr><td>P4.2</td><td>the real app renders the pinned type/version and the policy list</td><td><code>apps/web/e2e/meetings.spec.ts</code> in <code>web.yml</code></td><td>pass at <code>eb0deb61</code></td></tr>
+<tr><td>P5.1</td><td>every new action has one declaration and HTTP/MCP agree</td><td><code>cargo test -p conveyor-actions --test registry --test parity_http_mcp</code></td><td>pass (12/12, 7/7)</td></tr>
+<tr><td>P5.2</td><td>the migration ledger reaches 73</td><td><code>cargo test -p conveyor-store --test s07_schema</code></td><td>pass (3/3)</td></tr>
+<tr><td>P5.3</td><td>T19F is <code>built</code> in the coverage and seed data</td><td><code>python3 scripts/build-coverage.py --check &amp;&amp; node docs/design/scripts/check-coverage.cjs</code></td><td>pass</td></tr>
+<tr><td>P5.4</td><td>the design pack agrees</td><td><code>check-data</code>, <code>check-docs</code>, <code>check-v2</code>, <code>check-console</code>, <code>build-docs --check</code></td><td>pass</td></tr>
+</tbody></table>
+<h2>The live gate (issue #684)</h2>
+<p><code>scripts/t19f-live-gate-check.py --apply</code> performs, through the deployed engine's action surface:
+a meeting scheduled against forum policy v1; a v2 published through <code>authoring.intake</code> → <code>draft</code> →
+<code>approvals.request</code>/<code>decide</code> → <code>authoring.review</code> → <code>authoring.publish</code>; a board sitting opened on
+a real contract with <code>architecture.board_sit_open</code>, one chair invitation/response/position and
+<code>architecture.board_sit_decide</code>; and a cadence row materialised twice. Every write names an
+evidence file under <code>docs/evidence/t19f/gate/</code>; the ids are <code>docs/evidence/t19f/live-gate.json</code>.
+<code>--check</code> re-reads the rows and asserts:</p>
+<table><thead><tr><th>Invariant</th><th>Evidence</th><th>Result</th></tr></thead><tbody>
+<tr><td>the v1-pinned meeting still resolves version 1 after the v2 route is exercised</td><td>meeting <code>01a210c2-a327-7dc7-bab4-5a402a8497a8</code>, <code>live-gate.json.policy</code></td><td>pass</td></tr>
+<tr><td>the forum type carries an active v2</td><td>v2 <code>01a211da-c391-7867-86dd-d22f9cfed5d5</code>, human gate <code>01a211d8-001f-7296-bbc1-ccb13835a3ef</code> (<code>gate/05b-human-decision.md</code>, <code>gate/07-authoring-publish.md</code>, <code>live-gate.json.policy</code>)</td><td>pass</td></tr>
+<tr><td>the sitting's approval is <code>approved</code> with exactly one <code>via.surface='meeting'</code> decision row naming the chair</td><td>approval <code>01a210c8-9273-7964-9b97-0f3dd810bcf3</code>, <code>live-gate.json.sitting</code></td><td>pass</td></tr>
+<tr><td>the sitting's agenda item closed as <code>decision</code></td><td>item <code>01a210c8-97c5-7850-8270-16b37a07d8ce</code></td><td>pass</td></tr>
+<tr><td>the cadence meeting carries the bound type and the slot, non-cancelled</td><td>meeting <code>01a210c9-2397-73f1-8d07-7e8e807e524f</code> (materialised twice from one cadence)</td><td>pass</td></tr>
+</tbody></table>
+<p>The gate run is <code>docs/evidence/t19f/live-gate-check.txt</code>; its state is <code>live-gate.json</code>. Every
+assertion passes (13 PASS, 0 FAIL). The twelfth acceptance invariant — the forum type carrying an
+active v2 — was the one blocked in the first proof: the admin CLI records <code>service</code> and
+<code>authoring.review</code> refuses a machine-only review, so the close-out (#722) requested a fresh gate
+from the distinct <code>conveyor-approver</code> seat and the human <code>app_user</code> FR Test decided it in the
+signed-in console (<code>decided_by_kind='human'</code>, <code>via.channel='web'</code>, <code>gate/05b-human-decision.md</code>).
+<code>--apply</code> then completed <code>authoring.review</code> and <code>authoring.publish</code>; the v1-pinned meeting still
+resolves v1.</p>
+<h3>The publication</h3>
+<p><code>docs/design/scripts/publish-data.sh</code> regenerated the pack from the live database through the
+deployed binary (<code>docs/evidence/t19f/publish-final.log</code>). That publish was report-only: the strict
+gate is red on programme-wide debt that predates this unit (T5/T6/T8/T15/T17 closed since the
+accepted baseline; S18/S21/SPEC-V2 ledger rows) plus T19F's declared
+<code>project_in_unauthorised_tranche</code> P1 (active in tranche 6, whose authorisation is #526's unit, and
+the plan requires T19F to stay active until the tranche-6 review). The strict remediation — the
+five published closure records, the declared evidence, the baseline reconcile and the strict
+publish — is the follow-on conformance unit (#726): it ran <code>publish-data.sh</code> strict on the
+2026-11-25 snapshot and the audit reported <strong>strict audit OK</strong>; the pack committed with that run
+is the programme record.</p>
+<h2>The governance chain (issue #684)</h2>
+<p><code>scripts/governance-chain.py --project T19F --check</code> asserts the T19F record: seven approved
+artefacts, both live contracts with a requester distinct from the approver, B7 read back and not
+overwritten, one Phase-G compliance review per contract (read from the published
+<code>architecture.json</code>), and the published <code>architecture-artifact</code> document with its four headings.
+Evidence under <code>docs/evidence/t19f/gov/</code>.</p>
+<table><thead><tr><th>Invariant</th><th>Evidence</th><th>Result</th></tr></thead><tbody>
+<tr><td>seven mandatory artefacts are approved on T19F</td><td><code>gov/artifact-*.md</code></td><td>pass</td></tr>
+<tr><td>the SoAW and the delivery contract are live, requester ≠ approver</td><td><code>gov/contract-*.md</code></td><td>pass</td></tr>
+<tr><td>B7's baseline and owner are read back, not overwritten</td><td><code>gov/benefit-b7-baseline.md</code></td><td>pass</td></tr>
+<tr><td>both contracts carry a Phase-G compliance review (level <code>conformant</code>)</td><td>published <code>architecture.json</code></td><td>pass</td></tr>
+<tr><td>the <code>architecture-artifact</code> document is published with Metadata/Entries/Links/Document</td><td><code>gov/artifact-document-publish.md</code></td><td>pass</td></tr>
+</tbody></table>
+<p><code>scripts/governance-chain.py --project T19F --check</code> passes 24/24 on the published snapshot, and
+the T19 invocation it generalised still passes 18/18 (re-run live after the refactor).</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Decision-forum governance (follow-on) · conveyor output · published 2026-11-25T03:46:32.319854100+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Decision-forum governance (follow-on) · conveyor output · published 2026-11-25T11:25:19.603151696+00:00 · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

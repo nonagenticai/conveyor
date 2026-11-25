@@ -886,6 +886,18 @@
       "via": {
         "channel": "internal"
       }
+    },
+    {
+      "approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
+      "approver_id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "approver_name": "FR Test",
+      "created_at": "2026-11-25T08:36:58.49636+00:00",
+      "decided_by_kind": "human",
+      "decision": "approve",
+      "id": "01a211d9-d787-7074-9eab-cf8a80d97f05",
+      "via": {
+        "channel": "web"
+      }
     }
   ],
   "approvals": [
@@ -1967,6 +1979,21 @@
       "run_id": null,
       "status": "approved",
       "updated_at": "2026-11-25T03:33:06.44789+00:00",
+      "version": 2
+    },
+    {
+      "card_id": null,
+      "created_at": "2026-11-25T08:34:57.958362+00:00",
+      "expires_at": null,
+      "gate": "authoring.review",
+      "id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
+      "kind": "gate",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "required_decisions": 1,
+      "run_id": null,
+      "status": "approved",
+      "updated_at": "2026-11-25T08:36:58.49636+00:00",
       "version": 2
     }
   ],
@@ -21254,7 +21281,7 @@
       "version": 1
     }
   ],
-  "generated_at": "2026-11-25T03:46:32.319854100+00:00",
+  "generated_at": "2026-11-25T11:25:19.603151696+00:00",
   "lists": [
     {
       "board_id": "01a1d3e7-473e-7ccb-88ca-dbbc10d8e5e5",

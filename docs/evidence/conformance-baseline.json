@@ -193,12 +193,30 @@
     },
     {
       "rule": "project_in_unauthorised_tranche",
+      "subject": "T15",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "the project closed before its tranche authorisation; the tranche is still planned and its authorisation is the #526 authority-repair chain"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
       "subject": "T16",
       "severity": "P0",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "T17",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "the project closed before its tranche authorisation; the tranche is still planned and its authorisation is the #526 authority-repair chain"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -220,12 +238,39 @@
     },
     {
       "rule": "project_in_unauthorised_tranche",
+      "subject": "T5",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "the project closed before its tranche authorisation; the tranche is still planned and its authorisation is the #526 authority-repair chain"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "T6",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "the project closed before its tranche authorisation; the tranche is still planned and its authorisation is the #526 authority-repair chain"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
       "subject": "T7",
       "severity": "P0",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "T8",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "the project closed before its tranche authorisation; the tranche is still planned and its authorisation is the #526 authority-repair chain"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -418,25 +463,7 @@
     },
     {
       "rule": "closed_without_closure_review",
-      "subject": "S18",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closed_without_closure_review",
       "subject": "S20",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closed_without_closure_review",
-      "subject": "S21",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -598,34 +625,7 @@
     },
     {
       "rule": "closure_outputs_undeclared",
-      "subject": "S18",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closure_outputs_undeclared",
       "subject": "S20",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closure_outputs_undeclared",
-      "subject": "S21",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "closure_outputs_undeclared",
-      "subject": "SPEC-V2",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
@@ -1192,24 +1192,6 @@
     },
     {
       "rule": "project_in_unauthorised_tranche",
-      "subject": "T15",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "T17",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
       "subject": "T18",
       "severity": "P1",
       "disposition": "rework",
@@ -1219,57 +1201,30 @@
     },
     {
       "rule": "project_in_unauthorised_tranche",
-      "subject": "T5",
+      "subject": "T19F",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "T6",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "T8",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "active at tranche 6, whose authorisation is the #526 tranche chain; the closure review defers closure to the tranche-6 review"
     },
     {
       "rule": "seed_live_drift",
-      "subject": "T5",
+      "subject": "S21",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "the seed derives `closed` from S21's closed unit issues (#713 closed the execution level), while the live row stays `active`: closing a project in planned tranche 9 manufactures a tranche P0, and the synchronisation waits on the tranche-9 authorisation (#526 chain) or a seed install"
     },
     {
       "rule": "seed_live_drift",
-      "subject": "T6",
+      "subject": "T14",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "T8",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "the seed derives `closed` from T14's closed unit issues, while the live row stays `active`: closing a project in planned tranche 13 manufactures a tranche P0, and the synchronisation waits on the tranche-13 authorisation (#526 chain) or a seed install"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1499,15 +1454,6 @@
     {
       "rule": "unpublished_declared_output",
       "subject": "T7",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "unpublished_declared_output",
-      "subject": "T8",
       "severity": "P1",
       "disposition": "rework",
       "owner": "programme owner",

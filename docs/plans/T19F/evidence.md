@@ -1,6 +1,6 @@
 ---
 document: T19F/evidence
-version: 3
+version: 4
 status: published
 project: T19F
 category: evidence
@@ -84,7 +84,9 @@ accepted baseline; S18/S21/SPEC-V2 ledger rows) plus T19F's declared
 `project_in_unauthorised_tranche` P1 (active in tranche 6, whose authorisation is #526's unit, and
 the plan requires T19F to stay active until the tranche-6 review). The strict remediation — the
 five published closure records, the declared evidence, the baseline reconcile and the strict
-publish — is the follow-on conformance unit; this close-out does not re-publish the pack.
+publish — is the follow-on conformance unit (#726): it ran `publish-data.sh` strict on the
+2026-11-25 snapshot and the audit reported **strict audit OK**; the pack committed with that run
+is the programme record.
 
 ## The governance chain (issue #684)
 

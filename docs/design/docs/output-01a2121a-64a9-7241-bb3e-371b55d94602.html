@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Evidence — T6 Development project · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><hr />
+<h2>document: T6/evidence
+version: 1
+status: published
+project: T6
+category: evidence
+owner: programme-manager
+reviewer: Architecture Board
+review_date: 2026-11-25
+artifact_kind: evidence
+phase: G
+plateau: capability</h2>
+<h1>T6 — Development project: evidence</h1>
+<h2>Claim</h2>
+<p>T6 delivers the development project's governed chain: every step from lane to live verify is
+recorded, a red CI run refuses the merge gate, the implementer cannot decide the gates that judge
+it, a deploy without a tested rollback is refused and an exercised rollback records both digests
+and the schema generation.</p>
+<h2>Evidence</h2>
+<ul>
+<li><code>crates/actions/tests/development_project.rs::a_development_project_records_every_step_from_lane_to_live_verify</code></li>
+<li><code>::a_red_ci_run_refuses_the_merge_gate</code></li>
+<li><code>::the_implementer_cannot_decide_its_own_merge_gate</code>,
+<code>::a_development_project_cannot_change_the_gates_that_judge_it</code></li>
+<li><code>::a_deploy_without_a_tested_rollback_is_refused</code>,
+<code>::an_exercised_rollback_records_both_digests_and_the_schema_generation</code>,
+<code>::an_application_rollback_across_a_non_additive_migration_is_refused</code></li>
+<li><code>::auto_merge_defaults_off_and_reads_the_tenant_policy_row</code></li>
+<li>Migration <code>0068_development_project.sql</code>; merges <code>00094194</code> (PR #658) and <code>a8c22f8e</code> (PR #672).</li>
+</ul>
+<h2>Verification</h2>
+<p>Run <code>cargo test -p conveyor-actions --test development_project</code> on a checked-out main; the CI
+equivalent is the PRs' <code>preflight</code> and <code>ci-public</code> at the merge commits above.</p>
+<h2>Links</h2>
+<ul>
+<li><code>docs/plans/inception/T6/00-project-brief.md</code>, <code>01-inception-analysis.md</code>,
+<code>02-architecture-design.md</code></li>
+<li>Issue #80; PRs #658 and #672; issue #669 (the evidence correction).</li>
+</ul>
+<h2>Gap</h2>
+<p>The rollback evidence was not final at #658 and was corrected by #672 — this document cites the
+corrected record. No production deploy applier is evidenced; the tests prove the refusals and the
+step records. The tranche-11 authorisation is not claimed.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Development project · conveyor output · published 2026-11-25T11:25:19.603151696+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

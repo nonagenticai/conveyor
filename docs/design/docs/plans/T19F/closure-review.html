@@ -112,14 +112,21 @@
 </tr>
 </tbody>
 </table>
-<h2 id="decision">Decision</h2>
-<p>Acceptance is met on every row except the strict conformance publish, which is disclosed above and belongs to the follow-on conformance unit (the product's own strict gate is red on programme-wide debt that predates T19F, not on T19F's evidence). The human review was the product's designed gate: the admin CLI records <code>service</code> and <code>authoring.review</code> refuses a machine-only review, so FR Test — the tenant's human <code>app_user</code> seat, never the owner's personal account — decided a fresh gate in the signed-in console. <strong>Project closure is deferred to the tranche-6 review</strong>: T19F computes to tranche 6 from T19 (4) and T17 (5), and a project closed inside a planned tranche manufactures a <code>project_in_unauthorised_tranche</code> P0. T19F therefore stays <code>active</code> until the tranche-6 review records the closure, exactly as the plan's closure note declares.</p>
-<h2 id="follow-ups">Follow-ups</h2>
+<h2 id="evidence">Evidence</h2>
+<ul>
+<li>The live gate: <code>scripts/t19f-live-gate-check.py --check</code> — 13 PASS, 0 FAIL. The human gate <code>01a211d8-001f-7296-bbc1-ccb13835a3ef</code> was decided by FR Test (<code>decided_by_kind='human'</code>, <code>via.channel='web'</code>); <code>authoring.publish</code> wrote meeting_type v2 <code>01a211da-c391-7867-86dd-d22f9cfed5d5</code>; the v1-pinned meeting still resolves v1 (<code>docs/evidence/t19f/gate/05b-human-decision.md</code>, <code>07-authoring-publish.md</code>, <code>live-gate-check.txt</code>).</li>
+<li>The governance chain: <code>scripts/governance-chain.py --project T19F --check</code> — 24/24 (seven approved artefacts, two live contracts with a requester distinct from the approver, B7 read back and not overwritten, one Phase-G compliance review per contract, the published <code>architecture-artifact</code> document).</li>
+<li>The construction record: merges <code>bf0d9590</code> (PR #686), <code>eb0deb61</code> (PR #700), <code>9ace4e81</code> (PR #711), <code>ac115c81</code> (PR #715); <code>docs/plans/T19F/evidence.md</code> and <code>docs/evidence/t19f/</code>.</li>
+<li>The programme record: the live row (project <code>01a210ba-b6cb-76cc-82a3-a2b45cfb498f</code>, its board, B7) and the published pack.</li>
+</ul>
+<h2 id="open-items">Open items</h2>
 <ul>
 <li>The tranche-6 review owns the closure row and the benefit B7's incremental realisation.</li>
-<li>The tranche 2→4 authorisation chain is #526's unit; T19F adds no baseline entry.</li>
-<li>Programme-wide conformance debt and T19's ledgered P0 are unchanged by this unit.</li>
+<li>The strict conformance publish is the follow-on conformance unit (#726): it reconciles the programme-wide ledger and the declared records, and this review does not claim it.</li>
+<li>The tranche 2→4 authorisation chain is #526's unit; T19F adds no ledger entry of its own.</li>
 </ul>
+<h2 id="decision">Decision</h2>
+<p>Acceptance is met on every row except the strict conformance publish, which is disclosed above and belongs to the follow-on conformance unit (the product's own strict gate is red on programme-wide debt that predates T19F, not on T19F's evidence). The human review was the product's designed gate: the admin CLI records <code>service</code> and <code>authoring.review</code> refuses a machine-only review, so FR Test — the tenant's human <code>app_user</code> seat, never the owner's personal account — decided a fresh gate in the signed-in console. <strong>Project closure is deferred to the tranche-6 review</strong>: T19F computes to tranche 6 from T19 (4) and T17 (5), and a project closed inside a planned tranche manufactures a <code>project_in_unauthorised_tranche</code> P0. T19F therefore stays <code>active</code> until the tranche-6 review records the closure, exactly as the plan's closure note declares.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/plans/T19F/closure-review.md</code> at build time.</span>

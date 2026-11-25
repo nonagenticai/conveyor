@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T19F Forum bindings · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><hr />
+<h2>document: T19F/closure-review
+version: 3
+status: published
+project: T19F
+category: closure-review
+owner: programme-manager
+reviewer: Architecture Board
+review_date: 2026-12-01
+artifact_kind: closure-review
+phase: G
+plateau: capability</h2>
+<h1>T19F — Forum bindings: closure review</h1>
+<p>Whether the project delivered its acceptance, on its evidence, and the decision that follows.</p>
+<h2>Outcome vs acceptance</h2>
+<table><thead><tr><th>Acceptance criterion</th><th>Evidence</th><th>Result</th></tr></thead><tbody>
+<tr><td>Every P-scenario in <code>docs/plans/T19F-meeting-bindings.md</code> §P1–P5 passes</td><td>the construction table in <code>docs/plans/T19F/evidence.md</code>; tests at <code>eb0deb61</code></td><td>pass</td></tr>
+<tr><td>The repo gate is green at the exact head</td><td>PR #700's <code>preflight</code> and the merge-group <code>ci</code>; merge commit <code>eb0deb61</code></td><td>pass</td></tr>
+<tr><td>Migration 0073 is in the ledger and live</td><td>live <code>_sqlx_migrations</code> max 73, 72 rows (<code>docs/evidence/t19f/seed-readback.txt</code>)</td><td>pass</td></tr>
+<tr><td>The registry, parity and OpenAPI lock agree</td><td>587 actions; <code>registry</code>, <code>parity_http_mcp</code>, <code>--check-lock</code> at <code>eb0deb61</code></td><td>pass</td></tr>
+<tr><td>The design pack agrees</td><td><code>check-data</code>, <code>check-coverage</code>, <code>check-docs</code>, <code>check-v2</code>, <code>check-console</code>, <code>build-docs --check</code></td><td>pass</td></tr>
+<tr><td>T19F is a live programme row with its board and B7 link</td><td>seed created 1 project + 1 board; <code>programmes.refresh</code> skipped 52; project <code>01a210ba-b6cb-76cc-82a3-a2b45cfb498f</code></td><td>pass</td></tr>
+<tr><td><strong>The live gate</strong>: the v1 pin, the board sitting decided <code>via='meeting'</code>, and the cadence materialised once</td><td><code>scripts/t19f-live-gate-check.py --check</code> — 13/13 assertions PASS (<code>docs/evidence/t19f/live-gate-check.txt</code>)</td><td>pass</td></tr>
+<tr><td><strong>The policy v2 publish</strong> through the reviewed authoring route</td><td>human gate <code>01a211d8-001f-7296-bbc1-ccb13835a3ef</code> decided by FR Test (<code>decided_by_kind='human'</code>, <code>via.channel='web'</code>); <code>authoring.review</code> + <code>authoring.publish</code> wrote v2 <code>01a211da-c391-7867-86dd-d22f9cfed5d5</code>; the v1 meeting still resolves v1 (<code>gate/05b-human-decision.md</code>, <code>gate/07-authoring-publish.md</code>)</td><td>pass</td></tr>
+<tr><td>T19F's seven mandatory TOGAF artefacts are approved rows</td><td><code>scripts/governance-chain.py --project T19F --check</code> — 7/7 approved, 24/24 checks pass</td><td>pass</td></tr>
+<tr><td>T19F has live architecture contracts, requester ≠ approver</td><td>SoAW <code>01a210bd-ba25-78c1-a363-3eea5aa71335</code>, delivery contract <code>01a210bd-f408-778a-b67e-9b6cf36ca62a</code>, both board-decided</td><td>pass</td></tr>
+<tr><td>Each live contract has a Phase-G compliance review</td><td>two <code>architecture.reviews_record</code> rows, level <code>conformant</code>, read back from the published <code>architecture.json</code></td><td>pass</td></tr>
+<tr><td>B7 has a measurement baseline and an owner, and this unit does not overwrite it</td><td>baseline read back unchanged (<code>gov/benefit-b7-baseline.md</code>)</td><td>pass</td></tr>
+<tr><td>The TOGAF <code>architecture-artifact</code> standard is evidenced, not partial</td><td>published output <code>01a210be-6a72-77d4-ae4f-9ab9fa3c7f2a</code> with Metadata / Entries / Links / Document</td><td>pass</td></tr>
+<tr><td>The strict conformance publish</td><td>red on pre-existing programme-wide debt (T5/T6/T8/T15/T17 P0s; S18/S21/SPEC-V2 ledger rows) and on T19F's declared active-in-planned-tranche P1; the first publish was report-only with the exact findings (<code>docs/evidence/t19f/publish-final.log</code>). The strict remediation and the strict publish are the follow-on conformance unit; this review does not claim them</td><td><strong>open (disclosed)</strong></td></tr>
+<tr><td>One PR <code>Closes #684</code> merged</td><td>PR #711, merge commit <code>9ace4e81</code>; the human-review completion and the record refresh land on the close-out PR (#722)</td><td>pass</td></tr>
+</tbody></table>
+<h2>Evidence</h2>
+<ul>
+<li>The live gate: <code>scripts/t19f-live-gate-check.py --check</code> — 13 PASS, 0 FAIL. The human gate
+<code>01a211d8-001f-7296-bbc1-ccb13835a3ef</code> was decided by FR Test (<code>decided_by_kind='human'</code>,
+<code>via.channel='web'</code>); <code>authoring.publish</code> wrote meeting_type v2
+<code>01a211da-c391-7867-86dd-d22f9cfed5d5</code>; the v1-pinned meeting still resolves v1
+(<code>docs/evidence/t19f/gate/05b-human-decision.md</code>, <code>07-authoring-publish.md</code>,
+<code>live-gate-check.txt</code>).</li>
+<li>The governance chain: <code>scripts/governance-chain.py --project T19F --check</code> — 24/24 (seven
+approved artefacts, two live contracts with a requester distinct from the approver, B7 read back
+and not overwritten, one Phase-G compliance review per contract, the published
+<code>architecture-artifact</code> document).</li>
+<li>The construction record: merges <code>bf0d9590</code> (PR #686), <code>eb0deb61</code> (PR #700), <code>9ace4e81</code> (PR
+#711), <code>ac115c81</code> (PR #715); <code>docs/plans/T19F/evidence.md</code> and <code>docs/evidence/t19f/</code>.</li>
+<li>The programme record: the live row (project <code>01a210ba-b6cb-76cc-82a3-a2b45cfb498f</code>, its board,
+B7) and the published pack.</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li>The tranche-6 review owns the closure row and the benefit B7's incremental realisation.</li>
+<li>The strict conformance publish is the follow-on conformance unit (#726): it reconciles the
+programme-wide ledger and the declared records, and this review does not claim it.</li>
+<li>The tranche 2→4 authorisation chain is #526's unit; T19F adds no ledger entry of its own.</li>
+</ul>
+<h2>Decision</h2>
+<p>Acceptance is met on every row except the strict conformance publish, which is disclosed above and belongs to the follow-on conformance unit (the product's own strict gate is red on programme-wide debt that predates T19F, not on T19F's evidence). The human review was the product's designed gate: the admin CLI records <code>service</code> and <code>authoring.review</code> refuses a machine-only review, so FR Test — the tenant's human <code>app_user</code> seat, never the owner's personal account — decided a fresh gate in the signed-in console. <strong>Project closure is deferred to the tranche-6 review</strong>:
+T19F computes to tranche 6 from T19 (4) and T17 (5), and a project closed inside a planned tranche
+manufactures a <code>project_in_unauthorised_tranche</code> P0. T19F therefore stays <code>active</code> until the
+tranche-6 review records the closure, exactly as the plan's closure note declares.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision-forum governance (follow-on) · conveyor output · published 2026-11-25T11:25:19.603151696+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

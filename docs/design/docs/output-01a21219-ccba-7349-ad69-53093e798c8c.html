@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T5 Kata · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><hr />
+<h2>document: T5/closure-review
+version: 1
+status: published
+project: T5
+category: closure-review
+owner: programme-manager
+reviewer: Architecture Board
+review_date: 2026-11-25
+artifact_kind: closure-review
+phase: G
+plateau: capability</h2>
+<h1>T5 — Kata: closure review</h1>
+<p>Whether the project delivered its acceptance, on its evidence, and the decision that follows.</p>
+<h2>Outcome vs acceptance</h2>
+<table><thead><tr><th>Acceptance criterion</th><th>Evidence</th><th>Result</th></tr></thead><tbody>
+<tr><td>A planned procedure change opens a kata whose prediction is recorded before the measurement</td><td><code>crates/actions/tests/kata_gets.rs::the_prediction_is_recorded_before_the_measurement</code>; the <code>kata.*</code> action family in <code>docs/design/data/actions.json</code>; migration <code>0066_kata.sql</code></td><td>pass</td></tr>
+<tr><td>The measurement runs on the held-out split</td><td><code>crates/actions/tests/kata_measure.rs::a_procedure_change_is_measured_on_the_held_out_split</code></td><td>pass</td></tr>
+<tr><td>A measured regression reverts the candidate; a flat or incomparable result adopts nothing</td><td><code>crates/actions/tests/kata_revert.rs::a_measured_regression_reverts_the_candidate</code>, <code>::a_flat_or_incomparable_result_adopts_nothing</code></td><td>pass</td></tr>
+<tr><td>The kata cannot approve its own adoption</td><td><code>crates/actions/tests/kata_adopt.rs::the_kata_cannot_approve_its_own_adoption</code>; migration <code>0067_kata_gate.sql</code></td><td>pass</td></tr>
+<tr><td>A kata without an instrument is not opened; a second open kata for the same signature is refused</td><td><code>crates/actions/tests/kata_open.rs::a_kata_without_an_instrument_is_not_opened</code>, <code>::a_second_kata_for_an_open_signature_is_refused</code></td><td>pass</td></tr>
+<tr><td>The project's programme row and coverage agree</td><td>issue #77 closed by PR #636 (<code>7e617673</code>); #653 closed by PR #654 (<code>f8c82c68</code>); <code>build-coverage.py --check</code> and <code>build-programme-seed.py --check</code> green at <code>7d5ef094</code></td><td>pass</td></tr>
+</tbody></table>
+<h2>Evidence</h2>
+<ul>
+<li>Delivery merges: <code>7e6176733924b6bc695a7cf10a68dd5df061985c</code> (PR #636) and
+<code>f8c82c689cc4e0a848f68da1fcb520cb42d71f9e</code> (PR #654).</li>
+<li>Schema: <code>migrations/0066_kata.sql</code>, <code>migrations/0067_kata_gate.sql</code>.</li>
+<li>Behaviour: the <code>kata.*</code> action family (<code>crates/actions/src/kata.rs</code>,
+<code>crates/store/src/kata.rs</code>, <code>crates/domain/src/kata.rs</code>) and its integration tests under
+<code>crates/actions/tests/kata_*.rs</code>.</li>
+<li>The inception set: <code>docs/plans/inception/T5/</code> (brief, analysis, design).</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li>The tranche-10 authorisation is <strong>not</strong> claimed here: the tranche's state is <code>planned</code> and its
+authorisation is the #526 programme chain. This review records delivery, not authority.</li>
+<li>No open delivery item is named by the issue record.</li>
+</ul>
+<h2>Decision</h2>
+<p>Close. Acceptance is met on the evidence above; the tranche authorisation remains a separate
+programme act (#526), and this review does not manufacture it.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Kata · conveyor output · published 2026-11-25T11:25:19.603151696+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

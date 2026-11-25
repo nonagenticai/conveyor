@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T12 evidence — publish · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance/evidence-T12-publish.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t12-evidence--publish">T12 evidence — publish</h1>
+<p><code>documents.publish</code> for <code>01a2121a-fb41-7110-84df-f0e3499f704a</code> (admin act, If-Match). The standard's required headings are checked on this transition.</p>
+<pre><code>== write: documents.publish ==
+{
+  &quot;body&quot;: &quot;---\ndocument: T12/evidence\nversion: 1\nstatus: published\nproject: T12\ncategory: evidence\nowner: programme-manager\nreviewer: Architecture Board\nreview_date: 2026-11-25\nartifact_kind: evidence\nphase: G\nplateau: capability\n---\n\n# T12 \u2014 One organisation loop: evidence\n\n## Claim\n\nT12&#39;s loop is constructed and proven in the server harness: request \u2192 PM \u2192 delivery jobs \u2192 coach\ninterruption \u2192 kata \u2192 development project \u2192 deploy/live verify \u2192 operations incident \u2192 lesson, with\nevery transition audited and the loop within budget, and one benefit baselined before its\ntransition and read by the acceptance harness. The project&#39;s **acceptance is open**: the live half\nof P7 was not exercised (owner ruling 2026-11-24).\n\n## Evidence\n\n- `apps/server/tests/organisation_loop.rs` (12 scenarios), including `request_to_pm`,\n  `development_project_deploy_and_live_verify`, `deploy_failure_to_incident`,\n  `incident_to_promoted_lesson`, `every_loop_transition_audited`, `loop_within_budget` and\n  `architecture_and_benefits_acceptance`.\n- PR #670, merge `64f3d6ec370da089cefa46b4d8b6b80092ac98ad` (head `e65552f0`).\n- The deployed P6 service answered `GET /health` 200 at digest `sha256:84c75723\u2026`, tag\n  `sha-64f3d6e`, 2026-11-24T21:00:07Z.\n\n## Verification\n\n`cargo test -p conveyor-server --test organisation_loop` on a checked-out main; the deployment\nprobe is `curl -fsS https://&lt;deployed-host&gt;/health` at the tag above (recorded in the unit&#39;s\nevidence, not repeated here).\n\n## Links\n\n- `docs/plans/inception/T12/00-project-brief.md`, `01-inception-analysis.md`,\n  `02-architecture-design.md`\n- Issue #88 (open); PR #670; `docs/evidence/v2-coverage.md`.\n\n## Gap\n\nThe acceptance is open and this document does not claim it:\n\n- P7&#39;s live half is **not exercised** (owner ruling 2026-11-24).\n- The rollback exercise was not run.\n- The budget binding is an open question (tenant, programme or job binding; default tenant with\n  per-binding defaults); the observed refusal is the inference router&#39;s `429 budget_exceeded`, not\n  a conveyor-side spend gate.\n- No live benefit delta is claimed; `architecture_and_benefits_acceptance` is a harness test.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;evidence&quot;,
+  &quot;content_hash&quot;: &quot;76691699ac3f1cf66eb14252ef8b230de12f1826b7a7e948edb10210b7dd585b&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-25T09:48:07.761852Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a2121a-fb41-7110-84df-f0e3499f704a&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;evidence&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;76691699ac3f1cf66eb14252ef8b230de12f1826b7a7e948edb10210b7dd585b&quot;,
+    &quot;size_bytes&quot;: 2155,
+    &quot;unit&quot;: &quot;T12&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a1d039-0d36-7de8-891c-4d3dcf110cf5&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: true,
+  &quot;published_at&quot;: &quot;2026-11-25T09:48:13.113178Z&quot;,
+  &quot;published_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;published_by_name&quot;: &quot;FR Test&quot;,
+  &quot;size_bytes&quot;: 2155,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;Evidence \u2014 T12 One organisation loop&quot;,
+  &quot;unit&quot;: &quot;T12&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-25T09:48:13.113178Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: documents.get ==
+{
+  &quot;body&quot;: &quot;---\ndocument: T12/evidence\nversion: 1\nstatus: published\nproject: T12\ncategory: evidence\nowner: programme-manager\nreviewer: Architecture Board\nreview_date: 2026-11-25\nartifact_kind: evidence\nphase: G\nplateau: capability\n---\n\n# T12 \u2014 One organisation loop: evidence\n\n## Claim\n\nT12&#39;s loop is constructed and proven in the server harness: request \u2192 PM \u2192 delivery jobs \u2192 coach\ninterruption \u2192 kata \u2192 development project \u2192 deploy/live verify \u2192 operations incident \u2192 lesson, with\nevery transition audited and the loop within budget, and one benefit baselined before its\ntransition and read by the acceptance harness. The project&#39;s **acceptance is open**: the live half\nof P7 was not exercised (owner ruling 2026-11-24).\n\n## Evidence\n\n- `apps/server/tests/organisation_loop.rs` (12 scenarios), including `request_to_pm`,\n  `development_project_deploy_and_live_verify`, `deploy_failure_to_incident`,\n  `incident_to_promoted_lesson`, `every_loop_transition_audited`, `loop_within_budget` and\n  `architecture_and_benefits_acceptance`.\n- PR #670, merge `64f3d6ec370da089cefa46b4d8b6b80092ac98ad` (head `e65552f0`).\n- The deployed P6 service answered `GET /health` 200 at digest `sha256:84c75723\u2026`, tag\n  `sha-64f3d6e`, 2026-11-24T21:00:07Z.\n\n## Verification\n\n`cargo test -p conveyor-server --test organisation_loop` on a checked-out main; the deployment\nprobe is `curl -fsS https://&lt;deployed-host&gt;/health` at the tag above (recorded in the unit&#39;s\nevidence, not repeated here).\n\n## Links\n\n- `docs/plans/inception/T12/00-project-brief.md`, `01-inception-analysis.md`,\n  `02-architecture-design.md`\n- Issue #88 (open); PR #670; `docs/evidence/v2-coverage.md`.\n\n## Gap\n\nThe acceptance is open and this document does not claim it:\n\n- P7&#39;s live half is **not exercised** (owner ruling 2026-11-24).\n- The rollback exercise was not run.\n- The budget binding is an open question (tenant, programme or job binding; default tenant with\n  per-binding defaults); the observed refusal is the inference router&#39;s `429 budget_exceeded`, not\n  a conveyor-side spend gate.\n- No live benefit delta is claimed; `architecture_and_benefits_acceptance` is a harness test.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;evidence&quot;,
+  &quot;content_hash&quot;: &quot;76691699ac3f1cf66eb14252ef8b230de12f1826b7a7e948edb10210b7dd585b&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-25T09:48:07.761852Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a2121a-fb41-7110-84df-f0e3499f704a&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;evidence&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;76691699ac3f1cf66eb14252ef8b230de12f1826b7a7e948edb10210b7dd585b&quot;,
+    &quot;size_bytes&quot;: 2155,
+    &quot;unit&quot;: &quot;T12&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a1d039-0d36-7de8-891c-4d3dcf110cf5&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: true,
+  &quot;published_at&quot;: &quot;2026-11-25T09:48:13.113178Z&quot;,
+  &quot;published_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;published_by_name&quot;: &quot;FR Test&quot;,
+  &quot;size_bytes&quot;: 2155,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;Evidence \u2014 T12 One organisation loop&quot;,
+  &quot;unit&quot;: &quot;T12&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-25T09:48:13.113178Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/conformance/evidence-T12-publish.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
