@@ -17,6 +17,7 @@
       .std-meta dd { margin:.15rem 0 0; }
       .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
       .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-intent { max-width:68ch; }
       .std-source { font-size:.85rem; opacity:.8; }
       .std-index { list-style:none; padding:0; }
       .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
@@ -36,24 +37,24 @@
         <div><dt>Standard</dt><dd>TOGAF</dd></div>
         <div><dt>Level</dt><dd>project</dd></div>
         <div><dt>Subject</dt><dd>Plan: docs/plans/slices/S03-domain-schema.md</dd></div>
-        <div><dt>Status</dt><dd>evidenced</dd></div>
+        <div><dt>Status</dt><dd>partial</dd></div>
         <div><dt>SPEC</dt><dd>§8.1</dd></div>
         <div><dt>Gate</dt><dd>live</dd></div>
         <div><dt>Package</dt><dd><code>std-togaf-delivery-contract-s03:S03</code></dd></div>
         <div><dt>Provenance</dt><dd>2026-11-25T03:46:32.319854100+00:00 · b51896a61b28</dd></div>
       </dl>
       <h2>Commitments</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-absent">Not evidenced — Explicit absence — the contract&#x27;s commitment list: a commitments field on the delivery contract body (see <code>std-togaf-delivery-contract-s03:S03</code>).</p><h2>Compliance method</h2>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — S03 Domain and schema (retrospective, 2026-11-21) <span class="std-state">live</span></li>
-</ul><h2>Compliance method</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
-<ul>
-<li>Delivery contract — S03 Domain and schema (retrospective, 2026-11-21) <span class="std-state">live</span></li>
+<li>compliance: S03 is assessed clause by clause against the SPEC §8 S3 gate and the slice plan §7 gate. The four gate properties are carried by named tests: board.rs::archived_implies_the_card_sits_in_an_archive_list and ::restore_off_a_non_archive_list_is_an_error (a), claim_race.rs::thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic (b), approval_race.rs::sixteen_racers_create_exactly_one_pending_approval (c), transitions.rs::a_terminal_run_rejects_every_transition_and_a_revision_is_dense (d). Tenant isolation is rls_domain.rs::the_fourteen_domain_tables_isolate_runtime_owner_and_superuser. The schema-review clause is met with two admitted packages: v1-s03-1 (P1) records that property (b)&#x27;s lease-exclusivity half is not exercised, and v1-s03-2 (P2) records that the archive-exclusion claim covers only the two board-scan indexes. The Phase-G review records the compliance level against this contract; the rework&#x27;s acceptance instrument is acceptance/programme/S03.toml, and the closure gate is decided by an approver other than its requester on the P0-only gate.</li>
 </ul><h2>Approval</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 1 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_approval</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — S03 Domain and schema (retrospective, 2026-11-21) <span class="std-state">live</span></li>
+<li>approval 01a20063-5009-7a66-aaa2-5f2876187e88 — live <span class="std-state">live</span></li>
 </ul>
     </main>
   </body>
