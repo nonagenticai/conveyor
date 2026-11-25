@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "25 mandatory artefact package(s) open: dr-w3-shared-config-1:T1, compliance_review_missing:T1, mandatory_artefacts:T1, std-pmp-project-baseline-t1:T1, std-pmp-project-registers-t1:T1, std-togaf-architecture-artifact-instance-01a1ff89-4d05-7e2a-8dd2-2a29fb97a954:T1, std-togaf-architecture-artifact-instance-01a1ff89-7791-787e-a414-0d720c669445:T1, std-togaf-architecture-artifact-instance-01a1ff89-9ec5-7836-9065-5080c2d41e23:T1, +17 more",
+      "detail": "8 mandatory artefact package(s) open: dr-w3-shared-config-1:T1, compliance_review_missing:T1, mandatory_artefacts:T1, std-pmp-project-baseline-t1:T1, std-pmp-project-registers-t1:T1, std-togaf-architecture-artifact-t1:T1, std-togaf-delivery-contract-t1:T1, std-togaf-phase-g-t1-g:T1",
       "id": "T1-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -177,22 +177,22 @@
     }
   ],
   "failures": [
-    "T1-artefact-standard (P1): 25 mandatory artefact package(s) open: dr-w3-shared-config-1:T1, compliance_review_missing:T1, mandatory_artefacts:T1, std-pmp-project-baseline-t1:T1, std-pmp-project-registers-t1:T1, std-togaf-architecture-artifact-instance-01a1ff89-4d05-7e2a-8dd2-2a29fb97a954:T1, std-togaf-architecture-artifact-instance-01a1ff89-7791-787e-a414-0d720c669445:T1, std-togaf-architecture-artifact-instance-01a1ff89-9ec5-7836-9065-5080c2d41e23:T1, +17 more",
+    "T1-artefact-standard (P1): 8 mandatory artefact package(s) open: dr-w3-shared-config-1:T1, compliance_review_missing:T1, mandatory_artefacts:T1, std-pmp-project-baseline-t1:T1, std-pmp-project-registers-t1:T1, std-togaf-architecture-artifact-t1:T1, std-togaf-delivery-contract-t1:T1, std-togaf-phase-g-t1-g:T1",
     "T1-rework (P0): 3 unresolved P0/P1 package(s): dr-w3-shared-config-1:T1 (P1), compliance_review_missing:T1 (P1), mandatory_artefacts:T1 (P1)",
     "gate (P0): the gate check 'T1-artefact-standard' did not pass; the gate check 'T1-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The A\u2013D artefacts, the delivery contract, the closure review and the declared outputs exist; the project re-closes through the one gate.",
-  "generated_at": "2026-11-25T09:45:23.545818+00:00",
+  "generated_at": "2026-11-25T10:37:53.281173+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T1.toml",
   "name": "Plan spine \u2014 WBS, baselines, registers, cadence, tranches, benefits",
   "project": "T1",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "16 mandatory artefact package(s) open: closure_outputs_undeclared:S03, std-pmp-project-baseline-s03:S03, std-pmp-project-registers-s03:S03, std-togaf-architecture-artifact-instance-01a20062-07a7-7ee5-b99a-8e45e87ebda2:S03, std-togaf-architecture-artifact-instance-01a20062-31ed-76bc-986f-e232533a823b:S03, std-togaf-architecture-artifact-instance-01a20062-59d8-7175-91b6-1ef9e3b23391:S03, std-togaf-architecture-artifact-instance-01a20062-85ba-74fa-865a-19abcdf22bd9:S03, std-togaf-architecture-artifact-instance-01a20062-b2fa-7322-b13d-f5c14b641c31:S03, +8 more",
+      "detail": "6 mandatory artefact package(s) open: closure_outputs_undeclared:S03, std-pmp-project-baseline-s03:S03, std-pmp-project-registers-s03:S03, std-togaf-architecture-artifact-s03:S03, std-togaf-delivery-contract-s03:S03, std-togaf-phase-g-s03-g:S03",
       "id": "S03-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -178,22 +178,22 @@
   ],
   "failures": [
     "S03-closure-outputs (P0): the project declares no closure_outputs",
-    "S03-artefact-standard (P1): 16 mandatory artefact package(s) open: closure_outputs_undeclared:S03, std-pmp-project-baseline-s03:S03, std-pmp-project-registers-s03:S03, std-togaf-architecture-artifact-instance-01a20062-07a7-7ee5-b99a-8e45e87ebda2:S03, std-togaf-architecture-artifact-instance-01a20062-31ed-76bc-986f-e232533a823b:S03, std-togaf-architecture-artifact-instance-01a20062-59d8-7175-91b6-1ef9e3b23391:S03, std-togaf-architecture-artifact-instance-01a20062-85ba-74fa-865a-19abcdf22bd9:S03, std-togaf-architecture-artifact-instance-01a20062-b2fa-7322-b13d-f5c14b641c31:S03, +8 more",
+    "S03-artefact-standard (P1): 6 mandatory artefact package(s) open: closure_outputs_undeclared:S03, std-pmp-project-baseline-s03:S03, std-pmp-project-registers-s03:S03, std-togaf-architecture-artifact-s03:S03, std-togaf-delivery-contract-s03:S03, std-togaf-phase-g-s03-g:S03",
     "S03-rework (P0): 1 unresolved P0/P1 package(s): closure_outputs_undeclared:S03 (P1)",
     "gate (P0): the gate check 'S03-closure-outputs' did not pass; the gate check 'S03-artefact-standard' did not pass; the gate check 'S03-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "proptest on transitions and schema review \u2014 no transition leaves `list.kind` and `archived_at` contradictory, a claim never succeeds twice without release or expiry, one pending approval per (run, gate), and truncate/archive invariants hold",
-  "generated_at": "2026-11-25T09:45:21.174162+00:00",
+  "generated_at": "2026-11-25T10:37:51.119786+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S03.toml",
   "name": "Domain and schema \u2014 aggregates, state machines, baseline domain migration",
   "project": "S03",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

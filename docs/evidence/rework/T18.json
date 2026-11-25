@@ -30,7 +30,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a21214-4f05-7bc0-b0b6-2be68215c955 (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a21242-63c9-7615-976b-755293239187 (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T18-review",
       "kind": "snapshot",
       "result": "pass",
@@ -102,10 +102,10 @@
     {
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "1 open P0 package(s): std-pmp-change-control-t18:T18",
+      "detail": "no open P0 package for this project",
       "id": "T18-product",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -124,49 +124,44 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "7 mandatory artefact package(s) open: std-pmp-change-control-t18:T18, std-pmp-project-registers-t18:T18, std-togaf-delivery-contract-t18:T18, std-togaf-phase-b-t18-b:T18, std-togaf-phase-c-t18-c:T18, std-togaf-phase-d-t18-d:T18, std-togaf-phase-g-t18-g:T18",
+      "detail": "no open standard artefact package for this project",
       "id": "T18-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): std-pmp-change-control-t18:T18 (P0)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "T18-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T18-product' did not pass; the gate check 'T18-artefact-standard' did not pass; the gate check 'T18-rework' did not pass",
+      "detail": "gate discharged by executable checks: T18-project, T18-baseline, T18-contract, T18-review, T18-waivers, T18-pi-cadence, T18-pi-plan, T18-pi-objectives, T18-wsjf, T18-demo-credits, T18-lessons, T18-product, T18-coverage, T18-artefact-standard, T18-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T18-product (P0): 1 open P0 package(s): std-pmp-change-control-t18:T18",
-    "T18-artefact-standard (P1): 7 mandatory artefact package(s) open: std-pmp-change-control-t18:T18, std-pmp-project-registers-t18:T18, std-togaf-delivery-contract-t18:T18, std-togaf-phase-b-t18-b:T18, std-togaf-phase-c-t18-c:T18, std-togaf-phase-d-t18-d:T18, std-togaf-phase-g-t18-g:T18",
-    "T18-rework (P0): 1 unresolved P0/P1 package(s): std-pmp-change-control-t18:T18 (P0)",
-    "gate (P0): the gate check 'T18-product' did not pass; the gate check 'T18-artefact-standard' did not pass; the gate check 'T18-rework' did not pass"
-  ],
+  "failures": [],
   "gate": "a signed-in tenant drives portfolio \u2192 programme \u2192 project \u2192 work package, organisation \u2192 release \u2192 binding, procedures intake \u2192 publish, tools call \u2192 ledger, improve \u2192 kata \u2192 adoption, operations incident \u2192 postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports exists only from a real route and a present spec; no production screen renders a fixture",
-  "generated_at": "2026-11-25T09:45:24.347080+00:00",
+  "generated_at": "2026-11-25T11:44:20.362952+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T18.toml",
   "name": "The real V2 UI",
   "project": "T18",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T09:43:27.927052+00:00",
+    "git_sha": "676f798242fd24b7d8f5672501635e0e2e8f0447",
+    "path": "retained-snapshot/676f798242fd24b7d8f5672501635e0e2e8f0447"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }

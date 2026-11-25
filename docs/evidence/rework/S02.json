@@ -133,7 +133,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "24 mandatory artefact package(s) open: mandatory_artefacts:S02, tranche_plan:tranche-1, std-pmp-project-baseline-s02:S02, std-pmp-project-registers-s02:S02, std-togaf-architecture-artifact-instance-01a1ff84-8aab-76da-abbc-bbee569d7417:S02, std-togaf-architecture-artifact-instance-01a1ff84-b2bd-7741-ba51-db2e7c686957:S02, std-togaf-architecture-artifact-instance-01a1ff84-df25-7094-a0e3-64da36ef2c37:S02, std-togaf-architecture-artifact-instance-01a1ff85-09d8-71d9-8416-4bd269eb0520:S02, +16 more",
+      "detail": "7 mandatory artefact package(s) open: mandatory_artefacts:S02, tranche_plan:tranche-1, std-pmp-project-baseline-s02:S02, std-pmp-project-registers-s02:S02, std-togaf-architecture-artifact-s02:S02, std-togaf-delivery-contract-s02:S02, std-togaf-phase-g-s02-g:S02",
       "id": "S02-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -161,21 +161,21 @@
   "failures": [
     "S02-project (P0): status is 'active', expected 'closed'",
     "S02-closure-outputs (P0): the project declares no closure_outputs",
-    "S02-artefact-standard (P1): 24 mandatory artefact package(s) open: mandatory_artefacts:S02, tranche_plan:tranche-1, std-pmp-project-baseline-s02:S02, std-pmp-project-registers-s02:S02, std-togaf-architecture-artifact-instance-01a1ff84-8aab-76da-abbc-bbee569d7417:S02, std-togaf-architecture-artifact-instance-01a1ff84-b2bd-7741-ba51-db2e7c686957:S02, std-togaf-architecture-artifact-instance-01a1ff84-df25-7094-a0e3-64da36ef2c37:S02, std-togaf-architecture-artifact-instance-01a1ff85-09d8-71d9-8416-4bd269eb0520:S02, +16 more",
+    "S02-artefact-standard (P1): 7 mandatory artefact package(s) open: mandatory_artefacts:S02, tranche_plan:tranche-1, std-pmp-project-baseline-s02:S02, std-pmp-project-registers-s02:S02, std-togaf-architecture-artifact-s02:S02, std-togaf-delivery-contract-s02:S02, std-togaf-phase-g-s02-g:S02",
     "S02-rework (P0): 1 unresolved P0/P1 package(s): mandatory_artefacts:S02 (P1)",
     "gate (P0): the gate check 'S02-project' did not pass; the gate check 'S02-closure-outputs' did not pass; the gate check 'S02-artefact-standard' did not pass; the gate check 'S02-rework' did not pass"
   ],
   "gate": "The A\u2013D artefacts and the delivery contract exist, the brief and the evidence are published, the P2 long-job proof is landed, and the project closes through the one gate.",
-  "generated_at": "2026-11-25T09:45:21.091317+00:00",
+  "generated_at": "2026-11-25T10:37:51.041302+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S02.toml",
   "name": "Skeleton \u2014 workspace, tenancy, auth, jobs, SSE",
   "project": "S02",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

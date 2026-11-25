@@ -115,7 +115,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "30 mandatory artefact package(s) open: std-pmp-project-brief-spec-v2:SPEC-V2, std-togaf-benefits-diagram-spec-v2:SPEC-V2, std-togaf-candidate-solutions-spec-v2:SPEC-V2, std-togaf-phase-h-spec-v2-h:SPEC-V2, std-togaf-project-context-diagram-spec-v2:SPEC-V2, std-pmp-project-baseline-spec-v2:SPEC-V2, std-pmp-project-registers-spec-v2:SPEC-V2, std-togaf-architecture-artifact-instance-01a1ff41-5f8b-76e9-bf98-5073657e0d98:SPEC-V2, +22 more",
+      "detail": "13 mandatory artefact package(s) open: std-pmp-project-brief-spec-v2:SPEC-V2, std-togaf-benefits-diagram-spec-v2:SPEC-V2, std-togaf-candidate-solutions-spec-v2:SPEC-V2, std-togaf-phase-h-spec-v2-h:SPEC-V2, std-togaf-project-context-diagram-spec-v2:SPEC-V2, std-pmp-project-baseline-spec-v2:SPEC-V2, std-pmp-project-registers-spec-v2:SPEC-V2, std-togaf-architecture-artifact-spec-v2:SPEC-V2, +5 more",
       "id": "SPEC-V2-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -142,21 +142,21 @@
   ],
   "failures": [
     "SPEC-V2-closure-outputs (P0): the project declares no closure_outputs",
-    "SPEC-V2-artefact-standard (P1): 30 mandatory artefact package(s) open: std-pmp-project-brief-spec-v2:SPEC-V2, std-togaf-benefits-diagram-spec-v2:SPEC-V2, std-togaf-candidate-solutions-spec-v2:SPEC-V2, std-togaf-phase-h-spec-v2-h:SPEC-V2, std-togaf-project-context-diagram-spec-v2:SPEC-V2, std-pmp-project-baseline-spec-v2:SPEC-V2, std-pmp-project-registers-spec-v2:SPEC-V2, std-togaf-architecture-artifact-instance-01a1ff41-5f8b-76e9-bf98-5073657e0d98:SPEC-V2, +22 more",
+    "SPEC-V2-artefact-standard (P1): 13 mandatory artefact package(s) open: std-pmp-project-brief-spec-v2:SPEC-V2, std-togaf-benefits-diagram-spec-v2:SPEC-V2, std-togaf-candidate-solutions-spec-v2:SPEC-V2, std-togaf-phase-h-spec-v2-h:SPEC-V2, std-togaf-project-context-diagram-spec-v2:SPEC-V2, std-pmp-project-baseline-spec-v2:SPEC-V2, std-pmp-project-registers-spec-v2:SPEC-V2, std-togaf-architecture-artifact-spec-v2:SPEC-V2, +5 more",
     "SPEC-V2-rework (P0): 5 unresolved P0/P1 package(s): std-pmp-project-brief-spec-v2:SPEC-V2 (P1), std-togaf-benefits-diagram-spec-v2:SPEC-V2 (P1), std-togaf-candidate-solutions-spec-v2:SPEC-V2 (P1), std-togaf-phase-h-spec-v2-h:SPEC-V2 (P1), std-togaf-project-context-diagram-spec-v2:SPEC-V2 (P1)",
     "gate (P0): the gate check 'SPEC-V2-closure-outputs' did not pass; the gate check 'SPEC-V2-artefact-standard' did not pass; the gate check 'SPEC-V2-rework' did not pass"
   ],
   "gate": "The closure review exists and every declared closure output is published; the project re-closes through the one gate.",
-  "generated_at": "2026-11-25T09:45:23.302549+00:00",
+  "generated_at": "2026-11-25T10:37:53.109403+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/SPEC-V2.toml",
   "name": "SPEC V2 \u2014 the organisational operating model",
   "project": "SPEC-V2",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

@@ -195,16 +195,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The connector standard \u2014 one registry entry per kind, one inbound route, one command grammar, one multicast dispatcher and a tenant-admin grant matrix \u2014 is accepted on the \u00a75 Gate result at `99ed39f` plus the five-failure fix: clippy/fmt clean, lock OK, and every affected binary re-run green.",
-  "generated_at": "2026-11-25T09:45:21.748367+00:00",
+  "generated_at": "2026-11-25T10:37:51.646660+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S06d.toml",
   "name": "Interaction connector standard \u2014 web, Telegram, MCP first",
   "project": "S06d",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

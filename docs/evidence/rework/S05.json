@@ -43,7 +43,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a21213-9d2d-79d0-b119-a3fa9b970c84 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a21242-7d34-7bc7-a1f8-c658838b5731 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "S05-review",
       "kind": "snapshot",
       "result": "pass",
@@ -124,48 +124,44 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "5 mandatory artefact package(s) open: std-togaf-delivery-contract-s05:S05, std-togaf-phase-b-s05-b:S05, std-togaf-phase-c-s05-c:S05, std-togaf-phase-d-s05-d:S05, std-togaf-phase-g-s05-g:S05",
+      "detail": "no open standard artefact package for this project",
       "id": "S05-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "2 unresolved P0/P1 package(s): seed_live_drift:S05 (P1), v1-s05-1:S05 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "S05-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass",
+      "detail": "gate discharged by executable checks: S05-project, S05-baseline, S05-charter, S05-contract, S05-review, S05-waivers, S05-pi-cadence, S05-pi-plan, S05-pi-objectives, S05-lessons, S05-wsjf, S05-demo-credits, S05-product, S05-artefact-standard, S05-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "S05-artefact-standard (P1): 5 mandatory artefact package(s) open: std-togaf-delivery-contract-s05:S05, std-togaf-phase-b-s05-b:S05, std-togaf-phase-c-s05-c:S05, std-togaf-phase-d-s05-d:S05, std-togaf-phase-g-s05-g:S05",
-    "S05-rework (P0): 2 unresolved P0/P1 package(s): seed_live_drift:S05 (P1), v1-s05-1:S05 (P1)",
-    "gate (P0): the gate check 'S05-artefact-standard' did not pass; the gate check 'S05-rework' did not pass"
-  ],
+  "failures": [],
   "gate": "replay a board export, win a two-client race and survive the 1k-card load \u2014 zero deltas on 1,000 cards, one 200 and one 412 with the current representation, p95 \u2264 120 ms at 20 rps, the exact webhook shape, SSE within 200 ms, and no second store",
-  "generated_at": "2026-11-25T09:45:21.342266+00:00",
+  "generated_at": "2026-11-25T11:44:21.599809+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S05.toml",
   "name": "Board \u2014 projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
   "project": "S05",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T09:43:27.927052+00:00",
+    "git_sha": "676f798242fd24b7d8f5672501635e0e2e8f0447",
+    "path": "retained-snapshot/676f798242fd24b7d8f5672501635e0e2e8f0447"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }

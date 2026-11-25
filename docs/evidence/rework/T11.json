@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "23 mandatory artefact package(s) open: compliance_review_missing:T11, mandatory_artefacts:T11, std-pmp-project-baseline-t11:T11, std-pmp-project-registers-t11:T11, std-togaf-architecture-artifact-instance-01a1ff8d-e479-743c-a5f4-55dd0f18828a:T11, std-togaf-architecture-artifact-instance-01a1ff8e-0a8a-79c4-b144-573a7fd907f2:T11, std-togaf-architecture-artifact-instance-01a1ff8e-30a1-705b-a3ce-5becc79215c7:T11, std-togaf-architecture-artifact-instance-01a1ff8e-5b70-7521-9a16-fed5d0327f09:T11, +15 more",
+      "detail": "6 mandatory artefact package(s) open: compliance_review_missing:T11, mandatory_artefacts:T11, std-pmp-project-baseline-t11:T11, std-pmp-project-registers-t11:T11, std-togaf-architecture-artifact-t11:T11, std-togaf-phase-g-t11-g:T11",
       "id": "T11-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -177,22 +177,22 @@
     }
   ],
   "failures": [
-    "T11-artefact-standard (P1): 23 mandatory artefact package(s) open: compliance_review_missing:T11, mandatory_artefacts:T11, std-pmp-project-baseline-t11:T11, std-pmp-project-registers-t11:T11, std-togaf-architecture-artifact-instance-01a1ff8d-e479-743c-a5f4-55dd0f18828a:T11, std-togaf-architecture-artifact-instance-01a1ff8e-0a8a-79c4-b144-573a7fd907f2:T11, std-togaf-architecture-artifact-instance-01a1ff8e-30a1-705b-a3ce-5becc79215c7:T11, std-togaf-architecture-artifact-instance-01a1ff8e-5b70-7521-9a16-fed5d0327f09:T11, +15 more",
+    "T11-artefact-standard (P1): 6 mandatory artefact package(s) open: compliance_review_missing:T11, mandatory_artefacts:T11, std-pmp-project-baseline-t11:T11, std-pmp-project-registers-t11:T11, std-togaf-architecture-artifact-t11:T11, std-togaf-phase-g-t11-g:T11",
     "T11-rework (P0): 2 unresolved P0/P1 package(s): compliance_review_missing:T11 (P1), mandatory_artefacts:T11 (P1)",
     "gate (P0): the gate check 'T11-artefact-standard' did not pass; the gate check 'T11-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The A\u2013D artefacts, the delivery contract, the closure review and the declared outputs exist; the project re-closes through the one gate.",
-  "generated_at": "2026-11-25T09:45:23.718653+00:00",
+  "generated_at": "2026-11-25T10:37:53.445773+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T11.toml",
   "name": "Metrics, metering and maturity",
   "project": "T11",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

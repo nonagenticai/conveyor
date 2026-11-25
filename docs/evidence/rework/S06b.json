@@ -195,16 +195,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "At the end, one real agent task creates a project, reads its progress, answers an approval and closes the project \u2014 with the decision recorded as `decided_by_kind='agent'` \u2014 and no component called `nonagenticai_mcp_server` is in the path.",
-  "generated_at": "2026-11-25T09:45:21.540839+00:00",
+  "generated_at": "2026-11-25T10:37:51.460895+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S06b.toml",
   "name": "Agent direct interface \u2014 the conveyor's own MCP surface",
   "project": "S06b",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

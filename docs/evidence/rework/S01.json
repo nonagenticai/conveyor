@@ -128,7 +128,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "24 mandatory artefact package(s) open: closure_outputs_undeclared:S01, mandatory_artefacts:S01, std-pmp-project-baseline-s01:S01, std-pmp-project-registers-s01:S01, std-togaf-architecture-artifact-instance-01a1ff30-036a-7eca-8012-7d2073e4684c:S01, std-togaf-architecture-artifact-instance-01a1ff30-2cbb-7f0f-aa45-bb961b3daf21:S01, std-togaf-architecture-artifact-instance-01a1ff30-562c-769f-afb6-480f8a25b6cb:S01, std-togaf-architecture-artifact-instance-01a1ff30-7f7d-7b61-85a4-45a2baadcf66:S01, +16 more",
+      "detail": "7 mandatory artefact package(s) open: closure_outputs_undeclared:S01, mandatory_artefacts:S01, std-pmp-project-baseline-s01:S01, std-pmp-project-registers-s01:S01, std-togaf-architecture-artifact-s01:S01, std-togaf-delivery-contract-s01:S01, std-togaf-phase-g-s01-g:S01",
       "id": "S01-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -164,22 +164,22 @@
   ],
   "failures": [
     "S01-closure-outputs (P0): the project declares no closure_outputs",
-    "S01-artefact-standard (P1): 24 mandatory artefact package(s) open: closure_outputs_undeclared:S01, mandatory_artefacts:S01, std-pmp-project-baseline-s01:S01, std-pmp-project-registers-s01:S01, std-togaf-architecture-artifact-instance-01a1ff30-036a-7eca-8012-7d2073e4684c:S01, std-togaf-architecture-artifact-instance-01a1ff30-2cbb-7f0f-aa45-bb961b3daf21:S01, std-togaf-architecture-artifact-instance-01a1ff30-562c-769f-afb6-480f8a25b6cb:S01, std-togaf-architecture-artifact-instance-01a1ff30-7f7d-7b61-85a4-45a2baadcf66:S01, +16 more",
+    "S01-artefact-standard (P1): 7 mandatory artefact package(s) open: closure_outputs_undeclared:S01, mandatory_artefacts:S01, std-pmp-project-baseline-s01:S01, std-pmp-project-registers-s01:S01, std-togaf-architecture-artifact-s01:S01, std-togaf-delivery-contract-s01:S01, std-togaf-phase-g-s01-g:S01",
     "S01-rework (P0): 2 unresolved P0/P1 package(s): closure_outputs_undeclared:S01 (P1), mandatory_artefacts:S01 (P1)",
     "gate (P0): the gate check 'S01-closure-outputs' did not pass; the gate check 'S01-artefact-standard' did not pass; the gate check 'S01-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The decision record states what is observable and marks the rest not recoverable; the project re-closes through the one gate.",
-  "generated_at": "2026-11-25T09:45:21.007041+00:00",
+  "generated_at": "2026-11-25T10:37:50.961623+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S01.toml",
   "name": "UI spike \u2014 Leptos CSR vs Leptos SSR",
   "project": "S01",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []

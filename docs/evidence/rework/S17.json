@@ -172,16 +172,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "`conveyor-bench` is absorbed: the conveyor becomes the whole measurement loop \u2014 seed the SWE-bench subset, produce a patch per instance for an arm, run the graded test in a sandbox, parse the log with a ported swebench parser, resolve it, store the verdict, and compare runs.",
-  "generated_at": "2026-11-25T09:45:22.797474+00:00",
+  "generated_at": "2026-11-25T10:37:52.642762+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S17.toml",
   "name": "Native benchmark harness",
   "project": "S17",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:44:46Z",
-    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
-    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
+    "generated_at": "2026-11-25T10:31:33Z",
+    "git_sha": "37f991083c1cd34bd37561349a84f0200aa90f94",
+    "path": "retained-snapshot/37f991083c1cd34bd37561349a84f0200aa90f94"
   },
   "verdict": "red",
   "warnings": []
