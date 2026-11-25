@@ -3740,6 +3740,12 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let id = seed_asset(pg, ctx, AssetKind::Requirement).await;
             ctx.push("trace_links.create", id);
         }
+        "trace_links.view" => {
+            // The view's requirement root: a fresh asset per round, so the two transports read
+            // the same chain (no cards, runs or evidence yet).
+            let id = seed_asset(pg, ctx, AssetKind::Requirement).await;
+            ctx.push("trace_links.view", id);
+        }
         "trace_links.delete" => {
             let id = seed_trace_edge(pg, ctx).await;
             ctx.push("trace_links.delete", id);
@@ -5538,6 +5544,14 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         // immutable and carries no version).
         on_prepared("trace_links.delete", None),
         plain("trace_links.list", json!({"to_id": ctx.anchor_card}), None),
+        {
+            // A requirement root: the prepared asset and its (empty) downward chain.
+            let mut sample = plain("trace_links.view", json!({}), None);
+            sample.prepare = true;
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"requirement_id": ctx.pop("trace_links.view")}));
+            expecting(sample, 200)
+        },
         {
             // Idempotent on `(tenant, external_ref)`, so the ref is minted per ROUND.
             let mut sample = plain("project_requests.create", json!({}), None);

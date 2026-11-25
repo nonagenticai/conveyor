@@ -526,6 +526,52 @@ async fn a_trace_link_is_visible_from_both_ends_and_never_across_tenants() {
     assert_eq!(status, 409, "{body}");
 }
 
+/// v1-w2c-5: the governance view takes exactly one root, and a root that does not resolve is
+/// a classified 404 rather than an empty chain.
+#[tokio::test(flavor = "multi_thread")]
+async fn trace_view_requires_exactly_one_root() {
+    let (_pg, running, _alice, _bob) = fixture(false).await;
+
+    // Neither root: the caller must name one.
+    let (status, body) = running
+        .invoke("trace_links.view", "dev:alice", json!({}), None, None, None)
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert!(
+        body["errors"].to_string().contains("requirement_id"),
+        "the refusal names the field: {body}"
+    );
+
+    // Both roots: ambiguity is refused as well.
+    let (status, body) = running
+        .invoke(
+            "trace_links.view",
+            "dev:alice",
+            json!({
+                "requirement_id": uuid::Uuid::now_v7(),
+                "run_id": uuid::Uuid::now_v7(),
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+
+    // One root that does not exist in the tenant is a 404, not a schema error.
+    let (status, body) = running
+        .invoke(
+            "trace_links.view",
+            "dev:alice",
+            json!({"run_id": uuid::Uuid::now_v7()}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 404, "{body}");
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn a_dry_run_import_writes_nothing_and_a_real_one_imports_once() {
     let (pg, running, alice, _bob) = fixture(false).await;
@@ -665,7 +711,7 @@ async fn a_dry_run_import_writes_nothing_and_a_real_one_imports_once() {
 }
 
 #[tokio::test(flavor = "multi_thread")]
-async fn the_twelve_governance_actions_are_registered_with_their_scopes() {
+async fn the_governance_actions_are_registered_with_their_scopes() {
     let (_pg, running, _alice, _bob) = fixture(false).await;
     let (status, body) = running
         .http(
@@ -683,6 +729,7 @@ async fn the_twelve_governance_actions_are_registered_with_their_scopes() {
         ("trace_links.create", "governance:write"),
         ("trace_links.delete", "governance:write"),
         ("trace_links.list", "governance:read"),
+        ("trace_links.view", "governance:read"),
         ("catalogues.list", "catalogues:read"),
         ("catalogues.import", "catalogues:write"),
         ("project_requests.create", "requests:write"),

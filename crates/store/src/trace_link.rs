@@ -562,18 +562,18 @@ pub async fn view_trace_tx(
             };
             let mut cards: Vec<TraceViewCard> = sqlx::query_as(
                 "SELECT card.id, card.name
-                   FROM trace_link link
-                   JOIN card ON card.tenant_id = link.tenant_id AND card.id = link.to_id
-                  WHERE link.tenant_id = $1
-                    AND link.from_type = 'governed_asset' AND link.from_id = $2
-                    AND link.to_type = 'card'
+                   FROM trace_link tl
+                   JOIN card ON card.tenant_id = tl.tenant_id AND card.id = tl.to_id
+                  WHERE tl.tenant_id = $1
+                    AND tl.from_type = 'governed_asset' AND tl.from_id = $2
+                    AND tl.to_type = 'card'
                   UNION
                  SELECT card.id, card.name
-                   FROM trace_link link
-                   JOIN card ON card.tenant_id = link.tenant_id AND card.id = link.from_id
-                  WHERE link.tenant_id = $1
-                    AND link.to_type = 'governed_asset' AND link.to_id = $2
-                    AND link.from_type = 'card'
+                   FROM trace_link tl
+                   JOIN card ON card.tenant_id = tl.tenant_id AND card.id = tl.from_id
+                  WHERE tl.tenant_id = $1
+                    AND tl.to_type = 'governed_asset' AND tl.to_id = $2
+                    AND tl.from_type = 'card'
                   ORDER BY name, id
                   LIMIT $3",
             )

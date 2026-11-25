@@ -45,8 +45,8 @@ async fn trace_links_read_both_directions_and_resolve_both_ends_in_tenant() {
     let tenant = TenantId::from_uuid(seed.tenant).expect("non-nil");
 
     // The fixture's own trace row uses from_type='requirement' (S03 legacy); the writer
-    // admits only `END_TYPES` (governed_asset/card/project/document), so this edge is
-    // distinct from it.
+    // admits only `END_TYPES` (governed_asset/card/project/document/run/step/artefact/
+    // evidence), so this edge is distinct from it.
     let link = {
         let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
         let link = insert_trace_link_tx(
@@ -947,4 +947,225 @@ async fn catalogue_import_counts_created_updated_and_skipped_honestly() {
     .expect("read the changed card type");
     assert_eq!(type_label, "Bug fix (renamed)");
     assert_eq!(type_version, 2);
+}
+
+/// v1-w2c-5 / SPEC_V2 §8.5: the trace chain continues past the card. The view answers
+/// "which requirement does this run prove, and where is its evidence" from both roots:
+/// requirement → cards → runs → steps/artefacts/evidence, with the edges among those nodes.
+#[tokio::test]
+async fn the_trace_view_walks_requirement_to_run_step_artefact_and_evidence() {
+    let db = support::TestDb::fresh().await;
+    let seed = support::seed_tenant(&db.super_pool, "s07-trace-view").await;
+    let tenant = TenantId::from_uuid(seed.tenant).expect("non-nil");
+
+    // The requirement → card edge through the writer (the seed's own row uses the S03 legacy
+    // `requirement` type, which the whitelist does not admit).
+    let requirement_card = {
+        let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+        let link = insert_trace_link_tx(
+            &mut tx,
+            tenant,
+            &NewTraceLink::new("governed_asset", seed.asset, "card", seed.card),
+        )
+        .await
+        .expect("the requirement → card edge");
+        tx.commit().await.expect("commit");
+        link
+    };
+
+    // The run's own evidence: one step, one runner artefact reached through the attempt its
+    // `run.execute` job dispatched, and one governed tool call.
+    let step: Uuid = sqlx::query_scalar(
+        "INSERT INTO run_step (tenant_id, run_id, position, action, status)
+         VALUES ($1, $2, 1, 'cards.get', 'succeeded') RETURNING id",
+    )
+    .bind(seed.tenant)
+    .bind(seed.run)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed the run step");
+
+    let job: Uuid = sqlx::query_scalar(
+        "INSERT INTO job (tenant_id, kind, dedupe_key, payload, status)
+         VALUES ($1, 'run.execute', $2, $3, 'succeeded') RETURNING id",
+    )
+    .bind(seed.tenant)
+    .bind(format!("run:{}", seed.run))
+    .bind(json!({"run_id": seed.run}))
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed the run.execute job");
+
+    let attempt: Uuid = sqlx::query_scalar(
+        "INSERT INTO runner_run
+             (tenant_id, job_id, attempt, image, namespace, job_name, instruction, status)
+         VALUES ($1, $2, 1, 'test:latest', 'test', 'test-run', '{}'::jsonb, 'succeeded')
+         RETURNING id",
+    )
+    .bind(seed.tenant)
+    .bind(job)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed the runner attempt");
+
+    let artefact: Uuid = sqlx::query_scalar(
+        "INSERT INTO runner_artefact
+             (tenant_id, run_id, name, sha256, bytes, content_type, object_key)
+         VALUES ($1, $2, 'summary.txt', repeat('a', 64), 12, 'text/plain', 'run/summary.txt')
+         RETURNING id",
+    )
+    .bind(seed.tenant)
+    .bind(attempt)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed the runner artefact");
+
+    let toolkit: Uuid = sqlx::query_scalar(
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, owner)
+         VALUES ($1, 's07_test', 1, 'S07 trace view', 's07_test', 'test') RETURNING id",
+    )
+    .bind(seed.tenant)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed the toolkit");
+    let tool: Uuid = sqlx::query_scalar(
+        "INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, handler_action)
+         VALUES ($1, $2, 'call', '{}'::jsonb, 'read', 'tools.probe') RETURNING id",
+    )
+    .bind(seed.tenant)
+    .bind(toolkit)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed the tool");
+
+    let evidence: Uuid = sqlx::query_scalar(
+        "INSERT INTO tool_call
+             (tenant_id, run_id, run_step_id, card_id, tool_id, tool_key, toolkit_key,
+              toolkit_version, input_hash, status, latency_ms, http_status)
+         VALUES ($1, $2, $3, $4, $5, 's07_test.call', 's07_test', 1, repeat('b', 64), 'ok', 5, 200)
+         RETURNING id",
+    )
+    .bind(seed.tenant)
+    .bind(seed.run)
+    .bind(step)
+    .bind(seed.card)
+    .bind(tool)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed the governed tool call");
+
+    // The new ends resolve through the same tenant-scoped writer: run → step and
+    // artefact → evidence.
+    let (run_step_edge, artefact_evidence_edge) = {
+        let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+        let run_step = insert_trace_link_tx(
+            &mut tx,
+            tenant,
+            &NewTraceLink::new("run", seed.run, "step", step),
+        )
+        .await
+        .expect("run → step");
+        let artefact_evidence = insert_trace_link_tx(
+            &mut tx,
+            tenant,
+            &NewTraceLink::new("artefact", artefact, "evidence", evidence),
+        )
+        .await
+        .expect("artefact → evidence");
+        tx.commit().await.expect("commit the new ends");
+        (run_step, artefact_evidence)
+    };
+
+    // Requirement root: the asset, its card, the card's run and the run's evidence.
+    let requirement_view = {
+        let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+        let view = view_trace_tx(&mut tx, tenant, TraceRoot::Requirement(seed.asset))
+            .await
+            .expect("the requirement view");
+        tx.rollback().await.expect("roll back the read");
+        view
+    };
+    assert_eq!(requirement_view.root.root_type, "requirement");
+    assert_eq!(requirement_view.root.id, seed.asset);
+    assert_eq!(requirement_view.root.kind.as_deref(), Some("requirement"));
+    assert!(
+        !requirement_view.truncated,
+        "the fixture is under every cap"
+    );
+    assert!(
+        requirement_view
+            .cards
+            .iter()
+            .any(|card| card.id == seed.card),
+        "the requirement's card: {:?}",
+        requirement_view.cards
+    );
+    assert!(requirement_view.runs.iter().any(|run| run.id == seed.run));
+    assert!(requirement_view.steps.iter().any(|row| row.id == step));
+    assert!(
+        requirement_view
+            .artefacts
+            .iter()
+            .any(|row| row.id == artefact && row.run_id == seed.run),
+        "the run's artefact: {:?}",
+        requirement_view.artefacts
+    );
+    assert!(
+        requirement_view
+            .evidence
+            .iter()
+            .any(|row| row.id == evidence && row.run_id == Some(seed.run)),
+        "the run's governed call: {:?}",
+        requirement_view.evidence
+    );
+    for edge in [
+        requirement_card.id,
+        run_step_edge.id,
+        artefact_evidence_edge.id,
+    ] {
+        assert!(
+            requirement_view.edges.iter().any(|row| row.id == edge),
+            "edge {edge} is listed with the chain: {:?}",
+            requirement_view.edges
+        );
+    }
+
+    // Run root: the same chain from the run's own card.
+    let run_view = {
+        let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+        let view = view_trace_tx(&mut tx, tenant, TraceRoot::Run(seed.run))
+            .await
+            .expect("the run view");
+        tx.rollback().await.expect("roll back the read");
+        view
+    };
+    assert_eq!(run_view.root.root_type, "run");
+    assert_eq!(run_view.root.id, seed.run);
+    assert_eq!(run_view.root.card_id, Some(seed.card));
+    assert!(run_view.cards.iter().any(|card| card.id == seed.card));
+    assert!(run_view.runs.iter().any(|run| run.id == seed.run));
+    assert!(run_view.steps.iter().any(|row| row.id == step));
+    assert!(run_view.artefacts.iter().any(|row| row.id == artefact));
+    assert!(run_view.evidence.iter().any(|row| row.id == evidence));
+    assert!(
+        run_view
+            .edges
+            .iter()
+            .any(|row| row.id == requirement_card.id)
+    );
+
+    // An absent root is a classified 404, not an empty view.
+    let missing = {
+        let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+        let missing = view_trace_tx(&mut tx, tenant, TraceRoot::Run(Uuid::now_v7())).await;
+        tx.rollback().await.expect("roll back the refusal");
+        missing
+    };
+    assert!(
+        matches!(
+            missing,
+            Err(TraceLinkStoreError::RootNotFound { root: "run", .. })
+        ),
+        "unknown root: {missing:?}"
+    );
 }

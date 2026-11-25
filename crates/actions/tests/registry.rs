@@ -147,7 +147,9 @@ use serde_json::{Value, json};
 /// with their handlers, so they do not appear here. T11's `metrics.reconciliation` read adds
 /// one internal action and T11's billing shim adds one external read (`billing.rollup`):
 /// **619: 594 internal, 25 external**.
-const EXPECTED: [&str; 619] = [
+/// **v1-w2c-5 adds 1 internal**: `trace_links.view`, the bounded requirement/run chain read.
+/// 619 → **620: 595 internal, 25 external**.
+const EXPECTED: [&str; 620] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -722,6 +724,7 @@ const EXPECTED: [&str; 619] = [
     "trace_links.create",
     "trace_links.delete",
     "trace_links.list",
+    "trace_links.view",
     "tranches.authorise",
     "tranches.create",
     "tranches.delete",
@@ -868,8 +871,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` with their handlers.
     // T11's `metrics.reconciliation` read adds one internal action.
     // T11's billing shim adds one external read (`billing.rollup`).
-    // Final: 594 internal + 25 external = 619.
-    assert_eq!((internal, external), (594, 25));
+    // v1-w2c-5's `trace_links.view` adds one internal read.
+    // Final: 595 internal + 25 external = 620.
+    assert_eq!((internal, external), (595, 25));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
