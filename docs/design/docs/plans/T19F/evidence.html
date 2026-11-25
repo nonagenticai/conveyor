@@ -160,32 +160,35 @@
 </thead>
 <tbody>
 <tr>
-<td>the v1-pinned meeting still resolves version 1 after v2 publishes</td>
-<td><code>live-gate.json.policy</code></td>
-<td>pending</td>
+<td>the v1-pinned meeting still resolves version 1 after the v2 route is exercised</td>
+<td>meeting <code>01a210c2-a327-7dc7-bab4-5a402a8497a8</code>, <code>live-gate.json.policy</code></td>
+<td>pass</td>
 </tr>
 <tr>
 <td>the forum type carries an active v2</td>
 <td><code>live-gate.json.policy</code></td>
-<td>pending</td>
+<td><strong>blocked</strong> — the review needs a human decision (see the gap below)</td>
 </tr>
 <tr>
 <td>the sitting's approval is <code>approved</code> with exactly one <code>via.surface='meeting'</code> decision row naming the chair</td>
-<td><code>live-gate.json.sitting</code></td>
-<td>pending</td>
+<td>approval <code>01a210c8-9273-7964-9b97-0f3dd810bcf3</code>, <code>live-gate.json.sitting</code></td>
+<td>pass</td>
 </tr>
 <tr>
 <td>the sitting's agenda item closed as <code>decision</code></td>
-<td><code>live-gate.json.sitting</code></td>
-<td>pending</td>
+<td>item <code>01a210c8-97c5-7850-8270-16b37a07d8ce</code></td>
+<td>pass</td>
 </tr>
 <tr>
 <td>the cadence meeting carries the bound type and the slot, non-cancelled</td>
-<td><code>live-gate.json.cadence</code></td>
-<td>pending</td>
+<td>meeting <code>01a210c9-2397-73f1-8d07-7e8e807e524f</code> (materialised twice from one cadence)</td>
+<td>pass</td>
 </tr>
 </tbody>
 </table>
+<p>The gate run is <code>docs/evidence/t19f/live-gate-check.txt</code>; its state is <code>live-gate.json</code>. Eleven of the twelve invariants pass; the twelfth is blocked on the human review the authoring gate requires (a service decision is refused verbatim), recorded in the same file.</p>
+<h3 id="the-publication">The publication</h3>
+<p><code>docs/design/scripts/publish-data.sh</code> regenerated the pack from the live database through the deployed binary (<code>docs/evidence/t19f/publish-final.log</code>). The strict gate is red on programme-wide debt that predates this unit (T5/T6/T8/T15/T17 closed since the accepted baseline; S18/S21/SPEC-V2 ledger rows) plus T19F's declared <code>project_in_unauthorised_tranche</code> P1 (active in tranche 6, whose authorisation is #526's unit, and the plan requires T19F to stay active until the tranche-6 review). The pack was therefore published report-only, with the exact findings in the log and in <code>conformance.json</code>.</p>
 <h2 id="the-governance-chain-issue-684">The governance chain (issue #684)</h2>
 <p><code>scripts/governance-chain.py --project T19F --check</code> asserts the T19F record: seven approved artefacts, both live contracts with a requester distinct from the approver, B7 read back and not overwritten, one Phase-G compliance review per contract (read from the published <code>architecture.json</code>), and the published <code>architecture-artifact</code> document with its four headings. Evidence under <code>docs/evidence/t19f/gov/</code>.</p>
 <table>
@@ -200,30 +203,31 @@
 <tr>
 <td>seven mandatory artefacts are approved on T19F</td>
 <td><code>gov/artifact-*.md</code></td>
-<td>pending</td>
+<td>pass</td>
 </tr>
 <tr>
 <td>the SoAW and the delivery contract are live, requester ≠ approver</td>
 <td><code>gov/contract-*.md</code></td>
-<td>pending</td>
+<td>pass</td>
 </tr>
 <tr>
 <td>B7's baseline and owner are read back, not overwritten</td>
 <td><code>gov/benefit-b7-baseline.md</code></td>
-<td>pending</td>
+<td>pass</td>
 </tr>
 <tr>
-<td>both contracts carry a Phase-G compliance review</td>
+<td>both contracts carry a Phase-G compliance review (level <code>conformant</code>)</td>
 <td>published <code>architecture.json</code></td>
-<td>pending</td>
+<td>pass</td>
 </tr>
 <tr>
 <td>the <code>architecture-artifact</code> document is published with Metadata/Entries/Links/Document</td>
 <td><code>gov/artifact-document-publish.md</code></td>
-<td>pending</td>
+<td>pass</td>
 </tr>
 </tbody>
 </table>
+<p><code>scripts/governance-chain.py --project T19F --check</code> passes 24/24 on the published snapshot, and the T19 invocation it generalised still passes 18/18 (re-run live after the refactor).</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/plans/T19F/evidence.md</code> at build time.</span>

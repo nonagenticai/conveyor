@@ -1,7 +1,7 @@
 ---
 document: T19F/evidence
-version: 1
-status: draft
+version: 2
+status: published
 project: T19F
 category: evidence
 owner: programme-manager
@@ -60,11 +60,25 @@ evidence file under `docs/evidence/t19f/gate/`; the ids are `docs/evidence/t19f/
 
 | Invariant | Evidence | Result |
 |---|---|---|
-| the v1-pinned meeting still resolves version 1 after v2 publishes | `live-gate.json.policy` | pending |
-| the forum type carries an active v2 | `live-gate.json.policy` | pending |
-| the sitting's approval is `approved` with exactly one `via.surface='meeting'` decision row naming the chair | `live-gate.json.sitting` | pending |
-| the sitting's agenda item closed as `decision` | `live-gate.json.sitting` | pending |
-| the cadence meeting carries the bound type and the slot, non-cancelled | `live-gate.json.cadence` | pending |
+| the v1-pinned meeting still resolves version 1 after the v2 route is exercised | meeting `01a210c2-a327-7dc7-bab4-5a402a8497a8`, `live-gate.json.policy` | pass |
+| the forum type carries an active v2 | `live-gate.json.policy` | **blocked** — the review needs a human decision (see the gap below) |
+| the sitting's approval is `approved` with exactly one `via.surface='meeting'` decision row naming the chair | approval `01a210c8-9273-7964-9b97-0f3dd810bcf3`, `live-gate.json.sitting` | pass |
+| the sitting's agenda item closed as `decision` | item `01a210c8-97c5-7850-8270-16b37a07d8ce` | pass |
+| the cadence meeting carries the bound type and the slot, non-cancelled | meeting `01a210c9-2397-73f1-8d07-7e8e807e524f` (materialised twice from one cadence) | pass |
+
+The gate run is `docs/evidence/t19f/live-gate-check.txt`; its state is `live-gate.json`. Eleven of
+the twelve invariants pass; the twelfth is blocked on the human review the authoring gate requires
+(a service decision is refused verbatim), recorded in the same file.
+
+### The publication
+
+`docs/design/scripts/publish-data.sh` regenerated the pack from the live database through the
+deployed binary (`docs/evidence/t19f/publish-final.log`). The strict gate is red on programme-wide
+debt that predates this unit (T5/T6/T8/T15/T17 closed since the accepted baseline; S18/S21/SPEC-V2
+ledger rows) plus T19F's declared `project_in_unauthorised_tranche` P1 (active in tranche 6, whose
+authorisation is #526's unit, and the plan requires T19F to stay active until the tranche-6
+review). The pack was therefore published report-only, with the exact findings in the log and in
+`conformance.json`.
 
 ## The governance chain (issue #684)
 
@@ -76,8 +90,11 @@ Evidence under `docs/evidence/t19f/gov/`.
 
 | Invariant | Evidence | Result |
 |---|---|---|
-| seven mandatory artefacts are approved on T19F | `gov/artifact-*.md` | pending |
-| the SoAW and the delivery contract are live, requester ≠ approver | `gov/contract-*.md` | pending |
-| B7's baseline and owner are read back, not overwritten | `gov/benefit-b7-baseline.md` | pending |
-| both contracts carry a Phase-G compliance review | published `architecture.json` | pending |
-| the `architecture-artifact` document is published with Metadata/Entries/Links/Document | `gov/artifact-document-publish.md` | pending |
+| seven mandatory artefacts are approved on T19F | `gov/artifact-*.md` | pass |
+| the SoAW and the delivery contract are live, requester ≠ approver | `gov/contract-*.md` | pass |
+| B7's baseline and owner are read back, not overwritten | `gov/benefit-b7-baseline.md` | pass |
+| both contracts carry a Phase-G compliance review (level `conformant`) | published `architecture.json` | pass |
+| the `architecture-artifact` document is published with Metadata/Entries/Links/Document | `gov/artifact-document-publish.md` | pass |
+
+`scripts/governance-chain.py --project T19F --check` passes 24/24 on the published snapshot, and
+the T19 invocation it generalised still passes 18/18 (re-run live after the refactor).

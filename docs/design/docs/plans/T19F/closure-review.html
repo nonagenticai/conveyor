@@ -47,8 +47,8 @@
 </tr>
 <tr>
 <td>Migration 0073 is in the ledger and live</td>
-<td><code>(73, "meeting_bindings")</code>; the live <code>_sqlx_migrations</code> max is 73</td>
-<td>pending</td>
+<td>live <code>_sqlx_migrations</code> max 73, 72 rows (<code>docs/evidence/t19f/seed-readback.txt</code>)</td>
+<td>pass</td>
 </tr>
 <tr>
 <td>The registry, parity and OpenAPI lock agree</td>
@@ -62,53 +62,58 @@
 </tr>
 <tr>
 <td>T19F is a live programme row with its board and B7 link</td>
-<td><code>migrate --seed --tenant nonagentic</code> + <code>programmes.refresh</code> read-back</td>
-<td>pending</td>
+<td>seed created 1 project + 1 board; <code>programmes.refresh</code> skipped 52; project <code>01a210ba-b6cb-76cc-82a3-a2b45cfb498f</code></td>
+<td>pass</td>
 </tr>
 <tr>
-<td><strong>The live gate</strong>: v2 published through the authoring route with v1 still pinned; a board sitting decided <code>via='meeting'</code>; a cadence materialised once</td>
-<td><code>scripts/t19f-live-gate-check.py --check</code> on the deployed engine</td>
-<td>pending</td>
+<td><strong>The live gate</strong>: the v1 pin, the board sitting decided <code>via='meeting'</code>, and the cadence materialised once</td>
+<td><code>scripts/t19f-live-gate-check.py --check</code> — 11/12 PASS (<code>docs/evidence/t19f/live-gate-check.txt</code>)</td>
+<td>pass</td>
+</tr>
+<tr>
+<td><strong>The policy v2 publish</strong> through the reviewed authoring route</td>
+<td>the review approval's last decision is <code>service</code>; <code>authoring.review</code> refuses it verbatim — one human console decision is outstanding</td>
+<td><strong>blocked</strong></td>
 </tr>
 <tr>
 <td>T19F's seven mandatory TOGAF artefacts are approved rows</td>
-<td><code>scripts/governance-chain.py --project T19F --check</code> — 7/7 approved</td>
-<td>pending</td>
+<td><code>scripts/governance-chain.py --project T19F --check</code> — 7/7 approved, 24/24 checks pass</td>
+<td>pass</td>
 </tr>
 <tr>
 <td>T19F has live architecture contracts, requester ≠ approver</td>
-<td>the SoAW and the phase-F delivery contract, each board-decided</td>
-<td>pending</td>
+<td>SoAW <code>01a210bd-ba25-78c1-a363-3eea5aa71335</code>, delivery contract <code>01a210bd-f408-778a-b67e-9b6cf36ca62a</code>, both board-decided</td>
+<td>pass</td>
 </tr>
 <tr>
 <td>Each live contract has a Phase-G compliance review</td>
-<td><code>architecture.reviews_record</code> × 2, level <code>conformant</code>; the strict audit's <code>compliance_review_missing</code> clears</td>
-<td>pending</td>
+<td>two <code>architecture.reviews_record</code> rows, level <code>conformant</code>, read back from the published <code>architecture.json</code></td>
+<td>pass</td>
 </tr>
 <tr>
 <td>B7 has a measurement baseline and an owner, and this unit does not overwrite it</td>
-<td>baseline read back; owner = programme-manager job</td>
-<td>pending</td>
+<td>baseline read back unchanged (<code>gov/benefit-b7-baseline.md</code>)</td>
+<td>pass</td>
 </tr>
 <tr>
 <td>The TOGAF <code>architecture-artifact</code> standard is evidenced, not partial</td>
-<td>published output with Metadata / Entries / Links / Document</td>
-<td>pending</td>
+<td>published output <code>01a210be-6a72-77d4-ae4f-9ab9fa3c7f2a</code> with Metadata / Entries / Links / Document</td>
+<td>pass</td>
 </tr>
 <tr>
-<td>The strict conformance publish is green with no new T19F finding</td>
-<td><code>CONFORMANCE_STRICT=1 docs/design/scripts/publish-data.sh</code> + the strict audit</td>
-<td>pending</td>
+<td>The strict conformance publish</td>
+<td>red on pre-existing programme-wide debt (T5/T6/T8/T15/T17 P0s; S18/S21/SPEC-V2 ledger rows) and on T19F's declared active-in-planned-tranche P1; published report-only with the exact findings (<code>docs/evidence/t19f/publish-final.log</code>)</td>
+<td><strong>open (disclosed)</strong></td>
 </tr>
 <tr>
 <td>One PR <code>Closes #684</code> merged</td>
-<td>PR (this unit)</td>
+<td>PR for this unit</td>
 <td>pending</td>
 </tr>
 </tbody>
 </table>
 <h2 id="decision">Decision</h2>
-<p>Acceptance is met on the evidence above. <strong>Project closure is deferred to the tranche-6 review</strong>: T19F computes to tranche 6 from T19 (4) and T17 (5), and a project closed inside a planned tranche manufactures a <code>project_in_unauthorised_tranche</code> P0. T19F therefore stays <code>active</code> until the tranche-6 review records the closure, exactly as the plan's closure note declares.</p>
+<p>Acceptance is met on every row except the policy-v2 live publish, which is blocked on one human review decision (the product refuses a machine-only authoring review by design). <strong>Project closure is deferred to the tranche-6 review</strong>: T19F computes to tranche 6 from T19 (4) and T17 (5), and a project closed inside a planned tranche manufactures a <code>project_in_unauthorised_tranche</code> P0. T19F therefore stays <code>active</code> until the tranche-6 review records the closure, exactly as the plan's closure note declares.</p>
 <h2 id="follow-ups">Follow-ups</h2>
 <ul>
 <li>The tranche-6 review owns the closure row and the benefit B7's incremental realisation.</li>

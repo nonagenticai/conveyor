@@ -183,90 +183,151 @@ def apply(project_id_arg: str | None) -> int:
     base = resolve_base(project_id_arg)
     print(f"project {base['project_id']} board {base['board_id']} list {base['list_id']}")
 
-    # P1 — v1 exists with the schedule; a meeting pins it.
-    v1, _ = write_with_evidence(
-        "meetings.schedule",
-        {"title": "T19F live gate — the meeting pinned at policy v1",
-         "list_id": base["list_id"], "meeting_type_key": TYPE_KEY,
-         "policy": POLICY_V1, "convener_kind": "app_user",
-         "convener_id": base["operator_id"]},
-        name="01-schedule-v1.md",
-        header=(
-            f"# T19F live gate — policy v1 and its pinned meeting\n\n"
-            f"Action `meetings.schedule` creating meeting type `{TYPE_KEY}` v1 and a meeting "
-            f"pinned to it; the meeting must still resolve v1 after v2 is published.\n"
-        ),
-        read_action="meetings.get", read_id_from_output="id",
+    # P1 — v1 exists with the schedule; a meeting pins it. A resumed run reuses the
+    # meeting an earlier attempt already scheduled (meetings.get needs `meeting_id`, so the
+    # recorder's read-back is the meetings list and the pin is read explicitly below).
+    existing = read("meetings.list", {"limit": 200}).get("items", [])
+    resumed = next(
+        (m for m in existing
+         if m.get("meeting_type") == TYPE_KEY and m.get("meeting_type_version") == 1),
+        None,
     )
+    if resumed is not None:
+        v1 = resumed
+        ev = EVIDENCE / "01-schedule-v1.md"
+        ev.parent.mkdir(parents=True, exist_ok=True)
+        if not ev.exists():
+            ev.write_text("# T19F live gate — policy v1 and its pinned meeting\n")
+        with ev.open("a", encoding="utf-8") as handle:
+            handle.write(
+                "\nResumed: this meeting was created by the first attempt before the "
+                "read-back schema fix.\n```\n" + json.dumps(resumed, indent=2) + "\n```\n"
+            )
+        print(f"RESUME v1: meeting {v1['id']} is already pinned at version 1")
+    else:
+        v1, _ = write_with_evidence(
+            "meetings.schedule",
+            {"title": "T19F live gate — the meeting pinned at policy v1",
+             "list_id": base["list_id"], "meeting_type_key": TYPE_KEY,
+             "policy": POLICY_V1, "convener_kind": "app_user",
+             "convener_id": base["operator_id"]},
+            name="01-schedule-v1.md",
+            header=(
+                f"# T19F live gate — policy v1 and its pinned meeting\n\n"
+                f"Action `meetings.schedule` creating meeting type `{TYPE_KEY}` v1 and a meeting "
+                f"pinned to it; the meeting must still resolve v1 after v2 is published.\n"
+            ),
+            read_action="meetings.list", read_input={"limit": 5},
+        )
     v1_meeting = v1["id"]
     print(f"v1: meeting {v1_meeting} pinned at version {v1.get('meeting_type_version')}")
 
     # P1 — v2 through the authoring route: intake → draft → review approval → review → publish.
-    intake, _ = write_with_evidence(
-        "authoring.intake",
-        {"brief": "Publish the T19F live-gate forum policy v2 through the reviewed authoring route.",
-         "sources": [{"kind": "document", "ref": "docs/plans/T19F-meeting-bindings.md"}]},
-        name="02-intake.md",
-        header="# T19F live gate — the policy intake\n\nAction `authoring.intake`.\n",
-        read_action="authoring.intakes",
+    # Resumable: an asset that already exists under its key is reused; an approval already
+    # requested for it is reused. `authoring.review` requires the approval's LAST HUMAN decision
+    # (a service/rule decision is refused by design), so the act is attempted and, when only the
+    # machine decision exists, recorded as BLOCKED rather than forged — the sitting and cadence
+    # steps below do not depend on it.
+    assets = read("authoring.assets", {"kind": "policy"}).get("items", [])
+    asset = next((a for a in assets if a.get("key") == ASSET_KEY), None)
+    if asset is None:
+        intake, _ = write_with_evidence(
+            "authoring.intake",
+            {"brief": "Publish the T19F live-gate forum policy v2 through the reviewed authoring route.",
+             "sources": [{"kind": "document", "ref": "docs/plans/T19F-meeting-bindings.md"}]},
+            name="02-intake.md",
+            header="# T19F live gate — the policy intake\n\nAction `authoring.intake`.\n",
+            read_action="authoring.intakes",
+        )
+        draft, _ = write_with_evidence(
+            "authoring.draft",
+            {"intake_id": intake["id"], "kind": "policy", "key": ASSET_KEY, "payload": POLICY_V2},
+            name="03-draft.md",
+            header=(
+                f"# T19F live gate — the policy v2 draft\n\nAction `authoring.draft`, kind "
+                f"`policy`, key `{ASSET_KEY}`, payload carrying meeting_type `{TYPE_KEY}`.\n"
+            ),
+            read_action="authoring.assets", read_input={"kind": "policy"},
+        )
+        asset = draft
+    else:
+        print(f"RESUME policy: asset {asset['id']} exists ({asset.get('status')})")
+    asset_id = asset["id"]
+    approvals = read("approvals.list", {"project_id": base["project_id"]}).get("items", [])
+    approval_id = next(
+        (a["id"] for a in approvals
+         if a.get("gate") == "authoring.review" and a.get("target") == asset_id),
+        None,
     )
-    intake_id = intake["id"]
-    draft, _ = write_with_evidence(
-        "authoring.draft",
-        {"intake_id": intake_id, "kind": "policy", "key": ASSET_KEY, "payload": POLICY_V2},
-        name="03-draft.md",
-        header=(
-            f"# T19F live gate — the policy v2 draft\n\nAction `authoring.draft`, kind `policy`, "
-            f"key `{ASSET_KEY}`, payload carrying meeting_type `{TYPE_KEY}`.\n"
-        ),
-        read_action="authoring.assets", read_input={"kind": "policy"},
-    )
-    asset_id = draft["id"]
-    request, _ = write_with_evidence(
-        "approvals.request",
-        {"project_id": base["project_id"], "gate": "authoring.review", "kind": "gate",
-         "description": f"Review the T19F live-gate policy asset {asset_id}",
-         "target": asset_id},
-        name="04-review-request.md",
-        header="# T19F live gate — the review gate\n\nAction `approvals.request`, gate `authoring.review`.\n",
-        read_action="approvals.list", read_input={"project_id": base["project_id"]},
-    )
-    approval_id = request["id"]
-    write_with_evidence(
-        "approvals.decide",
-        {"approval_id": approval_id, "decision": "approve",
-         "note": "Reviewed against docs/plans/T19F/architecture-design.md"},
-        name="05-review-decision.md",
-        header=(
-            f"# T19F live gate — the review approval\n\nAction `approvals.decide` for approval "
-            f"{approval_id}, by the distinct `conveyor-approver` seat.\n"
-        ),
-        actor=base["approver_id"],
-        read_action="approvals.list", read_input={"project_id": base["project_id"]},
-    )
-    write_with_evidence(
-        "authoring.review",
-        {"asset_id": asset_id, "approval_id": approval_id},
-        name="06-authoring-review.md",
-        header=(
-            f"# T19F live gate — the authoring review\n\nAction `authoring.review` for asset "
-            f"{asset_id}, citing the approved gate {approval_id}.\n"
-        ),
-        read_action="authoring.assets", read_input={"kind": "policy"},
-    )
-    published, _ = write_with_evidence(
-        "authoring.publish",
-        {"asset_id": asset_id},
-        name="07-authoring-publish.md",
-        header=(
-            f"# T19F live gate — publishing the policy v2\n\nAction `authoring.publish` for asset "
-            f"{asset_id}; the hook writes the next immutable `{TYPE_KEY}` version.\n"
-        ),
-        read_action="authoring.assets", read_input={"kind": "policy"},
-    )
-    print(f"v2: asset {asset_id} published as meeting_type version "
-          f"{published.get('published_meeting_type_id')}")
-
+    if approval_id is None:
+        request, _ = write_with_evidence(
+            "approvals.request",
+            {"project_id": base["project_id"], "gate": "authoring.review", "kind": "gate",
+             "description": f"Review the T19F live-gate policy asset {asset_id}",
+             "target": asset_id},
+            name="04-review-request.md",
+            header="# T19F live gate — the review gate\n\nAction `approvals.request`, gate `authoring.review`.\n",
+            read_action="approvals.list", read_input={"project_id": base["project_id"]},
+        )
+        approval_id = request["id"]
+        write_with_evidence(
+            "approvals.decide",
+            {"approval_id": approval_id, "decision": "approve",
+             "note": "Reviewed against docs/plans/T19F/architecture-design.md"},
+            name="05-review-decision.md",
+            header=(
+                f"# T19F live gate — the review approval\n\nAction `approvals.decide` for "
+                f"approval {approval_id}, by the distinct `conveyor-approver` seat. The admin CLI "
+                f"records the decision as `service`; `authoring.review` needs a human decision.\n"
+            ),
+            actor=base["approver_id"],
+            read_action="approvals.list", read_input={"project_id": base["project_id"]},
+        )
+    reviewed = asset.get("status") in ("reviewed", "published")
+    blocked_review = None
+    if not reviewed:
+        try:
+            write_with_evidence(
+                "authoring.review",
+                {"asset_id": asset_id, "approval_id": approval_id},
+                name="06-authoring-review.md",
+                header=(
+                    f"# T19F live gate — the authoring review\n\nAction `authoring.review` for "
+                    f"asset {asset_id}, citing the approved gate {approval_id}.\n"
+                ),
+                read_action="authoring.assets", read_input={"kind": "policy"},
+            )
+            reviewed = True
+        except RuntimeError as error:
+            detail = str(error)
+            if "approval_missing" not in detail and "does not match the action schema" not in detail:
+                raise
+            blocked_review = (
+                "authoring.review refused: the approval has no human decision (the admin CLI "
+                "records `service`); a person must approve it in the console, then re-run"
+            )
+            print(f"BLOCKED policy v2: {blocked_review}")
+            ev = EVIDENCE / "06-authoring-review.md"
+            with ev.open("a", encoding="utf-8") as handle:
+                handle.write(
+                    "\nBLOCKED — the review needs a human decision. The approval was decided by "
+                    "the service actor; the product refuses a machine-only review.\n\n```\n"
+                    + detail.rstrip() + "\n```\n"
+                )
+    published = {}
+    if reviewed:
+        published, _ = write_with_evidence(
+            "authoring.publish",
+            {"asset_id": asset_id},
+            name="07-authoring-publish.md",
+            header=(
+                f"# T19F live gate — publishing the policy v2\n\nAction `authoring.publish` for "
+                f"asset {asset_id}; the hook writes the next immutable `{TYPE_KEY}` version.\n"
+            ),
+            read_action="authoring.assets", read_input={"kind": "policy"},
+        )
+        print(f"v2: asset {asset_id} published as meeting_type version "
+              f"{published.get('published_meeting_type_id')}")
     pinned = read("meetings.get", {"meeting_id": v1_meeting})
     pinned_meeting = pinned.get("meeting", pinned)
     if pinned_meeting.get("meeting_type_version") != 1:
@@ -275,7 +336,7 @@ def apply(project_id_arg: str | None) -> int:
         )
     versions = read("meetings.type_list", {"key": TYPE_KEY})
     version_rows = versions.get("items", [])
-    if len([v for v in version_rows if v.get("key") == TYPE_KEY or v.get("meeting_type_key") == TYPE_KEY]) < 2:
+    if reviewed and len(version_rows) < 2:
         raise RuntimeError(f"the type list does not carry two versions: {versions}")
     print(f"pinned: meeting {v1_meeting} still resolves v1; the type list carries "
           f"{len(version_rows)} version row(s)")
@@ -390,7 +451,7 @@ def apply(project_id_arg: str | None) -> int:
         "cadences.materialise", {"id": cadence_id, "list_id": base["list_id"]},
         name="17-cadence-materialise.md",
         header=f"# T19F live gate — materialising the cadence\n\nAction `cadences.materialise`.\n",
-        read_action="meetings.get", read_id_from_output="id",
+        read_action="meetings.list", read_input={"limit": 5},
     )
     second, _ = write_with_evidence(
         "cadences.materialise", {"id": cadence_id, "list_id": base["list_id"]},
@@ -399,7 +460,7 @@ def apply(project_id_arg: str | None) -> int:
             "# T19F live gate — materialising the cadence again\n\nAction "
             "`cadences.materialise`; the second call must return the first meeting.\n"
         ),
-        read_action="meetings.get", read_id_from_output="id",
+        read_action="meetings.list", read_input={"limit": 5},
     )
     if first.get("id") != second.get("id"):
         raise RuntimeError(
@@ -410,7 +471,9 @@ def apply(project_id_arg: str | None) -> int:
     state = {
         **base,
         "policy": {"type_key": TYPE_KEY, "asset_key": ASSET_KEY,
-                   "v1_meeting_id": v1_meeting, "v2_version": second.get("meeting_type_version")},
+                   "v1_meeting_id": v1_meeting,
+                   "v2_version": second.get("meeting_type_version"),
+                   "review_blocked": blocked_review},
         "sitting": {"body_id": body_id, "contract_id": subject_id, "meeting_id": meeting_id,
                     "agenda_item_id": item_id, "approval_id": sit_approval},
         "cadence": {"cadence_id": cadence_id, "meeting_id": first.get("id")},
@@ -446,12 +509,17 @@ def check() -> int:
 
     versions = read("meetings.type_list", {"key": state["policy"]["type_key"]})
     rows = versions.get("items", [])
-    expect(len(rows) >= 2, f"the forum type carries v1 and v2 (got {len(rows)} row(s))")
-    expect(any(v.get("version") == 2 and v.get("status") == "active" for v in rows),
-           "the v2 policy is an active version")
+    if state["policy"].get("review_blocked"):
+        expect(False, "the policy v2 is published after a human review: "
+                      + state["policy"]["review_blocked"])
+    else:
+        expect(len(rows) >= 2, f"the forum type carries v1 and v2 (got {len(rows)} row(s))")
+        expect(any(v.get("version") == 2 and v.get("status") == "active" for v in rows),
+               "the v2 policy is an active version")
 
     approval = None
-    approvals = read("approvals.list", {"project_id": state["project_id"]}).get("items", [])
+    # The sitting's approval is tenant-scoped (its subject lives in meta), not project-scoped.
+    approvals = read("approvals.list", {}).get("items", [])
     approval = next((a for a in approvals if a.get("id") == state["sitting"]["approval_id"]), None)
     expect(approval is not None, "the sitting's approval is a row")
     if approval is not None:

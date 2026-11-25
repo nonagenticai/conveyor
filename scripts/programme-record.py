@@ -86,6 +86,10 @@ READ_ONLY_ACTIONS = {
     # The plural reads do not end in `list`/`get`, so the suffix rule below misses them.
     "architecture.artifacts_links",
     "architecture.artifacts_entries",
+    # The authoring reads do not end in `list`/`get` either (`authoring.assets`,
+    # `authoring.intakes` are the route's plural reads).
+    "authoring.assets",
+    "authoring.intakes",
     "approvals.list",
     "approvals.get",
     "documents.get",

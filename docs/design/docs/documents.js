@@ -231,8 +231,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/data/conformance.html",
       "source": "docs/design/data/conformance.md",
       "section": "Design",
-      "sha256": "0b90fd258c3d8161d8c4f55b0a6aef78f286605c785bdf648a013c18e6be6163",
-      "bytes": 24325,
+      "sha256": "81ed52dcd07d46c5d88c7637666cff1eb72cda636360a6a59dfb01baed853416",
+      "bytes": 24819,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
     {
@@ -1194,8 +1194,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19F/artifact-register.html",
       "source": "docs/plans/T19F/artifact-register.md",
       "section": "Plans",
-      "sha256": "e164bea570355c9c971a254363c95cae239507f5b544f6e7f8161094fc17669b",
-      "bytes": 4244,
+      "sha256": "fea484e550864420488b169a76dca7a6c0cd092179efbccaa64e40bc8777359b",
+      "bytes": 4287,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/artifact-register.md"
     },
     {
@@ -1203,8 +1203,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19F/closure-review.html",
       "source": "docs/plans/T19F/closure-review.md",
       "section": "Plans",
-      "sha256": "b7435f8dcb5f8e4775c1fd983e286e04c56c80825e51e47ff8395fee4327efa9",
-      "bytes": 3144,
+      "sha256": "81a50bf16a1b18e8b14a558a640adb7095dc6d127fd613639aef8c0ea9b2e2e0",
+      "bytes": 3786,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/closure-review.md"
     },
     {
@@ -1212,8 +1212,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/T19F/evidence.html",
       "source": "docs/plans/T19F/evidence.md",
       "section": "Plans",
-      "sha256": "b5a6186c12e86c2a3b1192337e1917db9876093b3d2de464984ceced7a3946cd",
-      "bytes": 5562,
+      "sha256": "ed5eef0610d9088347b903d1a4788971661e58e95f9cc18f0eccb321e1a945ed",
+      "bytes": 6886,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/evidence.md"
     },
     {
