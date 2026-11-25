@@ -125,6 +125,12 @@
      "position": 9
     }
    ],
+   "links": [
+    {
+     "to": "Business Capability Map \u2014 S05 Board (Phase B)",
+     "kind": "dependency"
+    }
+   ],
    "body": "# Stakeholder Map \u2014 S05 Board (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d29-796d-967b-1e819a4dd40a; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine stakeholders on the influence/interest/engagement axes: the sponsoring group decides the tranche and the re-close, the SRO is accountable, the programme architect is responsible, the Architecture Board approves, S04/S06/S12 and the source analysts are consulted or informed, and operators and tenants are informed.\n\n## Links\n\nDerives from `docs/plans/slices/S05-board.md` \u00a71\u2013\u00a73 and \u00a79; realizes the Phase A stakeholder view for the board capability; reuses the programme roles already recorded in the conveyor buildout programme.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set; the published evidence document 01a1e686-f3ec-70d9-92f9-7dd6daef0c0f is the project's only contemporaneous publication."
   },
   {
@@ -207,6 +213,12 @@
       "objective": "board-export/v1 references keys, not UUIDs; two committed fixtures (v1-recording.json: 1 board, 5 lists, 20 cards, 30 comments, 40 tasks, 6 fields, seed 7; v1-1000.json: 1,000 cards, 10 lists, seed 42); four subcommands fixture|import|export|diff; archives are excluded (plan \u00a75, S5-D1)."
      },
      "position": 8
+    }
+   ],
+   "links": [
+    {
+     "to": "Requirements Catalog \u2014 S05 Board (Phase A)",
+     "kind": "derivation"
     }
    ],
    "body": "# Driver/Goal/Objective Catalog \u2014 S05 Board (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-24; project 01a1d039-0d29-796d-967b-1e819a4dd40a; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEight driver/goal/objective rows: the 280-flow lookup, the comment and membership convergence, custom-field groups, the webhook outbox, the single action write path, numeric positions and cursors, event-name ownership and the key-referenced export.\n\n## Links\n\nDerives from the slice plan \u00a71, \u00a73, \u00a75, \u00a78 and the decisions S5-D1 to S5-D8; realizes the Phase A driver view; reuses the S03 catalogue and matrix and the S04 action registry.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set; the accepted P0 exception and this rework are recorded in the closure review."
@@ -317,6 +329,12 @@
       "acceptance": "webhooks.create returns the secret once; webhooks.test returns WebhookDeliveryOut; events[] and excluded_events[] select the subscription; the deliver job reads the event row and sends the Bearer secret (plan \u00a75)."
      },
      "position": 10
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram \u2014 S05 Board (Phase A)",
+     "kind": "derivation"
     }
    ],
    "body": "# Requirements Catalog \u2014 S05 Board (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-24; project 01a1d039-0d29-796d-967b-1e819a4dd40a; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen requirements: the six gate properties (replay fidelity, one winner, 1k load, webhook shape, SSE, no second store), the nine tables and FORCE RLS, the 39 actions and 15 events, the read projections and the webhook lifecycle.\n\n## Links\n\nDerives from SPEC \u00a78 S5 and the slice plan \u00a75, \u00a76, \u00a77 and \u00a78; realizes the Phase A requirements view; reuses the S03 schema and matrix, the S04 registry and the S02 event/job/SSE primitives.\n\n## Document\n\nThe artefact sits under the slice plan; the acceptance instrument is acceptance/programme/S05.toml and the gate commands are plan \u00a77. The snapshot records no run of these properties."
@@ -465,6 +483,16 @@
      "position": 14
     }
    ],
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog \u2014 S05 Board (Phase C)",
+     "kind": "realization"
+    },
+    {
+     "to": "Business Capability Map \u2014 S05 Board (Phase B)",
+     "kind": "realization"
+    }
+   ],
    "body": "# Solution Concept Diagram \u2014 S05 Board (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-24; project 01a1d039-0d29-796d-967b-1e819a4dd40a; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nFourteen rows: seven components (the schema, the store, the actions, the projections, the export CLI, the gate tests and the load script) and seven edges (matrix to may_move, event to SSE, event to the webhook job, comment to its actions, membership to its action, S03 to S05 and the S04 registry to the actions).\n\n## Links\n\nDerives from the slice plan \u00a75 and \u00a76; realizes the Phase A solution concept; reuses the S03 schema/matrix and the S04 registry.\n\n## Document\n\nThe artefact sits under the slice plan; the named test binaries and the k6 script are its executable counterpart, and the plan's six gate properties are its acceptance."
   },
   {
@@ -565,6 +593,12 @@
       "evidence": "plan \u00a75, \u00a77 property c and trap 6"
      },
      "position": 9
+    }
+   ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog \u2014 S05 Board (Phase D)",
+     "kind": "realization"
     }
    ],
    "body": "# Business Capability Map \u2014 S05 Board (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-24; project 01a1d039-0d29-796d-967b-1e819a4dd40a; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine capabilities. The record claims the slice is built, but the snapshot contains no Phase-G review and no run of the six gate properties; eight capabilities are therefore recorded as declared and unevidenced, and the matrix move is inherited from S03.\n\n## Links\n\nDerives from the Phase A solution concept and the slice plan \u00a75\u2013\u00a78; realizes the Phase B capability view over SPEC \u00a78 S5; reuses the S03 matrix and the S04 registry.\n\n## Document\n\nThe artefact sits under the slice plan; the maturity column is the honest state at the 2026-11-24 rework snapshot, not a claim the acceptance gate passed."
@@ -716,6 +750,12 @@
      "position": 13
     }
    ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog \u2014 S05 Board (Phase D)",
+     "kind": "realization"
+    }
+   ],
    "body": "# Data Entity/Data Component Catalog \u2014 S05 Board (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-24; project 01a1d039-0d29-796d-967b-1e819a4dd40a; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nThirteen rows: the nine board tables of plan \u00a72.5 in the plan's order, plus the may_move function, the board-export/v1 format, the webhook delivery job and the event emitter.\n\n## Links\n\nDerives from the slice plan \u00a75\u2013\u00a77 and data-arch \u00a72.5; realizes the Phase C data view; reuses the S03 tenancy and `_tx` conventions and the S02 event and job primitives.\n\n## Document\n\nThe artefact sits under the slice plan and migrations/0004_board.sql; the schema is the entity record and the plan \u00a77 gate is its verification."
   },
   {
@@ -815,9 +855,132 @@
      "position": 10
     }
    ],
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog \u2014 S05 Board (Phase C)",
+     "kind": "dependency"
+    }
+   ],
    "body": "# Technology Standards Catalog \u2014 S05 Board (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-24; project 01a1d039-0d29-796d-967b-1e819a4dd40a; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen standards: Postgres 18 FORCE RLS, text+CHECK enumeration, numeric positions, cursor pagination, the action-only unversioned write path, the internal event vocabulary, the key-referenced export, the deduped webhook job, the source discipline and the verification route.\n\n## Links\n\nDerives from the slice plan \u00a75\u2013\u00a78, the S03 standards and the repository's current delivery rules; realizes the Phase D standards view; reuses the S04 registry and the S02 outbox.\n\n## Document\n\nThe artefact sits under the slice plan; the standards are exercised by migrations/0004_board.sql, the four gate test binaries and tests/load/board.js, and the acceptance instrument is acceptance/programme/S05.toml."
   }
  ],
+ "registers": {
+  "risk": [
+   {
+    "code": "S05-R1",
+    "title": "The six gate properties have no recorded run, so the built claim is unproven",
+    "body": "The Phase-G review, the delivery contract and the evidence Gap all record that at the 2026-11-24 snapshot no review records a run of the six plan section 7 properties: replay fidelity, one winner, 1k load, webhook shape, SSE and no second store. The project row is closed with meta.measured_status built, but built is a record claim, not a gate pass, and acceptance/programme/S05.toml has 17 checks whose closed-on-red state is the reason this rework exists. Until the properties run at a rework head, the re-close rests on the record set and the accepted P0 exception that carries the out-of-sequence close.",
+    "probability": "high",
+    "impact": 4,
+    "review_at": "2026-12-15",
+    "severity": "high",
+    "status": "open",
+    "response": "Run acceptance/programme/S05.toml and the four gate test binaries plus tests/load/board.js on a live stack, keep one receipt per property, and re-read the closure review on that evidence rather than inferring a pass from the built status.",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R1 Property (a) replay fidelity",
+      "R2 Property (b) one winner",
+      "R3 Property (c) 1k load",
+      "R4 Property (d) webhook shape",
+      "R5 Property (e) SSE",
+      "R6 Property (f) no second store"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "code": "S05-R2",
+    "title": "The plan frontmatter says planned while the project meta says built",
+    "body": "The project brief's Plan section and the evidence Gap both record that the slice plan frontmatter still reads status: planned and the project meta echoes meta.plan_status: planned although meta.measured_status is built. The Phase-G review judges the record set and does not reconcile the two, so a reader can take an unaccepted plan for an accepted one; the re-close rests on the acceptance record, not on the plan.",
+    "probability": "medium",
+    "impact": 3,
+    "review_at": "2026-12-15",
+    "severity": "medium",
+    "status": "open",
+    "response": "Reconcile the plan frontmatter with meta.measured_status at the tranche-4 review and record the decision in the plan of record.",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "acceptance/programme/S05.toml"
+     ],
+     "decisions": []
+    }
+   }
+  ],
+  "issue": [
+   {
+    "code": "S05-I1",
+    "title": "The close preceded tranche 4's authorisation by three days and rests only on an accepted P0 exception",
+    "body": "The project closed at 2026-11-21T01:05:43Z (version 7) and tranche 4 was authorised at 2026-11-24T17:04:34Z by the tranche-3 review; the accepted P0 issue records the close in an unauthorised tranche before the tranche review as a retrospective exception under the standing delegation. The charter, the Statement of Architecture Work and the evidence Gap carry the same order, so this rework's governance acts follow the close rather than precede it.",
+    "severity": "high",
+    "status": "open",
+    "response": "Have the tranche-4 review ratify the retrospective exception and this re-close in one decision, or return S05 to the board."
+   },
+   {
+    "code": "S05-I2",
+    "title": "The Planka fork is absent, so the per-event envelope and List.type transitions stay unverified",
+    "body": "The Technology Standards Catalog's source-discipline row and the evidence Gap record that the Planka fork is not present and that the per-event data envelope and the List.type transitions stay UNVERIFIED until measured. The plan's trap 1 forbids guessing them, so the board slice's reuse of Planka field shapes rests on the openapi and schema inventory, not on a runnable source.",
+    "severity": "medium",
+    "status": "open",
+    "response": "Measure the per-event envelope and the List.type transitions when the fork is restored, and keep the S14 cutover adapter deferred until then."
+   }
+  ],
+  "assumption": [
+   {
+    "code": "S05-A1",
+    "title": "The 2026-11-24 rework snapshot is the authoritative record for S05",
+    "body": "The delivery contract judges acceptance against the record at the 2026-11-24 rework snapshot, project closed 2026-11-21T01:05:43Z at version 7, and the checker refuses any id that appears nowhere in that snapshot. Every judgement in this pack is read from the snapshot, so if the snapshot is incomplete or stale for S05 the pack's facts and this re-close move with it.",
+    "status": "held"
+   },
+   {
+    "code": "S05-A2",
+    "title": "The live Planka database is test data and never gate evidence",
+    "body": "The project brief's reuse sources and the evidence Gap record that the live Planka database holds five cards, three webhooks and zero tasks, and plan traps 1 and 8 make it a test-data warning rather than evidence. The gate therefore rests on the two committed fixtures, v1-recording.json and v1-1000.json, so the live database can neither prove nor refute the six properties.",
+    "status": "held"
+   }
+  ],
+  "dependency": [
+   {
+    "code": "S05-D1",
+    "title": "S05 is blocked by S03, S04 and S02",
+    "body": "The project brief makes S05 blocked-by S03 (project, board, list, card, card_type, catalogue_entry, may_move and card.version), S04 (the ActionSpec derive, the registry and POST /api/actions/{name}/invocations) and S02 (event, job, audit_event and the /api/events SSE with Last-Event-ID replay). S05 adds no card state column and no second write path, so its build and its gate stand on those three slices.",
+    "status": "satisfied"
+   },
+   {
+    "code": "S05-D2",
+    "title": "S12 and S06 consume the board surface; S05 never writes claims, assignee or stopwatch",
+    "body": "The project brief makes S05 block S12's declared board and card-cockpit surface and S06's control-plane writes over the board (claims, assignee and stopwatch), and the charter puts those writes out of scope. The dependency stays open until S12 and S06 deliver against the declared surface; S05's re-close neither supplies nor verifies them.",
+    "status": "open"
+   }
+  ],
+  "benefit": [
+   {
+    "code": "S05-B1",
+    "title": "The 280 board\u2194project lookup flows become one foreign-key read through the project_type matrix",
+    "body": "The charter's mandate and the Driver/Goal/Objective Catalog's D1/G1 record the benefit: cards.move loads the card, both lists and project.project_type_code, then reads the matrix from catalogue_entry once and caches it per (tenant, project_type_code), instead of duplicating 280 board\u2194project lookup flows across board surfaces. The benefit is declared in the record and carried by the R1-R6 gate; it is not yet evidenced by a recorded run.",
+    "status": "open"
+   },
+   {
+    "code": "S05-B2",
+    "title": "One comment store and one membership model replace the Planka and fr duplication",
+    "body": "The charter's mandate and the Driver/Goal/Objective Catalog's D2/G2 record one comment table and one board_membership row (owner, admin, member or viewer with can_comment and watching, and project_manager and board_subscription folded in) as the replacement for the duplicated Planka and fr stores, with gate property f (R6) as its check. As with B1 the benefit is declared in the record and unevidenced until the property runs.",
+    "status": "open"
+   },
+   {
+    "code": "S05-B3",
+    "title": "The re-close is decidable from the acceptance instrument's P0 checks",
+    "body": "The closure states that S05 re-closes on the P0 checks of acceptance/programme/S05.toml, 17 checks with only lessons and artefact-standard at P1, so the close decision is repeatable by an independent reader rather than resting on prose. The Phase-G review and the closure review both judge the record set against that manifest.",
+    "status": "realized"
+   }
+  ]
+ },
  "delivery_contract": {
   "title": "Delivery contract \u2014 S05 Board (retrospective, 2026-11-24)",
   "body": {

@@ -14,6 +14,9 @@
   "artifacts": [
     {
       "title": "Stakeholder Map — T10 SAFe cadence and MSP tranches (Phase A)",
+      "links": [
+        {"to": "Solution Concept Diagram — T10 SAFe cadence and MSP tranches (Phase A)", "kind": "dependency"}
+      ],
       "phase_code": "a",
       "plateau": "psa",
       "artifact_kind": "matrix",
@@ -91,6 +94,9 @@
     },
     {
       "title": "Driver/Goal/Objective Catalog — T10 SAFe cadence and MSP tranches (Phase A)",
+      "links": [
+        {"to": "Stakeholder Map — T10 SAFe cadence and MSP tranches (Phase A)", "kind": "derivation"}
+      ],
       "phase_code": "a",
       "plateau": "psa",
       "artifact_kind": "catalog",
@@ -173,6 +179,9 @@
     },
     {
       "title": "Requirements Catalog — T10 SAFe cadence and MSP tranches (Phase A)",
+      "links": [
+        {"to": "Driver/Goal/Objective Catalog — T10 SAFe cadence and MSP tranches (Phase A)", "kind": "derivation"}
+      ],
       "phase_code": "a",
       "plateau": "psa",
       "artifact_kind": "catalog",
@@ -255,6 +264,9 @@
     },
     {
       "title": "Solution Concept Diagram — T10 SAFe cadence and MSP tranches (Phase A)",
+      "links": [
+        {"to": "Requirements Catalog — T10 SAFe cadence and MSP tranches (Phase A)", "kind": "derivation"}
+      ],
       "phase_code": "a",
       "plateau": "psa",
       "artifact_kind": "diagram",
@@ -337,6 +349,9 @@
     },
     {
       "title": "Business Capability Map — T10 SAFe cadence and MSP tranches (Phase B)",
+      "links": [
+        {"to": "Solution Concept Diagram — T10 SAFe cadence and MSP tranches (Phase A)", "kind": "derivation"}
+      ],
       "phase_code": "b",
       "plateau": "hld",
       "artifact_kind": "diagram",
@@ -419,6 +434,9 @@
     },
     {
       "title": "Data Entity/Data Component Catalog — T10 SAFe cadence and MSP tranches (Phase C)",
+      "links": [
+        {"to": "Business Capability Map — T10 SAFe cadence and MSP tranches (Phase B)", "kind": "derivation"}
+      ],
       "phase_code": "c",
       "plateau": "hld",
       "artifact_kind": "catalog",
@@ -501,6 +519,9 @@
     },
     {
       "title": "Technology Standards Catalog — T10 SAFe cadence and MSP tranches (Phase D)",
+      "links": [
+        {"to": "Data Entity/Data Component Catalog — T10 SAFe cadence and MSP tranches (Phase C)", "kind": "derivation"}
+      ],
       "phase_code": "d",
       "plateau": "hld",
       "artifact_kind": "catalog",
@@ -581,6 +602,100 @@
       "body": "## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d36-70c1-a5e8-f50956c5e3f9; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen standards. PostgreSQL 18 carries the cadence, tranche, demo, lesson and benefit tables in migrations/0056_cadence_tranche.sql; the Rust workspace is the implementation standard. WSJF is computed in the domain and never stored; the cadence state machine moves only along its table; the PI plan approval is the materialisation gate; demo evidence is an array of typed refs; retro closure requires a lesson per finding. Three standards are recorded as not met or partial: the tranche-review evidence check, the benefit-measurement value pair, and the programme governance rules around ownership, closure bypass and closure scope.\n\n## Links\n\nDerives from the Phase C data catalog and the repository's technology base. Reuses the workspace's PostgreSQL 18 and Rust standards and the delivery policy in docs/plans/03-DELIVERY.md. The compile and test verdict comes from the GitHub-hosted preflight.yml, never from local Rust compilation.\n\n## Document\n\nThe catalog is the technology view of the slice. It distinguishes a standard that is implemented and proved by a named test from a standard whose row exists but whose check is too weak; the latter are recorded with their finding codes rather than presented as met."
     }
   ],
+  "registers": {
+    "risk": [
+      {
+        "title": "The tranche-4 exit review is absent, so the tranche is reconciled unauthorised",
+        "code": "T10-R-01",
+        "body": "Tranche reconciliation records authorised:false with review_missing and projects_closed_before_authorisation; the exit criteria — every tranche-4 project accepted with published evidence, and a recorded continue, pause or stop — are unmet. The T10 re-close is decided on acceptance/programme/T10.toml and is not blocked by the exit, so this is a programme-level risk carried open rather than a blocker on this project's closure.",
+        "severity": "high",
+        "probability": "high",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "status": "open",
+        "response": "Take the tranche-4 exit review with typed baselines, benefit status and risk evidence, and record a continue, pause or stop decision before the next tranche is authorised.",
+        "meta": {"owner": "the SRO"},
+        "links": {"cards": [], "requirements": [{"kind": "requirement", "ref": "R4 gate clause 4"}], "decisions": []}
+      },
+      {
+        "title": "No benefit can claim realization while no benefit transition has been measured",
+        "code": "T10-R-02",
+        "body": "The seven benefit profiles are baselined, but benefit_transitions is empty and no post-transition measurement is recorded. Clause 5's refusal path is proved by benefit_transition.rs, yet the record stores timestamps plus free-form evidence with no typed baseline and post value pair (v1-p83-2), and benefit ownership is a free-text role rather than a job key (v1-p83-3).",
+        "severity": "high",
+        "probability": "high",
+        "impact": 4,
+        "review_at": "2026-12-15",
+        "status": "open",
+        "response": "Name the benefit owner as a job key and record a measured baseline and post-transition value through a benefit_transition before any realized status is reported.",
+        "meta": {"owner": "the BCM"},
+        "links": {"cards": [], "requirements": [{"kind": "requirement", "ref": "R5 gate clause 5"}], "decisions": []}
+      }
+    ],
+    "issue": [
+      {
+        "title": "v1-p83-1: the tranche-review evidence check is presence-only",
+        "code": "v1-p83-1",
+        "severity": "P1",
+        "status": "open",
+        "body": "The three evidence keys accept any non-null non-empty value, including the string none, and the seed authorises a tranche with no review; the tranche-4 row is declared authorised while reconciliation reports authorised:false."
+      },
+      {
+        "title": "v1-p82-5: PI materialisation is pinned to one project backlog",
+        "code": "v1-p82-5",
+        "severity": "P2",
+        "status": "open",
+        "body": "The materialisation query is pinned to one project_id, so the programme's standing backlog is not planned by WSJF; the project-backlog clause of the gate is proved and the programme-wide claim is not."
+      },
+      {
+        "title": "v1-p83-5: programme status is writable without a tranche review",
+        "code": "v1-p83-5",
+        "severity": "P2",
+        "status": "open",
+        "body": "programmes.update writes the programme status without a review or a realization plan, a bypass edge to closed that the tranche gate does not see."
+      }
+    ],
+    "assumption": [
+      {
+        "title": "The named test functions remain the gate evidence although this pass did not re-run them",
+        "status": "open",
+        "body": "The retrospective carried the test names from the project's recorded artefact entries and did not execute the suites; it assumes they still exist and pass at HEAD, with the compile and test verdict taken from preflight.yml rather than local Rust compilation."
+      },
+      {
+        "title": "T1's plan spine stays the only planning store T10 reads",
+        "status": "open",
+        "body": "T10 reuses T1's wbs_node, project_baseline, project_register_item and shared_config and adds no second plan store, card store or stored WSJF score; the cadence, tranche and benefit rows assume those tables remain the single planning and register vocabulary."
+      }
+    ],
+    "dependency": [
+      {
+        "title": "T1 supplies the plan spine T10 reuses",
+        "status": "met",
+        "body": "blocked-by T1: the wbs_node backlog, project_baseline rows, project_register_item register and shared_config are read from T1; T10 must not duplicate them."
+      },
+      {
+        "title": "T3 owns the PM job that charts, baselines, routes gates and closes",
+        "status": "met",
+        "body": "blocked-by T3: the charter, WBS, baseline, gate routing and closure of T10 run through T3's PM job, and the P0 programme record set supplies the accepted exception U3-EXC-T10 for the out-of-sequence closure."
+      },
+      {
+        "title": "Tranche 4 must stay authorised for the PI plan's ten-project scope",
+        "status": "at-risk",
+        "body": "Tranche 4 (version 2, state authorised) was authorised at 2026-11-24T17:04:34Z by the tranche-3 review with decision continue, but reconciliation records authorised:false with review_missing and projects_closed_before_authorisation, and the PI cadence still awaits approval."
+      }
+    ],
+    "benefit": [
+      {
+        "title": "Planning is arithmetic rather than opinion",
+        "status": "baselined",
+        "body": "WSJF is computed from the four typed inputs and never stored; cards materialise in computed-score order within WIP only behind an approved plan. The capability is live and proved by the named programme_cadence and pi_plan_approval suites; with benefit_transitions empty the benefit is baselined, not realized."
+      },
+      {
+        "title": "A demo credit needs typed evidence and a retro close needs a lesson",
+        "status": "baselined",
+        "body": "An accepted deliverable cannot demo without a typed evidence array and a retro cannot close while a finding lacks a lesson. Both capabilities are live and proved by demo_gate.rs and retro.rs; no post-transition measurement exists, so the benefit is baselined, not realized."
+      }
+    ]
+  },
   "delivery_contract": {
     "title": "Delivery contract — T10 SAFe cadence and MSP tranches (retrospective, U5a)",
     "body": {

@@ -111,6 +111,12 @@
      "position": 8
     }
    ],
+   "links": [
+    {
+     "to": "T19 — Requirements catalog",
+     "kind": "dependency"
+    }
+   ],
    "body": "# T19 — Stakeholder map\n\n## Metadata\n\nType matrix; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1; artefact 01a20cdd-e71f-7d06-8ca5-701ff6b7d69e, status approved; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nThe matrix places each stakeholder on the influence/interest/engagement axes and names what the decision forum owes them: the sponsoring group and the Architecture Board decide and approve; the chair is accountable for the agenda, the minutes gate and item closure; job bindings and human seats, including the owner, state positions, conditions and commitments; the programme manager reads decision latency, meeting load and participant-hours; auditors read the approval_decision rows written via='meeting'; the console and agent front ends carry the surfaces.\n\n## Links\n\nDerives from SPEC_V2 §6.8 (Meetings — the decision forum) and §12's T19 row, and from docs/plans/T19-decision-forums.md §3 and §4. It reuses the programme roles recorded in the conveyor buildout programme and the T9 governance_body and T10 programme_cadence seams; the live SoAW contract 01a20ce0-5183-776c-84bd-327f2301b19b is the Phase-A counterpart.\n\n## Document\n\nThe artefact records the stakeholder view as a matrix rather than a narrative: each row names one stakeholder, the stake it holds in the meeting record, and the engagement owed. It fixes the boundary that the owner and any human hold an ordinary seat rather than a privileged path, and that the LLM serves the forum as a drafter without becoming a participant. It records typed seats and attendance rows, never named individuals.\n"
   },
   {
@@ -208,6 +214,12 @@
       "observable": "forum metering"
      },
      "position": 9
+    }
+   ],
+   "links": [
+    {
+     "to": "T19 — Stakeholder map",
+     "kind": "derivation"
     }
    ],
    "body": "# T19 — Drivers, goals and objectives\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1; artefact 01a20cde-0f97-7f74-afd8-7cd74e0990e3, status approved; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nThe catalog states two drivers, two goals and five objectives. D1 and D2 explain why a decision needs its deliberation: the trade-offs between departments, the conditions attached, the dissent and the commitments given. G1 and G2 fix the shape of the answer — a meeting is a card, agenda items resolve approvals, and the outcome is arithmetic over typed positions under the stricter policy. O1 to O5 are the observable objectives: per-seat approval_decision rows with via='meeting', inquorate deferral, immutable meeting_type versions, the owner deciding live and asynchronously, and a forum with no decision being flagged.\n\n## Links\n\nDerives from SPEC_V2 §6.8 and decision D66, with the slice row at §12 and the gate at acceptance/programme/T19.toml. The plan docs/plans/T19-decision-forums.md §1–§4 elaborates the model, and the live SoAW contract 01a20ce0-5183-776c-84bd-327f2301b19b is the Phase-A counterpart.\n\n## Document\n\nThe catalog is deliberately short: it fixes the chain from driver to observable objective and refuses every adjacent goal the slice does not take. There is no chat objective, no transcript store, no calendar dependency and no LLM that selects, decides or infers. Each objective names the row a reviewer can query, so a future review can test the goal without re-reading the plan.\n"
@@ -338,6 +350,12 @@
      "position": 12
     }
    ],
+   "links": [
+    {
+     "to": "T19 — Drivers, goals and objectives",
+     "kind": "derivation"
+    }
+   ],
    "body": "# T19 — Requirements catalog\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1; artefact 01a20cde-371c-7d85-ae2d-780453958bef, status approved; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTwelve requirements carry the slice. R-01 to R-06 fix policy, convening, agenda, attendance, positions and the decision arithmetic; R-07 and R-08 dispose of outcomes and minutes; R-09 and R-10 carry the human seat and the metering; R-11 is the console destination; R-12 states the refusals that keep the design honest. Each functional requirement names the suite that verifies it in the plan, from meetings_policy through meetings_console, and the console adds the Playwright spec meetings.spec.ts.\n\n## Links\n\nDerives from SPEC_V2 §6.8, the T19 row at §12, the D66 decision, and docs/plans/T19-decision-forums.md §3–§7. The acceptance gate is acceptance/programme/T19.toml, and the requirements are consistent with the live delivery contract 01a20cea-91bb-77f4-a880-044c90bb5f0e.\n\n## Document\n\nThe catalog is the requirement baseline for the slice, not a design. It states what must be true and leaves the schema, the SQL and the HTTP shapes to the solution concept and the data entity catalog. The non-functional row is a set of refusals: any implementation that adds a chat table, a transcript store, a calendar write path, a second decision store or an LLM that invents a position fails R-12 regardless of its other behaviour.\n"
   },
   {
@@ -466,6 +484,12 @@
      "position": 12
     }
    ],
+   "links": [
+    {
+     "to": "T19 — Requirements catalog",
+     "kind": "realization"
+    }
+   ],
    "body": "# T19 — Solution concept\n\n## Metadata\n\nType diagram; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1; artefact 01a20cde-5f86-7720-9a16-36a964ef255d, status approved; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nThe diagram flows from policy to record: meeting_type pins the rule and participation; the meeting card convenes one instance; the agenda item names exactly one approval; attendance and one live position per participant capture the deliberation; close_item writes the per-seat approval_decision rows and derives the outcome by arithmetic under the stricter policy; minutes are drafted from those rows; actions become cards and commitments become dependencies or cards. The human surfaces in the web room, Telegram and MCP write the same rows, so the record does not depend on the room.\n\n## Links\n\nDerives from SPEC_V2 §6.8 and D66, with the slice row at §12, and from docs/plans/T19-decision-forums.md §4. The live SoAW contract 01a20ce0-5183-776c-84bd-327f2301b19b and delivery contract 01a20cea-91bb-77f4-a880-044c90bb5f0e bound the solution, and the acceptance gate is acceptance/programme/T19.toml.\n\n## Document\n\nThe concept deliberately has one decision store: every decision is an approval_decision row on the linked approval, and meeting_position is rationale and commitment, never a second decision. A transcript, where a tenant attaches one, is evidence on the item and never a position. The LLM drafts the agenda wording, the pre-read pack and the minutes, but it does not select, decide, infer or mark attendance; observers never count toward the arithmetic.\n"
   },
   {
@@ -585,6 +609,16 @@
      "position": 11
     }
    ],
+   "links": [
+    {
+     "to": "T19 — Solution concept",
+     "kind": "derivation"
+    },
+    {
+     "to": "T19 — Requirements catalog",
+     "kind": "derivation"
+    }
+   ],
    "body": "# T19 — Business capability map\n\n## Metadata\n\nType diagram; phase B; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1; artefact 01a20cde-86d7-7257-a45e-b4731ab423a4, status approved; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nEleven capabilities map the forum's lifecycle. C1 to C3 govern, convene and prepare; C4 to C6 capture participation and decide; C7 to C8 commit and record; C9 to C11 carry human participation, metering and the console. The map distinguishes primary capabilities (policy, convening, agenda, seats, positions, decision, minutes, human participation) from supporting ones (disposition, metering, console), and it shows that the decision capability is arithmetic over the position capability rather than a summary written by a person or a model.\n\n## Links\n\nDerives from SPEC_V2 §6.8 and §12's T19 row, and from docs/plans/T19-decision-forums.md §4 and the D1–D8 deliverables. The T9 governance_body and T10 programme_cadence seams are recorded as consumers, and the acceptance gate is acceptance/programme/T19.toml.\n\n## Document\n\nThe capability map is the bridge between the requirements and the tables: every primary capability has a row or an action behind it, and no capability is invented beyond the slice. It records what the forum does for the organisation — prepare, deliberate, decide, commit and record — and keeps the metering and the console as supporting capabilities rather than goals in themselves.\n"
   },
   {
@@ -695,6 +729,16 @@
      "position": 10
     }
    ],
+   "links": [
+    {
+     "to": "T19 — Business capability map",
+     "kind": "derivation"
+    },
+    {
+     "to": "T19 — Solution concept",
+     "kind": "derivation"
+    }
+   ],
    "body": "# T19 — Data entity catalog\n\n## Metadata\n\nType catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1; artefact 01a20cde-adbf-7626-9b2b-58faf7164755, status approved; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen entities carry the model. The five new tables own the forum policy, the convened card, the agenda, the attendance and the typed positions. The remaining rows are references the slice must not duplicate: the existing approval and its approval_decision rows, the card that the meeting is or an action becomes, the project_dependency a commitment may become, and the governed_asset that holds minutes. The catalog names the keys that give each table its identity, including the (tenant_id, key, version) uniqueness of meeting_type and the one-live-meeting-per-slot constraint on meeting.\n\n## Links\n\nDerives from SPEC_V2 §6.8's row table and from docs/plans/T19-decision-forums.md §6 (data model), with the migration ledgers and the participant extension recorded there. The acceptance gate is acceptance/programme/T19.toml, and the live delivery contract 01a20cea-91bb-77f4-a880-044c90bb5f0e carries compliance.\n\n## Document\n\nThe catalog's central rule is that meeting_position is not a decision: the only decision rows are approval_decision records on the linked approval, written once per qualifying seat with via='meeting'. A meeting can therefore never lower an approval's dual control, waive its evidence or bypass the P4 conflict exclusion; the decision arithmetic applies the meeting's rule first and the approval's policy second, and the stricter result wins. No transcript, chat or messages table exists, and none may be added under this slice.\n"
   },
   {
@@ -796,9 +840,130 @@
      "position": 9
     }
    ],
+   "links": [
+    {
+     "to": "T19 — Data entity catalog",
+     "kind": "derivation"
+    }
+   ],
    "body": "# T19 — Technology standards\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a20c80-b9b8-7214-abc6-f2c4f75a1fc1; artefact 01a20cde-d6bd-7cfe-88ad-42a1e6db30a7, status approved; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nThe standards are the repository's own, not new choices: PostgreSQL 18 with the typed migrations ledger, the Rust action API with unversioned routes, the existing event and job outbox, the SvelteKit console and its Playwright suite, and the governed-asset standard for minutes. The slice adds the meetings.* action family and five tables but no platform of its own; the agent front end uses the declared MCP surface and human decisions may arrive over Telegram, both writing the same approval_decision rows.\n\n## Links\n\nDerives from SPEC_V2 §6.8 and §10.2, the T19 row at §12, docs/plans/T19-decision-forums.md §6–§8, and the repository's engineering standards. The acceptance instrument is acceptance/programme/T19.toml, and the contracts 01a20ce0-5183-776c-84bd-327f2301b19b and 01a20cea-91bb-77f4-a880-044c90bb5f0e record the live governance.\n\n## Document\n\nThe catalog fixes the technology envelope and the verification tools together, because a standard that cannot be checked is a preference. Each row names the adopted platform or repository standard and, where applicable, the test that proves the slice uses it. The refusals stand: no chat platform, no transcript store, no AV integration, no calendar dependency, no LLM decision path and no second decision store; an ICS feed remains a read of meeting_attendance.\n"
   }
  ],
+ "registers": {
+  "risk": [
+   {
+    "code": "T19-R1",
+    "title": "The eight meetings suites and meetings.spec.ts have no rework-time run, so the closed record is unproven",
+    "body": "The charter, the delivery contract's compliance clause and the evidence gap all state that the 2026-11-24 snapshot holds no rework-time execution of acceptance/programme/T19.toml, the eight meetings suites meetings_policy, meetings_agenda, meetings_attendance, meetings_decision, meetings_outcomes, meetings_human_seat, meetings_metering and meetings_console, or apps/web/e2e/meetings.spec.ts. meta.measured_status says built and the row says closed, but a built status is a record claim, not a gate pass; until the gate runs at a rework head the built claim rests on the snapshot, the CLOSED issues #605 and #606 and the two conformant contract reviews.",
+    "status": "open",
+    "severity": "high",
+    "probability": "high",
+    "impact": 4,
+    "review_at": "2026-12-15",
+    "response": "Run acceptance/programme/T19.toml and the eight suites plus meetings.spec.ts at a rework head, keep one receipt per suite, and hold the verdict at consistent until those receipts exist rather than inferring a pass from the built status.",
+    "meta": {"owner": "the programme architect (conveyor-e2e)"},
+    "links": {
+     "cards": [],
+     "requirements": [
+      "acceptance/programme/T19.toml",
+      "R-06 close_item decision arithmetic (meetings_decision)"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "code": "T19-R2",
+    "title": "A meeting_position row could be read as a decision, creating the second decision store R-12 forbids",
+    "body": "The data entity catalog and the solution concept both fix that meeting_position is rationale, conditions and commitment, never a decision: the only decision rows are approval_decision records on the linked approval, written once per qualifying seat with via='meeting'. The risk is that the web room, the asynchronous queue, the Telegram surface or the MCP front end answers an item from positions, so a meeting appears to decide without close_item and without the stricter-wins arithmetic over quorum, required departments, dual control, evidence and the P4 conflict exclusion.",
+    "status": "open",
+    "severity": "high",
+    "probability": "medium",
+    "impact": 4,
+    "review_at": "2026-12-09",
+    "response": "Keep every decision read on approval_decision; have the review of the meetings.* actions and the /meetings console check that no surface resolves an item from meeting_position.",
+    "meta": {"owner": "the Architecture Board (conveyor-architecture-board)"},
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R-06 close_item decision arithmetic (meetings_decision)",
+      "R-12 no second decision store"
+     ],
+     "decisions": []
+    }
+   }
+  ],
+  "issue": [
+   {
+    "code": "T19-I1",
+    "title": "No receipt exists for acceptance/programme/T19.toml, the eight meetings suites or meetings.spec.ts at the rework head",
+    "body": "The charter's limit, the delivery contract's compliance clause and the evidence output's gap section all record that the snapshot holds no rework-time execution of the gate, the eight meetings suites or the web room spec, so the record cannot show a fresh pass. The close rests on the project row status closed with measured_status built, the CLOSED issues #605 and #606, the seven approved artefacts, the two live contracts and the two conformant contract reviews dated 2026-11-24T09:37-09:38Z.",
+    "status": "open",
+    "severity": "high"
+   },
+   {
+    "code": "T19-I2",
+    "title": "The tranche-4 authorisation postdates the contract reviews, so the governance acts precede the tranche that authorised them",
+    "body": "The delivery contract records tranche 4 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce as authorised at 2026-11-24T17:04:34Z by the tranche-3 review 01a211c9-0ef6-7a66-92b7-d114dc40a886, while the two contract reviews are dated 2026-11-24T09:37-09:38Z. This retrospective records the order truthfully and claims nothing about it; a future reviewer should read the contracts and reviews as authored before the tranche opened.",
+    "status": "open",
+    "severity": "medium"
+   },
+   {
+    "code": "T19-I3",
+    "title": "The live owner-seat gate has no record at the rework head",
+    "body": "The charter states the retrospective does not re-verify the live owner-seat gate and the evidence gap repeats it: no record shows the owner deciding one item live in the web room and one asynchronously over MCP with both rows written via='meeting', which objective O4 and requirement R-09 declare. The Telegram and MCP surfaces therefore remain declared checks, not measured ones.",
+    "status": "open",
+    "severity": "medium"
+   }
+  ],
+  "assumption": [
+   {
+    "code": "T19-A1",
+    "title": "The 2026-11-24 rework snapshot is the authoritative record for T19",
+    "body": "The charter states the retrospective is authored from the snapshot's rows under the standing delegation and records the gap truthfully; the evidence output's verification section says an independent reader can repeat the check against the same snapshot and that every cited id is gated against it. Every judgement in this pack is read from the snapshot, and an id that appears nowhere in it is refused.",
+    "status": "open"
+   },
+   {
+    "code": "T19-A2",
+    "title": "The consistent verdict stands without a waiver because the record shows no refused gate",
+    "body": "The Phase-G review reasons that the record supports consistent — seven approved artefacts, two live contracts, two conformant reviews, the authorised tranche and the CLOSED issues #605 and #606 — and does not support non_conformant because nothing in the record is non_conformant; the missing acceptance run is stated as a limit, not waived. The re-close rests on that distinction staying true, so it is recorded as an assumption rather than a proven fact.",
+    "status": "open"
+   }
+  ],
+  "dependency": [
+   {
+    "code": "T19-D1",
+    "title": "T1, T2 and T3 supply the approval, card, governed-asset and dependency primitives the meetings reference",
+    "body": "The project brief records that T19 depends on T1, T2 and T3 for the typed primitives a meeting references — the approval and its approval_decision rows, the card, the governed asset and the dependency edge — and the project row's meta names depends_on T1, T2, T3 and P0. The data entity catalog marks approval, approval_decision, card, project_dependency and governed_asset as referenced primitives rather than tables of this slice.",
+    "status": "satisfied"
+   },
+   {
+    "code": "T19-D2",
+    "title": "P0 supplies the acceptance instrument and the ledger discipline the re-close stands on",
+    "body": "meta.depends_on names P0, and the project brief records P0 as the source of the acceptance and ledger discipline. The delivery contract assesses T19 clause by clause against acceptance/programme/T19.toml and is authored under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, the authority the retrospective runs under.",
+    "status": "satisfied"
+   }
+  ],
+  "benefit": [
+   {
+    "code": "T19-B1",
+    "title": "Every decision is one approval_decision row per qualifying seat with via='meeting', so no decision escapes the governed store",
+    "body": "Goal G2 and objective O1 make the decision arithmetic the slice's first outcome: close_item writes one approval_decision per qualifying seat with via='meeting' and the stricter of the meeting type's rule and the approval's policy wins, including quorum, required departments, dual control, evidence and the P4 conflict exclusion. Auditors read the same rows the approval primitive always owned, and the data entity catalog keeps meeting_position as rationale rather than a second decision store.",
+    "status": "baselined"
+   },
+   {
+    "code": "T19-B2",
+    "title": "A meeting is a card under the existing DoD and WIP limits, so forums inherit the board's governance for free",
+    "body": "The solution concept and the data entity catalog make the meeting a card with the card_id and the uq_meeting_live constraint, owned by its chair under WIP limits and DoD. The slice adds no fifth unit and no chat: it reuses the approval, card, governed-asset and dependency primitives, so every meeting is visible and governed on the same board as the work it decides.",
+    "status": "baselined"
+   },
+   {
+    "code": "T19-B3",
+    "title": "Minutes, commitments and metering are recorded on the typed rows, so the deliberation outlives the room",
+    "body": "Requirements R-07, R-08 and R-10 and the solution concept record minutes as a chaired governed_asset(kind='minutes') drafted from the typed rows and published behind the chair's gate with dissent kept verbatim; actions become cards and commitments become project dependencies or cards. Participant-hours and the never-decided forum flag then let the programme manager see meeting load and retire a forum that produces no decision.",
+    "status": "baselined"
+   }
+  ]
+ },
  "delivery_contract": {
   "title": "Delivery contract — T19 Decision forums (meetings) (retrospective, 2026-11-24)",
   "body": {

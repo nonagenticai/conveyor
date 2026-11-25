@@ -122,6 +122,12 @@
      "position": 9
     }
    ],
+   "links": [
+    {
+     "to": "Business Capability Map — S09 Documents and integrations (Phase B)",
+     "kind": "dependency"
+    }
+   ],
    "body": "# Stakeholder Map — S09 Documents and integrations (Phase A)\n\n## Metadata\n\nType matrix; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under the standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine rows on the influence, interest and engagement axes: the sponsoring group decides the tranche and the retrospective disposition, the SRO is accountable, the programme architect is responsible, the Architecture Board approves the Phase A–D set, S03 and S04 supply tenancy and the action registry, S12 receives the declared admin surface, the strata and coding owners are consulted as external targets, and operators and tenants are informed on byte and secret custody.\n\n## Links\n\nDerives from docs/plans/slices/S09-documents-integrations.md sections 1 to 5 and 9; realizes the Phase A stakeholder view for the document, repository, secret and display boundary; reuses the programme roles already recorded in the conveyor buildout programme and the tranche-4 authorisation 01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. The project's only contemporaneous publication is the evidence page 01a1e687-7682-753d-b60e-1f00243b13a3, published 2026-11-16; this Phase A matrix is authored by the 2026-11-24 retrospective rework and does not attest delivery-time engagement."
   },
   {
@@ -212,6 +218,12 @@
       "objective": "documents.delete sets status deleted and enqueues document.purge; the purge checks status == deleted before removing bytes and clear_object_tx refuses a non-deleted row, so orphaned bytes and pointerless documents are both refused (plan 5.2, trap 0b)."
      },
      "position": 9
+    }
+   ],
+   "links": [
+    {
+     "to": "Requirements Catalog — S09 Documents and integrations (Phase A)",
+     "kind": "derivation"
     }
    ],
    "body": "# Driver/Goal/Objective Catalog — S09 Documents and integrations (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nNine driver, goal and objective rows: bytes out of Postgres into MinIO, secrets that never answer in plaintext, adjacent services reachable only as declared actions, an internal ingest action over the strata service, repositories as references, live report queries, read-only worker and billing displays, the x-secret projection and the guarded purge.\n\n## Links\n\nDerives from the slice plan sections 1, 3, 5, 8 and the ten decisions closed in section 9; realizes the Phase A driver view; reuses the S03 tenancy and trace_link and the S04 action registry and served spec.\n\n## Document\n\nThe artefact sits under the slice plan and the project's architecture set. The plan records that Part A and Part B were built on 2026-11-08; the pre-rework audit pack docs/evidence/rework/S09.json still records verdict red because the governance record and gate run were absent, and this catalogue records the intent rather than claiming the gate passed."
@@ -322,6 +334,12 @@
       "acceptance": "document.created/updated/deleted/ingested, repository.created/linked and secret.created/rotated/deleted are written one per mutation in the same transaction with the payload keys of plan 5.7; no event is emitted by a read path."
      },
      "position": 10
+    }
+   ],
+   "links": [
+    {
+     "to": "Solution Concept Diagram — S09 Documents and integrations (Phase A)",
+     "kind": "derivation"
     }
    ],
    "body": "# Requirements Catalog — S09 Documents and integrations (Phase A)\n\n## Metadata\n\nType catalog; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen requirements: the seven gate properties (round-trip, cap, secret, workers, reports, externals, billing), the four tables with FORCE RLS, the 27 declared actions of which 26 are registered, and the nine event types. Each row names its executable proof in the plan's gate or its test targets.\n\n## Links\n\nDerives from SPEC section 8 S9 and the slice plan sections 5, 6, 7 and 8; realizes the Phase A requirements view; reuses the S03 schema conventions and the S04 registry with its OpenAPI and MCP projection. The acceptance instrument is acceptance/programme/S09.toml.\n\n## Document\n\nThe artefact sits under the slice plan. The snapshot contains no run of properties a to g and no evidence that the deployed MinIO leg or the live strata_ingest call was exercised; the catalogue therefore states the required proof without claiming it was observed."
@@ -470,6 +488,16 @@
      "position": 14
     }
    ],
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — S09 Documents and integrations (Phase C)",
+     "kind": "realization"
+    },
+    {
+     "to": "Business Capability Map — S09 Documents and integrations (Phase B)",
+     "kind": "realization"
+    }
+   ],
    "body": "# Solution Concept Diagram — S09 Documents and integrations (Phase A)\n\n## Metadata\n\nType diagram; phase A; plateau psa; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nFourteen rows: seven components (migration 0013, the store modules, the served surfaces, the integrations module, MinIO, strata_ingest and the declared externals) and seven edges (row to object key, the authorized byte stream, the KEK to secret row, ArtifactRef to trace_link, the guarded purge, the outbox row and the S03/S04 primitives).\n\n## Links\n\nDerives from the slice plan sections 5.1 to 5.7 and the build order in section 6; realizes the Phase A solution concept; reuses the S03 schema and the S04 registry. The strata_rag base-URL contract and the /query versus /api/query discrepancy remain stated risks rather than silent assumptions.\n\n## Document\n\nThe artefact sits under the slice plan. Its executable counterparts are documents_roundtrip, documents_limits, secrets_never_revealed, externals_declared, reports_match_sql, repositories_crud and the served-spec lock; the plan gate in section 7 is its acceptance."
   },
   {
@@ -579,6 +607,12 @@
       "evidence": "plan 5.6 and 6; open question 4 resolved only as a contract"
      },
      "position": 10
+    }
+   ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog — S09 Documents and integrations (Phase D)",
+     "kind": "realization"
     }
    ],
    "body": "# Business Capability Map — S09 Documents and integrations (Phase B)\n\n## Metadata\n\nType diagram; phase B; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen capabilities: document lifecycle, the MinIO bytes backend, repository references, write-only secrets, coding job dispatch, the external service boundary, worker and provider display, billing display, live report queries and the strata ingest handoff. Each carries the plan's own statement of maturity rather than an inferred pass.\n\n## Links\n\nDerives from the Phase A solution concept and the slice plan sections 5 to 8; realizes the Phase B capability view over SPEC section 8 S9; reuses the S03 tenancy and trace_link and the S04 registry. The plan's build order is the maturity record for Part A and Part B.\n\n## Document\nThe artefact sits under the slice plan. The snapshot records no Phase-G review and no run of properties a to g, so the map distinguishes what the plan says was built from what the record proves; the strata ingest capability is the one openly unregistered action."
@@ -720,6 +754,12 @@
      "position": 12
     }
    ],
+   "links": [
+    {
+     "to": "Technology Standards Catalog — S09 Documents and integrations (Phase D)",
+     "kind": "realization"
+    }
+   ],
    "body": "# Data Entity/Data Component Catalog — S09 Documents and integrations (Phase C)\n\n## Metadata\n\nType catalog; phase C; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTwelve rows: the four tables document, repository, project_repository and secret, the ArtifactRef value, the MinIO object key, the purge job, the event outbox, run.external_ref, the app_licence read model, the sealed strata token and the billing source tables. Each names its owner and the one invariant that keeps the boundary intact.\n\n## Links\n\nDerives from 02-DATA-ARCHITECTURE section 2.10 and the slice plan sections 5.2 to 5.7; realizes the Phase C data view; reuses the S03 tenant, trace_link and revision and the S02 event and job primitives. The four-table cap is the plan's own rule.\n\n## Document\n\nThe artefact sits under the slice plan and migrations/0013_documents.sql. The snapshot records the migration's existence through the plan but no applied run or catalog read; the entity set is the designed record, and the plan section 7 gate is its verification."
   },
   {
@@ -819,9 +859,169 @@
      "position": 10
     }
    ],
+   "links": [
+    {
+     "to": "Data Entity/Data Component Catalog — S09 Documents and integrations (Phase C)",
+     "kind": "dependency"
+    }
+   ],
    "body": "# Technology Standards Catalog — S09 Documents and integrations (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board (conveyor-architecture-board); review date 2026-11-24; project 01a1d039-0d2d-71f1-a403-c9abe52c1888; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen standards: the repository's Postgres and FORCE RLS convention, the action-only unversioned write path, MinIO object storage, the HKDF and XChaCha20-Poly1305 envelope, the x-secret projection, external timeout and breaker, live report queries, non-absorption, content sniffing and the verification route.\n\n## Links\n\nDerives from the slice plan sections 5, 7 and 8 and the repository's delivery rules; realizes the Phase D standards view; reuses the S03 tenancy convention, the S04 registry and the S02 outbox. The standards are the constraints the gate and the named tests exercise.\n\n## Document\n\nThe artefact sits under the slice plan. Its executable counterparts are migration 0013, the integrations module, the served-spec lock and the test targets named in the plan gate; the snapshot records the design and the plan's build claims, not a recorded gate run."
   }
  ],
+ "registers": {
+  "risk": [
+   {
+    "code": "S09-R1",
+    "title": "The seven gate properties a to g have no recorded run, so the built claim is unproven",
+    "body": "The Phase-G review findings, the delivery contract compliance statement, the closure review's Outcome vs acceptance and the evidence Gap all record that at the 2026-11-24 snapshot no run of the plan section 7 properties exists: round-trip, cap, secret, workers, reports, externals and billing are each named with a test target, but no receipt is recorded. The project row is closed with meta.measured_status built, but built is a record claim, not a gate pass.",
+    "probability": "high",
+    "impact": 4,
+    "review_at": "2026-12-15",
+    "severity": "high",
+    "status": "open",
+    "response": "Run acceptance/programme/S09.toml and the named targets documents_roundtrip, documents_limits, secrets_never_revealed, externals_declared and reports_match_sql plus the workers and billing checks on a live stack, keep one receipt per property, and re-read the closure review on that evidence rather than inferring a pass from the built status.",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R1 Property (a) round-trip",
+      "R2 Property (b) cap",
+      "R3 Property (c) secret",
+      "R4 Property (d) workers",
+      "R5 Property (e) reports",
+      "R6 Property (f) externals",
+      "R7 Property (g) billing"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "code": "S09-R2",
+    "title": "The deployed MinIO leg and the live strata_ingest path behind documents.ingest are unproven",
+    "body": "The Solution Concept Diagram and the Business Capability Map record the deployed MinIO credentials and bucket policy as unproven, with scripts/prove-s3.sh proving only the S3 wire; strata_ingest is not reachable from a local gate, and documents.ingest is the one declared action of 27 that is not registered. The round-trip property may pass against an ephemeral bucket while the store the product will use stays unestablished.",
+    "probability": "medium",
+    "impact": 4,
+    "review_at": "2026-12-15",
+    "severity": "high",
+    "status": "open",
+    "response": "Have operators confirm the MinIO endpoint, credentials and bucket policy, run the byte route against the deployed bucket, and register documents.ingest once a live strata_ingest target and a sealed per-tenant token exist.",
+    "meta": {
+     "owner": "operators"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R1 Property (a) round-trip",
+      "R9 27 declared actions, 26 registered"
+     ],
+     "decisions": []
+    }
+   },
+   {
+    "code": "S09-R3",
+    "title": "The strata_rag path contract is unresolved: /query versus /api/query",
+    "body": "The Solution Concept Diagram's Links section and the Phase-G review findings both record that the strata_rag base-URL contract and the /query versus /api/query discrepancy remain a stated risk rather than a verified contract. Until the path is measured against a live target, any external action that reaches strata_rag rests on an unconfirmed interface.",
+    "probability": "medium",
+    "impact": 2,
+    "review_at": "2026-12-15",
+    "severity": "medium",
+    "status": "open",
+    "response": "Measure the live strata_rag path against its published contract, record which base URL and route the registered external uses, and close the discrepancy in the plan of record.",
+    "meta": {
+     "owner": "the programme architect (conveyor-e2e)"
+    },
+    "links": {
+     "cards": [],
+     "requirements": [
+      "R6 Property (f) externals"
+     ],
+     "decisions": []
+    }
+   }
+  ],
+  "issue": [
+   {
+    "code": "S09-I1",
+    "title": "documents.ingest is the one declared action of 27 not registered",
+    "body": "The Requirements Catalog's R9 row, the Business Capability Map's strata ingest handoff and the evidence Gap record that 26 of the front matter's 27 actions are registered and documents.ingest is the single gap, because it needs a live strata_ingest target and a sealed per-tenant token. The action is recorded as a follow-up with a live target rather than as proven code.",
+    "severity": "medium",
+    "status": "open",
+    "response": "Register documents.ingest as kind internal once a reachable strata_ingest target and a sealed strata_ingest.token exist, then exercise the POST /api/ingest/jobs path and store jobs[0].job_id in document.external_ref."
+   },
+   {
+    "code": "S09-I2",
+    "title": "The plan frontmatter reads planned while the project meta says measured_status built",
+    "body": "The project brief's Plan section, the Phase-G review findings and the evidence Gap all record that docs/plans/slices/S09-documents-integrations.md still carries status planned while the project row has meta.measured_status built and meta.plan_status planned. The two records are not reconciled, so a reader can take an unaccepted plan for an accepted one.",
+    "severity": "medium",
+    "status": "open",
+    "response": "Reconcile the plan frontmatter with the project meta at the tranche-4 review and record the decision in the plan of record."
+   },
+   {
+    "code": "S09-I3",
+    "title": "The nine linked issues are recorded closed but their acceptance is not re-verified",
+    "body": "The closure review's Open items and the evidence Gap record that issues 156, 168, 183, 195, 231, 245, 571, 577 and 579 are recorded closed in the snapshot, and that their acceptance is not re-verified by this retrospective. The re-close therefore rests on the closed record, not on a fresh acceptance check of each issue.",
+    "severity": "medium",
+    "status": "open",
+    "response": "Re-verify each linked issue's acceptance at the tranche-4 review or carry the closed record as the accepted basis for the retrospective close; do not infer a fresh pass."
+   }
+  ],
+  "assumption": [
+   {
+    "code": "S09-A1",
+    "title": "The 2026-11-24 rework snapshot is the authoritative record for S09",
+    "body": "The delivery contract judges acceptance against the record at the 2026-11-24 rework snapshot, project 01a1d039-0d2d-71f1-a403-c9abe52c1888 status closed at version 10, and the content checker refuses any id that appears nowhere in that snapshot. Every judgement in this pack is read from that snapshot; if it is incomplete or stale for S09, the pack's facts and the re-close move with it.",
+    "status": "held"
+   },
+   {
+    "code": "S09-A2",
+    "title": "S03 supplies tenant, trace_link and revision exactly as the project brief records",
+    "body": "The project brief's Dependencies section makes S09 blocked-by S03 for tenant, trace_link, revision and the tenancy convention of the four new tables, and the Data Entity/Data Component Catalog's ArtifactRef row treats the trace_link projection as S03-supplied. The four tables' FORCE RLS and the ArtifactRef value rest on that contract holding without change.",
+    "status": "held"
+   }
+  ],
+  "dependency": [
+   {
+    "code": "S09-D1",
+    "title": "S09 is blocked by S03, S04 and S02",
+    "body": "The project brief makes S09 blocked-by S03 (tenant, trace_link, revision and the tenancy convention for the four new tables), S04 (the ActionSpec derive, action_registry, POST /api/actions/{name}/invocations and the OpenAPI and MCP projection) and S02 (event, job, audit_event and the outbox that carries the nine S09 event types). S09 adds no second write path, so its build and its gate stand on those three slices.",
+    "status": "satisfied"
+   },
+   {
+    "code": "S09-D2",
+    "title": "The deployed leg depends on the operators' MinIO endpoint, credentials and bucket policy",
+    "body": "The Statement of Architecture Work assigns the KEK source and the MinIO bucket policy to operators, the Business Capability Map records the deployed MinIO credentials and bucket policy as unproven, and the closure review's Open items name operators as the owner of the deployed MinIO endpoint, credentials and bucket policy. The byte route cannot be proven end to end until that leg is confirmed.",
+    "status": "open"
+   },
+   {
+    "code": "S09-D3",
+    "title": "documents.ingest depends on a live strata_ingest target and a sealed per-tenant token",
+    "body": "The Business Capability Map, the Requirements Catalog's R9 row and the closure review's Open items record that documents.ingest needs a reachable strata_ingest target and a sealed strata_ingest.token before it can be registered and exercised; without them a tenant is refused 422 ingest_not_configured before a byte is read.",
+    "status": "open"
+   }
+  ],
+  "benefit": [
+   {
+    "code": "S09-B1",
+    "title": "Document bytes leave Postgres: content lives in MinIO behind one authorized stream",
+    "body": "The Driver/Goal/Objective Catalog's D1/G1 records the benefit: bytes move out of Postgres TOAST into bucket conveyor-documents at key t/<tenant>/<document>/<version>, every byte streams through /api/documents/{id}/content authenticated against tenant_id and membership, and no presigned URL exists. Rows and dumps stop carrying document content, and there is one authorizer, not two.",
+    "status": "open"
+   },
+   {
+    "code": "S09-B2",
+    "title": "Secrets are write-only: no response returns a plaintext, value key or ciphertext",
+    "body": "The Driver/Goal/Objective Catalog's D2/G2 and the Requirements Catalog's R3 record the benefit: create and rotate take value marked x-secret, get and list return id, name, scope, key_id, version and created_at only, and the served OpenAPI and MCP projection publish no default or example for the marked field. The whole-leak failure of a one-time reveal is removed by design.",
+    "status": "open"
+   },
+   {
+    "code": "S09-B3",
+    "title": "Adjacent services stay external: a call absent from action_registry does not exist",
+    "body": "The Driver/Goal/Objective Catalog's D3/G3 and the Technology Standards Catalog's external-calls standard record the benefit: every adjacent service is a declared action with a 5 s read or 30 s write timeout and a process-local breaker opening after five failures in 30 s, and reqwest:: appears only inside the executor. The conveyor does not absorb a worker manager, billing engine or KAG.",
+    "status": "open"
+   }
+  ]
+ },
  "delivery_contract": {
   "title": "Delivery contract — S09 Documents and integrations (retrospective, 2026-11-24)",
   "body": {
