@@ -418,8 +418,8 @@
       "verdict": "extend",
       "evidence": [
         "actions: baselines.* found (baselines.get, baselines.list, baselines.take)",
-        "actions: cadences.* found (cadences.create, cadences.delete, cadences.list…)",
-        "actions: governed_assets.* absent",
+        "actions: cadences.* found (cadences.approve_plan, cadences.create, cadences.credit_demo…)",
+        "actions: governed_assets.* found (governed_assets.approve, governed_assets.compose, governed_assets.get…)",
         "actions: programme_config.* absent",
         "actions: programmes.* found (programmes.baseline, programmes.baseline_approve, programmes.baselines_list…)",
         "actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)",
@@ -513,10 +513,10 @@
       "verdict": "new",
       "evidence": [
         "actions: approvals.* found (approvals.decide, approvals.list, approvals.request)",
-        "actions: decision_options.* absent",
+        "actions: decision_options.* found (decision_options.create, decision_options.get, decision_options.publish…)",
         "actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)",
         "actions: decisions.* found (decisions.create, decisions.get, decisions.list…)",
-        "actions: ladder.* found (ladder.apply_draft, ladder.case, ladder.evaluate…)",
+        "actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)",
         "actions: laya_configs.* found (laya_configs.create, laya_configs.list)",
         "actions: refinements.* found (refinements.list, refinements.publish)"
       ],
@@ -549,7 +549,7 @@
       "concept": "kata",
       "verdict": "new",
       "evidence": [
-        "actions: kata.* found (kata.adopt, kata.analyse, kata.get…)"
+        "actions: kata.* found (kata.adopt, kata.analyse, kata.close…)"
       ],
       "note": "V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5."
     },
