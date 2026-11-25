@@ -24,11 +24,25 @@ const root = path.resolve(__dirname, "..");
 const docsDir = path.join(root, "docs");
 const indexFile = path.join(docsDir, "outputs.js");
 
-/** Parse `window.CONVEYOR_OUTPUTS = {…};`, or null when the file is the placeholder. */
+/**
+ * Parse `window.CONVEYOR_OUTPUTS = {…};`, or null when the file is the placeholder.
+ *
+ * `//` comments are stripped first: the placeholder's comment names the assignment it describes,
+ * and matching that text first made the placeholder itself unparsable — main's design-pack was red
+ * from 8d39d7a3 until the committed index was restored. The last assignment wins, and its body runs
+ * to the LAST `;` because the JSON may contain `;` inside a string (the published index does).
+ */
 function parseIndex(text) {
-  const match = text.match(/window\.CONVEYOR_OUTPUTS\s*=\s*([\s\S]*?);\s*$/);
-  if (!match) return null;
-  return JSON.parse(match[1]);
+  const code = text.replace(/^\s*\/\/.*$/gm, "");
+  const marker = "window.CONVEYOR_OUTPUTS";
+  const at = code.lastIndexOf(marker);
+  if (at === -1) return null;
+  const equals = code.indexOf("=", at);
+  if (equals === -1) return null;
+  let body = code.slice(equals + 1);
+  const end = body.lastIndexOf(";");
+  if (end !== -1) body = body.slice(0, end);
+  return JSON.parse(body.trim());
 }
 
 /** The failures for one index/pages pair. Pure, so the self-test can drive it. */
@@ -92,6 +106,14 @@ function selfTest() {
     ["output-x.html"],
   );
   expectPass("placeholder and no pages", "// Placeholder. overwritten by a publish.\n", []);
+  expectPass(
+    "the placeholder whose comment names the assignment",
+    "// Placeholder. `conveyor snapshot --outputs-dir docs/design/docs` overwrites this file with the\n" +
+      '// published-output index (`window.CONVEYOR_OUTPUTS = {schema: "design-outputs/v1", …}`).\n' +
+      "// A null payload means no platform output has been published.\n" +
+      "window.CONVEYOR_OUTPUTS = null;\n",
+    [],
+  );
   expectFail(
     "an entry with no page",
     'window.CONVEYOR_OUTPUTS = {"outputs":[{"path":"docs/output-gone.html"}]};\n',

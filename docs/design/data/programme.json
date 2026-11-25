@@ -1,6 +1,6 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-25T10:28:43.209125320+00:00",
+  "generated_at": "2026-11-25T10:31:16.674113014+00:00",
   "issue_registry": {
     "issues": [
       {
@@ -55,7 +55,7 @@
         "number": 726,
         "state": "OPEN",
         "title": "rework: strict conformance — the published closure records, the T19F deferral and a green strict publish",
-        "updatedAt": "2026-11-25T10:01:12Z",
+        "updatedAt": "2026-11-25T10:30:35Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/726"
       },
       {
@@ -613,7 +613,7 @@
         "number": 630,
         "state": "OPEN",
         "title": "T18-3c: the run inspector's executor kind, binding pin and tools panel",
-        "updatedAt": "2026-11-25T10:05:52Z",
+        "updatedAt": "2026-11-25T10:28:33Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/630"
       },
       {

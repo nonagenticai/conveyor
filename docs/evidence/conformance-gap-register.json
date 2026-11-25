@@ -1592,8 +1592,8 @@
     }
   ],
   "snapshot": {
-    "generated_at": "2026-11-25T10:28:43.209125320+00:00",
-    "git_sha": "eb70b1cebb0248394b968cbbd050dad8735ff7de",
+    "generated_at": "2026-11-25T10:31:16.674113014+00:00",
+    "git_sha": "a22c4735e22d28e5de3664e5be9774267088ed42",
     "path": "data",
     "tenant": "nonagentic"
   },
