@@ -79,6 +79,9 @@ pub enum ArchitectureRule {
     /// A phase-H review has no typed outcome.
     #[error("the phase-H review has no recorded change or kata outcome")]
     OutcomeRequired,
+    /// The phase-H outcome is not recorded on the project's live delivery contract.
+    #[error("the phase-H outcome is not recorded on the project's live delivery contract")]
+    OutcomeNotOnDeliveryContract,
     /// The outcome names a change that is not an approved change row of the project.
     #[error("the outcome's change {0} is not an approved change row of this project")]
     OutcomeNotApproved(Uuid),
@@ -1021,10 +1024,19 @@ pub async fn link_artifacts_tx(
             why: "an artefact cannot link to itself",
         });
     }
+    // Both ends must be artefacts of this tenant AND of the same project: a link that crosses a
+    // project boundary would let one project's repository cite another project's evidence. The
+    // INSERT ... SELECT is the check and the write in one statement — zero joined rows writes
+    // nothing. A NULL project joins nothing: an artefact without a project has no project to
+    // share.
     let sql = format!(
         "INSERT INTO architecture_artifact_link
             (tenant_id, from_artifact_id, to_artifact_id, kind)
-         VALUES ($1, $2, $3, $4)
+         SELECT $1, f.id, t.id, $4
+           FROM architecture_artifact f
+           JOIN architecture_artifact t
+             ON t.tenant_id = f.tenant_id AND t.id = $3
+          WHERE f.tenant_id = $1 AND f.id = $2 AND f.project_id = t.project_id
          ON CONFLICT (tenant_id, from_artifact_id, to_artifact_id, kind) DO NOTHING
          RETURNING {LINK_COLUMNS}"
     );
@@ -1038,18 +1050,30 @@ pub async fn link_artifacts_tx(
     if let Some(record) = inserted {
         return Ok(record);
     }
+    // Nothing was inserted: either the idempotent replay of an existing edge, or the two ends
+    // are not in one project. Read the edge under the SAME project join, so a legacy
+    // cross-project row is refused rather than replayed.
     let sql = format!(
-        "SELECT {LINK_COLUMNS} FROM architecture_artifact_link
-          WHERE tenant_id = $1 AND from_artifact_id = $2 AND to_artifact_id = $3 AND kind = $4"
+        "SELECT {LINK_COLUMNS} FROM architecture_artifact_link l
+          WHERE l.tenant_id = $1 AND l.from_artifact_id = $2 AND l.to_artifact_id = $3
+            AND l.kind = $4
+            AND EXISTS (
+                SELECT 1 FROM architecture_artifact f
+                  JOIN architecture_artifact t
+                    ON t.tenant_id = f.tenant_id AND t.id = $3
+                 WHERE f.tenant_id = $1 AND f.id = $2 AND f.project_id = t.project_id)"
     );
     sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(from)
         .bind(to)
         .bind(kind)
-        .fetch_one(&mut *conn)
-        .await
-        .map_err(ArchitectureStoreError::Database)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(ArchitectureStoreError::Conflict {
+            what: "architecture artefact link",
+            why: "both artefacts must belong to the same project of this tenant",
+        })
 }
 
 /// Search the repository for reuse.
@@ -1061,9 +1085,10 @@ pub async fn search_repository_tx(
     kind: Option<&str>,
 ) -> Result<Vec<ArtifactRecord>, ArchitectureStoreError> {
     // The repository answers what an artefact reuses, not only what matches the text: an
-    // artefact reached by a `reuse` edge from a match is returned too, across projects, phases
-    // and plateaus. A search confined to the query's own plateau would hide exactly the
-    // enterprise artefact a solution artefact was built to reuse (D1's reuse scenario).
+    // artefact reached by a `reuse` edge from a match is returned too, across phases and
+    // plateaus. A search confined to the query's own plateau would hide exactly the enterprise
+    // artefact a solution artefact was built to reuse (D1's reuse scenario). A link, like the
+    // repository's other edges, stays inside one project (`link_artifacts_tx`).
     let sql = format!(
         "WITH matched AS (
             SELECT id FROM architecture_artifact
@@ -1803,6 +1828,26 @@ pub async fn request_contract_tx(
         )))
     })?;
     if let Some(old) = new.supersedes_id {
+        // A supersede is a revision OF THE SAME PROJECT's instrument. Refused before the
+        // retirement runs, so a cross-project citation writes neither the retirement nor the
+        // replacement — the two-row chain can never straddle a project boundary.
+        let previous: Option<Uuid> = sqlx::query_scalar(
+            "SELECT project_id FROM architecture_contract WHERE tenant_id = $1 AND id = $2",
+        )
+        .bind(tenant.as_uuid())
+        .bind(old)
+        .fetch_optional(&mut *conn)
+        .await?;
+        match previous {
+            None => return Err(ArchitectureStoreError::NotFound("architecture contract")),
+            Some(project) if project != new.project_id => {
+                return Err(ArchitectureStoreError::Conflict {
+                    what: "architecture contract",
+                    why: "a superseded contract must govern the same project as its replacement",
+                });
+            }
+            Some(_) => {}
+        }
         sqlx::query(
             "UPDATE architecture_contract
                 SET status = 'superseded', version = version + 1, updated_at = now()
@@ -2354,22 +2399,43 @@ pub async fn advance_phase_tx(
         let contract = assert_phase_g_tx(&mut *conn, tenant, project_id).await?;
         contract_id.get_or_insert(contract.id);
     }
-    // Phase H: exactly one typed outcome must be recorded.
+    // Phase H: EXACTLY ONE typed outcome must be recorded, and it must sit on the project's
+    // live delivery contract — the design gate's own instrument. A compliance review of any
+    // other contract (a draft, or a non-delivery kind) is not the phase's improvement verdict,
+    // and a second outcome is a conflict rather than a stronger case. The partial unique index
+    // `architecture_compliance_review_one_outcome` refuses the second row at the table.
     if requested == "h" {
-        let recorded: bool = sqlx::query_scalar(
-            "SELECT EXISTS (
-                SELECT 1 FROM architecture_compliance_review
-                 WHERE tenant_id = $1 AND project_id = $2 AND outcome IS NOT NULL
-            )",
+        let outcomes: Vec<(String, String)> = sqlx::query_as(
+            "SELECT c.status, c.kind
+               FROM architecture_compliance_review r
+               JOIN architecture_contract c
+                 ON c.tenant_id = r.tenant_id AND c.id = r.contract_id
+              WHERE r.tenant_id = $1 AND r.project_id = $2 AND r.outcome IS NOT NULL
+                AND c.project_id = r.project_id",
         )
         .bind(tenant.as_uuid())
         .bind(project_id)
-        .fetch_one(&mut *conn)
+        .fetch_all(&mut *conn)
         .await?;
-        if !recorded {
-            return Err(ArchitectureStoreError::Illegal(
-                ArchitectureRule::OutcomeRequired,
-            ));
+        match outcomes.as_slice() {
+            [] => {
+                return Err(ArchitectureStoreError::Illegal(
+                    ArchitectureRule::OutcomeRequired,
+                ));
+            }
+            [(status, kind)]
+                if status.as_str() == "live" && kind.as_str() == "delivery_contract" => {}
+            [_] => {
+                return Err(ArchitectureStoreError::Illegal(
+                    ArchitectureRule::OutcomeNotOnDeliveryContract,
+                ));
+            }
+            _ => {
+                return Err(ArchitectureStoreError::Conflict {
+                    what: "phase-H outcome",
+                    why: "exactly one outcome review may govern a project",
+                });
+            }
         }
     }
     let evidence = json!({

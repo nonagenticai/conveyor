@@ -34,9 +34,14 @@ fn blueprint() -> Value {
         "b": { "hld": ["business_capability_map"] },
         "c": { "hld": ["data_entity_catalog"] },
         "d": { "hld": ["technology_standards"] },
-        "e": { "sd": ["solution_concept"] },
-        "f": { "sd": ["business_capability_map"] },
-        "g": { "sd": ["technology_standards"] },
+        // A phase kept in the set keeps its mandatory rows (0102): the profile's own picks sit
+        // beside them, never instead of them.
+        "e": {
+            "sd": ["solution_concept"],
+            "hld": ["gap_analysis", "candidate_solutions", "project_context_diagram", "benefits_diagram"],
+        },
+        "f": { "sd": ["business_capability_map"], "hld": ["implementation_migration_plan"] },
+        "g": { "sd": ["technology_standards"], "hld": ["compliance_review"] },
     })
 }
 
@@ -168,6 +173,14 @@ async fn phase_g_requires_a_live_contract_a_review_and_a_waiver() {
     let (status, out) = arch::advance(&f.running, &project, "d").await;
     assert_eq!(status, 200, "D: {out}");
     approved(&f, &project, "solution_concept", "e", "sd", "diagram").await;
+    for (key, kind) in [
+        ("gap_analysis", "matrix"),
+        ("candidate_solutions", "catalog"),
+        ("project_context_diagram", "diagram"),
+        ("benefits_diagram", "diagram"),
+    ] {
+        approved(&f, &project, key, "e", "hld", kind).await;
+    }
     let (status, out) = arch::advance(&f.running, &project, "e").await;
     assert_eq!(status, 200, "E: {out}");
 
@@ -181,6 +194,15 @@ async fn phase_g_requires_a_live_contract_a_review_and_a_waiver() {
         "diagram",
     )
     .await;
+    approved(
+        &f,
+        &project,
+        "implementation_migration_plan",
+        "f",
+        "hld",
+        "catalog",
+    )
+    .await;
     let contract = arch::live_contract(&f, &project, "delivery_contract", "f").await;
     let (status, out) = arch::advance(&f.running, &project, "f").await;
     assert_eq!(status, 200, "F: {out}");
@@ -188,6 +210,7 @@ async fn phase_g_requires_a_live_contract_a_review_and_a_waiver() {
 
     // G: the artefact set is approved, but the contract has no Phase-G review yet.
     approved(&f, &project, "technology_standards", "g", "sd", "catalog").await;
+    approved(&f, &project, "compliance_review", "g", "hld", "catalog").await;
     let (status, refused) = arch::advance(&f.running, &project, "g").await;
     assert_eq!(status, 409, "G passed without a review: {refused}");
     assert_eq!(refused["type"], "architecture_review_missing", "{refused}");

@@ -333,3 +333,205 @@ async fn an_active_board_decides_a_contract_and_a_retired_one_cannot() {
     );
     tx.rollback().await.expect("rollback");
 }
+
+#[tokio::test]
+async fn a_supersede_across_projects_is_refused_and_writes_neither_row() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "contract-supersede").await;
+    let tenant = TenantId::from_uuid(seeded.tenant).expect("tenant");
+    let home = project(&db.super_pool, seeded.tenant).await;
+    let other = project(&db.super_pool, seeded.tenant).await;
+
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let old = request_contract_tx(&mut tx, tenant, &contract(home, seeded.user))
+        .await
+        .expect("the project's contract");
+
+    let mut foreign = contract(other, seeded.user);
+    foreign.supersedes_id = Some(old.id);
+    let refused = request_contract_tx(&mut tx, tenant, &foreign).await;
+    assert!(
+        is_conflict(refused),
+        "a contract of another project may not supersede this one"
+    );
+    let unchanged = get_contract_tx(&mut tx, tenant, old.id)
+        .await
+        .expect("read the contract")
+        .expect("the contract");
+    assert_eq!(
+        unchanged.status, "draft",
+        "the refusal retired the old contract"
+    );
+    assert!(
+        unchanged.superseded_by_id.is_none(),
+        "the refusal wrote the reverse link: {unchanged:?}"
+    );
+    assert_eq!(unchanged.version, 1, "the refusal bumped the old contract");
+    let replacement_rows: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM architecture_contract WHERE tenant_id = $1 AND project_id = $2",
+    )
+    .bind(seeded.tenant)
+    .bind(other)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("count the other project's contracts");
+    assert_eq!(
+        replacement_rows, 0,
+        "the refused supersede wrote the replacement row"
+    );
+
+    // The same project's supersede still writes both ends of the chain.
+    let mut same_project = contract(home, seeded.user);
+    same_project.supersedes_id = Some(old.id);
+    let replacement = request_contract_tx(&mut tx, tenant, &same_project)
+        .await
+        .expect("a same-project supersede");
+    let retired = get_contract_tx(&mut tx, tenant, old.id)
+        .await
+        .expect("read the contract")
+        .expect("the contract");
+    assert_eq!(retired.status, "superseded", "the old contract is retired");
+    assert_eq!(
+        retired.superseded_by_id,
+        Some(replacement.id),
+        "the old contract names its successor"
+    );
+    tx.rollback().await.expect("rollback");
+}
+
+#[tokio::test]
+async fn an_adopted_profile_needs_an_existing_board_decision() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "adm-adoption-constraint").await;
+    let tenant = TenantId::from_uuid(seeded.tenant).expect("tenant");
+    let profile: Uuid = sqlx::query_scalar(
+        "INSERT INTO adm_profile (tenant_id, key, name) VALUES ($1, 'adm', 'ADM') RETURNING id",
+    )
+    .bind(seeded.tenant)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert a draft profile");
+
+    // A random uuid names no approval row: the FK refuses the adoption.
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let refused = sqlx::query(
+        "UPDATE adm_profile
+            SET status = 'adopted', adopted_at = now(), board_decision_id = $3
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant)
+    .bind(profile)
+    .bind(Uuid::now_v7())
+    .execute(&mut *tx)
+    .await
+    .expect_err("an adoption citing no approval row must be refused");
+    let constraint = refused
+        .as_database_error()
+        .and_then(|database| database.constraint())
+        .map(str::to_owned);
+    assert_eq!(
+        constraint.as_deref(),
+        Some("adm_profile_board_decision_fk"),
+        "the refusal must name the adoption FK: {refused}"
+    );
+    tx.rollback().await.expect("rollback");
+
+    // An adoption with no decision at all is refused by the CHECK.
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let refused = sqlx::query(
+        "UPDATE adm_profile SET status = 'adopted', adopted_at = now()
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant)
+    .bind(profile)
+    .execute(&mut *tx)
+    .await
+    .expect_err("an adoption citing no decision must be refused");
+    let constraint = refused
+        .as_database_error()
+        .and_then(|database| database.constraint())
+        .map(str::to_owned);
+    assert_eq!(
+        constraint.as_deref(),
+        Some("adm_profile_adopted_needs_decision"),
+        "the refusal must name the adoption CHECK: {refused}"
+    );
+    tx.rollback().await.expect("rollback");
+
+    let status: String =
+        sqlx::query_scalar("SELECT status FROM adm_profile WHERE tenant_id = $1 AND id = $2")
+            .bind(seeded.tenant)
+            .bind(profile)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("read the profile");
+    assert_eq!(status, "draft", "a refused adoption changed the profile");
+}
+
+#[tokio::test]
+async fn a_second_phase_h_outcome_is_refused_by_its_index() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "phase-h-one-outcome").await;
+    let tenant = TenantId::from_uuid(seeded.tenant).expect("tenant");
+    let project = project(&db.super_pool, seeded.tenant).await;
+
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let first = request_contract_tx(&mut tx, tenant, &contract(project, seeded.user))
+        .await
+        .expect("the first contract");
+    let mut second_new = contract(project, seeded.user);
+    second_new.kind = "request_for_architecture".to_owned();
+    second_new.phase_code = "h".to_owned();
+    let second = request_contract_tx(&mut tx, tenant, &second_new)
+        .await
+        .expect("a second contract of the project");
+
+    let outcome = json!({ "kind": "change" });
+    sqlx::query(
+        "INSERT INTO architecture_compliance_review
+             (tenant_id, project_id, contract_id, level, outcome, reviewed_by)
+         VALUES ($1, $2, $3, 'compliant', $4, $5)",
+    )
+    .bind(seeded.tenant)
+    .bind(project)
+    .bind(first.id)
+    .bind(&outcome)
+    .bind(seeded.user)
+    .execute(&mut *tx)
+    .await
+    .expect("the project's one outcome review");
+    let outcomes: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM architecture_compliance_review
+          WHERE tenant_id = $1 AND project_id = $2 AND outcome IS NOT NULL",
+    )
+    .bind(seeded.tenant)
+    .bind(project)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("count the project's outcomes");
+    assert_eq!(outcomes, 1, "the first outcome review exists");
+
+    let refused = sqlx::query(
+        "INSERT INTO architecture_compliance_review
+             (tenant_id, project_id, contract_id, level, outcome, reviewed_by)
+         VALUES ($1, $2, $3, 'compliant', $4, $5)",
+    )
+    .bind(seeded.tenant)
+    .bind(project)
+    .bind(second.id)
+    .bind(&outcome)
+    .bind(seeded.user)
+    .execute(&mut *tx)
+    .await
+    .expect_err("a second phase-H outcome must be refused");
+    let constraint = refused
+        .as_database_error()
+        .and_then(|database| database.constraint())
+        .map(str::to_owned);
+    assert_eq!(
+        constraint.as_deref(),
+        Some("architecture_compliance_review_one_outcome"),
+        "the refusal must name the one-outcome index: {refused}"
+    );
+    tx.rollback().await.expect("rollback");
+}

@@ -1173,6 +1173,7 @@ async fn metrics_reconcile(
                 )),
                 card_type_code: "incident".to_owned(),
                 internal_coach_card: false,
+                internal_system_card: true,
                 due_at: None,
                 parent_card_id: None,
                 job_binding_id: None,
@@ -1183,6 +1184,8 @@ async fn metrics_reconcile(
                     "billing_usd": billing_usd,
                     "delta_usd": delta,
                 })),
+                // A reconciliation incident is a system record, not governed work.
+                trace_link: None,
             },
         )
         .await?

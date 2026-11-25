@@ -858,6 +858,8 @@ fn the_default_schedule_set_is_the_maintenance_kinds() {
             "prompt_audit.prune",
             "approval.expire",
             "approval.closed.emit",
+            // S07: a draft intake unresolved after 24 h is expired in place.
+            "project_request.timeout",
             // S06d: multicast the interaction, then close the losing recipients.
             "interaction.dispatch",
             "interaction.close",

@@ -63,11 +63,21 @@ pub fn findings() -> Vec<Finding> {
 pub fn open_p0_findings(owner_project: &str, now: Timestamp) -> Vec<Finding> {
     findings()
         .into_iter()
-        .filter(|finding| finding.severity == "P0")
-        .filter(|finding| finding.owner_project.as_deref() == Some(owner_project))
-        .filter(|finding| finding.resolved_by.is_none())
-        .filter(|finding| !waived(finding, now))
+        .filter(|finding| is_open_p0(finding, owner_project, now))
         .collect()
+}
+
+/// Whether one finding is an open P0 for `owner_project` at `now`.
+///
+/// The predicate is separated from the ledger so the rule can be proved on constructed rows:
+/// a test that pins a particular live finding goes stale the day that finding is resolved
+/// (measured 2026-11-25: v1-s06-2 was resolved and two tests that cited it as "the open P0"
+/// turned red).
+fn is_open_p0(finding: &Finding, owner_project: &str, now: Timestamp) -> bool {
+    finding.severity == "P0"
+        && finding.owner_project.as_deref() == Some(owner_project)
+        && finding.resolved_by.is_none()
+        && !waived(finding, now)
 }
 
 fn waived(finding: &Finding, now: Timestamp) -> bool {
@@ -85,7 +95,7 @@ fn parse_date(raw: &str) -> Option<NaiveDate> {
 
 #[cfg(test)]
 mod tests {
-    use super::{Finding, Waiver, findings, open_p0_findings, parse_date, waived};
+    use super::{Finding, Waiver, findings, is_open_p0, open_p0_findings, parse_date, waived};
     use chrono::{TimeZone, Utc};
 
     fn at(day: &str) -> chrono::DateTime<Utc> {
@@ -93,16 +103,53 @@ mod tests {
         Utc.from_utc_datetime(&date.and_hms_opt(12, 0, 0).expect("a noon"))
     }
 
+    fn finding(id: &str, severity: &str, owner: &str) -> Finding {
+        Finding {
+            id: id.to_owned(),
+            severity: severity.to_owned(),
+            owner_project: Some(owner.to_owned()),
+            resolved_by: None,
+            waiver: None,
+        }
+    }
+
+    /// The rule on constructed rows: severity, owner, resolution and waiver decide openness.
+    /// A test that named a live finding went stale when that finding was resolved; the
+    /// ledger-level invariant below is the live half.
     #[test]
     fn an_unresolved_p0_is_open_for_its_owner() {
-        let open = open_p0_findings("S06", at("2026-11-22"));
+        let open = finding("v1-test-open", "P0", "S06");
+        assert!(is_open_p0(&open, "S06", at("2026-11-22")));
         assert!(
-            open.iter().any(|finding| finding.id == "v1-s06-2"),
-            "S06's unresolved P0 is open: {open:?}"
-        );
-        assert!(
-            open_p0_findings("NOT-A-PROJECT", at("2026-11-22")).is_empty(),
+            !is_open_p0(&open, "NOT-A-PROJECT", at("2026-11-22")),
             "a finding is charged only to the project that owns it"
+        );
+        let p1 = finding("v1-test-p1", "P1", "S06");
+        assert!(
+            !is_open_p0(&p1, "S06", at("2026-11-22")),
+            "only a P0 gates closure"
+        );
+        let mut resolved = finding("v1-test-resolved", "P0", "S06");
+        resolved.resolved_by = Some(serde_json::json!({"commit": "0".repeat(40)}));
+        assert!(
+            !is_open_p0(&resolved, "S06", at("2026-11-22")),
+            "a resolution receipt closes the finding"
+        );
+    }
+
+    /// The live half: the committed ledger carries no open P0 — the state the programme must
+    /// hold at its final acceptance, and the reason a test cannot cite a live P0 fixture.
+    #[test]
+    fn the_ledger_carries_no_open_p0() {
+        let open: Vec<String> = findings()
+            .into_iter()
+            .filter(|row| row.severity == "P0" && row.resolved_by.is_none() && row.waiver.is_none())
+            .map(|row| row.id)
+            .collect();
+        assert!(open.is_empty(), "open P0 findings in the ledger: {open:?}");
+        assert!(
+            open_p0_findings("S06", at("2026-11-22")).is_empty(),
+            "no project carries an open ledger P0"
         );
     }
 

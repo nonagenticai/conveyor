@@ -934,6 +934,9 @@ async fn dispatch(
         "approval.expire" => approval_expire(pool, tenant, &config.app_key).await?,
         "delivery.send" => delivery_send(pool, tenant, payload).await?,
         "approval.closed.emit" => approval_closed_emit(pool, tenant).await?,
+        // S07 §5.4: a `draft` intake still unresolved after the 24 h window is expired in
+        // place and announced on its own topic (S06 §5.3's `project_request.timeout`).
+        "project_request.timeout" => project_request_timeout(pool, tenant).await?,
         "interaction.dispatch" => interaction_dispatch(pool, tenant).await?,
         "interaction.close" => interaction_close(pool, tenant).await?,
         "quality.score" => quality_score(pool, tenant, payload).await?,
@@ -1591,6 +1594,40 @@ async fn approval_expire(pool: &PgPool, tenant: TenantId, app_key: &str) -> Resu
             );
         }
     }
+    Ok(())
+}
+
+// ── S07: the CP intake ──────────────────────────────────────────────────────────────────
+
+/// `project_request.timeout` — a `draft` intake still unresolved after
+/// `store::project_request::TIMEOUT_HOURS` expires in place (S06 §5.3, S07 §5.4).
+///
+/// The sweep only matches `draft`, so a second run expires nothing and writes no second
+/// event: the row's status is the idempotency witness, not a separate marker. Each expired
+/// row is announced once on `project_request:<id>` in the same transaction as the update.
+async fn project_request_timeout(pool: &PgPool, tenant: TenantId) -> Result<(), JobFailure> {
+    let mut tx = store::begin_scoped(pool, tenant).await.map_err(retryable)?;
+    let cutoff = Utc::now() - chrono::Duration::hours(store::project_request::TIMEOUT_HOURS);
+    let expired = store::project_request::expire_stale_project_requests_tx(&mut tx, tenant, cutoff)
+        .await
+        .map_err(retryable)?;
+    for record in &expired {
+        emit_event(
+            &mut tx,
+            tenant,
+            &format!("project_request:{}", record.id),
+            "project_request",
+            record.id,
+            "project_request.expired",
+            serde_json::json!({
+                "id": record.id,
+                "external_ref": record.external_ref,
+                "status": record.status,
+            }),
+        )
+        .await?;
+    }
+    tx.commit().await.map_err(retryable)?;
     Ok(())
 }
 

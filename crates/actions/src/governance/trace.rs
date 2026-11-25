@@ -73,8 +73,9 @@ fn check_kind(kind: &str) -> Result<(), ActionError> {
 ///
 /// A missing end is a `404` (the CONTRACT §2 tenancy rule, not an FK error), a duplicate edge
 /// is a `409`, and an unknown vocabulary value is a `422` — never a `500` for input the
-/// caller supplied.
-fn trace_error(error: TraceLinkStoreError, action: &str) -> ActionError {
+/// caller supplied. `pub(crate)` because `cards.create` writes the card's birth edge through
+/// the same writer and must refuse it identically (v1-w2c-6).
+pub(crate) fn trace_error(error: TraceLinkStoreError, action: &str) -> ActionError {
     match error {
         TraceLinkStoreError::UnknownType(end_type) => invalid(
             "type",

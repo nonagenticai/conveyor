@@ -1,5 +1,5 @@
-//! T9 (#81) D5 — Phase H records exactly one typed outcome, and an unrecorded review refuses
-//! the gate.
+//! T9 (#81) D5 — Phase H records exactly one typed outcome, on the project's live delivery
+//! contract, and an unrecorded or elsewhere-recorded review refuses the gate.
 //!
 //! `rbuild -- test -p conveyor-api --test togaf_h_change`.
 
@@ -98,6 +98,119 @@ async fn kata_candidate(f: &arch::Fixture, project: Uuid) -> Uuid {
     run_of(&f.pg.super_pool, f.seeded.tenant_id, project, kata).await
 }
 
+/// Walk a project through Preliminary..G: every phase's approved set (the profile's set plus the
+/// standard's mandatory E–H rows), the Phase-G live delivery contract and its compliance review
+/// (a level, not a phase-H outcome). Returns the project id; its delivery contract is live.
+async fn walk_to_phase_g(f: &arch::Fixture) -> String {
+    arch::tailor(f, blueprint(), json!({})).await;
+    let project = arch::project(&f.running, "architecture").await;
+
+    for (key, kind) in [
+        ("principles_catalog", "principles_catalog"),
+        ("principle_derivation", "diagram"),
+        ("principle_realization", "diagram"),
+    ] {
+        approved(f, &project, key, "preliminary", "psa", kind).await;
+    }
+    let (status, out) = arch::advance(&f.running, &project, "preliminary").await;
+    assert_eq!(status, 200, "advance preliminary: {out}");
+
+    let (status, out) = arch::advance(&f.running, &project, "a").await;
+    assert_eq!(status, 409, "phase A has no approved set yet: {out}");
+    assert_eq!(out["type"], "architecture_artifact_missing", "{out}");
+    for (key, kind) in [
+        ("stakeholder_map", "matrix"),
+        ("driver_goal_objective", "catalog"),
+        ("requirements_catalog", "catalog"),
+        ("solution_concept", "diagram"),
+    ] {
+        approved(f, &project, key, "a", "psa", kind).await;
+    }
+    let (status, out) = arch::advance(&f.running, &project, "a").await;
+    assert_eq!(status, 200, "advance a: {out}");
+
+    approved(
+        f,
+        &project,
+        "business_capability_map",
+        "b",
+        "hld",
+        "diagram",
+    )
+    .await;
+    let (status, out) = arch::advance(&f.running, &project, "b").await;
+    assert_eq!(status, 200, "advance b: {out}");
+
+    approved(f, &project, "data_entity_catalog", "c", "hld", "catalog").await;
+    let (status, out) = arch::advance(&f.running, &project, "c").await;
+    assert_eq!(status, 200, "advance c: {out}");
+
+    approved(f, &project, "technology_standards", "d", "hld", "catalog").await;
+    let (status, out) = arch::advance(&f.running, &project, "d").await;
+    assert_eq!(status, 200, "advance d: {out}");
+
+    // E–H: the standard's mandatory rows join every set, so the phase needs them approved too.
+    for (key, kind) in [
+        ("solution_concept", "diagram"),
+        ("gap_analysis", "matrix"),
+        ("candidate_solutions", "catalog"),
+        ("project_context_diagram", "diagram"),
+        ("benefits_diagram", "diagram"),
+    ] {
+        approved(f, &project, key, "e", "hld", kind).await;
+    }
+    let (status, out) = arch::advance(&f.running, &project, "e").await;
+    assert_eq!(status, 200, "advance e: {out}");
+
+    for (key, kind) in [
+        ("business_capability_map", "diagram"),
+        ("implementation_migration_plan", "catalog"),
+    ] {
+        approved(f, &project, key, "f", "hld", kind).await;
+    }
+    let (status, out) = arch::advance(&f.running, &project, "f").await;
+    assert_eq!(status, 200, "advance f: {out}");
+
+    // Phase G is a gate for every delivery project: a live delivery contract and its compliance
+    // review are what open it.
+    let contract = arch::live_contract(f, &project, "delivery_contract", "f").await;
+    arch::created_as(
+        &f.running,
+        support::REVIEWER,
+        "architecture.reviews_record",
+        json!({
+            "project_id": project,
+            "contract_id": contract,
+            "level": "compliant",
+            "delegation_ref": f.delegation,
+            "findings": [{ "finding": "the delivery is judged at Phase G" }],
+            "evidence": { "ref": "phase G" },
+        }),
+        None,
+    )
+    .await;
+    for (key, kind) in [
+        ("technology_standards", "catalog"),
+        ("compliance_review", "catalog"),
+    ] {
+        approved(f, &project, key, "g", "hld", kind).await;
+    }
+    let (status, out) = arch::advance(&f.running, &project, "g").await;
+    assert_eq!(status, 200, "advance g: {out}");
+    project
+}
+
+/// Phase H's approved set: the profile's type plus the standard's two mandatory H rows.
+async fn approve_phase_h(f: &arch::Fixture, project: &str) {
+    for (key, kind) in [
+        ("solution_concept", "diagram"),
+        ("architecture_change_request", "catalog"),
+        ("architecture_requirement", "catalog"),
+    ] {
+        approved(f, project, key, "h", "hld", kind).await;
+    }
+}
+
 #[tokio::test]
 async fn a_scope_change_produces_a_change_register_row() {
     let f = arch::fixture().await;
@@ -129,17 +242,20 @@ async fn a_scope_change_produces_a_change_register_row() {
     assert_eq!(review["outcome"]["kind"], "change", "{review}");
     assert_eq!(review["outcome"]["change_id"], change, "{review}");
 
-    // A systemic finding is a kata candidate and writes no change row of its own.
+    // A systemic finding is a kata candidate and writes no change row of its own. One outcome
+    // review may govern a project (#526), so the kata case seeds its own project.
     let before = arch::change_rows(&f.pg, f.seeded.tenant_id).await;
+    let kata_project = arch::project(&f.running, "architecture").await;
+    let kata_project_uuid = Uuid::parse_str(&kata_project).expect("project id");
     let kata_contract =
-        arch::request_contract(&f.running, &project, "statement_of_intent", "h").await;
-    let candidate = kata_candidate(&f, project_uuid).await;
+        arch::request_contract(&f.running, &kata_project, "statement_of_intent", "h").await;
+    let candidate = kata_candidate(&f, kata_project_uuid).await;
     let kata = arch::created_as(
         &f.running,
         support::REVIEWER,
         "architecture.reviews_record",
         json!({
-            "project_id": project,
+            "project_id": kata_project,
             "contract_id": arch::id_of(&kata_contract),
             "level": "non_conformant",
             "delegation_ref": f.delegation,
@@ -165,73 +281,22 @@ async fn a_scope_change_produces_a_change_register_row() {
 #[tokio::test]
 async fn an_unrecorded_review_refuses_the_gate() {
     let f = arch::fixture().await;
-    arch::tailor(&f, blueprint(), json!({})).await;
-    let project = arch::project(&f.running, "architecture").await;
+    let project = walk_to_phase_g(&f).await;
     let project_uuid = Uuid::parse_str(&project).expect("project id");
+    approve_phase_h(&f, &project).await;
 
-    for (key, kind) in [
-        ("principles_catalog", "principles_catalog"),
-        ("principle_derivation", "diagram"),
-        ("principle_realization", "diagram"),
-    ] {
-        approved(&f, &project, key, "preliminary", "psa", kind).await;
-    }
-    let (status, out) = arch::advance(&f.running, &project, "preliminary").await;
-    assert_eq!(status, 200, "advance preliminary: {out}");
+    // Zero outcomes: the Phase-G review records a level, not a phase-H outcome.
+    let (status, refused) = arch::advance(&f.running, &project, "h").await;
+    assert_eq!(status, 409, "{refused}");
+    assert_eq!(
+        refused["type"], "architecture_outcome_required",
+        "{refused}"
+    );
 
-    let (status, out) = arch::advance(&f.running, &project, "a").await;
-    assert_eq!(status, 409, "phase A has no approved set yet: {out}");
-    assert_eq!(out["type"], "architecture_artifact_missing", "{out}");
-    for (key, kind) in [
-        ("stakeholder_map", "matrix"),
-        ("driver_goal_objective", "catalog"),
-        ("requirements_catalog", "catalog"),
-        ("solution_concept", "diagram"),
-    ] {
-        approved(&f, &project, key, "a", "psa", kind).await;
-    }
-    let (status, out) = arch::advance(&f.running, &project, "a").await;
-    assert_eq!(status, 200, "advance a: {out}");
-
-    approved(
-        &f,
-        &project,
-        "business_capability_map",
-        "b",
-        "hld",
-        "diagram",
-    )
-    .await;
-    let (status, out) = arch::advance(&f.running, &project, "b").await;
-    assert_eq!(status, 200, "advance b: {out}");
-
-    approved(&f, &project, "data_entity_catalog", "c", "hld", "catalog").await;
-    let (status, out) = arch::advance(&f.running, &project, "c").await;
-    assert_eq!(status, 200, "advance c: {out}");
-
-    approved(&f, &project, "technology_standards", "d", "hld", "catalog").await;
-    let (status, out) = arch::advance(&f.running, &project, "d").await;
-    assert_eq!(status, 200, "advance d: {out}");
-
-    approved(&f, &project, "solution_concept", "e", "sd", "diagram").await;
-    let (status, out) = arch::advance(&f.running, &project, "e").await;
-    assert_eq!(status, 200, "advance e: {out}");
-
-    approved(
-        &f,
-        &project,
-        "business_capability_map",
-        "f",
-        "sd",
-        "diagram",
-    )
-    .await;
-    let (status, out) = arch::advance(&f.running, &project, "f").await;
-    assert_eq!(status, 200, "advance f: {out}");
-
-    // Phase G is a gate for every delivery project: a live delivery contract and its compliance
-    // review are what open it.
-    let contract = arch::live_contract(&f, &project, "delivery_contract", "f").await;
+    // The one outcome must sit on the project's LIVE delivery contract. A delivery contract
+    // requested for phase H is approved live and carries the kata outcome; the gate opens.
+    let contract = arch::live_contract(&f, &project, "delivery_contract", "h").await;
+    let candidate = kata_candidate(&f, project_uuid).await;
     arch::created_as(
         &f.running,
         support::REVIEWER,
@@ -241,28 +306,31 @@ async fn an_unrecorded_review_refuses_the_gate() {
             "contract_id": contract,
             "level": "compliant",
             "delegation_ref": f.delegation,
-            "findings": [{ "finding": "the delivery is judged at Phase G" }],
-            "evidence": { "ref": "phase G" },
+            "outcome": { "kind": "kata", "kata_candidate_id": candidate },
         }),
         None,
     )
     .await;
-    approved(&f, &project, "technology_standards", "g", "sd", "catalog").await;
-    let (status, out) = arch::advance(&f.running, &project, "g").await;
-    assert_eq!(status, 200, "advance g: {out}");
 
-    approved(&f, &project, "solution_concept", "h", "sd", "diagram").await;
-    let (status, refused) = arch::advance(&f.running, &project, "h").await;
-    assert_eq!(status, 409, "{refused}");
-    assert_eq!(
-        refused["type"], "architecture_outcome_required",
-        "{refused}"
-    );
+    let (status, out) = arch::advance(&f.running, &project, "h").await;
+    assert_eq!(status, 200, "{out}");
+    assert_eq!(out["closed_phase"], "h", "{out}");
+    assert!(out["next_phase"].is_null(), "H is the last phase: {out}");
+}
 
+#[tokio::test]
+async fn an_outcome_on_a_non_delivery_contract_does_not_satisfy_h() {
+    let f = arch::fixture().await;
+    let project = walk_to_phase_g(&f).await;
+    let project_uuid = Uuid::parse_str(&project).expect("project id");
+    approve_phase_h(&f, &project).await;
+
+    // A typed outcome on a draft request-for-architecture contract is a real review row, but it
+    // is not the design gate's instrument: the contract is neither live nor a delivery contract.
     let contract =
         arch::request_contract(&f.running, &project, "request_for_architecture", "h").await;
     let candidate = kata_candidate(&f, project_uuid).await;
-    arch::created_as(
+    let review = arch::created_as(
         &f.running,
         support::REVIEWER,
         "architecture.reviews_record",
@@ -276,9 +344,12 @@ async fn an_unrecorded_review_refuses_the_gate() {
         None,
     )
     .await;
+    assert_eq!(review["outcome"]["kind"], "kata", "{review}");
 
-    let (status, out) = arch::advance(&f.running, &project, "h").await;
-    assert_eq!(status, 200, "{out}");
-    assert_eq!(out["closed_phase"], "h", "{out}");
-    assert!(out["next_phase"].is_null(), "H is the last phase: {out}");
+    let (status, refused) = arch::advance(&f.running, &project, "h").await;
+    assert_eq!(status, 409, "a non-delivery outcome opened H: {refused}");
+    assert_eq!(
+        refused["type"], "architecture_outcome_not_on_delivery_contract",
+        "{refused}"
+    );
 }

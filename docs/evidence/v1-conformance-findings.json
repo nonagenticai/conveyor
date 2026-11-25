@@ -3538,7 +3538,12 @@
    ],
    "failure_scenario": "A new direct HTTP call in an api, server or auth path bypasses timeout, breaker, idempotency and audit, and this gate still passes.",
    "acceptance": "A workspace-wide scan with an exact allowlist (engine plus declared transports), or restate property f to its true scope; a planted offender outside the engine must fail.",
-   "owner_project": "S09"
+   "owner_project": "S09",
+   "resolved_by": {
+    "commit": "9884fb3f39efc61e1c2b5828d962dc76b47bc192",
+    "test": "scripts/check-egress.py",
+    "evidence": "Workspace-wide scan: `python3 scripts/check-egress.py --check` reports 40 declared transports over 767 tracked source files (crates/auth, crates/api and apps/server included), and `--self-test` plants a reqwest:: client in crates/api/src and proves it is refused plus a stale allowlist entry is reported. scripts/ci/gate.sh runs --check; the S09 plan's property f is restated to this scope. v1-s09-1's narrow actions-crate test is kept as that crate's half and now cites the workspace gate."
+   }
   },
   {
    "id": "v1-s10-1",
@@ -3916,7 +3921,12 @@
    ],
    "failure_scenario": "A cursor regression rescans or sorts the 1,000-card board per page: first-page p95 stays under 120 ms so the gate stays green, while paging all five pages exceeds 500 ms.",
    "acceptance": "board.js walks five cursor pages on the 1,000-card board and asserts total ≤500 ms, failing when a page query sorts or rescans in Rust; the gate runs that scenario.",
-   "owner_project": "S05"
+   "owner_project": "S05",
+   "resolved_by": {
+    "commit": "0e6bdcdc0cf1e6c3dd7425b5020e890e8c228022",
+    "test": "tests/load/board.js::fivePages",
+    "evidence": "tests/load/board.js now has a five_pages scenario walking five cursor pages over the 1,000-card board with thresholds five_page_ms max<=500 and checks rate==1 (harness committed at 9884fb3f). Measured run at this commit on a disposable postgres:18 with tests/fixtures/board/v1-1000.json imported through the real actions: five walks, max 76.7 ms (avg 73.34), every walk read 1,000 cards and exhausted the cursor, 2,420/2,420 checks passed, first-page p95 19.53 ms at 20 rps, 0 failed requests. Log docs/evidence/s05-load-gate.log, summary docs/evidence/s05-load-gate.json."
+   }
   },
   {
    "id": "v1-t5-1",

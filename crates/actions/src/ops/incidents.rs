@@ -363,6 +363,7 @@ async fn ops_incident(
             description: None,
             card_type_code: INCIDENT_CARD_TYPE.to_owned(),
             internal_coach_card: false,
+            internal_system_card: true,
             due_at: None,
             parent_card_id: None,
             job_binding_id: None,
@@ -373,6 +374,8 @@ async fn ops_incident(
                 META_RUN: input.run_id.map(|id| id.to_string()),
                 META_EVIDENCE: input.evidence,
             })),
+            // An incident card is a system record, not governed work.
+            trace_link: None,
         },
     )
     .await?

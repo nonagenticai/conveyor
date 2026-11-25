@@ -427,7 +427,13 @@ mod tests {
                 (104, "knowledge retrieval ledger".to_owned()),
                 // #526 (v1-w4b-5): the refusal ledger behind the "gate that never refused"
                 // flag (0105_gate_refusal_ledger.sql, SPEC_V2 §7.5).
-                (105, "gate refusal ledger".to_owned())
+                (105, "gate refusal ledger".to_owned()),
+                // #526 (v1-s07-1): the terminal `expired` status behind
+                // `project_request.timeout` (0106_project_request_expired.sql, S06 §5.3).
+                (106, "project request expired".to_owned()),
+                // #526 (architecture findings): the adoption FK/CHECK and the one-outcome
+                // phase-H index (0107_architecture_integrity.sql).
+                (107, "architecture integrity".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

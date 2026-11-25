@@ -2329,14 +2329,14 @@ async fn seed_parity_document(pg: &support::Pg, ctx: &Ctx) -> Uuid {
 }
 
 /// Seed the rows the sample's input will name, once per round.
-/// One artefact row for a T9 sample, at version 1.
-async fn seed_arch_artifact(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+/// One artefact row for a T9 sample, at version 1. A link needs both ends in one project.
+async fn seed_arch_artifact(pg: &support::Pg, ctx: &Ctx, project: Option<Uuid>) -> Uuid {
     scoped(pg, ctx, async move |conn| {
         store::architecture::create_artifact_tx(
             conn,
             ctx.tenant,
             &store::architecture::NewArtifact {
-                project_id: None,
+                project_id: project,
                 artifact_type_id: None,
                 phase_code: "preliminary".to_owned(),
                 plateau: "psa".to_owned(),
@@ -2356,6 +2356,23 @@ async fn seed_arch_artifact(pg: &support::Pg, ctx: &Ctx) -> Uuid {
         .await
         .expect("seed an architecture artefact")
         .id
+    })
+    .await
+}
+
+/// One seeded standard type of the tenant (`artifacts_create` names its artifact_type).
+async fn seed_arch_type(pg: &support::Pg, ctx: &Ctx, key: &str) -> Uuid {
+    let key = key.to_owned();
+    scoped(pg, ctx, async move |conn| {
+        store::architecture::seed_standard_tx(&mut *conn, ctx.tenant)
+            .await
+            .expect("seed the artefact standard");
+        sqlx::query_scalar("SELECT id FROM artifact_type WHERE tenant_id = $1 AND key = $2 LIMIT 1")
+            .bind(ctx.tenant.as_uuid())
+            .bind(&key)
+            .fetch_one(&mut *conn)
+            .await
+            .expect("read the seeded artifact_type")
     })
     .await
 }
@@ -4146,18 +4163,27 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             ctx.push("changes.request.baseline", baseline);
         }
         // ── T9: the architecture capability (#81) ─────────────────────────────────────────
+        "architecture.artifacts_create" => {
+            // #526: a create names its project and its standard type; both are prepared here.
+            let project = seed_parity_project(pg, ctx).await;
+            let artifact_type = seed_arch_type(pg, ctx, "principles_catalog").await;
+            ctx.push("architecture.artifacts_create.project", project);
+            ctx.push("architecture.artifacts_create.type", artifact_type);
+        }
         "architecture.artifacts_get"
         | "architecture.artifacts_entries"
         | "architecture.artifacts_links"
         | "architecture.artifacts_update"
         | "architecture.artifacts_approve"
         | "architecture.artifacts_supersede" => {
-            let artifact = seed_arch_artifact(pg, ctx).await;
+            let artifact = seed_arch_artifact(pg, ctx, None).await;
             ctx.push(sample.name, artifact);
         }
         "architecture.artifacts_link" => {
-            let from = seed_arch_artifact(pg, ctx).await;
-            let to = seed_arch_artifact(pg, ctx).await;
+            // A link joins two artefacts of ONE project (#526).
+            let project = seed_parity_project(pg, ctx).await;
+            let from = seed_arch_artifact(pg, ctx, Some(project)).await;
+            let to = seed_arch_artifact(pg, ctx, Some(project)).await;
             ctx.push("architecture.artifacts_link", from);
             ctx.push("architecture.artifacts_link", to);
         }
@@ -7522,9 +7548,14 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         expecting(plain("architecture.maturity_list", json!({}), None), 200),
         expecting(plain("architecture.skills_list", json!({}), None), 200),
         {
+            // #526: an artefact names its project and its standard type; the prepare step seeds
+            // both, and the sample carries them.
             let mut sample = plain("architecture.artifacts_create", json!({}), None);
-            sample.input = Box::new(|_ctx: &Ctx| {
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
                 json!({
+                    "project_id": ctx.pop("architecture.artifacts_create.project"),
+                    "artifact_type_id": ctx.pop("architecture.artifacts_create.type"),
                     "phase_code": "preliminary",
                     "plateau": "psa",
                     "artifact_kind": "catalog",

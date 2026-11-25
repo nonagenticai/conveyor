@@ -262,6 +262,26 @@ pub(crate) fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "retro_finding_without_lesson",
             format!("the retro finding {key:?} has no lesson; propose one before closing"),
         ),
+        PlanStoreError::Illegal(PlanError::ClosureAssetMissing) => ActionError::new(
+            409,
+            "programme_closure_asset_missing",
+            "the programme has no approved closure asset; decide its closure first",
+        ),
+        PlanStoreError::Illegal(PlanError::RealizationPlanMissing) => ActionError::new(
+            409,
+            "programme_realization_plan_missing",
+            "the programme has no approved or published benefits realization plan",
+        ),
+        PlanStoreError::Illegal(PlanError::PostClosureOwnerMissing) => ActionError::new(
+            409,
+            "programme_post_closure_owner_missing",
+            "the realization plan's post_closure_owner must name a job id in this tenant",
+        ),
+        PlanStoreError::Illegal(PlanError::LessonEvidenceMissing) => invalid(
+            "evidence",
+            "required",
+            "a lesson needs at least one evidence reference",
+        ),
         PlanStoreError::PiPlanNotApproved => ActionError::new(
             409,
             "pi_plan_not_approved",
