@@ -1,0 +1,8 @@
+Defaulted container "conveyor" out of: conveyor, migrate (init)
+{"timestamp":"2026-11-25T03:23:05.658723Z","level":"INFO","fields":{"message":"relation \"_sqlx_migrations\" already exists, skipping"},"target":"sqlx::postgres::notice"}
+{"timestamp":"2026-11-25T03:23:05.909141Z","level":"INFO","fields":{"message":"migrations applied and runtime grants re-applied","migrations":72},"target":"conveyor"}
+{"timestamp":"2026-11-25T03:23:06.753424Z","level":"INFO","fields":{"message":"maintenance schedules ensured","inserted":0},"target":"conveyor"}
+{"timestamp":"2026-11-25T03:23:11.388585Z","level":"INFO","fields":{"message":"catalogue seeded","tenant":"nonagentic","created":0,"updated":0,"skipped":137},"target":"conveyor"}
+{"timestamp":"2026-11-25T03:23:11.707360Z","level":"INFO","fields":{"message":"benchmark suite seeded","tenant":"nonagentic","suites_created":0},"target":"conveyor"}
+{"timestamp":"2026-11-25T03:23:24.502643Z","level":"INFO","fields":{"message":"programme seeded","tenant":"nonagentic","created":1,"updated":12,"skipped":39,"boards_created":1},"target":"conveyor"}
+{"timestamp":"2026-11-25T03:23:25.603724Z","level":"INFO","fields":{"message":"organisation seeded","tenant":"nonagentic","created":0,"skipped":28,"releases_published":0},"target":"conveyor"}

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F — Evidence · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/evidence-output.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f--evidence">T19F — Evidence</h1>
+<p>What was claimed, what was measured, and what remains a gap.</p>
+<h2 id="claim">Claim</h2>
+<p>The T19F forum bindings are delivered on <code>main</code> (<code>eb0deb61</code>) and proven on the deployed engine: a meeting stays pinned to forum-policy v1 while the v2 route is exercised, a board subject is decided in a sitting whose per-seat decision row carries <code>via.surface='meeting'</code>, and a cadence row materialises exactly one meeting. The policy v2 itself awaits one human review decision, which the product's authoring gate refuses to let a machine supply.</p>
+<h2 id="evidence">Evidence</h2>
+<ul>
+<li>Construction: PR #700 merged as <code>eb0deb61</code>; migration 0073 applied on the live database (<code>_sqlx_migrations</code> max 73); the deployed image carries it (pod digest <code>9c80514d…</code>).</li>
+<li>Programme row: project <code>T19F</code> <code>01a210ba-b6cb-76cc-82a3-a2b45cfb498f</code> on its board, <code>programmes.refresh</code> reports <code>created 0, skipped 52</code>.</li>
+<li>Governance chain: <code>scripts/governance-chain.py --project T19F --check</code> passes 24/24 on the published snapshot — seven approved artefacts, seven links, a live Statement of Architecture Work and a live phase-F delivery contract (requester ≠ approver), B7's baseline read back and not overwritten, one Phase-G compliance review per contract (level <code>conformant</code>), and the published <code>architecture-artifact</code> document with its Metadata/Entries/Links/Document headings.</li>
+<li>Live gate: <code>scripts/t19f-live-gate-check.py --check</code> passes 11 of 12 invariants:
+<ul>
+<li>the meeting <code>01a210c2-a327-7dc7-bab4-5a402a8497a8</code> is pinned at policy <code>t19f_live_gate_forum</code> version 1; the pinned meeting still resolves v1 after the v2 route was exercised;</li>
+<li>the sitting body <code>01a210c8-579b-7808-bc32-aef8899b0b7a</code> decided contract <code>01a210c8-7ea8-7dc9-8104-700ecfe2905b</code> in meeting <code>01a210c8-94ee-73ba-9147-88f2b4729ae0</code>; approval <code>01a210c8-9273-7964-9b97-0f3dd810bcf3</code> is <code>approved</code> with exactly one decision row carrying <code>via.surface='meeting'</code> and naming the chair (<code>conveyor-approver</code>); the agenda item closed as <code>decision</code>;</li>
+<li>cadence <code>01a210c9-0d47-7473-8339-7ea7648e59e9</code> materialised twice to the same meeting <code>01a210c9-2397-73f1-8d07-7e8e807e524f</code>, carrying the bound forum type and the slot and not cancelled.</li>
+</ul></li>
+</ul>
+<h2 id="verification">Verification</h2>
+<pre><code>python3 scripts/governance-chain.py --project T19F --check      # 24/24 PASS
+python3 scripts/t19f-live-gate-check.py --check                  # 11/12 PASS, 1 blocked</code></pre>
+<p>The transports are <code>scripts/programme-record.py</code> (the deployed action surface) and, for the snapshot, <code>docs/design/scripts/publish-data.sh</code>. Raw read-backs and acts are under <code>docs/evidence/t19f/</code> (<code>gate/</code>, <code>gov/</code>, <code>live-gate.json</code>, <code>live-gate-check.txt</code>, <code>publish-report-only.log</code>).</p>
+<h2 id="links">Links</h2>
+<ul>
+<li>Plan: <code>docs/plans/T19F-meeting-bindings.md</code>; artefacts under <code>docs/plans/T19F/</code>.</li>
+<li>Implementation: PR #700 (<code>Closes #683</code>), merge <code>eb0deb61</code>.</li>
+<li>This unit: issue #684.</li>
+</ul>
+<h2 id="gap">Gap</h2>
+<ul>
+<li><strong>The policy v2 publish is blocked on one human review.</strong> <code>authoring.review</code> requires the approval's last decision to be <code>human</code>; the admin CLI records <code>service</code> by design, so the gate refuses it verbatim (<code>BLOCKED policy v2: …</code>). A person must approve the review gate in the console, after which re-running <code>--apply</code> publishes v2 and the twelfth invariant passes. The asset <code>01a210c3-7c34-7338-89f2-6c7a6e40bea7</code> and its approved gate <code>01a210c3-9007-75f4-927c-d1dc32f54c6b</code> are in place for that click.</li>
+<li>The strict conformance publish is red on programme-wide debt that predates this unit (T5, T6, T8, T15 and T17 closed since the accepted baseline; their new/worsened P0s and the S18/S21/ SPEC-V2 ledger rows). The T19F finding is <code>project_in_unauthorised_tranche</code> P1 — T19F is active in tranche 6, whose authorisation is #526's unit; the plan requires T19F to stay active until the tranche-6 review, so this is the declared state, not a regression. The pack was therefore published report-only with the exact findings in <code>publish-report-only.log</code>.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19f/evidence-output.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

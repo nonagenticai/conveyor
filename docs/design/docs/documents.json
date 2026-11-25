@@ -231,8 +231,8 @@
       "path": "docs/design/data/conformance.html",
       "source": "docs/design/data/conformance.md",
       "section": "Design",
-      "sha256": "0b90fd258c3d8161d8c4f55b0a6aef78f286605c785bdf648a013c18e6be6163",
-      "bytes": 24325,
+      "sha256": "81ed52dcd07d46c5d88c7637666cff1eb72cda636360a6a59dfb01baed853416",
+      "bytes": 24819,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
     {
@@ -929,6 +929,429 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19/refresh-evidence.md"
     },
     {
+      "title": "T19F — Evidence",
+      "path": "docs/evidence/t19f/evidence-output.html",
+      "source": "docs/evidence/t19f/evidence-output.md",
+      "section": "Evidence",
+      "sha256": "9a1500aaaac63e62fe3e84af8b08d6c3f811dfe8639d09352483a831d45733dd",
+      "bytes": 3951,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/evidence-output.md"
+    },
+    {
+      "title": "T19F live gate — policy v1 and its pinned meeting",
+      "path": "docs/evidence/t19f/gate/01-schedule-v1.html",
+      "source": "docs/evidence/t19f/gate/01-schedule-v1.md",
+      "section": "Evidence",
+      "sha256": "61d99b989ca499a373ba398da4392dcaa71357a4d8a5b49e70baf3389ff87000",
+      "bytes": 2256,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/01-schedule-v1.md"
+    },
+    {
+      "title": "T19F live gate — the policy intake",
+      "path": "docs/evidence/t19f/gate/02-intake.html",
+      "source": "docs/evidence/t19f/gate/02-intake.md",
+      "section": "Evidence",
+      "sha256": "009dcd8fbb454e54b662e32dad3a5552eea6ced6ac35d3af90f5e59e12b77e4b",
+      "bytes": 891,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/02-intake.md"
+    },
+    {
+      "title": "T19F live gate — the policy v2 draft",
+      "path": "docs/evidence/t19f/gate/03-draft.html",
+      "source": "docs/evidence/t19f/gate/03-draft.md",
+      "section": "Evidence",
+      "sha256": "2907b0e8fa0263a99a0ecad9cb546d04199e77a1ff385ef12ff6660be6c17ab9",
+      "bytes": 1727,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/03-draft.md"
+    },
+    {
+      "title": "T19F live gate — the review gate",
+      "path": "docs/evidence/t19f/gate/04-review-request.html",
+      "source": "docs/evidence/t19f/gate/04-review-request.md",
+      "section": "Evidence",
+      "sha256": "dcceb24f5ab38b89c8c75818e676d2e041e2bbf0724bc0f9fb4a833eaeff08b8",
+      "bytes": 1471,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/04-review-request.md"
+    },
+    {
+      "title": "T19F live gate — the review approval",
+      "path": "docs/evidence/t19f/gate/05-review-decision.html",
+      "source": "docs/evidence/t19f/gate/05-review-decision.md",
+      "section": "Evidence",
+      "sha256": "4d6a965d9605d974d926fb95beb93163b0665e5d4eb65b9ec1bd8d910bf37f40",
+      "bytes": 1947,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/05-review-decision.md"
+    },
+    {
+      "title": "T19F live gate — the authoring review",
+      "path": "docs/evidence/t19f/gate/06-authoring-review.html",
+      "source": "docs/evidence/t19f/gate/06-authoring-review.md",
+      "section": "Evidence",
+      "sha256": "87e19f6bd6cf6f53e4e8d255332bc5b4365fe26485ab0561542343f54bb51a6e",
+      "bytes": 591,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/06-authoring-review.md"
+    },
+    {
+      "title": "T19F live gate — the sitting body",
+      "path": "docs/evidence/t19f/gate/08-board-open.html",
+      "source": "docs/evidence/t19f/gate/08-board-open.md",
+      "section": "Evidence",
+      "sha256": "5db5a0abb938f8f6c6bcb62f99b66358e4c5bb37fd8f84b16b18e4219b16b20c",
+      "bytes": 978,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/08-board-open.md"
+    },
+    {
+      "title": "T19F live gate — activating the body",
+      "path": "docs/evidence/t19f/gate/09-board-activate.html",
+      "source": "docs/evidence/t19f/gate/09-board-activate.md",
+      "section": "Evidence",
+      "sha256": "938e03daa70e8f303246c8693413876970ff4d290b03eac30e81569b1e56c48e",
+      "bytes": 601,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/09-board-activate.md"
+    },
+    {
+      "title": "T19F live gate — the sitting subject",
+      "path": "docs/evidence/t19f/gate/10-sitting-subject.html",
+      "source": "docs/evidence/t19f/gate/10-sitting-subject.md",
+      "section": "Evidence",
+      "sha256": "38d1af951b7bf5d22a69094bd59d2b1894d511075744d8c4c25a416be8c75def",
+      "bytes": 1137,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/10-sitting-subject.md"
+    },
+    {
+      "title": "T19F live gate — the sitting opens",
+      "path": "docs/evidence/t19f/gate/11-sitting-open.html",
+      "source": "docs/evidence/t19f/gate/11-sitting-open.md",
+      "section": "Evidence",
+      "sha256": "a28247db3a5114fa090805823d7b7fbdc1faf2a3098440c5e088d8f50815f61f",
+      "bytes": 764,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/11-sitting-open.md"
+    },
+    {
+      "title": "T19F live gate — the chair seat",
+      "path": "docs/evidence/t19f/gate/12-sitting-invite.html",
+      "source": "docs/evidence/t19f/gate/12-sitting-invite.md",
+      "section": "Evidence",
+      "sha256": "7b483e3c88b677e8cde1f6b95ed626875b41e53fb4b9f61090845cb518bd8cea",
+      "bytes": 3044,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/12-sitting-invite.md"
+    },
+    {
+      "title": "T19F live gate — the chair accepts",
+      "path": "docs/evidence/t19f/gate/13-sitting-respond.html",
+      "source": "docs/evidence/t19f/gate/13-sitting-respond.md",
+      "section": "Evidence",
+      "sha256": "249bbb2f79cc0a1e8a961d351078eaad64e4d87c8369facebb7911d0723543ae",
+      "bytes": 3059,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/13-sitting-respond.md"
+    },
+    {
+      "title": "T19F live gate — the chair's position",
+      "path": "docs/evidence/t19f/gate/14-sitting-position.html",
+      "source": "docs/evidence/t19f/gate/14-sitting-position.md",
+      "section": "Evidence",
+      "sha256": "deb59a498d5d1b675aed1425c99681a7269732d5277a0df2ffa3f3197c4b6565",
+      "bytes": 3706,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/14-sitting-position.md"
+    },
+    {
+      "title": "T19F live gate — the sitting decides",
+      "path": "docs/evidence/t19f/gate/15-sitting-decide.html",
+      "source": "docs/evidence/t19f/gate/15-sitting-decide.md",
+      "section": "Evidence",
+      "sha256": "f7bfb9463fd21d09b7ac7196851709e57335fbbceb5d3043215e38351738acfb",
+      "bytes": 870,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/15-sitting-decide.md"
+    },
+    {
+      "title": "T19F live gate — the cadence row",
+      "path": "docs/evidence/t19f/gate/16-cadence-create.html",
+      "source": "docs/evidence/t19f/gate/16-cadence-create.md",
+      "section": "Evidence",
+      "sha256": "5adc823119bb673850758f9ed1839f6223c71581804e1cbf6a6e1794a7cf8620",
+      "bytes": 9895,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/16-cadence-create.md"
+    },
+    {
+      "title": "T19F live gate — materialising the cadence",
+      "path": "docs/evidence/t19f/gate/17-cadence-materialise.html",
+      "source": "docs/evidence/t19f/gate/17-cadence-materialise.md",
+      "section": "Evidence",
+      "sha256": "4e960458a0bc101079eab8d2278a6c79352ab8533285cd596cd11454dd5404ae",
+      "bytes": 3472,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/17-cadence-materialise.md"
+    },
+    {
+      "title": "T19F live gate — materialising the cadence again",
+      "path": "docs/evidence/t19f/gate/18-cadence-materialise-again.html",
+      "source": "docs/evidence/t19f/gate/18-cadence-materialise-again.md",
+      "section": "Evidence",
+      "sha256": "44fbc4158c4798c240eb937287b19c7ce2420627246745bf3ca771c7a84323a0",
+      "bytes": 3525,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/18-cadence-materialise-again.md"
+    },
+    {
+      "title": "T19F — Business capability map — approval",
+      "path": "docs/evidence/t19f/gov/approve-business_capability_map.html",
+      "source": "docs/evidence/t19f/gov/approve-business_capability_map.md",
+      "section": "Evidence",
+      "sha256": "bf2ca96e4082fce71394e1fdf4858d0c709e5fd5e94da7ff0d2e87dc794c2710",
+      "bytes": 2005,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/approve-business_capability_map.md"
+    },
+    {
+      "title": "T19F — Data entity catalog — approval",
+      "path": "docs/evidence/t19f/gov/approve-data_entity_catalog.html",
+      "source": "docs/evidence/t19f/gov/approve-data_entity_catalog.md",
+      "section": "Evidence",
+      "sha256": "050695055ffa811b7bc565d761d43eec00a0d94d987467fe4a453f4c0cdac63e",
+      "bytes": 2075,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/approve-data_entity_catalog.md"
+    },
+    {
+      "title": "T19F — Drivers, goals and objectives — approval",
+      "path": "docs/evidence/t19f/gov/approve-driver_goal_objective.html",
+      "source": "docs/evidence/t19f/gov/approve-driver_goal_objective.md",
+      "section": "Evidence",
+      "sha256": "198ed9d66bb96aabad128dabd641f6fad2d50cf792327a76598d758a6913a9b6",
+      "bytes": 2087,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/approve-driver_goal_objective.md"
+    },
+    {
+      "title": "T19F — Requirements catalog — approval",
+      "path": "docs/evidence/t19f/gov/approve-requirements_catalog.html",
+      "source": "docs/evidence/t19f/gov/approve-requirements_catalog.md",
+      "section": "Evidence",
+      "sha256": "73e31b7fb1090d7097b9e8c17cce2d6f36bf8b84eaf66ea516b3a0406c5f7bee",
+      "bytes": 2120,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/approve-requirements_catalog.md"
+    },
+    {
+      "title": "T19F — Solution concept — approval",
+      "path": "docs/evidence/t19f/gov/approve-solution_concept.html",
+      "source": "docs/evidence/t19f/gov/approve-solution_concept.md",
+      "section": "Evidence",
+      "sha256": "6a9de2643f1750d56ffd90f99ef41bc3f5a229239f6f571535d9a18e0e48083b",
+      "bytes": 2044,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/approve-solution_concept.md"
+    },
+    {
+      "title": "T19F — Stakeholder map — approval",
+      "path": "docs/evidence/t19f/gov/approve-stakeholder_map.html",
+      "source": "docs/evidence/t19f/gov/approve-stakeholder_map.md",
+      "section": "Evidence",
+      "sha256": "42ae35cb961db8498fd15ca974fe042f8c659b91f022c5a851a54d01cc62774b",
+      "bytes": 2019,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/approve-stakeholder_map.md"
+    },
+    {
+      "title": "T19F — Technology standards — approval",
+      "path": "docs/evidence/t19f/gov/approve-technology_standards.html",
+      "source": "docs/evidence/t19f/gov/approve-technology_standards.md",
+      "section": "Evidence",
+      "sha256": "87bfcb22e105eca1ec150bc58ad49d8835296810efe369664719dca9eb445d44",
+      "bytes": 2038,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/approve-technology_standards.md"
+    },
+    {
+      "title": "T19F — Business capability map",
+      "path": "docs/evidence/t19f/gov/artifact-business_capability_map.html",
+      "source": "docs/evidence/t19f/gov/artifact-business_capability_map.md",
+      "section": "Evidence",
+      "sha256": "bbe069f6964394dface73d3f4d4926d29b578c57d54338d13146928ba16795e3",
+      "bytes": 1890,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/artifact-business_capability_map.md"
+    },
+    {
+      "title": "T19F — Data entity catalog",
+      "path": "docs/evidence/t19f/gov/artifact-data_entity_catalog.html",
+      "source": "docs/evidence/t19f/gov/artifact-data_entity_catalog.md",
+      "section": "Evidence",
+      "sha256": "6023d6cdebc5cc264b4b2c0c13c2c80f480705e463f18279696e18f7a6ff4d52",
+      "bytes": 1956,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/artifact-data_entity_catalog.md"
+    },
+    {
+      "title": "T19F — Architecture artifact (the typed TOGAF set)",
+      "path": "docs/evidence/t19f/gov/artifact-document-compose.html",
+      "source": "docs/evidence/t19f/gov/artifact-document-compose.md",
+      "section": "Evidence",
+      "sha256": "3680999ef0a38e50b0f7dbda9d420d06bc13a72eeb68ed76ee6d638c12ff8de1",
+      "bytes": 8959,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/artifact-document-compose.md"
+    },
+    {
+      "title": "T19F — Architecture artifact (the typed TOGAF set) — publication",
+      "path": "docs/evidence/t19f/gov/artifact-document-publish.html",
+      "source": "docs/evidence/t19f/gov/artifact-document-publish.md",
+      "section": "Evidence",
+      "sha256": "22c33e6c6d3115b6586c1964a57e6b8d823166b38872f488f055f42c4dcbd6f3",
+      "bytes": 9091,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/artifact-document-publish.md"
+    },
+    {
+      "title": "T19F — Drivers, goals and objectives",
+      "path": "docs/evidence/t19f/gov/artifact-driver_goal_objective.html",
+      "source": "docs/evidence/t19f/gov/artifact-driver_goal_objective.md",
+      "section": "Evidence",
+      "sha256": "fd7864d2441ca4cfb764710446ad4fbec62bc0bd585db6d457873732a0b0b2f5",
+      "bytes": 1970,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/artifact-driver_goal_objective.md"
+    },
+    {
+      "title": "T19F artefact link — drivergoalobjective derivation requirementscatalog",
+      "path": "docs/evidence/t19f/gov/artifact-links.html",
+      "source": "docs/evidence/t19f/gov/artifact-links.md",
+      "section": "Evidence",
+      "sha256": "2c4c66bdaf7533762bb3b323f374d77e4078fb949bdfba76c7c016dd4fb7a833",
+      "bytes": 5971,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/artifact-links.md"
+    },
+    {
+      "title": "T19F — Requirements catalog",
+      "path": "docs/evidence/t19f/gov/artifact-requirements_catalog.html",
+      "source": "docs/evidence/t19f/gov/artifact-requirements_catalog.md",
+      "section": "Evidence",
+      "sha256": "4272734b918ece0ef227020b7fed8d252e5770b597505c677e5657d04e99b158",
+      "bytes": 2002,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/artifact-requirements_catalog.md"
+    },
+    {
+      "title": "T19F — Solution concept",
+      "path": "docs/evidence/t19f/gov/artifact-solution_concept.html",
+      "source": "docs/evidence/t19f/gov/artifact-solution_concept.md",
+      "section": "Evidence",
+      "sha256": "a111b2c431b4a178f7c82aa101f27220d8831f45f5dc7d6f98886db2e530b0d3",
+      "bytes": 1922,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/artifact-solution_concept.md"
+    },
+    {
+      "title": "T19F — Stakeholder map",
+      "path": "docs/evidence/t19f/gov/artifact-stakeholder_map.html",
+      "source": "docs/evidence/t19f/gov/artifact-stakeholder_map.md",
+      "section": "Evidence",
+      "sha256": "cd197371a33506d53a26dab76277c25c9d57c6bef22b49fcd33266c38d0b4f5b",
+      "bytes": 1895,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/artifact-stakeholder_map.md"
+    },
+    {
+      "title": "T19F — Technology standards",
+      "path": "docs/evidence/t19f/gov/artifact-technology_standards.html",
+      "source": "docs/evidence/t19f/gov/artifact-technology_standards.md",
+      "section": "Evidence",
+      "sha256": "2d5d4e9bb468d0351d1fbd1aa0917c5d7967557d7cea9aa889ef2d70a1f0f1d9",
+      "bytes": 1920,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/artifact-technology_standards.md"
+    },
+    {
+      "title": "T19F architecture contract — approval",
+      "path": "docs/evidence/t19f/gov/contract-approve.html",
+      "source": "docs/evidence/t19f/gov/contract-approve.md",
+      "section": "Evidence",
+      "sha256": "62815c0234d4cc91ac4b8381fbb84d37482f7df87cd54129b965d5c724585d2a",
+      "bytes": 3680,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/contract-approve.md"
+    },
+    {
+      "title": "T19F architecture contract — the Board's decision",
+      "path": "docs/evidence/t19f/gov/contract-board-decision.html",
+      "source": "docs/evidence/t19f/gov/contract-board-decision.md",
+      "section": "Evidence",
+      "sha256": "2439914553c2cc1f8962c9a7b1efa31624a124a06508bfd0e8fe60439de88598",
+      "bytes": 1788,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/contract-board-decision.md"
+    },
+    {
+      "title": "Statement of Architecture Work — T19F forum bindings (2026-11-25)",
+      "path": "docs/evidence/t19f/gov/contract-request.html",
+      "source": "docs/evidence/t19f/gov/contract-request.md",
+      "section": "Evidence",
+      "sha256": "fcb6577c8cf09ad6d2a9f9dd87b9fb7730ceca0181ef86c04520860b01969244",
+      "bytes": 3442,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/contract-request.md"
+    },
+    {
+      "title": "T19F delivery contract — approval",
+      "path": "docs/evidence/t19f/gov/delivery-contract-approve.html",
+      "source": "docs/evidence/t19f/gov/delivery-contract-approve.md",
+      "section": "Evidence",
+      "sha256": "59b96241d651e6602e48fddb134eb10d0ea76d3e52a8da4d6a08a448beff8e08",
+      "bytes": 3762,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/delivery-contract-approve.md"
+    },
+    {
+      "title": "T19F delivery contract — the Board's decision",
+      "path": "docs/evidence/t19f/gov/delivery-contract-board-decision.html",
+      "source": "docs/evidence/t19f/gov/delivery-contract-board-decision.md",
+      "section": "Evidence",
+      "sha256": "29ed3cb6a213a3b82c1d0d51ad2bf8628ddeedbc1914d36378bdb89cee029f25",
+      "bytes": 1705,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/delivery-contract-board-decision.md"
+    },
+    {
+      "title": "Delivery contract — T19F forum bindings (2026-11-25)",
+      "path": "docs/evidence/t19f/gov/delivery-contract-request.html",
+      "source": "docs/evidence/t19f/gov/delivery-contract-request.md",
+      "section": "Evidence",
+      "sha256": "cb61186f9c2d0c0163b5ae81691eebf5b37389d84bf5c81eca0188b956af9f9a",
+      "bytes": 3529,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/delivery-contract-request.md"
+    },
+    {
+      "title": "T19F live proof — T19F — Evidence",
+      "path": "docs/evidence/t19f/gov/output-evidence.html",
+      "source": "docs/evidence/t19f/gov/output-evidence.md",
+      "section": "Evidence",
+      "sha256": "bde2d03e40c786068c095bad34f15b1f4b86dd934ad76df11eeab16dc2f528fd",
+      "bytes": 20955,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/output-evidence.md"
+    },
+    {
+      "title": "T19F live proof — T19F — Project brief",
+      "path": "docs/evidence/t19f/gov/output-project-brief.html",
+      "source": "docs/evidence/t19f/gov/output-project-brief.md",
+      "section": "Evidence",
+      "sha256": "9b0ec5d74a1ccde8c6fa85b8b98fcbd2d754856508c4a6eda3efb58b0197a4ad",
+      "bytes": 28162,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/output-project-brief.md"
+    },
+    {
+      "title": "T19F phase-G compliance review — deliverycontract",
+      "path": "docs/evidence/t19f/gov/review-delivery_contract.html",
+      "source": "docs/evidence/t19f/gov/review-delivery_contract.md",
+      "section": "Evidence",
+      "sha256": "9540baf632a0b10b6ff3d3883cfcd306c3e43442ca299ff4533c5e2dbc2223ce",
+      "bytes": 2621,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/review-delivery_contract.md"
+    },
+    {
+      "title": "T19F phase-G compliance review — statementofarchitecturework",
+      "path": "docs/evidence/t19f/gov/review-statement_of_architecture_work.html",
+      "source": "docs/evidence/t19f/gov/review-statement_of_architecture_work.md",
+      "section": "Evidence",
+      "sha256": "a61144e32bf2711b55cc57c947555f5818373f65021a7b2757c965c653e0d5a8",
+      "bytes": 2617,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/review-statement_of_architecture_work.md"
+    },
+    {
+      "title": "T19F — Project brief",
+      "path": "docs/evidence/t19f/project-brief-output.html",
+      "source": "docs/evidence/t19f/project-brief-output.md",
+      "section": "Evidence",
+      "sha256": "e91f7cb6e5958aa71e433fc329d446382cb2a6a93e21178ccfcf3b2e34537686",
+      "bytes": 3164,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/project-brief-output.md"
+    },
+    {
+      "title": "T19F live proof — the programme refresh",
+      "path": "docs/evidence/t19f/refresh-readback.html",
+      "source": "docs/evidence/t19f/refresh-readback.md",
+      "section": "Evidence",
+      "sha256": "42811f947bca5b1e716cf6087092d73642fe97b9a1a94d654ee6cf7728b026a2",
+      "bytes": 175,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/refresh-readback.md"
+    },
+    {
       "title": "V1 → SPECV2 coverage",
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
@@ -1194,9 +1617,27 @@
       "path": "docs/plans/T19F/artifact-register.html",
       "source": "docs/plans/T19F/artifact-register.md",
       "section": "Plans",
-      "sha256": "0da8389f33a51f2ab6b2c78032cac8fe6841a4717c4e38172882a92f5b35ebdd",
-      "bytes": 4256,
+      "sha256": "fea484e550864420488b169a76dca7a6c0cd092179efbccaa64e40bc8777359b",
+      "bytes": 4287,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/artifact-register.md"
+    },
+    {
+      "title": "T19F — Forum bindings: closure review",
+      "path": "docs/plans/T19F/closure-review.html",
+      "source": "docs/plans/T19F/closure-review.md",
+      "section": "Plans",
+      "sha256": "81a50bf16a1b18e8b14a558a640adb7095dc6d127fd613639aef8c0ea9b2e2e0",
+      "bytes": 3786,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/closure-review.md"
+    },
+    {
+      "title": "T19F — Forum bindings: evidence",
+      "path": "docs/plans/T19F/evidence.html",
+      "source": "docs/plans/T19F/evidence.md",
+      "section": "Plans",
+      "sha256": "ed5eef0610d9088347b903d1a4788971661e58e95f9cc18f0eccb321e1a945ed",
+      "bytes": 6886,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19F/evidence.md"
     },
     {
       "title": "T19F — Inception analysis",

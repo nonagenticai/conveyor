@@ -1,11 +1,11 @@
 {
-  "audited_at": "2026-11-24",
-  "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+  "audited_at": "2026-11-25",
+  "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
   "findings": [
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "benefit-transition",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "benefit-transition",
       "evidence": [
         {
@@ -98,7 +98,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "benefit-transition",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "benefit-transition",
       "evidence": [
         {
@@ -191,7 +191,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "benefit-transition",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "benefit-transition",
       "evidence": [
         {
@@ -284,7 +284,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "benefit-transition",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "benefit-transition",
       "evidence": [
         {
@@ -377,7 +377,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "benefit-transition",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "benefit-transition",
       "evidence": [
         {
@@ -470,7 +470,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "benefit-transition",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "benefit-transition",
       "evidence": [
         {
@@ -563,7 +563,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "benefit-transition",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "benefit-transition",
       "evidence": [
         {
@@ -656,7 +656,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "blueprint",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "blueprint",
       "evidence": [
         {
@@ -736,7 +736,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "governance",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "governance",
       "evidence": [
         {
@@ -816,7 +816,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "programme-plan",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "programme-plan",
       "evidence": [
         {
@@ -896,7 +896,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "refined-vision",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "refined-vision",
       "evidence": [
         {
@@ -950,7 +950,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "closure-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "closure-review",
       "evidence": [
         {
@@ -1030,7 +1030,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-brief",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-brief",
       "evidence": [
         {
@@ -1162,7 +1162,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "delivery-contract",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -1229,7 +1229,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "delivery-contract",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "delivery-contract",
       "evidence": [
         {
@@ -1296,7 +1296,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-e",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-e",
       "evidence": [
         {
@@ -1368,7 +1368,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-e",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-e",
       "evidence": [
         {
@@ -1440,7 +1440,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-e",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-e",
       "evidence": [
         {
@@ -1512,7 +1512,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-e",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-e",
       "evidence": [
         {
@@ -1584,7 +1584,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-e",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-e",
       "evidence": [
         {
@@ -1656,7 +1656,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-e",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-e",
       "evidence": [
         {
@@ -1728,7 +1728,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-e",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-e",
       "evidence": [
         {
@@ -1800,7 +1800,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-e",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-e",
       "evidence": [
         {
@@ -1872,7 +1872,79 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-e",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+      "category": "phase-e",
+      "evidence": [
+        {
+          "artefact": "std-togaf-phase-e-t19f-e",
+          "section": "Mandatory artefacts",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-phase-e-t19f-e",
+          "section": "Contract and gate",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-phase-e-t19f-e",
+          "section": "Evidence",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-phase-e-t19f-e",
+      "missing": [
+        "Mandatory artefacts",
+        "Contract and gate",
+        "Evidence"
+      ],
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-e-t19f-e:T19F",
+      "problem": "The phase-e artefact for T19F — E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:e",
+        "key": "T19F/e",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — E"
+      },
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "phase-e",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-e",
       "evidence": [
         {
@@ -1944,7 +2016,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-e",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-e",
       "evidence": [
         {
@@ -2016,7 +2088,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-g",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
         {
@@ -2088,7 +2160,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-g",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
         {
@@ -2160,7 +2232,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-g",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
         {
@@ -2232,7 +2304,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-g",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
         {
@@ -2304,7 +2376,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-g",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
         {
@@ -2376,7 +2448,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-g",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
         {
@@ -2448,7 +2520,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-g",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
         {
@@ -2520,7 +2592,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-g",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
         {
@@ -2592,7 +2664,79 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-g",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+      "category": "phase-g",
+      "evidence": [
+        {
+          "artefact": "std-togaf-phase-g-t19f-g",
+          "section": "Mandatory artefacts",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-phase-g-t19f-g",
+          "section": "Contract and gate",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-phase-g-t19f-g",
+          "section": "Evidence",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-phase-g-t19f-g",
+      "missing": [
+        "Mandatory artefacts",
+        "Contract and gate",
+        "Evidence"
+      ],
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-g-t19f-g:T19F",
+      "problem": "The phase-g artefact for T19F — G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:g",
+        "key": "T19F/g",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — G"
+      },
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "phase-g",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
         {
@@ -2664,7 +2808,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-g",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-g",
       "evidence": [
         {
@@ -2736,7 +2880,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-h",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-h",
       "evidence": [
         {
@@ -2808,7 +2952,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-h",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-h",
       "evidence": [
         {
@@ -2880,7 +3024,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-h",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-h",
       "evidence": [
         {
@@ -2952,7 +3096,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-h",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-h",
       "evidence": [
         {
@@ -3024,7 +3168,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-h",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-h",
       "evidence": [
         {
@@ -3096,7 +3240,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-h",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-h",
       "evidence": [
         {
@@ -3168,7 +3312,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-h",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-h",
       "evidence": [
         {
@@ -3240,7 +3384,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-h",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-h",
       "evidence": [
         {
@@ -3312,7 +3456,79 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-h",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+      "category": "phase-h",
+      "evidence": [
+        {
+          "artefact": "std-togaf-phase-h-t19f-h",
+          "section": "Mandatory artefacts",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-phase-h-t19f-h",
+          "section": "Contract and gate",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-phase-h-t19f-h",
+          "section": "Evidence",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-phase-h-t19f-h",
+      "missing": [
+        "Mandatory artefacts",
+        "Contract and gate",
+        "Evidence"
+      ],
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-h-t19f-h:T19F",
+      "problem": "The phase-h artefact for T19F — H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:h",
+        "key": "T19F/h",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — H"
+      },
+      "title": "TOGAF artefact absent: phase-h"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "phase-h",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-h",
       "evidence": [
         {
@@ -3384,7 +3600,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-h",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-h",
       "evidence": [
         {
@@ -3456,7 +3672,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "business-case",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "business-case",
       "evidence": [
         {
@@ -3497,7 +3713,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "programme-brief",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "programme-brief",
       "evidence": [
         {
@@ -3590,7 +3806,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "programme-strategies",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "programme-strategies",
       "evidence": [
         {
@@ -3683,7 +3899,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -3776,7 +3992,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -3856,7 +4072,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -3923,7 +4139,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -4016,7 +4232,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -4109,7 +4325,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -4202,7 +4418,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -4282,7 +4498,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -4375,7 +4591,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -4468,7 +4684,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -4561,7 +4777,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -4654,7 +4870,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -4747,7 +4963,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -4840,7 +5056,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -4933,7 +5149,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -5026,7 +5242,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -5119,7 +5335,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -5212,7 +5428,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -5305,7 +5521,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -5398,7 +5614,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -5491,7 +5707,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -5584,7 +5800,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -5664,7 +5880,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -5757,7 +5973,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -5850,7 +6066,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -5930,7 +6146,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -6023,7 +6239,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -6103,7 +6319,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -6196,7 +6412,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -6289,7 +6505,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "project-registers",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "project-registers",
       "evidence": [
         {
@@ -6382,7 +6598,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -6449,7 +6665,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -6516,7 +6732,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -6557,7 +6773,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -6598,7 +6814,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -6665,7 +6881,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -6706,7 +6922,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -6747,7 +6963,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -6788,7 +7004,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -6829,7 +7045,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -6870,7 +7086,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -6937,7 +7153,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7004,7 +7220,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7071,7 +7287,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7138,7 +7354,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7205,7 +7421,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7272,7 +7488,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7339,7 +7555,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7406,7 +7622,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7473,7 +7689,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7540,7 +7756,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7607,7 +7823,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7674,7 +7890,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7741,7 +7957,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7808,7 +8024,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7875,7 +8091,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -7942,7 +8158,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8009,7 +8225,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8076,7 +8292,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8143,7 +8359,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8210,7 +8426,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8277,7 +8493,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8318,7 +8534,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8359,7 +8575,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8400,7 +8616,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8441,7 +8657,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8482,7 +8698,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8549,7 +8765,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8590,7 +8806,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8657,7 +8873,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8724,7 +8940,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8791,7 +9007,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8858,7 +9074,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8925,7 +9141,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -8966,7 +9182,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -9033,7 +9249,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -9074,7 +9290,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -9141,7 +9357,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -9208,7 +9424,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -9275,7 +9491,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "architecture-artifact",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "architecture-artifact",
       "evidence": [
         {
@@ -9342,7 +9558,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9383,7 +9599,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9424,7 +9640,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9465,7 +9681,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9506,7 +9722,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9547,7 +9763,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9588,7 +9804,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9629,7 +9845,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9670,7 +9886,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9711,7 +9927,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9752,7 +9968,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9793,7 +10009,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9834,7 +10050,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9875,7 +10091,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9916,7 +10132,48 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+      "category": "compliance-review",
+      "evidence": [
+        {
+          "artefact": "std-togaf-compliance-review-t19f",
+          "section": "Waivers",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/waivers",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-compliance-review-t19f",
+      "missing": [
+        "Waivers"
+      ],
+      "owner_project": "T19F",
+      "package_key": "std-togaf-compliance-review-t19f:T19F",
+      "problem": "The compliance-review artefact for Follow-on: docs/plans/T19F-meeting-bindings.md is partial; missing required sections: Waivers.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+        "key": "T19F",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "Follow-on: docs/plans/T19F-meeting-bindings.md"
+      },
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "compliance-review",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9957,7 +10214,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "compliance-review",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "compliance-review",
       "evidence": [
         {
@@ -9998,7 +10255,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10039,7 +10296,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10080,7 +10337,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10121,7 +10378,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10162,7 +10419,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10203,7 +10460,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10244,7 +10501,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10285,7 +10542,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10326,7 +10583,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10367,7 +10624,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10408,7 +10665,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10449,7 +10706,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10490,7 +10747,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10531,7 +10788,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10572,7 +10829,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10613,7 +10870,48 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+      "category": "phase-b",
+      "evidence": [
+        {
+          "artefact": "std-togaf-phase-b-t19f-b",
+          "section": "Contract and gate",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-phase-b-t19f-b",
+      "missing": [
+        "Contract and gate"
+      ],
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-b-t19f-b:T19F",
+      "problem": "The phase-b artefact for T19F — B is partial; missing required sections: Contract and gate.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:b",
+        "key": "T19F/b",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — B"
+      },
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "phase-b",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10654,7 +10952,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10695,7 +10993,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-b",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-b",
       "evidence": [
         {
@@ -10736,7 +11034,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -10777,7 +11075,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -10818,7 +11116,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -10859,7 +11157,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -10900,7 +11198,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -10941,7 +11239,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -10982,7 +11280,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -11023,7 +11321,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -11064,7 +11362,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -11105,7 +11403,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -11146,7 +11444,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -11187,7 +11485,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -11228,7 +11526,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -11269,7 +11567,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -11310,7 +11608,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -11351,7 +11649,48 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+      "category": "phase-c",
+      "evidence": [
+        {
+          "artefact": "std-togaf-phase-c-t19f-c",
+          "section": "Contract and gate",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-phase-c-t19f-c",
+      "missing": [
+        "Contract and gate"
+      ],
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-c-t19f-c:T19F",
+      "problem": "The phase-c artefact for T19F — C is partial; missing required sections: Contract and gate.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:c",
+        "key": "T19F/c",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — C"
+      },
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "phase-c",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -11392,7 +11731,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -11433,7 +11772,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-c",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-c",
       "evidence": [
         {
@@ -11474,7 +11813,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -11515,7 +11854,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -11556,7 +11895,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -11597,7 +11936,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -11638,7 +11977,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -11679,7 +12018,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -11720,7 +12059,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -11761,7 +12100,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -11802,7 +12141,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -11843,7 +12182,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -11884,7 +12223,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -11925,7 +12264,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -11966,7 +12305,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -12007,7 +12346,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -12048,7 +12387,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -12089,7 +12428,48 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+      "category": "phase-d",
+      "evidence": [
+        {
+          "artefact": "std-togaf-phase-d-t19f-d",
+          "section": "Contract and gate",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-phase-d-t19f-d",
+      "missing": [
+        "Contract and gate"
+      ],
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-d-t19f-d:T19F",
+      "problem": "The phase-d artefact for T19F — D is partial; missing required sections: Contract and gate.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:d",
+        "key": "T19F/d",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — D"
+      },
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "phase-d",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -12130,7 +12510,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -12171,7 +12551,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-d",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-d",
       "evidence": [
         {
@@ -12212,7 +12592,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12271,7 +12651,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12330,7 +12710,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12389,7 +12769,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12448,7 +12828,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12507,7 +12887,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12566,7 +12946,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12625,7 +13005,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12684,7 +13064,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12743,7 +13123,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12802,7 +13182,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12861,7 +13241,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12920,7 +13300,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -12979,7 +13359,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -13038,7 +13418,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -13097,7 +13477,66 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
+      "category": "phase-f",
+      "evidence": [
+        {
+          "artefact": "std-togaf-phase-f-t19f-f",
+          "section": "Mandatory artefacts",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-phase-f-t19f-f",
+          "section": "Evidence",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ],
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-phase-f-t19f-f",
+      "missing": [
+        "Mandatory artefacts",
+        "Evidence"
+      ],
+      "owner_project": "T19F",
+      "package_key": "std-togaf-phase-f-t19f-f:T19F",
+      "problem": "The phase-f artefact for T19F — F is partial; missing required sections: Mandatory artefacts, Evidence.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f:f",
+        "key": "T19F/f",
+        "kind": "phase",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T19F",
+        "title": "T19F — F"
+      },
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "phase-f",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -13156,7 +13595,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {
@@ -13215,7 +13654,7 @@
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "phase-f",
-      "audited_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+      "audited_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
       "category": "phase-f",
       "evidence": [
         {

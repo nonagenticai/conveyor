@@ -2939,9 +2939,45 @@
       "title": "T19 — Architecture artifact (the typed TOGAF set)",
       "unit": "T19",
       "updated_at": "2026-11-24T09:31:58.766037+00:00"
+    },
+    {
+      "card_id": null,
+      "category": "architecture-artifact",
+      "created_at": "2026-11-25T03:27:24.159798+00:00",
+      "id": "01a210be-6a72-77d4-ae4f-9ab9fa3c7f2a",
+      "kind": "document",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "publishable": true,
+      "title": "T19F — Architecture artifact (the typed TOGAF set)",
+      "unit": "T19F",
+      "updated_at": "2026-11-25T03:27:29.396734+00:00"
+    },
+    {
+      "card_id": null,
+      "category": "project-brief",
+      "created_at": "2026-11-25T03:30:37.59501+00:00",
+      "id": "01a210c1-5e0b-73a0-8369-4e02145395e2",
+      "kind": "document",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "publishable": true,
+      "title": "T19F — Project brief",
+      "unit": "T19F",
+      "updated_at": "2026-11-25T03:31:44.524272+00:00"
+    },
+    {
+      "card_id": null,
+      "category": "evidence",
+      "created_at": "2026-11-25T03:41:34.231212+00:00",
+      "id": "01a210cb-6308-7552-861c-dad6bc5a3b9f",
+      "kind": "document",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "publishable": true,
+      "title": "T19F — Evidence",
+      "unit": "T19F",
+      "updated_at": "2026-11-25T03:41:39.359669+00:00"
     }
   ],
-  "generated_at": "2026-11-24T16:30:00Z",
+  "generated_at": "2026-11-25T03:46:32.319854100+00:00",
   "governed_assets": [
     {
       "confidence": null,

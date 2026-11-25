@@ -1,7 +1,62 @@
 {
-  "generated_at": "2026-11-24T16:30:00Z",
-  "git_sha": "a2ef9194eb2ce10ef99231e128aa66c5cdff9d18",
+  "generated_at": "2026-11-25T03:46:18.516715051+00:00",
+  "git_sha": "b51896a61b28cec6ca8e87d0fc9617fa43dafe7d",
   "packages": [
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T15",
+      "apply_to": "PLATFORM",
+      "artefact": "closure_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A closure review output is published for the project",
+          "met": false
+        },
+        {
+          "item": "The audit reports no closed_without_closure_review gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "closed_without_closure_review",
+          "source": "snapshot",
+          "subjects": [
+            "T15"
+          ]
+        }
+      ],
+      "key": "closed_without_closure_review:T15",
+      "owner_project": "T15",
+      "rule": "closed_without_closure_review",
+      "scope": "T15",
+      "severity": "P0",
+      "spec": "\u00a78.4",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "project is closed but its closure review is not published",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P0",
+          "subject": "T15"
+        }
+      ],
+      "title": "Publish the project's closure review"
+    },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T16",
       "apply_to": "PLATFORM",
@@ -55,6 +110,61 @@
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
           "subject": "T16"
+        }
+      ],
+      "title": "Publish the project's closure review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T17",
+      "apply_to": "PLATFORM",
+      "artefact": "closure_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A closure review output is published for the project",
+          "met": false
+        },
+        {
+          "item": "The audit reports no closed_without_closure_review gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "closed_without_closure_review",
+          "source": "snapshot",
+          "subjects": [
+            "T17"
+          ]
+        }
+      ],
+      "key": "closed_without_closure_review:T17",
+      "owner_project": "T17",
+      "rule": "closed_without_closure_review",
+      "scope": "T17",
+      "severity": "P0",
+      "spec": "\u00a78.4",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "project is closed but its closure review is not published",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P0",
+          "subject": "T17"
         }
       ],
       "title": "Publish the project's closure review"
@@ -117,6 +227,116 @@
       "title": "Publish the project's closure review"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T5",
+      "apply_to": "PLATFORM",
+      "artefact": "closure_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A closure review output is published for the project",
+          "met": false
+        },
+        {
+          "item": "The audit reports no closed_without_closure_review gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "closed_without_closure_review",
+          "source": "snapshot",
+          "subjects": [
+            "T5"
+          ]
+        }
+      ],
+      "key": "closed_without_closure_review:T5",
+      "owner_project": "T5",
+      "rule": "closed_without_closure_review",
+      "scope": "T5",
+      "severity": "P0",
+      "spec": "\u00a78.4",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "project is closed but its closure review is not published",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P0",
+          "subject": "T5"
+        }
+      ],
+      "title": "Publish the project's closure review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T6",
+      "apply_to": "PLATFORM",
+      "artefact": "closure_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A closure review output is published for the project",
+          "met": false
+        },
+        {
+          "item": "The audit reports no closed_without_closure_review gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "closed_without_closure_review",
+          "source": "snapshot",
+          "subjects": [
+            "T6"
+          ]
+        }
+      ],
+      "key": "closed_without_closure_review:T6",
+      "owner_project": "T6",
+      "rule": "closed_without_closure_review",
+      "scope": "T6",
+      "severity": "P0",
+      "spec": "\u00a78.4",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "project is closed but its closure review is not published",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P0",
+          "subject": "T6"
+        }
+      ],
+      "title": "Publish the project's closure review"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T7",
       "apply_to": "PLATFORM",
       "artefact": "closure_review",
@@ -174,8 +394,63 @@
       "title": "Publish the project's closure review"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T8",
+      "apply_to": "PLATFORM",
+      "artefact": "closure_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A closure review output is published for the project",
+          "met": false
+        },
+        {
+          "item": "The audit reports no closed_without_closure_review gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "closed_without_closure_review",
+          "source": "snapshot",
+          "subjects": [
+            "T8"
+          ]
+        }
+      ],
+      "key": "closed_without_closure_review:T8",
+      "owner_project": "T8",
+      "rule": "closed_without_closure_review",
+      "scope": "T8",
+      "severity": "P0",
+      "spec": "\u00a78.4",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "project is closed but its closure review is not published",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P0",
+          "subject": "T8"
+        }
+      ],
+      "title": "Publish the project's closure review"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-10",
-      "apply_to": "T5",
+      "apply_to": "PLATFORM",
       "artefact": "tranche_review",
       "baseline": {
         "disposition": "rework",
@@ -229,14 +504,150 @@
           "subject": "S12"
         },
         {
-          "detail": "project is active in tranche 10 whose state is 'planned'",
+          "detail": "project is closed in tranche 10 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P0",
+          "subject": "T5"
+        }
+      ],
+      "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-11",
+      "apply_to": "S14",
+      "artefact": "tranche_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 3,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The tranche has a recorded continue|pause|stop decision",
+          "met": false
+        },
+        {
+          "item": "The audit reports no project_in_unauthorised_tranche gap for that tranche",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "msp.json",
+          "rule": "project_in_unauthorised_tranche",
+          "source": "snapshot",
+          "subjects": [
+            "T6",
+            "T8",
+            "S14"
+          ]
+        }
+      ],
+      "key": "project_in_unauthorised_tranche:tranche-11",
+      "owner_project": "T12",
+      "rule": "project_in_unauthorised_tranche",
+      "scope": "tranche-11",
+      "severity": "P0",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 3,
+      "subjects": [
+        {
+          "detail": "project is closed in tranche 11 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P0",
+          "subject": "T6"
+        },
+        {
+          "detail": "project is closed in tranche 11 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P0",
+          "subject": "T8"
+        },
+        {
+          "detail": "project is active in tranche 11 whose state is 'planned'",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "T5"
+          "subject": "S14"
+        }
+      ],
+      "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-12",
+      "apply_to": "PLATFORM",
+      "artefact": "tranche_review",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 1,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The tranche has a recorded continue|pause|stop decision",
+          "met": false
+        },
+        {
+          "item": "The audit reports no project_in_unauthorised_tranche gap for that tranche",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "msp.json",
+          "rule": "project_in_unauthorised_tranche",
+          "source": "snapshot",
+          "subjects": [
+            "T15"
+          ]
+        }
+      ],
+      "key": "project_in_unauthorised_tranche:tranche-12",
+      "owner_project": "T12",
+      "rule": "project_in_unauthorised_tranche",
+      "scope": "tranche-12",
+      "severity": "P0",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "project is closed in tranche 12 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P0",
+          "subject": "T15"
         }
       ],
       "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
@@ -429,9 +840,9 @@
           "subjects": [
             "S08",
             "S17",
+            "T17",
             "T7",
-            "S06",
-            "T17"
+            "S06"
           ]
         }
       ],
@@ -473,6 +884,16 @@
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
+          "subject": "T17"
+        },
+        {
+          "detail": "project is closed in tranche 5 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P0",
           "subject": "T7"
         },
         {
@@ -484,28 +905,18 @@
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S06"
-        },
-        {
-          "detail": "project is active in tranche 5 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T17"
         }
       ],
       "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-6",
-      "apply_to": "PLATFORM",
+      "apply_to": "T19F",
       "artefact": "tranche_review",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 4,
+        "entries": 5,
         "owners": [
           "programme owner"
         ]
@@ -531,6 +942,7 @@
             "S06b",
             "S10",
             "S11",
+            "T19F",
             "S06a"
           ]
         }
@@ -543,7 +955,7 @@
       "spec": "\u00a78.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 4,
+      "subject_count": 5,
       "subjects": [
         {
           "detail": "project is closed in tranche 6 whose state is 'planned'",
@@ -574,6 +986,16 @@
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
           "subject": "S11"
+        },
+        {
+          "detail": "project is active in tranche 6 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T19F"
         },
         {
           "detail": "project is archived in tranche 6 whose state is 'planned'",
@@ -748,7 +1170,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-9",
-      "apply_to": "PLATFORM",
+      "apply_to": "S18",
       "artefact": "tranche_review",
       "baseline": {
         "disposition": "rework",
@@ -776,8 +1198,8 @@
           "rule": "project_in_unauthorised_tranche",
           "source": "snapshot",
           "subjects": [
-            "S18",
             "S20",
+            "S18",
             "S21"
           ]
         }
@@ -800,26 +1222,26 @@
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
-          "subject": "S18"
-        },
-        {
-          "detail": "project is closed in tranche 9 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P0",
           "subject": "S20"
         },
         {
-          "detail": "project is closed in tranche 9 whose state is 'planned'",
+          "detail": "project is active in tranche 9 whose state is 'planned'",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P0",
+          "severity": "P1",
+          "subject": "S18"
+        },
+        {
+          "detail": "project is active in tranche 9 whose state is 'planned'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
           "subject": "S21"
         }
       ],
@@ -3265,63 +3687,6 @@
       "title": "Publish the project's closure review"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S18",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "S18"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:S18",
-      "owner_project": "S18",
-      "rule": "closed_without_closure_review",
-      "scope": "S18",
-      "severity": "P1",
-      "spec": "\u00a78.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S18"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S20",
       "apply_to": "PLATFORM",
       "artefact": "closure_review",
@@ -3379,70 +3744,13 @@
       "title": "Publish the project's closure review"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S21",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "S21"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:S21",
-      "owner_project": "S21",
-      "rule": "closed_without_closure_review",
-      "scope": "S21",
-      "severity": "P1",
-      "spec": "\u00a78.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S21"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closure_outputs_undeclared:tranche-0",
       "apply_to": "PLATFORM",
       "artefact": "closure_outputs",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 4,
+        "entries": 3,
         "owners": [
           "programme owner"
         ]
@@ -3467,8 +3775,7 @@
           "subjects": [
             "P0",
             "S00",
-            "S01",
-            "SPEC-V2"
+            "S01"
           ]
         }
       ],
@@ -3480,7 +3787,7 @@
       "spec": "\u00a78.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 4,
+      "subject_count": 3,
       "subjects": [
         {
           "detail": "project is closed but declares no closure_outputs",
@@ -3511,23 +3818,13 @@
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S01"
-        },
-        {
-          "detail": "project is closed but declares no closure_outputs",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "SPEC-V2"
         }
       ],
       "title": "Declare and publish the project's closure outputs"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closure_outputs_undeclared:tranche-10",
-      "apply_to": "T5",
+      "apply_to": "PLATFORM",
       "artefact": "closure_outputs",
       "baseline": {
         "disposition": "rework",
@@ -3560,7 +3857,7 @@
         }
       ],
       "key": "closure_outputs_undeclared:tranche-10",
-      "owner_project": "T5",
+      "owner_project": "PLATFORM",
       "rule": "closure_outputs_undeclared",
       "scope": "tranche-10",
       "severity": "P1",
@@ -3788,7 +4085,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closure_outputs_undeclared:tranche-6",
-      "apply_to": "PLATFORM",
+      "apply_to": "T19F",
       "artefact": "closure_outputs",
       "baseline": {
         "disposition": "rework",
@@ -3823,7 +4120,7 @@
         }
       ],
       "key": "closure_outputs_undeclared:tranche-6",
-      "owner_project": "PLATFORM",
+      "owner_project": "T19F",
       "rule": "closure_outputs_undeclared",
       "scope": "tranche-6",
       "severity": "P1",
@@ -4003,12 +4300,12 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closure_outputs_undeclared:tranche-9",
-      "apply_to": "PLATFORM",
+      "apply_to": "S18",
       "artefact": "closure_outputs",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 3,
+        "entries": 1,
         "owners": [
           "programme owner"
         ]
@@ -4031,32 +4328,20 @@
           "rule": "closure_outputs_undeclared",
           "source": "snapshot",
           "subjects": [
-            "S18",
-            "S20",
-            "S21"
+            "S20"
           ]
         }
       ],
       "key": "closure_outputs_undeclared:tranche-9",
-      "owner_project": "PLATFORM",
+      "owner_project": "S18",
       "rule": "closure_outputs_undeclared",
       "scope": "tranche-9",
       "severity": "P1",
       "spec": "\u00a78.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 3,
+      "subject_count": 1,
       "subjects": [
-        {
-          "detail": "project is closed but declares no closure_outputs",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S18"
-        },
         {
           "detail": "project is closed but declares no closure_outputs",
           "disposition": "rework",
@@ -4066,155 +4351,9 @@
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S20"
-        },
-        {
-          "detail": "project is closed but declares no closure_outputs",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S21"
         }
       ],
       "title": "Declare and publish the project's closure outputs"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-11",
-      "apply_to": "S14",
-      "artefact": "tranche_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 3,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The tranche has a recorded continue|pause|stop decision",
-          "met": false
-        },
-        {
-          "item": "The audit reports no project_in_unauthorised_tranche gap for that tranche",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "msp.json",
-          "rule": "project_in_unauthorised_tranche",
-          "source": "snapshot",
-          "subjects": [
-            "S14",
-            "T6",
-            "T8"
-          ]
-        }
-      ],
-      "key": "project_in_unauthorised_tranche:tranche-11",
-      "owner_project": "T12",
-      "rule": "project_in_unauthorised_tranche",
-      "scope": "tranche-11",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 3,
-      "subjects": [
-        {
-          "detail": "project is active in tranche 11 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S14"
-        },
-        {
-          "detail": "project is active in tranche 11 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T6"
-        },
-        {
-          "detail": "project is active in tranche 11 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T8"
-        }
-      ],
-      "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-12",
-      "apply_to": "T15",
-      "artefact": "tranche_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The tranche has a recorded continue|pause|stop decision",
-          "met": false
-        },
-        {
-          "item": "The audit reports no project_in_unauthorised_tranche gap for that tranche",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "msp.json",
-          "rule": "project_in_unauthorised_tranche",
-          "source": "snapshot",
-          "subjects": [
-            "T15"
-          ]
-        }
-      ],
-      "key": "project_in_unauthorised_tranche:tranche-12",
-      "owner_project": "T12",
-      "rule": "project_in_unauthorised_tranche",
-      "scope": "tranche-12",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is active in tranche 12 whose state is 'planned'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T15"
-        }
-      ],
-      "title": "Authorise or re-plan a tranche that is delivering without a gate decision"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-13",
@@ -6012,64 +6151,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-10",
-      "apply_to": "T5",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "S12"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-10",
-      "owner_project": "T5",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-10",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "S12"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-11",
-      "apply_to": "S14",
+      "apply_to": "PLATFORM",
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
@@ -6097,15 +6179,15 @@
           "rule": "unpublished_declared_output",
           "source": "snapshot",
           "subjects": [
-            "S14",
-            "T8"
+            "S12",
+            "T5"
           ]
         }
       ],
-      "key": "unpublished_declared_output:tranche-11",
-      "owner_project": "S14",
+      "key": "unpublished_declared_output:tranche-10",
+      "owner_project": "PLATFORM",
       "rule": "unpublished_declared_output",
-      "scope": "tranche-11",
+      "scope": "tranche-10",
       "severity": "P1",
       "spec": "\u00a78.3",
       "standard": "MSP",
@@ -6120,8 +6202,67 @@
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
-          "subject": "S14"
+          "subject": "S12"
         },
+        {
+          "detail": "declared outputs are not published: closure-review, evidence",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T5"
+        }
+      ],
+      "title": "Publish every output the project declares"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-11",
+      "apply_to": "S14",
+      "artefact": "published_output",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": "2027-02-18",
+        "entries": 3,
+        "owners": [
+          "programme owner"
+        ]
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
+          "met": false
+        },
+        {
+          "item": "The audit reports no unpublished_declared_output gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "unpublished_declared_output",
+          "source": "snapshot",
+          "subjects": [
+            "S14",
+            "T6",
+            "T8"
+          ]
+        }
+      ],
+      "key": "unpublished_declared_output:tranche-11",
+      "owner_project": "S14",
+      "rule": "unpublished_declared_output",
+      "scope": "tranche-11",
+      "severity": "P1",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 3,
+      "subjects": [
         {
           "detail": "declared outputs are not published: project-brief",
           "disposition": "rework",
@@ -6130,7 +6271,137 @@
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
+          "subject": "S14"
+        },
+        {
+          "detail": "declared outputs are not published: closure-review, evidence",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T6"
+        },
+        {
+          "detail": "declared outputs are not published: closure-review, project-brief",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
           "subject": "T8"
+        }
+      ],
+      "title": "Publish every output the project declares"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-12",
+      "apply_to": "PLATFORM",
+      "artefact": "published_output",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
+          "met": false
+        },
+        {
+          "item": "The audit reports no unpublished_declared_output gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "unpublished_declared_output",
+          "source": "snapshot",
+          "subjects": [
+            "T15"
+          ]
+        }
+      ],
+      "key": "unpublished_declared_output:tranche-12",
+      "owner_project": "PLATFORM",
+      "rule": "unpublished_declared_output",
+      "scope": "tranche-12",
+      "severity": "P1",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "declared outputs are not published: closure-review, evidence",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T15"
+        }
+      ],
+      "title": "Publish every output the project declares"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-13",
+      "apply_to": "T12",
+      "artefact": "published_output",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
+          "met": false
+        },
+        {
+          "item": "The audit reports no unpublished_declared_output gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "programme.json",
+          "rule": "unpublished_declared_output",
+          "source": "snapshot",
+          "subjects": [
+            "T12"
+          ]
+        }
+      ],
+      "key": "unpublished_declared_output:tranche-13",
+      "owner_project": "T12",
+      "rule": "unpublished_declared_output",
+      "scope": "tranche-13",
+      "severity": "P1",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "declared outputs are not published: evidence",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T12"
         }
       ],
       "title": "Publish every output the project declares"
@@ -6322,7 +6593,7 @@
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 4,
+        "entries": 5,
         "owners": [
           "programme owner"
         ]
@@ -6348,6 +6619,7 @@
             "S06",
             "S08",
             "S17",
+            "T17",
             "T7"
           ]
         }
@@ -6360,7 +6632,7 @@
       "spec": "\u00a78.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 4,
+      "subject_count": 5,
       "subjects": [
         {
           "detail": "declared outputs are not published: project-brief",
@@ -6393,6 +6665,16 @@
           "subject": "S17"
         },
         {
+          "detail": "declared outputs are not published: closure-review, evidence",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T17"
+        },
+        {
           "detail": "declared outputs are not published: closure-review, evidence, project-brief",
           "disposition": "rework",
           "evidence": [],
@@ -6407,7 +6689,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-6",
-      "apply_to": "PLATFORM",
+      "apply_to": "T19F",
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
@@ -6442,7 +6724,7 @@
         }
       ],
       "key": "unpublished_declared_output:tranche-6",
-      "owner_project": "PLATFORM",
+      "owner_project": "T19F",
       "rule": "unpublished_declared_output",
       "scope": "tranche-6",
       "severity": "P1",
@@ -6644,7 +6926,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-9",
-      "apply_to": "PLATFORM",
+      "apply_to": "S18",
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
@@ -6679,7 +6961,7 @@
         }
       ],
       "key": "unpublished_declared_output:tranche-9",
-      "owner_project": "PLATFORM",
+      "owner_project": "S18",
       "rule": "unpublished_declared_output",
       "scope": "tranche-9",
       "severity": "P1",
@@ -8583,107 +8865,6 @@
         }
       ],
       "title": "Demo and retro cadence rows enforce nothing: no evidence, no credit, no lessons"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check seed_live_drift:programme",
-      "apply_to": "PLATFORM",
-      "artefact": "seed_reconciliation",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 5,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The seeded project facts equal the live rows, or the drift is recorded and approved",
-          "met": false
-        },
-        {
-          "item": "The audit reports no seed_live_drift gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "seed_live_drift",
-          "source": "snapshot",
-          "subjects": [
-            "T5",
-            "T6",
-            "T8",
-            "S21",
-            "T19"
-          ]
-        }
-      ],
-      "key": "seed_live_drift:programme",
-      "owner_project": "PLATFORM",
-      "rule": "seed_live_drift",
-      "scope": "programme",
-      "severity": "P1",
-      "spec": "\u00a75.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 5,
-      "subjects": [
-        {
-          "detail": "seed status 'closed' != live status 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T5"
-        },
-        {
-          "detail": "seed status 'closed' != live status 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T6"
-        },
-        {
-          "detail": "seed status 'closed' != live status 'active'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T8"
-        },
-        {
-          "detail": "seed status 'active' != live status 'closed'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S21"
-        },
-        {
-          "detail": "seed status 'active' != live status 'closed'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T19"
-        }
-      ],
-      "title": "Reconcile the seed with the live rows"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p101-1:T2",
@@ -11144,7 +11325,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p91-1:T6",
-      "apply_to": "T6",
+      "apply_to": "PLATFORM",
       "artefact": "\u00a79.1",
       "baseline": null,
       "depends_on": [],
@@ -11219,7 +11400,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p93-1:T5",
-      "apply_to": "T5",
+      "apply_to": "PLATFORM",
       "artefact": "\u00a79.3",
       "baseline": null,
       "depends_on": [],
@@ -11306,7 +11487,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p93-2:T6",
-      "apply_to": "T6",
+      "apply_to": "PLATFORM",
       "artefact": "\u00a79.3",
       "baseline": null,
       "depends_on": [],
@@ -11855,7 +12036,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1b-3:T5",
-      "apply_to": "T5",
+      "apply_to": "PLATFORM",
       "artefact": "\u00a76.3",
       "baseline": null,
       "depends_on": [],
@@ -12125,168 +12306,6 @@
         }
       ],
       "title": "The authority and gate matrix is hard-coded code plus caller input, not tenant data"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1c-3:T2",
-      "apply_to": "PLATFORM",
-      "artefact": "\u00a77.2/\u00a77.3",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The L1 path performs the laya request itself (or records a verified laya call id) and derives answer, confidence, probabilities and measured latency from the response; a laya-rung decision without that provenance is refused; a test posts a confidence directly and proves it cannot produce rung='laya'.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 775,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "    let confidence = input.confidence.ok_or_else(|| {",
-              "source": "code"
-            },
-            {
-              "line": 827,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "            rung: Rung::Laya,",
-              "source": "code"
-            },
-            {
-              "line": 845,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "            latency_ms: input.latency_ms,",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w1c-3",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w1c-3:T2",
-      "owner_project": "T2",
-      "rule": "v1-w1c-3",
-      "scope": "T2",
-      "severity": "P1",
-      "spec": "\u00a77.2/\u00a77.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "\u00a77.2 defines the laya contract (POST /v1/systemone over row-authored questions) and \u00a77.3 makes laya mandatory for the listed decisions. The repository contains no ladder laya client: the only laya HTTP path is process/step.rs's judge. ladder.evaluate instead takes the answer, confidence, probabilities and latency from the request body and writes rung='laya' with whatever configuration versions happen to be resolved. The 'calibrated choice' is therefore an unverifiable assertion; nothing distinguishes a real laya answer from a number an agent invented.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 775,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "    let confidence = input.confidence.ok_or_else(|| {",
-                  "source": "code"
-                },
-                {
-                  "line": 827,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "            rung: Rung::Laya,",
-                  "source": "code"
-                },
-                {
-                  "line": 845,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "            latency_ms: input.latency_ms,",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w1c-3",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T2"
-        }
-      ],
-      "title": "L1 laya is never invoked: ladder.evaluate stamps rung=laya on caller-supplied answer, confidence and latency"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1c-4:T2",
-      "apply_to": "PLATFORM",
-      "artefact": "\u00a77.2",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "option sets are authored/versioned rows resolved by policy+question, the evaluate action references the set (and a real version), and the answer must equal one of that set's keys or the action returns 422; tests cover an answer outside the set and a caller trying to pass its own option list.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 816,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "        .or_else(|| (!options.is_empty()).then_some(1));",
-              "source": "code"
-            },
-            {
-              "line": 851,
-              "path": "crates/store/src/ladder.rs",
-              "quote": "            \"INSERT INTO decision_option (tenant_id, decision_id, key, label, payload)",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w1c-4",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w1c-4:T2",
-      "owner_project": "T2",
-      "rule": "v1-w1c-4",
-      "scope": "T2",
-      "severity": "P1",
-      "spec": "\u00a77.2",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "\u00a77.2 requires options to be authored and versioned rows (decision_option) and never free text from a prompt, so a choice is provably one of a finite set. In the ladder surfaces, options arrive in the same request body as the answer, the option-set version is fabricated as 1 whenever any options are supplied, and record_decision_tx inserts the options after the decision without comparing new.answer to any option key. A laya decision can therefore carry an answer outside its own recorded option set, or a one-element option set that merely echoes the answer.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 816,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "        .or_else(|| (!options.is_empty()).then_some(1));",
-                  "source": "code"
-                },
-                {
-                  "line": 851,
-                  "path": "crates/store/src/ladder.rs",
-                  "quote": "            \"INSERT INTO decision_option (tenant_id, decision_id, key, label, payload)",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w1c-4",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T2"
-        }
-      ],
-      "title": "Options are inline request text, not authored/versioned rows, and the answer is never checked against them"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3a-5:T7",
@@ -12686,7 +12705,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3c-4:T8",
-      "apply_to": "T8",
+      "apply_to": "PLATFORM",
       "artefact": "\u00a712",
       "baseline": null,
       "depends_on": [],
@@ -13664,7 +13683,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check contract_missing:tranche-10",
-      "apply_to": "T5",
+      "apply_to": "PLATFORM",
       "artefact": "architecture_contract",
       "baseline": {
         "disposition": "rework",
@@ -13697,7 +13716,7 @@
         }
       ],
       "key": "contract_missing:tranche-10",
-      "owner_project": "T5",
+      "owner_project": "PLATFORM",
       "rule": "contract_missing",
       "scope": "tranche-10",
       "severity": "P1",
@@ -13789,7 +13808,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check contract_missing:tranche-12",
-      "apply_to": "T15",
+      "apply_to": "PLATFORM",
       "artefact": "architecture_contract",
       "baseline": {
         "disposition": "rework",
@@ -13822,7 +13841,7 @@
         }
       ],
       "key": "contract_missing:tranche-12",
-      "owner_project": "T15",
+      "owner_project": "PLATFORM",
       "rule": "contract_missing",
       "scope": "tranche-12",
       "severity": "P1",
@@ -14265,7 +14284,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check mandatory_artefacts:tranche-10",
-      "apply_to": "T5",
+      "apply_to": "PLATFORM",
       "artefact": "phase_artefacts",
       "baseline": {
         "disposition": "rework",
@@ -14412,7 +14431,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check mandatory_artefacts:tranche-12",
-      "apply_to": "T15",
+      "apply_to": "PLATFORM",
       "artefact": "phase_artefacts",
       "baseline": {
         "disposition": "rework",
@@ -14864,7 +14883,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check mandatory_artefacts:tranche-6",
-      "apply_to": "PLATFORM",
+      "apply_to": "T19F",
       "artefact": "phase_artefacts",
       "baseline": {
         "disposition": "rework",
@@ -15101,7 +15120,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check mandatory_artefacts:tranche-9",
-      "apply_to": "PLATFORM",
+      "apply_to": "S18",
       "artefact": "phase_artefacts",
       "baseline": {
         "disposition": "rework",
@@ -15958,7 +15977,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-spec-v2-e:SPEC-V2",
-      "apply_to": "PLATFORM",
+      "apply_to": "SPEC-V2",
       "artefact": "phase-e",
       "baseline": null,
       "depends_on": [],
@@ -16484,6 +16503,139 @@
           "reason": null,
           "severity": "P1",
           "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-e"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-e-t19f-e:T19F",
+      "apply_to": "T19F",
+      "artefact": "phase-e",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-e-t19f-e",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t19f-e",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-e-t19f-e",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-e-t19f-e",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-e-t19f-e:T19F",
+      "owner_project": "T19F",
+      "rule": "std-togaf-phase-e-t19f-e",
+      "scope": "T19F",
+      "severity": "P1",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-e artefact for T19F \u2014 E is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-e-t19f-e",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t19f-e",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-e-t19f-e",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-e-t19f-e",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T19F"
         }
       ],
       "title": "TOGAF artefact absent: phase-e"
@@ -17288,7 +17440,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-spec-v2-g:SPEC-V2",
-      "apply_to": "PLATFORM",
+      "apply_to": "SPEC-V2",
       "artefact": "phase-g",
       "baseline": null,
       "depends_on": [],
@@ -17814,6 +17966,139 @@
           "reason": null,
           "severity": "P1",
           "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-g"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-g-t19f-g:T19F",
+      "apply_to": "T19F",
+      "artefact": "phase-g",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-g-t19f-g",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t19f-g",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-g-t19f-g",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-g-t19f-g",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-g-t19f-g:T19F",
+      "owner_project": "T19F",
+      "rule": "std-togaf-phase-g-t19f-g",
+      "scope": "T19F",
+      "severity": "P1",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-g artefact for T19F \u2014 G is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-g-t19f-g",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t19f-g",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-g-t19f-g",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-g-t19f-g",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T19F"
         }
       ],
       "title": "TOGAF artefact absent: phase-g"
@@ -18618,7 +18903,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-spec-v2-h:SPEC-V2",
-      "apply_to": "PLATFORM",
+      "apply_to": "SPEC-V2",
       "artefact": "phase-h",
       "baseline": null,
       "depends_on": [],
@@ -19144,6 +19429,139 @@
           "reason": null,
           "severity": "P1",
           "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact absent: phase-h"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-h-t19f-h:T19F",
+      "apply_to": "T19F",
+      "artefact": "phase-h",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-h-t19f-h",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t19f-h",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-h-t19f-h",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-h-t19f-h",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-h-t19f-h:T19F",
+      "owner_project": "T19F",
+      "rule": "std-togaf-phase-h-t19f-h",
+      "scope": "T19F",
+      "severity": "P1",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-h artefact for T19F \u2014 H is absent; missing required sections: Mandatory artefacts, Contract and gate, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-h-t19f-h",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t19f-h",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-h-t19f-h",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-h-t19f-h",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T19F"
         }
       ],
       "title": "TOGAF artefact absent: phase-h"
@@ -23759,7 +24177,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-project-registers-spec-v2:SPEC-V2",
-      "apply_to": "PLATFORM",
+      "apply_to": "SPEC-V2",
       "artefact": "project-registers",
       "baseline": null,
       "depends_on": [],
@@ -25861,7 +26279,7 @@
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "163 declared dependency edge(s) carry no blocks|needs|supersedes|informs kind",
+          "detail": "168 declared dependency edge(s) carry no blocks|needs|supersedes|informs kind",
           "disposition": "rework",
           "evidence": [],
           "expires": null,
@@ -26692,7 +27110,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p57-1:T17",
-      "apply_to": "T17",
+      "apply_to": "PLATFORM",
       "artefact": "\u00a75.7",
       "baseline": null,
       "depends_on": [],
@@ -27088,93 +27506,6 @@
         }
       ],
       "title": "Live download is not the bytes the CLI wrote"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1c-5:T2",
-      "apply_to": "PLATFORM",
-      "artefact": "\u00a77.2",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A gate_unavailable path exists on the ladder that records the outage and applies fail_policy (closed => refused, open => the policy action), with a test for an unreachable laya on both a closed and an open policy; open with annotate must record the note, closed must record the refusal.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 262,
-              "path": "crates/domain/src/ladder.rs",
-              "quote": "pub fn unavailable(fail_policy: FailPolicy, action: FailAction) -> Outcome {",
-              "source": "code"
-            },
-            {
-              "line": 785,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "    let outcome = evaluate(confidence, threshold, action)",
-              "source": "code"
-            },
-            {
-              "line": 572,
-              "path": "crates/store/src/ladder.rs",
-              "quote": "    pub fn fail_policy(&self) -> Result<FailPolicy, LadderStoreError> {",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w1c-5",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w1c-5:T2",
-      "owner_project": "T2",
-      "rule": "v1-w1c-5",
-      "scope": "T2",
-      "severity": "P2",
-      "spec": "\u00a77.2",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "\u00a77.2 requires Unavailable to be gate_unavailable, following fail_policy, and never silently a pass. The domain's unavailable() maps closed|open to refused|action, but nothing calls it: ladder.evaluate requires a confidence, computes only the threshold outcome, and the sole caller of effective.fail_policy() is validate_vocabulary(). The fail_policy column is validated for spelling and then dead at the evaluation boundary, so a closed safety policy and an open routing policy behave identically when laya is unreachable.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 262,
-                  "path": "crates/domain/src/ladder.rs",
-                  "quote": "pub fn unavailable(fail_policy: FailPolicy, action: FailAction) -> Outcome {",
-                  "source": "code"
-                },
-                {
-                  "line": 785,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "    let outcome = evaluate(confidence, threshold, action)",
-                  "source": "code"
-                },
-                {
-                  "line": 572,
-                  "path": "crates/store/src/ladder.rs",
-                  "quote": "    pub fn fail_policy(&self) -> Result<FailPolicy, LadderStoreError> {",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w1c-5",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T2"
-        }
-      ],
-      "title": "fail_policy and the Unavailable outcome are stored but never applied; a laya outage cannot become gate_unavailable"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1c-6:T11",
@@ -27801,8 +28132,8 @@
       "title": "Plan the project's WBS"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-10",
-      "apply_to": "T5",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-11",
+      "apply_to": "S14",
       "artefact": "wbs_node",
       "baseline": {
         "disposition": "rework",
@@ -27828,64 +28159,7 @@
           "rule": "wbs_absent",
           "source": "snapshot",
           "subjects": [
-            "T5"
-          ]
-        }
-      ],
-      "key": "wbs_absent:tranche-10",
-      "owner_project": "T5",
-      "rule": "wbs_absent",
-      "scope": "tranche-10",
-      "severity": "P2",
-      "spec": "\u00a75.1",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T5"
-        }
-      ],
-      "title": "Plan the project's WBS"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-11",
-      "apply_to": "S14",
-      "artefact": "wbs_node",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 3,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The project has a WBS with at least one work_package node carrying acceptance criteria",
-          "met": false
-        },
-        {
-          "item": "The audit reports no wbs_absent gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "work.json",
-          "rule": "wbs_absent",
-          "source": "snapshot",
-          "subjects": [
-            "S14",
-            "T6",
-            "T8"
+            "S14"
           ]
         }
       ],
@@ -27897,81 +28171,6 @@
       "spec": "\u00a75.1",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 3,
-      "subjects": [
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S14"
-        },
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T6"
-        },
-        {
-          "detail": "no WBS node is published for the active project",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T8"
-        }
-      ],
-      "title": "Plan the project's WBS"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-12",
-      "apply_to": "T15",
-      "artefact": "wbs_node",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The project has a WBS with at least one work_package node carrying acceptance criteria",
-          "met": false
-        },
-        {
-          "item": "The audit reports no wbs_absent gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "work.json",
-          "rule": "wbs_absent",
-          "source": "snapshot",
-          "subjects": [
-            "T15"
-          ]
-        }
-      ],
-      "key": "wbs_absent:tranche-12",
-      "owner_project": "T15",
-      "rule": "wbs_absent",
-      "scope": "tranche-12",
-      "severity": "P2",
-      "spec": "\u00a75.1",
-      "standard": "SPEC",
-      "status": "open",
       "subject_count": 1,
       "subjects": [
         {
@@ -27982,7 +28181,7 @@
           "owner": null,
           "reason": null,
           "severity": "P2",
-          "subject": "T15"
+          "subject": "S14"
         }
       ],
       "title": "Plan the project's WBS"
@@ -28115,7 +28314,7 @@
       "baseline": {
         "disposition": "rework",
         "earliest_expires": null,
-        "entries": 2,
+        "entries": 1,
         "owners": []
       },
       "depends_on": [],
@@ -28136,8 +28335,7 @@
           "rule": "wbs_absent",
           "source": "snapshot",
           "subjects": [
-            "S06",
-            "T17"
+            "S06"
           ]
         }
       ],
@@ -28149,7 +28347,7 @@
       "spec": "\u00a75.1",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 2,
+      "subject_count": 1,
       "subjects": [
         {
           "detail": "no WBS node is published for the active project",
@@ -28160,7 +28358,52 @@
           "reason": null,
           "severity": "P2",
           "subject": "S06"
+        }
+      ],
+      "title": "Plan the project's WBS"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-6",
+      "apply_to": "T19F",
+      "artefact": "wbs_node",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 1,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The project has a WBS with at least one work_package node carrying acceptance criteria",
+          "met": false
         },
+        {
+          "item": "The audit reports no wbs_absent gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "work.json",
+          "rule": "wbs_absent",
+          "source": "snapshot",
+          "subjects": [
+            "T19F"
+          ]
+        }
+      ],
+      "key": "wbs_absent:tranche-6",
+      "owner_project": "T19F",
+      "rule": "wbs_absent",
+      "scope": "tranche-6",
+      "severity": "P2",
+      "spec": "\u00a75.1",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
         {
           "detail": "no WBS node is published for the active project",
           "disposition": "rework",
@@ -28169,7 +28412,7 @@
           "owner": null,
           "reason": null,
           "severity": "P2",
-          "subject": "T17"
+          "subject": "T19F"
         }
       ],
       "title": "Plan the project's WBS"
@@ -28285,13 +28528,79 @@
       "title": "Plan the project's WBS"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check wbs_absent:tranche-9",
+      "apply_to": "S18",
+      "artefact": "wbs_node",
+      "baseline": {
+        "disposition": "rework",
+        "earliest_expires": null,
+        "entries": 2,
+        "owners": []
+      },
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The project has a WBS with at least one work_package node carrying acceptance criteria",
+          "met": false
+        },
+        {
+          "item": "The audit reports no wbs_absent gap for the project",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "file": "work.json",
+          "rule": "wbs_absent",
+          "source": "snapshot",
+          "subjects": [
+            "S18",
+            "S21"
+          ]
+        }
+      ],
+      "key": "wbs_absent:tranche-9",
+      "owner_project": "S18",
+      "rule": "wbs_absent",
+      "scope": "tranche-9",
+      "severity": "P2",
+      "spec": "\u00a75.1",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 2,
+      "subjects": [
+        {
+          "detail": "no WBS node is published for the active project",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S18"
+        },
+        {
+          "detail": "no WBS node is published for the active project",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S21"
+        }
+      ],
+      "title": "Plan the project's WBS"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check requester_is_approver:programme",
       "apply_to": "PLATFORM",
       "artefact": "architecture_contract",
       "baseline": {
         "disposition": "unprovable",
         "earliest_expires": null,
-        "entries": 16,
+        "entries": 18,
         "owners": []
       },
       "depends_on": [],
@@ -28322,6 +28631,8 @@
             "T13",
             "T19",
             "T19",
+            "T19F",
+            "T19F",
             "T2",
             "T2",
             "T4",
@@ -28339,7 +28650,7 @@
       "spec": "\u00a78.1",
       "standard": "TOGAF",
       "status": "suppressed",
-      "subject_count": 16,
+      "subject_count": 18,
       "subjects": [
         {
           "detail": "the snapshot does not carry the contract requester",
@@ -28440,6 +28751,26 @@
           "reason": null,
           "severity": "P2",
           "subject": "T19"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19F"
+        },
+        {
+          "detail": "the snapshot does not carry the contract requester",
+          "disposition": "unprovable",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19F"
         },
         {
           "detail": "the snapshot does not carry the contract requester",
@@ -31491,7 +31822,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-s18:S18",
-      "apply_to": "PLATFORM",
+      "apply_to": "S18",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -31860,7 +32191,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-s21:S21",
-      "apply_to": "PLATFORM",
+      "apply_to": "S21",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -31983,7 +32314,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-spec-v2:SPEC-V2",
-      "apply_to": "PLATFORM",
+      "apply_to": "SPEC-V2",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -32604,7 +32935,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t15:T15",
-      "apply_to": "T15",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -32850,7 +33181,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t17:T17",
-      "apply_to": "T17",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -33444,7 +33775,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t5:T5",
-      "apply_to": "T5",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -33567,7 +33898,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t6:T6",
-      "apply_to": "T6",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -33813,7 +34144,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t8:T8",
-      "apply_to": "T8",
+      "apply_to": "PLATFORM",
       "artefact": "architecture-artifact",
       "baseline": null,
       "depends_on": [],
@@ -34461,7 +34792,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-spec-v2:SPEC-V2",
-      "apply_to": "PLATFORM",
+      "apply_to": "SPEC-V2",
       "artefact": "compliance-review",
       "baseline": null,
       "depends_on": [],
@@ -34905,6 +35236,81 @@
           "reason": null,
           "severity": "P2",
           "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact partial: compliance-review"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-t19f:T19F",
+      "apply_to": "T19F",
+      "artefact": "compliance-review",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-compliance-review-t19f",
+              "section": "Waivers",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/waivers",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-compliance-review-t19f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-compliance-review-t19f:T19F",
+      "owner_project": "T19F",
+      "rule": "std-togaf-compliance-review-t19f",
+      "scope": "T19F",
+      "severity": "P2",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The compliance-review artefact for Follow-on: docs/plans/T19F-meeting-bindings.md is partial; missing required sections: Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-compliance-review-t19f",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-compliance-review-t19f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19F"
         }
       ],
       "title": "TOGAF artefact partial: compliance-review"
@@ -35736,7 +36142,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-spec-v2-b:SPEC-V2",
-      "apply_to": "PLATFORM",
+      "apply_to": "SPEC-V2",
       "artefact": "phase-b",
       "baseline": null,
       "depends_on": [],
@@ -36255,6 +36661,81 @@
           "reason": null,
           "severity": "P2",
           "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-b"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-b-t19f-b:T19F",
+      "apply_to": "T19F",
+      "artefact": "phase-b",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-b-t19f-b",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-b-t19f-b",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-b-t19f-b:T19F",
+      "owner_project": "T19F",
+      "rule": "std-togaf-phase-b-t19f-b",
+      "scope": "T19F",
+      "severity": "P2",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-b artefact for T19F \u2014 B is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-b-t19f-b",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-b-t19f-b",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19F"
         }
       ],
       "title": "TOGAF artefact partial: phase-b"
@@ -37086,7 +37567,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-spec-v2-c:SPEC-V2",
-      "apply_to": "PLATFORM",
+      "apply_to": "SPEC-V2",
       "artefact": "phase-c",
       "baseline": null,
       "depends_on": [],
@@ -37605,6 +38086,81 @@
           "reason": null,
           "severity": "P2",
           "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-c"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-c-t19f-c:T19F",
+      "apply_to": "T19F",
+      "artefact": "phase-c",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-c-t19f-c",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-c-t19f-c",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-c-t19f-c:T19F",
+      "owner_project": "T19F",
+      "rule": "std-togaf-phase-c-t19f-c",
+      "scope": "T19F",
+      "severity": "P2",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-c artefact for T19F \u2014 C is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-c-t19f-c",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-c-t19f-c",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19F"
         }
       ],
       "title": "TOGAF artefact partial: phase-c"
@@ -38436,7 +38992,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-spec-v2-d:SPEC-V2",
-      "apply_to": "PLATFORM",
+      "apply_to": "SPEC-V2",
       "artefact": "phase-d",
       "baseline": null,
       "depends_on": [],
@@ -38955,6 +39511,81 @@
           "reason": null,
           "severity": "P2",
           "subject": "T19"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-d"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-d-t19f-d:T19F",
+      "apply_to": "T19F",
+      "artefact": "phase-d",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-d-t19f-d",
+              "section": "Contract and gate",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/contracts",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-d-t19f-d",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-d-t19f-d:T19F",
+      "owner_project": "T19F",
+      "rule": "std-togaf-phase-d-t19f-d",
+      "scope": "T19F",
+      "severity": "P2",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-d artefact for T19F \u2014 D is partial; missing required sections: Contract and gate.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-d-t19f-d",
+                  "section": "Contract and gate",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/contracts",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-d-t19f-d",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19F"
         }
       ],
       "title": "TOGAF artefact partial: phase-d"
@@ -40058,7 +40689,7 @@
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-spec-v2-f:SPEC-V2",
-      "apply_to": "PLATFORM",
+      "apply_to": "SPEC-V2",
       "artefact": "phase-f",
       "baseline": null,
       "depends_on": [],
@@ -40820,6 +41451,115 @@
       "title": "TOGAF artefact partial: phase-f"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t19f-f:T19F",
+      "apply_to": "T19F",
+      "artefact": "phase-f",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-phase-f-t19f-f",
+              "section": "Mandatory artefacts",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-phase-f-t19f-f",
+              "section": "Evidence",
+              "snapshot": [
+                [
+                  "architecture.json",
+                  "/artifacts",
+                  0
+                ],
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-phase-f-t19f-f",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-phase-f-t19f-f:T19F",
+      "owner_project": "T19F",
+      "rule": "std-togaf-phase-f-t19f-f",
+      "scope": "T19F",
+      "severity": "P2",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The phase-f artefact for T19F \u2014 F is partial; missing required sections: Mandatory artefacts, Evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-phase-f-t19f-f",
+                  "section": "Mandatory artefacts",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-phase-f-t19f-f",
+                  "section": "Evidence",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/artifacts",
+                      0
+                    ],
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-phase-f-t19f-f",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T19F"
+        }
+      ],
+      "title": "TOGAF artefact partial: phase-f"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-f-t2-f:T2",
       "apply_to": "PLATFORM",
       "artefact": "phase-f",
@@ -41325,11 +42065,11 @@
   "scorecard": {
     "MSP": {
       "findings": 8,
-      "gaps": 113,
-      "p0": 25,
-      "p1": 83,
+      "gaps": 119,
+      "p0": 33,
+      "p1": 81,
       "p2": 5,
-      "packages": 74,
+      "packages": 79,
       "rules": 12,
       "rules_clean": 5,
       "rules_with_gaps": 7,
@@ -41360,53 +42100,53 @@
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 86,
-      "gaps": 21,
+      "findings": 83,
+      "gaps": 14,
       "p0": 0,
-      "p1": 3,
-      "p2": 18,
-      "packages": 98,
+      "p1": 0,
+      "p2": 14,
+      "packages": 94,
       "rules": 8,
-      "rules_clean": 4,
-      "rules_with_gaps": 4,
+      "rules_clean": 5,
+      "rules_with_gaps": 3,
       "suppressed": 0
     },
     "TOGAF": {
       "findings": 12,
-      "gaps": 73,
+      "gaps": 75,
       "p0": 1,
       "p1": 56,
-      "p2": 16,
-      "packages": 210,
+      "p2": 18,
+      "packages": 218,
       "rules": 9,
       "rules_clean": 5,
       "rules_with_gaps": 4,
       "suppressed": 0
     }
   },
-  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.XOD8UtypLt/data",
+  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.mnMK5M1bkK/data",
   "summary": {
     "by_severity": {
-      "P0": 26,
-      "P1": 189,
-      "P2": 214
+      "P0": 33,
+      "P1": 187,
+      "P2": 218
     },
     "by_standard": {
-      "MSP": 74,
+      "MSP": 79,
       "PMP": 34,
       "SAFe": 13,
-      "SPEC": 98,
-      "TOGAF": 210
+      "SPEC": 94,
+      "TOGAF": 218
     },
     "by_status": {
-      "open": 427,
+      "open": 436,
       "suppressed": 2
     },
     "duplicates": 0,
-    "open": 427,
-    "packages": 429,
-    "resolved": 14,
-    "subjects": 544,
+    "open": 436,
+    "packages": 438,
+    "resolved": 17,
+    "subjects": 550,
     "suppressed": 2
   }
 }
