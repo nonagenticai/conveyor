@@ -151,16 +151,16 @@
   ],
   "failures": [],
   "gate": "a signed-in tenant drives portfolio \u2192 programme \u2192 project \u2192 work package, organisation \u2192 release \u2192 binding, procedures intake \u2192 publish, tools call \u2192 ledger, improve \u2192 kata \u2192 adoption, operations incident \u2192 postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports exists only from a real route and a present spec; no production screen renders a fixture",
-  "generated_at": "2026-11-25T11:44:20.362952+00:00",
+  "generated_at": "2026-11-25T11:48:35.653135+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T18.toml",
   "name": "The real V2 UI",
   "project": "T18",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:43:27.927052+00:00",
-    "git_sha": "676f798242fd24b7d8f5672501635e0e2e8f0447",
-    "path": "retained-snapshot/676f798242fd24b7d8f5672501635e0e2e8f0447"
+    "generated_at": "2026-11-25T11:47:45.486408+00:00",
+    "git_sha": "1c1eb54c264539e6f16c01276ad9f185fe7bcda0",
+    "path": "retained-snapshot/1c1eb54c264539e6f16c01276ad9f185fe7bcda0"
   },
   "verdict": "green",
   "warnings": []

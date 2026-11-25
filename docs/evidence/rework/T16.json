@@ -3,7 +3,7 @@
     {
       "check": "project",
       "description": "T16 is closed",
-      "detail": "project T16 is active",
+      "detail": "project T16 is closed",
       "id": "T16-project",
       "kind": "snapshot",
       "result": "pass",
@@ -43,7 +43,7 @@
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "contract 01a21214-1a69-7f12-80ad-380fc39ea1be approved by board decision 01a21214-1ab2-7e5c-96a9-d0eb94877234 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "detail": "contract 01a21242-5500-76c6-8ee7-dc3114701cef approved by board decision 01a21242-5549-759a-aedb-fca89903e174 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "T16-contract",
       "kind": "snapshot",
       "result": "pass",
@@ -151,38 +151,35 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): seed_live_drift:T16 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "T16-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T16-rework' did not pass",
+      "detail": "gate discharged by executable checks: T16-project, T16-baseline, T16-charter, T16-closure-outputs, T16-contract, T16-review, T16-closure-gate, T16-waivers, T16-pi-cadence, T16-pi-plan, T16-pi-objectives, T16-wsjf, T16-demo-credits, T16-lessons, T16-product, T16-artefact-standard, T16-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T16-rework (P0): 1 unresolved P0/P1 package(s): seed_live_drift:T16 (P1)",
-    "gate (P0): the gate check 'T16-rework' did not pass"
-  ],
+  "failures": [],
   "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds",
-  "generated_at": "2026-11-25T11:44:19.755153+00:00",
+  "generated_at": "2026-11-25T11:48:35.055608+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T16.toml",
   "name": "SOP, RDF/OWL and process-document ingestion",
   "project": "T16",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:43:27.927052+00:00",
-    "git_sha": "676f798242fd24b7d8f5672501635e0e2e8f0447",
-    "path": "retained-snapshot/676f798242fd24b7d8f5672501635e0e2e8f0447"
+    "generated_at": "2026-11-25T11:47:45.486408+00:00",
+    "git_sha": "1c1eb54c264539e6f16c01276ad9f185fe7bcda0",
+    "path": "retained-snapshot/1c1eb54c264539e6f16c01276ad9f185fe7bcda0"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }

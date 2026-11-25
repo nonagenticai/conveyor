@@ -3,7 +3,7 @@
     {
       "check": "project",
       "description": "T4 is closed",
-      "detail": "project T4 is active",
+      "detail": "project T4 is closed",
       "id": "T4-project",
       "kind": "snapshot",
       "result": "pass",
@@ -43,7 +43,7 @@
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "contract 01a2028b-dde6-7ed4-9e47-6e582f2341d8 approved by board decision 01a2028b-f63c-7c27-b580-d4cba2c1e70f about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "detail": "contract 01a21242-3dcc-7d4a-97be-9166b1a6ffe5 approved by board decision 01a21242-3e12-7ea0-8781-2402a45e7885 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "T4-contract",
       "kind": "snapshot",
       "result": "pass",
@@ -151,10 +151,10 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): seed_live_drift:T4 (P1)",
+      "detail": "no unresolved P0/P1 package for this project",
       "id": "T4-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -173,29 +173,26 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T4-rework' did not pass",
+      "detail": "gate discharged by executable checks: T4-project, T4-baseline, T4-charter, T4-closure-outputs, T4-contract, T4-review, T4-closure-gate, T4-waivers, T4-pi-cadence, T4-pi-plan, T4-pi-objectives, T4-wsjf, T4-demo-credits, T4-lessons, T4-product, T4-artefact-standard, T4-rework, T4-coach-gate",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T4-rework (P0): 1 unresolved P0/P1 package(s): seed_live_drift:T4 (P1)",
-    "gate (P0): the gate check 'T4-rework' did not pass"
-  ],
+  "failures": [],
   "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata",
-  "generated_at": "2026-11-25T11:44:17.314110+00:00",
+  "generated_at": "2026-11-25T11:48:32.611901+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T4.toml",
   "name": "Kanban coach",
   "project": "T4",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T09:43:27.927052+00:00",
-    "git_sha": "676f798242fd24b7d8f5672501635e0e2e8f0447",
-    "path": "retained-snapshot/676f798242fd24b7d8f5672501635e0e2e8f0447"
+    "generated_at": "2026-11-25T11:47:45.486408+00:00",
+    "git_sha": "1c1eb54c264539e6f16c01276ad9f185fe7bcda0",
+    "path": "retained-snapshot/1c1eb54c264539e6f16c01276ad9f185fe7bcda0"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
