@@ -547,6 +547,11 @@ def build_subjects(
         artifact_id = str(row.get("id") or "")
         if not artifact_id:
             continue
+        # A superseded or archived artefact is history, not work: the rework re-versioned it, so
+        # its replacement is the subject that owes a document. Instancing the old row produced a
+        # package that could never close (measured 2026-11-25: 7-24 per tr4 member).
+        if str(row.get("status") or "").strip().lower() in {"superseded", "archived"}:
+            continue
         project = project_by_id.get(str(row.get("project_id") or ""))
         subjects["artifact"].append({
             "kind": "artifact",
