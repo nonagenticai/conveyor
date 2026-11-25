@@ -161,7 +161,7 @@ def all_ids(value: Any, found: set[str]) -> None:
 
 def check(content: dict, template_standard: dict, snapshot_ids: set[str],
           wsjf: tuple[int, int, int, int], closes: bool,
-          architecture: bool = False) -> list[str]:
+          architecture: bool = False, outputs: list[str] | None = None) -> list[str]:
     problems: list[str] = []
 
     def expect(condition: bool, message: str) -> None:
@@ -295,11 +295,16 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
     expect(isinstance(review.get("evidence"), dict), "review evidence must be an object")
 
     templates = template_standard.get("templates") or {}
-    for key in ("project_brief_output", "evidence_output"):
-        category = key.replace("_output", "").replace("_", "-")
+    # Every output the project declares in `meta.expected_outputs` must be authored: the
+    # factory publishes each one and the close gate requires them. Checking only the two
+    # fixed keys let T9 declare twelve outputs and carry two (measured 2026-11-25).
+    categories = outputs if outputs is not None else ["project-brief", "evidence"]
+    for category in categories:
+        key = f"{category.replace('-', '_')}_output"
         required = (templates.get(category) or {}).get("required") or []
         body = content.get(key)
-        expect(isinstance(body, str) and bool(body.strip()), f"{key} must be authored")
+        expect(isinstance(body, str) and bool(body.strip()),
+               f"{key} must be authored (the project declares the {category} output)")
         if isinstance(body, str) and body.strip():
             missing = [name for name in required if name not in headings(body)]
             expect(not missing, f"{key} is missing required sections: {', '.join(missing)}")
@@ -371,6 +376,16 @@ def project_architecture(snapshot: Path, project: str) -> bool:
             return "architecture" in named or named in {"programme", "a-h", "ah"}
         return str(meta.get("track") or "").strip().lower() == "programme"
     fail(f"project {project!r} is not in the snapshot")
+
+
+def expected_outputs(snapshot: Path, project: str) -> list[str]:
+    """The outputs the project's own record declares; the close gate requires every one."""
+    data = json.loads((snapshot / "programme.json").read_text(encoding="utf-8"))
+    for row in data.get("projects") or []:
+        if row.get("key") == project:
+            return [str(category) for category in
+                    (row.get("meta") or {}).get("expected_outputs") or []]
+    return ["project-brief", "evidence"]
 
 
 def self_test() -> None:
@@ -544,7 +559,8 @@ def main() -> None:
     content = json.loads(args.content.read_text(encoding="utf-8"))
     problems = check(content, standard, load_snapshot_ids(args.snapshot), wsjf,
                      args.closes == "true",
-                     architecture=project_architecture(args.snapshot, args.project))
+                     architecture=project_architecture(args.snapshot, args.project),
+                     outputs=expected_outputs(args.snapshot, args.project))
     if problems:
         for problem in problems:
             print(f"FAIL {problem}", file=sys.stderr)
