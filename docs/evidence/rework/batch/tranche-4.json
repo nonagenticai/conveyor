@@ -1,6 +1,6 @@
 {
   "blocked": 0,
-  "generated_at": "2026-11-25T07:24:46+00:00",
+  "generated_at": "2026-11-25T07:30:53+00:00",
   "green": 0,
   "members": [
     {
@@ -30,6 +30,7 @@
       ],
       "key": "S05",
       "log": "docs/evidence/rework/batch/tranche-4/S05.log",
+      "publish_exit": 1,
       "state": "RECEIPT_RED"
     },
     {
@@ -122,6 +123,7 @@
       ],
       "key": "S07",
       "log": "docs/evidence/rework/batch/tranche-4/S07.log",
+      "publish_exit": 1,
       "state": "RECEIPT_RED"
     },
     {
@@ -214,6 +216,7 @@
       ],
       "key": "S09",
       "log": "docs/evidence/rework/batch/tranche-4/S09.log",
+      "publish_exit": 1,
       "state": "RECEIPT_RED"
     },
     {
@@ -250,6 +253,7 @@
       ],
       "key": "T10",
       "log": "docs/evidence/rework/batch/tranche-4/T10.log",
+      "publish_exit": 1,
       "state": "RECEIPT_RED"
     },
     {
@@ -335,6 +339,7 @@
       ],
       "key": "T14",
       "log": "docs/evidence/rework/batch/tranche-4/T14.log",
+      "publish_exit": 1,
       "state": "RECEIPT_RED"
     },
     {
@@ -378,6 +383,7 @@
       ],
       "key": "T16",
       "log": "docs/evidence/rework/batch/tranche-4/T16.log",
+      "publish_exit": 1,
       "state": "RECEIPT_RED"
     },
     {
@@ -456,6 +462,7 @@
       ],
       "key": "T18",
       "log": "docs/evidence/rework/batch/tranche-4/T18.log",
+      "publish_exit": 1,
       "state": "RECEIPT_RED"
     },
     {
@@ -534,6 +541,7 @@
       ],
       "key": "T19",
       "log": "docs/evidence/rework/batch/tranche-4/T19.log",
+      "publish_exit": 1,
       "state": "RECEIPT_RED"
     },
     {
@@ -570,6 +578,7 @@
       ],
       "key": "T4",
       "log": "docs/evidence/rework/batch/tranche-4/T4.log",
+      "publish_exit": 1,
       "state": "RECEIPT_RED"
     },
     {
@@ -599,6 +608,7 @@
       ],
       "key": "T9",
       "log": "docs/evidence/rework/batch/tranche-4/T9.log",
+      "publish_exit": 1,
       "state": "RECEIPT_RED"
     }
   ],

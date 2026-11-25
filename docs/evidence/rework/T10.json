@@ -183,7 +183,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized",
-  "generated_at": "2026-11-25T07:23:58.349615+00:00",
+  "generated_at": "2026-11-25T07:29:57.220639+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T10.toml",
   "name": "SAFe cadence and MSP tranches",

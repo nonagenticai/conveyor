@@ -1,0 +1,87 @@
+{
+  "body_sha256": "e50c854867cb0e5ca48740b1fa475e571dd52fa0689ea59ad1d3aed5e94a2adf",
+  "category": "statement-of-architecture-work",
+  "headings": [
+    {
+      "heading": "Assignment",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Scope",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Responsibilities",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Acceptance criteria",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Contract",
+      "required": true,
+      "sources": [
+        {
+          "category": "statement-of-architecture-work",
+          "count": 1,
+          "file": "architecture.json",
+          "kind": "rows",
+          "pointer": "/contracts"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "bc2322766512ad69b1a58740b0cffceccfbf2c0ccb3dfd305b652cf2e61ae79b",
+  "spec": "\u00a78.1",
+  "standard": "TOGAF",
+  "subject": {
+    "id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+    "key": "T4",
+    "kind": "project",
+    "title": "Kanban coach"
+  },
+  "title": "Statement Of Architecture Work \u2014 Kanban coach"
+}

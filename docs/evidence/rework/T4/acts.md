@@ -19,3 +19,5 @@ baseline decision.
 T4: 32 acts in `transcript.jsonl`; the last run recorded 2.
 
 T4: 46 acts in `transcript.jsonl`; the last run recorded 7.
+
+T4: 47 acts in `transcript.jsonl`; the last run recorded 1.

@@ -175,7 +175,7 @@
     "gate (P0): the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-artefact-standard' did not pass; the gate check 'T16-rework' did not pass"
   ],
   "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds",
-  "generated_at": "2026-11-25T07:24:25.859274+00:00",
+  "generated_at": "2026-11-25T07:30:16.294563+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T16.toml",
   "name": "SOP, RDF/OWL and process-document ingestion",

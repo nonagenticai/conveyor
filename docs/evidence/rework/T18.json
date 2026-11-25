@@ -162,7 +162,7 @@
     "gate (P0): the gate check 'T18-baseline' did not pass; the gate check 'T18-contract' did not pass; the gate check 'T18-review' did not pass; the gate check 'T18-wsjf' did not pass; the gate check 'T18-demo-credits' did not pass; the gate check 'T18-product' did not pass; the gate check 'T18-coverage' did not pass; the gate check 'T18-artefact-standard' did not pass; the gate check 'T18-rework' did not pass"
   ],
   "gate": "a signed-in tenant drives portfolio \u2192 programme \u2192 project \u2192 work package, organisation \u2192 release \u2192 binding, procedures intake \u2192 publish, tools call \u2192 ledger, improve \u2192 kata \u2192 adoption, operations incident \u2192 postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports exists only from a real route and a present spec; no production screen renders a fixture",
-  "generated_at": "2026-11-25T07:24:30.836797+00:00",
+  "generated_at": "2026-11-25T07:30:25.738323+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T18.toml",
   "name": "The real V2 UI",

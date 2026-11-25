@@ -189,7 +189,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "the meeting is a card plus a typed record: an agenda item that decides names one approval, each qualifying seat records one position, close_item derives the item's outcome by arithmetic over the positions and the linked approval's stricter policy (quorum, required departments, dual control, evidence, conflict exclusion), an observer never counts, a human who requested the gate is always excluded (P4), a quorum miss defers with reason inquorate, an item with no outcome cannot close, and no transcript or chat is a decision; the eight meetings suites and the web room spec pass",
-  "generated_at": "2026-11-25T07:24:36.091149+00:00",
+  "generated_at": "2026-11-25T07:30:34.168408+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T19.toml",
   "name": "Decision forums (meetings)",

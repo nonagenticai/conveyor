@@ -1,13 +1,158 @@
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T18
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T18 --content docs/evidence/rework/tranche-4/rework-content-T18.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd --keep-active
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: not applicable (the project stays active)
+  SoAW: already live
+  artefact: Stakeholder Map — T18 The real V2 UI (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — T18 The real V2 UI (Phase A) already present
+  01 architecture.artifacts_create ok
+  02 architecture.artifacts_approve ok
+  03 architecture.artifacts_create ok
+  04 architecture.artifacts_approve ok
+  05 architecture.artifacts_create ok
+  06 architecture.artifacts_approve ok
+  07 architecture.artifacts_create ok
+  08 architecture.artifacts_approve ok
+  09 architecture.artifacts_create ok
+  10 architecture.artifacts_approve ok
+  11 architecture.contracts_request ok
+  12 architecture.board_decide ok
+  13 architecture.contracts_approve ok
+  14 projects.baseline ok
+  closure-review output: not applicable (the project stays active)
+  15 documents.compose ok
+  16 documents.publish ok
+
+rework: inception-analysis: no body in the content file
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T18 --snapshot /tmp/conv526-t9-snap/data --outputs-dir /tmp/conv526-t9-snap/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T18-bodies --local-bin /tmp/conv526-f726-bin
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [],
+  "skipped": [],
+  "refused": [
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Change requests' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Decision' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Approval' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "inception-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "project-baseline",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Scope' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Outcome' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "project-registers",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Risks' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T18",
+      "project_id": "01a20c80-b734-748a-b299-879ea19be681",
+      "category": "project-wbs",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Work packages' has a source that resolves to zero rows"
+      }
+    }
+  ],
+  "counts": {
+    "due": 9,
+    "present": 0,
+    "missing-edge": 0,
+    "stale": 0,
+    "ambiguous": 0
+  }
+}
 
 
-usage: publish-artefact-bodies.py [-h] [--standard STANDARD]
-                                  [--snapshot SNAPSHOT]
-                                  [--outputs-dir OUTPUTS_DIR]
-                                  [--category CATEGORY] [--project PROJECT]
-                                  [--all-projects] [--all] [--check]
-                                  [--dry-run] [--apply] [--republish-stale]
-                                  [--local-bin LOCAL_BIN]
-                                  [--actor-id ACTOR_ID] [--journal JOURNAL]
-                                  [--bodies-out BODIES_OUT] [--self-test]
-publish-artefact-bodies.py: error: --snapshot DIR is required
+[exit 1]
+

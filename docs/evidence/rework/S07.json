@@ -191,7 +191,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "the relevance eval set beats the agreed baseline \u2014 3 revisions with a dense sequence, an idempotent seed, both GIN indexes used, relevance targets met, traceability in both directions with 0 cross-tenant rows, quality read-only, and no orphan",
-  "generated_at": "2026-11-25T07:23:35.330883+00:00",
+  "generated_at": "2026-11-25T07:29:31.301336+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S07.toml",
   "name": "Requirements, catalogues, revisions, quality scoring, search",

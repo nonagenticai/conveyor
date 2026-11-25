@@ -181,7 +181,7 @@
     "gate (P0): the gate check 'T14-baseline' did not pass; the gate check 'T14-closure-outputs' did not pass; the gate check 'T14-contract' did not pass; the gate check 'T14-review' did not pass; the gate check 'T14-closure-gate' did not pass; the gate check 'T14-wsjf' did not pass; the gate check 'T14-demo-credits' did not pass; the gate check 'T14-product' did not pass; the gate check 'T14-artefact-standard' did not pass; the gate check 'T14-rework' did not pass"
   ],
   "gate": "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish",
-  "generated_at": "2026-11-25T07:24:11.286852+00:00",
+  "generated_at": "2026-11-25T07:30:06.790857+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T14.toml",
   "name": "Estate toolkits",
