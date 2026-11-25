@@ -5479,7 +5479,7 @@
       "version": 1
     }
   ],
-  "generated_at": "2026-11-25T10:31:16.674113014+00:00",
+  "generated_at": "2026-11-25T11:14:11.890355316+00:00",
   "procedures": [
     {
       "acceptance_criteria": [
@@ -54638,8 +54638,8 @@
       "enabled": true,
       "id": "01a1cfea-9698-7dad-ba27-08d205cb93de",
       "kind": "approval.closed.emit",
-      "last_run_at": "2026-11-25T10:31:01.218215+00:00",
-      "next_run_at": "2026-11-25T10:32:00+00:00",
+      "last_run_at": "2026-11-25T11:14:01.648907+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54648,8 +54648,8 @@
       "enabled": true,
       "id": "01a1cfea-9680-7085-b8b1-bc6b4dfc114d",
       "kind": "approval.expire",
-      "last_run_at": "2026-11-25T10:31:01.218215+00:00",
-      "next_run_at": "2026-11-25T10:32:00+00:00",
+      "last_run_at": "2026-11-25T11:14:01.648907+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54658,8 +54658,8 @@
       "enabled": true,
       "id": "01a1cfea-9714-77f1-a50d-3a9f98814339",
       "kind": "benchmark.reap",
-      "last_run_at": "2026-11-25T10:30:00.517153+00:00",
-      "next_run_at": "2026-11-25T10:35:00+00:00",
+      "last_run_at": "2026-11-25T11:10:00.303107+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54668,8 +54668,8 @@
       "enabled": true,
       "id": "01a1cfea-95fe-761b-b939-cf0b0f6a56ff",
       "kind": "card.lease_sweep",
-      "last_run_at": "2026-11-25T10:31:01.218215+00:00",
-      "next_run_at": "2026-11-25T10:32:00+00:00",
+      "last_run_at": "2026-11-25T11:14:01.648907+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54678,8 +54678,8 @@
       "enabled": true,
       "id": "01a1cfea-96fb-7cdc-abe1-4f7bcc24b809",
       "kind": "copilot.proposal.sweep",
-      "last_run_at": "2026-11-25T10:31:01.218215+00:00",
-      "next_run_at": "2026-11-25T10:32:00+00:00",
+      "last_run_at": "2026-11-25T11:14:01.648907+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54688,8 +54688,8 @@
       "enabled": true,
       "id": "01a1cfea-96e3-7252-a907-0c9e8f8f79e4",
       "kind": "copilot.turn.reap",
-      "last_run_at": "2026-11-25T10:31:01.218215+00:00",
-      "next_run_at": "2026-11-25T10:32:00+00:00",
+      "last_run_at": "2026-11-25T11:14:01.648907+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54718,8 +54718,8 @@
       "enabled": true,
       "id": "01a1cfea-964e-7242-aa07-9aed9cb19879",
       "kind": "eval.reap",
-      "last_run_at": "2026-11-25T10:30:00.517153+00:00",
-      "next_run_at": "2026-11-25T10:35:00+00:00",
+      "last_run_at": "2026-11-25T11:10:00.303107+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54728,8 +54728,8 @@
       "enabled": true,
       "id": "01a1cfea-9633-702e-a5fd-e3cc93471bed",
       "kind": "eval.run.tick",
-      "last_run_at": "2026-11-25T10:31:01.218215+00:00",
-      "next_run_at": "2026-11-25T10:32:00+00:00",
+      "last_run_at": "2026-11-25T11:14:01.648907+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54748,8 +54748,8 @@
       "enabled": true,
       "id": "01a1cfea-95cb-7cd7-8695-58af27214381",
       "kind": "idempotency.sweep",
-      "last_run_at": "2026-11-25T10:10:00.693447+00:00",
-      "next_run_at": "2026-11-25T11:10:00+00:00",
+      "last_run_at": "2026-11-25T11:10:00.303107+00:00",
+      "next_run_at": "2026-11-25T12:10:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54768,8 +54768,8 @@
       "enabled": true,
       "id": "01a1cfea-96ca-7b13-9821-3f041b90bbc4",
       "kind": "interaction.close",
-      "last_run_at": "2026-11-25T10:31:01.218215+00:00",
-      "next_run_at": "2026-11-25T10:32:00+00:00",
+      "last_run_at": "2026-11-25T11:14:01.648907+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54778,8 +54778,8 @@
       "enabled": true,
       "id": "01a1cfea-96b1-7a01-8554-8dd3ab71dddc",
       "kind": "interaction.dispatch",
-      "last_run_at": "2026-11-25T10:31:01.218215+00:00",
-      "next_run_at": "2026-11-25T10:32:00+00:00",
+      "last_run_at": "2026-11-25T11:14:01.648907+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54798,8 +54798,8 @@
       "enabled": true,
       "id": "01a1cfea-95e5-7c26-afa0-541a0cb74e3d",
       "kind": "licence.sync",
-      "last_run_at": "2026-11-25T10:30:00.517153+00:00",
-      "next_run_at": "2026-11-25T10:35:00+00:00",
+      "last_run_at": "2026-11-25T11:10:00.303107+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54838,8 +54838,8 @@
       "enabled": true,
       "id": "01a1cfea-9618-7cbb-bf37-15b3872cf99f",
       "kind": "run.reap",
-      "last_run_at": "2026-11-25T10:31:01.218215+00:00",
-      "next_run_at": "2026-11-25T10:32:00+00:00",
+      "last_run_at": "2026-11-25T11:14:01.648907+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54848,8 +54848,8 @@
       "enabled": true,
       "id": "01a1e019-9e2c-705e-9def-ec1b949ab127",
       "kind": "runner.reap",
-      "last_run_at": "2026-11-25T10:30:00.517153+00:00",
-      "next_run_at": "2026-11-25T10:45:00+00:00",
+      "last_run_at": "2026-11-25T11:00:01.967134+00:00",
+      "next_run_at": "2026-11-25T11:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },

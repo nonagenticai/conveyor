@@ -259,6 +259,29 @@ fn policy_out(record: &PolicyRecord) -> PolicyOut {
     }
 }
 
+/// A policy's `meta` is a declaration document. The one member the engine acts on is
+/// `on_accept` — what an accepted gate does with its draft: `park` (the default when absent)
+/// or `apply`. A value outside that vocabulary is refused at authoring, never at decision time.
+pub(crate) fn validate_policy_meta(meta: &Value) -> Result<(), ActionError> {
+    let Some(object) = meta.as_object() else {
+        return Err(invalid(
+            "meta",
+            "invalid_policy_meta",
+            "policy meta must be a JSON object",
+        ));
+    };
+    if let Some(value) = object.get("on_accept")
+        && !matches!(value.as_str(), Some("park") | Some("apply"))
+    {
+        return Err(invalid(
+            "meta",
+            "invalid_policy_meta",
+            "on_accept must be \"park\" or \"apply\"",
+        ));
+    }
+    Ok(())
+}
+
 /// A member whose presence is meaningful: absent keeps, an explicit `null` clears.
 fn deserialize_present<'de, D>(deserializer: D) -> Result<Option<Option<Value>>, D::Error>
 where
@@ -307,6 +330,8 @@ async fn decision_policies_create(
     if kind.is_empty() {
         return Err(invalid("kind", "missing", "a case kind is required"));
     }
+    let meta = input.meta.unwrap_or_else(|| serde_json::json!({}));
+    validate_policy_meta(&meta)?;
     let record = store::ladder::insert_policy_tx(
         &mut *tx,
         ctx.tenant,
@@ -316,7 +341,7 @@ async fn decision_policies_create(
             threshold: input.threshold,
             fail_policy: input.fail_policy.unwrap_or_else(|| "closed".to_owned()),
             action: input.action.unwrap_or_else(|| "handover".to_owned()),
-            meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
+            meta,
             fire_when: input.fire_when,
         },
     )
@@ -373,6 +398,9 @@ async fn decision_policies_update(
         )?;
         current.version
     };
+    if let Some(meta) = input.meta.as_ref().filter(|meta| !meta.is_null()) {
+        validate_policy_meta(meta)?;
+    }
     let record = store::ladder::update_policy_tx(
         &mut *tx,
         ctx.tenant,

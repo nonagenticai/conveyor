@@ -1,8 +1,33 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-25T10:31:16.674113014+00:00",
+  "generated_at": "2026-11-25T11:14:11.890355316+00:00",
   "issue_registry": {
     "issues": [
+      {
+        "labels": [
+          {
+            "color": "0075ca",
+            "name": "documentation"
+          },
+          {
+            "color": "1D76DB",
+            "name": "unit"
+          },
+          {
+            "color": "FBCA04",
+            "name": "status:claimed"
+          },
+          {
+            "color": "6E7781",
+            "name": "S21"
+          }
+        ],
+        "number": 734,
+        "state": "OPEN",
+        "title": "docs: S21's records state step 11 merged, and its migration as 0074",
+        "updatedAt": "2026-11-25T11:12:27Z",
+        "url": "https://github.com/nonagenticai/conveyor/issues/734"
+      },
       {
         "labels": [
           {
@@ -34,7 +59,7 @@
         "number": 729,
         "state": "CLOSED",
         "title": "design: build-docs must preserve the published outputs index — main's design-pack is red",
-        "updatedAt": "2026-11-25T10:26:59Z",
+        "updatedAt": "2026-11-25T10:58:30Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/729"
       },
       {
@@ -55,7 +80,7 @@
         "number": 726,
         "state": "OPEN",
         "title": "rework: strict conformance — the published closure records, the T19F deferral and a green strict publish",
-        "updatedAt": "2026-11-25T10:30:35Z",
+        "updatedAt": "2026-11-25T10:33:12Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/726"
       },
       {
@@ -137,9 +162,9 @@
           }
         ],
         "number": 697,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "add: S21 step 11 — the execution level closes: apply-on-accept, prompt receipts, release knowledge layers",
-        "updatedAt": "2026-11-25T09:43:01Z",
+        "updatedAt": "2026-11-25T10:56:17Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/697"
       },
       {
@@ -613,7 +638,7 @@
         "number": 630,
         "state": "OPEN",
         "title": "T18-3c: the run inspector's executor kind, binding pin and tools panel",
-        "updatedAt": "2026-11-25T10:28:33Z",
+        "updatedAt": "2026-11-25T10:52:41Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/630"
       },
       {

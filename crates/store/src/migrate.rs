@@ -337,7 +337,10 @@ mod tests {
                 (71, "ladder option sets".to_owned()),
                 // #557: the per-tool verification declaration (0072_tool_meta.sql, SPEC_V2 §11.3).
                 (72, "tool meta".to_owned()),
-                (73, "meeting bindings".to_owned())
+                (73, "meeting bindings".to_owned()),
+                // S21 step 11 (#697): the release knowledge layers the compiler resolves
+                // (0074_organisation_layers.sql, SPEC_V2 §4.1).
+                (74, "organisation layers".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

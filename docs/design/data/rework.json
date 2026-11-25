@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-25T10:31:04.587442683+00:00",
-  "git_sha": "a22c4735e22d28e5de3664e5be9774267088ed42",
+  "generated_at": "2026-11-25T11:14:00.550226488+00:00",
+  "git_sha": "15cc28b677a05892a41c88179a33ace87a7d2bb7",
   "packages": [
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T16",
@@ -1787,81 +1787,6 @@
         }
       ],
       "title": "Output pages and programme.csv bypass the redaction and programme filters"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1a-2:T0",
-      "apply_to": "PLATFORM",
-      "artefact": "§4",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Publishing over a department whose required kind has no resolvable value returns 409 release_not_ready with the kind and department named; two sibling departments declaring one kind at different values return 422 department_conflict; the release snapshot records the resolved layer values and their sources, and a successful publish is reproducible byte-for-byte.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 575,
-              "path": "crates/store/src/organisation.rs",
-              "quote": "        \"family\": job.family,",
-              "source": "code"
-            },
-            {
-              "line": 578,
-              "path": "crates/store/src/organisation.rs",
-              "quote": "        \"anatomy\": job.definition,",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w1a-2",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w1a-2:T0",
-      "owner_project": "T0",
-      "rule": "v1-w1a-2",
-      "scope": "T0",
-      "severity": "P0",
-      "spec": "§4.1",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "SPEC_V2 §4.1 requires the release to compile base → industry → department archetype → each department in declared order → job, with required kinds that can only be tightened downward, sibling-value conflicts raised as department_conflict, and unresolvable required knowledge refused with 409 release_not_ready naming the kind and department. compile_release_tx builds the whole immutable snapshot from the catalogue row and its placement only (job_key/title/family/industry/departments/anatomy); there is no layer store, no required-kind resolution and no code path that emits release_not_ready or department_conflict (neither string occurs anywhere under crates/). job_releases.publish therefore hashes and stores an unresolved draft as a release.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 575,
-                  "path": "crates/store/src/organisation.rs",
-                  "quote": "        \"family\": job.family,",
-                  "source": "code"
-                },
-                {
-                  "line": 578,
-                  "path": "crates/store/src/organisation.rs",
-                  "quote": "        \"anatomy\": job.definition,",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w1a-2",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T0"
-        }
-      ],
-      "title": "Release compile ignores the knowledge layers and can never refuse release_not_ready or department_conflict"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3a-1:T7",
@@ -10863,93 +10788,6 @@
         }
       ],
       "title": "Workflow and generic runs bypass the required-knowledge readiness guard"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p77-1:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "§7.7",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Creating or activating an internal_agent without a resolvable prompt_ref is refused, readiness blocks it and agent.run cannot call a model without compiled text; a test proves a NULL prompt_ref yields zero calls and every internal_agent call carries a 64-hex prompt hash.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 463,
-              "path": "crates/actions/src/workflow/agent.rs",
-              "quote": "    if let Some(reference) = record.prompt_ref.as_deref() {",
-              "source": "code"
-            },
-            {
-              "line": 184,
-              "path": "crates/actions/src/capability/readiness.rs",
-              "quote": "    if let Some(reference) = agent.prompt_ref.as_deref()",
-              "source": "code"
-            },
-            {
-              "line": 192,
-              "path": "crates/domain/src/capability.rs",
-              "quote": "    /// A built-in `<name>@<version>`, or `None` to use the action's default.",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p77-1",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p77-1:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "v1-p77-1",
-      "scope": "PLATFORM",
-      "severity": "P1",
-      "spec": "§7.7",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "§7.7 requires every prompt to be compiled at run time from the run's sources with a recorded hash; agent.run compiles only when prompt_ref is Some, readiness skips the check when it is None, and the domain claims a default that does not exist.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 463,
-                  "path": "crates/actions/src/workflow/agent.rs",
-                  "quote": "    if let Some(reference) = record.prompt_ref.as_deref() {",
-                  "source": "code"
-                },
-                {
-                  "line": 184,
-                  "path": "crates/actions/src/capability/readiness.rs",
-                  "quote": "    if let Some(reference) = agent.prompt_ref.as_deref()",
-                  "source": "code"
-                },
-                {
-                  "line": 192,
-                  "path": "crates/domain/src/capability.rs",
-                  "quote": "    /// A built-in `<name>@<version>`, or `None` to use the action's default.",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p77-1",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "A run can call a model with no compiled prompt and a NULL prompt hash"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p91-1:T6",
@@ -26974,93 +26812,6 @@
       "title": "Unpriced calls become zero in the billing/reconciliation figure"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p77-2:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "§7.7",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "An action can set and version prompt.budget_chars and prompt_section.budget_chars; with a tight ceiling the compile refuses with the measured size over the limit and makes no model call; a test sets a ceiling and asserts the refusal.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 1272,
-              "path": "crates/store/src/seed.rs",
-              "quote": "            \"INSERT INTO prompt (tenant_id, key, version, status, title)",
-              "source": "code"
-            },
-            {
-              "line": 1289,
-              "path": "crates/store/src/seed.rs",
-              "quote": "                     (tenant_id, prompt_id, position, source_kind, required, template)",
-              "source": "code"
-            },
-            {
-              "line": 9,
-              "path": "migrations/0031_s21_prompt_budget.sql",
-              "quote": "--      what every seeded recipe stays — the mechanism is opt-in until a recipe names a ceiling.",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p77-2",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p77-2:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "v1-p77-2",
-      "scope": "PLATFORM",
-      "severity": "P2",
-      "spec": "§7.7",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "§7.7 requires compiled prompts with character budgets and a measured refusal over budget; both seed inserts omit budget_chars and no action writes the column, so every recipe stays unbounded.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 1272,
-                  "path": "crates/store/src/seed.rs",
-                  "quote": "            \"INSERT INTO prompt (tenant_id, key, version, status, title)",
-                  "source": "code"
-                },
-                {
-                  "line": 1289,
-                  "path": "crates/store/src/seed.rs",
-                  "quote": "                     (tenant_id, prompt_id, position, source_kind, required, template)",
-                  "source": "code"
-                },
-                {
-                  "line": 9,
-                  "path": "migrations/0031_s21_prompt_budget.sql",
-                  "quote": "--      what every seeded recipe stays — the mechanism is opt-in until a recipe names a ceiling.",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p77-2",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "Prompt character budgets cannot be written, so the over-budget refusal is unreachable"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-pack-2:PLATFORM",
       "apply_to": "PLATFORM",
       "artefact": "publication",
@@ -41728,12 +41479,12 @@
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 83,
+      "findings": 80,
       "gaps": 15,
       "p0": 0,
       "p1": 1,
       "p2": 14,
-      "packages": 95,
+      "packages": 92,
       "rules": 8,
       "rules_clean": 4,
       "rules_with_gaps": 4,
@@ -41752,29 +41503,29 @@
       "suppressed": 0
     }
   },
-  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.bJbw9wsCTl/data",
+  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.dOYOK4XN32/data",
   "summary": {
     "by_severity": {
-      "P0": 28,
-      "P1": 186,
-      "P2": 218
+      "P0": 27,
+      "P1": 185,
+      "P2": 217
     },
     "by_standard": {
       "MSP": 72,
       "PMP": 34,
       "SAFe": 13,
-      "SPEC": 95,
+      "SPEC": 92,
       "TOGAF": 218
     },
     "by_status": {
-      "open": 430,
+      "open": 427,
       "suppressed": 2
     },
     "duplicates": 0,
-    "open": 430,
-    "packages": 432,
-    "resolved": 17,
-    "subjects": 540,
+    "open": 427,
+    "packages": 429,
+    "resolved": 20,
+    "subjects": 537,
     "suppressed": 2
   }
 }

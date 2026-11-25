@@ -139,6 +139,9 @@ pub enum CapabilityError {
     /// `prompt_ref` is not `<name>@<version>`.
     #[error("prompt_ref must be <name>@<version>, got {0:?}")]
     BadPromptRef(String),
+    /// An `active` executor spec names no prompt, so a model call would have no compiled text.
+    #[error("an active internal_agent must name a prompt_ref")]
+    PromptRequired,
 }
 
 /// The parsed `<name>@<version>` of a built-in prompt. v1 resolves built-ins only; a tenant-authored
@@ -191,6 +194,10 @@ pub struct AgentConfig<'a> {
     pub model_ref: &'a str,
     /// A built-in `<name>@<version>`, or `None` to use the action's default.
     pub prompt_ref: Option<&'a str>,
+    /// The status the row will hold after this write. An `active` agent must name a prompt:
+    /// SPEC_V2 §7.7 records a `prompt_sha256` for every call, and a call with no compiled text
+    /// has none.
+    pub active: bool,
     /// The actions the executor may invoke. Grammar only here; registration is readiness.
     pub allowed_actions: &'a [String],
     /// The loop's iteration ceiling.
@@ -213,6 +220,8 @@ pub fn validate_agent_config(config: &AgentConfig<'_>) -> Result<(), CapabilityE
     }
     if let Some(prompt_ref) = config.prompt_ref {
         PromptRef::parse(prompt_ref)?;
+    } else if config.active {
+        return Err(CapabilityError::PromptRequired);
     }
     let mut seen = std::collections::BTreeSet::new();
     for action in config.allowed_actions {
@@ -363,6 +372,8 @@ pub enum ReadinessBlocker {
         /// The unresolved ref.
         prompt_ref: String,
     },
+    /// The agent is active but names no prompt, so no model call could carry compiled text.
+    PromptNotConfigured,
 }
 
 impl ReadinessBlocker {
@@ -381,6 +392,7 @@ impl ReadinessBlocker {
             // The catalogue's own refusal vocabulary (crates/actions/src/prompt/mod.rs), so the
             // pre-run guard and the executor's `prompt_unresolved` refusal agree.
             Self::PromptMissing { .. } => "prompt_unresolved",
+            Self::PromptNotConfigured => "prompt_not_configured",
         }
     }
 }
@@ -448,6 +460,7 @@ mod tests {
         let ok = AgentConfig {
             model_ref: "model:primary",
             prompt_ref: None,
+            active: false,
             allowed_actions: &actions,
             max_iterations: MAX_ITERATIONS,
             timeout_secs: MAX_TIMEOUT_SECS,
@@ -500,6 +513,33 @@ mod tests {
     }
 
     #[test]
+    fn an_active_executor_requires_a_prompt() {
+        let actions: Vec<String> = Vec::new();
+        let draft = AgentConfig {
+            model_ref: "model:primary",
+            prompt_ref: None,
+            active: false,
+            allowed_actions: &actions,
+            max_iterations: 1,
+            timeout_secs: 1,
+        };
+        assert_eq!(validate_agent_config(&draft), Ok(()));
+        let active = AgentConfig {
+            active: true,
+            ..draft.clone()
+        };
+        assert_eq!(
+            validate_agent_config(&active),
+            Err(CapabilityError::PromptRequired)
+        );
+        let named = AgentConfig {
+            prompt_ref: Some("agent@1"),
+            ..active
+        };
+        assert_eq!(validate_agent_config(&named), Ok(()));
+    }
+
+    #[test]
     fn capability_allowed_actions_are_checked_for_grammar_and_duplicates() {
         let ok: Vec<String> = vec![
             "agent.run".to_owned(),
@@ -509,6 +549,7 @@ mod tests {
         let config = AgentConfig {
             model_ref: "model:primary",
             prompt_ref: Some("prompt_audit@1"),
+            active: true,
             allowed_actions: &ok,
             max_iterations: 1,
             timeout_secs: 1,

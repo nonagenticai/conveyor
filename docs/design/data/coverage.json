@@ -1484,16 +1484,16 @@
       "key": "S21",
       "measured": {
         "actions": [
-          10,
-          10
+          12,
+          12
         ],
         "modules": [
           4,
           4
         ],
         "tables": [
-          4,
-          4
+          5,
+          5
         ]
       },
       "name": "Message construction (the compiled prompt)",
@@ -1517,7 +1517,8 @@
           624,
           649,
           656,
-          697
+          697,
+          734
         ],
         "open": 1,
         "ready": 0,

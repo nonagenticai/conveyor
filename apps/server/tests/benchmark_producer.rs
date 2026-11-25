@@ -185,8 +185,8 @@ struct Fixture {
 }
 
 /// One tenant with one active member (the principal an agent run acts as), one active capability
-/// agent (a tool-less, prompt-less agent — a benchmark run has no run/procedure facts to render a
-/// catalogue prompt from), one seeded suite and one `conveyor` run over its single instance.
+/// agent (tool-less, and pinned to its own system-only recipe since SPEC_V2 §7.7 requires compiled
+/// text for every call), one seeded suite and one `conveyor` run over its single instance.
 async fn fixture(db: &common::TestDb, problem: &str) -> Fixture {
     let slug = format!("producer-{}", Uuid::now_v7());
     let tenant_id: Uuid =
@@ -225,11 +225,32 @@ async fn fixture(db: &common::TestDb, problem: &str) -> Fixture {
     .expect("capability");
     // 0035 makes a `process_agent` name its process; this arm measures a tool-less agent that
     // answers from the problem statement alone, so it is a `tool_agent`.
+    // SPEC_V2 §7.7 (#697): an active executor must name a resolvable prompt; the fixture carries
+    // its own so the arm does not depend on the tenant's catalogue.
+    let (bench_prompt,): (Uuid,) = sqlx::query_as(
+        "INSERT INTO prompt (tenant_id, key, version, status, title)
+         VALUES ($1, 'bench_prompt', 1, 'active', 'Benchmark prompt') RETURNING id",
+    )
+    .bind(tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the benchmark prompt");
+    sqlx::query(
+        "INSERT INTO prompt_section
+             (tenant_id, prompt_id, position, source_kind, required, template)
+         VALUES ($1, $2, 1, 'system', true, 'Answer the benchmark case.')",
+    )
+    .bind(tenant_id)
+    .bind(bench_prompt)
+    .execute(&mut *tx)
+    .await
+    .expect("the benchmark prompt section");
     let agent: Uuid = sqlx::query_scalar(
         "INSERT INTO capability_agent
              (tenant_id, capability_id, key, role, status, model_ref, prompt_ref,
               max_iterations, timeout_secs)
-         VALUES ($1, $2, 'bench-agent', 'tool_agent', 'active', 'test-model', NULL, 8, 300)
+         VALUES ($1, $2, 'bench-agent', 'tool_agent', 'active', 'test-model',
+                 'bench_prompt@1', 8, 300)
          RETURNING id",
     )
     .bind(tenant_id)
@@ -371,9 +392,35 @@ async fn the_producer_drives_the_real_loop_and_records_the_patch() {
          OpenAI-compatible backends reject `tools: []` (vLLM answers 400 before the model)"
     );
     let messages = request["messages"].as_array().expect("messages");
+    let system: Vec<&Value> = messages
+        .iter()
+        .filter(|message| message["role"] == "system")
+        .collect();
+    assert_eq!(
+        system.len(),
+        1,
+        "SPEC_V2 §7.7 (#697): the one compiled prompt is the system message"
+    );
     assert!(
-        messages.iter().all(|message| message["role"] != "system"),
-        "no prompt is rendered for a benchmark run, so none may be sent or claimed"
+        system[0]["content"]
+            .as_str()
+            .is_some_and(|text| text.contains("Answer the benchmark case.")),
+        "the active executor's recipe renders into the call"
+    );
+    let (calls_hashed, calls_total): (i64, i64) = {
+        let row: (i64, i64) = sqlx::query_as(
+            "SELECT count(*) FILTER (WHERE prompt_sha256 ~ '^[0-9a-f]{64}$'), count(*)
+               FROM inference_call WHERE tenant_id = $1",
+        )
+        .bind(fixture.tenant.as_uuid())
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("the ledger");
+        row
+    };
+    assert_eq!(
+        calls_hashed, calls_total,
+        "every call carries a 64-hex prompt hash"
     );
 
     let (status, patch, sha, attempts) = case_row(&db, &fixture).await;
@@ -391,8 +438,9 @@ async fn the_producer_drives_the_real_loop_and_records_the_patch() {
 
     let (prompt_ref, run_id, caller_kind) = inference_row(&db, &fixture).await;
     assert_eq!(
-        prompt_ref, None,
-        "the ledger must not claim a prompt the loop never applied"
+        prompt_ref.as_deref(),
+        Some("bench_prompt@1"),
+        "SPEC_V2 §7.7 (#697): the ledger names the compiled prompt the loop applied"
     );
     assert_eq!(
         run_id,
@@ -609,13 +657,32 @@ async fn process_fixture(db: &common::TestDb, problem: &str, agent_status: &str)
     .fetch_one(&mut *tx)
     .await
     .expect("capability");
-    // 0035 makes a `process_agent` name its process; a NULL prompt_ref keeps readiness to the
-    // facts this test owns (the prompt catalogue is not the process arm's problem).
+    // 0035 makes a `process_agent` name its process. SPEC_V2 §7.7 (#697): it must also name a
+    // resolvable prompt; the fixture carries its own.
+    let (fix_prompt,): (Uuid,) = sqlx::query_as(
+        "INSERT INTO prompt (tenant_id, key, version, status, title)
+         VALUES ($1, 'swebench_prompt', 1, 'active', 'SWE-bench prompt') RETURNING id",
+    )
+    .bind(tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the process prompt");
+    sqlx::query(
+        "INSERT INTO prompt_section
+             (tenant_id, prompt_id, position, source_kind, required, template)
+         VALUES ($1, $2, 1, 'system', true, 'Fix the benchmark case.')",
+    )
+    .bind(tenant_id)
+    .bind(fix_prompt)
+    .execute(&mut *tx)
+    .await
+    .expect("the process prompt section");
     let agent: Uuid = sqlx::query_scalar(
         "INSERT INTO capability_agent
-             (tenant_id, capability_id, key, role, process_key, status, model_ref,
+             (tenant_id, capability_id, key, role, process_key, status, model_ref, prompt_ref,
               max_iterations, timeout_secs)
-         VALUES ($1, $2, 'swebench-fix', 'process_agent', 'swebench-fix', $3, 'test-model', 12, 300)
+         VALUES ($1, $2, 'swebench-fix', 'process_agent', 'swebench-fix', $3, 'test-model',
+                 'swebench_prompt@1', 12, 300)
          RETURNING id",
     )
     .bind(tenant_id)

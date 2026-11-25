@@ -566,8 +566,8 @@ async fn a_bound_process_agent_starts_where_the_capability_is_ambiguous() {
         let (id,): (Uuid,) = sqlx::query_as(
             "INSERT INTO capability_agent
                  (tenant_id, capability_id, key, role, process_key, status, model_ref,
-                  allowed_actions, max_iterations, timeout_secs)
-             VALUES ($1, $2, $3, 'process_agent', $3, 'active', 'test-model',
+                  prompt_ref, allowed_actions, max_iterations, timeout_secs)
+             VALUES ($1, $2, $3, 'process_agent', $3, 'active', 'test-model', 'agent@1',
                      ARRAY['cards.claim'], 1, 30)
              RETURNING id",
         )

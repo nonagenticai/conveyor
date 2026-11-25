@@ -370,6 +370,8 @@
     "ops.rollback",
     "ops.scale",
     "ops.triage",
+    "organisation_layers.list",
+    "organisation_layers.set",
     "pm.charter",
     "pm.close",
     "pm.get",

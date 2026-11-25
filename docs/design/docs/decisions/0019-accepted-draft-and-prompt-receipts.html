@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0019 — The accepted draft is applied and every call is receipted · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0019-accepted-draft-and-prompt-receipts.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0019--the-accepted-draft-is-applied-and-every-call-is-receipted">0019 — The accepted draft is applied and every call is receipted</h1>
+<p>Status: Accepted · Date: 2026-11-24 · Issue: #697 · Resolves: S21 §23, rework <code>v1-p77-1</code>, <code>v1-p77-2</code>; implements SPEC_V2 §5.1, §7.1, §7.3, §7.4, §7.7</p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><p><strong>An accepted L1 gate applies its draft when — and only when — the policy says so.</strong> The effective <code>gate.precheck</code> policy may declare <code>meta.on_accept = "apply"</code>; absent or <code>"park"</code> is the default and keeps today's behaviour exactly (the run succeeds, the draft stays unattached). This is the owner's decision of 2026-11-24: forward-only, opt-in, no tenant's behaviour changes because the unit shipped.</p></li>
+<li><p><strong>One apply gate, three callers.</strong> The apply is <code>crate::ladder::apply_draft_tx</code> — the same function <code>ladder.apply_draft</code> and the <code>run.resume</code> worker call. The executor calls it inside its finish transaction, with the recorded L1 decision, after <code>finish_step_tx</code> and before <code>finish_succeeded</code>. It never writes a decision, never re-generates, and never calls the model again; the decision's <code>meta.draft_document_id</code>, <code>prompt_sha256</code> and <code>run_id</code> bind it to this document.</p></li>
+<li><p><strong>The policy value is validated at authoring.</strong> <code>decision_policies.create|update</code> accept only <code>on_accept ∈ {park, apply}</code> (or absent) and refuse anything else <code>422 invalid_policy_meta</code> before any write. A stored policy that cannot be honoured is not a runtime surprise.</p></li>
+<li><p><strong>An <code>internal_agent</code> run is always carded.</strong> The dispatcher already refuses a cardless <code>internal_agent</code> run <code>capability_not_ready</code> before the executor runs (<code>crates/actions/src/executor/mod.rs:458</code>, "an internal_agent run must execute on a card"), so there is no work package without a card. The executor still guards the case — a cardless accepted run records <code>apply_skipped: no_card</code> and attaches nothing — as defence in depth, not as a product path.</p></li>
+<li><p><strong>A declared apply that cannot apply fails the run.</strong> If <code>apply_draft_tx</code> refuses (a broken decision binding is a runtime inconsistency, not a user error), the run finishes <code>failed</code> with <code>draft_apply_invalid</code>, the same class the resume worker uses. A half-applied draft is never left behind.</p></li>
+<li><p><strong>No model call without compiled text and a 64-hex hash.</strong> An <code>internal_agent</code> that is <code>active</code> must name a <code>prompt_ref</code> that resolves to an active prompt in the tenant: <code>domain::capability::validate_agent_config</code> refuses <code>None</code> for an active agent; <code>capability_agents.create|update</code> answer <code>422 prompt_ref_required</code>; readiness returns <code>PromptNotConfigured</code>; <code>agent.run</code> refuses <code>409 capability_not_ready</code> naming the agent before any inference. Every recorded <code>inference_call</code> for an internal agent carries a <code>prompt_sha256</code> matching <code>^[0-9a-f]{64}$</code>.</p></li>
+<li><p><strong>The recipe's character ceiling is authored with the recipe.</strong> <code>prompt_recipes.create</code> gains <code>budget_chars: Option&lt;u32&gt;</code>; <code>0</code> is <code>422</code>; <code>NewPrompt</code> and the INSERT write it, and a new version carries a new ceiling. <code>compile</code> already refuses over budget with the measured size and never truncates — this decision makes that refusal reachable from an authored recipe.</p></li>
+<li><p><strong>No migration.</strong> <code>decision_policy.meta</code> is existing jsonb and <code>prompt.budget_chars</code> exists since migration <code>0031</code>. The unit adds no column and no table.</p></li>
+</ol>
+<h2 id="why">Why</h2>
+<p>SPEC_V2 §7.1: "L2 has no path to a state transition. A generated output is stored as a draft artefact; applying it is an action, and the action's gate is L1/L3." §7.3 names the gate pre-check as <code>pass | review | refuse</code>; a pass that leaves the draft unattached is not an application, it is a no-op that only a person's separate approval can complete. ADR 0011:77 rejected auto-apply as "a policy choice, not this unit" and the explicit gate was kept — the owner has now chosen: park by default, policy opts in.</p>
+<p>SPEC_V2 §7.7: "a prompt is compiled at run time from the run's sources … with character budgets, a measured refusal over budget, and a recorded <code>prompt_sha256</code>. Missing required source → <code>409 capability_not_ready</code> naming the pin and section, <strong>before</strong> a model call." Two holes remain in the code: an active agent without a prompt passes validation, readiness and <code>agent.run</code>, so a call can be recorded with a NULL hash; and the recipe-level ceiling has a reader but no writer. Both make a claim in the spec unreachable rather than false.</p>
+<h2 id="alternatives-rejected">Alternatives rejected</h2>
+<ul>
+<li><strong>Apply on any accepted L1 decision without a policy declaration.</strong> It would change every tenant's gate behaviour at once; an accepted quality score is evidence, not a standing licence to attach a document.</li>
+<li><strong>A new <code>apply</code> action or a second apply path.</strong> Three callers of one function is the invariant that keeps the gate honest; a second path drifts from the checks (<code>v1-w1c-2</code>'s class of defect).</li>
+<li><strong>Enforcing the prompt only at readiness.</strong> Readiness is advisory for bound runs; the action and the execution path must refuse, or a run created before readiness passes can still call.</li>
+<li><strong>A default prompt when <code>prompt_ref</code> is absent.</strong> §7.7 compiles from the run's sources; a built-in default would be a second compiler with no recipe, no budget and no source provenance.</li>
+<li><strong>A separate action to set the recipe budget.</strong> The recipe is versioned by <code>create</code>; a separate writer would split one version's fields across two actions and two transactions.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>The executor's accepted branch gains one call; its judge doc already carries <code>decision_id</code> and gains <code>apply_skipped</code> for the cardless case.</li>
+<li><code>capability_agents.create|update</code> may now refuse an active agent with no prompt. Fixtures that were active without one are rewritten, never relaxed; a seeded active agent without a prompt is a seed defect and is fixed in the seed.</li>
+<li>Readiness gains a blocker variant; the bound path and the unique-active-agent path share it.</li>
+<li><code>prompt_recipes.create</code>'s schema moves; the served-spec lock moves and no action is added.</li>
+<li><code>v1-p77-1</code> and <code>v1-p77-2</code> clear when the unit's acceptance passes.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0019-accepted-draft-and-prompt-receipts.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
