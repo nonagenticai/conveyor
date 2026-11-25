@@ -857,15 +857,17 @@ pub async fn resolve_binding_pin_tx(
     tenant: TenantId,
     binding_id: Uuid,
     requested_hash: Option<&str>,
-) -> Result<(Uuid, String), OrganisationStoreError> {
-    let row: Option<(String, String)> = sqlx::query_as(
-        "SELECT status, release_hash FROM job_binding WHERE tenant_id = $1 AND id = $2",
+) -> Result<(Uuid, String, String), OrganisationStoreError> {
+    let row: Option<(String, String, String)> = sqlx::query_as(
+        "SELECT status, release_hash, executor_kind FROM job_binding
+          WHERE tenant_id = $1 AND id = $2",
     )
     .bind(tenant.as_uuid())
     .bind(binding_id)
     .fetch_optional(&mut *conn)
     .await?;
-    let (status, binding_hash) = row.ok_or(OrganisationStoreError::NotFound("binding"))?;
+    let (status, binding_hash, executor_kind) =
+        row.ok_or(OrganisationStoreError::NotFound("binding"))?;
     let status: BindingStatus = status
         .parse()
         .map_err(OrganisationStoreError::UnknownStatus)?;
@@ -876,7 +878,7 @@ pub async fn resolve_binding_pin_tx(
             requested_hash: requested,
         });
     }
-    Ok((binding_id, binding_hash))
+    Ok((binding_id, binding_hash, executor_kind))
 }
 
 // ── the public snapshot section ───────────────────────────────────────────────────────────

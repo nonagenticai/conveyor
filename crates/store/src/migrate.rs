@@ -337,7 +337,10 @@ mod tests {
                 (71, "ladder option sets".to_owned()),
                 // #557: the per-tool verification declaration (0072_tool_meta.sql, SPEC_V2 §11.3).
                 (72, "tool meta".to_owned()),
-                (73, "meeting bindings".to_owned())
+                (73, "meeting bindings".to_owned()),
+                // T18-3c (#630): the run pins the executor kind it was created with
+                // (0074_run_executor_kind.sql, SPEC_V2 §10.5.2).
+                (74, "run executor kind".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

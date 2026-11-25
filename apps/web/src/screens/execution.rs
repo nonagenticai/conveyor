@@ -1,9 +1,9 @@
 //! The execution room — the tenant's runs and the run inspector's provenance.
 //!
 //! `runs.list` is the queue; `runs.get` is the trace (steps, gates, process, inputs and the tree),
-//! and the run detail screen renders the same read. The tool ledger and the executor/pin are not
-//! exposed by either read yet, so this screen names those gaps instead of inventing columns
-//! (owner: T13 for `tool_calls.list`; T0/T4/S21 for the executor kind and binding pin).
+//! and `tool_calls.list` is the run's tools ledger. The run carries the executor kind and the job
+//! binding / release pin it was created with (T18-3c), so the history and the detail render the
+//! pin instead of naming it as a gap.
 
 use leptos::prelude::*;
 use leptos_router::components::A;
@@ -11,7 +11,7 @@ use serde_json::json;
 
 use crate::api::{ApiError, InvokeOptions, Page};
 use crate::components::{Empty, ErrorPanel, StatusPill, Tile, age, fmt_int, short_id};
-use crate::models::{RunGet, RunOut};
+use crate::models::{RunGet, RunOut, ToolCallOut};
 use crate::state::AppCtx;
 
 async fn load(ctx: AppCtx) -> Result<Vec<RunOut>, ApiError> {
@@ -37,6 +37,22 @@ async fn load_run(ctx: AppCtx, id: &str) -> Result<RunGet, ApiError> {
     serde_json::from_value(value).map_err(|error| ApiError::Network(format!("run: {error}")))
 }
 
+/// The run's tools ledger — the panel's version, credential alias and evidence.
+async fn load_tool_calls(ctx: AppCtx, run_id: &str) -> Result<Vec<ToolCallOut>, ApiError> {
+    let value = ctx
+        .client()
+        .invoke(
+            "tool_calls.list",
+            json!({ "run_id": run_id, "limit": 50 }),
+            InvokeOptions::default(),
+        )
+        .await?
+        .output;
+    let page: Page<ToolCallOut> = serde_json::from_value(value)
+        .map_err(|error| ApiError::Network(format!("tool calls: {error}")))?;
+    Ok(page.items)
+}
+
 fn pretty(value: &serde_json::Value) -> String {
     serde_json::to_string_pretty(value).unwrap_or_default()
 }
@@ -51,11 +67,16 @@ pub fn ExecutionScreen() -> impl IntoView {
     let refresh = Callback::new(move |_| data.refetch());
     let selected = RwSignal::new(Option::<String>::None);
     let detail = RwSignal::new(Option::<Result<RunGet, ApiError>>::None);
+    let tools = RwSignal::new(Option::<Result<Vec<ToolCallOut>, ApiError>>::None);
     let detail_loading = RwSignal::new(false);
     let load_detail = move |id: String| {
         detail_loading.set(true);
         detail.set(None);
+        tools.set(None);
         leptos::task::spawn_local(async move {
+            // The ledger is set before the run so the detail's first render already has it.
+            let tool_result = load_tool_calls(ctx, &id).await;
+            tools.set(Some(tool_result));
             let result = load_run(ctx, &id).await;
             detail.set(Some(result));
             detail_loading.set(false);
@@ -100,6 +121,7 @@ pub fn ExecutionScreen() -> impl IntoView {
                                 <table class="table" data-testid="execution-runs">
                                     <thead><tr>
                                         <th>"Run"</th><th>"Card"</th><th>"Status"</th><th>"Attempt"</th>
+                                        <th>"Executor"</th><th>"Binding"</th><th>"Release pin"</th>
                                         <th>"Started"</th><th>"Finished"</th><th></th>
                                     </tr></thead>
                                     <tbody>
@@ -122,6 +144,21 @@ pub fn ExecutionScreen() -> impl IntoView {
                                                     <td class="mono">{card}</td>
                                                     <td><StatusPill status=run.status.clone()/></td>
                                                     <td class="mono">{run.attempt.to_string()}</td>
+                                                    <td class="mono">
+                                                        {run.executor_kind.clone().unwrap_or_else(|| "—".to_owned())}
+                                                    </td>
+                                                    <td class="mono">
+                                                        {run.job_binding_id
+                                                            .as_deref()
+                                                            .map(|id| short_id(Some(id)))
+                                                            .unwrap_or_else(|| "—".to_owned())}
+                                                    </td>
+                                                    <td class="mono">
+                                                        {run.release_hash
+                                                            .as_deref()
+                                                            .map(|hash| short_id(Some(hash)))
+                                                            .unwrap_or_else(|| "—".to_owned())}
+                                                    </td>
                                                     <td>{age(run.started_at)}</td>
                                                     <td>{age(run.finished_at)}</td>
                                                     <td><A href=format!("/runs/{}", run.id)><span class="muted">"Open"</span></A></td>
@@ -142,13 +179,60 @@ pub fn ExecutionScreen() -> impl IntoView {
                             Some(Err(error)) => view! {
                                 <ErrorPanel error=error on_retry=retry_detail/>
                             }.into_any(),
-                            Some(Ok(run)) => run_detail(run),
+                            Some(Ok(run)) => run_detail(run, tools.get()),
                         }}
-                        <section class="panel planned-panel">
-                            <h2>"Not in this read"</h2>
-                            <p class="muted">
-                                "The executor kind and the job binding / release hash pin are not exposed by runs.list or runs.get yet (owner: T0 · T4 · S21). The tools panel (tool version, credential alias, returned evidence) needs tool_calls.list (owner: T13, #557). The step's own input, output and judge are the execution trace this read carries."
-                            </p>
+                        <section class="panel" data-testid="execution-tools">
+                            <h2>"Tools"</h2>
+                            {match tools {
+                                None => view! {
+                                    <p class="muted">"Reading the run's tool calls…"</p>
+                                }.into_any(),
+                                Some(Err(error)) => view! {
+                                    <div class="callout bad">
+                                        <div class="hd">"Tool ledger unavailable"</div>
+                                        <p>{format!("{error}")}</p>
+                                    </div>
+                                }.into_any(),
+                                Some(Ok(calls)) if calls.is_empty() => view! {
+                                    <p class="muted">"No tool call recorded for this run."</p>
+                                }.into_any(),
+                                Some(Ok(calls)) => view! {
+                                    <table class="table" data-testid="execution-tool-calls">
+                                        <thead><tr>
+                                            <th>"Tool"</th><th>"Version"</th><th>"Status"</th>
+                                            <th>"Credential alias"</th><th>"Evidence"</th>
+                                        </tr></thead>
+                                        <tbody>
+                                            {calls.into_iter().map(|call| view! {
+                                                <tr>
+                                                    <td class="mono">{call.tool.clone()}</td>
+                                                    <td class="mono">
+                                                        {format!(
+                                                            "{}@{} · {}",
+                                                            call.toolkit,
+                                                            call.toolkit_version,
+                                                            short_id(Some(&call.tool_id)),
+                                                        )}
+                                                    </td>
+                                                    <td><StatusPill status=call.status.clone()/></td>
+                                                    <td class="mono">
+                                                        {call.credential_alias.clone().unwrap_or_else(|| "—".to_owned())}
+                                                    </td>
+                                                    <td class="mono">
+                                                        {if call.evidence.is_null() {
+                                                            call.error_message
+                                                                .clone()
+                                                                .unwrap_or_else(|| "—".to_owned())
+                                                        } else {
+                                                            pretty(&call.evidence)
+                                                        }}
+                                                    </td>
+                                                </tr>
+                                            }).collect_view()}
+                                        </tbody>
+                                    </table>
+                                }.into_any(),
+                            }}
                         </section>
                     }.into_any()
                 }
@@ -157,7 +241,7 @@ pub fn ExecutionScreen() -> impl IntoView {
     }
 }
 
-fn run_detail(run: RunGet) -> AnyView {
+fn run_detail(run: RunGet, tools: Option<Result<Vec<ToolCallOut>, ApiError>>) -> AnyView {
     let row = run.run.clone();
     let steps = run.steps;
     let approvals = run.approvals;
@@ -178,6 +262,12 @@ fn run_detail(run: RunGet) -> AnyView {
             <div class="kv">
                 <dt>"Status"</dt><dd><StatusPill status=row.status.clone()/></dd>
                 <dt>"Attempt"</dt><dd class="mono">{row.attempt.to_string()}</dd>
+                <dt>"Executor"</dt>
+                <dd class="mono">{row.executor_kind.clone().unwrap_or_else(|| "—".to_owned())}</dd>
+                <dt>"Job binding"</dt>
+                <dd class="mono">{row.job_binding_id.clone().unwrap_or_else(|| "—".to_owned())}</dd>
+                <dt>"Release pin"</dt>
+                <dd class="mono">{row.release_hash.clone().unwrap_or_else(|| "—".to_owned())}</dd>
                 <dt>"Started"</dt><dd>{age(row.started_at)}</dd>
                 <dt>"Finished"</dt><dd>{age(row.finished_at)}</dd>
                 <dt>"Card"</dt>
