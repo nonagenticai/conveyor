@@ -510,8 +510,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S21-EXECUTION.html",
       "source": "docs/evidence/S21-EXECUTION.md",
       "section": "Evidence",
-      "sha256": "91d8c37f034e4a2b85dfd6617d4731009647a58157a1f54fdfc3cd3426f9958b",
-      "bytes": 5089,
+      "sha256": "d3428acdb029047c407214e9d38b0fe8c58cc80cd724ad69605e324a676814d3",
+      "bytes": 5168,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-EXECUTION.md"
     },
     {
@@ -591,8 +591,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/T0-RELEASE-LAYERS.html",
       "source": "docs/evidence/T0-RELEASE-LAYERS.md",
       "section": "Evidence",
-      "sha256": "6ca42bdc4336edff56db14cf573b1637b58ec0d4d8e7393287b63a16a42e6eda",
-      "bytes": 3842,
+      "sha256": "7c79129158ec3267358b040c04d95fa5f741619e14cd3c20b7c96fdfea2bea28",
+      "bytes": 3921,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/T0-RELEASE-LAYERS.md"
     },
     {
@@ -1437,8 +1437,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "7f5f5b504b61bcd7cbde955a4b424b03a0fa336f1e043c20597f52ec9ccd7738",
-      "bytes": 261463,
+      "sha256": "93f8f327566a9fe6de30dd455790c1683b458a07283e7c443a539f1df75e39c8",
+      "bytes": 261497,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -2148,8 +2148,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "f751901b3b99de99db9cac9890839ca11f1a4b9a6d3961b7c10afd707e49661d",
-      "bytes": 62915,
+      "sha256": "f4c706ef7be80ec1814c5970894bfad9c689770e808ce4909a68e5e99bf94163",
+      "bytes": 62935,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]
