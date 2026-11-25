@@ -1008,9 +1008,11 @@ def ensure_reviews(state):
     if not REVIEWS:
         print("SKIP  reviews: this profile's chain records none")
         return []
+    # Re-read: on a fresh run the two contracts were approved after `state` was loaded.
+    contracts = read("architecture.contracts_list", {"project_id": PROJECT}).get("items", [])
     live = {
         row.get("kind"): row
-        for row in state["contracts"]
+        for row in contracts
         if row.get("status") == "live" and row.get("approved_at")
     }
     recorded = []
