@@ -29,8 +29,8 @@ use conveyor_store::quality::{
     max_similarity_tx,
 };
 use conveyor_store::trace_link::{
-    NewTraceLink, TraceFilter, TraceLinkStoreError, delete_trace_link_tx, insert_trace_link_tx,
-    list_trace_links_tx,
+    NewTraceLink, TraceFilter, TraceLinkStoreError, TraceRoot, delete_trace_link_tx,
+    insert_trace_link_tx, list_trace_links_tx, view_trace_tx,
 };
 use rust_decimal::Decimal;
 use serde_json::json;

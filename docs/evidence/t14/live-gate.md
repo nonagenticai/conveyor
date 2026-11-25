@@ -34,11 +34,16 @@ was changed from `draft` because the gate names it), retrieval/webscraper/lean4 
 
 ## Blockers that are not code
 
-- **Tenant licences.** `speech`/`transcription` need a sealed `licence.token` for the audio
-  services; `scientific` needs a licence the service accepts. The staging record holds only the
-  `conveyor` app licence, and minting licences for these apps is an estate licensing act.
+- **Tenant licences — a production licensing act, by the programme's own rule.** `speech`/
+  `transcription` need a sealed `licence.token` for the audio services; `scientific` needs a
+  licence its service accepts. The staging record holds only the `conveyor` app licence, and the
+  production tenant's sealed `licence.token` was created after the record copy was taken. The
+  programme already ruled on this class in `docs/evidence/S21-RUN.md:100`: minting a licence for
+  a non-production tenant is **a production licensing act**, so these calls are deploy-bound
+  proofs taken with the production credential on the deployed engine — not something the
+  pre-merge record can or should mint for itself.
 - **Object storage in the local engine.** `image_gen` renders but cannot store its document
-  without MinIO; the deployed pod has it. This receipt must be taken on a MinIO-capable engine.
+  without MinIO; the deployed pod has it. This receipt is likewise deploy-bound.
 
-Both are named, measured refusals — not silent gaps. Until they exist, T14's live-call clause
-cannot be claimed, and the project stays open.
+Both are named, measured refusals — not silent gaps. Until the deployed proofs exist, T14's
+live-call clause cannot be claimed, and the project stays open.
