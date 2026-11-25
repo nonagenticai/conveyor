@@ -139,13 +139,35 @@ impl<'a> ActionCaller<'a> {
             },
         )
         .await
-        .map_err(|error| CallError::Action {
-            name: name.to_owned(),
-            status: error.status,
-            detail: error.detail,
+        .map_err(|error| {
+            let errors = field_errors(&error.errors);
+            CallError::Action {
+                name: name.to_owned(),
+                status: error.status,
+                detail: error.detail,
+                errors,
+            }
         })?;
         Ok(outcome.body.get("output").cloned().unwrap_or(Value::Null))
     }
+}
+
+/// The `errors[]` of a refused action, rendered for the operator.
+///
+/// The CLI printed only the RFC 9457 `detail`, which is the fixed sentence "the input does not
+/// match the action schema" for every 422. Two record investigations (2026-11-25) could not
+/// tell which field failed; the boundary already carries the field, code and detail, so it is
+/// printed here rather than discarded.
+fn field_errors(errors: &[conveyor_actions::spec::FieldError]) -> String {
+    if errors.is_empty() {
+        return String::new();
+    }
+    let rendered = errors
+        .iter()
+        .map(|error| format!("{}: {} ({})", error.field, error.detail, error.code))
+        .collect::<Vec<_>>()
+        .join("; ");
+    format!(" [{rendered}]")
 }
 
 /// Why an operator action could not run.
@@ -167,7 +189,7 @@ pub enum CallError {
     #[error("{0:?} is not an internal action")]
     NotInternal(String),
     /// The action itself refused.
-    #[error("{name} refused ({status}): {detail}")]
+    #[error("{name} refused ({status}): {detail}{errors}")]
     Action {
         /// The action name.
         name: String,
@@ -175,5 +197,7 @@ pub enum CallError {
         status: u16,
         /// The RFC 9457 detail.
         detail: String,
+        /// The rendered `errors[]` (empty when the refusal carries none).
+        errors: String,
     },
 }
