@@ -17,6 +17,7 @@
       .std-meta dd { margin:.15rem 0 0; }
       .std-state { font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }
       .std-absent { border-left:3px solid #b45309; padding:.35rem .75rem; background:#fff7ed; }
+      .std-intent { max-width:68ch; }
       .std-source { font-size:.85rem; opacity:.8; }
       .std-index { list-style:none; padding:0; }
       .std-index li { border-top:1px solid var(--line, #e5e5e5); padding:.5rem 0; }
@@ -36,27 +37,24 @@
         <div><dt>Standard</dt><dd>TOGAF</dd></div>
         <div><dt>Level</dt><dd>project</dd></div>
         <div><dt>Subject</dt><dd>SPEC_V2 slice T2 (docs/SPEC_V2.md §12)</dd></div>
-        <div><dt>Status</dt><dd>evidenced</dd></div>
+        <div><dt>Status</dt><dd>partial</dd></div>
         <div><dt>SPEC</dt><dd>§8.1</dd></div>
         <div><dt>Gate</dt><dd>live</dd></div>
         <div><dt>Package</dt><dd><code>std-togaf-delivery-contract-t2:T2</code></dd></div>
         <div><dt>Provenance</dt><dd>2026-11-25T03:46:32.319854100+00:00 · b51896a61b28</dd></div>
       </dl>
       <h2>Commitments</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-absent">Not evidenced — Explicit absence — the contract&#x27;s commitment list: a commitments field on the delivery contract body (see <code>std-togaf-delivery-contract-t2:T2</code>).</p><h2>Compliance method</h2>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_field</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (re-review at the fixed P0) <span class="std-state">live</span></li>
-</ul><h2>Compliance method</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
-<ul>
-<li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (re-review at the fixed P0) <span class="std-state">live</span></li>
+<li>compliance: T2 is assessed against SPEC_V2 §12 T2 and issue #73. The fourth clause — a generated draft cannot transition a card — is proved on create, update and apply by documents_compose_gate.rs and ladder_human_gate.rs. Residual deviations are recorded, none P0: v1-w1c-3, v1-w1c-4, v1-p101-1 (P1); v1-t2-5, v1-w1c-5, v1-p102-1 (P2); artefacts std-pmp-project-brief-t2 and std-togaf-architecture-artifact-t2 (P2 partials).</li>
 </ul><h2>Approval</h2>
-<p class="std-source">Source: <code>architecture.json#/contracts</code> — 2 row(s)</p>
+<p class="std-intent">The record the section derives from, or an explicit absence.</p>
+<p class="std-source">Source: <code>contract_approval</code> — 1 row(s)</p>
 <ul>
-<li>Delivery contract — T2 Decision ladder (retrospective, U5a) <span class="std-state">superseded</span></li>
-<li>Delivery contract — T2 Decision ladder (re-review at the fixed P0) <span class="std-state">live</span></li>
+<li>approval 01a2009a-a7fa-7a68-a539-32dc78e5a221 — live <span class="std-state">live</span></li>
 </ul>
     </main>
   </body>
