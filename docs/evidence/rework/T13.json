@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d37-730f-8f8a-2f50e5a0933d\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "T13-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "",
       "stdout": ""
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "15 mandatory artefact package(s) open: std-togaf-phase-g-t13-g:T13, std-pmp-project-baseline-t13:T13, std-pmp-project-registers-t13:T13, std-togaf-architecture-artifact-instance-01a20275-1783-769e-9744-fa9246b22916:T13, std-togaf-architecture-artifact-instance-01a20275-6094-70ad-89a6-512086e3a162:T13, std-togaf-architecture-artifact-instance-01a20275-a8ee-7e43-afaa-505a452e314d:T13, std-togaf-architecture-artifact-instance-01a20275-f69f-77aa-b414-595b4337e30c:T13, std-togaf-architecture-artifact-instance-01a20276-3c76-793c-a765-68b0210bcb5e:T13, +7 more",
+      "detail": "15 mandatory artefact package(s) open: std-pmp-project-baseline-t13:T13, std-pmp-project-registers-t13:T13, std-togaf-architecture-artifact-instance-01a20275-1783-769e-9744-fa9246b22916:T13, std-togaf-architecture-artifact-instance-01a20275-6094-70ad-89a6-512086e3a162:T13, std-togaf-architecture-artifact-instance-01a20275-a8ee-7e43-afaa-505a452e314d:T13, std-togaf-architecture-artifact-instance-01a20275-f69f-77aa-b414-595b4337e30c:T13, std-togaf-architecture-artifact-instance-01a20276-3c76-793c-a765-68b0210bcb5e:T13, std-togaf-architecture-artifact-instance-01a20276-82e4-7594-b73b-60590e969803:T13, +7 more",
       "id": "T13-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -151,7 +151,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "2 unresolved P0/P1 package(s): v1-p116-1:T13 (P1), std-togaf-phase-g-t13-g:T13 (P1)",
+      "detail": "1 unresolved P0/P1 package(s): v1-p116-1:T13 (P1)",
       "id": "T13-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -160,7 +160,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T13-charter' did not pass; the gate check 'T13-artefact-standard' did not pass; the gate check 'T13-rework' did not pass",
+      "detail": "the gate check 'T13-artefact-standard' did not pass; the gate check 'T13-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -177,23 +177,22 @@
     }
   ],
   "failures": [
-    "T13-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
-    "T13-artefact-standard (P1): 15 mandatory artefact package(s) open: std-togaf-phase-g-t13-g:T13, std-pmp-project-baseline-t13:T13, std-pmp-project-registers-t13:T13, std-togaf-architecture-artifact-instance-01a20275-1783-769e-9744-fa9246b22916:T13, std-togaf-architecture-artifact-instance-01a20275-6094-70ad-89a6-512086e3a162:T13, std-togaf-architecture-artifact-instance-01a20275-a8ee-7e43-afaa-505a452e314d:T13, std-togaf-architecture-artifact-instance-01a20275-f69f-77aa-b414-595b4337e30c:T13, std-togaf-architecture-artifact-instance-01a20276-3c76-793c-a765-68b0210bcb5e:T13, +7 more",
-    "T13-rework (P0): 2 unresolved P0/P1 package(s): v1-p116-1:T13 (P1), std-togaf-phase-g-t13-g:T13 (P1)",
-    "gate (P0): the gate check 'T13-charter' did not pass; the gate check 'T13-artefact-standard' did not pass; the gate check 'T13-rework' did not pass",
+    "T13-artefact-standard (P1): 15 mandatory artefact package(s) open: std-pmp-project-baseline-t13:T13, std-pmp-project-registers-t13:T13, std-togaf-architecture-artifact-instance-01a20275-1783-769e-9744-fa9246b22916:T13, std-togaf-architecture-artifact-instance-01a20275-6094-70ad-89a6-512086e3a162:T13, std-togaf-architecture-artifact-instance-01a20275-a8ee-7e43-afaa-505a452e314d:T13, std-togaf-architecture-artifact-instance-01a20275-f69f-77aa-b414-595b4337e30c:T13, std-togaf-architecture-artifact-instance-01a20276-3c76-793c-a765-68b0210bcb5e:T13, std-togaf-architecture-artifact-instance-01a20276-82e4-7594-b73b-60590e969803:T13, +7 more",
+    "T13-rework (P0): 1 unresolved P0/P1 package(s): v1-p116-1:T13 (P1)",
+    "gate (P0): the gate check 'T13-artefact-standard' did not pass; the gate check 'T13-rework' did not pass",
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt",
-  "generated_at": "2026-11-25T08:48:07.110827+00:00",
+  "generated_at": "2026-11-25T09:45:23.899067+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T13.toml",
   "name": "Tool platform",
   "project": "T13",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T08:47:56Z",
-    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
-    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
+    "generated_at": "2026-11-25T09:44:46Z",
+    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
   },
   "verdict": "red",
   "warnings": []

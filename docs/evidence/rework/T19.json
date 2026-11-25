@@ -3,32 +3,32 @@
     {
       "check": "project",
       "description": "T19 is closed",
-      "detail": "project T19 is closed",
+      "detail": "status is 'active', expected 'closed'",
       "id": "T19-project",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "no project baseline",
+      "detail": "baseline 01a21215-0d0d-7727-8a76-130e36a86bcf approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "T19-baseline",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a20c80-b9b8-7214-abc6-f2c4f75a1fc1\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "T19-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "",
       "stdout": ""
     },
     {
@@ -61,10 +61,10 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "no approved closure gate for the project",
+      "detail": "latest closure gate 01a21215-14ad-7624-ae4c-71275d2c8b07 decided by a distinct approver",
       "id": "T19-closure-gate",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -106,19 +106,19 @@
     {
       "check": "wsjf",
       "description": "every WBS node carries the four WSJF inputs",
-      "detail": "no WBS deliverable carries the plan",
+      "detail": "1 WBS node(s) carry the four WSJF inputs",
       "id": "T19-wsjf",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "demo_credits",
       "description": "every accepted deliverable has a demo credit",
-      "detail": "no accepted deliverable to demo",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
       "id": "T19-demo-credits",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -133,16 +133,16 @@
     {
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "2 open P0 package(s): std-pmp-change-control-t19:T19, std-pmp-project-baseline-t19:T19",
+      "detail": "no open P0 package for this project",
       "id": "T19-product",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "16 mandatory artefact package(s) open: std-pmp-change-control-t19:T19, std-pmp-project-baseline-t19:T19, std-pmp-project-registers-t19:T19, std-pmp-project-wbs-t19:T19, std-togaf-architecture-artifact-instance-01a20cdd-e71f-7d06-8ca5-701ff6b7d69e:T19, std-togaf-architecture-artifact-instance-01a20cde-0f97-7f74-afd8-7cd74e0990e3:T19, std-togaf-architecture-artifact-instance-01a20cde-371c-7d85-ae2d-780453958bef:T19, std-togaf-architecture-artifact-instance-01a20cde-5f86-7720-9a16-36a964ef255d:T19, +8 more",
+      "detail": "19 mandatory artefact package(s) open: std-togaf-architecture-artifact-instance-01a20cdd-e71f-7d06-8ca5-701ff6b7d69e:T19, std-togaf-architecture-artifact-instance-01a20cde-0f97-7f74-afd8-7cd74e0990e3:T19, std-togaf-architecture-artifact-instance-01a20cde-371c-7d85-ae2d-780453958bef:T19, std-togaf-architecture-artifact-instance-01a20cde-5f86-7720-9a16-36a964ef255d:T19, std-togaf-architecture-artifact-instance-01a20cde-86d7-7257-a45e-b4731ab423a4:T19, std-togaf-architecture-artifact-instance-01a20cde-adbf-7626-9b2b-58faf7164755:T19, std-togaf-architecture-artifact-instance-01a20cde-d6bd-7cfe-88ad-42a1e6db30a7:T19, std-togaf-architecture-artifact-instance-01a21214-fc96-7e8a-b850-dc987a45a7f3:T19, +11 more",
       "id": "T19-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -151,7 +151,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "5 unresolved P0/P1 package(s): std-pmp-change-control-t19:T19 (P0), std-pmp-project-baseline-t19:T19 (P0), std-pmp-project-registers-t19:T19 (P1), std-pmp-project-wbs-t19:T19 (P1), v1-meetings-1:T19 (P1)",
+      "detail": "2 unresolved P0/P1 package(s): seed_live_drift:T19 (P1), v1-meetings-1:T19 (P1)",
       "id": "T19-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -160,45 +160,30 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T19-baseline' did not pass; the gate check 'T19-charter' did not pass; the gate check 'T19-closure-gate' did not pass; the gate check 'T19-wsjf' did not pass; the gate check 'T19-demo-credits' did not pass; the gate check 'T19-product' did not pass; the gate check 'T19-artefact-standard' did not pass; the gate check 'T19-rework' did not pass",
+      "detail": "the gate check 'T19-project' did not pass; the gate check 'T19-artefact-standard' did not pass; the gate check 'T19-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
       "result": "fail",
       "severity": "P0"
     }
   ],
   "failures": [
-    "T19-baseline (P0): no project baseline",
-    "T19-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-    "T19-closure-gate (P0): no approved closure gate for the project",
-    "T19-wsjf (P0): no WBS deliverable carries the plan",
-    "T19-demo-credits (P0): no accepted deliverable to demo",
-    "T19-product (P0): 2 open P0 package(s): std-pmp-change-control-t19:T19, std-pmp-project-baseline-t19:T19",
-    "T19-artefact-standard (P1): 16 mandatory artefact package(s) open: std-pmp-change-control-t19:T19, std-pmp-project-baseline-t19:T19, std-pmp-project-registers-t19:T19, std-pmp-project-wbs-t19:T19, std-togaf-architecture-artifact-instance-01a20cdd-e71f-7d06-8ca5-701ff6b7d69e:T19, std-togaf-architecture-artifact-instance-01a20cde-0f97-7f74-afd8-7cd74e0990e3:T19, std-togaf-architecture-artifact-instance-01a20cde-371c-7d85-ae2d-780453958bef:T19, std-togaf-architecture-artifact-instance-01a20cde-5f86-7720-9a16-36a964ef255d:T19, +8 more",
-    "T19-rework (P0): 5 unresolved P0/P1 package(s): std-pmp-change-control-t19:T19 (P0), std-pmp-project-baseline-t19:T19 (P0), std-pmp-project-registers-t19:T19 (P1), std-pmp-project-wbs-t19:T19 (P1), v1-meetings-1:T19 (P1)",
-    "gate (P0): the gate check 'T19-baseline' did not pass; the gate check 'T19-charter' did not pass; the gate check 'T19-closure-gate' did not pass; the gate check 'T19-wsjf' did not pass; the gate check 'T19-demo-credits' did not pass; the gate check 'T19-product' did not pass; the gate check 'T19-artefact-standard' did not pass; the gate check 'T19-rework' did not pass",
-    "closed-on-red (P0): the project is closed on a red manifest"
+    "T19-project (P0): status is 'active', expected 'closed'",
+    "T19-artefact-standard (P1): 19 mandatory artefact package(s) open: std-togaf-architecture-artifact-instance-01a20cdd-e71f-7d06-8ca5-701ff6b7d69e:T19, std-togaf-architecture-artifact-instance-01a20cde-0f97-7f74-afd8-7cd74e0990e3:T19, std-togaf-architecture-artifact-instance-01a20cde-371c-7d85-ae2d-780453958bef:T19, std-togaf-architecture-artifact-instance-01a20cde-5f86-7720-9a16-36a964ef255d:T19, std-togaf-architecture-artifact-instance-01a20cde-86d7-7257-a45e-b4731ab423a4:T19, std-togaf-architecture-artifact-instance-01a20cde-adbf-7626-9b2b-58faf7164755:T19, std-togaf-architecture-artifact-instance-01a20cde-d6bd-7cfe-88ad-42a1e6db30a7:T19, std-togaf-architecture-artifact-instance-01a21214-fc96-7e8a-b850-dc987a45a7f3:T19, +11 more",
+    "T19-rework (P0): 2 unresolved P0/P1 package(s): seed_live_drift:T19 (P1), v1-meetings-1:T19 (P1)",
+    "gate (P0): the gate check 'T19-project' did not pass; the gate check 'T19-artefact-standard' did not pass; the gate check 'T19-rework' did not pass"
   ],
   "gate": "the meeting is a card plus a typed record: an agenda item that decides names one approval, each qualifying seat records one position, close_item derives the item's outcome by arithmetic over the positions and the linked approval's stricter policy (quorum, required departments, dual control, evidence, conflict exclusion), an observer never counts, a human who requested the gate is always excluded (P4), a quorum miss defers with reason inquorate, an item with no outcome cannot close, and no transcript or chat is a decision; the eight meetings suites and the web room spec pass",
-  "generated_at": "2026-11-25T09:40:53.816581+00:00",
+  "generated_at": "2026-11-25T09:45:24.433283+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T19.toml",
   "name": "Decision forums (meetings)",
   "project": "T19",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T08:47:56Z",
-    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
-    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
+    "generated_at": "2026-11-25T09:44:46Z",
+    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
   },
   "verdict": "red",
   "warnings": []

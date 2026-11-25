@@ -1,0 +1,89 @@
+{
+ "gate": "python3 scripts/check-tranche-exit.py --tranche 4 --snapshot /tmp/conv526-final/data -> exit 1",
+ "members": [
+  {
+   "key": "S05",
+   "reason": "verdict 'red'",
+   "receipt_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+   "state": "red",
+   "status": "active",
+   "verdict": "red"
+  },
+  {
+   "key": "S07",
+   "reason": "verdict 'red'",
+   "receipt_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+   "state": "red",
+   "status": "active",
+   "verdict": "red"
+  },
+  {
+   "key": "S09",
+   "reason": "verdict 'red'",
+   "receipt_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+   "state": "red",
+   "status": "active",
+   "verdict": "red"
+  },
+  {
+   "key": "T10",
+   "reason": "verdict 'red'",
+   "receipt_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+   "state": "red",
+   "status": "closed",
+   "verdict": "red"
+  },
+  {
+   "key": "T14",
+   "reason": "verdict 'red'",
+   "receipt_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+   "state": "red",
+   "status": "active",
+   "verdict": "red"
+  },
+  {
+   "key": "T16",
+   "reason": "verdict 'red'",
+   "receipt_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+   "state": "red",
+   "status": "active",
+   "verdict": "red"
+  },
+  {
+   "key": "T18",
+   "reason": "verdict 'red'",
+   "receipt_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+   "state": "red",
+   "status": "active",
+   "verdict": "red"
+  },
+  {
+   "key": "T19",
+   "reason": "verdict 'red'",
+   "receipt_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+   "state": "red",
+   "status": "active",
+   "verdict": "red"
+  },
+  {
+   "key": "T4",
+   "reason": "verdict 'red'",
+   "receipt_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+   "state": "red",
+   "status": "active",
+   "verdict": "red"
+  },
+  {
+   "key": "T9",
+   "reason": "verdict 'red'",
+   "receipt_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+   "state": "red",
+   "status": "closed",
+   "verdict": "red"
+  }
+ ],
+ "ready": false,
+ "schema": "tranche-exit-evidence/v1",
+ "snapshot_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+ "tranche": 4
+}

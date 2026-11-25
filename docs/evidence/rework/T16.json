@@ -43,19 +43,19 @@
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "no live board-approved delivery contract",
+      "detail": "contract 01a21214-1a69-7f12-80ad-380fc39ea1be approved by board decision 01a21214-1ab2-7e5c-96a9-d0eb94877234 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "T16-contract",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "no Phase-G compliance review for the project's live contract",
+      "detail": "review 01a21214-3246-7b99-befc-9b2cc058a989 (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T16-review",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -142,7 +142,7 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "13 mandatory artefact package(s) open: contract_missing:T16, std-togaf-phase-g-t16-g:T16, std-pmp-project-baseline-t16:T16, std-pmp-project-registers-t16:T16, std-togaf-architecture-artifact-instance-01a211c9-201c-701d-bc1e-056eefbdc8da:T16, std-togaf-architecture-artifact-instance-01a211c9-20a5-752e-a91d-c5b7ee790855:T16, std-togaf-architecture-artifact-instance-01a211c9-212a-70d4-bbbf-17c3c5038409:T16, std-togaf-architecture-artifact-instance-01a211c9-21b3-7d90-a789-8de4b76a8105:T16, +5 more",
+      "detail": "19 mandatory artefact package(s) open: std-togaf-architecture-artifact-instance-01a211c9-201c-701d-bc1e-056eefbdc8da:T16, std-togaf-architecture-artifact-instance-01a211c9-20a5-752e-a91d-c5b7ee790855:T16, std-togaf-architecture-artifact-instance-01a211c9-212a-70d4-bbbf-17c3c5038409:T16, std-togaf-architecture-artifact-instance-01a211c9-21b3-7d90-a789-8de4b76a8105:T16, std-togaf-architecture-artifact-instance-01a211c9-223d-793d-901f-9bda541ac0be:T16, std-togaf-architecture-artifact-instance-01a211c9-22d1-752d-a37e-9f00de53a021:T16, std-togaf-architecture-artifact-instance-01a211c9-2355-7f70-ac03-cda28d967ba0:T16, std-togaf-architecture-artifact-instance-01a21214-1c29-70ea-9695-e1ca6d8b21ab:T16, +11 more",
       "id": "T16-artefact-standard",
       "kind": "snapshot",
       "result": "fail",
@@ -151,7 +151,7 @@
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "3 unresolved P0/P1 package(s): seed_live_drift:T16 (P1), contract_missing:T16 (P1), std-togaf-phase-g-t16-g:T16 (P1)",
+      "detail": "1 unresolved P0/P1 package(s): seed_live_drift:T16 (P1)",
       "id": "T16-rework",
       "kind": "snapshot",
       "result": "fail",
@@ -160,7 +160,7 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-artefact-standard' did not pass; the gate check 'T16-rework' did not pass",
+      "detail": "the gate check 'T16-artefact-standard' did not pass; the gate check 'T16-rework' did not pass",
       "id": "gate",
       "kind": "manifest",
       "result": "fail",
@@ -168,23 +168,21 @@
     }
   ],
   "failures": [
-    "T16-contract (P0): no live board-approved delivery contract",
-    "T16-review (P0): no Phase-G compliance review for the project's live contract",
-    "T16-artefact-standard (P1): 13 mandatory artefact package(s) open: contract_missing:T16, std-togaf-phase-g-t16-g:T16, std-pmp-project-baseline-t16:T16, std-pmp-project-registers-t16:T16, std-togaf-architecture-artifact-instance-01a211c9-201c-701d-bc1e-056eefbdc8da:T16, std-togaf-architecture-artifact-instance-01a211c9-20a5-752e-a91d-c5b7ee790855:T16, std-togaf-architecture-artifact-instance-01a211c9-212a-70d4-bbbf-17c3c5038409:T16, std-togaf-architecture-artifact-instance-01a211c9-21b3-7d90-a789-8de4b76a8105:T16, +5 more",
-    "T16-rework (P0): 3 unresolved P0/P1 package(s): seed_live_drift:T16 (P1), contract_missing:T16 (P1), std-togaf-phase-g-t16-g:T16 (P1)",
-    "gate (P0): the gate check 'T16-contract' did not pass; the gate check 'T16-review' did not pass; the gate check 'T16-artefact-standard' did not pass; the gate check 'T16-rework' did not pass"
+    "T16-artefact-standard (P1): 19 mandatory artefact package(s) open: std-togaf-architecture-artifact-instance-01a211c9-201c-701d-bc1e-056eefbdc8da:T16, std-togaf-architecture-artifact-instance-01a211c9-20a5-752e-a91d-c5b7ee790855:T16, std-togaf-architecture-artifact-instance-01a211c9-212a-70d4-bbbf-17c3c5038409:T16, std-togaf-architecture-artifact-instance-01a211c9-21b3-7d90-a789-8de4b76a8105:T16, std-togaf-architecture-artifact-instance-01a211c9-223d-793d-901f-9bda541ac0be:T16, std-togaf-architecture-artifact-instance-01a211c9-22d1-752d-a37e-9f00de53a021:T16, std-togaf-architecture-artifact-instance-01a211c9-2355-7f70-ac03-cda28d967ba0:T16, std-togaf-architecture-artifact-instance-01a21214-1c29-70ea-9695-e1ca6d8b21ab:T16, +11 more",
+    "T16-rework (P0): 1 unresolved P0/P1 package(s): seed_live_drift:T16 (P1)",
+    "gate (P0): the gate check 'T16-artefact-standard' did not pass; the gate check 'T16-rework' did not pass"
   ],
   "gate": "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds",
-  "generated_at": "2026-11-25T09:40:44.461458+00:00",
+  "generated_at": "2026-11-25T09:45:24.167529+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T16.toml",
   "name": "SOP, RDF/OWL and process-document ingestion",
   "project": "T16",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T08:47:56Z",
-    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
-    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
+    "generated_at": "2026-11-25T09:44:46Z",
+    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
   },
   "verdict": "red",
   "warnings": []

@@ -22,13 +22,13 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d34-7973-8989-0b83246fc888\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
       "exit": 1,
       "id": "T6-charter",
       "kind": "command",
       "result": "fail",
       "severity": "P0",
-      "stderr": "FAILED: CONVEYOR_SSH_KEY is required for the real transport\nTraceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    d=json.loads(s[s.find(\"{\"):])\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py\", line 371, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
       "stdout": ""
     },
     {
@@ -161,7 +161,7 @@
   "failures": [
     "T6-project (P0): status is 'closed', expected 'active'",
     "T6-baseline (P0): no project baseline",
-    "T6-charter (P0): exit 1: 15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 358, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/Homebrew/Cellar/python@3.15/3.15.2/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py\", line 376, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "T6-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
     "T6-contract (P0): no live board-approved delivery contract",
     "T6-review (P0): no Phase-G compliance review for the project's live contract",
     "T6-pi-cadence (P0): no PI cadence row for tranche-11",
@@ -177,16 +177,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "T6 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'a real feature lands: lane \u2192 PR \u2192 CI \u2192 review \u2192 merge \u2192 deploy \u2192 live verify; the project cannot change its own gates; rollback tested' \u2014 is the condition on which it may be closed, not a claim that it is met.",
-  "generated_at": "2026-11-25T08:48:08.014948+00:00",
+  "generated_at": "2026-11-25T09:45:24.955313+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T6.toml",
   "name": "Development project",
   "project": "T6",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T08:47:56Z",
-    "git_sha": "f207cd4f6651270b69b65c607ef89694eb88f8b0",
-    "path": "retained-snapshot/f207cd4f6651270b69b65c607ef89694eb88f8b0"
+    "generated_at": "2026-11-25T09:44:46Z",
+    "git_sha": "5481294a74997f9b7c8a8fd7212914624aa4dc21",
+    "path": "retained-snapshot/5481294a74997f9b7c8a8fd7212914624aa4dc21"
   },
   "verdict": "red",
   "warnings": []
