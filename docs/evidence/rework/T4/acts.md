@@ -23,3 +23,7 @@ T4: 46 acts in `transcript.jsonl`; the last run recorded 7.
 T4: 47 acts in `transcript.jsonl`; the last run recorded 1.
 
 T4: 110 acts in `transcript.jsonl`; the last run recorded 63.
+
+T4: 141 acts in `transcript.jsonl`; the last run recorded 31.
+
+T4: 155 acts in `transcript.jsonl`; the last run recorded 14.
