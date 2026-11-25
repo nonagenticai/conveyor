@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F live proof — T19F — Evidence · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gov/output-evidence.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f-live-proof--t19f--evidence">T19F live proof — T19F — Evidence</h1>
+<p>Action <code>documents.compose</code> then <code>documents.publish</code>; the body is <code>docs/evidence/t19f/evidence-output.md</code>, written to the output standard's required sections.</p>
+<pre><code>== write: documents.compose ==
+{
+  &quot;body&quot;: &quot;# T19F \u2014 Evidence\n\nWhat was claimed, what was measured, and what remains a gap.\n\n## Claim\n\nThe T19F forum bindings are delivered on `main` (`eb0deb61`) and proven on the deployed engine: a\nmeeting stays pinned to forum-policy v1 while the v2 route is exercised, a board subject is decided\nin a sitting whose per-seat decision row carries `via.surface=&#39;meeting&#39;`, and a cadence row\nmaterialises exactly one meeting. The policy v2 itself awaits one human review decision, which the\nproduct&#39;s authoring gate refuses to let a machine supply.\n\n## Evidence\n\n- Construction: PR #700 merged as `eb0deb61`; migration 0073 applied on the live database\n  (`_sqlx_migrations` max 73); the deployed image carries it (pod digest `9c80514d\u2026`).\n- Programme row: project `T19F` `01a210ba-b6cb-76cc-82a3-a2b45cfb498f` on its board, `programmes.refresh`\n  reports `created 0, skipped 52`.\n- Governance chain: `scripts/governance-chain.py --project T19F --check` passes 24/24 on the\n  published snapshot \u2014 seven approved artefacts, seven links, a live Statement of Architecture Work\n  and a live phase-F delivery contract (requester \u2260 approver), B7&#39;s baseline read back and not\n  overwritten, one Phase-G compliance review per contract (level `conformant`), and the published\n  `architecture-artifact` document with its Metadata/Entries/Links/Document headings.\n- Live gate: `scripts/t19f-live-gate-check.py --check` passes 11 of 12 invariants:\n  - the meeting `01a210c2-a327-7dc7-bab4-5a402a8497a8` is pinned at policy `t19f_live_gate_forum`\n    version 1; the pinned meeting still resolves v1 after the v2 route was exercised;\n  - the sitting body `01a210c8-579b-7808-bc32-aef8899b0b7a` decided contract\n    `01a210c8-7ea8-7dc9-8104-700ecfe2905b` in meeting `01a210c8-94ee-73ba-9147-88f2b4729ae0`;\n    approval `01a210c8-9273-7964-9b97-0f3dd810bcf3` is `approved` with exactly one decision row\n    carrying `via.surface=&#39;meeting&#39;` and naming the chair (`conveyor-approver`); the agenda item\n    closed as `decision`;\n  - cadence `01a210c9-0d47-7473-8339-7ea7648e59e9` materialised twice to the same meeting\n    `01a210c9-2397-73f1-8d07-7e8e807e524f`, carrying the bound forum type and the slot and not\n    cancelled.\n\n## Verification\n\n```\npython3 scripts/governance-chain.py --project T19F --check      # 24/24 PASS\npython3 scripts/t19f-live-gate-check.py --check                  # 11/12 PASS, 1 blocked\n```\n\nThe transports are `scripts/programme-record.py` (the deployed action surface) and, for the\nsnapshot, `docs/design/scripts/publish-data.sh`. Raw read-backs and acts are under\n`docs/evidence/t19f/` (`gate/`, `gov/`, `live-gate.json`, `live-gate-check.txt`,\n`publish-report-only.log`).\n\n## Links\n\n- Plan: `docs/plans/T19F-meeting-bindings.md`; artefacts under `docs/plans/T19F/`.\n- Implementation: PR #700 (`Closes #683`), merge `eb0deb61`.\n- This unit: issue #684.\n\n## Gap\n\n- **The policy v2 publish is blocked on one human review.** `authoring.review` requires the\n  approval&#39;s last decision to be `human`; the admin CLI records `service` by design, so the gate\n  refuses it verbatim (`BLOCKED policy v2: \u2026`). A person must approve the review gate in the\n  console, after which re-running `--apply` publishes v2 and the twelfth invariant passes. The\n  asset `01a210c3-7c34-7338-89f2-6c7a6e40bea7` and its approved gate\n  `01a210c3-9007-75f4-927c-d1dc32f54c6b` are in place for that click.\n- The strict conformance publish is red on programme-wide debt that predates this unit (T5, T6,\n  T8, T15 and T17 closed since the accepted baseline; their new/worsened P0s and the S18/S21/\n  SPEC-V2 ledger rows). The T19F finding is `project_in_unauthorised_tranche` P1 \u2014 T19F is active\n  in tranche 6, whose authorisation is #526&#39;s unit; the plan requires T19F to stay active until\n  the tranche-6 review, so this is the declared state, not a regression. The pack was therefore\n  published report-only with the exact findings in `publish-report-only.log`.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;evidence&quot;,
+  &quot;content_hash&quot;: &quot;9a1500aaaac63e62fe3e84af8b08d6c3f811dfe8639d09352483a831d45733dd&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-25T03:41:34.231212Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a210cb-6308-7552-861c-dad6bc5a3b9f&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;evidence&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;9a1500aaaac63e62fe3e84af8b08d6c3f811dfe8639d09352483a831d45733dd&quot;,
+    &quot;size_bytes&quot;: 3951,
+    &quot;unit&quot;: &quot;T19F&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: false,
+  &quot;published_at&quot;: null,
+  &quot;published_by&quot;: null,
+  &quot;published_by_name&quot;: null,
+  &quot;size_bytes&quot;: 3951,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;T19F \u2014 Evidence&quot;,
+  &quot;unit&quot;: &quot;T19F&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-25T03:41:34.231212Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: documents.get ==
+{
+  &quot;body&quot;: &quot;# T19F \u2014 Evidence\n\nWhat was claimed, what was measured, and what remains a gap.\n\n## Claim\n\nThe T19F forum bindings are delivered on `main` (`eb0deb61`) and proven on the deployed engine: a\nmeeting stays pinned to forum-policy v1 while the v2 route is exercised, a board subject is decided\nin a sitting whose per-seat decision row carries `via.surface=&#39;meeting&#39;`, and a cadence row\nmaterialises exactly one meeting. The policy v2 itself awaits one human review decision, which the\nproduct&#39;s authoring gate refuses to let a machine supply.\n\n## Evidence\n\n- Construction: PR #700 merged as `eb0deb61`; migration 0073 applied on the live database\n  (`_sqlx_migrations` max 73); the deployed image carries it (pod digest `9c80514d\u2026`).\n- Programme row: project `T19F` `01a210ba-b6cb-76cc-82a3-a2b45cfb498f` on its board, `programmes.refresh`\n  reports `created 0, skipped 52`.\n- Governance chain: `scripts/governance-chain.py --project T19F --check` passes 24/24 on the\n  published snapshot \u2014 seven approved artefacts, seven links, a live Statement of Architecture Work\n  and a live phase-F delivery contract (requester \u2260 approver), B7&#39;s baseline read back and not\n  overwritten, one Phase-G compliance review per contract (level `conformant`), and the published\n  `architecture-artifact` document with its Metadata/Entries/Links/Document headings.\n- Live gate: `scripts/t19f-live-gate-check.py --check` passes 11 of 12 invariants:\n  - the meeting `01a210c2-a327-7dc7-bab4-5a402a8497a8` is pinned at policy `t19f_live_gate_forum`\n    version 1; the pinned meeting still resolves v1 after the v2 route was exercised;\n  - the sitting body `01a210c8-579b-7808-bc32-aef8899b0b7a` decided contract\n    `01a210c8-7ea8-7dc9-8104-700ecfe2905b` in meeting `01a210c8-94ee-73ba-9147-88f2b4729ae0`;\n    approval `01a210c8-9273-7964-9b97-0f3dd810bcf3` is `approved` with exactly one decision row\n    carrying `via.surface=&#39;meeting&#39;` and naming the chair (`conveyor-approver`); the agenda item\n    closed as `decision`;\n  - cadence `01a210c9-0d47-7473-8339-7ea7648e59e9` materialised twice to the same meeting\n    `01a210c9-2397-73f1-8d07-7e8e807e524f`, carrying the bound forum type and the slot and not\n    cancelled.\n\n## Verification\n\n```\npython3 scripts/governance-chain.py --project T19F --check      # 24/24 PASS\npython3 scripts/t19f-live-gate-check.py --check                  # 11/12 PASS, 1 blocked\n```\n\nThe transports are `scripts/programme-record.py` (the deployed action surface) and, for the\nsnapshot, `docs/design/scripts/publish-data.sh`. Raw read-backs and acts are under\n`docs/evidence/t19f/` (`gate/`, `gov/`, `live-gate.json`, `live-gate-check.txt`,\n`publish-report-only.log`).\n\n## Links\n\n- Plan: `docs/plans/T19F-meeting-bindings.md`; artefacts under `docs/plans/T19F/`.\n- Implementation: PR #700 (`Closes #683`), merge `eb0deb61`.\n- This unit: issue #684.\n\n## Gap\n\n- **The policy v2 publish is blocked on one human review.** `authoring.review` requires the\n  approval&#39;s last decision to be `human`; the admin CLI records `service` by design, so the gate\n  refuses it verbatim (`BLOCKED policy v2: \u2026`). A person must approve the review gate in the\n  console, after which re-running `--apply` publishes v2 and the twelfth invariant passes. The\n  asset `01a210c3-7c34-7338-89f2-6c7a6e40bea7` and its approved gate\n  `01a210c3-9007-75f4-927c-d1dc32f54c6b` are in place for that click.\n- The strict conformance publish is red on programme-wide debt that predates this unit (T5, T6,\n  T8, T15 and T17 closed since the accepted baseline; their new/worsened P0s and the S18/S21/\n  SPEC-V2 ledger rows). The T19F finding is `project_in_unauthorised_tranche` P1 \u2014 T19F is active\n  in tranche 6, whose authorisation is #526&#39;s unit; the plan requires T19F to stay active until\n  the tranche-6 review, so this is the declared state, not a regression. The pack was therefore\n  published report-only with the exact findings in `publish-report-only.log`.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;evidence&quot;,
+  &quot;content_hash&quot;: &quot;9a1500aaaac63e62fe3e84af8b08d6c3f811dfe8639d09352483a831d45733dd&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-25T03:41:34.231212Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a210cb-6308-7552-861c-dad6bc5a3b9f&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;evidence&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;9a1500aaaac63e62fe3e84af8b08d6c3f811dfe8639d09352483a831d45733dd&quot;,
+    &quot;size_bytes&quot;: 3951,
+    &quot;unit&quot;: &quot;T19F&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: false,
+  &quot;published_at&quot;: null,
+  &quot;published_by&quot;: null,
+  &quot;published_by_name&quot;: null,
+  &quot;size_bytes&quot;: 3951,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;T19F \u2014 Evidence&quot;,
+  &quot;unit&quot;: &quot;T19F&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-25T03:41:34.231212Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}</code></pre>
+<pre><code>== write: documents.publish ==
+{
+  &quot;body&quot;: &quot;# T19F \u2014 Evidence\n\nWhat was claimed, what was measured, and what remains a gap.\n\n## Claim\n\nThe T19F forum bindings are delivered on `main` (`eb0deb61`) and proven on the deployed engine: a\nmeeting stays pinned to forum-policy v1 while the v2 route is exercised, a board subject is decided\nin a sitting whose per-seat decision row carries `via.surface=&#39;meeting&#39;`, and a cadence row\nmaterialises exactly one meeting. The policy v2 itself awaits one human review decision, which the\nproduct&#39;s authoring gate refuses to let a machine supply.\n\n## Evidence\n\n- Construction: PR #700 merged as `eb0deb61`; migration 0073 applied on the live database\n  (`_sqlx_migrations` max 73); the deployed image carries it (pod digest `9c80514d\u2026`).\n- Programme row: project `T19F` `01a210ba-b6cb-76cc-82a3-a2b45cfb498f` on its board, `programmes.refresh`\n  reports `created 0, skipped 52`.\n- Governance chain: `scripts/governance-chain.py --project T19F --check` passes 24/24 on the\n  published snapshot \u2014 seven approved artefacts, seven links, a live Statement of Architecture Work\n  and a live phase-F delivery contract (requester \u2260 approver), B7&#39;s baseline read back and not\n  overwritten, one Phase-G compliance review per contract (level `conformant`), and the published\n  `architecture-artifact` document with its Metadata/Entries/Links/Document headings.\n- Live gate: `scripts/t19f-live-gate-check.py --check` passes 11 of 12 invariants:\n  - the meeting `01a210c2-a327-7dc7-bab4-5a402a8497a8` is pinned at policy `t19f_live_gate_forum`\n    version 1; the pinned meeting still resolves v1 after the v2 route was exercised;\n  - the sitting body `01a210c8-579b-7808-bc32-aef8899b0b7a` decided contract\n    `01a210c8-7ea8-7dc9-8104-700ecfe2905b` in meeting `01a210c8-94ee-73ba-9147-88f2b4729ae0`;\n    approval `01a210c8-9273-7964-9b97-0f3dd810bcf3` is `approved` with exactly one decision row\n    carrying `via.surface=&#39;meeting&#39;` and naming the chair (`conveyor-approver`); the agenda item\n    closed as `decision`;\n  - cadence `01a210c9-0d47-7473-8339-7ea7648e59e9` materialised twice to the same meeting\n    `01a210c9-2397-73f1-8d07-7e8e807e524f`, carrying the bound forum type and the slot and not\n    cancelled.\n\n## Verification\n\n```\npython3 scripts/governance-chain.py --project T19F --check      # 24/24 PASS\npython3 scripts/t19f-live-gate-check.py --check                  # 11/12 PASS, 1 blocked\n```\n\nThe transports are `scripts/programme-record.py` (the deployed action surface) and, for the\nsnapshot, `docs/design/scripts/publish-data.sh`. Raw read-backs and acts are under\n`docs/evidence/t19f/` (`gate/`, `gov/`, `live-gate.json`, `live-gate-check.txt`,\n`publish-report-only.log`).\n\n## Links\n\n- Plan: `docs/plans/T19F-meeting-bindings.md`; artefacts under `docs/plans/T19F/`.\n- Implementation: PR #700 (`Closes #683`), merge `eb0deb61`.\n- This unit: issue #684.\n\n## Gap\n\n- **The policy v2 publish is blocked on one human review.** `authoring.review` requires the\n  approval&#39;s last decision to be `human`; the admin CLI records `service` by design, so the gate\n  refuses it verbatim (`BLOCKED policy v2: \u2026`). A person must approve the review gate in the\n  console, after which re-running `--apply` publishes v2 and the twelfth invariant passes. The\n  asset `01a210c3-7c34-7338-89f2-6c7a6e40bea7` and its approved gate\n  `01a210c3-9007-75f4-927c-d1dc32f54c6b` are in place for that click.\n- The strict conformance publish is red on programme-wide debt that predates this unit (T5, T6,\n  T8, T15 and T17 closed since the accepted baseline; their new/worsened P0s and the S18/S21/\n  SPEC-V2 ledger rows). The T19F finding is `project_in_unauthorised_tranche` P1 \u2014 T19F is active\n  in tranche 6, whose authorisation is #526&#39;s unit; the plan requires T19F to stay active until\n  the tranche-6 review, so this is the declared state, not a regression. The pack was therefore\n  published report-only with the exact findings in `publish-report-only.log`.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;evidence&quot;,
+  &quot;content_hash&quot;: &quot;9a1500aaaac63e62fe3e84af8b08d6c3f811dfe8639d09352483a831d45733dd&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-25T03:41:34.231212Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a210cb-6308-7552-861c-dad6bc5a3b9f&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;evidence&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;9a1500aaaac63e62fe3e84af8b08d6c3f811dfe8639d09352483a831d45733dd&quot;,
+    &quot;size_bytes&quot;: 3951,
+    &quot;unit&quot;: &quot;T19F&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: true,
+  &quot;published_at&quot;: &quot;2026-11-25T03:41:39.359669Z&quot;,
+  &quot;published_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;published_by_name&quot;: &quot;FR Test&quot;,
+  &quot;size_bytes&quot;: 3951,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;T19F \u2014 Evidence&quot;,
+  &quot;unit&quot;: &quot;T19F&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-25T03:41:39.359669Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}
+== read-back: documents.get ==
+{
+  &quot;body&quot;: &quot;# T19F \u2014 Evidence\n\nWhat was claimed, what was measured, and what remains a gap.\n\n## Claim\n\nThe T19F forum bindings are delivered on `main` (`eb0deb61`) and proven on the deployed engine: a\nmeeting stays pinned to forum-policy v1 while the v2 route is exercised, a board subject is decided\nin a sitting whose per-seat decision row carries `via.surface=&#39;meeting&#39;`, and a cadence row\nmaterialises exactly one meeting. The policy v2 itself awaits one human review decision, which the\nproduct&#39;s authoring gate refuses to let a machine supply.\n\n## Evidence\n\n- Construction: PR #700 merged as `eb0deb61`; migration 0073 applied on the live database\n  (`_sqlx_migrations` max 73); the deployed image carries it (pod digest `9c80514d\u2026`).\n- Programme row: project `T19F` `01a210ba-b6cb-76cc-82a3-a2b45cfb498f` on its board, `programmes.refresh`\n  reports `created 0, skipped 52`.\n- Governance chain: `scripts/governance-chain.py --project T19F --check` passes 24/24 on the\n  published snapshot \u2014 seven approved artefacts, seven links, a live Statement of Architecture Work\n  and a live phase-F delivery contract (requester \u2260 approver), B7&#39;s baseline read back and not\n  overwritten, one Phase-G compliance review per contract (level `conformant`), and the published\n  `architecture-artifact` document with its Metadata/Entries/Links/Document headings.\n- Live gate: `scripts/t19f-live-gate-check.py --check` passes 11 of 12 invariants:\n  - the meeting `01a210c2-a327-7dc7-bab4-5a402a8497a8` is pinned at policy `t19f_live_gate_forum`\n    version 1; the pinned meeting still resolves v1 after the v2 route was exercised;\n  - the sitting body `01a210c8-579b-7808-bc32-aef8899b0b7a` decided contract\n    `01a210c8-7ea8-7dc9-8104-700ecfe2905b` in meeting `01a210c8-94ee-73ba-9147-88f2b4729ae0`;\n    approval `01a210c8-9273-7964-9b97-0f3dd810bcf3` is `approved` with exactly one decision row\n    carrying `via.surface=&#39;meeting&#39;` and naming the chair (`conveyor-approver`); the agenda item\n    closed as `decision`;\n  - cadence `01a210c9-0d47-7473-8339-7ea7648e59e9` materialised twice to the same meeting\n    `01a210c9-2397-73f1-8d07-7e8e807e524f`, carrying the bound forum type and the slot and not\n    cancelled.\n\n## Verification\n\n```\npython3 scripts/governance-chain.py --project T19F --check      # 24/24 PASS\npython3 scripts/t19f-live-gate-check.py --check                  # 11/12 PASS, 1 blocked\n```\n\nThe transports are `scripts/programme-record.py` (the deployed action surface) and, for the\nsnapshot, `docs/design/scripts/publish-data.sh`. Raw read-backs and acts are under\n`docs/evidence/t19f/` (`gate/`, `gov/`, `live-gate.json`, `live-gate-check.txt`,\n`publish-report-only.log`).\n\n## Links\n\n- Plan: `docs/plans/T19F-meeting-bindings.md`; artefacts under `docs/plans/T19F/`.\n- Implementation: PR #700 (`Closes #683`), merge `eb0deb61`.\n- This unit: issue #684.\n\n## Gap\n\n- **The policy v2 publish is blocked on one human review.** `authoring.review` requires the\n  approval&#39;s last decision to be `human`; the admin CLI records `service` by design, so the gate\n  refuses it verbatim (`BLOCKED policy v2: \u2026`). A person must approve the review gate in the\n  console, after which re-running `--apply` publishes v2 and the twelfth invariant passes. The\n  asset `01a210c3-7c34-7338-89f2-6c7a6e40bea7` and its approved gate\n  `01a210c3-9007-75f4-927c-d1dc32f54c6b` are in place for that click.\n- The strict conformance publish is red on programme-wide debt that predates this unit (T5, T6,\n  T8, T15 and T17 closed since the accepted baseline; their new/worsened P0s and the S18/S21/\n  SPEC-V2 ledger rows). The T19F finding is `project_in_unauthorised_tranche` P1 \u2014 T19F is active\n  in tranche 6, whose authorisation is #526&#39;s unit; the plan requires T19F to stay active until\n  the tranche-6 review, so this is the declared state, not a regression. The pack was therefore\n  published report-only with the exact findings in `publish-report-only.log`.\n&quot;,
+  &quot;card_id&quot;: null,
+  &quot;category&quot;: &quot;evidence&quot;,
+  &quot;content_hash&quot;: &quot;9a1500aaaac63e62fe3e84af8b08d6c3f811dfe8639d09352483a831d45733dd&quot;,
+  &quot;content_type&quot;: &quot;text/markdown&quot;,
+  &quot;created_at&quot;: &quot;2026-11-25T03:41:34.231212Z&quot;,
+  &quot;created_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;created_by_name&quot;: &quot;FR Test&quot;,
+  &quot;external_ref&quot;: null,
+  &quot;id&quot;: &quot;01a210cb-6308-7552-861c-dad6bc5a3b9f&quot;,
+  &quot;kind&quot;: &quot;document&quot;,
+  &quot;meta&quot;: {
+    &quot;category&quot;: &quot;evidence&quot;,
+    &quot;content_type&quot;: &quot;text/markdown&quot;,
+    &quot;sha256&quot;: &quot;9a1500aaaac63e62fe3e84af8b08d6c3f811dfe8639d09352483a831d45733dd&quot;,
+    &quot;size_bytes&quot;: 3951,
+    &quot;unit&quot;: &quot;T19F&quot;
+  },
+  &quot;parent_document_id&quot;: null,
+  &quot;project_id&quot;: &quot;01a210ba-b6cb-76cc-82a3-a2b45cfb498f&quot;,
+  &quot;publish_requested_at&quot;: null,
+  &quot;publishable&quot;: true,
+  &quot;published_at&quot;: &quot;2026-11-25T03:41:39.359669Z&quot;,
+  &quot;published_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;published_by_name&quot;: &quot;FR Test&quot;,
+  &quot;size_bytes&quot;: 3951,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;title&quot;: &quot;T19F \u2014 Evidence&quot;,
+  &quot;unit&quot;: &quot;T19F&quot;,
+  &quot;updated_at&quot;: &quot;2026-11-25T03:41:39.359669Z&quot;,
+  &quot;updated_by&quot;: &quot;01a1cf1e-09dd-7580-99cc-de395f3e86cc&quot;,
+  &quot;updated_by_name&quot;: &quot;FR Test&quot;,
+  &quot;version&quot;: 1
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19f/gov/output-evidence.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
