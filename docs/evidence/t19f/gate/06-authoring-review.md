@@ -12,3 +12,60 @@ error: authoring.review refused (422): the input does not match the action schem
 command terminated with exit code 1
 FAILED: authoring.review: transport exited 1
 ```
+
+```
+== write: authoring.review ==
+{
+  "depends_on": [],
+  "id": "01a210c3-7c34-7338-89f2-6c7a6e40bea7",
+  "intake_id": "01a210c3-68d9-7caf-b5af-8ea62a0f422d",
+  "key": "t19f-live-gate-policy-v2",
+  "kind": "policy",
+  "payload": {
+    "meeting_type": {
+      "agenda_sources": [],
+      "decision_rule": "majority",
+      "evidence_minimum": 0,
+      "meeting_type_key": "t19f_live_gate_forum",
+      "name": "T19F live-gate forum v2",
+      "purpose": "The v2 published through the authoring route by the T19F live gate.",
+      "quorum": 1,
+      "required_participation": []
+    }
+  },
+  "published_at": null,
+  "published_meeting_type_id": null,
+  "review_approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
+  "status": "reviewed",
+  "version": 2
+}
+== read-back: authoring.assets ==
+{
+  "items": [
+    {
+      "depends_on": [],
+      "id": "01a210c3-7c34-7338-89f2-6c7a6e40bea7",
+      "intake_id": "01a210c3-68d9-7caf-b5af-8ea62a0f422d",
+      "key": "t19f-live-gate-policy-v2",
+      "kind": "policy",
+      "payload": {
+        "meeting_type": {
+          "agenda_sources": [],
+          "decision_rule": "majority",
+          "evidence_minimum": 0,
+          "meeting_type_key": "t19f_live_gate_forum",
+          "name": "T19F live-gate forum v2",
+          "purpose": "The v2 published through the authoring route by the T19F live gate.",
+          "quorum": 1,
+          "required_participation": []
+        }
+      },
+      "published_at": null,
+      "published_meeting_type_id": null,
+      "review_approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef",
+      "status": "reviewed",
+      "version": 2
+    }
+  ]
+}
+```

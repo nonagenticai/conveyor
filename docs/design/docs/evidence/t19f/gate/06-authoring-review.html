@@ -31,6 +31,60 @@ Defaulted container &quot;conveyor&quot; out of: conveyor, migrate (init)
 error: authoring.review refused (422): the input does not match the action schema
 command terminated with exit code 1
 FAILED: authoring.review: transport exited 1</code></pre>
+<pre><code>== write: authoring.review ==
+{
+  &quot;depends_on&quot;: [],
+  &quot;id&quot;: &quot;01a210c3-7c34-7338-89f2-6c7a6e40bea7&quot;,
+  &quot;intake_id&quot;: &quot;01a210c3-68d9-7caf-b5af-8ea62a0f422d&quot;,
+  &quot;key&quot;: &quot;t19f-live-gate-policy-v2&quot;,
+  &quot;kind&quot;: &quot;policy&quot;,
+  &quot;payload&quot;: {
+    &quot;meeting_type&quot;: {
+      &quot;agenda_sources&quot;: [],
+      &quot;decision_rule&quot;: &quot;majority&quot;,
+      &quot;evidence_minimum&quot;: 0,
+      &quot;meeting_type_key&quot;: &quot;t19f_live_gate_forum&quot;,
+      &quot;name&quot;: &quot;T19F live-gate forum v2&quot;,
+      &quot;purpose&quot;: &quot;The v2 published through the authoring route by the T19F live gate.&quot;,
+      &quot;quorum&quot;: 1,
+      &quot;required_participation&quot;: []
+    }
+  },
+  &quot;published_at&quot;: null,
+  &quot;published_meeting_type_id&quot;: null,
+  &quot;review_approval_id&quot;: &quot;01a211d8-001f-7296-bbc1-ccb13835a3ef&quot;,
+  &quot;status&quot;: &quot;reviewed&quot;,
+  &quot;version&quot;: 2
+}
+== read-back: authoring.assets ==
+{
+  &quot;items&quot;: [
+    {
+      &quot;depends_on&quot;: [],
+      &quot;id&quot;: &quot;01a210c3-7c34-7338-89f2-6c7a6e40bea7&quot;,
+      &quot;intake_id&quot;: &quot;01a210c3-68d9-7caf-b5af-8ea62a0f422d&quot;,
+      &quot;key&quot;: &quot;t19f-live-gate-policy-v2&quot;,
+      &quot;kind&quot;: &quot;policy&quot;,
+      &quot;payload&quot;: {
+        &quot;meeting_type&quot;: {
+          &quot;agenda_sources&quot;: [],
+          &quot;decision_rule&quot;: &quot;majority&quot;,
+          &quot;evidence_minimum&quot;: 0,
+          &quot;meeting_type_key&quot;: &quot;t19f_live_gate_forum&quot;,
+          &quot;name&quot;: &quot;T19F live-gate forum v2&quot;,
+          &quot;purpose&quot;: &quot;The v2 published through the authoring route by the T19F live gate.&quot;,
+          &quot;quorum&quot;: 1,
+          &quot;required_participation&quot;: []
+        }
+      },
+      &quot;published_at&quot;: null,
+      &quot;published_meeting_type_id&quot;: null,
+      &quot;review_approval_id&quot;: &quot;01a211d8-001f-7296-bbc1-ccb13835a3ef&quot;,
+      &quot;status&quot;: &quot;reviewed&quot;,
+      &quot;version&quot;: 2
+    }
+  ]
+}</code></pre>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/evidence/t19f/gate/06-authoring-review.md</code> at build time.</span>

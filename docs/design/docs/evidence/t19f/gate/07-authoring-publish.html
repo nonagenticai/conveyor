@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19F live gate — publishing the policy v2 · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/t19f/gate/07-authoring-publish.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19f-live-gate--publishing-the-policy-v2">T19F live gate — publishing the policy v2</h1>
+<p>Action <code>authoring.publish</code> for asset 01a210c3-7c34-7338-89f2-6c7a6e40bea7; the hook writes the next immutable <code>t19f_live_gate_forum</code> version.</p>
+<pre><code>== write: authoring.publish ==
+{
+  &quot;depends_on&quot;: [],
+  &quot;id&quot;: &quot;01a210c3-7c34-7338-89f2-6c7a6e40bea7&quot;,
+  &quot;intake_id&quot;: &quot;01a210c3-68d9-7caf-b5af-8ea62a0f422d&quot;,
+  &quot;key&quot;: &quot;t19f-live-gate-policy-v2&quot;,
+  &quot;kind&quot;: &quot;policy&quot;,
+  &quot;payload&quot;: {
+    &quot;meeting_type&quot;: {
+      &quot;agenda_sources&quot;: [],
+      &quot;decision_rule&quot;: &quot;majority&quot;,
+      &quot;evidence_minimum&quot;: 0,
+      &quot;meeting_type_key&quot;: &quot;t19f_live_gate_forum&quot;,
+      &quot;name&quot;: &quot;T19F live-gate forum v2&quot;,
+      &quot;purpose&quot;: &quot;The v2 published through the authoring route by the T19F live gate.&quot;,
+      &quot;quorum&quot;: 1,
+      &quot;required_participation&quot;: []
+    }
+  },
+  &quot;published_at&quot;: &quot;2026-11-25T08:37:59.051034Z&quot;,
+  &quot;published_meeting_type_id&quot;: &quot;01a211da-c391-7867-86dd-d22f9cfed5d5&quot;,
+  &quot;review_approval_id&quot;: &quot;01a211d8-001f-7296-bbc1-ccb13835a3ef&quot;,
+  &quot;status&quot;: &quot;published&quot;,
+  &quot;version&quot;: 3
+}
+== read-back: authoring.assets ==
+{
+  &quot;items&quot;: [
+    {
+      &quot;depends_on&quot;: [],
+      &quot;id&quot;: &quot;01a210c3-7c34-7338-89f2-6c7a6e40bea7&quot;,
+      &quot;intake_id&quot;: &quot;01a210c3-68d9-7caf-b5af-8ea62a0f422d&quot;,
+      &quot;key&quot;: &quot;t19f-live-gate-policy-v2&quot;,
+      &quot;kind&quot;: &quot;policy&quot;,
+      &quot;payload&quot;: {
+        &quot;meeting_type&quot;: {
+          &quot;agenda_sources&quot;: [],
+          &quot;decision_rule&quot;: &quot;majority&quot;,
+          &quot;evidence_minimum&quot;: 0,
+          &quot;meeting_type_key&quot;: &quot;t19f_live_gate_forum&quot;,
+          &quot;name&quot;: &quot;T19F live-gate forum v2&quot;,
+          &quot;purpose&quot;: &quot;The v2 published through the authoring route by the T19F live gate.&quot;,
+          &quot;quorum&quot;: 1,
+          &quot;required_participation&quot;: []
+        }
+      },
+      &quot;published_at&quot;: &quot;2026-11-25T08:37:59.051034Z&quot;,
+      &quot;published_meeting_type_id&quot;: &quot;01a211da-c391-7867-86dd-d22f9cfed5d5&quot;,
+      &quot;review_approval_id&quot;: &quot;01a211d8-001f-7296-bbc1-ccb13835a3ef&quot;,
+      &quot;status&quot;: &quot;published&quot;,
+      &quot;version&quot;: 3
+    }
+  ]
+}</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/t19f/gate/07-authoring-publish.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
