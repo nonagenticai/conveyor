@@ -401,6 +401,15 @@ pub struct RunOut {
     pub finished_at: Option<DateTime<Utc>>,
     #[serde(default)]
     pub version: i64,
+    /// The executor kind pinned at creation (T18-3c).
+    #[serde(default)]
+    pub executor_kind: Option<String>,
+    /// The job binding the run pinned (T18-3c).
+    #[serde(default)]
+    pub job_binding_id: Option<String>,
+    /// The release the binding pinned (T18-3c).
+    #[serde(default)]
+    pub release_hash: Option<String>,
     #[serde(default)]
     pub created_at: Option<DateTime<Utc>>,
 }
@@ -1096,6 +1105,45 @@ pub struct RunGet {
     pub tree: RunTree,
     #[serde(default)]
     pub inputs: Value,
+}
+
+/// `tool_calls.list` — one ledger row for the run inspector's tools panel (T18-3c).
+#[derive(Clone, Debug, Deserialize)]
+pub struct ToolCallOut {
+    pub id: String,
+    /// The canonical tool name the caller used.
+    #[serde(default)]
+    pub tool: String,
+    /// The toolkit key.
+    #[serde(default)]
+    pub toolkit: String,
+    /// The pinned toolkit version.
+    #[serde(default)]
+    pub toolkit_version: i64,
+    /// The exact tool version row.
+    pub tool_id: String,
+    /// `ok | precondition_failed | check_failed | pending | backend_error`.
+    pub status: String,
+    /// The destination's HTTP status.
+    #[serde(default)]
+    pub http_status: Option<i32>,
+    /// Latency in milliseconds.
+    #[serde(default)]
+    pub latency_ms: i32,
+    /// The grant's credential alias, when the call was authorised by a binding.
+    #[serde(default)]
+    pub credential_alias: Option<String>,
+    /// The run step's returned evidence, when the call recorded one.
+    #[serde(default)]
+    pub evidence: Value,
+    /// The failure class, when the call failed.
+    #[serde(default)]
+    pub error_class: Option<String>,
+    /// The failure message, when the call failed.
+    #[serde(default)]
+    pub error_message: Option<String>,
+    #[serde(default)]
+    pub created_at: Option<DateTime<Utc>>,
 }
 
 /// One run's tree edge: its parent, the step that started it, its depth and its children.

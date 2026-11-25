@@ -119,9 +119,11 @@ test("a failed probe unbinds new runs", async ({ page, request }) => {
   // The grant is now disabled in the ledger of grants; in-flight runs are untouched by the
   // broker (the screen says so rather than implying the run is killed).
   await page.getByRole("tab", { name: "Bindings" }).click();
+  // The full id, not its visible prefix: a UUIDv7's first eight characters change only about
+  // every 65 s, and another grant created in the same window would share them.
   const grant = page
     .getByTestId("tools-bindings")
-    .locator("tbody tr", { hasText: created.id.slice(0, 8) });
+    .locator(`tr[data-grant-id="${created.id}"]`);
   await expect(grant).toContainText("disabled");
   await expect(page.getByTestId("tools-bindings")).toContainText("in-flight");
 });

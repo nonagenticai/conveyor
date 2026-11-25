@@ -366,6 +366,18 @@ pub struct ToolCallListRow {
     pub http_status: Option<i32>,
     /// Latency in milliseconds.
     pub latency_ms: i32,
+    /// The grant's credential alias, when the call was authorised by a binding.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub credential_alias: Option<String>,
+    /// The run step's returned evidence, when the call recorded one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub evidence: Option<Value>,
+    /// The failure class, when the call failed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_class: Option<String>,
+    /// The failure message, when the call failed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_message: Option<String>,
     /// When the call was recorded.
     pub created_at: DateTime<Utc>,
 }
@@ -436,6 +448,10 @@ async fn tool_calls_list(
                 status: row.status,
                 http_status: row.http_status,
                 latency_ms: row.latency_ms,
+                credential_alias: row.credential_alias,
+                evidence: row.evidence,
+                error_class: row.error_class,
+                error_message: row.error_message,
                 created_at: row.created_at,
             })
             .collect(),

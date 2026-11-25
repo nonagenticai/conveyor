@@ -155,6 +155,15 @@ pub struct RunOut {
     /// The workflow node this run is a child of, when its parent runs a workflow (0037).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub workflow_step_id: Option<String>,
+    /// The job binding this run pinned (T18-3c).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_binding_id: Option<String>,
+    /// The release the binding pinned (T18-3c).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub release_hash: Option<String>,
+    /// The executor kind pinned when the run was created (T18-3c).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub executor_kind: Option<String>,
     /// When the run row was created.
     pub created_at: DateTime<Utc>,
     /// The run's declared outputs, keyed by the process's `outputs` names (S18 P3b).

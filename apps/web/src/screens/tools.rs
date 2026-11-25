@@ -613,6 +613,10 @@ fn bindings_panel(
                                     {data.bindings.iter().map(|row| {
                                         let enabled = row.get("enabled").and_then(Value::as_bool).unwrap_or(false);
                                         let full_id = row.get("id").and_then(Value::as_str).unwrap_or_default().to_owned();
+                                        // The full id addresses the row: `short_id` is the first eight
+                                        // characters of a UUIDv7, which only change about every 65 s, so
+                                        // two grants created in one window share the visible prefix.
+                                        let row_id = full_id.clone();
                                         let row_version = row.get("version").and_then(Value::as_i64).unwrap_or(0);
                                         // Selecting the row loads its own values, so an update of one
                                         // field cannot silently narrow the ceiling or clear the
@@ -620,7 +624,7 @@ fn bindings_panel(
                                         let row_ceiling = row.get("effect_ceiling").and_then(Value::as_str).unwrap_or("read").to_owned();
                                         let row_credential = row.get("credential_alias").and_then(Value::as_str).unwrap_or("").to_owned();
                                         view! {
-                                            <tr>
+                                            <tr data-grant-id=row_id>
                                                 <td class="mono">{short_id(row.get("id").and_then(Value::as_str))}</td>
                                                 <td class="mono">{short_id(row.get("job_binding_id").and_then(Value::as_str))}</td>
                                                 <td class="mono">{short_id(row.get("run_id").and_then(Value::as_str))}</td>
