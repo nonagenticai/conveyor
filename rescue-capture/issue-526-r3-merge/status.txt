@@ -1,0 +1,9 @@
+M  crates/actions/src/governance/trace.rs
+M  crates/actions/src/governance/views.rs
+ M crates/actions/tests/parity_http_mcp.rs
+ M crates/actions/tests/registry.rs
+ M crates/api/src/lib.rs
+ M crates/api/tests/s07_requests.rs
+M  crates/store/src/trace_link.rs
+MM crates/store/tests/s07_store.rs
+M  docs/evidence/t14/live-gate.md

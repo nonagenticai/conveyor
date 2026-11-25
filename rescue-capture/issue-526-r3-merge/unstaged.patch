@@ -1,0 +1,397 @@
+diff --git a/crates/actions/tests/parity_http_mcp.rs b/crates/actions/tests/parity_http_mcp.rs
+index 5d8fe99a..b1bd221e 100644
+--- a/crates/actions/tests/parity_http_mcp.rs
++++ b/crates/actions/tests/parity_http_mcp.rs
+@@ -3740,6 +3740,12 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
+             let id = seed_asset(pg, ctx, AssetKind::Requirement).await;
+             ctx.push("trace_links.create", id);
+         }
++        "trace_links.view" => {
++            // The view's requirement root: a fresh asset per round, so the two transports read
++            // the same chain (no cards, runs or evidence yet).
++            let id = seed_asset(pg, ctx, AssetKind::Requirement).await;
++            ctx.push("trace_links.view", id);
++        }
+         "trace_links.delete" => {
+             let id = seed_trace_edge(pg, ctx).await;
+             ctx.push("trace_links.delete", id);
+@@ -5538,6 +5544,14 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
+         // immutable and carries no version).
+         on_prepared("trace_links.delete", None),
+         plain("trace_links.list", json!({"to_id": ctx.anchor_card}), None),
++        {
++            // A requirement root: the prepared asset and its (empty) downward chain.
++            let mut sample = plain("trace_links.view", json!({}), None);
++            sample.prepare = true;
++            sample.input =
++                Box::new(|ctx: &Ctx| json!({"requirement_id": ctx.pop("trace_links.view")}));
++            expecting(sample, 200)
++        },
+         {
+             // Idempotent on `(tenant, external_ref)`, so the ref is minted per ROUND.
+             let mut sample = plain("project_requests.create", json!({}), None);
+diff --git a/crates/actions/tests/registry.rs b/crates/actions/tests/registry.rs
+index 5612268d..2a40468a 100644
+--- a/crates/actions/tests/registry.rs
++++ b/crates/actions/tests/registry.rs
+@@ -147,7 +147,9 @@ use serde_json::{Value, json};
+ /// with their handlers, so they do not appear here. T11's `metrics.reconciliation` read adds
+ /// one internal action and T11's billing shim adds one external read (`billing.rollup`):
+ /// **619: 594 internal, 25 external**.
+-const EXPECTED: [&str; 619] = [
++/// **v1-w2c-5 adds 1 internal**: `trace_links.view`, the bounded requirement/run chain read.
++/// 619 → **620: 595 internal, 25 external**.
++const EXPECTED: [&str; 620] = [
+     "actions.describe",
+     "actions.list",
+     "agent.run",
+@@ -722,6 +724,7 @@ const EXPECTED: [&str; 619] = [
+     "trace_links.create",
+     "trace_links.delete",
+     "trace_links.list",
++    "trace_links.view",
+     "tranches.authorise",
+     "tranches.create",
+     "tranches.delete",
+@@ -868,8 +871,9 @@ fn the_registry_is_exactly_the_declared_set() {
+     // `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` with their handlers.
+     // T11's `metrics.reconciliation` read adds one internal action.
+     // T11's billing shim adds one external read (`billing.rollup`).
+-    // Final: 594 internal + 25 external = 619.
+-    assert_eq!((internal, external), (594, 25));
++    // v1-w2c-5's `trace_links.view` adds one internal read.
++    // Final: 595 internal + 25 external = 620.
++    assert_eq!((internal, external), (595, 25));
+     println!(
+         "registry: {} actions ({} internal, {} external), all consistent",
+         registry.len(),
+diff --git a/crates/api/src/lib.rs b/crates/api/src/lib.rs
+index 6f7f00a3..2a791bf7 100644
+--- a/crates/api/src/lib.rs
++++ b/crates/api/src/lib.rs
+@@ -430,10 +430,11 @@ mod tests {
+         // S21 step 10's ladder.case, ladder.precheck and decision_option_sets.get|set are retired
+         // with the duplicate ladder path. T11's metrics.reconciliation read adds one internal
+         // action and T11's billing shim adds one external read (`billing.rollup`) — the merged
+-        // registry is 619: 594 internal, 25 external after the main merge.
++        // registry is 619: 594 internal, 25 external after the main merge. v1-w2c-5's
++        // `trace_links.view` adds one internal read: 620 (595 internal, 25 external).
+         assert_eq!(
+             registry.len(),
+-            619,
++            620,
+             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
+              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
+              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
+@@ -480,7 +481,8 @@ mod tests {
+              authoring.intakes; S21 step 10's ladder.case, ladder.precheck and \
+              decision_option_sets.get|set are retired with the duplicate ladder path; T11's \
+              metrics.reconciliation read is the 604th action; T11's billing shim adds one \
+-             external read (`billing.rollup`), the 619th (619: 594 internal, 25 external). \
++             external read (`billing.rollup`), the 619th (619: 594 internal, 25 external); \
++             v1-w2c-5's `trace_links.view` is the 620th (595 internal, 25 external). \
+              The count is asserted here because this crate serves the registry; a lane that adds \
+              an action bumps it."
+         );
+diff --git a/crates/api/tests/s07_requests.rs b/crates/api/tests/s07_requests.rs
+index 030651dc..d0fe6c05 100644
+--- a/crates/api/tests/s07_requests.rs
++++ b/crates/api/tests/s07_requests.rs
+@@ -526,6 +526,54 @@ async fn a_trace_link_is_visible_from_both_ends_and_never_across_tenants() {
+     assert_eq!(status, 409, "{body}");
+ }
+ 
++/// v1-w2c-5: the governance view takes exactly one root, and a root that does not resolve is
++/// a classified 404 rather than an empty chain.
++#[tokio::test(flavor = "multi_thread")]
++async fn trace_view_requires_exactly_one_root() {
++    let (_pg, running, _alice, _bob) = fixture(false).await;
++
++    // Neither root: the caller must name one.
++    let (status, body) = running
++        .invoke("trace_links.view", "dev:alice", json!({}), None, None, None)
++        .await;
++    assert_eq!(status, 422, "{body}");
++    assert!(
++        body["errors"]
++            .to_string()
++            .contains("requirement_id"),
++        "the refusal names the field: {body}"
++    );
++
++    // Both roots: ambiguity is refused as well.
++    let (status, body) = running
++        .invoke(
++            "trace_links.view",
++            "dev:alice",
++            json!({
++                "requirement_id": uuid::Uuid::now_v7(),
++                "run_id": uuid::Uuid::now_v7(),
++            }),
++            None,
++            None,
++            None,
++        )
++        .await;
++    assert_eq!(status, 422, "{body}");
++
++    // One root that does not exist in the tenant is a 404, not a schema error.
++    let (status, body) = running
++        .invoke(
++            "trace_links.view",
++            "dev:alice",
++            json!({"run_id": uuid::Uuid::now_v7()}),
++            None,
++            None,
++            None,
++        )
++        .await;
++    assert_eq!(status, 404, "{body}");
++}
++
+ #[tokio::test(flavor = "multi_thread")]
+ async fn a_dry_run_import_writes_nothing_and_a_real_one_imports_once() {
+     let (pg, running, alice, _bob) = fixture(false).await;
+@@ -665,7 +713,7 @@ async fn a_dry_run_import_writes_nothing_and_a_real_one_imports_once() {
+ }
+ 
+ #[tokio::test(flavor = "multi_thread")]
+-async fn the_twelve_governance_actions_are_registered_with_their_scopes() {
++async fn the_governance_actions_are_registered_with_their_scopes() {
+     let (_pg, running, _alice, _bob) = fixture(false).await;
+     let (status, body) = running
+         .http(
+@@ -683,6 +731,7 @@ async fn the_twelve_governance_actions_are_registered_with_their_scopes() {
+         ("trace_links.create", "governance:write"),
+         ("trace_links.delete", "governance:write"),
+         ("trace_links.list", "governance:read"),
++        ("trace_links.view", "governance:read"),
+         ("catalogues.list", "catalogues:read"),
+         ("catalogues.import", "catalogues:write"),
+         ("project_requests.create", "requests:write"),
+diff --git a/crates/store/tests/s07_store.rs b/crates/store/tests/s07_store.rs
+index 242dfa8b..053dd630 100644
+--- a/crates/store/tests/s07_store.rs
++++ b/crates/store/tests/s07_store.rs
+@@ -948,3 +948,221 @@ async fn catalogue_import_counts_created_updated_and_skipped_honestly() {
+     assert_eq!(type_label, "Bug fix (renamed)");
+     assert_eq!(type_version, 2);
+ }
++
++/// v1-w2c-5 / SPEC_V2 §8.5: the trace chain continues past the card. The view answers
++/// "which requirement does this run prove, and where is its evidence" from both roots:
++/// requirement → cards → runs → steps/artefacts/evidence, with the edges among those nodes.
++#[tokio::test]
++async fn the_trace_view_walks_requirement_to_run_step_artefact_and_evidence() {
++    let db = support::TestDb::fresh().await;
++    let seed = support::seed_tenant(&db.super_pool, "s07-trace-view").await;
++    let tenant = TenantId::from_uuid(seed.tenant).expect("non-nil");
++
++    // The requirement → card edge through the writer (the seed's own row uses the S03 legacy
++    // `requirement` type, which the whitelist does not admit).
++    let requirement_card = {
++        let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
++        let link = insert_trace_link_tx(
++            &mut tx,
++            tenant,
++            &NewTraceLink::new("governed_asset", seed.asset, "card", seed.card),
++        )
++        .await
++        .expect("the requirement → card edge");
++        tx.commit().await.expect("commit");
++        link
++    };
++
++    // The run's own evidence: one step, one runner artefact reached through the attempt its
++    // `run.execute` job dispatched, and one governed tool call.
++    let step: Uuid = sqlx::query_scalar(
++        "INSERT INTO run_step (tenant_id, run_id, position, action, status)
++         VALUES ($1, $2, 1, 'cards.get', 'succeeded') RETURNING id",
++    )
++    .bind(seed.tenant)
++    .bind(seed.run)
++    .fetch_one(&db.super_pool)
++    .await
++    .expect("seed the run step");
++
++    let job: Uuid = sqlx::query_scalar(
++        "INSERT INTO job (tenant_id, kind, dedupe_key, payload, status)
++         VALUES ($1, 'run.execute', $2, $3, 'succeeded') RETURNING id",
++    )
++    .bind(seed.tenant)
++    .bind(format!("run:{}", seed.run))
++    .bind(json!({"run_id": seed.run}))
++    .fetch_one(&db.super_pool)
++    .await
++    .expect("seed the run.execute job");
++
++    let attempt: Uuid = sqlx::query_scalar(
++        "INSERT INTO runner_run
++             (tenant_id, job_id, attempt, image, namespace, job_name, instruction, status)
++         VALUES ($1, $2, 1, 'test:latest', 'test', 'test-run', '{}'::jsonb, 'succeeded')
++         RETURNING id",
++    )
++    .bind(seed.tenant)
++    .bind(job)
++    .fetch_one(&db.super_pool)
++    .await
++    .expect("seed the runner attempt");
++
++    let artefact: Uuid = sqlx::query_scalar(
++        "INSERT INTO runner_artefact
++             (tenant_id, run_id, name, sha256, bytes, content_type, object_key)
++         VALUES ($1, $2, 'summary.txt', repeat('a', 64), 12, 'text/plain', 'run/summary.txt')
++         RETURNING id",
++    )
++    .bind(seed.tenant)
++    .bind(attempt)
++    .fetch_one(&db.super_pool)
++    .await
++    .expect("seed the runner artefact");
++
++    let toolkit: Uuid = sqlx::query_scalar(
++        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, owner)
++         VALUES ($1, 's07_test', 1, 'S07 trace view', 's07_test', 'test') RETURNING id",
++    )
++    .bind(seed.tenant)
++    .fetch_one(&db.super_pool)
++    .await
++    .expect("seed the toolkit");
++    let tool: Uuid = sqlx::query_scalar(
++        "INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, handler_action)
++         VALUES ($1, $2, 'call', '{}'::jsonb, 'read', 'tools.probe') RETURNING id",
++    )
++    .bind(seed.tenant)
++    .bind(toolkit)
++    .fetch_one(&db.super_pool)
++    .await
++    .expect("seed the tool");
++
++    let evidence: Uuid = sqlx::query_scalar(
++        "INSERT INTO tool_call
++             (tenant_id, run_id, run_step_id, card_id, tool_id, tool_key, toolkit_key,
++              toolkit_version, input_hash, status, latency_ms, http_status)
++         VALUES ($1, $2, $3, $4, $5, 's07_test.call', 's07_test', 1, repeat('b', 64), 'ok', 5, 200)
++         RETURNING id",
++    )
++    .bind(seed.tenant)
++    .bind(seed.run)
++    .bind(step)
++    .bind(seed.card)
++    .bind(tool)
++    .fetch_one(&db.super_pool)
++    .await
++    .expect("seed the governed tool call");
++
++    // The new ends resolve through the same tenant-scoped writer: run → step and
++    // artefact → evidence.
++    let (run_step_edge, artefact_evidence_edge) = {
++        let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
++        let run_step = insert_trace_link_tx(
++            &mut tx,
++            tenant,
++            &NewTraceLink::new("run", seed.run, "step", step),
++        )
++        .await
++        .expect("run → step");
++        let artefact_evidence = insert_trace_link_tx(
++            &mut tx,
++            tenant,
++            &NewTraceLink::new("artefact", artefact, "evidence", evidence),
++        )
++        .await
++        .expect("artefact → evidence");
++        tx.commit().await.expect("commit the new ends");
++        (run_step, artefact_evidence)
++    };
++
++    // Requirement root: the asset, its card, the card's run and the run's evidence.
++    let requirement_view = {
++        let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
++        let view = view_trace_tx(&mut tx, tenant, TraceRoot::Requirement(seed.asset))
++            .await
++            .expect("the requirement view");
++        tx.rollback().await.expect("roll back the read");
++        view
++    };
++    assert_eq!(requirement_view.root.root_type, "requirement");
++    assert_eq!(requirement_view.root.id, seed.asset);
++    assert_eq!(requirement_view.root.kind.as_deref(), Some("requirement"));
++    assert!(!requirement_view.truncated, "the fixture is under every cap");
++    assert!(
++        requirement_view
++            .cards
++            .iter()
++            .any(|card| card.id == seed.card),
++        "the requirement's card: {:?}",
++        requirement_view.cards
++    );
++    assert!(requirement_view.runs.iter().any(|run| run.id == seed.run));
++    assert!(requirement_view.steps.iter().any(|row| row.id == step));
++    assert!(
++        requirement_view
++            .artefacts
++            .iter()
++            .any(|row| row.id == artefact && row.run_id == seed.run),
++        "the run's artefact: {:?}",
++        requirement_view.artefacts
++    );
++    assert!(
++        requirement_view
++            .evidence
++            .iter()
++            .any(|row| row.id == evidence && row.run_id == Some(seed.run)),
++        "the run's governed call: {:?}",
++        requirement_view.evidence
++    );
++    for edge in [
++        requirement_card.id,
++        run_step_edge.id,
++        artefact_evidence_edge.id,
++    ] {
++        assert!(
++            requirement_view.edges.iter().any(|row| row.id == edge),
++            "edge {edge} is listed with the chain: {:?}",
++            requirement_view.edges
++        );
++    }
++
++    // Run root: the same chain from the run's own card.
++    let run_view = {
++        let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
++        let view = view_trace_tx(&mut tx, tenant, TraceRoot::Run(seed.run))
++            .await
++            .expect("the run view");
++        tx.rollback().await.expect("roll back the read");
++        view
++    };
++    assert_eq!(run_view.root.root_type, "run");
++    assert_eq!(run_view.root.id, seed.run);
++    assert_eq!(run_view.root.card_id, Some(seed.card));
++    assert!(run_view.cards.iter().any(|card| card.id == seed.card));
++    assert!(run_view.runs.iter().any(|run| run.id == seed.run));
++    assert!(run_view.steps.iter().any(|row| row.id == step));
++    assert!(run_view.artefacts.iter().any(|row| row.id == artefact));
++    assert!(run_view.evidence.iter().any(|row| row.id == evidence));
++    assert!(
++        run_view
++            .edges
++            .iter()
++            .any(|row| row.id == requirement_card.id)
++    );
++
++    // An absent root is a classified 404, not an empty view.
++    let missing = {
++        let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
++        let missing = view_trace_tx(&mut tx, tenant, TraceRoot::Run(Uuid::now_v7())).await;
++        tx.rollback().await.expect("roll back the refusal");
++        missing
++    };
++    assert!(
++        matches!(
++            missing,
++            Err(TraceLinkStoreError::RootNotFound { root: "run", .. })
++        ),
++        "unknown root: {missing:?}"
++    );
++}
