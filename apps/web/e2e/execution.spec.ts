@@ -104,28 +104,22 @@ test("the tools panel names the tool version, credential alias and outcome", asy
     "toolkits.list",
     { page: { limit: 200 }, status: "published" },
   );
-  const toolkit = toolkits.items[0];
-  expect(toolkit, "toolkits.publish makes the embedded manifests readable").toBeTruthy();
-  const tools = await invoke<{ items: { tool: string; toolkit: string }[] }>(
-    request,
-    "tools.list",
-    { page: { limit: 200 } },
-  );
-  const tool = tools.items.find((row) => row.toolkit === toolkit!.key);
-  expect(tool, "the toolkit has a published operation").toBeTruthy();
+  const toolkit = toolkits.items.find((row) => row.key === "lean4");
+  expect(toolkit, "toolkits.publish makes the Lean toolkit readable").toBeTruthy();
   await invoke(request, "tool_bindings.create", {
     job_binding_id: pinned.id,
     toolkit_id: toolkit!.id,
     effect_ceiling: "read",
-    credential_alias: "coding.tenant",
+    credential_alias: "lean4.tenant",
   });
 
-  // The dev estate has no external destination URL, so the call itself fails — but the ledger
-  // row (tool version, grant alias, outcome) is real and is what the panel must name.
+  // `lean4.check` declares no required input, so `{}` reaches the broker's ledger. The dev
+  // estate has no Lean destination URL, so the call's outcome is its failure — still a ledger
+  // row naming the tool version, the grant alias and the outcome.
   try {
     await invoke(request, "tools.call", {
       run_id: run.id,
-      tool: `${tool!.toolkit}.${tool!.tool}`,
+      tool: "lean4.check",
       input: {},
     });
   } catch {
@@ -140,8 +134,8 @@ test("the tools panel names the tool version, credential alias and outcome", asy
 
   const panel = page.getByTestId("execution-tool-calls");
   await expect(panel).toBeVisible();
-  await expect(panel).toContainText(`${tool!.toolkit}.${tool!.tool}`);
-  await expect(panel).toContainText("coding.tenant");
+  await expect(panel).toContainText("lean4.check");
+  await expect(panel).toContainText("lean4.tenant");
   await expect(panel.locator("tbody tr").first()).not.toBeEmpty();
   await expect(page.locator(".problem")).toHaveCount(0);
 });
