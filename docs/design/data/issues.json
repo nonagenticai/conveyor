@@ -5666,7 +5666,7 @@
       "title": "CI cost: merge-run tree equality (deferred, measurement-gated)",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/22",
-      "updatedAt": "2026-11-24T19:59:18Z",
+      "updatedAt": "2026-11-25T00:56:10Z",
       "labels": [
         {
           "name": "unit",
