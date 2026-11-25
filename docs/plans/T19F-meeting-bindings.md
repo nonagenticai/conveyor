@@ -1,12 +1,12 @@
 ---
 slice: T19F
 title: Decision-forum governance — policy authoring and the T9/T10 binding
-status: proposed
+status: built
 depends_on: [T19, T17, T9, T10, P0]
 spec_sections: ["§6.8", "§8.1", "§8.2", "§8.3", "§12 T19", "§12 T19F", "D66"]
 adds_tables: []
 adds_actions: [meetings.type_list, meetings.type_get, architecture.board_sit_open, architecture.board_sit_decide, cadences.materialise]
-adds_events: [meeting_type.published]
+adds_events: []
 adds_modules: []
 parity_ids: []
 ---
@@ -89,9 +89,10 @@ one arithmetic T19 already proves. A quorum miss defers `inquorate`; it is not a
 
 `programme_cadence.meeting_type_key` names the forum type for PI planning, the demo, the retro or a
 refinement. `cadences.materialise` resolves the latest non-retired version, schedules the meeting
-with the slot, and returns the existing non-cancelled instance on a repeat. A partial unique index
-on `(tenant_id, cadence_slot)` for non-cancelled meetings makes "one cadence row, one meeting" the
-database's promise; a cancelled instance may be replaced.
+with the slot, and returns the existing non-cancelled instance on a repeat. The one-instance
+promise is enforced by locking the cadence row (`SELECT … FOR UPDATE`) before the existing-instance
+lookup, because T19's `uq_meeting_live` already owns the slot rule and permits a second *scheduled*
+meeting; a stronger unique index would change that contract. A cancelled instance may be replaced.
 
 ### 4.4 What does not change
 
@@ -103,7 +104,7 @@ RLS and audit rules are the existing rows'.
 
 ### P1 — The policy authoring route
 
-Migration `0068_meeting_bindings.sql`; the `authoring.publish` hook; `meetings.type_list/get`.
+Migration `0073_meeting_bindings.sql`; the `authoring.publish` hook; `meetings.type_list/get`.
 
 - Given a live meeting pinned to a policy's v1, when a reviewed `kind=policy` asset for the same key
   is published, then a v2 row exists and the meeting still resolves v1.
@@ -133,7 +134,7 @@ Migration `0068_meeting_bindings.sql`; the `authoring.publish` hook; `meetings.t
 
 ### P3 — The cadence materialisation
 
-`programme_cadence.meeting_type_key`; the one-instance index; `cadences.materialise`.
+`programme_cadence.meeting_type_key`; the materialise row lock; `cadences.materialise`.
 
 - Given a cadence row with a type, when materialise is called twice, then one non-cancelled meeting
   exists with the bound type and the slot.
@@ -172,14 +173,14 @@ governance chain, the live gate and the strict programme publish.
 
 ## 6. Data model
 
-`migrations/0068_meeting_bindings.sql`, additive only:
+`migrations/0073_meeting_bindings.sql`, additive only:
 
 | Object | Change |
 |---|---|
 | `authoring_asset` | `published_meeting_type_id uuid NULL REFERENCES meeting_type(id)`, `CHECK (published_meeting_type_id IS NULL OR kind = 'policy')`, partial unique index on the column |
 | `governance_body` | `meeting_type_key text NULL`, `CHECK (IS NULL OR btrim(...) <> '')` |
 | `programme_cadence` | `meeting_type_key text NULL`, same blank check |
-| `meeting` | `CREATE UNIQUE INDEX uq_meeting_cadence_instance ON meeting (tenant_id, cadence_slot) WHERE cadence_slot IS NOT NULL AND status <> 'cancelled'` |
+| `meeting` | none — T19's `uq_meeting_live` is unchanged; `materialise_cadence_tx` locks the cadence row so the one-instance rule does not become a stronger scheduling rule |
 
 No new table. No FK on a versioned key: the actions resolve the latest non-retired version.
 
@@ -194,7 +195,8 @@ No new table. No FK on a versioned key: the actions resolve the latest non-retir
 | `cadences.materialise` | write | idempotent per cadence slot |
 | `authoring.publish` | write (changed) | a `kind=policy` payload writes the next `meeting_type` version |
 
-Events: `meeting_type.published` on the authoring publish. The meeting events stay T19's.
+No new event: the authoring publish keeps T17's event surface, and the meeting events stay
+T19's.
 
 ## 8. The programme
 

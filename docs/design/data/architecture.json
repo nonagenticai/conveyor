@@ -18263,6 +18263,446 @@
       "version": 2
     },
     {
+      "artifact_kind": "catalog",
+      "artifact_type_id": "01a1f2c1-1406-747c-a7e8-b30353a58eaf",
+      "artifact_version": 1,
+      "change_initiative": "",
+      "contract_id": null,
+      "created_at": "2026-11-25T03:24:43.470913+00:00",
+      "document_id": null,
+      "entries": [
+        {
+          "artifact_id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+          "axis_a": "DR1",
+          "axis_b": "driver",
+          "created_at": "2026-11-25T03:24:43.470913+00:00",
+          "id": "01a210bb-f723-755f-903b-c65c4f1525da",
+          "position": 0,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:43.470913+00:00",
+          "value": "A policy change today has no route: the meeting type is versioned but only the schedule creates v1, and an inline policy is refused.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+          "axis_a": "G1",
+          "axis_b": "goal",
+          "created_at": "2026-11-25T03:24:43.470913+00:00",
+          "id": "01a210bb-f73e-72ac-8dca-5088dbb42ca5",
+          "position": 1,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:43.470913+00:00",
+          "value": "A governed policy lifecycle: a reviewed authoring asset publishes the next immutable meeting_type version.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+          "axis_a": "O1",
+          "axis_b": "objective",
+          "created_at": "2026-11-25T03:24:43.470913+00:00",
+          "id": "01a210bb-f758-7b3e-923d-4cd5a538e77d",
+          "position": 2,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:43.470913+00:00",
+          "value": "A reviewed kind=policy asset publishes v2 while an in-flight meeting still resolves v1.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+          "axis_a": "DR2",
+          "axis_b": "driver",
+          "created_at": "2026-11-25T03:24:43.470913+00:00",
+          "id": "01a210bb-f773-7296-9ff1-985ed1686368",
+          "position": 3,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:43.470913+00:00",
+          "value": "The board's deliberation is not recorded as a meeting: architecture.board_decide writes one approval row directly.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+          "axis_a": "G2",
+          "axis_b": "goal",
+          "created_at": "2026-11-25T03:24:43.470913+00:00",
+          "id": "01a210bb-f78d-7b53-8e22-efc324a16535",
+          "position": 4,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:43.470913+00:00",
+          "value": "A seated board decision taken in a sitting, one approval_decision row per qualifying seat with via='meeting'.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+          "axis_a": "O2",
+          "axis_b": "objective",
+          "created_at": "2026-11-25T03:24:43.470913+00:00",
+          "id": "01a210bb-f7a8-7281-9bef-783b2b9eaa23",
+          "position": 5,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:43.470913+00:00",
+          "value": "A sitting on a real subject closes through T19's close_item_tx and the approval status matches the derived rule.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+          "axis_a": "DR3",
+          "axis_b": "driver",
+          "created_at": "2026-11-25T03:24:43.470913+00:00",
+          "id": "01a210bb-f7c1-7cc8-b9f1-35fc9bbf1398",
+          "position": 6,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:43.470913+00:00",
+          "value": "A cadence slot is scheduled by hand.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+          "axis_a": "G3",
+          "axis_b": "goal",
+          "created_at": "2026-11-25T03:24:43.470913+00:00",
+          "id": "01a210bb-f7db-7787-bf1b-1af3cadaa200",
+          "position": 7,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:43.470913+00:00",
+          "value": "A cadence-driven forum: a cadence row names its meeting_type and materialises its meeting.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+          "axis_a": "O3",
+          "axis_b": "objective",
+          "created_at": "2026-11-25T03:24:43.470913+00:00",
+          "id": "01a210bb-f7f4-7bec-9278-02ffa6e0fefb",
+          "position": 8,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:43.470913+00:00",
+          "value": "cadences.materialise called twice yields exactly one non-cancelled meeting with the bound type and the slot.",
+          "version": 1
+        }
+      ],
+      "id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+      "meta": {},
+      "phase_code": "a",
+      "plateau": "psa",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "purpose": "Why the forum bindings exist and what they are measured against.",
+      "scope": "§PSA drivers, goals and objectives of the T19F architecture design.",
+      "stakeholders": [],
+      "status": "approved",
+      "title": "T19F — Drivers, goals and objectives",
+      "updated_at": "2026-11-25T03:24:48.589282+00:00",
+      "version": 2
+    },
+    {
+      "artifact_kind": "catalog",
+      "artifact_type_id": "01a1f2c1-1421-7aa2-9f15-39948d9a84ab",
+      "artifact_version": 1,
+      "change_initiative": "",
+      "contract_id": null,
+      "created_at": "2026-11-25T03:24:53.853655+00:00",
+      "document_id": null,
+      "entries": [
+        {
+          "artifact_id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+          "axis_a": "R1",
+          "axis_b": "condition",
+          "created_at": "2026-11-25T03:24:53.853655+00:00",
+          "id": "01a210bc-1fb4-78b9-b66b-bcf0dec5674f",
+          "position": 0,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:53.853655+00:00",
+          "value": "A policy change publishes a new immutable version.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+          "axis_a": "R2",
+          "axis_b": "condition",
+          "created_at": "2026-11-25T03:24:53.853655+00:00",
+          "id": "01a210bc-1fcf-72ea-b9ae-69577fc04295",
+          "position": 1,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:53.853655+00:00",
+          "value": "A policy change passes a human review gate (T17 authoring.review).",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+          "axis_a": "R3",
+          "axis_b": "condition",
+          "created_at": "2026-11-25T03:24:53.853655+00:00",
+          "id": "01a210bc-1fe9-7638-b51c-e21ec9af4510",
+          "position": 2,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:53.853655+00:00",
+          "value": "An in-flight meeting keeps its pinned version.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+          "axis_a": "R4",
+          "axis_b": "condition",
+          "created_at": "2026-11-25T03:24:53.853655+00:00",
+          "id": "01a210bc-2003-764b-b927-52967a4f30d2",
+          "position": 3,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:53.853655+00:00",
+          "value": "A board subject decision can be taken in a sitting.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+          "axis_a": "R5",
+          "axis_b": "condition",
+          "created_at": "2026-11-25T03:24:53.853655+00:00",
+          "id": "01a210bc-201f-712e-9eee-4025b42dc058",
+          "position": 4,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:53.853655+00:00",
+          "value": "A sitting writes one approval_decision per qualifying seat with via='meeting'.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+          "axis_a": "R6",
+          "axis_b": "condition",
+          "created_at": "2026-11-25T03:24:53.853655+00:00",
+          "id": "01a210bc-2039-765f-a1d0-c757698d9578",
+          "position": 5,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:53.853655+00:00",
+          "value": "A cadence row names its meeting type and materialises one meeting.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+          "axis_a": "R7",
+          "axis_b": "constraint",
+          "created_at": "2026-11-25T03:24:53.853655+00:00",
+          "id": "01a210bc-2053-7434-8e04-0d3c52ef3662",
+          "position": 6,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:53.853655+00:00",
+          "value": "The direct board path is unchanged.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+          "axis_a": "R8",
+          "axis_b": "constraint",
+          "created_at": "2026-11-25T03:24:53.853655+00:00",
+          "id": "01a210bc-206c-7ac7-9fb5-2798cebbbd1f",
+          "position": 7,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:53.853655+00:00",
+          "value": "The policy and cadence bindings are tenant-scoped and RLS-guarded.",
+          "version": 1
+        }
+      ],
+      "id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+      "meta": {},
+      "phase_code": "a",
+      "plateau": "psa",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "purpose": "The typed conditions and constraints the design satisfies.",
+      "scope": "§PSA requirements R1–R8 of the T19F architecture design; docs/SPEC_V2.md §6.8, §12 T19F.",
+      "stakeholders": [],
+      "status": "approved",
+      "title": "T19F — Requirements catalog",
+      "updated_at": "2026-11-25T03:24:58.9698+00:00",
+      "version": 2
+    },
+    {
+      "artifact_kind": "diagram",
+      "artifact_type_id": "01a1f2c1-143c-73a5-8820-83771e8602ca",
+      "artifact_version": 1,
+      "change_initiative": "",
+      "contract_id": null,
+      "created_at": "2026-11-25T03:25:03.812078+00:00",
+      "document_id": null,
+      "entries": [
+        {
+          "artifact_id": "01a210bc-465a-7d83-b9c6-7c7b089d8b02",
+          "axis_a": "Authoring asset (kind=policy)",
+          "axis_b": "the draft",
+          "created_at": "2026-11-25T03:25:03.812078+00:00",
+          "id": "01a210bc-468f-74be-9efb-8fbcb4bb9839",
+          "position": 0,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:03.812078+00:00",
+          "value": "The payload carries the meeting_type; publishing the reviewed asset is the release.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-465a-7d83-b9c6-7c7b089d8b02",
+          "axis_a": "meeting_type",
+          "axis_b": "the runtime policy",
+          "created_at": "2026-11-25T03:25:03.812078+00:00",
+          "id": "01a210bc-46a9-7006-92df-7149d171f16d",
+          "position": 1,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:03.812078+00:00",
+          "value": "An immutable version written by authoring.publish; meetings pin a version.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-465a-7d83-b9c6-7c7b089d8b02",
+          "axis_a": "Board sitting",
+          "axis_b": "the decision",
+          "created_at": "2026-11-25T03:25:03.812078+00:00",
+          "id": "01a210bc-46c2-78d2-86fd-b6d8363773a9",
+          "position": 2,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:03.812078+00:00",
+          "value": "An approval + a live meeting + a deciding agenda item; the decision is T19's close_item_tx arithmetic over positions and the linked approval's stricter policy.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-465a-7d83-b9c6-7c7b089d8b02",
+          "axis_a": "Cadence materialisation",
+          "axis_b": "the schedule",
+          "created_at": "2026-11-25T03:25:03.812078+00:00",
+          "id": "01a210bc-46db-7ad9-81a2-995d0316c746",
+          "position": 3,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:03.812078+00:00",
+          "value": "A schedule carrying the slot and the cadence's pinned type, serialised on the cadence row; nothing else is added.",
+          "version": 1
+        }
+      ],
+      "id": "01a210bc-465a-7d83-b9c6-7c7b089d8b02",
+      "meta": {},
+      "phase_code": "a",
+      "plateau": "psa",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "purpose": "The four elements of the binding and how each keeps the one decision store.",
+      "scope": "§PSA solution concept of the T19F architecture design.",
+      "stakeholders": [],
+      "status": "approved",
+      "title": "T19F — Solution concept",
+      "updated_at": "2026-11-25T03:25:08.537034+00:00",
+      "version": 2
+    },
+    {
+      "artifact_kind": "matrix",
+      "artifact_type_id": "01a1f2c1-13ea-7764-afc8-4f6322e0ad3e",
+      "artifact_version": 1,
+      "change_initiative": "",
+      "contract_id": null,
+      "created_at": "2026-11-25T03:24:33.455544+00:00",
+      "document_id": null,
+      "entries": [
+        {
+          "artifact_id": "01a210bb-cfc9-72ec-85f5-619bf730fff9",
+          "axis_a": "SRO / sponsoring group",
+          "axis_b": "the board's decisions are deliberated and evidenced",
+          "created_at": "2026-11-25T03:24:33.455544+00:00",
+          "id": "01a210bb-cffe-7e78-8856-58b08ae87f0f",
+          "position": 0,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:33.455544+00:00",
+          "value": {
+            "engagement": "tranche review; the programme board",
+            "influence": "high",
+            "interest": "high"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-cfc9-72ec-85f5-619bf730fff9",
+          "axis_a": "Programme manager",
+          "axis_b": "the tranche-6 evidence and B7",
+          "created_at": "2026-11-25T03:24:33.455544+00:00",
+          "id": "01a210bb-d019-7029-9acf-22a57185fc1d",
+          "position": 1,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:33.455544+00:00",
+          "value": {
+            "engagement": "the meeting record",
+            "influence": "high",
+            "interest": "high"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-cfc9-72ec-85f5-619bf730fff9",
+          "axis_a": "Architecture Board",
+          "axis_b": "the sitting path, contracts and artefacts",
+          "created_at": "2026-11-25T03:24:33.455544+00:00",
+          "id": "01a210bb-d032-7a35-844d-46e7307c8228",
+          "position": 2,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:33.455544+00:00",
+          "value": {
+            "engagement": "the sitting; the phase-G review",
+            "influence": "high",
+            "interest": "high"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-cfc9-72ec-85f5-619bf730fff9",
+          "axis_a": "BCM",
+          "axis_b": "B7's measurement",
+          "created_at": "2026-11-25T03:24:33.455544+00:00",
+          "id": "01a210bb-d04d-7006-bb06-5f1cfb421553",
+          "position": 3,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:33.455544+00:00",
+          "value": {
+            "engagement": "the benefit profile and the review",
+            "influence": "medium",
+            "interest": "high"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-cfc9-72ec-85f5-619bf730fff9",
+          "axis_a": "Department heads",
+          "axis_b": "seats are invited and counted",
+          "created_at": "2026-11-25T03:24:33.455544+00:00",
+          "id": "01a210bb-d066-7cd5-b670-a6a5508cd34f",
+          "position": 4,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:33.455544+00:00",
+          "value": {
+            "engagement": "the attendance rows",
+            "influence": "high",
+            "interest": "medium"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bb-cfc9-72ec-85f5-619bf730fff9",
+          "axis_a": "Delivery teams",
+          "axis_b": "no change to the direct paths",
+          "created_at": "2026-11-25T03:24:33.455544+00:00",
+          "id": "01a210bb-d083-7e01-8162-71f50dbb98f5",
+          "position": 5,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:24:33.455544+00:00",
+          "value": {
+            "engagement": "the release note",
+            "influence": "low",
+            "interest": "medium"
+          },
+          "version": 1
+        }
+      ],
+      "id": "01a210bb-cfc9-72ec-85f5-619bf730fff9",
+      "meta": {},
+      "phase_code": "a",
+      "plateau": "psa",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "purpose": "Who holds an interest in the forum bindings and how they are engaged.",
+      "scope": "§PSA stakeholders of the T19F architecture design.",
+      "stakeholders": [],
+      "status": "approved",
+      "title": "T19F — Stakeholder map",
+      "updated_at": "2026-11-25T03:24:38.605164+00:00",
+      "version": 2
+    },
+    {
       "artifact_kind": "diagram",
       "artifact_type_id": null,
       "artifact_version": 1,
@@ -22170,6 +22610,71 @@
       "status": "approved",
       "title": "T19 — Business capability map",
       "updated_at": "2026-11-24T09:24:04.699586+00:00",
+      "version": 2
+    },
+    {
+      "artifact_kind": "diagram",
+      "artifact_type_id": "01a1f2c1-1456-7505-bb5b-5b8656aa8a1b",
+      "artifact_version": 1,
+      "change_initiative": "",
+      "contract_id": null,
+      "created_at": "2026-11-25T03:25:13.202189+00:00",
+      "document_id": null,
+      "entries": [
+        {
+          "artifact_id": "01a210bc-6b09-7785-ab85-5e72fc64997a",
+          "axis_a": "B1 Governed tenant assets",
+          "axis_b": "T17",
+          "created_at": "2026-11-25T03:25:13.202189+00:00",
+          "id": "01a210bc-6b3e-7262-abee-d37a96fc52dc",
+          "position": 0,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:13.202189+00:00",
+          "value": {
+            "realisation": "T17's authoring route, extended with the policy payload"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-6b09-7785-ab85-5e72fc64997a",
+          "axis_a": "B2 Deliberated decisions",
+          "axis_b": "T19",
+          "created_at": "2026-11-25T03:25:13.202189+00:00",
+          "id": "01a210bc-6b57-7df5-a221-cd77a31bef4c",
+          "position": 1,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:13.202189+00:00",
+          "value": {
+            "realisation": "T19's meeting, reused by the board sitting"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-6b09-7785-ab85-5e72fc64997a",
+          "axis_a": "B3 Cadence-driven forums",
+          "axis_b": "T10",
+          "created_at": "2026-11-25T03:25:13.202189+00:00",
+          "id": "01a210bc-6b72-71c5-aa7a-65c486d82989",
+          "position": 2,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:13.202189+00:00",
+          "value": {
+            "realisation": "T10's cadence row, binding to a meeting type"
+          },
+          "version": 1
+        }
+      ],
+      "id": "01a210bc-6b09-7785-ab85-5e72fc64997a",
+      "meta": {},
+      "phase_code": "b",
+      "plateau": "hld",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "purpose": "The capabilities the bindings realise.",
+      "scope": "§HLD business capability map of the T19F architecture design.",
+      "stakeholders": [],
+      "status": "approved",
+      "title": "T19F — Business capability map",
+      "updated_at": "2026-11-25T03:25:18.386185+00:00",
       "version": 2
     },
     {
@@ -27693,6 +28198,113 @@
     },
     {
       "artifact_kind": "catalog",
+      "artifact_type_id": "01a1f2c1-1470-71d6-a5a8-2e7d0d615178",
+      "artifact_version": 1,
+      "change_initiative": "",
+      "contract_id": null,
+      "created_at": "2026-11-25T03:25:23.3597+00:00",
+      "document_id": null,
+      "entries": [
+        {
+          "artifact_id": "01a210bc-92bd-71d7-964f-8d9761e78baa",
+          "axis_a": "meeting_type",
+          "axis_b": "no schema change; the writer and the reads are new",
+          "created_at": "2026-11-25T03:25:23.3597+00:00",
+          "id": "01a210bc-92f7-7af5-811b-3ac50858312e",
+          "position": 0,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:23.3597+00:00",
+          "value": {
+            "migration": "reused"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-92bd-71d7-964f-8d9761e78baa",
+          "axis_a": "meeting",
+          "axis_b": "no change; T19's uq_meeting_live stays the slot rule",
+          "created_at": "2026-11-25T03:25:23.3597+00:00",
+          "id": "01a210bc-9312-7733-a5c0-9c80af8cbb74",
+          "position": 1,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:23.3597+00:00",
+          "value": {
+            "migration": "reused"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-92bd-71d7-964f-8d9761e78baa",
+          "axis_a": "governance_body",
+          "axis_b": "meeting_type_key",
+          "created_at": "2026-11-25T03:25:23.3597+00:00",
+          "id": "01a210bc-932c-7a33-baa1-e6e815e892fd",
+          "position": 2,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:23.3597+00:00",
+          "value": {
+            "migration": "0073_meeting_bindings.sql"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-92bd-71d7-964f-8d9761e78baa",
+          "axis_a": "programme_cadence",
+          "axis_b": "meeting_type_key",
+          "created_at": "2026-11-25T03:25:23.3597+00:00",
+          "id": "01a210bc-9347-7643-a6c0-162dfff59a90",
+          "position": 3,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:23.3597+00:00",
+          "value": {
+            "migration": "0073_meeting_bindings.sql"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-92bd-71d7-964f-8d9761e78baa",
+          "axis_a": "authoring_asset",
+          "axis_b": "published_meeting_type_id",
+          "created_at": "2026-11-25T03:25:23.3597+00:00",
+          "id": "01a210bc-9361-7f38-92a9-0d71fe2c07dd",
+          "position": 4,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:23.3597+00:00",
+          "value": {
+            "migration": "0073_meeting_bindings.sql"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-92bd-71d7-964f-8d9761e78baa",
+          "axis_a": "approval, approval_decision, meeting_agenda_item, meeting_attendance, meeting_position",
+          "axis_b": "reused unchanged",
+          "created_at": "2026-11-25T03:25:23.3597+00:00",
+          "id": "01a210bc-937b-7a52-976f-373686dc49bf",
+          "position": 5,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:23.3597+00:00",
+          "value": {
+            "migration": "reused"
+          },
+          "version": 1
+        }
+      ],
+      "id": "01a210bc-92bd-71d7-964f-8d9761e78baa",
+      "meta": {},
+      "phase_code": "c",
+      "plateau": "hld",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "purpose": "The columns the bindings add and the entities they reuse unchanged.",
+      "scope": "§HLD data entity catalog of the T19F architecture design; migration 0073.",
+      "stakeholders": [],
+      "status": "approved",
+      "title": "T19F — Data entity catalog",
+      "updated_at": "2026-11-25T03:25:28.167194+00:00",
+      "version": 2
+    },
+    {
+      "artifact_kind": "catalog",
       "artifact_type_id": null,
       "artifact_version": 1,
       "change_initiative": "",
@@ -28515,6 +29127,77 @@
       "status": "approved",
       "title": "T19 — Technology standards",
       "updated_at": "2026-11-24T09:24:25.374431+00:00",
+      "version": 2
+    },
+    {
+      "artifact_kind": "catalog",
+      "artifact_type_id": "01a1f2c1-148a-7b2a-8f3e-77e7d910fcc2",
+      "artifact_version": 1,
+      "change_initiative": "",
+      "contract_id": null,
+      "created_at": "2026-11-25T03:25:32.861782+00:00",
+      "document_id": null,
+      "entries": [
+        {
+          "artifact_id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+          "axis_a": "Rust + sqlx, AdditiveForward migrations",
+          "axis_b": "storage",
+          "created_at": "2026-11-25T03:25:32.861782+00:00",
+          "id": "01a210bc-b816-7103-8c32-84779b3c63ab",
+          "position": 0,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:32.861782+00:00",
+          "value": "Migration 0073; every altered column is nullable and the direct paths keep working.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+          "axis_a": "One ActionSpec per action",
+          "axis_b": "interface",
+          "created_at": "2026-11-25T03:25:32.861782+00:00",
+          "id": "01a210bc-b82f-76b7-aba8-4fc02f4cc028",
+          "position": 1,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:32.861782+00:00",
+          "value": "HTTP + MCP + OpenAPI + generated client for the five new actions.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+          "axis_a": "RLS and tenant scoping",
+          "axis_b": "storage",
+          "created_at": "2026-11-25T03:25:32.861782+00:00",
+          "id": "01a210bc-b848-7e58-8cfb-3fba6f8822f5",
+          "position": 2,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:32.861782+00:00",
+          "value": "Every altered table keeps ENABLE and FORCE ROW LEVEL SECURITY.",
+          "version": 1
+        },
+        {
+          "artifact_id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+          "axis_a": "Deterministic generators",
+          "axis_b": "build",
+          "created_at": "2026-11-25T03:25:32.861782+00:00",
+          "id": "01a210bc-b862-7305-b2ce-f61332d29ebd",
+          "position": 3,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-25T03:25:32.861782+00:00",
+          "value": "Seed, coverage and docs are regenerated, never hand-edited.",
+          "version": 1
+        }
+      ],
+      "id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+      "meta": {},
+      "phase_code": "d",
+      "plateau": "hld",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "purpose": "The platform the bindings run on and the invariants they keep.",
+      "scope": "§HLD technology standards of the T19F architecture design.",
+      "stakeholders": [],
+      "status": "approved",
+      "title": "T19F — Technology standards",
+      "updated_at": "2026-11-25T03:25:37.679917+00:00",
       "version": 2
     },
     {
@@ -34160,9 +34843,49 @@
       "status": "active",
       "updated_at": "2026-11-21T01:11:54.86633+00:00",
       "version": 2
+    },
+    {
+      "charter": "Decides the T19F live-gate subject in a sitting.",
+      "commissioning_authority": "",
+      "created_at": "2026-11-25T03:38:14.660192+00:00",
+      "decision_limits": {},
+      "id": "01a210c8-579b-7808-bc32-aef8899b0b7a",
+      "key": "t19f-live-gate-board",
+      "kind": "architecture_board",
+      "members": [],
+      "name": "T19F live-gate board",
+      "status": "active",
+      "updated_at": "2026-11-25T03:38:19.729321+00:00",
+      "version": 2
     }
   ],
   "compliance_reviews": [
+    {
+      "contract_id": "01a210bd-f408-778a-b67e-9b6cf36ca62a",
+      "created_at": "2026-11-25T03:27:16.632283+00:00",
+      "id": "01a210be-4ded-728e-96ba-d4805b5f9b29",
+      "level": "conformant",
+      "outcome": null,
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "reviewed_at": "2026-11-25T03:27:16.632283+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-25T03:27:16.632283+00:00",
+      "version": 1
+    },
+    {
+      "contract_id": "01a210bd-ba25-78c1-a363-3eea5aa71335",
+      "created_at": "2026-11-25T03:27:11.515312+00:00",
+      "id": "01a210be-3a02-75f3-b39d-5309d7a2cd92",
+      "level": "conformant",
+      "outcome": null,
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "reviewed_at": "2026-11-25T03:27:11.515312+00:00",
+      "reviewed_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "reviewed_by_name": "conveyor-approver",
+      "updated_at": "2026-11-25T03:27:11.515312+00:00",
+      "version": 1
+    },
     {
       "contract_id": "01a20cea-91bb-77f4-a880-044c90bb5f0e",
       "created_at": "2026-11-24T09:38:03.239657+00:00",
@@ -35065,6 +35788,29 @@
       "version": 2
     },
     {
+      "approval_id": "01a210bd-cdb2-7f2f-ac9a-c314fb1856af",
+      "approved_at": "2026-11-25T03:26:48.7374+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "acceptance_criteria": "The T19F plan's P1–P5 scenarios, the live gate recorded in docs/plans/T19F/evidence.md, and the closure review in docs/plans/T19F/closure-review.md that defers project closure to the tranche-6 review.",
+        "assignment": "Build T19F — the forum bindings — to the plan's P1–P5: a meeting_type version is written only by the reviewed authoring route, a board subject is decided in a sitting with via='meeting' rows, and a cadence row materialises its own meeting exactly once.",
+        "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+        "responsibilities": "The programme architect owns the artefact set; the Architecture Board reviews and approves; the programme manager owns B7's measurement; the SRO accepts the tranche-6 evidence.",
+        "scope": "Migration 0073; the authoring publish hook and meetings.type_list/type_get; architecture.board_sit_open/board_sit_decide; cadences.materialise; the mock-UI and real-app surfaces; the programme record and its evidence."
+      },
+      "created_at": "2026-11-25T03:26:38.984805+00:00",
+      "id": "01a210bd-ba25-78c1-a363-3eea5aa71335",
+      "kind": "statement_of_architecture_work",
+      "phase_code": "a",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work — T19F forum bindings (2026-11-25)",
+      "updated_at": "2026-11-25T03:26:48.7374+00:00",
+      "version": 2
+    },
+    {
       "approval_id": "01a1fdd4-cac3-7767-9b0f-4c15d064d6f6",
       "approved_at": "2026-11-21T11:19:12.031209+00:00",
       "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
@@ -35447,9 +36193,54 @@
       "title": "Delivery contract — T19 decision forums (2026-11-24)",
       "updated_at": "2026-11-24T09:37:19.527985+00:00",
       "version": 2
+    },
+    {
+      "approval_id": "01a210be-08ae-77ff-8656-fd9da2828264",
+      "approved_at": "2026-11-25T03:27:03.799814+00:00",
+      "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+      "body": {
+        "approval": "The Architecture Board approves this contract under the standing delegation; the board decision is cited in the approval field of the contract row.",
+        "commitments": [
+          "Migration 0073 is live: the authoring output link, the body and cadence meeting-type keys, and no new index on meeting.",
+          "A reviewed kind=policy asset publishes the next immutable meeting_type version; an in-flight meeting keeps its pinned version.",
+          "A board sitting decides a real subject through T19's close_item_tx with per-seat via='meeting' rows; the direct board path is unchanged.",
+          "cadences.materialise schedules the cadence's meeting once, serialised on the cadence row; a second call returns the first.",
+          "The slice's acceptance is the live gate recorded in docs/plans/T19F/evidence.md."
+        ],
+        "compliance_method": "The Architecture Board's Phase-G compliance reviews read the delivered rows against the Statement of Architecture Work; each deviation is a change request or a recorded waiver.",
+        "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+      },
+      "created_at": "2026-11-25T03:26:53.805668+00:00",
+      "id": "01a210bd-f408-778a-b67e-9b6cf36ca62a",
+      "kind": "delivery_contract",
+      "phase_code": "f",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Delivery contract — T19F forum bindings (2026-11-25)",
+      "updated_at": "2026-11-25T03:27:03.799814+00:00",
+      "version": 2
+    },
+    {
+      "approval_id": null,
+      "approved_at": null,
+      "approved_by": null,
+      "body": null,
+      "created_at": "2026-11-25T03:38:24.653635+00:00",
+      "id": "01a210c8-7ea8-7dc9-8104-700ecfe2905b",
+      "kind": "delivery_contract",
+      "phase_code": "f",
+      "project_id": "01a210ba-b6cb-76cc-82a3-a2b45cfb498f",
+      "status": "draft",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "T19F live gate — the sitting subject",
+      "updated_at": "2026-11-25T03:38:24.653635+00:00",
+      "version": 1
     }
   ],
-  "generated_at": "2026-11-24T16:30:00Z",
+  "generated_at": "2026-11-25T03:46:32.319854100+00:00",
   "links": [
     {
       "from_artifact_id": "01a20233-abbe-7e25-9206-6f3c8bcba167",
@@ -35540,6 +36331,13 @@
       "id": "01a20ce0-1850-7c77-ab61-acf6c28b9f9c",
       "kind": "dependency",
       "to_artifact_id": "01a20cde-86d7-7257-a45e-b4731ab423a4",
+      "version": 1
+    },
+    {
+      "from_artifact_id": "01a210bb-cfc9-72ec-85f5-619bf730fff9",
+      "id": "01a210bd-7d79-74f8-b53b-e9e5a1b8bef6",
+      "kind": "dependency",
+      "to_artifact_id": "01a210bc-6b09-7785-ab85-5e72fc64997a",
       "version": 1
     },
     {
@@ -35991,6 +36789,20 @@
       "version": 1
     },
     {
+      "from_artifact_id": "01a210bb-f6ea-7d99-b23f-4dc3dace459c",
+      "id": "01a210bd-2f20-74b2-9362-c2c52f9387e5",
+      "kind": "derivation",
+      "to_artifact_id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+      "version": 1
+    },
+    {
+      "from_artifact_id": "01a210bc-1f7b-7703-bb2d-a0d8695d12bd",
+      "id": "01a210bd-427d-70d6-8990-fcd27c8d269a",
+      "kind": "derivation",
+      "to_artifact_id": "01a210bc-465a-7d83-b9c6-7c7b089d8b02",
+      "version": 1
+    },
+    {
       "from_artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
       "id": "01a1f2c1-cdba-731d-ac0f-934b07ff8d0a",
       "kind": "realization",
@@ -36006,16 +36818,16 @@
     },
     {
       "from_artifact_id": "01a20cde-5f86-7720-9a16-36a964ef255d",
-      "id": "01a20cdf-f295-76b4-b9eb-1465f0484504",
+      "id": "01a20ce0-0567-7c74-be0f-7eb958c4b0f5",
       "kind": "realization",
-      "to_artifact_id": "01a20cde-adbf-7626-9b2b-58faf7164755",
+      "to_artifact_id": "01a20cde-86d7-7257-a45e-b4731ab423a4",
       "version": 1
     },
     {
       "from_artifact_id": "01a20cde-5f86-7720-9a16-36a964ef255d",
-      "id": "01a20ce0-0567-7c74-be0f-7eb958c4b0f5",
+      "id": "01a20cdf-f295-76b4-b9eb-1465f0484504",
       "kind": "realization",
-      "to_artifact_id": "01a20cde-86d7-7257-a45e-b4731ab423a4",
+      "to_artifact_id": "01a20cde-adbf-7626-9b2b-58faf7164755",
       "version": 1
     },
     {
@@ -36030,6 +36842,34 @@
       "id": "01a20ce0-3ebe-76bb-a6da-63d71cacf574",
       "kind": "realization",
       "to_artifact_id": "01a20cde-d6bd-7cfe-88ad-42a1e6db30a7",
+      "version": 1
+    },
+    {
+      "from_artifact_id": "01a210bc-465a-7d83-b9c6-7c7b089d8b02",
+      "id": "01a210bd-56bf-7cac-b247-ca534b179239",
+      "kind": "realization",
+      "to_artifact_id": "01a210bc-92bd-71d7-964f-8d9761e78baa",
+      "version": 1
+    },
+    {
+      "from_artifact_id": "01a210bc-465a-7d83-b9c6-7c7b089d8b02",
+      "id": "01a210bd-6a41-7642-a2b5-fa70f7cf444c",
+      "kind": "realization",
+      "to_artifact_id": "01a210bc-6b09-7785-ab85-5e72fc64997a",
+      "version": 1
+    },
+    {
+      "from_artifact_id": "01a210bc-6b09-7785-ab85-5e72fc64997a",
+      "id": "01a210bd-9242-76cc-92d5-490b91a57fd4",
+      "kind": "realization",
+      "to_artifact_id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
+      "version": 1
+    },
+    {
+      "from_artifact_id": "01a210bc-92bd-71d7-964f-8d9761e78baa",
+      "id": "01a210bd-a5ea-7f1e-abf9-ab00c0798585",
+      "kind": "realization",
+      "to_artifact_id": "01a210bc-b7e1-7a83-b322-81d74e0a903a",
       "version": 1
     }
   ],
@@ -39081,6 +39921,75 @@
         }
       ],
       "project": "T19"
+    },
+    {
+      "declared": {
+        "adm_phase": "G",
+        "plateau": "capability"
+      },
+      "next_required": "e",
+      "phases": [
+        {
+          "compliance": {
+            "outcome": null,
+            "reviewed_at": "2026-11-25T03:27:11.515312+00:00"
+          },
+          "contract": {
+            "id": "01a210bd-ba25-78c1-a363-3eea5aa71335",
+            "kind": "statement_of_architecture_work",
+            "status": "live"
+          },
+          "phase": "a",
+          "state": "evidenced"
+        },
+        {
+          "compliance": null,
+          "contract": null,
+          "phase": "b",
+          "state": "evidenced"
+        },
+        {
+          "compliance": null,
+          "contract": null,
+          "phase": "c",
+          "state": "evidenced"
+        },
+        {
+          "compliance": null,
+          "contract": null,
+          "phase": "d",
+          "state": "evidenced"
+        },
+        {
+          "compliance": null,
+          "contract": null,
+          "phase": "e",
+          "state": "not-evidenced"
+        },
+        {
+          "compliance": null,
+          "contract": {
+            "id": "01a210c8-7ea8-7dc9-8104-700ecfe2905b",
+            "kind": "delivery_contract",
+            "status": "draft"
+          },
+          "phase": "f",
+          "state": "evidenced"
+        },
+        {
+          "compliance": null,
+          "contract": null,
+          "phase": "g",
+          "state": "not-evidenced"
+        },
+        {
+          "compliance": null,
+          "contract": null,
+          "phase": "h",
+          "state": "not-evidenced"
+        }
+      ],
+      "project": "T19F"
     },
     {
       "declared": {

@@ -450,7 +450,7 @@
       "gap": null
     },
     "T19F": {
-      "status": "proposed",
+      "status": "built",
       "tables": [],
       "actions": [
         "meetings.type_list",
@@ -465,7 +465,7 @@
         "docs/plans/T19F/architecture-design.md",
         "docs/SPEC_V2.md"
       ],
-      "gap": "the five actions are the implementation (#683); none is measured before it lands"
+      "gap": null
     }
   }
 }

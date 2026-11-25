@@ -337,6 +337,9 @@ mod tests {
                 // (0071_ladder_option_sets.sql, SPEC_V2 §7.2, §7.3). Main's row stays verbatim;
                 // #526's 0103 evolves the tables into the lane's model.
                 (71, "ladder option sets".to_owned()),
+                // #557: the per-tool verification declaration (0072_tool_meta.sql, SPEC_V2 §11.3).
+                (72, "tool meta".to_owned()),
+                (73, "meeting bindings".to_owned()),
                 // ── The lane's reserved block (0080+), after main's 0066–0071. Versions
                 // 0072–0079 stay free for main; the block's SQL is unchanged, only its version
                 // moved. The kata union (the lane's candidate/propagation records and

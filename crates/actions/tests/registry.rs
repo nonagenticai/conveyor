@@ -146,8 +146,9 @@ use serde_json::{Value, json};
 /// #656 `ladder.case`, `ladder.precheck` and `decision_option_sets.get|set` are retired
 /// with their handlers, so they do not appear here. T11's `metrics.reconciliation` read adds
 /// one internal action and T11's billing shim adds one external read (`billing.rollup`):
-/// **610: 585 internal, 25 external**.
-const EXPECTED: [&str; 610] = [
+/// **The merged main (2026-11-25) adds 9 internal**: `tools.list|get`, `toolkits.list`, `tool_calls.list`, the T19F `meetings.type_get|type_list`, `architecture.board_sit_open|decide` and `cadences.materialise`; #656's `ladder.case|precheck` and `decision_option_sets.get|set` stay retired.
+/// **619: 594 internal, 25 external**.
+const EXPECTED: [&str; 619] = [
     "actions.describe",
     "actions.list",
     "agent.run",
@@ -174,6 +175,8 @@ const EXPECTED: [&str; 610] = [
     "architecture.board_get",
     "architecture.board_list",
     "architecture.board_open",
+    "architecture.board_sit_decide",
+    "architecture.board_sit_open",
     "architecture.contracts_approve",
     "architecture.contracts_get",
     "architecture.contracts_list",
@@ -235,6 +238,7 @@ const EXPECTED: [&str; 610] = [
     "cadences.credit_list",
     "cadences.delete",
     "cadences.list",
+    "cadences.materialise",
     "cadences.update",
     "capabilities.bind_knowledge",
     "capabilities.get",
@@ -434,12 +438,9 @@ const EXPECTED: [&str; 610] = [
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
-    // T14 (#561): the Lean prover's three read actions.
     "lean4.check",
     "lean4.elaborate",
     "lean4.prove",
-    // T8 (#79): the organisational-memory lifecycle — propose with independent evidence,
-    // a person's review, and promotion to a governed-asset source draft.
     "lessons.promote",
     "lessons.propose",
     "lessons.review",
@@ -474,6 +475,8 @@ const EXPECTED: [&str; 610] = [
     "meetings.position",
     "meetings.respond",
     "meetings.schedule",
+    "meetings.type_get",
+    "meetings.type_list",
     "members.list",
     "members.remove",
     "members.set_role",
@@ -578,11 +581,11 @@ const EXPECTED: [&str; 610] = [
     "processes.update",
     "produce.script",
     "produce.speech",
+    "programme_lessons.list",
+    "programme_lessons.propose",
     "programmes.baseline",
     "programmes.baseline_approve",
     "programmes.baselines_list",
-    "programme_lessons.list",
-    "programme_lessons.propose",
     "programmes.create",
     "programmes.get",
     "programmes.list",
@@ -693,22 +696,26 @@ const EXPECTED: [&str; 610] = [
     "tasks.update",
     "tenants.get",
     "tenants.update_settings",
-    "tool_bindings.create",
-    "tool_bindings.list",
-    "tool_bindings.retire",
-    "tool_bindings.update",
     "tool_authoring.draft",
     "tool_authoring.promote",
     "tool_authoring.publish",
     "tool_authoring.review",
     "tool_authoring.test",
     "tool_authoring.validate",
+    "tool_bindings.create",
+    "tool_bindings.list",
+    "tool_bindings.retire",
+    "tool_bindings.update",
+    "tool_calls.list",
     "toolkits.discover_mcp",
     "toolkits.import_openapi",
+    "toolkits.list",
     "toolkits.publish",
     "toolkits.register_mcp",
     "tools.call",
     "tools.dispatch",
+    "tools.get",
+    "tools.list",
     "tools.probe",
     "tools.resume",
     "tools.retire",
@@ -740,7 +747,6 @@ const EXPECTED: [&str; 610] = [
     "webhooks.delete",
     "webhooks.test",
     "webhooks.update",
-    // T14 (#561): the webscraper's two read actions.
     "webscraper.scrape_bulk",
     "webscraper.scrape_url",
     "workers.list",
@@ -864,7 +870,7 @@ fn the_registry_is_exactly_the_declared_set() {
     // T11's `metrics.reconciliation` read adds one internal action.
     // T11's billing shim adds one external read (`billing.rollup`).
     // Final: 585 internal + 25 external = 610.
-    assert_eq!((internal, external), (585, 25));
+    assert_eq!((internal, external), (594, 25));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

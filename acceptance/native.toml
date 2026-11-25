@@ -1,10 +1,10 @@
 # The native acceptance contract (S14 P3.1, conveyor#8).
 #
 # `scripts/acceptance.py` reads this file and refuses to call a release reachable on partial
-# evidence: every required context below must be `success` on the commit under test, every
-# surface must answer its declared status, and every command must select at least `min_tests`
-# tests. The repository's own required-check authority (the `main` ruleset, measured
-# 2026-11-20) must not name a context this file omits.
+# evidence: every required context below must conclude its declared `conclusion` on the commit
+# under test, every surface must answer its declared status, and every command must select at
+# least `min_tests` tests. The repository's own required-check authority (the `main` ruleset,
+# measured 2026-11-24) must not name a context this file omits.
 #
 # 401 is declared only where authentication is the correct answer (`/mcp`, `/api/me`); it is
 # never accepted as "reachable" for a public surface.
@@ -38,11 +38,13 @@ conclusion = "success"
 name = "secret-scan"
 conclusion = "success"
 
-# The `main` ruleset requires DCO on every PR commit; the manifest must cover the whole
-# authority or the release check fails on a context the product already satisfies.
+# `dco` is required by the `main` ruleset but only runs on pull requests, so on a main-push sha
+# its check-run concludes `skipped` (measured 2026-11-24 on f4c2947: `dco=skipped`, with the
+# ref's pull-request run reporting `dco=success`). Declaring the conclusion it actually has keeps
+# the reconciliation honest instead of weakening it.
 [[contexts]]
 name = "dco"
-conclusion = "success"
+conclusion = "skipped"
 
 # The deployed surfaces. A 404, a 422 or any 5xx is a refusal, never a pass.
 [[probes]]

@@ -75,7 +75,7 @@ and B7; the strict conformance publish is green with no new T19F finding.
 |---|---|
 | A policy change is smuggled through `meetings.schedule` | the schedule refuses a policy when the key exists; the authoring route is the only version writer |
 | A board sitting lowers dual control | `close_item_tx` applies the linked approval's stricter policy; the sitting adds no second path |
-| A cadence slot gets two meetings | the partial unique index on the slot; the action returns the existing instance |
+| A cadence slot gets two meetings | the cadence row lock in `materialise_cadence_tx`; the action returns the existing instance |
 | T17's authoring route is mid-flight (#655) | the hook is additive and signature-stable; rebase or coordinate with the T17 lane |
 | T19F closes in a planned tranche | it stays active; the closure review defers closure to the tranche-6 review |
 

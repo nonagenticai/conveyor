@@ -25,7 +25,11 @@ struct MeetingRow {
     #[serde(default)]
     card_name: String,
     #[serde(default)]
+    meeting_type: String,
+    #[serde(default)]
     meeting_type_name: String,
+    #[serde(default)]
+    meeting_type_version: i64,
     #[serde(default)]
     decision_rule: String,
     #[serde(default)]
@@ -34,6 +38,26 @@ struct MeetingRow {
     opens_at: Option<String>,
     #[serde(default)]
     retirement_candidate: bool,
+}
+
+/// One pinned forum policy (`meetings.type_list`): the meeting's type and its version.
+#[derive(Clone, Debug, Default, Deserialize)]
+struct MeetingTypeRow {
+    #[serde(default)]
+    key: String,
+    #[serde(default)]
+    name: String,
+    #[serde(default)]
+    decision_rule: String,
+    #[serde(default)]
+    quorum: i64,
+    #[allow(dead_code)]
+    #[serde(default)]
+    evidence_minimum: i64,
+    #[serde(default)]
+    status: String,
+    #[serde(default)]
+    version: i64,
 }
 
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -153,6 +177,21 @@ pub fn MeetingsScreen() -> impl IntoView {
         }
     });
     let retry = Callback::new(move |_| rows.refetch());
+    let policies = LocalResource::new(move || {
+        let _tenant = ctx.tenant.get();
+        let _ = refresh.get();
+        let client = ctx.client();
+        async move {
+            parse::<Page<MeetingTypeRow>>(
+                client
+                    .invoke("meetings.type_list", json!({}), InvokeOptions::default())
+                    .await?
+                    .output,
+                "the forum policies",
+            )
+        }
+    });
+    let retry_policies = Callback::new(move |_| policies.refetch());
 
     view! {
         <section class="screen">
@@ -189,6 +228,33 @@ pub fn MeetingsScreen() -> impl IntoView {
                                             <span class="pill wait">"no decision — retirement candidate"</span>
                                         })}
                                     </li>
+                                }
+                            }).collect_view()}
+                        </ul>
+                    }.into_any(),
+                })}
+            </Suspense>
+            <h2>"Forum policies"</h2>
+            <Suspense fallback=move || view! { <p class="muted">"Reading…"</p> }>
+                {move || policies.get().map(|result| match result {
+                    Err(error) => view! { <ErrorPanel error=error on_retry=retry_policies/> }.into_any(),
+                    Ok(page) if page.items.is_empty() => view! {
+                        <Empty message="No forum policy in this tenant yet. A meeting schedules its first version.".to_owned()/>
+                    }.into_any(),
+                    Ok(page) => view! {
+                        <ul class="list">
+                            {page.items.into_iter().map(|policy| {
+                                let label = format!(
+                                    "{} · {} · {} · quorum {} · {} · v{}",
+                                    policy.key,
+                                    policy.name,
+                                    policy.decision_rule,
+                                    policy.quorum,
+                                    policy.status,
+                                    policy.version,
+                                );
+                                view! {
+                                    <li class="row"><span>{label}</span></li>
                                 }
                             }).collect_view()}
                         </ul>
@@ -267,8 +333,12 @@ pub fn MeetingRoomScreen() -> impl IntoView {
                                 <h1>{meeting.card_name.clone()}</h1>
                                 <p class="muted">
                                     {format!(
-                                        "{} · {} · {}",
-                                        meeting.meeting_type_name, meeting.decision_rule, meeting.status
+                                        "{} · {} v{} · {} · {}",
+                                        meeting.meeting_type_name,
+                                        meeting.meeting_type,
+                                        meeting.meeting_type_version,
+                                        meeting.decision_rule,
+                                        meeting.status
                                     )}
                                 </p>
                             </header>
