@@ -162,13 +162,17 @@ programme at the stated date:
   authorisation (P0), which belongs to the #526 retrospective chain; the `meeting_type` authoring
   route and the T9/T10 binding are the T19F follow-on (below). The T18 UI lane (#562–#566) is in
   flight and independent.
-- **T19F (decision-forum governance) is proposed at tranche 6** — the follow-on T19's closure
-  review named. The plan and the MSP/TOGAF/SAFe artefact set are
-  `docs/plans/T19F-meeting-bindings.md` and `docs/plans/T19F/`; **#683** implements the versioned
-  policy authoring through T17's route, the board sitting and the cadence materialisation;
-  **#684** proves them on the deployed engine. The project stays `active`: its closure review
-  defers closure to the tranche-6 review, so no unledgered P0 is manufactured. T19's ledgered
-  tranche-4 P0 remains the #526 chain's.
+- **T19F (decision-forum governance) is built and active at tranche 6** — the follow-on T19's
+  closure review named. The plan and the MSP/TOGAF/SAFe artefact set are
+  `docs/plans/T19F-meeting-bindings.md` and `docs/plans/T19F/`; **#682/#683/#684** delivered the
+  plan (PR #686), the versioned policy authoring through T17's route, the board sitting and the
+  cadence materialisation (PR #700), and the live proof (PR #711). The close-out (#722) recorded
+  the human `authoring.review` decision by FR Test in the signed-in console and took the live gate
+  to 12/12: the policy v2 is published, the v1-pinned meeting still resolves v1, the sitting
+  decided `via='meeting'` and the cadence materialised once. The project stays `active`: its
+  closure review defers closure to the tranche-6 review, so no unledgered P0 is manufactured.
+  T19's ledgered tranche-4 P0 remains the #526 chain's; the strict conformance remediation is the
+  follow-on unit.
 - **Architecture contracts remain a large open gap, one project smaller.** Twelve delivery
   projects (T3, T5–T8, T12, T14–T19) had no live contract at the last audit; T19 now carries one,
   live and board-approved, so the count is eleven. The board's approval is the authority act, and

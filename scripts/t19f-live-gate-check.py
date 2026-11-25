@@ -179,9 +179,68 @@ def resolve_base(project_id_arg: str | None) -> dict:
     }
 
 
+def completed_state(state: dict) -> dict | None:
+    """Refresh a recorded state when every live row it names already satisfies the gate.
+
+    A completed run must be re-runnable (the issue's P2.2): the policy v2 is live, the sitting
+    item closed as a decision, the cadence meeting carries its slot — so there is nothing to
+    write but the state, and no second meeting/asset/approval may be created.
+    """
+    versions = read("meetings.type_list", {"key": TYPE_KEY}).get("items", [])
+    v2 = next(
+        (v for v in versions if v.get("version") == 2 and v.get("status") == "active"), None
+    )
+    if v2 is None:
+        return None
+    detail = read("meetings.get", {"meeting_id": state["sitting"]["meeting_id"]})
+    if not any(i.get("outcome") == "decision" for i in detail.get("agenda", [])):
+        return None
+    materialised = read("meetings.get", {"meeting_id": state["cadence"]["meeting_id"]})
+    meeting = materialised.get("meeting", materialised)
+    if (
+        meeting.get("meeting_type") != TYPE_KEY
+        or meeting.get("cadence_slot") != state["cadence"]["cadence_id"]
+        or meeting.get("status") == "cancelled"
+    ):
+        return None
+    assets = read("authoring.assets", {"kind": "policy"}).get("items", [])
+    asset = next((a for a in assets if a.get("key") == state["policy"]["asset_key"]), None)
+    if asset is None or asset.get("status") != "published":
+        return None
+    approvals = read("approvals.list", {"project_id": state["project_id"]}).get("items", [])
+    human = next(
+        (
+            a
+            for a in approvals
+            if a.get("gate") == "authoring.review"
+            and a.get("target") == asset["id"]
+            and (a.get("decisions") or [])
+            and a["decisions"][-1].get("decision") == "approve"
+            and a["decisions"][-1].get("decided_by_kind") == "human"
+        ),
+        None,
+    )
+    if human is None:
+        return None
+    refreshed = json.loads(json.dumps(state))
+    refreshed["policy"]["review_blocked"] = None
+    refreshed["policy"]["asset_id"] = asset["id"]
+    refreshed["policy"]["v2_version"] = v2.get("version")
+    refreshed["policy"]["v2_meeting_type_id"] = v2.get("id")
+    refreshed["policy"]["human_approval_id"] = human["id"]
+    return refreshed
+
+
 def apply(project_id_arg: str | None) -> int:
     base = resolve_base(project_id_arg)
     print(f"project {base['project_id']} board {base['board_id']} list {base['list_id']}")
+    recorded = json.loads(STATE.read_text(encoding="utf-8")) if STATE.exists() else None
+    if recorded is not None:
+        refreshed = completed_state(recorded)
+        if refreshed is not None:
+            STATE.write_text(json.dumps(refreshed, indent=2) + "\n", encoding="utf-8")
+            print("RESUME: policy v2 live, sitting decided, cadence materialised; state refreshed")
+            return check()
 
     # P1 — v1 exists with the schedule; a meeting pins it. A resumed run reuses the
     # meeting an earlier attempt already scheduled (meetings.get needs `meeting_id`, so the
@@ -254,34 +313,48 @@ def apply(project_id_arg: str | None) -> int:
         print(f"RESUME policy: asset {asset['id']} exists ({asset.get('status')})")
     asset_id = asset["id"]
     approvals = read("approvals.list", {"project_id": base["project_id"]}).get("items", [])
-    approval_id = next(
-        (a["id"] for a in approvals
-         if a.get("gate") == "authoring.review" and a.get("target") == asset_id),
-        None,
-    )
-    if approval_id is None:
-        request, _ = write_with_evidence(
-            "approvals.request",
-            {"project_id": base["project_id"], "gate": "authoring.review", "kind": "gate",
-             "description": f"Review the T19F live-gate policy asset {asset_id}",
-             "target": asset_id},
-            name="04-review-request.md",
-            header="# T19F live gate — the review gate\n\nAction `approvals.request`, gate `authoring.review`.\n",
-            read_action="approvals.list", read_input={"project_id": base["project_id"]},
-        )
-        approval_id = request["id"]
-        write_with_evidence(
-            "approvals.decide",
-            {"approval_id": approval_id, "decision": "approve",
-             "note": "Reviewed against docs/plans/T19F/architecture-design.md"},
-            name="05-review-decision.md",
-            header=(
-                f"# T19F live gate — the review approval\n\nAction `approvals.decide` for "
-                f"approval {approval_id}, by the distinct `conveyor-approver` seat. The admin CLI "
-                f"records the decision as `service`; `authoring.review` needs a human decision.\n"
-            ),
-            actor=base["approver_id"],
-            read_action="approvals.list", read_input={"project_id": base["project_id"]},
+
+    def human_approve(candidate: dict) -> bool:
+        """The gate whose latest decision is a human approve (the only kind authoring.review takes)."""
+        decisions = candidate.get("decisions") or []
+        latest = decisions[-1] if decisions else None
+        return bool(latest) and latest.get("decision") == "approve" and latest.get(
+            "decided_by_kind"
+        ) == "human"
+
+    matching = [
+        a for a in approvals
+        if a.get("gate") == "authoring.review" and a.get("target") == asset_id
+    ]
+    eligible = [a for a in matching if human_approve(a)]
+    if eligible:
+        # The newest human-decided gate wins; a service-decided gate stays as history only.
+        approval_id = eligible[-1]["id"]
+        print(f"REVIEW GATE: {approval_id} carries the human decision")
+    else:
+        if not matching:
+            request, _ = write_with_evidence(
+                "approvals.request",
+                {"project_id": base["project_id"], "gate": "authoring.review", "kind": "gate",
+                 "description": f"Human review of the T19F live-gate policy asset {asset_id}",
+                 "target": asset_id},
+                name="04-review-request.md",
+                header=(
+                    "# T19F live gate — the review gate\n\nAction `approvals.request`, gate "
+                    "`authoring.review`, requested by the distinct `conveyor-approver` seat so "
+                    "a human can decide it.\n"
+                ),
+                actor=base["approver_id"],
+                read_action="approvals.list", read_input={"project_id": base["project_id"]},
+            )
+            pending = request["id"]
+        else:
+            pending = matching[-1]["id"]
+        # The admin CLI records `service`, which authoring.review refuses by design. A person
+        # decides the gate in the signed-in console; this script never records that decision.
+        raise RuntimeError(
+            "the authoring.review gate has no human decision; approve gate "
+            f"{pending} in the signed-in console, then re-run --apply"
         )
     reviewed = asset.get("status") in ("reviewed", "published")
     blocked_review = None
@@ -468,11 +541,15 @@ def apply(project_id_arg: str | None) -> int:
         )
     print(f"cadence: {cadence_id} materialised as meeting {first.get('id')} twice")
 
+    v2_row = next(
+        (v for v in version_rows if v.get("version") == 2 and v.get("status") == "active"), None
+    )
     state = {
         **base,
-        "policy": {"type_key": TYPE_KEY, "asset_key": ASSET_KEY,
+        "policy": {"type_key": TYPE_KEY, "asset_key": ASSET_KEY, "asset_id": asset_id,
                    "v1_meeting_id": v1_meeting,
-                   "v2_version": second.get("meeting_type_version"),
+                   "v2_version": (v2_row or {}).get("version"),
+                   "v2_meeting_type_id": (v2_row or {}).get("id"),
                    "review_blocked": blocked_review},
         "sitting": {"body_id": body_id, "contract_id": subject_id, "meeting_id": meeting_id,
                     "agenda_item_id": item_id, "approval_id": sit_approval},

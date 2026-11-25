@@ -9,8 +9,11 @@
     "type_key": "t19f_live_gate_forum",
     "asset_key": "t19f-live-gate-policy-v2",
     "v1_meeting_id": "01a210c2-a327-7dc7-bab4-5a402a8497a8",
-    "v2_version": 1,
-    "review_blocked": "authoring.review refused: the approval has no human decision (the admin CLI records `service`); a person must approve it in the console, then re-run"
+    "v2_version": 2,
+    "review_blocked": null,
+    "asset_id": "01a210c3-7c34-7338-89f2-6c7a6e40bea7",
+    "v2_meeting_type_id": "01a211da-c391-7867-86dd-d22f9cfed5d5",
+    "human_approval_id": "01a211d8-001f-7296-bbc1-ccb13835a3ef"
   },
   "sitting": {
     "body_id": "01a210c8-579b-7808-bc32-aef8899b0b7a",
