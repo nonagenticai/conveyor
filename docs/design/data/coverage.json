@@ -491,8 +491,8 @@
         "numbers": [
           2
         ],
-        "open": 1,
-        "ready": 1,
+        "open": 0,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2789,8 +2789,8 @@
       },
       "total": 51,
       "uncovered": [],
-      "with_open_units": 11,
-      "without_open_units": 40
+      "with_open_units": 10,
+      "without_open_units": 41
     },
     "screens": {
       "actions_invoked": 39,
