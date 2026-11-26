@@ -1,0 +1,59 @@
+{
+  "body_sha256": "a663c7e0200c47eb1c3ac715a5c17585408fea0a8fa867e9d1cd4dba79ccca92",
+  "category": "project-wbs",
+  "headings": [
+    {
+      "heading": "Work packages",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Acceptance",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Status",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-wbs",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/wbs_nodes"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "168f615f234fe1fae79809f6ccef423e53ffdb42233399ae60775197cfbe3dd1",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a20c80-b9b8-7214-abc6-f2c4f75a1fc1",
+    "key": "T19",
+    "kind": "project",
+    "title": "Decision forums (meetings)"
+  },
+  "title": "Project Wbs \u2014 Decision forums (meetings)"
+}

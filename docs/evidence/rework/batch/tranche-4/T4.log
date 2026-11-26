@@ -1,10 +1,338 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T4 --content docs/evidence/rework/tranche-4/rework-content-T4.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd --keep-active
 
+  reopen: not needed
+  charter: already approved
+  closure outputs: not applicable (the project stays active)
+  SoAW: already live
+  01 documents.compose ok
+  02 documents.publish ok
+  03 architecture.artifacts_supersede ok
+  04 architecture.artifacts_update ok
+  05 architecture.artifacts_approve ok
+  artefact: Stakeholder Map — T4 Kanban coach (Phase A) re-versioned, bound and documented
+  06 documents.compose ok
+  07 documents.publish ok
+  08 architecture.artifacts_supersede ok
+  09 architecture.artifacts_update ok
+  10 architecture.artifacts_approve ok
+  artefact: Driver/Goal/Objective Catalog — T4 Kanban coach (Phase A) re-versioned, bound and documented
+  11 documents.compose ok
+  12 documents.publish ok
+  13 architecture.artifacts_supersede ok
+  14 architecture.artifacts_update ok
+  15 architecture.artifacts_approve ok
+  artefact: Requirements Catalog — T4 Kanban coach (Phase A) re-versioned, bound and documented
+  16 documents.compose ok
+  17 documents.publish ok
+  18 architecture.artifacts_supersede ok
+  19 architecture.artifacts_update ok
+  20 architecture.artifacts_approve ok
+  artefact: Solution Concept Diagram — T4 Kanban coach (Phase A) re-versioned, bound and documented
+  21 documents.compose ok
+  22 documents.publish ok
+  23 architecture.artifacts_supersede ok
+  24 architecture.artifacts_update ok
+  25 architecture.artifacts_approve ok
+  artefact: Business Capability Map — T4 Kanban coach (Phase B) re-versioned, bound and documented
+  26 documents.compose ok
+  27 documents.publish ok
+  28 architecture.artifacts_supersede ok
+  29 architecture.artifacts_update ok
+  30 architecture.artifacts_approve ok
+  artefact: Data Entity/Data Component Catalog — T4 Kanban coach (Phase C) re-versioned, bound and documented
+  31 documents.compose ok
+  32 documents.publish ok
+  33 architecture.artifacts_supersede ok
+  34 architecture.artifacts_update ok
+  35 architecture.artifacts_approve ok
+  artefact: Technology Standards Catalog — T4 Kanban coach (Phase D) re-versioned, bound and documented
+  36 architecture.artifacts_link ok
+  37 architecture.artifacts_link ok
+  38 architecture.artifacts_link ok
+  39 architecture.artifacts_link ok
+  40 architecture.artifacts_link ok
+  41 architecture.artifacts_link ok
+  42 architecture.artifacts_link ok
+  43 architecture.artifacts_link ok
+  44 architecture.artifacts_link ok
+  45 documents.compose ok
+  46 documents.publish ok
+  document architecture-artifact: published
+  47 architecture.contracts_request ok
+  48 architecture.board_decide ok
+  49 architecture.contracts_approve ok
+  delivery contract: revised to carry the authored body
+  50 registers.create ok
+  51 registers.create ok
+  52 registers.create ok
+  53 registers.create ok
+  54 registers.create ok
+  55 registers.create ok
+  56 registers.create ok
+  57 registers.create ok
+  benefit transitions: none in the content
+  baseline: already taken
+  58 projects.baseline ok
+  59 approvals.decide ok
+  60 projects.baseline ok
+  61 approvals.decide ok
+  closure-review output: not applicable (the project stays active)
+  62 documents.publish ok
+  63 documents.update ok
+  64 documents.publish ok
+  project-brief output: body corrected and republished
+  65 documents.publish ok
+  66 documents.update ok
+  67 documents.publish ok
+  evidence output: body corrected and republished
+  68 architecture.reviews_record ok
+  69 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  70 registers.update ok
+  record fixes: none in the content
+  71 approvals.request ok
+  72 approvals.decide ok
+  73 cards.comment ok
+  74 cards.move ok
+  75 cards.move ok
+  card cleared: v1-p6-1:T4
+  76 approvals.request ok
+  77 approvals.decide ok
+  78 cards.comment ok
+  79 cards.move ok
+  80 cards.move ok
+  card cleared: compliance_review_missing:T4
+  81 approvals.request ok
+  82 approvals.decide ok
+  83 cards.comment ok
+  84 cards.move ok
+  85 cards.move ok
+  card cleared: v1-p6-2:T4
+  86 approvals.request ok
+  87 approvals.decide ok
+  88 cards.comment ok
+  89 cards.move ok
+  90 cards.move ok
+  card cleared: v1-p6-4:T4
+  91 approvals.request ok
+  92 approvals.decide ok
+  93 cards.comment ok
+  94 cards.move ok
+  95 cards.move ok
+  card cleared: v1-p6-5:T4
+  96 approvals.request ok
+  97 approvals.decide ok
+  98 cards.comment ok
+  99 cards.move ok
+  100 cards.move ok
+  card cleared: std-togaf-phase-e-t4-e:T4
+  101 approvals.request ok
+  102 approvals.decide ok
+  103 cards.comment ok
+  104 cards.move ok
+  105 cards.move ok
+  card cleared: std-togaf-phase-g-t4-g:T4
+  106 approvals.request ok
+  107 approvals.decide ok
+  108 cards.comment ok
+  109 cards.move ok
+  110 cards.move ok
+  card cleared: std-togaf-phase-h-t4-h:T4
+  111 approvals.request ok
+  112 approvals.decide ok
+  113 cards.comment ok
+  114 cards.move ok
+  115 cards.move ok
+  card cleared: std-pmp-project-registers-t4:T4
+  116 approvals.request ok
+  117 approvals.decide ok
+  118 cards.comment ok
+  119 cards.move ok
+  120 cards.move ok
+  card cleared: v1-p6-6:T4
+  121 approvals.request ok
+  122 approvals.decide ok
+  123 cards.comment ok
+  124 cards.move ok
+  125 cards.move ok
+  card cleared: std-togaf-architecture-artifact-t4:T4
+  126 approvals.request ok
+  127 approvals.decide ok
+  128 cards.comment ok
+  129 cards.move ok
+  130 cards.move ok
+  card cleared: std-togaf-compliance-review-t4:T4
+  131 approvals.request ok
+  132 approvals.decide ok
+  133 cards.comment ok
+  134 cards.move ok
+  135 cards.move ok
+  card cleared: std-togaf-phase-b-t4-b:T4
+  136 approvals.request ok
+  137 approvals.decide ok
+  138 cards.comment ok
+  139 cards.move ok
+  140 cards.move ok
+  card cleared: std-togaf-phase-c-t4-c:T4
+  141 approvals.request ok
+  142 approvals.decide ok
+  143 cards.comment ok
+  144 cards.move ok
+  145 cards.move ok
+  card cleared: std-togaf-phase-d-t4-d:T4
+  146 approvals.request ok
+  147 approvals.decide ok
+  148 cards.comment ok
+  149 cards.move ok
+  150 cards.move ok
+  card cleared: std-togaf-phase-f-t4-f:T4
+  card discharge: 16 card(s) cleared of 326 open package(s)
+  closure: not applicable (the project stays active)
+T4: 150 acts recorded
 
-  File "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py", line 1868
-    "code": format!(
-                  ^
-SyntaxError: invalid syntax
+
+[exit 0]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T4 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T4-snap-x_0274ar/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T4-snap-x_0274ar/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T4-bodies --local-bin /tmp/conv526-bin-8111c984
+
+{
+  "schema": "artefact-publication/v1",
+  "applied": [
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "compliance-review",
+      "document_id": "01a219e0-5e77-73a7-a568-830f1e5a4c4a",
+      "natural_key": "artefact:T4:compliance-review:44f27fd9af300f4b",
+      "body_sha256": "44f27fd9af300f4bfaa751b8f033de1b916639ead8902c5173894c48245ddad9"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "delivery-contract",
+      "document_id": "01a219e0-6021-7051-b9c5-a582512b5c23",
+      "natural_key": "artefact:T4:delivery-contract:02772e72747d5628",
+      "body_sha256": "02772e72747d56281336e26fac6832748fb58ae3175cdac7b643bb2239a50797"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "project-baseline",
+      "document_id": "01a219e0-61b4-7406-a977-b7849c3e7cb7",
+      "natural_key": "artefact:T4:project-baseline:503085ead979bb07",
+      "body_sha256": "503085ead979bb07d406745e1485d06a2caef8b4ee8f90fbbbeee8cc8163047c"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "project-registers",
+      "document_id": "01a219e0-6348-737d-b062-3914932f86e9",
+      "natural_key": "artefact:T4:project-registers:5fec80d0c6097256",
+      "body_sha256": "5fec80d0c60972565c039a937705a685ca932f6c1fa09074d05ecd61cd80507a"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "project-wbs",
+      "document_id": "01a219e0-6513-71b8-8748-de4e924d6b14",
+      "natural_key": "artefact:T4:project-wbs:5fce6d9540001a8d",
+      "body_sha256": "5fce6d9540001a8d130e2bcffd23648c4a03b78108aca2a1983d9da9f8b47d94"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "statement-of-architecture-work",
+      "document_id": "01a219e0-66e9-74fe-864c-db19edfa3434",
+      "natural_key": "artefact:T4:statement-of-architecture-work:e50c854867cb0e5c",
+      "body_sha256": "e50c854867cb0e5ca48740b1fa475e571dd52fa0689ea59ad1d3aed5e94a2adf"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "change-control",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    }
+  ],
+  "refused": [
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "statement-of-intent",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "T4",
+      "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
+      }
+    }
+  ],
+  "counts": {
+    "due": 10,
+    "present": 0,
+    "missing-edge": 0,
+    "stale": 3,
+    "ambiguous": 0
+  }
+}
+
 
 [exit 1]
 

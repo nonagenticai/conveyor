@@ -1,5 +1,5 @@
 {
-  "body_sha256": "62367eadf822ed592950b9799fcbfbac0dd0c19f56ebadcd3eb70afa18229be4",
+  "body_sha256": "02772e72747d56281336e26fac6832748fb58ae3175cdac7b643bb2239a50797",
   "category": "delivery-contract",
   "headings": [
     {
@@ -8,7 +8,7 @@
       "sources": [
         {
           "category": "delivery-contract",
-          "count": 0,
+          "count": 1,
           "file": "contract_field",
           "kind": "computed",
           "pointer": ""
@@ -21,7 +21,7 @@
           "pointer": ""
         }
       ],
-      "status": "absent"
+      "status": "evidenced"
     },
     {
       "heading": "Compliance method",

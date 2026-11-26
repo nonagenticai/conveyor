@@ -1,5 +1,5 @@
 {
-  "body_sha256": "e29a19753f3a3966a865815e2b080804d1af90bec7db0b09d140523c9b376465",
+  "body_sha256": "44f27fd9af300f4bfaa751b8f033de1b916639ead8902c5173894c48245ddad9",
   "category": "compliance-review",
   "headings": [
     {
@@ -8,7 +8,7 @@
       "sources": [
         {
           "category": "compliance-review",
-          "count": 1,
+          "count": 2,
           "file": "architecture.json",
           "kind": "rows",
           "pointer": "/compliance_reviews"
@@ -22,7 +22,7 @@
       "sources": [
         {
           "category": "compliance-review",
-          "count": 1,
+          "count": 2,
           "file": "architecture.json",
           "kind": "rows",
           "pointer": "/compliance_reviews"

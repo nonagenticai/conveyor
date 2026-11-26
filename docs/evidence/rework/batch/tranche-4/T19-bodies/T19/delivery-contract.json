@@ -1,5 +1,5 @@
 {
-  "body_sha256": "99494f6cd68d1f34a506956eedcaef12b644ddd5a56ada0cdef83eb98ec58f76",
+  "body_sha256": "a5f0d277e5d1fe6a7ca1efb0eb479cda2fcc47ffeea5a010a6887597850edfeb",
   "category": "delivery-contract",
   "headings": [
     {
@@ -29,7 +29,7 @@
       "sources": [
         {
           "category": "delivery-contract",
-          "count": 0,
+          "count": 1,
           "file": "contract_field",
           "kind": "computed",
           "pointer": ""
@@ -42,7 +42,7 @@
           "pointer": ""
         }
       ],
-      "status": "absent"
+      "status": "evidenced"
     },
     {
       "heading": "Approval",

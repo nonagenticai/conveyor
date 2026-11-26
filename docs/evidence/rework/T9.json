@@ -52,7 +52,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a21242-26f0-710f-9173-9dcd2a51fed6 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a219e0-cf6f-7839-8c64-5c590e56f4d7 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T9-review",
       "kind": "snapshot",
       "result": "pass",
@@ -61,7 +61,7 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "latest closure gate 01a21242-2a22-77cc-b34e-ae0bfe983b0a decided by a distinct approver",
+      "detail": "latest closure gate 01a216d0-ac07-7f54-bf44-9cd590a0a8d7 decided by a distinct approver",
       "id": "T9-closure-gate",
       "kind": "snapshot",
       "result": "pass",
@@ -124,7 +124,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a211c9-1412-772b-b094-06288207fcd1 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a216d0-e31c-7ac3-a21c-9336873a946e carries a statement and evidence from the tranche-4 retro",
       "id": "T9-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -169,16 +169,16 @@
   ],
   "failures": [],
   "gate": "an architecture project passes Preliminary and A\u2013F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata",
-  "generated_at": "2026-11-25T11:48:33.214770+00:00",
+  "generated_at": "2026-11-26T22:02:15.834685+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T9.toml",
   "name": "TOGAF ADM capability",
   "project": "T9",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T11:47:45.486408+00:00",
-    "git_sha": "1c1eb54c264539e6f16c01276ad9f185fe7bcda0",
-    "path": "retained-snapshot/1c1eb54c264539e6f16c01276ad9f185fe7bcda0"
+    "generated_at": "2026-11-26T22:01:29.858509+00:00",
+    "git_sha": "60b290a3c661b22572603c4f007906561ee7f44b",
+    "path": "retained-snapshot/60b290a3c661b22572603c4f007906561ee7f44b"
   },
   "verdict": "green",
   "warnings": []

@@ -12,7 +12,7 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "baseline 01a21214-0e05-7016-8a3c-20c55314ca1e approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "detail": "baseline 01a219dd-68b3-7467-b150-49c5b261bfb9 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "T14-baseline",
       "kind": "snapshot",
       "result": "pass",
@@ -34,7 +34,7 @@
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "contract 01a21213-fc98-7a5d-a699-9683ac6459c0 approved by board decision 01a21213-fce1-7a03-8080-3eb9385f2ec2 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "detail": "contract 01a219dd-4673-70da-b701-3f43675b4fa6 approved by board decision 01a219dd-4701-7342-9adf-f2c47331c4af about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "T14-contract",
       "kind": "snapshot",
       "result": "pass",
@@ -43,7 +43,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a21242-4c39-76dd-9620-953c9fcd43f9 (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a219dd-7ac5-7777-a3ed-94afa7c3a5fe (consistent) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T14-review",
       "kind": "snapshot",
       "result": "pass",
@@ -106,7 +106,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a211c9-1412-772b-b094-06288207fcd1 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a216d0-e31c-7ac3-a21c-9336873a946e carries a statement and evidence from the tranche-4 retro",
       "id": "T14-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -154,16 +154,16 @@
     "gate (P0): the gate check 'T14-rework' did not pass"
   ],
   "gate": "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish",
-  "generated_at": "2026-11-25T11:48:34.453259+00:00",
+  "generated_at": "2026-11-26T21:58:20.684577+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T14.toml",
   "name": "Estate toolkits",
   "project": "T14",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T11:47:45.486408+00:00",
-    "git_sha": "1c1eb54c264539e6f16c01276ad9f185fe7bcda0",
-    "path": "retained-snapshot/1c1eb54c264539e6f16c01276ad9f185fe7bcda0"
+    "generated_at": "2026-11-26T21:58:16.568374+00:00",
+    "git_sha": "60b290a3c661b22572603c4f007906561ee7f44b",
+    "path": "retained-snapshot/60b290a3c661b22572603c4f007906561ee7f44b"
   },
   "verdict": "red",
   "warnings": []

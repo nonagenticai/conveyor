@@ -1,5 +1,5 @@
 {
-  "body_sha256": "c081ef0791d688cfd32df9ae218512c6f089fa7d91673a03d09588b4513c270f",
+  "body_sha256": "503085ead979bb07d406745e1485d06a2caef8b4ee8f90fbbbeee8cc8163047c",
   "category": "project-baseline",
   "headings": [
     {
@@ -22,7 +22,7 @@
       "sources": [
         {
           "category": "project-baseline",
-          "count": 0,
+          "count": 1,
           "file": "msp.json",
           "kind": "rows",
           "pointer": "/project_baselines"
@@ -35,7 +35,7 @@
           "pointer": ""
         }
       ],
-      "status": "absent"
+      "status": "evidenced"
     },
     {
       "heading": "Cost",
@@ -43,7 +43,7 @@
       "sources": [
         {
           "category": "project-baseline",
-          "count": 0,
+          "count": 1,
           "file": "msp.json",
           "kind": "rows",
           "pointer": "/project_baselines"
@@ -56,7 +56,7 @@
           "pointer": ""
         }
       ],
-      "status": "absent"
+      "status": "evidenced"
     },
     {
       "heading": "Approval",
@@ -64,7 +64,7 @@
       "sources": [
         {
           "category": "project-baseline",
-          "count": 1,
+          "count": 3,
           "file": "work.json",
           "kind": "rows",
           "pointer": "/approvals"
