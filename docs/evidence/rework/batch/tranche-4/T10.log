@@ -1,61 +1,62 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project T10 --content docs/evidence/rework/tranche-4/rework-content-T10.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
 
-  01 projects.reopen ok
+  reopen: not needed
   charter: already approved
   closure outputs: already ['closure-review']
   SoAW: already live
-  02 documents.compose ok
-  03 documents.publish ok
-  04 architecture.artifacts_supersede ok
-  05 architecture.artifacts_update ok
-  06 architecture.artifacts_approve ok
+  01 documents.compose ok
+  02 documents.publish ok
+  03 architecture.artifacts_supersede ok
+  04 architecture.artifacts_update ok
+  05 architecture.artifacts_approve ok
   artefact: Stakeholder Map — T10 SAFe cadence and MSP tranches (Phase A) re-versioned, bound and documented
-  07 documents.compose ok
-  08 documents.publish ok
-  09 architecture.artifacts_supersede ok
-  10 architecture.artifacts_update ok
-  11 architecture.artifacts_approve ok
+  06 documents.compose ok
+  07 documents.publish ok
+  08 architecture.artifacts_supersede ok
+  09 architecture.artifacts_update ok
+  10 architecture.artifacts_approve ok
   artefact: Driver/Goal/Objective Catalog — T10 SAFe cadence and MSP tranches (Phase A) re-versioned, bound and documented
-  12 documents.compose ok
-  13 documents.publish ok
-  14 architecture.artifacts_supersede ok
-  15 architecture.artifacts_update ok
-  16 architecture.artifacts_approve ok
+  11 documents.compose ok
+  12 documents.publish ok
+  13 architecture.artifacts_supersede ok
+  14 architecture.artifacts_update ok
+  15 architecture.artifacts_approve ok
   artefact: Requirements Catalog — T10 SAFe cadence and MSP tranches (Phase A) re-versioned, bound and documented
-  17 documents.compose ok
-  18 documents.publish ok
-  19 architecture.artifacts_supersede ok
-  20 architecture.artifacts_update ok
-  21 architecture.artifacts_approve ok
+  16 documents.compose ok
+  17 documents.publish ok
+  18 architecture.artifacts_supersede ok
+  19 architecture.artifacts_update ok
+  20 architecture.artifacts_approve ok
   artefact: Solution Concept Diagram — T10 SAFe cadence and MSP tranches (Phase A) re-versioned, bound and documented
-  22 documents.compose ok
-  23 documents.publish ok
-  24 architecture.artifacts_supersede ok
-  25 architecture.artifacts_update ok
-  26 architecture.artifacts_approve ok
+  21 documents.compose ok
+  22 documents.publish ok
+  23 architecture.artifacts_supersede ok
+  24 architecture.artifacts_update ok
+  25 architecture.artifacts_approve ok
   artefact: Business Capability Map — T10 SAFe cadence and MSP tranches (Phase B) re-versioned, bound and documented
-  27 documents.compose ok
-  28 documents.publish ok
-  29 architecture.artifacts_supersede ok
-  30 architecture.artifacts_update ok
-  31 architecture.artifacts_approve ok
+  26 documents.compose ok
+  27 documents.publish ok
+  28 architecture.artifacts_supersede ok
+  29 architecture.artifacts_update ok
+  30 architecture.artifacts_approve ok
   artefact: Data Entity/Data Component Catalog — T10 SAFe cadence and MSP tranches (Phase C) re-versioned, bound and documented
-  32 documents.compose ok
-  33 documents.publish ok
-  34 architecture.artifacts_supersede ok
-  35 architecture.artifacts_update ok
-  36 architecture.artifacts_approve ok
+  31 documents.compose ok
+  32 documents.publish ok
+  33 architecture.artifacts_supersede ok
+  34 architecture.artifacts_update ok
+  35 architecture.artifacts_approve ok
   artefact: Technology Standards Catalog — T10 SAFe cadence and MSP tranches (Phase D) re-versioned, bound and documented
+  36 architecture.artifacts_link ok
   37 architecture.artifacts_link ok
   38 architecture.artifacts_link ok
   39 architecture.artifacts_link ok
   40 architecture.artifacts_link ok
   41 architecture.artifacts_link ok
   42 architecture.artifacts_link ok
-  43 architecture.artifacts_link ok
-  delivery contract: already live
-  44 registers.create ok
-  45 registers.create ok
+  43 architecture.contracts_request ok
+  44 architecture.board_decide ok
+  45 architecture.contracts_approve ok
+  delivery contract: revised to carry the authored body
   46 registers.create ok
   47 registers.create ok
   48 registers.create ok
@@ -66,54 +67,193 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   53 registers.create ok
   54 registers.create ok
   55 registers.create ok
+  56 registers.create ok
+  57 registers.create ok
+  benefit transitions: none in the content
   baseline: already taken
-  56 projects.baseline ok
-  57 approvals.decide ok
   58 projects.baseline ok
   59 approvals.decide ok
+  60 projects.baseline ok
+  61 approvals.decide ok
   closure-review output: already published
-  60 documents.publish ok
-  61 documents.update ok
   62 documents.publish ok
+  63 documents.update ok
+  64 documents.publish ok
   project-brief output: body corrected and republished
-  63 documents.publish ok
-  64 documents.update ok
   65 documents.publish ok
+  66 documents.update ok
+  67 documents.publish ok
   evidence output: body corrected and republished
-  Phase-G review: already recorded
-  66 cadences.credit_demo ok
+  68 architecture.reviews_record ok
+  69 cadences.credit_demo ok
   baseline approval: none pending
-  67 projects.close_request ok
-  68 approvals.decide ok
-  69 approvals.request ok
-  70 approvals.decide ok
-  71 projects.close ok
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  70 approvals.request ok
+  71 approvals.decide ok
+  72 cards.comment ok
+  73 cards.move ok
+  74 cards.move ok
+  card cleared: v1-p83-1:T10
+  75 approvals.request ok
+  76 approvals.decide ok
+  77 cards.comment ok
+  78 cards.move ok
+  79 cards.move ok
+  card cleared: v1-p83-2:T10
+  80 approvals.request ok
+  81 approvals.decide ok
+  82 cards.comment ok
+  83 cards.move ok
+  84 cards.move ok
+  card cleared: v1-p83-3:T10
+  85 approvals.request ok
+  86 approvals.decide ok
+  87 cards.comment ok
+  88 cards.move ok
+  89 cards.move ok
+  card cleared: v1-p83-4:T10
+  90 approvals.request ok
+  91 approvals.decide ok
+  92 cards.comment ok
+  93 cards.move ok
+  94 cards.move ok
+  card cleared: v1-p83-5:T10
+  95 approvals.request ok
+  96 approvals.decide ok
+  97 cards.comment ok
+  98 cards.move ok
+  99 cards.move ok
+  card cleared: v1-w2b-3:T10
+  100 approvals.request ok
+  101 approvals.decide ok
+  102 cards.comment ok
+  103 cards.move ok
+  104 cards.move ok
+  card cleared: v1-w2b-5:T10
+  105 approvals.request ok
+  106 approvals.decide ok
+  107 cards.comment ok
+  108 cards.move ok
+  109 cards.move ok
+  card cleared: v1-p82-2:T10
+  110 approvals.request ok
+  111 approvals.decide ok
+  112 cards.comment ok
+  113 cards.move ok
+  114 cards.move ok
+  card cleared: v1-p82-3:T10
+  115 approvals.request ok
+  116 approvals.decide ok
+  117 cards.comment ok
+  118 cards.move ok
+  119 cards.move ok
+  card cleared: v1-p82-4:T10
+  120 approvals.request ok
+  121 approvals.decide ok
+  122 cards.comment ok
+  123 cards.move ok
+  124 cards.move ok
+  card cleared: v1-w2c-2:T10
+  125 approvals.request ok
+  126 approvals.decide ok
+  127 cards.comment ok
+  128 cards.move ok
+  129 cards.move ok
+  card cleared: std-togaf-phase-e-t10-e:T10
+  130 approvals.request ok
+  131 approvals.decide ok
+  132 cards.comment ok
+  133 cards.move ok
+  134 cards.move ok
+  card cleared: std-togaf-phase-h-t10-h:T10
+  135 approvals.request ok
+  136 approvals.decide ok
+  137 cards.comment ok
+  138 cards.move ok
+  139 cards.move ok
+  card cleared: compliance_review_missing:T10
+  140 approvals.request ok
+  141 approvals.decide ok
+  142 cards.comment ok
+  143 cards.move ok
+  144 cards.move ok
+  card cleared: std-togaf-phase-g-t10-g:T10
+  145 approvals.request ok
+  146 approvals.decide ok
+  147 cards.comment ok
+  148 cards.move ok
+  149 cards.move ok
+  card cleared: std-pmp-project-registers-t10:T10
+  150 approvals.request ok
+  151 approvals.decide ok
+  152 cards.comment ok
+  153 cards.move ok
+  154 cards.move ok
+  card cleared: v1-p83-6:T10
+  155 approvals.request ok
+  156 approvals.decide ok
+  157 cards.comment ok
+  158 cards.move ok
+  159 cards.move ok
+  card cleared: v1-p82-5:T10
+  160 approvals.request ok
+  161 approvals.decide ok
+  162 cards.comment ok
+  163 cards.move ok
+  164 cards.move ok
+  card cleared: v1-p82-6:T10
+  165 approvals.request ok
+  166 approvals.decide ok
+  167 cards.comment ok
+  168 cards.move ok
+  169 cards.move ok
+  card cleared: std-togaf-architecture-artifact-t10:T10
+  170 approvals.request ok
+  171 approvals.decide ok
+  172 cards.comment ok
+  173 cards.move ok
+  174 cards.move ok
+  card cleared: std-togaf-compliance-review-t10:T10
+  175 approvals.request ok
+  176 approvals.decide ok
+  177 cards.comment ok
+  178 cards.move ok
+  179 cards.move ok
+  card cleared: std-togaf-phase-b-t10-b:T10
+  180 approvals.request ok
+  181 approvals.decide ok
+  182 cards.comment ok
+  183 cards.move ok
+  184 cards.move ok
+  card cleared: std-togaf-phase-c-t10-c:T10
+  185 approvals.request ok
+  186 approvals.decide ok
+  187 cards.comment ok
+  188 cards.move ok
+  189 cards.move ok
+  card cleared: std-togaf-phase-d-t10-d:T10
+  190 approvals.request ok
+  191 approvals.decide ok
+  192 cards.comment ok
+  193 cards.move ok
+  194 cards.move ok
+  card cleared: std-togaf-phase-f-t10-f:T10
+  card discharge: 25 card(s) cleared of 380 open package(s)
+  closure gate: already approved
+  destructive gate: already approved
+  195 projects.close ok
   closed T10: 01a1d039-0d36-70c1-a5e8-f50956c5e3f9
-T10: 71 acts recorded
+T10: 195 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T10 --snapshot /tmp/conv526-r2b-snap/data --outputs-dir /tmp/conv526-r2b-snap/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T10-bodies --local-bin /tmp/conv526-r3-cli
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project T10 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T10-snap-yidhztxz/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-T10-snap-yidhztxz/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/T10-bodies --local-bin /tmp/conv526-bin-8111c984
 
 {
   "schema": "artefact-publication/v1",
-  "applied": [
-    {
-      "project_key": "T10",
-      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
-      "category": "delivery-contract",
-      "document_id": "01a211c8-e8e4-7315-b979-e1db30dfbf1a",
-      "edge_repaired": true
-    },
-    {
-      "project_key": "T10",
-      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
-      "category": "project-baseline",
-      "document_id": "01a211c8-ea9e-718b-9b15-7300897cf432",
-      "edge_repaired": true
-    }
-  ],
+  "applied": [],
   "skipped": [
     {
       "project_key": "T10",
@@ -143,6 +283,22 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "project_key": "T10",
       "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
       "category": "compliance-review",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "delivery-contract",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    },
+    {
+      "project_key": "T10",
+      "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+      "category": "project-baseline",
       "mandatory": true,
       "trigger": null,
       "state": "stale"
@@ -233,8 +389,8 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   "counts": {
     "due": 4,
     "present": 0,
-    "missing-edge": 2,
-    "stale": 8,
+    "missing-edge": 0,
+    "stale": 10,
     "ambiguous": 0
   }
 }

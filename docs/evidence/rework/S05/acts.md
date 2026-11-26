@@ -14,3 +14,5 @@ S05: 150 acts in `transcript.jsonl`; the last run recorded 10.
 S05: 165 acts in `transcript.jsonl`; the last run recorded 15.
 
 S05: 179 acts in `transcript.jsonl`; the last run recorded 14.
+
+S05: 266 acts in `transcript.jsonl`; the last run recorded 87.

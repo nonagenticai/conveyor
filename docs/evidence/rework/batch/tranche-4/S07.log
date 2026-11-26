@@ -59,6 +59,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   57 registers.create ok
   58 registers.create ok
   59 registers.create ok
+  benefit transitions: none in the content
   60 projects.baseline ok
   61 projects.baseline ok
   62 approvals.decide ok
@@ -73,19 +74,146 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   71 documents.publish ok
   evidence output: body corrected and republished
   72 architecture.reviews_record ok
+  73 wbs.update ok
+  74 cadences.credit_demo ok
+  75 approvals.decide ok
+  76 changes.request ok
+  77 approvals.decide ok
+  record fixes: none in the content
+  78 approvals.request ok
+  79 approvals.decide ok
+  80 cards.comment ok
+  81 cards.move ok
+  82 cards.move ok
+  card cleared: closed_without_closure_review:S07
+  83 approvals.request ok
+  84 approvals.decide ok
+  85 cards.comment ok
+  86 cards.move ok
+  87 cards.move ok
+  card cleared: v1-w2c-5:S07
+  88 approvals.request ok
+  89 approvals.decide ok
+  90 cards.comment ok
+  91 cards.move ok
+  92 cards.move ok
+  card cleared: v1-w2c-6:S07
+  93 approvals.request ok
+  94 approvals.decide ok
+  95 cards.comment ok
+  96 cards.move ok
+  97 cards.move ok
+  card cleared: std-pmp-project-registers-s07:S07
+  98 approvals.request ok
+  99 approvals.decide ok
+  100 cards.comment ok
+  101 cards.move ok
+  102 cards.move ok
+  card cleared: std-togaf-architecture-artifact-s07:S07
+  card discharge: 5 card(s) cleared of 401 open package(s)
+  103 projects.close_request ok
+  104 approvals.decide ok
+  105 approvals.request ok
+  106 approvals.decide ok
 
-rework: changes.request refused at act 73: error: changes.request refused (422): the input does not match the action schema [baseline_id: baseline 01a21213-b628-739b-a57c-f07b4bd3728a is a cost baseline; the direct route needs the scope baseline (baseline_not_scope)]
-FAILED: changes.request: transport exited 1
+rework: projects.close refused at act 107: error: projects.close refused (409): project S07 cannot close until its mandatory artefacts exist (missing: project-registers, project-wbs)
+FAILED: projects.close: transport exited 1
 
 [exit 1]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S07 --snapshot /tmp/conv526-r2b-snap/data --outputs-dir /tmp/conv526-r2b-snap/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/S07-bodies --local-bin /tmp/conv526-r3-cli
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S07 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S07-snap-m0tr7y63/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S07-snap-m0tr7y63/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/S07-bodies --local-bin /tmp/conv526-bin-8111c984
 
 {
   "schema": "artefact-publication/v1",
-  "applied": [],
-  "skipped": [],
+  "applied": [
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "compliance-review",
+      "document_id": "01a219d9-b12d-7650-a24f-c9afa78ddd72",
+      "natural_key": "artefact:S07:compliance-review:43594194cda26acc",
+      "body_sha256": "43594194cda26acc780731f58ec264795001136927387da8eb05de68d84f7cef"
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "delivery-contract",
+      "document_id": "01a219d9-b351-737a-be7c-e58714c30ace",
+      "natural_key": "artefact:S07:delivery-contract:6c9bf4c72f987bae",
+      "body_sha256": "6c9bf4c72f987bae0353ca57c728ce5e86d383e106c5706b93fceebf7aa4ded8"
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "project-baseline",
+      "document_id": "01a219d9-b517-7453-a814-2edd0ac9a19e",
+      "natural_key": "artefact:S07:project-baseline:36f4d00193c22405",
+      "body_sha256": "36f4d00193c22405c1998ebae9bd1f36c9ef8adbb8c50e8bd61f2c83ef704030"
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "project-wbs",
+      "document_id": "01a219d9-b6d7-74c9-934c-27a341a2061d",
+      "natural_key": "artefact:S07:project-wbs:bb89976a7c24e45b",
+      "body_sha256": "bb89976a7c24e45b15686194ead84e9127b48c9b605a05d2fc7cf07d9c32deb3"
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "statement-of-architecture-work",
+      "document_id": "01a219d9-b8fe-721e-b4c2-698bc214ff61",
+      "natural_key": "artefact:S07:statement-of-architecture-work:0ceecdbf3e989133",
+      "body_sha256": "0ceecdbf3e989133e5968f8e1049ad8a25dae2f95df476f24f39f6c3108c5b9c"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    }
+  ],
   "refused": [
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Document' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
     {
       "project_key": "S07",
       "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
@@ -94,68 +222,8 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "trigger": null,
       "state": "due",
       "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Change requests' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S07",
-      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
-      "category": "closure-review",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Outcome vs acceptance' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S07",
-      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
-      "category": "compliance-review",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Decision' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S07",
-      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
-      "category": "delivery-contract",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Approval' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S07",
-      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
-      "category": "project-baseline",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Scope' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S07",
-      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
-      "category": "project-brief",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Outcome' has a source that resolves to zero rows"
+        "code": "EMPTY_REGISTER_CODE",
+        "message": "required heading 'Change requests' resolves a register row with an empty code"
       }
     },
     {
@@ -166,32 +234,100 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "trigger": null,
       "state": "due",
       "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Risks' has a source that resolves to zero rows"
+        "code": "EMPTY_REGISTER_CODE",
+        "message": "required heading 'Changes' resolves a register row with an empty code"
       }
     },
     {
       "project_key": "S07",
       "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
-      "category": "project-wbs",
-      "mandatory": true,
+      "category": "statement-of-intent",
+      "mandatory": false,
       "trigger": null,
       "state": "due",
       "refusal": {
         "code": "EMPTY_POINTER",
-        "message": "required heading 'Work packages' has a source that resolves to zero rows"
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S07",
+      "project_id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
       }
     }
   ],
   "counts": {
-    "due": 8,
+    "due": 12,
     "present": 0,
     "missing-edge": 0,
-    "stale": 0,
+    "stale": 1,
     "ambiguous": 0
   }
 }
 
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S07 --content docs/evidence/rework/tranche-4/rework-content-S07.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — S07 Requirements and search (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — S07 Requirements and search (Phase A) already present
+  artefact: Requirements Catalog — S07 Requirements and search (Phase A) already present
+  artefact: Solution Concept Diagram — S07 Requirements and search (Phase A) already present
+  artefact: Business Capability Map — S07 Requirements and search (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — S07 Requirements and search (Phase C) already present
+  artefact: Technology Standards Catalog — S07 Requirements and search (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  delivery contract: already live
+  register risk: The plan §7 functional gate has no recorded run already present
+  register risk: The §5.6 relevance targets have no measured eval numbers already present
+  register risk: Both GIN indexes are dead if the trigram operators are not LEAKPROOF already present
+  register issue: The snapshot carries no linked issue and no baseline row already present
+  register issue: The plan §10.3 open question still assumes outline and outline_node exist already present
+  register assumption: The 2026-11-24 snapshot is the authoritative record for S07 already present
+  register assumption: S03 and S04 keep the surfaces S07 reuses already present
+  register dependency: S03 keeps governed_asset, revision, catalogue_entry and trace_link already present
+  register dependency: S04 projects every S07 action through the registry already present
+  register dependency: PostgreSQL 18 carries pg_trgm and the LEAKPROOF operators already present
+  register benefit: One governed_asset lifecycle replaces RM's 57 domain tables already present
+  register benefit: Every mutation leaves an immutable revision with a Rust field-level compare already present
+  register benefit: A measured relevance baseline over 40 human-labelled queries already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  09 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  closure gate: already approved
+  destructive gate: already approved
+
+rework: projects.close refused at act 10: error: projects.close refused (409): project S07 cannot close until its mandatory artefacts exist (missing: project-registers)
+FAILED: projects.close: transport exited 1
 
 [exit 1]
 

@@ -1856,6 +1856,20 @@ class Runner:
             read_action="registers.get",
             read_id_from_output="change_id",
         )
+        # The composer refuses a register row with an empty code (`EMPTY_REGISTER_CODE`), and a
+        # change row is a register row: `changes.request` writes none, so the factory names it
+        # before the gate decides. Measured on S07/S09, tr4 batch 2026-11-26: `project-registers`
+        # and `change-control` were refused on the empty code and the close then refused the two
+        # missing mandatory documents.
+        self.invoke(
+            "registers.update",
+            {
+                "id": str(change["change_id"]),
+                "code": f"CH-{self.project}-{str(change['change_id'])[-6:]}",
+            },
+            read_action="registers.get",
+            read_input={"id": str(change["change_id"])},
+        )
         self.decide(change["approval_id"], "approve the change that authorises the acceptance")
         return str(change["change_id"])
 

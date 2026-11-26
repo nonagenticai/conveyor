@@ -60,6 +60,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   58 registers.create ok
   59 registers.create ok
   60 registers.create ok
+  benefit transitions: none in the content
   61 projects.baseline ok
   62 projects.baseline ok
   63 approvals.decide ok
@@ -74,19 +75,134 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   72 documents.publish ok
   evidence output: body corrected and republished
   73 architecture.reviews_record ok
+  74 wbs.update ok
+  75 cadences.credit_demo ok
+  76 approvals.decide ok
+  77 changes.request ok
+  78 approvals.decide ok
+  record fixes: none in the content
+  79 approvals.request ok
+  80 approvals.decide ok
+  81 cards.comment ok
+  82 cards.move ok
+  83 cards.move ok
+  card cleared: closed_without_closure_review:S09
+  84 approvals.request ok
+  85 approvals.decide ok
+  86 cards.comment ok
+  87 cards.move ok
+  88 cards.move ok
+  card cleared: std-pmp-project-registers-s09:S09
+  89 approvals.request ok
+  90 approvals.decide ok
+  91 cards.comment ok
+  92 cards.move ok
+  93 cards.move ok
+  card cleared: std-togaf-architecture-artifact-s09:S09
+  card discharge: 3 card(s) cleared of 391 open package(s)
+  94 projects.close_request ok
+  95 approvals.decide ok
+  96 approvals.request ok
+  97 approvals.decide ok
 
-rework: changes.request refused at act 74: error: changes.request refused (422): the input does not match the action schema [baseline_id: baseline 01a21213-d3f3-7249-8f2f-93708b7063e1 is a cost baseline; the direct route needs the scope baseline (baseline_not_scope)]
-FAILED: changes.request: transport exited 1
+rework: projects.close refused at act 98: error: projects.close refused (409): project S09 cannot close until its mandatory artefacts exist (missing: project-registers, project-wbs)
+FAILED: projects.close: transport exited 1
 
 [exit 1]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S09 --snapshot /tmp/conv526-r2b-snap/data --outputs-dir /tmp/conv526-r2b-snap/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/S09-bodies --local-bin /tmp/conv526-r3-cli
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S09 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S09-snap-oko6x3w_/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S09-snap-oko6x3w_/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-4/S09-bodies --local-bin /tmp/conv526-bin-8111c984
 
 {
   "schema": "artefact-publication/v1",
-  "applied": [],
-  "skipped": [],
+  "applied": [
+    {
+      "project_key": "S09",
+      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+      "category": "compliance-review",
+      "document_id": "01a219da-72bb-71e7-b00e-ee54b5d38ef0",
+      "natural_key": "artefact:S09:compliance-review:add34d6003d81864",
+      "body_sha256": "add34d6003d81864d87541b23bec44b3f76ed2a5267cbc4d754ba5a2446356a5"
+    },
+    {
+      "project_key": "S09",
+      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+      "category": "delivery-contract",
+      "document_id": "01a219da-7480-74ec-8802-1bbc94167cd8",
+      "natural_key": "artefact:S09:delivery-contract:9e5427db7593962f",
+      "body_sha256": "9e5427db7593962f59c5d9da57ce59895221bdff552376d479e1f249ed32f7a4"
+    },
+    {
+      "project_key": "S09",
+      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+      "category": "project-baseline",
+      "document_id": "01a219da-763a-7033-9a27-4cd67a13ef38",
+      "natural_key": "artefact:S09:project-baseline:9608c5865d2454d4",
+      "body_sha256": "9608c5865d2454d4fdb38e882076c8058abf8095215cf5f718d7810943cd7fdc"
+    },
+    {
+      "project_key": "S09",
+      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+      "category": "project-wbs",
+      "document_id": "01a219da-7801-70ff-8833-2b6dfbf5a81a",
+      "natural_key": "artefact:S09:project-wbs:dd57eed7aa4e285f",
+      "body_sha256": "dd57eed7aa4e285febaf3fd2a49491aedbf0e87c8725ce413fea02e5798e32a1"
+    },
+    {
+      "project_key": "S09",
+      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+      "category": "statement-of-architecture-work",
+      "document_id": "01a219da-79db-7458-890b-e9d736f51de1",
+      "natural_key": "artefact:S09:statement-of-architecture-work:873542d048105cb0",
+      "body_sha256": "873542d048105cb029b11baa269121c8e745c1894783e164f9b0be42b40ec3e4"
+    }
+  ],
+  "skipped": [
+    {
+      "project_key": "S09",
+      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+      "category": "project-brief",
+      "mandatory": true,
+      "trigger": null,
+      "state": "stale"
+    }
+  ],
   "refused": [
+    {
+      "project_key": "S09",
+      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+      "category": "architecture-analysis",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Current state' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S09",
+      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+      "category": "architecture-artifact",
+      "mandatory": true,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Document' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S09",
+      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+      "category": "architecture-design",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "EMPTY_POINTER",
+        "message": "required heading 'Context and boundary' has a source that resolves to zero rows"
+      }
+    },
     {
       "project_key": "S09",
       "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
@@ -95,68 +211,8 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "trigger": null,
       "state": "due",
       "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Change requests' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "closure-review",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Outcome vs acceptance' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "compliance-review",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Decision' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "delivery-contract",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Approval' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "project-baseline",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Scope' has a source that resolves to zero rows"
-      }
-    },
-    {
-      "project_key": "S09",
-      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "project-brief",
-      "mandatory": true,
-      "trigger": null,
-      "state": "due",
-      "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Outcome' has a source that resolves to zero rows"
+        "code": "EMPTY_REGISTER_CODE",
+        "message": "required heading 'Change requests' resolves a register row with an empty code"
       }
     },
     {
@@ -167,32 +223,101 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "trigger": null,
       "state": "due",
       "refusal": {
-        "code": "EMPTY_POINTER",
-        "message": "required heading 'Risks' has a source that resolves to zero rows"
+        "code": "EMPTY_REGISTER_CODE",
+        "message": "required heading 'Changes' resolves a register row with an empty code"
       }
     },
     {
       "project_key": "S09",
       "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
-      "category": "project-wbs",
-      "mandatory": true,
+      "category": "statement-of-intent",
+      "mandatory": false,
       "trigger": null,
       "state": "due",
       "refusal": {
         "code": "EMPTY_POINTER",
-        "message": "required heading 'Work packages' has a source that resolves to zero rows"
+        "message": "required heading 'Intended use' has a source that resolves to zero rows"
+      }
+    },
+    {
+      "project_key": "S09",
+      "project_id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+      "category": "waiver",
+      "mandatory": false,
+      "trigger": null,
+      "state": "due",
+      "refusal": {
+        "code": "NO_EVIDENCE",
+        "message": "no required heading resolves to a non-zero fact; headings alone are not evidence"
       }
     }
   ],
   "counts": {
-    "due": 8,
+    "due": 12,
     "present": 0,
     "missing-edge": 0,
-    "stale": 0,
+    "stale": 1,
     "ambiguous": 0
   }
 }
 
+
+[exit 1]
+
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S09 --content docs/evidence/rework/tranche-4/rework-content-S09.json --tranche-label tranche 4 --demo-cadence 01a202a1-f4ee-7acc-8e57-50ac6f0417fd
+
+  reopen: not needed
+  charter: already approved
+  closure outputs: already ['closure-review']
+  SoAW: already live
+  artefact: Stakeholder Map — S09 Documents and integrations (Phase A) already present
+  artefact: Driver/Goal/Objective Catalog — S09 Documents and integrations (Phase A) already present
+  artefact: Requirements Catalog — S09 Documents and integrations (Phase A) already present
+  artefact: Solution Concept Diagram — S09 Documents and integrations (Phase A) already present
+  artefact: Business Capability Map — S09 Documents and integrations (Phase B) already present
+  artefact: Data Entity/Data Component Catalog — S09 Documents and integrations (Phase C) already present
+  artefact: Technology Standards Catalog — S09 Documents and integrations (Phase D) already present
+  01 architecture.artifacts_link ok
+  02 architecture.artifacts_link ok
+  03 architecture.artifacts_link ok
+  04 architecture.artifacts_link ok
+  05 architecture.artifacts_link ok
+  06 architecture.artifacts_link ok
+  07 architecture.artifacts_link ok
+  08 architecture.artifacts_link ok
+  delivery contract: already live
+  register risk: The seven gate properties a to g have no recorded run, so the built claim is unproven already present
+  register risk: The deployed MinIO leg and the live strata_ingest path behind documents.ingest are unproven already present
+  register risk: The strata_rag path contract is unresolved: /query versus /api/query already present
+  register issue: documents.ingest is the one declared action of 27 not registered already present
+  register issue: The plan frontmatter reads planned while the project meta says measured_status built already present
+  register issue: The nine linked issues are recorded closed but their acceptance is not re-verified already present
+  register assumption: The 2026-11-24 rework snapshot is the authoritative record for S09 already present
+  register assumption: S03 supplies tenant, trace_link and revision exactly as the project brief records already present
+  register dependency: S09 is blocked by S03, S04 and S02 already present
+  register dependency: The deployed leg depends on the operators' MinIO endpoint, credentials and bucket policy already present
+  register dependency: documents.ingest depends on a live strata_ingest target and a sealed per-tenant token already present
+  register benefit: Document bytes leave Postgres: content lives in MinIO behind one authorized stream already present
+  register benefit: Secrets are write-only: no response returns a plaintext, value key or ciphertext already present
+  register benefit: Adjacent services stay external: a call absent from action_registry does not exist already present
+  benefit transitions: none in the content
+  baseline: already taken
+  schedule baseline: already taken
+  cost baseline: already taken
+  closure-review output: already published
+  project-brief output: current
+  evidence output: current
+  Phase-G review: already recorded
+  09 cadences.credit_demo ok
+  baseline approval: none pending
+  change control: 1 change row(s) present
+  record fixes: none in the content
+  card discharge: no open rework card owned by the project
+  closure gate: already approved
+  destructive gate: already approved
+
+rework: projects.close refused at act 10: error: projects.close refused (409): project S09 cannot close until its mandatory artefacts exist (missing: project-registers)
+FAILED: projects.close: transport exited 1
 
 [exit 1]
 

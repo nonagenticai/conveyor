@@ -12,7 +12,7 @@
     {
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "baseline 01a21213-9817-7c2f-b7cc-4a72514ea0aa approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "detail": "baseline 01a219d8-ad39-77c1-83f6-da901324441d approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "S05-baseline",
       "kind": "snapshot",
       "result": "pass",
@@ -34,7 +34,7 @@
     {
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "contract 01a21213-88fe-7e0f-8110-c5f38148ed34 approved by board decision 01a21213-8943-7874-b457-e5feaa1c4542 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "detail": "contract 01a219d8-8bc7-71a2-8dbe-33702699eac1 approved by board decision 01a219d8-8c6d-715e-ad85-da38d5f3351c about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "S05-contract",
       "kind": "snapshot",
       "result": "pass",
@@ -43,7 +43,7 @@
     {
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a21242-7d34-7bc7-a1f8-c658838b5731 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a219d8-c069-7f66-a965-ee434ae1565b (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "S05-review",
       "kind": "snapshot",
       "result": "pass",
@@ -88,7 +88,7 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "lesson 01a211c9-1412-772b-b094-06288207fcd1 carries a statement and evidence from the tranche-4 retro",
+      "detail": "lesson 01a216d0-e31c-7ac3-a21c-9336873a946e carries a statement and evidence from the tranche-4 retro",
       "id": "S05-lessons",
       "kind": "snapshot",
       "result": "pass",
@@ -151,16 +151,16 @@
   ],
   "failures": [],
   "gate": "replay a board export, win a two-client race and survive the 1k-card load \u2014 zero deltas on 1,000 cards, one 200 and one 412 with the current representation, p95 \u2264 120 ms at 20 rps, the exact webhook shape, SSE within 200 ms, and no second store",
-  "generated_at": "2026-11-25T11:48:36.895284+00:00",
+  "generated_at": "2026-11-26T21:53:09.049025+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S05.toml",
   "name": "Board \u2014 projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE",
   "project": "S05",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-25T11:47:45.486408+00:00",
-    "git_sha": "1c1eb54c264539e6f16c01276ad9f185fe7bcda0",
-    "path": "retained-snapshot/1c1eb54c264539e6f16c01276ad9f185fe7bcda0"
+    "generated_at": "2026-11-26T21:53:04.515281+00:00",
+    "git_sha": "60b290a3c661b22572603c4f007906561ee7f44b",
+    "path": "retained-snapshot/60b290a3c661b22572603c4f007906561ee7f44b"
   },
   "verdict": "green",
   "warnings": []
