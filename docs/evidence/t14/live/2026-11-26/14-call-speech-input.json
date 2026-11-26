@@ -1,0 +1,9 @@
+{
+ "input": {
+  "run_id": "01a21a03-69b2-71d3-930f-ac6d5bec70d7",
+  "tool": "speech.synthesize",
+  "input": {
+   "text": "The conveyor toolkit gate speaks once, on twenty-six November twenty twenty-six."
+  }
+ }
+}

@@ -1,0 +1,10 @@
+{
+  "effect_ceiling": "write",
+  "enabled": true,
+  "id": "01a21a03-f686-78aa-95ed-6d8580234992",
+  "run_id": "01a21a03-f612-75c9-9fa2-12a6b0c2b95b",
+  "toolkit_id": "01a21a02-364e-7966-afaf-aef0b040a3f4",
+  "toolkit_key": "coding",
+  "toolkit_version": 2,
+  "version": 1
+}

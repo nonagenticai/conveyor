@@ -1,0 +1,21 @@
+{
+  "archived_at": null,
+  "assignee_id": null,
+  "board_id": "01a1d3e7-aedf-7a3d-b14e-ee5133cfcfde",
+  "card_type_code": "incident",
+  "created_at": "2026-11-26T22:41:14.197903Z",
+  "description": "",
+  "due_at": null,
+  "due_done_at": null,
+  "id": "01a21a05-23dd-794d-b2a0-b486d52c581b",
+  "job_binding_id": null,
+  "list_changed_at": "2026-11-26T22:41:14.197903Z",
+  "list_id": "01a1d3e7-af77-7a06-93e6-3ca7ffeebe15",
+  "meta": {},
+  "name": "T14 live gate 2026-11-26 — scientific",
+  "parent_card_id": null,
+  "position": 8192.0,
+  "prev_list_id": null,
+  "updated_at": "2026-11-26T22:41:14.197903Z",
+  "version": 1
+}

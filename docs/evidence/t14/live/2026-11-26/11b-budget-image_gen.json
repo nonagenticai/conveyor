@@ -1,0 +1,4 @@
+{
+ "update": "update run set inputs = jsonb_set(coalesce(inputs, '{}'::jsonb), '{limits}', jsonb_build_object('cost_budget_usd', 5.0), true) where tenant_id = '01a1cf6d-23af-7e0e-8b07-89c8f06bafb4' and id = '01a21a04-03b3-7f69-9a7c-f570fb0fe8e5'",
+ "run_inputs": "{\"limits\": {\"cost_budget_usd\": 5.0}}"
+}

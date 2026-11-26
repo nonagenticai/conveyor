@@ -1,0 +1,1 @@
+error: licences mint: POST http://127.0.0.1:28544/internal/tenants/01a1cf6d-23af-7e0e-8b07-89c8f06bafb4/bundle-token?app=strata-rag&ttl_minutes=60: HTTP 403: {"detail":"Role required: bundle-token-minter"}

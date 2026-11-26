@@ -1,0 +1,10 @@
+{
+  "effect_ceiling": "spend",
+  "enabled": true,
+  "id": "01a21a03-6a45-7f93-b4ee-00dba79f966e",
+  "run_id": "01a21a03-69b2-71d3-930f-ac6d5bec70d7",
+  "toolkit_id": "01a21a02-3651-7986-a25b-714b0beafb7e",
+  "toolkit_key": "speech",
+  "toolkit_version": 2,
+  "version": 1
+}

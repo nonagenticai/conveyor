@@ -1,0 +1,11 @@
+{
+  "credential_alias": "licence.token",
+  "effect_ceiling": "read",
+  "enabled": true,
+  "id": "01a21a05-247f-7989-bcbf-45527caafa8b",
+  "run_id": "01a21a05-2417-7472-9e2a-aaf4c3a88770",
+  "toolkit_id": "01a21a02-3655-7a96-abfa-93fc192e3f3a",
+  "toolkit_key": "scientific",
+  "toolkit_version": 1,
+  "version": 1
+}
