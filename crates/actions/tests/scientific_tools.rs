@@ -46,7 +46,7 @@ fn only_the_locked_reads_are_declared() {
     }
     // The dropped surface stays dropped: no graph, sandbox or write action hides behind a name.
     for spec in registry().iter() {
-        let name = spec.name;
+        let name = spec.name.as_ref();
         if name.starts_with("scientific") {
             assert!(
                 !name.contains("graph") && !name.contains("sandbox"),

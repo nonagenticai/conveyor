@@ -96,7 +96,7 @@ fn external_services(registry: &Registry) -> BTreeSet<&'static str> {
     registry
         .iter()
         .filter(|spec| spec.kind == ActionKind::External)
-        .filter_map(|spec| match spec.handler {
+        .filter_map(|spec| match &spec.handler {
             HandlerRef::External { service, .. } => Some(service.as_ref()),
             _ => None,
         })

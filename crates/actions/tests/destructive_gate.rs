@@ -211,9 +211,9 @@ fn every_destructive_action_is_gated_or_listed() {
             spec.name
         );
         if spec.approval_target.is_some() {
-            gated.push(spec.name);
+            gated.push(spec.name.as_ref());
         } else {
-            ungated.push(spec.name);
+            ungated.push(spec.name.as_ref());
         }
     }
     ungated.sort_unstable();
@@ -302,7 +302,7 @@ fn every_destructive_action_declares_a_target() {
             continue;
         }
         if spec.approval_target.is_none() {
-            undecided.push(spec.name);
+            undecided.push(spec.name.as_ref());
         }
     }
     assert!(
