@@ -1,11 +1,78 @@
 {
   "issues": [
     {
+      "number": 773,
+      "title": "publish: republish the standards record and register after the delivery-contract filter",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/773",
+      "updatedAt": "2026-11-26T21:10:48Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 763,
+      "title": "audit: review the delivery contract, not the SoAW, for compliance",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/763",
+      "updatedAt": "2026-11-26T16:24:20Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 762,
+      "title": "proof: the live delivery drills on the released engine, and the mint path that blocks them",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/762",
+      "updatedAt": "2026-11-26T15:57:47Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:needs-human",
+          "color": "5319E7"
+        },
+        {
+          "name": "T1",
+          "color": "6E7781"
+        },
+        {
+          "name": "T14",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
       "number": 760,
       "title": "auth: the session channel \u2014 a machine principal and a licence-bearer mint",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/760",
-      "updatedAt": "2026-11-26T13:58:55Z",
+      "updatedAt": "2026-11-26T16:33:36Z",
       "labels": [
         {
           "name": "unit",
@@ -60,7 +127,7 @@
       "title": "ops: strict-green live publish \u2014 reconcile the ledger to the live P0/P1 set",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/754",
-      "updatedAt": "2026-11-26T14:06:37Z",
+      "updatedAt": "2026-11-26T15:50:11Z",
       "labels": [
         {
           "name": "unit",
@@ -81,7 +148,7 @@
       "title": "skills: six programme delivery-role playbooks and role routing",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/753",
-      "updatedAt": "2026-11-26T14:33:27Z",
+      "updatedAt": "2026-11-26T15:50:09Z",
       "labels": [
         {
           "name": "unit",
@@ -627,7 +694,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/660",
-      "updatedAt": "2026-11-26T14:06:52Z",
+      "updatedAt": "2026-11-26T15:05:23Z",
       "labels": [
         {
           "name": "programme",
@@ -1688,7 +1755,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-26T13:56:50Z",
+      "updatedAt": "2026-11-26T16:23:53Z",
       "labels": [
         {
           "name": "unit",
@@ -6363,17 +6430,17 @@
     {
       "number": 3,
       "title": "S04 \u2014 the external action execution contract (import \u2192 invoke \u2192 restart)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/3",
-      "updatedAt": "2026-11-26T13:15:08Z",
+      "updatedAt": "2026-11-26T17:09:30Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S04",

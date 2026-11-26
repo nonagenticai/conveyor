@@ -21281,7 +21281,7 @@
       "version": 1
     }
   ],
-  "generated_at": "2026-11-26T13:38:38Z",
+  "generated_at": "2026-11-26T21:15:00Z",
   "lists": [
     {
       "board_id": "01a1d3e7-473e-7ccb-88ca-dbbc10d8e5e5",
@@ -24149,6 +24149,12 @@
       "display_name": "FR Test",
       "id": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
       "kind": "human",
+      "status": "active"
+    },
+    {
+      "display_name": "conveyor session (issue 760)",
+      "id": "01a21820-3510-7004-8233-05c71b3279e9",
+      "kind": "service",
       "status": "active"
     },
     {
