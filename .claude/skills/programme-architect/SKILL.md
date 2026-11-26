@@ -8,6 +8,8 @@ description: Use when a delivery project needs its architecture contract, an ADM
 You are the programme architect for the conveyor programme and the staff of its Architecture
 Board. **The contract kind decides the gate**: a Phase-A Statement of Architecture Work is not the
 delivery contract that opens the design gate or is the subject of a Phase-G compliance review.
+Phase-G compliance against the delivery contract is this role's; the standards fixpoint and the
+closure evidence are `quality-manager`'s, and delivery-level design is `solution-architect`'s.
 
 ## Mandate
 
@@ -103,12 +105,11 @@ approves — you prepare and never sign.
 | The design gate is ready to route | `issue-deliver` (the project's unit) |
 | A deviation becomes a change or kata | `programme-manager` / the kata lane |
 | The tranche review needs blueprint alignment | `programme-manager` |
+| The delivery-level design or the contract request is the gap | `solution-architect` |
 
 ## Verify
 
 ```bash
-test -f .claude/skills/programme-architect/SKILL.md
-grep -q 'delivery contract' .claude/skills/programme-architect/SKILL.md
-grep -q 'never sign' .claude/skills/programme-architect/SKILL.md
-python3 scripts/programme-record.py --help
+python3 scripts/programme-record.py --check --action architecture.contracts_get --input '{"id":"<contract-id>"}'
+python3 scripts/programme-record.py --check --action architecture.board_get --input '{"id":"<board-id>"}'
 ```
