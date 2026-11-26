@@ -249,8 +249,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/data/conformance.html",
       "source": "docs/design/data/conformance.md",
       "section": "Design",
-      "sha256": "d1151e4a9466601431d4267129fe581e3510a791755279e0577fcf599001a9a6",
-      "bytes": 23795,
+      "sha256": "a2adb480868e389c1e690a1ef8823f584da3ba547e731f8f168c47bf6efb2232",
+      "bytes": 23410,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
     {
@@ -618,8 +618,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "d1151e4a9466601431d4267129fe581e3510a791755279e0577fcf599001a9a6",
-      "bytes": 23795,
+      "sha256": "a2adb480868e389c1e690a1ef8823f584da3ba547e731f8f168c47bf6efb2232",
+      "bytes": 23410,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
     {
@@ -927,6 +927,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "077ef6e3f3ba3fad737cc65bb288092663d58dc22e7d70192af9b5f21638afed",
       "bytes": 4420,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/produce-capture-2026-11-16.md"
+    },
+    {
+      "title": "Proof of delivery — the Lean certificate corpus",
+      "path": "docs/evidence/proof-of-delivery.html",
+      "source": "docs/evidence/proof-of-delivery.md",
+      "section": "Evidence",
+      "sha256": "7e9b40058881ca44088c6795498464c2688871839a234a35e2187e66c8b221d7",
+      "bytes": 8834,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/proof-of-delivery.md"
     },
     {
       "title": "T19 — Business capability map — approval",
@@ -1734,8 +1743,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/03-DELIVERY.html",
       "source": "docs/plans/03-DELIVERY.md",
       "section": "Plans",
-      "sha256": "fc4c0d0b74daec0a08083342993b3d481409ed6e0d5334a22ba6f14777905882",
-      "bytes": 25579,
+      "sha256": "12514c99588f9b8c02f46592384bd62878cb350d8948fbfa9f9df9987ca26fc0",
+      "bytes": 26151,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
     },
     {
@@ -2493,6 +2502,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "f4c706ef7be80ec1814c5970894bfad9c689770e808ce4909a68e5e99bf94163",
       "bytes": 62935,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
+    },
+    {
+      "title": "Lean delivery certificates",
+      "path": "docs/spec/lean/README.html",
+      "source": "docs/spec/lean/README.md",
+      "section": "Spec",
+      "sha256": "ce870a3d2ca1951c572b086750adccbe634e2845f65232205483d4218c28bc6f",
+      "bytes": 4325,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/spec/lean/README.md"
     }
   ]
 };

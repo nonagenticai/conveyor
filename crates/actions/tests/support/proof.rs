@@ -20,15 +20,18 @@ use uuid::Uuid;
 
 use super::{Pg, Seeded, set_env};
 
-/// A source the stub answers `valid` for, until a test says otherwise.
-pub const SOURCE: &str = "theorem delivery_ok : 2 + 2 = 4 := by decide\n";
-
-/// The theorem [`SOURCE`] declares.
+/// The theorem every fixture certificate closes.
 pub const THEOREM: &str = "delivery_ok";
 
 /// A spec digest shaped like the column's CHECK wants it.
 pub fn spec_sha256() -> String {
     "7c3a5b19".repeat(8)
+}
+
+/// Render a facts document the way the engine does. The source is never hand-written: a caller
+/// cannot supply one that disagrees with the facts, so neither may a fixture.
+pub fn source(facts: &Value) -> String {
+    conveyor_actions::proof::render::render(facts, THEOREM).expect("the fixture facts render")
 }
 
 /// One stub prover per test binary, with the process-global base URL set exactly once.
@@ -115,18 +118,17 @@ impl Prover {
 
 /// Seal the tenant's prover credential, as `conveyor admin upstream-token` does.
 pub async fn seal_lean4(pg: &Pg, tenant: TenantId) {
+    seal_lean4_token(pg, tenant, b"test-lean4-token").await;
+}
+
+/// Seal a specific prover credential — the live corpus test seals a real licence token.
+pub async fn seal_lean4_token(pg: &Pg, tenant: TenantId, token: &[u8]) {
     let mut tx = conveyor_store::begin_scoped(&pg.runtime, tenant)
         .await
         .expect("scoped tx");
-    conveyor_store::secret::create_secret_tx(
-        &mut tx,
-        tenant,
-        "lean4.token",
-        b"test-lean4-token",
-        "tenant",
-    )
-    .await
-    .expect("seal the lean4 token");
+    conveyor_store::secret::create_secret_tx(&mut tx, tenant, "lean4.token", token, "tenant")
+        .await
+        .expect("seal the lean4 token");
     tx.commit().await.expect("commit the lean4 token");
 }
 
@@ -193,14 +195,25 @@ pub fn record_input(
     })
 }
 
-/// The facts a test certificate is about.
+/// The facts a test certificate is about: a slice that is closed and carries its evidence.
+///
+/// `marker` makes each test's facts distinct, so a facts digest is never accidentally shared.
 pub fn facts(marker: &str) -> Value {
-    json!({ "evidence": ["gate"], "marker": marker, "slice": "T1" })
+    json!({
+        "kind": "slice",
+        "spec_sha256": spec_sha256(),
+        "model_sha256": conveyor_actions::proof::render::model_sha256(),
+        "state": "closed",
+        "required": ["gate", marker],
+        "present": ["gate", marker],
+    })
 }
 
 /// Record a certificate end to end and return its id and `certificate_sha256`.
-pub async fn record(pg: &Pg, seeded: &Seeded, source: &str) -> (String, String) {
-    let (key, input) = check(pg, seeded, source).await;
+pub async fn record(pg: &Pg, seeded: &Seeded, marker: &str) -> (String, String) {
+    let facts = facts(marker);
+    let source = source(&facts);
+    let (key, input) = check(pg, seeded, &source).await;
     let subject = Uuid::now_v7();
     let outcome = invoke(
         &pg.runtime,
@@ -209,7 +222,7 @@ pub async fn record(pg: &Pg, seeded: &Seeded, source: &str) -> (String, String) 
         request(
             "proofs.record",
             seeded.user_id,
-            record_input(&key, &input, subject, &facts("base"), THEOREM, "kernel"),
+            record_input(&key, &input, subject, &facts, THEOREM, "kernel"),
             None,
         ),
     )

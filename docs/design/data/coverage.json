@@ -333,8 +333,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 0,
-        "claimed": 1,
+        "blocked": 1,
+        "claimed": 4,
         "numbers": [
           16,
           17,
@@ -359,9 +359,13 @@
           569,
           660,
           669,
-          733
+          733,
+          755,
+          756,
+          760,
+          773
         ],
-        "open": 12,
+        "open": 16,
         "ready": 6,
         "unknown": 0
       }
@@ -573,8 +577,8 @@
         "numbers": [
           3
         ],
-        "open": 1,
-        "ready": 1,
+        "open": 0,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1649,14 +1653,15 @@
       "tranche": 1,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           72,
           744,
-          746
+          746,
+          762
         ],
-        "open": 2,
-        "ready": 1,
+        "open": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2789,8 +2794,8 @@
       },
       "total": 51,
       "uncovered": [],
-      "with_open_units": 10,
-      "without_open_units": 41
+      "with_open_units": 9,
+      "without_open_units": 42
     },
     "screens": {
       "actions_invoked": 39,

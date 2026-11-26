@@ -17,7 +17,7 @@ use rmcp::handler::server::ServerHandler;
 use rmcp::model::{
     CallToolRequestParams, CallToolResponse, CallToolResult, CancelTaskParams, ContentBlock,
     ErrorData as McpError, GetTaskParams, GetTaskResult, ListToolsResult, PaginatedRequestParams,
-    ServerCapabilities, ServerConfig, UpdateTaskParams,
+    ServerCapabilities, ServerConfig, Tool, UpdateTaskParams,
 };
 use rmcp::service::{RequestContext, RoleServer};
 use rmcp::transport::StreamableHttpServerConfig;
@@ -155,7 +155,7 @@ impl ServerHandler for McpServer {
         // The role is `kata_executor` for every intra-action check; the grant set is where the
         // elevation lives, so intersecting it with the role would hide `projects.create` — the
         // very action the agent exists to call.
-        let tools = if let Some(authority) = &session.channel {
+        let mut tools: Vec<Tool> = if let Some(authority) = &session.channel {
             registry()
                 .iter()
                 .filter(|spec| spec.permits_channel(authority))
@@ -169,6 +169,25 @@ impl ServerHandler for McpServer {
                 .filter_map(|value| serde_json::from_value(value).ok())
                 .collect()
         };
+        // S04 P1: the tenant's approved imported actions are tools of the same session.
+        match crate::resolve::imported(&self.deps.pool, session.tenant).await {
+            Ok(imported) => {
+                for action in imported {
+                    let visible = match &session.channel {
+                        Some(authority) => {
+                            !action.machine_forbidden()
+                                && crate::channel::allows(authority, &action.name)
+                        }
+                        None => action.permits_role(session.role),
+                    };
+                    if visible && let Ok(tool) = serde_json::from_value::<Tool>(action.tool_json())
+                    {
+                        tools.push(tool);
+                    }
+                }
+            }
+            Err(error) => tracing::warn!(%error, "tools/list: imported actions unavailable"),
+        }
         Ok(ListToolsResult {
             tools,
             next_cursor: None,
@@ -187,39 +206,79 @@ impl ServerHandler for McpServer {
         let Some(session) = session_of(&context) else {
             return Err(McpError::invalid_request("unauthenticated", None));
         };
-        let Some(spec) = registry()
-            .iter()
-            .find(|spec| spec.mcp_name() == request.name.as_ref())
-        else {
-            // An unknown NAME is a JSON-RPC -32602. A tool that exists but is outside this
-            // role's set is NOT handled here: it resolves to its spec and the shared
-            // `invoke` refuses it with the same `403 action-forbidden` HTTP returns. The
-            // S4-D6 guarantee is the `tools/list` absence above, not indistinguishability
-            // at `tools/call`.
-            return Err(McpError::invalid_params(
-                format!("unknown tool {:?}", request.name),
-                None,
-            ));
-        };
-
-        // A machine principal is different: its channel grants ARE its contract, so an action
-        // outside them (or under the floor) is refused in the same words as an unknown name —
-        // the refusal must not tell a long-lived unattended credential what else exists.
-        if let Some(authority) = &session.channel
-            && !spec.permits_channel(authority)
-        {
-            return Err(McpError::invalid_params(
-                format!("unknown tool {:?}", request.name),
-                None,
-            ));
-        }
+        let tool_name = request.name.as_ref();
+        // S04 P1: a compiled action first, then the tenant's approved imported rows. Both
+        // arrive at the same `invoke`, so HTTP and MCP cannot diverge. An unknown NAME is a
+        // JSON-RPC -32602; a tool outside this role's set resolves and the shared `invoke`
+        // refuses it (the S4-D6 guarantee is the `tools/list` absence, not indistinguishability
+        // at `tools/call`).
+        let (action_name, route_path, task_capable) =
+            match registry().iter().find(|spec| spec.mcp_name() == tool_name) {
+                Some(spec) => {
+                    // A machine principal is different: its channel grants ARE its contract, so an
+                    // action outside them (or under the floor) is refused in the same words as an
+                    // unknown name — the refusal must not tell a long-lived unattended credential
+                    // what else exists.
+                    if let Some(authority) = &session.channel
+                        && !spec.permits_channel(authority)
+                    {
+                        return Err(McpError::invalid_params(
+                            format!("unknown tool {:?}", request.name),
+                            None,
+                        ));
+                    }
+                    (spec.name.to_owned(), spec.route_path(), spec.task_capable)
+                }
+                None => {
+                    let imported = crate::resolve::imported(&self.deps.pool, session.tenant)
+                        .await
+                        .map_err(|_| McpError::internal_error("resolve imported actions", None))?;
+                    let matches: Vec<_> = imported
+                        .into_iter()
+                        .filter(|action| action.mcp_name() == tool_name)
+                        .collect();
+                    match matches.as_slice() {
+                        [] => {
+                            return Err(McpError::invalid_params(
+                                format!("unknown tool {:?}", request.name),
+                                None,
+                            ));
+                        }
+                        [action] => {
+                            let visible = match &session.channel {
+                                Some(authority) => {
+                                    !action.machine_forbidden()
+                                        && crate::channel::allows(authority, &action.name)
+                                }
+                                None => action.permits_role(session.role),
+                            };
+                            if !visible {
+                                return Err(McpError::invalid_params(
+                                    format!("unknown tool {:?}", request.name),
+                                    None,
+                                ));
+                            }
+                            (action.name.clone(), action.route_path(), false)
+                        }
+                        _ => {
+                            return Err(McpError::invalid_params(
+                                format!(
+                                    "tool {:?} is ambiguous: MCP names are not injective",
+                                    request.name
+                                ),
+                                None,
+                            ));
+                        }
+                    }
+                }
+            };
 
         let input = request
             .arguments
             .map(Value::Object)
             .unwrap_or_else(|| json!({}));
         let invoke_request = InvokeRequest {
-            action: spec.name.to_owned(),
+            action: action_name,
             input,
             precondition: None,
             idempotency_key: idempotency_key_of(&context),
@@ -253,7 +312,7 @@ impl ServerHandler for McpServer {
             match invoke(&self.deps.pool, registry(), session.tenant, invoke_request).await {
                 Ok(outcome) => (outcome.status, outcome.body),
                 Err(error) => {
-                    let instance = spec.route_path();
+                    let instance = route_path.clone();
                     (
                         error.status,
                         error.problem(Some(&instance), request_id_of(&context).as_deref()),
@@ -264,7 +323,7 @@ impl ServerHandler for McpServer {
         // S06c: a task-capable action's successful call is the task's START. The task id is
         // the run the action created; a failed call stays an ordinary error result, so the
         // client never gets a task for work that never started.
-        if spec.task_capable && (200..300).contains(&status) {
+        if task_capable && (200..300).contains(&status) {
             return Ok(CallToolResponse::Task(tasks::start_result(&body)?));
         }
         let mut result = CallToolResult::success(vec![ContentBlock::text(text)]);

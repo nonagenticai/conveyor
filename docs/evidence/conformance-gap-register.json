@@ -1,7 +1,7 @@
 {
   "counts": {
     "P0": 29,
-    "P1": 133,
+    "P1": 130,
     "P2": 37,
     "P3": 0
   },
@@ -551,54 +551,6 @@
       "subject": "S20"
     },
     {
-      "detail": "closed delivery project has no Phase-G compliance review",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "compliance_review_missing",
-      "severity": "P1",
-      "subject": "T1"
-    },
-    {
-      "detail": "closed delivery project has no Phase-G compliance review",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "compliance_review_missing",
-      "severity": "P1",
-      "subject": "T10"
-    },
-    {
-      "detail": "closed delivery project has no Phase-G compliance review",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "compliance_review_missing",
-      "severity": "P1",
-      "subject": "T11"
-    },
-    {
-      "detail": "closed delivery project has no Phase-G compliance review",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "compliance_review_missing",
-      "severity": "P1",
-      "subject": "T2"
-    },
-    {
-      "detail": "closed delivery project has no Phase-G compliance review",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "compliance_review_missing",
-      "severity": "P1",
-      "subject": "T4"
-    },
-    {
-      "detail": "closed delivery project has no Phase-G compliance review",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "compliance_review_missing",
-      "severity": "P1",
-      "subject": "T9"
-    },
-    {
       "detail": "delivery project has no live architecture contract",
       "disposition": "rework",
       "evidence": null,
@@ -1084,7 +1036,31 @@
       "evidence": null,
       "rule": "seed_live_drift",
       "severity": "P1",
+      "subject": "S02"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
       "subject": "S21"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "SPEC-V2"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T13"
     },
     {
       "detail": "seed status 'closed' != live status 'active'",
@@ -1600,8 +1576,8 @@
     }
   ],
   "snapshot": {
-    "generated_at": "2026-11-25T11:25:19.603151696+00:00",
-    "git_sha": "bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df",
+    "generated_at": "2026-11-26T21:15:00Z",
+    "git_sha": "34753fa35fc2ea65ece4893e6893cf0a16ffb1ab",
     "path": "data",
     "tenant": "nonagentic"
   },

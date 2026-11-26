@@ -109,6 +109,9 @@ Blocker: #N — <a plain line, present iff this issue is `status:blocked`; say w
       `ci-public` as the final gate; docs: `git diff --check` + links).
 - [ ] Tests added/updated per part; none skipped.
 - [ ] Docs updated; migrations/ledger and `--check-lock` handled when touched.
+- [ ] A unit that adds/removes an action **or changes an input schema** names `registry`,
+      `parity_http_mcp`, `served-spec.lock.json`, `actions.json` and the design-pack index in its
+      acceptance, and runs them locally before the PR.
 - [ ] A unit that closes the slice's last open issue updates that slice's
       `scripts/v2-slice-artefacts.json` row to the measured shape (tables/actions/modules) and runs
       `python3 scripts/build-coverage.py --check`; a failure naming

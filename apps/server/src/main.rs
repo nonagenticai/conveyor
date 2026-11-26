@@ -9,8 +9,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
-use conveyor_actions::registry::{assert_registry_consistent, registry};
-use conveyor_actions::spec::HandlerRef;
+use conveyor_actions::registry::assert_registry_consistent;
 use conveyor_api::{AppState, Config, ConfigError, app, openapi};
 use conveyor_store as store;
 use sqlx::PgPool;
@@ -673,38 +672,14 @@ async fn serve() -> Result<(), RunError> {
 }
 
 /// Every approved `action_registry` row must name a compiled action, and an external row's
-/// service must have a configured base URL (S04 §5.2).
+/// Every approved `action_registry` row is either a compiled action or a valid imported
+/// contract (S04 P1.1). The rule lives in `conveyor_actions::resolve` so the same model that
+/// invokes an imported action also describes what boot accepts.
 async fn assert_db_registry(pool: &PgPool) -> Result<(), RunError> {
-    for tenant in store::tenants::active_ids(pool).await? {
-        let mut tx = store::begin_scoped(pool, tenant).await?;
-        let rows = store::actions::approved_registry(&mut tx).await?;
-        tx.commit().await?;
-        for row in rows {
-            let Some(spec) = registry().get(&row.name) else {
-                return Err(RunError::Refused(format!(
-                    "the database names action {:?}, which this binary does not compile",
-                    row.name
-                )));
-            };
-            if let HandlerRef::External { service, .. } = spec.handler
-                && conveyor_actions::invoke::service_url(service).is_none()
-            {
-                return Err(RunError::Refused(format!(
-                    "action {:?} names service {:?}, which has no configured base URL",
-                    row.name, row.service
-                )));
-            }
-            if row.kind == "workflow" && !matches!(spec.handler, HandlerRef::Workflow) {
-                return Err(RunError::Refused(format!(
-                    "action {:?} is stored as a workflow but compiled without one",
-                    row.name
-                )));
-            }
-        }
-    }
-    Ok(())
+    conveyor_actions::resolve::assert_boot_registry(pool)
+        .await
+        .map_err(RunError::Refused)
 }
-
 async fn worker() -> Result<(), RunError> {
     assert_registry_consistent()?;
     let config = Config::from_env()?;
@@ -1098,18 +1073,6 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
             mint,
             token_stdin: _,
         } => {
-            let licences = match config.licences_base_url.as_deref() {
-                Some(base) => Some(match config.service_credentials() {
-                    Ok(creds) => conveyor_auth::LicenceSyncClient::with_credentials(base, creds)
-                        .map_err(|error| RunError::Refused(format!("licences client: {error}")))?,
-                    Err(error) => {
-                        return Err(RunError::Refused(format!(
-                            "licences S2S credential: {error}"
-                        )));
-                    }
-                }),
-                None => None,
-            };
             let source = if mint {
                 admin::upstream_tokens::TokenSource::Mint
             } else {
@@ -1119,8 +1082,30 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                 })?;
                 admin::upstream_tokens::TokenSource::Byo(line.trim().as_bytes().to_vec())
             };
+            // The mint authenticates as `conveyor-bundle-minter`, its own platform-owned client.
+            // The backend's credential is not a fallback: the licences mint route is owner-scoped
+            // and `conveyor-backend` belongs to a different owner, so it would be refused anyway.
+            let minter = match &source {
+                admin::upstream_tokens::TokenSource::Mint => {
+                    let base = config.licences_base_url.as_deref().ok_or_else(|| {
+                        RunError::Refused(
+                            "LICENCES_BASE_URL is not set; the mint needs the licences API"
+                                .to_owned(),
+                        )
+                    })?;
+                    let creds = config
+                        .bundle_minter_credentials()
+                        .map_err(RunError::Refused)?;
+                    Some(
+                        conveyor_auth::LicenceSyncClient::with_credentials(base, creds).map_err(
+                            |error| RunError::Refused(format!("licences client: {error}")),
+                        )?,
+                    )
+                }
+                admin::upstream_tokens::TokenSource::Byo(_) => None,
+            };
             let filled =
-                admin::upstream_tokens::fill(&pool, licences.as_ref(), &tenant, service, source)
+                admin::upstream_tokens::fill(&pool, minter.as_ref(), &tenant, service, source)
                     .await
                     .map_err(RunError::Refused)?;
             println!(

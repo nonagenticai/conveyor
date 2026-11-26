@@ -208,7 +208,7 @@ async fn export_document(
     );
     let (document, _size) = create_from_bytes(
         tx,
-        ctx,
+        &ctx.call(),
         NewBytesDocument {
             action: SHEETS_EXPORT,
             title: &title,

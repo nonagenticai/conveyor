@@ -22,6 +22,10 @@
 //! so a successful re-verification returns the stored row unchanged — it is a replay, not a
 //! second claim.
 
+pub mod manifest;
+pub mod programme;
+pub mod render;
+
 use conveyor_domain::TenantId;
 use conveyor_domain::compare::content_hash;
 use conveyor_store as store;
@@ -335,6 +339,45 @@ fn store_failure(error: ProofStoreError, action: &str) -> ActionError {
     }
 }
 
+/// The renderer's refusals, as action errors.
+fn render_failure(error: render::RenderError) -> ActionError {
+    use render::RenderError as Refused;
+    match error {
+        Refused::UnknownKind(kind) => refuse(
+            "facts_canonical",
+            "proof_facts_unknown_kind",
+            format!("a certificate is about a slice, a programme or a package; {kind:?} is none"),
+        ),
+        Refused::NotAnObject => refuse(
+            "facts_canonical",
+            "proof_facts_not_json",
+            "the canonical facts must be a JSON object",
+        ),
+        Refused::Missing(field) => refuse(
+            "facts_canonical",
+            "proof_facts_incomplete",
+            format!("the facts name no {field:?}"),
+        ),
+        Refused::NotA(detail) => refuse("facts_canonical", "proof_facts_invalid", detail),
+        Refused::Forbidden(detail) => refuse("facts_canonical", "proof_facts_invalid", detail),
+        Refused::ModelMismatch { named, embedded } => refuse(
+            "facts_canonical",
+            "proof_model_mismatch",
+            format!("the facts name model {named}; this binary embeds {embedded}"),
+        ),
+        Refused::Incomplete(item) => refuse(
+            "facts_canonical",
+            "proof_facts_incomplete",
+            format!("the facts do not satisfy the model: {item}"),
+        ),
+        Refused::TheoremName(name) => refuse(
+            "theorem",
+            "proof_theorem_invalid",
+            format!("{name:?} is not a Lean identifier"),
+        ),
+    }
+}
+
 /// `proofs.record` — turn a completed prover invocation into a durable certificate.
 #[crate::action(
     name = "proofs.record",
@@ -396,14 +439,14 @@ async fn proofs_record(
         )
     })?;
     // The facts are stored verbatim, so they must be a JSON document rather than free text;
-    // their digest follows from the text, and a verifier re-renders the source from it.
-    if serde_json::from_str::<Value>(&input.facts_canonical).is_err() {
-        return Err(refuse(
+    // their digest follows from the text, and the source is re-rendered from it.
+    let facts_value: Value = serde_json::from_str(&input.facts_canonical).map_err(|_| {
+        refuse(
             "facts_canonical",
             "proof_facts_not_json",
             "the canonical facts must be a JSON document",
-        ));
-    }
+        )
+    })?;
 
     let resolved = resolve_invocation(
         &mut *tx,
@@ -413,6 +456,29 @@ async fn proofs_record(
         &input.invocation_input,
     )
     .await?;
+
+    // The certificate pins one specification and the facts were taken against one; when they
+    // disagree, the certificate would claim a statement about a spec its facts never described.
+    let facts_spec = facts_value.get("spec_sha256").and_then(Value::as_str);
+    if facts_spec != Some(spec_sha256) {
+        return Err(refuse(
+            "spec_sha256",
+            "proof_spec_mismatch",
+            "the facts name a different specification than the certificate pins",
+        ));
+    }
+
+    // The source must be this renderer's output for these facts. Without this, "re-render and
+    // compare" is advisory and a caller can certify a theorem their facts do not state.
+    let rendered = render::render(&facts_value, theorem).map_err(render_failure)?;
+    if resolved.source != rendered {
+        return Err(refuse(
+            "invocation_input",
+            "proof_source_not_rendered",
+            "the checked source is not this rendering of these facts; a certificate records what \
+             its facts state, not what a caller wrote",
+        ));
+    }
 
     // The source is the one the prover read. A caller cannot substitute it, and the theorem it
     // claims must be in it, or the certificate would name a theorem nothing proved.
@@ -509,6 +575,29 @@ async fn proofs_reverify(
             "proof_facts_mismatch",
             "the stored facts_sha256 does not describe the stored facts",
         ));
+    }
+
+    // A row whose facts name the model this binary embeds must carry the source this binary
+    // renders from those facts. The digest checks above already catch a rewritten row; this is
+    // what catches a row rewritten *consistently*, because it needs the model, not just the row.
+    // Rows proven against an older model are skipped: their source belongs to that model.
+    let stored_facts: Value = serde_json::from_str(&stored.facts_canonical).map_err(|_| {
+        refuse(
+            "proof_id",
+            "proof_facts_not_json",
+            "the stored facts are not a JSON document",
+        )
+    })?;
+    let current_model = render::model_sha256();
+    if stored_facts.get("model_sha256").and_then(Value::as_str) == Some(current_model.as_str()) {
+        let rendered = render::render(&stored_facts, &stored.theorem).map_err(render_failure)?;
+        if rendered != stored.lean_source {
+            return Err(refuse(
+                "proof_id",
+                "proof_source_not_rendered",
+                "the stored source is not this rendering of the stored facts",
+            ));
+        }
     }
 
     if input.idempotency_key.trim() == stored.idempotency_key {

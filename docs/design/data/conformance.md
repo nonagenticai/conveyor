@@ -1,11 +1,11 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df` generated `2026-11-25T11:25:19.603151696+00:00` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.GOOS58ge8M/data`.
+Snapshot: `34753fa35fc2ea65ece4893e6893cf0a16ffb1ab` generated `2026-11-26T21:15:00Z` from `/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.ka3gjiEZAi/data`.
 
 | Severity | Count |
 |---|---:|
 | P0 | 29 |
-| P1 | 133 |
+| P1 | 130 |
 | P2 | 37 |
 | P3 | 0 |
 
@@ -81,12 +81,6 @@ Snapshot: `bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df` generated `2026-11-25T11:25
 | `closure_outputs_undeclared` | `S16` | P1 | project is closed but declares no closure_outputs |
 | `closure_outputs_undeclared` | `S17` | P1 | project is closed but declares no closure_outputs |
 | `closure_outputs_undeclared` | `S20` | P1 | project is closed but declares no closure_outputs |
-| `compliance_review_missing` | `T1` | P1 | closed delivery project has no Phase-G compliance review |
-| `compliance_review_missing` | `T10` | P1 | closed delivery project has no Phase-G compliance review |
-| `compliance_review_missing` | `T11` | P1 | closed delivery project has no Phase-G compliance review |
-| `compliance_review_missing` | `T2` | P1 | closed delivery project has no Phase-G compliance review |
-| `compliance_review_missing` | `T4` | P1 | closed delivery project has no Phase-G compliance review |
-| `compliance_review_missing` | `T9` | P1 | closed delivery project has no Phase-G compliance review |
 | `contract_missing` | `T12` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T14` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T15` | P1 | delivery project has no live architecture contract |
@@ -147,7 +141,10 @@ Snapshot: `bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df` generated `2026-11-25T11:25
 | `project_in_unauthorised_tranche` | `T14` | P1 | project is active in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T18` | P1 | project is active in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T19F` | P1 | project is active in tranche 6 whose state is 'planned' |
+| `seed_live_drift` | `S02` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `S21` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `SPEC-V2` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `T13` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T14` | P1 | seed status 'closed' != live status 'active' |
 | `unpublished_declared_output` | `S04` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S05` | P1 | declared outputs are not published: project-brief |
@@ -187,7 +184,7 @@ Snapshot: `bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df` generated `2026-11-25T11:25
 | PLATFORM | active | 0 | 0 | 0 | 0 | 0 |
 | S00 | closed | 0 | 0 | 2 | 0 | 0 |
 | S01 | closed | 0 | 0 | 2 | 0 | 0 |
-| S02 | active | 1 | 0 | 1 | 0 | 0 |
+| S02 | active | 1 | 0 | 2 | 0 | 0 |
 | S03 | closed | 2 | 0 | 1 | 0 | 0 |
 | S04 | active | 3 | 0 | 2 | 0 | 0 |
 | S05 | closed | 4 | 1 | 4 | 0 | 0 |
@@ -211,13 +208,13 @@ Snapshot: `bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df` generated `2026-11-25T11:25
 | S19 | active | 8 | 0 | 3 | 1 | 0 |
 | S20 | closed | 9 | 1 | 4 | 0 | 0 |
 | S21 | active | 9 | 0 | 4 | 1 | 0 |
-| SPEC-V2 | active | 0 | 0 | 0 | 0 | 0 |
+| SPEC-V2 | active | 0 | 0 | 1 | 0 | 0 |
 | T0 | closed | 0 | 0 | 1 | 0 | 0 |
-| T1 | closed | 1 | 0 | 2 | 2 | 0 |
-| T10 | closed | 4 | 1 | 1 | 2 | 0 |
-| T11 | closed | 1 | 0 | 2 | 2 | 0 |
+| T1 | closed | 1 | 0 | 1 | 2 | 0 |
+| T10 | closed | 4 | 1 | 0 | 2 | 0 |
+| T11 | closed | 1 | 0 | 1 | 2 | 0 |
 | T12 | active | 13 | 0 | 3 | 1 | 0 |
-| T13 | active | 3 | 0 | 0 | 2 | 0 |
+| T13 | active | 3 | 0 | 1 | 2 | 0 |
 | T14 | active | 4 | 0 | 5 | 1 | 0 |
 | T15 | closed | 12 | 1 | 2 | 0 | 0 |
 | T16 | closed | 4 | 2 | 3 | 0 | 0 |
@@ -225,11 +222,11 @@ Snapshot: `bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df` generated `2026-11-25T11:25
 | T18 | active | 4 | 0 | 4 | 1 | 0 |
 | T19 | closed | 4 | 1 | 0 | 2 | 0 |
 | T19F | active | 6 | 0 | 1 | 3 | 0 |
-| T2 | closed | 2 | 0 | 2 | 2 | 0 |
+| T2 | closed | 2 | 0 | 1 | 2 | 0 |
 | T3 | closed | 3 | 1 | 3 | 0 | 0 |
-| T4 | closed | 4 | 2 | 1 | 2 | 0 |
+| T4 | closed | 4 | 2 | 0 | 2 | 0 |
 | T5 | closed | 10 | 1 | 2 | 0 | 0 |
 | T6 | closed | 11 | 1 | 2 | 0 | 0 |
 | T7 | closed | 5 | 2 | 3 | 0 | 0 |
 | T8 | closed | 11 | 1 | 2 | 0 | 0 |
-| T9 | closed | 4 | 1 | 1 | 2 | 0 |
+| T9 | closed | 4 | 1 | 0 | 2 | 0 |

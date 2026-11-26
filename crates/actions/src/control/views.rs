@@ -372,6 +372,13 @@ pub struct ApprovalRequestIn {
     /// Refuse an empty evidence list when true.
     #[serde(default)]
     pub require_evidence: bool,
+    /// Evidence kinds this gate refuses to open without (#746).
+    ///
+    /// `require_evidence` only refuses an *empty* list, so a caller that omits the proof is still
+    /// accepted — advisory, not a gate. Naming a kind here is what makes it required: the
+    /// programme release gate names `lean_proof`.
+    #[serde(default)]
+    pub required_kinds: Vec<String>,
     /// The specification digest a `lean_proof` evidence item must answer (#744).
     ///
     /// Stored in `meta.pinned_spec_sha256` beside the resolved evidence. A `lean_proof` item on

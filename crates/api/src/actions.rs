@@ -46,12 +46,24 @@ pub fn manifest_etag(entries: &Value) -> String {
 /// learns the name of an action it cannot call. `If-None-Match` matching the current ETag
 /// answers `304` with no body.
 pub async fn manifest(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     caller: Caller,
     _licence: RequireLicence,
     headers: HeaderMap,
 ) -> Response {
-    let entries = Value::Array(registry().manifest(caller.role));
+    let mut entries = registry().manifest(caller.role);
+    // S04 P1: the tenant's approved imported actions are entries of the SAME manifest, and the
+    // ETag covers them too, so a refresh or a revocation changes the document.
+    if let Ok(imported) = conveyor_actions::resolve::imported(&state.pool, caller.tenant).await {
+        for action in imported {
+            if action.permits_role(caller.role)
+                && let Ok(value) = serde_json::to_value(action.manifest_entry())
+            {
+                entries.push(value);
+            }
+        }
+    }
+    let entries = Value::Array(entries);
     let etag = manifest_etag(&entries);
     if headers
         .get(header::IF_NONE_MATCH)

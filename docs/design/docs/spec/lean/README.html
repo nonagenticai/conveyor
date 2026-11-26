@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Lean delivery certificates · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/spec/lean/README.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="lean-delivery-certificates">Lean delivery certificates</h1>
+<p>A delivered slice, a delivered work package and the programme release each carry a <strong>certificate</strong>: a Lean source that a third party can re-check from the facts alone. The prover is a compute backend, not an oracle — it answers "this source is valid", so the value is in <em>what the source says</em>, and that is a small, hand-written model plus the facts rendered into it.</p>
+<h2 id="the-three-grades">The three grades</h2>
+<table>
+<thead>
+<tr>
+<th>Grade</th>
+<th>What is proven</th>
+<th>Where it lives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Instance</strong></td>
+<td>one record's facts satisfy the model (<code>checkSlice facts = true</code>, closed <code>by decide</code>)</td>
+<td>rendered per record by <code>crates/actions/src/proof/render.rs</code></td>
+</tr>
+<tr>
+<td><strong>Universal</strong></td>
+<td>the model's own properties, for every state (<code>closed_is_terminal</code>, <code>no_self_transition</code>, <code>accepted_path_carries_evidence</code>)</td>
+<td><code>DeliveryModel.lean</code>, proven once</td>
+</tr>
+<tr>
+<td><strong>Bundle</strong></td>
+<td>a release's leaf certificate digests are exactly the expected set, with no duplicate and none missing</td>
+<td>rendered by <code>crates/actions/src/proof/programme.rs</code></td>
+</tr>
+</tbody>
+</table>
+<p>An instance certificate is only worth what the model is worth, which is why the model travels <strong>inside every certificate's source</strong>: a reader does not have to trust our copy of it.</p>
+<h2 id="what-is-proven-and-what-is-assumed">What is proven, and what is assumed</h2>
+<p>Proven: the facts, as written, satisfy <code>checkSlice</code> / <code>checkProgramme</code> / <code>checkPackage</code>, and the model's universal theorems. The kernel checks this; nothing is trusted from the prover beyond an answer of <code>valid</code>.</p>
+<p>Assumed, and stated in every certificate:</p>
+<ul>
+<li><strong>Refinement.</strong> That the engine builds the facts from what it actually recorded — an approved approval row, a card in its done list, a run's evidence. Lean does not see the database. Proving that the Rust implementation refines the model is a different tool's job (Verus, Kani, or a refinement proof); this corpus does not claim it.</li>
+<li><strong>The spec pin.</strong> <code>spec_sha256</code> names the <code>docs/SPEC_V2.md</code> the facts were taken against. The renderer refuses a facts document whose recorded model digest is not the model it embeds, so a certificate cannot silently mix models.</li>
+<li><strong>The toolchain.</strong> Sources are pure core Lean, no <code>Mathlib</code> import and no <code>native_decide</code>. The kernel reduces them; the prover's own identity is recorded on the row, and <code>prover_identity.attested</code> is <code>false</code> because the compute backend is not attested.</li>
+</ul>
+<h2 id="the-re-check-protocol">The re-check protocol</h2>
+<p>A certificate is two engine invocations and one judgement, never a caller's claim:</p>
+<ol type="1">
+<li><strong>Render</strong> the facts (pure function of the canonical JSON, no clock, no map iteration order).</li>
+<li><strong>Check</strong> the rendered source through the declared external action <code>lean4.check</code>, with an <code>Idempotency-Key</code>. The engine owns the HTTP call, the timeout, the breaker and the audit row, and persists the response.</li>
+<li><strong>Record</strong> (<code>proofs.record</code>) that invocation's key and input body. The handler re-reads the persisted response, refuses a caller-supplied verdict and refuses a source that is not the renderer's output for those facts.</li>
+</ol>
+<p>Re-verification is the same shape with a <strong>fresh</strong> invocation: <code>lean4.check</code> again with a new key, then <code>proofs.reverify</code>, which refuses unless the fresh source, verdict and recomputed certificate digest all equal the stored ones. The proof table is append-only, so a successful re-verification returns the same row — it is a replay, not a second claim.</p>
+<h2 id="model-drift">Model drift</h2>
+<p>The model file is embedded into every rendered source, so editing it changes every future source. A stored certificate is re-checkable against the model it was proven on — its <code>facts_canonical</code> carries that model's digest — and a certificate can never be re-rendered against a different model and still pass. Re-proving after a model edit is a <strong>new certificate</strong>, never an edit of the old one.</p>
+<h2 id="limits">Limits</h2>
+<ul>
+<li>The model is deliberately small: §5.3 (plan ≠ evidence), §5.4 (a gate carries evidence), and a terminal closed state. It is not a model of the whole engine.</li>
+<li>A certificate re-checks a <em>statement about recorded facts</em>, not the behaviour of the running system. What it buys is that the statement cannot be quietly changed later: the facts, the spec pin and the model digest are all in the digest the certificate carries.</li>
+<li>The prover has a source-size and timeout cap; a bundle is a set of leaf digests for that reason, not one enormous checked expression.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/spec/lean/README.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -5,11 +5,14 @@
 //! exercised over HTTP, not through a mocked trait.
 
 use axum::Router;
+use axum::extract::{Form, State};
 use axum::http::StatusCode;
 use axum::routing::{get, post};
 use chrono::{DateTime, Utc};
 use conveyor_auth::licence::{LicenceSyncClient, SyncError, Verdict, evaluate};
+use conveyor_auth::oauth::ClientCredentials;
 use conveyor_domain::TenantId;
+use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use tokio::net::TcpListener;
 
@@ -137,6 +140,82 @@ async fn an_inactive_200_body_is_unknown() {
     assert_eq!(
         outcome.status, "unknown",
         "`active: false` wins over a contradictory status string"
+    );
+}
+
+/// #776: the mint presents the minter's own client id, not the backend's.
+///
+/// The licences mint route owner-scopes: a request made as `conveyor-backend` is refused however
+/// many roles it holds. The stub records the token request's form body, so this fails if the
+/// credential ever falls back to the process-wide one.
+#[derive(Clone, Default)]
+struct Recorded(Arc<Mutex<Option<HashMap<String, String>>>>);
+
+fn json(body: &'static str) -> ([(axum::http::HeaderName, &'static str); 1], &'static str) {
+    (
+        [(axum::http::header::CONTENT_TYPE, "application/json")],
+        body,
+    )
+}
+
+async fn token(
+    State(seen): State<Recorded>,
+    Form(form): Form<Vec<(String, String)>>,
+) -> ([(axum::http::HeaderName, &'static str); 1], &'static str) {
+    *seen.0.lock().expect("record the token request") = Some(form.into_iter().collect());
+    json(r#"{"access_token":"minter-bearer","expires_in":3600,"token_type":"Bearer"}"#)
+}
+
+async fn bundle() -> ([(axum::http::HeaderName, &'static str); 1], &'static str) {
+    json(
+        r#"{"token":"bundle-token","expires_at":"2026-12-01T00:00:00Z","license_id":"lic-minter"}"#,
+    )
+}
+
+#[tokio::test]
+async fn the_mint_uses_the_minter_client() {
+    let seen = Recorded::default();
+    let app = Router::new()
+        .route("/token", post(token))
+        .route("/internal/tenants/{tenant}/bundle-token", post(bundle))
+        .with_state(seen.clone());
+    let listener = TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind the stub");
+    let base = format!("http://{}", listener.local_addr().expect("stub addr"));
+    tokio::spawn(async move {
+        axum::serve(listener, app).await.expect("stub server");
+    });
+
+    let creds = ClientCredentials::new(
+        &format!("{base}/token"),
+        "conveyor-bundle-minter",
+        "minter-secret",
+    )
+    .expect("the minter credential");
+    let client = LicenceSyncClient::with_credentials(&base, creds).expect("client");
+
+    let minted = client
+        .mint_bundle_token(tenant(), "lean4-prover", 60)
+        .await
+        .expect("mint");
+    assert_eq!(minted.token, "bundle-token");
+    assert_eq!(minted.license_id.as_deref(), Some("lic-minter"));
+
+    let got = seen
+        .0
+        .lock()
+        .expect("read the record")
+        .clone()
+        .expect("the stub recorded the token request");
+    assert_eq!(
+        got.get("client_id").map(String::as_str),
+        Some("conveyor-bundle-minter"),
+        "the mint must authenticate as the minter, never as conveyor-backend"
+    );
+    assert_eq!(
+        got.get("grant_type").map(String::as_str),
+        Some("client_credentials")
     );
 }
 

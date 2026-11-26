@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-25T11:25:08.159569651+00:00",
-  "git_sha": "bc9336b88deaf3e2f26cc49c01ba0cb0d8f385df",
+  "generated_at": "2026-11-26T21:15:00Z",
+  "git_sha": "34753fa35fc2ea65ece4893e6893cf0a16ffb1ab",
   "packages": [
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T16",
@@ -2056,7 +2056,7 @@
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 2,
+        "entries": 1,
         "owners": [
           "programme owner"
         ]
@@ -2079,7 +2079,6 @@
           "rule": "compliance_review_missing",
           "source": "snapshot",
           "subjects": [
-            "T4",
             "T4"
           ]
         }
@@ -2092,7 +2091,7 @@
       "spec": "\u00a78.1",
       "standard": "TOGAF",
       "status": "open",
-      "subject_count": 2,
+      "subject_count": 1,
       "subjects": [
         {
           "detail": "a non-conformant review has no active waiver",
@@ -2102,16 +2101,6 @@
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
-          "subject": "T4"
-        },
-        {
-          "detail": "closed delivery project has no Phase-G compliance review",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
           "subject": "T4"
         }
       ],
@@ -8369,7 +8358,7 @@
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 2,
+        "entries": 5,
         "owners": [
           "programme owner"
         ]
@@ -8392,7 +8381,10 @@
           "rule": "seed_live_drift",
           "source": "snapshot",
           "subjects": [
+            "S02",
             "S21",
+            "SPEC-V2",
+            "T13",
             "T14"
           ]
         }
@@ -8405,8 +8397,18 @@
       "spec": "\u00a75.3",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 2,
+      "subject_count": 5,
       "subjects": [
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "the seed derives `closed` from S02's closed unit issues, while the live row stays `active`: the retrospective rework's S02 slice is green on the replay record but not promoted, so a closure now would claim evidence the live record does not carry; the synchronisation waits on the #526 chain or a seed install",
+          "severity": "P1",
+          "subject": "S02"
+        },
         {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
@@ -8416,6 +8418,26 @@
           "reason": "the seed derives `closed` from S21's closed unit issues (#713 closed the execution level), while the live row stays `active`: closing a project in planned tranche 9 manufactures a tranche P0, and the synchronisation waits on the tranche-9 authorisation (#526 chain) or a seed install",
           "severity": "P1",
           "subject": "S21"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "the seed derives `closed` from SPEC-V2's closed unit issues, while the live row stays `active`: the live record still carries ten open TOGAF/MSP artefact packages (phase E/G/H, registers, compliance review), so a closure now would claim artefacts the live record does not carry; the synchronisation waits on the retrospective rework's SPEC-V2 slice (#526 chain) or a seed install",
+          "severity": "P1",
+          "subject": "SPEC-V2"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "the seed derives `closed` from T13's closed unit issues, while the live row stays `active`: the live closure is refused on two open P0 rework packages (v1-w4a-1 spend budget gate, v1-w4a-2 write-verify), and the synchronisation waits on the rework lane's T13 slice (#526 chain) and the tranche-3 review",
+          "severity": "P1",
+          "subject": "T13"
         },
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -12872,291 +12894,6 @@
         }
       ],
       "title": "self_approval='allowed' lets a requester decide their own gate"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check compliance_review_missing:T1",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A compliance review names one of the six verdicts against the project's contract",
-          "met": false
-        },
-        {
-          "item": "The audit reports no compliance_review_missing gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "architecture.json",
-          "rule": "compliance_review_missing",
-          "source": "snapshot",
-          "subjects": [
-            "T1"
-          ]
-        }
-      ],
-      "key": "compliance_review_missing:T1",
-      "owner_project": "T1",
-      "rule": "compliance_review_missing",
-      "scope": "T1",
-      "severity": "P1",
-      "spec": "\u00a78.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "closed delivery project has no Phase-G compliance review",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T1"
-        }
-      ],
-      "title": "Publish the project's Phase G compliance review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check compliance_review_missing:T10",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A compliance review names one of the six verdicts against the project's contract",
-          "met": false
-        },
-        {
-          "item": "The audit reports no compliance_review_missing gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "architecture.json",
-          "rule": "compliance_review_missing",
-          "source": "snapshot",
-          "subjects": [
-            "T10"
-          ]
-        }
-      ],
-      "key": "compliance_review_missing:T10",
-      "owner_project": "T10",
-      "rule": "compliance_review_missing",
-      "scope": "T10",
-      "severity": "P1",
-      "spec": "\u00a78.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "closed delivery project has no Phase-G compliance review",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T10"
-        }
-      ],
-      "title": "Publish the project's Phase G compliance review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check compliance_review_missing:T11",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A compliance review names one of the six verdicts against the project's contract",
-          "met": false
-        },
-        {
-          "item": "The audit reports no compliance_review_missing gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "architecture.json",
-          "rule": "compliance_review_missing",
-          "source": "snapshot",
-          "subjects": [
-            "T11"
-          ]
-        }
-      ],
-      "key": "compliance_review_missing:T11",
-      "owner_project": "T11",
-      "rule": "compliance_review_missing",
-      "scope": "T11",
-      "severity": "P1",
-      "spec": "\u00a78.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "closed delivery project has no Phase-G compliance review",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T11"
-        }
-      ],
-      "title": "Publish the project's Phase G compliance review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check compliance_review_missing:T2",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A compliance review names one of the six verdicts against the project's contract",
-          "met": false
-        },
-        {
-          "item": "The audit reports no compliance_review_missing gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "architecture.json",
-          "rule": "compliance_review_missing",
-          "source": "snapshot",
-          "subjects": [
-            "T2"
-          ]
-        }
-      ],
-      "key": "compliance_review_missing:T2",
-      "owner_project": "T2",
-      "rule": "compliance_review_missing",
-      "scope": "T2",
-      "severity": "P1",
-      "spec": "\u00a78.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "closed delivery project has no Phase-G compliance review",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T2"
-        }
-      ],
-      "title": "Publish the project's Phase G compliance review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check compliance_review_missing:T9",
-      "apply_to": "PLATFORM",
-      "artefact": "compliance_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": "2027-02-18",
-        "entries": 1,
-        "owners": [
-          "programme owner"
-        ]
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A compliance review names one of the six verdicts against the project's contract",
-          "met": false
-        },
-        {
-          "item": "The audit reports no compliance_review_missing gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "architecture.json",
-          "rule": "compliance_review_missing",
-          "source": "snapshot",
-          "subjects": [
-            "T9"
-          ]
-        }
-      ],
-      "key": "compliance_review_missing:T9",
-      "owner_project": "T9",
-      "rule": "compliance_review_missing",
-      "scope": "T9",
-      "severity": "P1",
-      "spec": "\u00a78.1",
-      "standard": "TOGAF",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "closed delivery project has no Phase-G compliance review",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": "2027-02-18",
-          "owner": "programme owner",
-          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
-          "severity": "P1",
-          "subject": "T9"
-        }
-      ],
-      "title": "Publish the project's Phase G compliance review"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check contract_missing:tranche-10",
@@ -27070,93 +26807,6 @@
         }
       ],
       "title": "The kata.* family is not an action family; kata exists only as an unregistered process key"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3b-6:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "\u00a710.4",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "analyse.app, analyse.brand, analyse.content and analyse.report are registered with schemas and handlers (or explicitly scoped out in SPEC \u00a710.4 by owner decision), and a registry test asserts the final six-verb set.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 1210,
-              "path": "docs/SPEC_V2.md",
-              "quote": "| analysis | `analyse.site`, `analyse.app`, `analyse.video`, `analyse.brand`, `analyse.content`, `analyse.report` |",
-              "source": "code"
-            },
-            {
-              "line": 16,
-              "path": "crates/actions/src/analysis/actions.rs",
-              "quote": "const ACTION: &str = \"analyse.site\";",
-              "source": "code"
-            },
-            {
-              "line": 16,
-              "path": "crates/actions/src/analysis/video.rs",
-              "quote": "    name = \"analyse.video\",",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w3b-6",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w3b-6:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "v1-w3b-6",
-      "scope": "PLATFORM",
-      "severity": "P2",
-      "spec": "\u00a710.4",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "SPEC \u00a710.4 and \u00a710.4.1 declare analyse.site, analyse.app, analyse.video, analyse.brand, analyse.content and analyse.report as the evidence producers for gates. Only analyse.site (analysis/actions.rs:16) and analyse.video (analysis/video.rs:16) are registered; there is no analyse.app, analyse.brand, analyse.content or analyse.report in the registry, so four of the six measured subjects named by \u00a710.4.1 cannot be analysed through the action surface.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 1210,
-                  "path": "docs/SPEC_V2.md",
-                  "quote": "| analysis | `analyse.site`, `analyse.app`, `analyse.video`, `analyse.brand`, `analyse.content`, `analyse.report` |",
-                  "source": "code"
-                },
-                {
-                  "line": 16,
-                  "path": "crates/actions/src/analysis/actions.rs",
-                  "quote": "const ACTION: &str = \"analyse.site\";",
-                  "source": "code"
-                },
-                {
-                  "line": 16,
-                  "path": "crates/actions/src/analysis/video.rs",
-                  "quote": "    name = \"analyse.video\",",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w3b-6",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "Four of the six declared analyse.* actions are missing"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3c-6:T3",
@@ -41490,12 +41140,12 @@
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 80,
-      "gaps": 16,
+      "findings": 79,
+      "gaps": 19,
       "p0": 0,
-      "p1": 2,
+      "p1": 5,
       "p2": 14,
-      "packages": 92,
+      "packages": 91,
       "rules": 8,
       "rules_clean": 4,
       "rules_with_gaps": 4,
@@ -41503,40 +41153,40 @@
     },
     "TOGAF": {
       "findings": 12,
-      "gaps": 75,
+      "gaps": 69,
       "p0": 1,
-      "p1": 56,
+      "p1": 50,
       "p2": 18,
-      "packages": 218,
+      "packages": 213,
       "rules": 9,
       "rules_clean": 5,
       "rules_with_gaps": 4,
       "suppressed": 0
     }
   },
-  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.GOOS58ge8M/data",
+  "snapshot": "/var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/tmp.ka3gjiEZAi/data",
   "summary": {
     "by_severity": {
       "P0": 27,
-      "P1": 185,
-      "P2": 217
+      "P1": 180,
+      "P2": 216
     },
     "by_standard": {
       "MSP": 72,
       "PMP": 34,
       "SAFe": 13,
-      "SPEC": 92,
-      "TOGAF": 218
+      "SPEC": 91,
+      "TOGAF": 213
     },
     "by_status": {
-      "open": 427,
+      "open": 421,
       "suppressed": 2
     },
     "duplicates": 0,
-    "open": 427,
-    "packages": 429,
-    "resolved": 20,
-    "subjects": 538,
+    "open": 421,
+    "packages": 423,
+    "resolved": 21,
+    "subjects": 534,
     "suppressed": 2
   }
 }

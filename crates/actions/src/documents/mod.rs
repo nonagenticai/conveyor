@@ -126,6 +126,18 @@ pub async fn emit_document_event(
     id: uuid::Uuid,
     payload: Value,
 ) -> Result<(), ActionError> {
+    emit_document_event_call(conn, &ctx.call(), event_type, id, payload).await
+}
+
+/// Append one document event from the call attribution alone (an imported action has no
+/// compiled spec to build a `HandlerCtx` from).
+pub async fn emit_document_event_call(
+    conn: &mut PgConnection,
+    ctx: &crate::invoke::CallContext,
+    event_type: &'static str,
+    id: uuid::Uuid,
+    payload: Value,
+) -> Result<(), ActionError> {
     let row = conveyor_store::NewEvent {
         topic: format!("document:{id}"),
         event_type: event_type.to_owned(),
@@ -138,7 +150,7 @@ pub async fn emit_document_event(
     conveyor_store::outbox::append(&mut *conn, ctx.tenant, &row)
         .await
         .map_err(|error| {
-            tracing::error!(%error, event = event_type, action = ctx.action, "append document event");
+            tracing::error!(%error, event = event_type, "append document event");
             ActionError::internal()
         })?;
     Ok(())
