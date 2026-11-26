@@ -1,39 +1,24 @@
 {
   "blocked": 1,
-  "generated_at": "2026-11-26T09:50:10+00:00",
-  "green": 3,
+  "generated_at": "2026-11-26T10:26:56+00:00",
+  "green": 0,
   "members": [
     {
-      "factory_exit": 0,
-      "gaps": [],
-      "key": "S00",
-      "log": "docs/evidence/rework/batch/tranche-0/S00.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_GREEN"
-    },
-    {
-      "factory_exit": 0,
-      "gaps": [],
-      "key": "S01",
-      "log": "docs/evidence/rework/batch/tranche-0/S01.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_GREEN"
-    },
-    {
-      "gaps": [],
-      "key": "SPEC-V2",
+      "factory_exit": 1,
+      "gaps": [
+        {
+          "detail": "rework: read governed_assets.list failed: error: governed_assets.list refused (500): the invocation could not be completed",
+          "gap": "instrument",
+          "id": null
+        }
+      ],
+      "key": "PLATFORM",
+      "log": "docs/evidence/rework/batch/tranche-0/PLATFORM.log",
+      "publish_exit": null,
       "state": "BLOCKED"
-    },
-    {
-      "factory_exit": 0,
-      "gaps": [],
-      "key": "T0",
-      "log": "docs/evidence/rework/batch/tranche-0/T0.log",
-      "publish_exit": 1,
-      "state": "RECEIPT_GREEN"
     }
   ],
   "red": 0,
-  "snapshot_sha": "bb240bc7",
+  "snapshot_sha": "f69258be77217de5f167bc0d4e780bea3a6964c6",
   "tranche": 0
 }

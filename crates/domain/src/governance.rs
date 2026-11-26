@@ -54,11 +54,33 @@ pub enum AssetKind {
     ProjectsDossier,
     /// The PM's status report.
     StatusReport,
+    /// A meeting's minutes (T19F; migration 0065).
+    Minutes,
+    /// A lesson's source draft (T8; migration 0069).
+    LessonSource,
+    /// A tool authoring draft (T15; migration 0070).
+    ToolDraft,
+    /// The programme's information strategy (MSP; migration 0044).
+    InformationStrategy,
+    /// The programme's risk strategy (MSP; migration 0044).
+    RiskStrategy,
+    /// The programme's issue strategy (MSP; migration 0044).
+    IssueStrategy,
+    /// The programme's monitoring strategy (MSP; migration 0044).
+    MonitoringStrategy,
+    /// The programme's communications strategy (MSP; migration 0044).
+    CommunicationsStrategy,
+    /// The programme's quality strategy (MSP; migration 0044).
+    QualityStrategy,
+    /// The programme's resource strategy (MSP; migration 0044).
+    ResourceStrategy,
 }
 
 impl AssetKind {
-    /// Every kind.
-    pub const ALL: [AssetKind; 16] = [
+    /// Every kind. The set mirrors the database CHECK exactly (migration 0101): a kind the
+    /// column accepts but the domain cannot parse makes `governed_assets.list` a 500 the
+    /// moment one row carries it (measured 2026-11-26 on the `minutes` kind).
+    pub const ALL: [AssetKind; 26] = [
         AssetKind::Requirement,
         AssetKind::Principle,
         AssetKind::Adr,
@@ -75,6 +97,16 @@ impl AssetKind {
         AssetKind::BenefitsRealizationPlan,
         AssetKind::ProjectsDossier,
         AssetKind::StatusReport,
+        AssetKind::Minutes,
+        AssetKind::LessonSource,
+        AssetKind::ToolDraft,
+        AssetKind::InformationStrategy,
+        AssetKind::RiskStrategy,
+        AssetKind::IssueStrategy,
+        AssetKind::MonitoringStrategy,
+        AssetKind::CommunicationsStrategy,
+        AssetKind::QualityStrategy,
+        AssetKind::ResourceStrategy,
     ];
 
     /// The stored `governed_asset.kind`.
@@ -96,6 +128,16 @@ impl AssetKind {
             AssetKind::BenefitsRealizationPlan => "benefits_realization_plan",
             AssetKind::ProjectsDossier => "projects_dossier",
             AssetKind::StatusReport => "status_report",
+            AssetKind::Minutes => "minutes",
+            AssetKind::LessonSource => "lesson_source",
+            AssetKind::ToolDraft => "tool_draft",
+            AssetKind::InformationStrategy => "information_strategy",
+            AssetKind::RiskStrategy => "risk_strategy",
+            AssetKind::IssueStrategy => "issue_strategy",
+            AssetKind::MonitoringStrategy => "monitoring_strategy",
+            AssetKind::CommunicationsStrategy => "communications_strategy",
+            AssetKind::QualityStrategy => "quality_strategy",
+            AssetKind::ResourceStrategy => "resource_strategy",
         }
     }
 }

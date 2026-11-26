@@ -50,3 +50,6 @@
 {"factory_exit": 0, "gaps": [], "key": "S01", "log": "docs/evidence/rework/batch/tranche-0/S01.log", "snapshot_sha": "bb240bc7", "state": "RECEIPT_GREEN", "tranche": 0, "ts": "2026-11-26T09:49:16+00:00"}
 {"key": "T0", "snapshot_sha": "bb240bc7", "state": "RUNNING", "tranche": 0, "ts": "2026-11-26T09:49:16+00:00"}
 {"factory_exit": 0, "gaps": [], "key": "T0", "log": "docs/evidence/rework/batch/tranche-0/T0.log", "snapshot_sha": "bb240bc7", "state": "RECEIPT_GREEN", "tranche": 0, "ts": "2026-11-26T09:50:10+00:00"}
+{"blocked": null, "content": "docs/evidence/rework/tranche-0/rework-content-PLATFORM.json", "key": "PLATFORM", "snapshot_sha": "f69258be77217de5f167bc0d4e780bea3a6964c6", "state": "PREFLIGHTED", "tranche": 0, "ts": "2026-11-26T10:26:38+00:00"}
+{"key": "PLATFORM", "snapshot_sha": "f69258be77217de5f167bc0d4e780bea3a6964c6", "state": "RUNNING", "tranche": 0, "ts": "2026-11-26T10:26:38+00:00"}
+{"factory_exit": 1, "gaps": [{"detail": "rework: read governed_assets.list failed: error: governed_assets.list refused (500): the invocation could not be completed", "gap": "instrument", "id": null}], "key": "PLATFORM", "log": "docs/evidence/rework/batch/tranche-0/PLATFORM.log", "snapshot_sha": "f69258be77217de5f167bc0d4e780bea3a6964c6", "state": "BLOCKED", "tranche": 0, "ts": "2026-11-26T10:26:56+00:00"}
