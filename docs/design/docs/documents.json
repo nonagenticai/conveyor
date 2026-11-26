@@ -42,8 +42,8 @@
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "fc0fe31ad425fa1fef9c1641bb67ce075b02c86f2834554bd862cba1a99b99e2",
-      "bytes": 198169,
+      "sha256": "599d49d9ffa18388c02feacc2e00f0e2b62a2e9fd7e1dcca5b4d93b1c558ef7e",
+      "bytes": 200300,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -218,6 +218,24 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0020-release-knowledge-layers.md"
     },
     {
+      "title": "0021 — The Gemba Walk is a separate client, a candidate primary UI",
+      "path": "docs/decisions/0021-gemba-walk-client.html",
+      "source": "docs/decisions/0021-gemba-walk-client.md",
+      "section": "Decisions",
+      "sha256": "495d3d11fa5e8e26eb0f1837c3a2ee58654ac6f6bf11903bbd3e96d4e9492fef",
+      "bytes": 8180,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0021-gemba-walk-client.md"
+    },
+    {
+      "title": "The Gemba Walk — client and architecture specification",
+      "path": "docs/design/GEMBA-WALK-SPEC.html",
+      "source": "docs/design/GEMBA-WALK-SPEC.md",
+      "section": "Design",
+      "sha256": "71372a3f7bf5e24a03d960427f6fafa4fc80bab746d77eea0cc0ea0f70153f26",
+      "bytes": 27311,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/GEMBA-WALK-SPEC.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
@@ -231,8 +249,8 @@
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "370afdcf06026ef6526d99b45c23f2b1cb110402ed1a2936cc8a97b97e83d13e",
-      "bytes": 25873,
+      "sha256": "055c106aaa225bc86a97d8cec0fd254a54b6d71b6cf587adf3a0165e63665d4b",
+      "bytes": 26204,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -1671,8 +1689,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "93f8f327566a9fe6de30dd455790c1683b458a07283e7c443a539f1df75e39c8",
-      "bytes": 261497,
+      "sha256": "c768d8f708df6171fa56031741381c61a2544426f85286f72e9bdbaa77b1eda6",
+      "bytes": 262102,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -1773,6 +1791,15 @@
       "sha256": "16b6910f7805ff530b8a75c1d7211a2d1df5789d0188145d0b84ba41c56822ad",
       "bytes": 6451,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/06-TOOL-PROVENANCE.md"
+    },
+    {
+      "title": "GEMBA-WALK — the Gemba Walk client",
+      "path": "docs/plans/GEMBA-WALK.html",
+      "source": "docs/plans/GEMBA-WALK.md",
+      "section": "Plans",
+      "sha256": "034d42af5356173adb9d470b4ead507f6b0494bfe39bf4a3167f25ee591f614b",
+      "bytes": 18439,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/GEMBA-WALK.md"
     },
     {
       "title": "P0 — Programme definition",
