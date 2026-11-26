@@ -1941,6 +1941,20 @@ async fn tool_authoring_publish(
     .await
     .map_err(|error| authoring_store_error(error, "tool_authoring.publish"))?;
 
+    // §11.6.3: publishing the tool rebinds every step that was waiting for its operation. A step
+    // already pinned is left alone — binding is a forward act, never a silent upgrade.
+    for tool in &published_tools {
+        let action = format!("{}.{}", toolkit.key, tool.key);
+        store::process::pin_steps_to_tool_tx(
+            &mut *tx, ctx.tenant, &action, toolkit_id, version, tool.key,
+        )
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, %action, "rebind the steps waiting for the published tool");
+            ActionError::internal()
+        })?;
+    }
+
     let published = json!({
         "toolkit_id": toolkit_id,
         "toolkit_key": toolkit.key,

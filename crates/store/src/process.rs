@@ -1827,3 +1827,33 @@ fn is_draft_conflict(error: &sqlx::Error) -> bool {
 fn version_of(raw: i64) -> Version {
     Version::new(u64::try_from(raw).unwrap_or(1)).unwrap_or(Version::INITIAL)
 }
+
+/// Bind every unpinned step whose `action` names `action` to a published tool version (§11.6.3).
+///
+/// Returns how many steps were rebound. A step already pinned is left alone: publication is
+/// copy-forward, so a later version must not silently move a step that a run already trusted.
+/// That is also what makes a repeated publish idempotent — the second call matches no row.
+pub async fn pin_steps_to_tool_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    action: &str,
+    toolkit_id: Uuid,
+    tool_version: i64,
+    tool_key: &str,
+) -> Result<u64, sqlx::Error> {
+    let updated = sqlx::query(
+        "UPDATE process_step s
+            SET tool_id = t.id, tool_version = $3, updated_at = now()
+           FROM tool t
+          WHERE s.tenant_id = $1 AND s.action = $2 AND s.tool_id IS NULL
+            AND t.tenant_id = $1 AND t.toolkit_id = $4 AND t.key = $5",
+    )
+    .bind(tenant.as_uuid())
+    .bind(action)
+    .bind(tool_version)
+    .bind(toolkit_id)
+    .bind(tool_key)
+    .execute(conn)
+    .await?;
+    Ok(updated.rows_affected())
+}
