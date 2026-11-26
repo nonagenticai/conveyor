@@ -303,6 +303,33 @@ impl HandlerCtx {
         self.policy
             .allows(scope.as_str(), scope.granted_to(self.role))
     }
+
+    /// The attribution an invocation records, without the compiled action name.
+    pub fn call(&self) -> CallContext {
+        CallContext {
+            tenant: self.tenant,
+            actor_id: self.actor_id,
+            actor_kind: self.actor_kind.clone(),
+            request_id: self.request_id.clone(),
+        }
+    }
+}
+
+/// Everything the bookkeeping and the external path need from the caller.
+///
+/// A compiled action carries this inside its [`HandlerCtx`]; an imported action has no compiled
+/// spec to build one from, so the same four fields travel alone. Using this instead of a
+/// synthetic [`HandlerCtx`] is what keeps the action name from having to be `&'static`.
+#[derive(Clone)]
+pub struct CallContext {
+    /// The caller's tenant.
+    pub tenant: TenantId,
+    /// The acting user.
+    pub actor_id: Uuid,
+    /// `user | agent | service`.
+    pub actor_kind: String,
+    /// The request id.
+    pub request_id: Option<String>,
 }
 
 /// An invocation failure, rendered as RFC 9457 by both transports.
@@ -921,6 +948,12 @@ pub async fn invoke(
     tenant: TenantId,
     request: InvokeRequest,
 ) -> Result<InvokeOutcome, ActionError> {
+    // S04 P1: a name the binary does not compile resolves through the tenant's approved
+    // registry rows. The compiled path is untouched, and both transports reach this function,
+    // so HTTP and MCP cannot diverge.
+    if registry.get(&request.action).is_none() {
+        return invoke_imported(pool, tenant, request).await;
+    }
     let Prechecked {
         spec,
         input,
@@ -978,9 +1011,56 @@ pub async fn invoke(
 
     match spec.kind {
         ActionKind::Internal => invoke_internal(pool, spec, ctx, input, input_hash, &request).await,
-        ActionKind::External => invoke_external(pool, spec, ctx, input, input_hash, &request).await,
+        ActionKind::External => {
+            let Some(call) = ExternalCall::from_spec(spec) else {
+                return Err(ActionError::internal());
+            };
+            let call_ctx = ctx.call();
+            invoke_external(pool, &call, &call_ctx, input, input_hash, &request).await
+        }
         ActionKind::Workflow => Err(ActionError::workflow(spec.name)),
     }
+}
+
+/// Invoke an imported action: resolve it through the tenant's approved rows, run the same
+/// authorisation the compiled path runs, then the same external machinery.
+async fn invoke_imported(
+    pool: &PgPool,
+    tenant: TenantId,
+    request: InvokeRequest,
+) -> Result<InvokeOutcome, ActionError> {
+    let action = crate::resolve::get(pool, tenant, &request.action).await?;
+    let (input, _precondition) = crate::resolve::precheck(&action, &request)?;
+    let crate::resolve::ResolvedHandler::External(external) = &action.handler else {
+        return Err(ActionError::workflow(&action.name));
+    };
+    let call = ExternalCall {
+        name: &action.name,
+        version: action.version,
+        spec_hash: match &action.source {
+            crate::resolve::ActionSource::Registry { schema_hash, .. } => schema_hash.clone(),
+            crate::resolve::ActionSource::Compiled => String::new(),
+        },
+        service: &external.service,
+        method: &external.method,
+        path: &external.path,
+        auth: external.auth.as_deref(),
+        auth_optional: external.auth_optional,
+        upload: None,
+        timeout_ms: action.timeout_ms,
+        tenancy: action.tenancy,
+        captures_usage: false,
+        artefact: None,
+        bindings: Some(&external.bindings),
+    };
+    let ctx = CallContext {
+        tenant,
+        actor_id: request.actor_id,
+        actor_kind: request.actor_kind.clone(),
+        request_id: request.request_id.clone(),
+    };
+    let input_hash = idempotency::request_hash(&input);
+    invoke_external(pool, &call, &ctx, input, input_hash, &request).await
 }
 
 async fn invoke_internal(
@@ -1069,8 +1149,10 @@ async fn invoke_internal(
         let invocation_id = record_bookkeeping(
             &mut tx,
             ctx.tenant,
-            spec,
-            &ctx,
+            spec.name,
+            spec.version,
+            &spec.spec_hash(),
+            &ctx.call(),
             &input_hash,
             request,
             "ok",
@@ -1103,8 +1185,9 @@ async fn invoke_internal(
             let elapsed = started.elapsed().as_millis().min(i32::MAX as u128) as i32;
             record_failure(
                 pool,
-                spec,
-                &ctx,
+                spec.name,
+                spec.version,
+                &ctx.call(),
                 &input_hash,
                 request,
                 error.outcome(),
@@ -1120,8 +1203,9 @@ async fn invoke_internal(
             let elapsed = started.elapsed().as_millis().min(i32::MAX as u128) as i32;
             record_failure(
                 pool,
-                spec,
-                &ctx,
+                spec.name,
+                spec.version,
+                &ctx.call(),
                 &input_hash,
                 request,
                 "timeout",
@@ -1214,35 +1298,161 @@ async fn send_once(
     builder: reqwest::RequestBuilder,
     timeout: Duration,
 ) -> Result<ExternalResponse, ()> {
-    match tokio::time::timeout(timeout, builder.send()).await {
+    // The deadline covers the BODY, not just the response headers (S04 P3.2). An upstream that
+    // stalls mid-body would otherwise hold the call open past the action's declared timeout.
+    let exchange = async {
+        let response = builder.send().await?;
+        let status = response.status();
+        let body = response.bytes().await?;
+        Ok::<_, reqwest::Error>((status, body))
+    };
+    match tokio::time::timeout(timeout, exchange).await {
         Err(_) => Err(()),
         Ok(Err(error)) => Ok(Err(error)),
-        Ok(Ok(response)) => {
-            let status = response.status();
-            Ok(response.bytes().await.map(|body| (status, body)))
+        Ok(Ok(response)) => Ok(Ok(response)),
+    }
+}
+
+/// One external call's contract, built from a compiled spec or an approved imported row.
+///
+/// The external machinery reads this instead of a `&ActionSpec`, so an imported action reaches
+/// the same idempotency claim, breaker, credential opening, artefact materialisation and
+/// bookkeeping as a compiled one (S04 P1/P3).
+struct ExternalCall<'a> {
+    name: &'a str,
+    version: u32,
+    spec_hash: String,
+    service: &'a str,
+    method: &'a str,
+    path: &'a str,
+    auth: Option<&'a str>,
+    auth_optional: bool,
+    upload: Option<crate::spec::Upload>,
+    timeout_ms: u32,
+    tenancy: crate::spec::Tenancy,
+    captures_usage: bool,
+    artefact: Option<&'a crate::spec::Artefact>,
+    /// How the input maps onto path, query and body. `None` keeps the compiled behaviour: the
+    /// whole input is the JSON body and the path is static.
+    bindings: Option<&'a crate::resolve::Bindings>,
+}
+
+impl<'a> ExternalCall<'a> {
+    fn from_spec(spec: &'a crate::spec::ActionSpec) -> Option<Self> {
+        let HandlerRef::External {
+            service,
+            method,
+            path,
+            auth,
+            auth_optional,
+            upload,
+        } = spec.handler
+        else {
+            return None;
+        };
+        Some(Self {
+            name: spec.name,
+            version: spec.version,
+            spec_hash: spec.spec_hash(),
+            service,
+            method,
+            path,
+            auth,
+            auth_optional,
+            upload,
+            timeout_ms: spec.timeout_ms,
+            tenancy: spec.tenancy,
+            captures_usage: spec.captures_usage,
+            artefact: spec.artefact.as_ref(),
+            bindings: None,
+        })
+    }
+}
+
+/// The upstream URL: the operation path with its `{name}` templates substituted from the input
+/// and the query binding appended. Compiled actions declare no bindings and keep the literal
+/// join.
+fn external_url(
+    base: &str,
+    call: &ExternalCall<'_>,
+    input: &Value,
+) -> Result<reqwest::Url, ActionError> {
+    let mut path = call.path.to_owned();
+    if let Some(bindings) = call.bindings {
+        for member in &bindings.path {
+            let value = input.get(member).map(scalar_text).unwrap_or_default();
+            path = path.replace(&format!("{{{member}}}"), &encode_segment(&value));
         }
     }
+    let joined = format!("{}{}", base.trim_end_matches('/'), path);
+    let mut url =
+        reqwest::Url::parse(&joined).map_err(|_| ActionError::unconfigured(call.service))?;
+    if let Some(bindings) = call.bindings
+        && !bindings.query.is_empty()
+    {
+        let mut pairs = url.query_pairs_mut();
+        for member in &bindings.query {
+            if let Some(value) = input.get(member) {
+                pairs.append_pair(member, &scalar_text(value));
+            }
+        }
+    }
+    Ok(url)
+}
+
+/// The body an external call sends: the whole input unless the bindings name members.
+fn external_body(call: &ExternalCall<'_>, input: &Value) -> Option<Value> {
+    match call.bindings.and_then(|bindings| bindings.body.as_ref()) {
+        Some(members) if members.is_empty() => None,
+        Some(members) => {
+            let mut object = serde_json::Map::new();
+            for member in members {
+                if let Some(value) = input.get(member) {
+                    object.insert(member.clone(), value.clone());
+                }
+            }
+            Some(Value::Object(object))
+        }
+        None => Some(input.clone()),
+    }
+}
+
+/// A path/query member's text: strings verbatim, scalars as their JSON text.
+fn scalar_text(value: &Value) -> String {
+    match value {
+        Value::String(text) => text.clone(),
+        Value::Null => String::new(),
+        other => other.to_string(),
+    }
+}
+
+/// Percent-encode one path segment, keeping RFC 3986's unreserved set.
+fn encode_segment(value: &str) -> String {
+    let mut out = String::with_capacity(value.len());
+    for byte in value.bytes() {
+        match byte {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'.' | b'_' | b'~' => {
+                out.push(char::from(byte));
+            }
+            other => out.push_str(&format!("%{other:02X}")),
+        }
+    }
+    out
 }
 
 async fn invoke_external(
     pool: &PgPool,
-    spec: &crate::spec::ActionSpec,
-    ctx: HandlerCtx,
+    call: &ExternalCall<'_>,
+    ctx: &CallContext,
     input: Value,
     input_hash: String,
     request: &InvokeRequest,
 ) -> Result<InvokeOutcome, ActionError> {
-    let HandlerRef::External {
-        service,
-        method,
-        path,
-        auth,
-        auth_optional,
-        upload,
-    } = spec.handler
-    else {
-        return Err(ActionError::internal());
-    };
+    let service = call.service;
+    let method = call.method;
+    let auth = call.auth;
+    let auth_optional = call.auth_optional;
+    let upload = call.upload;
     let started = Instant::now();
 
     // An external call carries no mutation of ours, but the KEY is still the caller's
@@ -1255,14 +1465,14 @@ async fn invoke_external(
         store::actions::set_statement_timeout(&mut tx, BOOKKEEPING_TIMEOUT_MS)
             .await
             .map_err(|_| ActionError::internal())?;
-        let claimed = idempotency::begin(&mut tx, ctx.tenant, spec.name, key, &input_hash)
+        let claimed = idempotency::begin(&mut tx, ctx.tenant, call.name, key, &input_hash)
             .await
             .map_err(|error| {
-                tracing::error!(%error, action = spec.name, "claim external idempotency key");
+                tracing::error!(%error, action = call.name, "claim external idempotency key");
                 ActionError::internal()
             })?;
         if !claimed {
-            let found = idempotency::lookup(&mut tx, ctx.tenant, spec.name, key, &input_hash)
+            let found = idempotency::lookup(&mut tx, ctx.tenant, call.name, key, &input_hash)
                 .await
                 .map_err(|_| ActionError::internal())?;
             let _ = tx.rollback().await;
@@ -1294,17 +1504,18 @@ async fn invoke_external(
     let claim = ClaimRelease::arm(
         pool,
         ctx.tenant,
-        spec.name,
+        call.name,
         request.idempotency_key.as_deref(),
     );
     let claim_settled = claim.as_ref().map(ClaimRelease::settled_flag);
 
-    if breaker_is_open(ctx.tenant, spec.name, Instant::now()) {
+    if breaker_is_open(ctx.tenant, call.name, Instant::now()) {
         let elapsed = started.elapsed().as_millis() as i32;
         record_failure(
             pool,
-            spec,
-            &ctx,
+            call.name,
+            call.version,
+            ctx,
             &input_hash,
             request,
             "refused",
@@ -1313,7 +1524,7 @@ async fn invoke_external(
         )
         .await;
         settle_claim(&claim_settled);
-        return Err(ActionError::circuit_open(spec.name));
+        return Err(ActionError::circuit_open(call.name));
     }
 
     let base = match tenant_service_url(pool, ctx.tenant, service).await {
@@ -1324,8 +1535,9 @@ async fn invoke_external(
         let elapsed = started.elapsed().as_millis() as i32;
         record_failure(
             pool,
-            spec,
-            &ctx,
+            call.name,
+            call.version,
+            ctx,
             &input_hash,
             request,
             "error",
@@ -1336,7 +1548,7 @@ async fn invoke_external(
         settle_claim(&claim_settled);
         return Err(ActionError::unconfigured(service));
     };
-    let url = format!("{}{}", base.trim_end_matches('/'), path);
+    let url = external_url(&base, call, &input)?;
 
     // A per-tenant credential is opened under the caller's tenant, never compiled in and never
     // read from the environment. A missing secret is a typed 503 (the caller treats an
@@ -1353,7 +1565,7 @@ async fn invoke_external(
                 Ok(bytes) => bearer_from_secret(bytes),
                 Err(store::secret::SecretError::NotFound) => None,
                 Err(error) => {
-                    tracing::warn!(%error, action = spec.name, "open the action's secret");
+                    tracing::warn!(%error, action = call.name, "open the action's secret");
                     None
                 }
             };
@@ -1366,8 +1578,9 @@ async fn invoke_external(
                     let elapsed = started.elapsed().as_millis() as i32;
                     record_failure(
                         pool,
-                        spec,
-                        &ctx,
+                        call.name,
+                        call.version,
+                        ctx,
                         &input_hash,
                         request,
                         "error",
@@ -1423,7 +1636,7 @@ async fn invoke_external(
                     .await
                     .map_err(|_| ActionError::internal())?;
                 let loaded =
-                    crate::documents::actions::fetch_bytes(&mut tx, ctx.tenant, id, spec.name)
+                    crate::documents::actions::fetch_bytes(&mut tx, ctx.tenant, id, call.name)
                         .await?;
                 let _ = tx.rollback().await;
                 loaded
@@ -1434,22 +1647,29 @@ async fn invoke_external(
                 .mime_str(&loaded.content_type)
                 .map_err(|_| ActionError::internal())?;
             let form = reqwest::multipart::Form::new().part(upload.field.to_owned(), part);
-            client.post(&url).multipart(form)
+            client.post(url.as_str()).multipart(form)
         }
-        None => match method {
-            "POST" => client.post(&url).json(&input),
-            "PUT" => client.put(&url).json(&input),
-            "PATCH" => client.patch(&url).json(&input),
-            "DELETE" => client.delete(&url).json(&input),
-            _ => client.get(&url),
-        },
+        None => {
+            let body = external_body(call, &input);
+            match (method, body) {
+                ("POST", Some(body)) => client.post(url.as_str()).json(&body),
+                ("POST", None) => client.post(url.as_str()),
+                ("PUT", Some(body)) => client.put(url.as_str()).json(&body),
+                ("PUT", None) => client.put(url.as_str()),
+                ("PATCH", Some(body)) => client.patch(url.as_str()).json(&body),
+                ("PATCH", None) => client.patch(url.as_str()),
+                ("DELETE", Some(body)) => client.delete(url.as_str()).json(&body),
+                ("DELETE", None) => client.delete(url.as_str()),
+                _ => client.get(url.as_str()),
+            }
+        }
     };
     if let Some(correlation) = &correlation {
         builder = builder.header("X-Correlation-Id", correlation);
     }
     // The caller's tenant, for the external actions that scope themselves to it (every current
     // one). `ctx` is Copy and is not consumed until the failure recorder below.
-    if spec.tenancy == Tenancy::Tenant {
+    if call.tenancy == Tenancy::Tenant {
         // The estate's licence gates read the credential from `X-Tenant-Id: Bearer <token>`
         // first and `Authorization` second. A licence-auth action therefore puts its bearer in
         // this header too: the bare tenant id every other external call sends is itself read as
@@ -1470,7 +1690,7 @@ async fn invoke_external(
         // account); without the project it books no project, which is exactly what the two
         // `service_key=inference-router` coverage floors fire on. The project value is the
         // tenant-level id the billing owner ruling defines for an app with no fr project.
-        if spec.captures_usage {
+        if call.captures_usage {
             builder = builder.header(ACTOR_HEADER, ctx.actor_id.to_string());
             builder = builder.header(
                 PROJECT_HEADER,
@@ -1484,7 +1704,7 @@ async fn invoke_external(
     // A declared artefact carries its payload inside the JSON response (CONTRACT §6), so ask for
     // JSON explicitly instead of relying on the service's default. It matters: the narration
     // contract answers raw `audio/wav` unless `Accept` names JSON.
-    if spec.artefact.is_some() {
+    if call.artefact.is_some() {
         builder = builder.header(reqwest::header::ACCEPT, "application/json");
     }
 
@@ -1494,8 +1714,8 @@ async fn invoke_external(
     // bill. Measured 2026-11-19 on tenant `nonagentic-conveyor`: two cancelled `inference.chat`
     // calls left ~62k vLLM prompt tokens with no billing row and put
     // `LocalLlmMeteringCoverageLow` at 0.75. Unmetered actions keep the old behaviour.
-    let timeout = Duration::from_millis(u64::from(spec.timeout_ms));
-    let result = if spec.captures_usage {
+    let timeout = Duration::from_millis(u64::from(call.timeout_ms));
+    let result = if call.captures_usage {
         send_metered(builder, timeout).await
     } else {
         send_once(builder, timeout).await
@@ -1504,7 +1724,7 @@ async fn invoke_external(
     let elapsed = started.elapsed().as_millis().min(i32::MAX as u128) as i32;
     // Clones, because the closure below captures them and the success path still needs
     // the originals.
-    let failure_ctx = ctx.clone();
+    let failure_ctx = (*ctx).clone();
     let failure_hash = input_hash.clone();
     let failure_settled = claim_settled.clone();
     let failure = |error: ActionError, breaker: bool| {
@@ -1513,11 +1733,12 @@ async fn invoke_external(
         let settled = failure_settled.clone();
         async move {
             if breaker {
-                breaker_record_failure(ctx.tenant, spec.name, Instant::now());
+                breaker_record_failure(ctx.tenant, call.name, Instant::now());
             }
             record_failure(
                 pool,
-                spec,
+                call.name,
+                call.version,
                 &failure_ctx,
                 &failure_hash,
                 request,
@@ -1535,9 +1756,9 @@ async fn invoke_external(
     };
 
     let (status, body) = match result {
-        Err(_) => return failure(ActionError::timeout(spec.name, spec.timeout_ms), false).await,
+        Err(_) => return failure(ActionError::timeout(call.name, call.timeout_ms), false).await,
         Ok(Err(error)) => {
-            tracing::warn!(%error, action = spec.name, "external call failed");
+            tracing::warn!(%error, action = call.name, "external call failed");
             // Distinct from `upstream_failed`: the service never ANSWERED, so a caller cannot
             // tell a refused connection from a reset after delivery. It must not retry this the
             // way it retries a 5xx (the request may already have been served and billed).
@@ -1549,10 +1770,19 @@ async fn invoke_external(
     // outage uses. When this action presents the tenant's licence, that answer is classified as
     // the tenant's licence being unusable before the generic mapping would call it an upstream
     // fault. The upstream body is logged, never echoed.
-    if let Some(marker) = licence_refusal_marker(auth, status.as_u16(), &body) {
+    let marker = if auth == Some(crate::integrations::audio::LICENCE_TOKEN_SECRET) {
+        licence_refusal_marker(
+            Some(crate::integrations::audio::LICENCE_TOKEN_SECRET),
+            status.as_u16(),
+            &body,
+        )
+    } else {
+        None
+    };
+    if let Some(marker) = marker {
         let detail = String::from_utf8_lossy(&body).to_string();
         tracing::warn!(
-            action = spec.name,
+            action = call.name,
             service,
             status = status.as_u16(),
             marker,
@@ -1573,7 +1803,7 @@ async fn invoke_external(
         // prompt, a credential or an internal URL in its error text, and the problem body is
         // served to the caller.
         tracing::warn!(
-            action = spec.name,
+            action = call.name,
             service,
             status = status.as_u16(),
             upstream = %truncate(&detail),
@@ -1591,18 +1821,18 @@ async fn invoke_external(
     let output: Value = match serde_json::from_slice(&body) {
         Ok(value) => value,
         Err(error) => {
-            tracing::warn!(%error, action = spec.name, "external response was not JSON");
+            tracing::warn!(%error, action = call.name, "external response was not JSON");
             return failure(ActionError::upstream_failed(service, status.as_u16()), true).await;
         }
     };
-    breaker_record_success(ctx.tenant, spec.name);
+    breaker_record_success(ctx.tenant, call.name);
 
     // S09 §5.2: a declared artefact is written HERE, in the engine, not by a handler — the same rule
     // the ledger row follows one block below. The external call already happened, so the fact it
     // produced is committed in its own transaction; a failure is a real failure of the action's
     // contract (it promised a document) and is recorded as such.
-    let output = match spec.artefact {
-        Some(artefact) => materialise_artefact(pool, spec, &ctx, artefact, output).await?,
+    let output = match call.artefact {
+        Some(artefact) => materialise_artefact(pool, call.name, ctx, *artefact, output).await?,
         None => output,
     };
 
@@ -1612,7 +1842,7 @@ async fn invoke_external(
     let capture = request
         .usage
         .as_ref()
-        .filter(|_| spec.captures_usage)
+        .filter(|_| call.captures_usage)
         .map(|usage| {
             let captured = conveyor_domain::inference::capture(
                 request.input.get("model").and_then(Value::as_str),
@@ -1653,8 +1883,10 @@ async fn invoke_external(
     let invocation_id = match record_bookkeeping(
         &mut tx,
         ctx.tenant,
-        spec,
-        &ctx,
+        call.name,
+        call.version,
+        &call.spec_hash,
+        ctx,
         &input_hash,
         request,
         "ok",
@@ -1697,8 +1929,8 @@ async fn invoke_external(
 /// what the action's contract says it produces.
 async fn materialise_artefact(
     pool: &PgPool,
-    spec: &crate::spec::ActionSpec,
-    ctx: &HandlerCtx,
+    action: &str,
+    ctx: &CallContext,
     artefact: crate::spec::Artefact,
     mut output: Value,
 ) -> Result<Value, ActionError> {
@@ -1740,7 +1972,7 @@ async fn materialise_artefact(
         &mut tx,
         ctx,
         crate::documents::actions::NewBytesDocument {
-            action: spec.name,
+            action,
             title: artefact.title,
             content_type: artefact.content_type,
             kind: "document",
@@ -1779,8 +2011,10 @@ async fn materialise_artefact(
 async fn record_bookkeeping(
     conn: &mut sqlx::PgConnection,
     tenant: TenantId,
-    spec: &crate::spec::ActionSpec,
-    ctx: &HandlerCtx,
+    action: &str,
+    version: u32,
+    spec_hash: &str,
+    ctx: &CallContext,
     input_hash: &str,
     request: &InvokeRequest,
     outcome: &'static str,
@@ -1792,8 +2026,8 @@ async fn record_bookkeeping(
 ) -> Result<Uuid, ActionError> {
     let record = store::actions::InvocationRecord {
         actor_id: Some(ctx.actor_id),
-        action: spec.name,
-        action_version: spec.version as i32,
+        action,
+        action_version: version as i32,
         input_hash,
         idempotency_key: request.idempotency_key.as_deref(),
         outcome,
@@ -1803,33 +2037,33 @@ async fn record_bookkeeping(
     let invocation_id = store::actions::record_invocation(&mut *conn, tenant, &record)
         .await
         .map_err(|error| {
-            tracing::error!(%error, action = spec.name, "record action_invocation");
+            tracing::error!(%error, action = action, "record action_invocation");
             ActionError::internal()
         })?;
 
-    let mut entry = AuditEntry::service(spec.name, audit_status);
+    let mut entry = AuditEntry::service(action, audit_status);
     entry.actor_id = Some(ctx.actor_id);
     entry.actor_kind = sanitize_actor_kind(&ctx.actor_kind);
     entry.request_id = ctx.request_id.clone();
-    entry.resource_type = Some(resource_type(spec.name));
+    entry.resource_type = Some(resource_type(action));
     entry.resource_id = resource_id(&request.input);
     entry.details = serde_json::json!({
         "outcome": outcome,
         "duration_ms": duration_ms,
-        "spec_hash": spec.spec_hash(),
+        "spec_hash": spec_hash,
     });
     audit::record(&mut *conn, tenant, &entry)
         .await
         .map_err(|error| {
-            tracing::error!(%error, action = spec.name, "record audit_event");
+            tracing::error!(%error, action = action, "record audit_event");
             ActionError::internal()
         })?;
 
     if let Some(key) = request.idempotency_key.as_deref() {
-        idempotency::save(&mut *conn, tenant, spec.name, key, input_hash, status, body)
+        idempotency::save(&mut *conn, tenant, action, key, input_hash, status, body)
             .await
             .map_err(|error| {
-                tracing::error!(%error, action = spec.name, "save idempotency response");
+                tracing::error!(%error, action = action, "save idempotency response");
                 ActionError::internal()
             })?;
     }
@@ -1861,7 +2095,7 @@ async fn record_bookkeeping(
             store::inference::capture_and_maybe_audit_tx(&mut *conn, tenant, &call).await;
         if !capture_outcome.recorded {
             tracing::warn!(
-                action = spec.name,
+                action = action,
                 error = ?capture_outcome.error,
                 "inference ledger capture failed; the call is unaffected"
             );
@@ -1892,23 +2126,18 @@ fn settle_claim(settled: &Option<Arc<AtomicBool>>) {
 struct ClaimRelease {
     pool: PgPool,
     tenant: TenantId,
-    scope: &'static str,
+    scope: String,
     key: Option<String>,
     settled: Arc<AtomicBool>,
 }
 
 impl ClaimRelease {
     /// Arm for one claimed key; `None` when the call carried no idempotency key.
-    fn arm(
-        pool: &PgPool,
-        tenant: TenantId,
-        scope: &'static str,
-        key: Option<&str>,
-    ) -> Option<Self> {
+    fn arm(pool: &PgPool, tenant: TenantId, scope: &str, key: Option<&str>) -> Option<Self> {
         key.map(|key| Self {
             pool: pool.clone(),
             tenant,
-            scope,
+            scope: scope.to_owned(),
             key: Some(key.to_owned()),
             settled: Arc::new(AtomicBool::new(false)),
         })
@@ -1933,9 +2162,9 @@ impl Drop for ClaimRelease {
         };
         let pool = self.pool.clone();
         let tenant = self.tenant;
-        let scope = self.scope;
+        let scope = self.scope.clone();
         handle.spawn(async move {
-            if let Err(error) = release_claim(&pool, tenant, scope, &key).await {
+            if let Err(error) = release_claim(&pool, tenant, &scope, &key).await {
                 tracing::warn!(%error, action = scope, "release an abandoned idempotency claim");
             }
         });
@@ -1960,8 +2189,9 @@ async fn release_claim(
 #[allow(clippy::too_many_arguments)]
 async fn record_failure(
     pool: &PgPool,
-    spec: &crate::spec::ActionSpec,
-    ctx: &HandlerCtx,
+    action: &str,
+    version: u32,
+    ctx: &CallContext,
     input_hash: &str,
     request: &InvokeRequest,
     outcome: &'static str,
@@ -1974,8 +2204,8 @@ async fn record_failure(
         store::actions::set_statement_timeout(&mut tx, BOOKKEEPING_TIMEOUT_MS).await?;
         let record = store::actions::InvocationRecord {
             actor_id: Some(ctx.actor_id),
-            action: spec.name,
-            action_version: spec.version as i32,
+            action,
+            action_version: version as i32,
             input_hash,
             idempotency_key: request.idempotency_key.as_deref(),
             outcome,
@@ -1983,7 +2213,7 @@ async fn record_failure(
             trace_id: request.trace_id.as_deref(),
         };
         store::actions::record_invocation(&mut tx, tenant, &record).await?;
-        let mut entry = AuditEntry::service(spec.name, audit_status);
+        let mut entry = AuditEntry::service(action, audit_status);
         entry.actor_id = Some(ctx.actor_id);
         entry.actor_kind = sanitize_actor_kind(&ctx.actor_kind);
         entry.request_id = ctx.request_id.clone();
@@ -1994,7 +2224,7 @@ async fn record_failure(
         // A failure produced no response: release the in-flight claim so the caller can
         // retry (internal claims already rolled back; this is the external path).
         if let Some(key) = request.idempotency_key.as_deref() {
-            store::actions::release_idempotency(&mut tx, tenant, spec.name, key).await?;
+            store::actions::release_idempotency(&mut tx, tenant, action, key).await?;
         }
         // Commit: dropping the transaction would roll the recorded failure back, and the
         // row this function exists to write would silently never exist.
@@ -2009,9 +2239,9 @@ async fn record_failure(
     {
         Ok(Ok(())) => {}
         Ok(Err(error)) => {
-            tracing::error!(%error, action = spec.name, "record failed invocation")
+            tracing::error!(%error, action = action, "record failed invocation")
         }
-        Err(_) => tracing::error!(action = spec.name, "recording the failure timed out"),
+        Err(_) => tracing::error!(action = action, "recording the failure timed out"),
     }
 }
 

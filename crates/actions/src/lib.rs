@@ -106,6 +106,8 @@ pub mod prompt_audit;
 pub mod publish;
 pub mod rbac;
 pub mod registry;
+// S04 P1: one tenant-aware resolution model for compiled and approved imported actions.
+pub mod resolve;
 // T1 (SPEC_V2 §5, §8.2, §8.3): the plan spine and the MSP rows.
 pub mod spec;
 pub mod spine;
