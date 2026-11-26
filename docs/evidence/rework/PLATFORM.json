@@ -70,38 +70,34 @@
     {
       "check": "artefact_standard",
       "description": "every mandatory standard artefact this project owns is evidenced",
-      "detail": "5 mandatory artefact package(s) open: dr-w4-proj-probe-row:PLATFORM, dr-w4-prog-refined-vision-count:PLATFORM, dr-w4-prog-safe-cadence-pi:PLATFORM, dr-w4-prog-safe-portfolio-count:PLATFORM, std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM (4 not yet due: tranche planned)",
+      "detail": "no due mandatory artefact package; 4 not yet due (tranche planned)",
       "id": "PLATFORM-artefact-standard",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
       "check": "rework_resolution",
       "description": "no unresolved P0/P1 rework package remains for the project",
-      "detail": "1 unresolved P0/P1 package(s): dr-w4-proj-probe-row:PLATFORM (P1) (4 not yet due: tranche planned)",
+      "detail": "no due unresolved P0/P1 package; 4 not yet due (tranche planned)",
       "id": "PLATFORM-rework",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'PLATFORM-artefact-standard' did not pass; the gate check 'PLATFORM-rework' did not pass",
+      "detail": "gate discharged by executable checks: PLATFORM-project, PLATFORM-baseline, PLATFORM-charter, PLATFORM-pi-cadence, PLATFORM-wsjf, PLATFORM-demo-credits, PLATFORM-product, PLATFORM-artefact-standard, PLATFORM-rework",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "PLATFORM-artefact-standard (P1): 5 mandatory artefact package(s) open: dr-w4-proj-probe-row:PLATFORM, dr-w4-prog-refined-vision-count:PLATFORM, dr-w4-prog-safe-cadence-pi:PLATFORM, dr-w4-prog-safe-portfolio-count:PLATFORM, std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM (4 not yet due: tranche planned)",
-    "PLATFORM-rework (P0): 1 unresolved P0/P1 package(s): dr-w4-proj-probe-row:PLATFORM (P1) (4 not yet due: tranche planned)",
-    "gate (P0): the gate check 'PLATFORM-artefact-standard' did not pass; the gate check 'PLATFORM-rework' did not pass"
-  ],
+  "failures": [],
   "gate": "The standing platform row carries an approved charter and a baseline; it does not close.",
-  "generated_at": "2026-11-26T10:42:28.600962+00:00",
+  "generated_at": "2026-11-26T10:44:53.810826+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/PLATFORM.toml",
   "name": "CI, runners and platform",
@@ -112,6 +108,6 @@
     "git_sha": "f69258be77217de5f167bc0d4e780bea3a6964c6",
     "path": "retained-snapshot/f69258be77217de5f167bc0d4e780bea3a6964c6"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }

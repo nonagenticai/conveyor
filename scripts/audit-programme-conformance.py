@@ -1540,14 +1540,23 @@ def load_dataset(
     outputs_path: Path | None,
 ) -> Dataset:
     data_dir = snapshot
+    programme_doc = read_json(data_dir / "programme.json")
+    # The snapshot embeds the issue registry in programme.json; a publish also writes it as
+    # its own file. Read whichever the snapshot carries, so a rule about an issue does not
+    # report "the registry is not readable" on every live snapshot.
+    issues_doc = (
+        read_json(data_dir / "issues.json")
+        if (data_dir / "issues.json").exists()
+        else programme_doc.get("issue_registry") or {}
+    )
     return Dataset(
-        programme=read_json(data_dir / "programme.json"),
+        programme=programme_doc,
         msp=read_json(data_dir / "msp.json"),
         architecture=read_json(data_dir / "architecture.json"),
         manifest=read_json(data_dir / "manifest.json") if (data_dir / "manifest.json").exists() else {},
         outputs=read_outputs(outputs_path or data_dir.parent / "docs" / "outputs.js"),
         coverage=read_json(data_dir / "coverage.json") if (data_dir / "coverage.json").exists() else {},
-        issues=read_json(data_dir / "issues.json") if (data_dir / "issues.json").exists() else {},
+        issues=issues_doc,
         seed=read_json(seed_dir / "programme.json"),
         definition=read_json(seed_dir / "programme-definition.json"),
         output_standard=read_json(

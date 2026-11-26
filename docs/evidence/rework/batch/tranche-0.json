@@ -1,40 +1,18 @@
 {
   "blocked": 0,
-  "generated_at": "2026-11-26T10:42:28+00:00",
-  "green": 0,
+  "generated_at": "2026-11-26T10:44:53+00:00",
+  "green": 1,
   "members": [
     {
       "factory_exit": 0,
-      "gaps": [
-        {
-          "detail": "5 mandatory artefact package(s) open: dr-w4-proj-probe-row:PLATFORM, dr-w4-prog-refined-vision-count:PLATFORM, dr-w4-prog-safe-cadence-pi:PLATFORM, dr-w4-prog-safe-portfolio-count:PLATFORM, std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM (4 not yet due: tranche planned)",
-          "gap": "record",
-          "id": "PLATFORM-artefact-standard",
-          "kind": "snapshot",
-          "severity": "P1"
-        },
-        {
-          "detail": "1 unresolved P0/P1 package(s): dr-w4-proj-probe-row:PLATFORM (P1) (4 not yet due: tranche planned)",
-          "gap": "record",
-          "id": "PLATFORM-rework",
-          "kind": "snapshot",
-          "severity": "P0"
-        },
-        {
-          "detail": "the gate check 'PLATFORM-artefact-standard' did not pass; the gate check 'PLATFORM-rework' did not pass",
-          "gap": "code",
-          "id": "gate",
-          "kind": "manifest",
-          "severity": "P0"
-        }
-      ],
+      "gaps": [],
       "key": "PLATFORM",
       "log": "docs/evidence/rework/batch/tranche-0/PLATFORM.log",
       "publish_exit": 1,
-      "state": "RECEIPT_RED"
+      "state": "RECEIPT_GREEN"
     }
   ],
-  "red": 1,
+  "red": 0,
   "snapshot_sha": "f69258be77217de5f167bc0d4e780bea3a6964c6",
   "tranche": 0
 }

@@ -104,26 +104,14 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   45 wbs.update ok
   46 tranches.update ok
   lesson L-PLATFORM-1: already present
-  47 approvals.request ok
-  48 approvals.decide ok
-  49 cards.comment ok
-  50 cards.move ok
-  51 cards.move ok
-  card cleared: v1-p112-1:PLATFORM
-  52 approvals.request ok
-  53 approvals.decide ok
-  54 cards.comment ok
-  55 cards.move ok
-  56 cards.move ok
-  card cleared: v1-w3b-2:PLATFORM
-  card discharge: 2 card(s) cleared of 496 open package(s)
+  card discharge: 0 card(s) cleared of 491 open package(s)
   closure: not applicable (the project stays active)
-PLATFORM: 56 acts recorded
+PLATFORM: 46 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project PLATFORM --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-ux865wem/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-ux865wem/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project PLATFORM --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-1k4ngxvg/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-PLATFORM-snap-1k4ngxvg/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/PLATFORM-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
 
 {
   "schema": "artefact-publication/v1",
@@ -159,7 +147,7 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
       "category": "change-control",
       "mandatory": true,
       "trigger": null,
-      "state": "present"
+      "state": "stale"
     },
     {
       "project_key": "PLATFORM",
@@ -298,9 +286,9 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   ],
   "counts": {
     "due": 5,
-    "present": 4,
+    "present": 3,
     "missing-edge": 0,
-    "stale": 9,
+    "stale": 10,
     "ambiguous": 0
   }
 }
