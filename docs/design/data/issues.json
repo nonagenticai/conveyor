@@ -1,11 +1,40 @@
 {
   "issues": [
     {
+      "number": 797,
+      "title": "T3/T13: the three tranche-3 P0 residuals \u2014 baseline guard, spend budget, write-verify",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/797",
+      "updatedAt": "2026-11-26T22:45:11Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "T3",
+          "color": "6E7781"
+        },
+        {
+          "name": "T13",
+          "color": "6E7781"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
       "number": 792,
       "title": "GEMBA-WALK inception \u2014 register the programme project and publish the MSP/TOGAF/SAFe set",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/792",
-      "updatedAt": "2026-11-26T22:02:48Z",
+      "updatedAt": "2026-11-26T22:30:31Z",
       "labels": [
         {
           "name": "unit",
@@ -45,9 +74,9 @@
     {
       "number": 789,
       "title": "ci: run design-pack on merge_group so it can be a required check",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/789",
-      "updatedAt": "2026-11-26T22:01:01Z",
+      "updatedAt": "2026-11-26T22:41:18Z",
       "labels": [
         {
           "name": "unit",
@@ -64,7 +93,7 @@
       "title": "estate: the conveyor-bundle-minter client and the lean4-prover licence app (#776 P3)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/788",
-      "updatedAt": "2026-11-26T21:42:55Z",
+      "updatedAt": "2026-11-26T22:08:12Z",
       "labels": [
         {
           "name": "unit",
@@ -174,15 +203,15 @@
       "title": "github: the intent channel \u2014 issue form, DoR on events, sub-issues and tranche milestones",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/780",
-      "updatedAt": "2026-11-26T21:39:07Z",
+      "updatedAt": "2026-11-26T22:32:11Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -195,7 +224,7 @@
       "title": "programme: the unit record \u2014 charter, list and close a delivery unit as a row",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/779",
-      "updatedAt": "2026-11-26T21:59:41Z",
+      "updatedAt": "2026-11-26T22:25:49Z",
       "labels": [
         {
           "name": "unit",
@@ -216,7 +245,7 @@
       "title": "T13 \u2014 a missing operation opens a tool request; publish rebinds the step",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/778",
-      "updatedAt": "2026-11-26T21:59:55Z",
+      "updatedAt": "2026-11-26T22:09:00Z",
       "labels": [
         {
           "name": "unit",
@@ -235,9 +264,9 @@
     {
       "number": 776,
       "title": "add: the mint path uses a dedicated minter credential, and refuses without one",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/776",
-      "updatedAt": "2026-11-26T21:41:56Z",
+      "updatedAt": "2026-11-26T22:41:18Z",
       "labels": [
         {
           "name": "unit",
@@ -342,7 +371,7 @@
       "title": "design: provenance on every output page and a declared-vs-evidenced register",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/756",
-      "updatedAt": "2026-11-26T13:33:10Z",
+      "updatedAt": "2026-11-26T22:43:05Z",
       "labels": [
         {
           "name": "unit",
@@ -2008,7 +2037,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-26T21:38:44Z",
+      "updatedAt": "2026-11-26T22:07:11Z",
       "labels": [
         {
           "name": "unit",
