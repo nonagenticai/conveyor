@@ -1653,13 +1653,13 @@
       "tranche": 1,
       "units": {
         "blocked": 0,
-        "claimed": 2,
+        "claimed": 1,
         "numbers": [
           72,
           744,
           746
         ],
-        "open": 2,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }

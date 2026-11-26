@@ -1,6 +1,6 @@
 {
   "feedback": [],
-  "generated_at": "2026-11-26T13:37:01Z",
+  "generated_at": "2026-11-26T13:38:38Z",
   "issue_registry": {
     "issues": [
       {
@@ -59,7 +59,7 @@
         "number": 754,
         "state": "OPEN",
         "title": "ops: strict-green live publish — reconcile the ledger to the live P0/P1 set",
-        "updatedAt": "2026-11-26T13:35:45Z",
+        "updatedAt": "2026-11-26T13:38:11Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/754"
       },
       {
@@ -145,9 +145,9 @@
           }
         ],
         "number": 744,
-        "state": "OPEN",
+        "state": "CLOSED",
         "title": "add: the proof store, proofs actions and the lean_proof gate evidence",
-        "updatedAt": "2026-11-26T13:09:31Z",
+        "updatedAt": "2026-11-26T13:37:19Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/744"
       },
       {
@@ -618,7 +618,7 @@
         "number": 660,
         "state": "OPEN",
         "title": "conveyor-buildout — the SPEC_V2 programme",
-        "updatedAt": "2026-11-26T12:52:59Z",
+        "updatedAt": "2026-11-26T13:37:27Z",
         "url": "https://github.com/nonagenticai/conveyor/issues/660"
       },
       {
