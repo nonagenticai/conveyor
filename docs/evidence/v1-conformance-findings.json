@@ -4989,7 +4989,12 @@
    ],
    "failure_scenario": "An author ingests a procedure whose step needs an operation no tool provides. The intake is refused with no record of what was missing, and no card is opened; the procedure can never acquire the tool, so it stays permanently invalid and the gap is invisible to the tool estate.",
    "acceptance": "A missing operation creates a tool-request card naming the operation, the step and the procedure; publishing a tool version rebinds the step; a test ingests such a procedure, asserts the card exists and that the procedure is retryable once the tool is published.",
-   "owner_project": "T13"
+   "owner_project": "T13",
+   "resolved_by": {
+    "commit": "68a38449ab8a389ee2ea4aab7eadcbfc051c83dc",
+    "test": "crates/actions/tests/sop_ingestion.rs::a_missing_operation_opens_a_tool_request_and_binds_once_published",
+    "evidence": "sop_ingestion 13/13. The procedure's missing operation opens a tool_request card (meta names the operation, the process and its steps) instead of refusing 422 sop.cannot_grant_tool; procedures.validate stays a read and resolves each request against the tenant's published tools; publishing toolkit <toolkit>.<tool> v1 makes the re-validation report the pin shell.exec -> shell.exec v1 with no open request; the derived agent's allowed_actions stays empty."
+   }
   },
   {
    "id": "v1-p119-1",
