@@ -890,6 +890,7 @@ pub async fn update_register_tx(
     review_at: Option<NaiveDate>,
     response: Option<&str>,
     meta: Option<&Value>,
+    code: Option<&str>,
 ) -> Result<RegisterRecord, PlanStoreError> {
     let current =
         get_register_tx(&mut *conn, tenant, id)
@@ -927,6 +928,7 @@ pub async fn update_register_tx(
             links = coalesce($12, links),
             review_at = coalesce($13, review_at), response = coalesce($14, response),
             meta = coalesce($15, meta),
+            code = coalesce($16, code),
             version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2 AND version = $3
           RETURNING {REGISTER_COLUMNS}"
@@ -947,6 +949,7 @@ pub async fn update_register_tx(
         .bind(review_at)
         .bind(response)
         .bind(meta)
+        .bind(code)
         .fetch_optional(&mut *conn)
         .await?;
     row.ok_or(PlanStoreError::Stale {

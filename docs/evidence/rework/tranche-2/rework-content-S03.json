@@ -17,6 +17,12 @@
   "artifacts": [
     {
       "title": "Stakeholder Map — S03 Domain and schema (Phase A)",
+      "links": [
+        {
+          "to": "Driver/Goal/Objective Catalog — S03 Domain and schema (Phase A)",
+          "kind": "derivation"
+        }
+      ],
       "phase_code": "a",
       "plateau": "psa",
       "artifact_kind": "matrix",
@@ -120,6 +126,12 @@
     },
     {
       "title": "Driver/Goal/Objective Catalog — S03 Domain and schema (Phase A)",
+      "links": [
+        {
+          "to": "Requirements Catalog — S03 Domain and schema (Phase A)",
+          "kind": "derivation"
+        }
+      ],
       "phase_code": "a",
       "plateau": "psa",
       "artifact_kind": "catalog",
@@ -197,6 +209,12 @@
     },
     {
       "title": "Requirements Catalog — S03 Domain and schema (Phase A)",
+      "links": [
+        {
+          "to": "Solution Concept Diagram — S03 Domain and schema (Phase A)",
+          "kind": "realization"
+        }
+      ],
       "phase_code": "a",
       "plateau": "psa",
       "artifact_kind": "catalog",
@@ -317,6 +335,12 @@
     },
     {
       "title": "Solution Concept Diagram — S03 Domain and schema (Phase A)",
+      "links": [
+        {
+          "to": "Business Capability Map — S03 Domain and schema (Phase B)",
+          "kind": "realization"
+        }
+      ],
       "phase_code": "a",
       "plateau": "psa",
       "artifact_kind": "diagram",
@@ -509,6 +533,12 @@
     },
     {
       "title": "Business Capability Map — S03 Domain and schema (Phase B)",
+      "links": [
+        {
+          "to": "Data Entity/Data Component Catalog — S03 Domain and schema (Phase C)",
+          "kind": "realization"
+        }
+      ],
       "phase_code": "b",
       "plateau": "hld",
       "artifact_kind": "diagram",
@@ -611,6 +641,12 @@
     },
     {
       "title": "Data Entity/Data Component Catalog — S03 Domain and schema (Phase C)",
+      "links": [
+        {
+          "to": "Technology Standards Catalog — S03 Domain and schema (Phase D)",
+          "kind": "dependency"
+        }
+      ],
       "phase_code": "c",
       "plateau": "hld",
       "artifact_kind": "catalog",
@@ -791,6 +827,12 @@
     },
     {
       "title": "Technology Standards Catalog — S03 Domain and schema (Phase D)",
+      "links": [
+        {
+          "to": "Stakeholder Map — S03 Domain and schema (Phase A)",
+          "kind": "reuse"
+        }
+      ],
       "phase_code": "d",
       "plateau": "hld",
       "artifact_kind": "catalog",
@@ -890,6 +932,88 @@
       "body": "# Technology Standards Catalog — S03 Domain and schema (Phase D)\n\n## Metadata\n\nType catalog; phase D; plateau hld; owner the programme architect (conveyor-e2e); reviewer the Architecture Board; review date 2026-11-21; project 01a1d039-0d28-743b-86c7-0d0698ed69c1; retrospective under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14.\n\n## Entries\n\nTen standards: Postgres 18 FORCE RLS, text+CHECK enumeration, the partial-index guarantee, UTC lease time, numeric positions, the `_tx` convention, the embedded forward-only migration set, the error vocabulary, the pure domain crate and the verification route.\n\n## Links\n\nDerives from the slice plan §5–§8 and data-arch §1.8; realizes the Phase D standards view; reuses the repository's delivery contract and the GitHub-hosted preflight.\n\n## Document\n\nThe artefact sits under the slice plan; the standards are exercised by migrations/0002_domain.sql and the store test suite, and the gate is recorded in acceptance/programme/S03.toml."
     }
   ],
+  "registers": {
+    "risk": [
+      {
+        "title": "The lease-exclusivity claim is not exercised by the 32-racer test (v1-s03-1)",
+        "code": "R-S03-01",
+        "body": "claim_card_tx lets the same assignee re-claim an unexpired lease through its third arm (OR assignee_id = $3), and the 32-racer test shares seed.user and Version::INITIAL, so the version predicate decides the winner and the test would pass with the lease arm deleted. Property (b) is therefore overstated for the lease half.",
+        "probability": "high",
+        "impact": 3,
+        "review_at": "2026-12-05",
+        "links": {
+          "requirements": ["R2"],
+          "decisions": ["S3-D5"]
+        },
+        "meta": {"owner": "programme architect (conveyor-e2e)"},
+        "status": "admitted"
+      },
+      {
+        "title": "The archive-exclusion claim covers only the two board-scan indexes (v1-s03-2)",
+        "code": "R-S03-02",
+        "body": "Only card_board_list_position_idx and card_board_position_idx carry WHERE archived_at IS NULL; card_assignee_lease_idx and card_tsv_idx include stamped cards, and the later card_name_trgm_idx and card_wbs_node_idx add no predicate. A later slice inheriting the schema could read the claim as absolute.",
+        "probability": "medium",
+        "impact": 2,
+        "review_at": "2026-12-05",
+        "links": {
+          "requirements": ["R10"],
+          "decisions": ["S3-D1"]
+        },
+        "meta": {"owner": "programme architect (conveyor-e2e)"},
+        "status": "admitted"
+      }
+    ],
+    "issue": [
+      {
+        "title": "S03 closed out of sequence before the tranche-2 review (U3-EXC-S03)",
+        "code": "I-S03-01",
+        "body": "The project row reached closed at 2026-11-21T01:05:32Z in an unauthorised tranche before the tranche review; the delegate accepted it as a retrospective exception under the standing delegation, and this rework re-closes the project through the one gate.",
+        "status": "accepted"
+      },
+      {
+        "title": "No contemporaneous schema review or Phase A-D artefact set existed at the snapshot",
+        "code": "I-S03-02",
+        "body": "The plan requires a second reader over data-arch §2.3/§2.4 and the mandatory artefacts; none existed at the 2026-11-21T19:24:46Z snapshot. This retrospective batch authors the seven artefacts and re-performs the review, admitting two packages.",
+        "status": "closed"
+      }
+    ],
+    "assumption": [
+      {
+        "title": "S02's platform primitives stay stable under the domain",
+        "code": "A-S03-01",
+        "body": "0001_platform.sql, begin_scoped, the conveyor_runtime role and domain::{TenantId, Id, Version} are the base the fourteen tables and the tenant_isolation policy stand on; a change to the runtime role or to app_current_tenant() would invalidate the RLS proof."
+      },
+      {
+        "title": "Postgres 18 enforces FORCE RLS for the owner and scopes the runtime role",
+        "code": "A-S03-02",
+        "body": "The RLS proof assumes the runtime role is scoped to one tenant per transaction and that ENABLE plus FORCE leaves the table owner with zero rows under the app_current_tenant() policy; rls_domain.rs checks runtime, owner and superuser."
+      }
+    ],
+    "dependency": [
+      {
+        "title": "S02 platform migration and tenancy primitives land first",
+        "code": "D-S03-01",
+        "body": "S03 is blocked by S02: migrations/0002_domain.sql builds on 0001_platform.sql, begin_scoped, the conveyor_runtime role and TenantId, Id and Version."
+      },
+      {
+        "title": "Later slices add tables and never re-invent one",
+        "code": "D-S03-02",
+        "body": "S04–S13 register actions, board satellites, channels, outlines and workflow over these fourteen tables and may add tables, but the baseline domain, the may_move matrix and the catalogue vocabulary are inherited, not replaced."
+      }
+    ],
+    "benefit": [
+      {
+        "title": "One stored domain behind every later slice",
+        "code": "B-S03-01",
+        "body": "Fourteen tenant-isolated tables in one baseline migration mean a later slice reaches for an existing table instead of inventing one, and the anti-accretion rule (R10) keeps fr's 224-migration history out of the baseline."
+      },
+      {
+        "title": "The database and Rust refuse the same transition",
+        "code": "B-S03-02",
+        "body": "The may_move matrix, the run, approval and asset state machines and the partial uniques give one refusal vocabulary: a terminal run rejects every transition, one pending approval exists per (run, gate), and a claim is granted once per version."
+      }
+    ]
+  },
   "delivery_contract": {
     "title": "Delivery contract — S03 Domain and schema (retrospective, 2026-11-21)",
     "body": {

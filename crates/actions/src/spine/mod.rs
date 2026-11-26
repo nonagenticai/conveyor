@@ -731,6 +731,9 @@ pub struct RegisterUpdateIn {
     /// The new title.
     #[serde(default)]
     pub title: Option<String>,
+    /// The new human code.
+    #[serde(default)]
+    pub code: Option<String>,
     /// The new body.
     #[serde(default)]
     pub body: Option<String>,
@@ -2180,6 +2183,7 @@ async fn registers_update(
         input.review_at,
         trimmed(input.response).as_deref(),
         input.meta.as_ref(),
+        trimmed(input.code).as_deref(),
     )
     .await
     .map_err(|error| spine_error(error, ctx.action))?;

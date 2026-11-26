@@ -944,18 +944,30 @@ def computed_rows(
             key=lambda row: (str(row.get("reviewed_at") or ""), str(row.get("version") or "")),
         )
         evidence = latest.get("evidence") if isinstance(latest.get("evidence"), dict) else {}
+        conditions = latest.get("conditions") or evidence.get("conditions")
+        # The `outcome` column is Phase H's typed change/kata outcome (migration 0054), not a
+        # phase-A–G decision. A phase-G review's typed decision is its one level, so the
+        # Decision heading names that level and states the phase-H outcome explicitly instead
+        # of publishing "no outcome" over a review that does govern (deep review
+        # w4-proj-compliance-decision, measured on T2, 2026-11-26).
         return [{
             "kind": "governing_review",
             "id": latest.get("id"),
+            "decision": latest.get("level"),
             "level": latest.get("level"),
-            "outcome": latest.get("outcome"),
-            "conditions": latest.get("conditions") or evidence.get("conditions"),
+            "conditions": conditions if conditions not in (None, "", [], {}) else "none recorded",
+            "phase_h_outcome": latest.get("outcome"),
             "reviewed_at": latest.get("reviewed_at"),
             "reviewed_by_name": latest.get("reviewed_by_name"),
             "findings": latest.get("findings") or [],
             "title": (
                 f"governing review {latest.get('id')}: "
-                f"{latest.get('level') or 'unlevelled'} / {latest.get('outcome') or 'no outcome'}"
+                f"{latest.get('level') or 'unlevelled'} governs"
+                + (
+                    f"; phase-H outcome {json.dumps(latest.get('outcome'))}"
+                    if latest.get("outcome")
+                    else "; phase-H outcome not recorded (a phase-G decision is its level)"
+                )
             ),
         }]
     if name == "waiver_status":
@@ -2822,7 +2834,8 @@ def self_test_wsjf(outputs: Path, std: dict[str, Any]) -> None:
 
 
 def self_test_demo_and_lessons_mandatory(outputs: Path, std: dict[str, Any]) -> None:
-    """Demo-credit and lesson absence is a P2 section gap while optional, P1 once mandatory."""
+    """Demo-credit and lesson absence is the page's honest absence while optional, P1 once
+    mandatory."""
     # The committed standard is already flipped (the records session's edits), so the P2 half
     # restores the optional flag explicitly and the P1 half reads the standard as committed.
     optional_std = copy.deepcopy(std)
@@ -2851,8 +2864,12 @@ def self_test_demo_and_lessons_mandatory(outputs: Path, std: dict[str, Any]) -> 
             f"{category}: the page must state the absence honestly, got {artefact['status']}"
         )
         optional = finding_for(findings, category)
-        assert optional is not None and optional["severity"] == "P2", (
-            f"{category}: an `optional` source is a section-level P2, got {optional and optional['severity']}"
+        # `build_findings` skips an artefact whose required sections all resolve: an optional
+        # source with no row is the page's honest absence (`partial`), not a gap. The mandatory
+        # half below is what earns a finding.
+        assert optional is None, (
+            f"{category}: an optional source must state the absence, not raise a finding, "
+            f"got {optional and optional['severity']}"
         )
         _, findings = generate(mandatory_safe_standard(std), fixture, outputs)
         finding = finding_for(findings, category)
@@ -3101,6 +3118,46 @@ def self_test_computed_sources(fixture: dict[str, Any]) -> None:
         {"kind": "programme", "id": "pg1", "programme_id": "pg1"}, {},
     )
     assert rows and rows[0]["owner_user_id"] == "u1", rows
+
+    # The Decision heading names the governing review and its typed decision; a phase-G review's
+    # decision is its level, and the phase-H outcome is stated as not recorded rather than
+    # published as "no outcome" (deep review w4-proj-compliance-decision).
+    snap = json.loads(json.dumps(fixture))
+    snap["architecture"]["compliance_reviews"] = [
+        {"id": "r-old", "project_id": "p1", "level": "non_conformant",
+         "outcome": None, "reviewed_at": "2026-11-21T00:00:00Z", "evidence": {}},
+        {"id": "r-new", "project_id": "p1", "level": "compliant",
+         "outcome": None, "reviewed_at": "2026-11-26T00:00:00Z", "evidence": {}},
+    ]
+    rows = computed_rows(
+        "governing_review", {}, snap,
+        {"kind": "project", "id": "p1", "project_id": "p1"}, {},
+    )
+    assert rows and rows[0]["id"] == "r-new", rows
+    assert rows[0]["decision"] == "compliant", rows
+    assert rows[0]["conditions"] == "none recorded", rows
+    assert rows[0]["phase_h_outcome"] is None, rows
+    assert "r-new" in rows[0]["title"] and "compliant governs" in rows[0]["title"], rows
+
+    # The Waivers heading is evidence even when the project has none: the computed source is an
+    # explicit none with the count, never the template sentence (deep review
+    # w4-proj-compliance-waivers).
+    snap = json.loads(json.dumps(fixture))
+    rows = computed_rows(
+        "waiver_status", {}, snap,
+        {"kind": "project", "id": "p1", "project_id": "p1"}, {},
+    )
+    assert rows and rows[0]["waivers"] == 0 and "None recorded" in rows[0]["title"], rows
+    snap["architecture"]["waivers"] = [{
+        "id": "w1", "project_id": "p1", "reason": "legacy import",
+        "reassess_at": "2026-12-15", "owner_user_id": "u1",
+    }]
+    rows = computed_rows(
+        "waiver_status", {}, snap,
+        {"kind": "project", "id": "p1", "project_id": "p1"}, {},
+    )
+    assert rows and rows[0]["id"] == "w1", rows
+    assert "legacy import" in rows[0]["title"] and "2026-12-15" in rows[0]["title"], rows
     print("generate-standards: self-test case computed-sources OK")
 
 

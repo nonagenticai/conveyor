@@ -374,6 +374,39 @@ async fn a_risk_update_keeps_the_risk_complete() {
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["review_at"], "2026-12-01", "{body}");
 
+    // The human code is editable: a row created without one accepts the pack's code, and an
+    // unrelated edit afterwards leaves it in place. The standard's project-registers document
+    // refuses a row whose code is empty, so an update that could not write the code left every
+    // rework run unable to publish that document and the close gate refused the project.
+    let (status, body) = running
+        .invoke(
+            "registers.update",
+            TOKEN,
+            json!({"id": risk, "code": "R-S02-07"}),
+            Some("\"2\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(output(&body)["code"], "R-S02-07", "{body}");
+    let (status, body) = running
+        .invoke(
+            "registers.update",
+            TOKEN,
+            json!({"id": risk, "title": "Vendor delay, renamed"}),
+            Some("\"3\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        output(&body)["code"],
+        "R-S02-07",
+        "a code survives an edit that does not name it: {body}"
+    );
+
     // A row seeded without a review date (a legacy row) cannot be edited while still incomplete:
     // the update re-runs the create rule.
     let raw: uuid::Uuid = sqlx::query_scalar(
