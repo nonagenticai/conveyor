@@ -14,13 +14,14 @@ parity_ids: []
 # GEMBA-WALK — the Gemba Walk client
 
 Owner direction: 2026-11-26 · ADR: `docs/decisions/0021-gemba-walk-client.md` · Spec:
-`docs/design/GEMBA-WALK-SPEC.md` · Baseline measured at `main@d958824f8` on 2026-11-26.
+`docs/design/GEMBA-WALK-SPEC.md` · Baseline measured at `main@d958824f8` on 2026-11-26 and
+re-verified at `main@0d6db794b` on 2026-11-26 (counts unchanged).
 
 This plan is deliberately **not** a SPEC_V2 §12 `T##` slice. The programme-seed generator parses
 only `docs/plans/slices/S*.md` and `**(T##)**` rows in §12, so a T-row would silently change
 `seed/programme.json` and fail `build-programme-seed.py --check`. The walk is registered as a
-cross-cutting project in `docs/plans/00-INDEX.md`; programme registration and the issue set are W0,
-taken only once the owner accepts ADR 0021.
+cross-cutting project in `docs/plans/00-INDEX.md`; the parent issue and the programme registration
+are W0, taken only once the owner accepts ADR 0021.
 
 ## 1. Objective and gate
 
@@ -70,8 +71,10 @@ pre-empted. It is not defined as pixel or copy parity with either existing clien
 ## 4. Relationship to the programme
 
 - Not a §12 `T##` slice and not in `seed/programme.json` in this unit.
-- W0 registers a programme project and creates the unit issues once ADR 0021 is accepted; the
-  registration is a separate, reviewable data change (`seed/programme.json` + the issue ledger).
+- W0 creates the parent issue and registers the programme project once ADR 0021 is accepted; the
+  registration is a reviewable data change through `scripts/build-programme-seed.py` and
+  `seed/programme-definition.json`, never a hand-edit of `seed/programme.json` or
+  `docs/design/data/issues.json` (see §8.1).
 - The V2 coverage instrument (D65, `scripts/build-v2-coverage.py`) continues to measure `apps/web`
   and is not touched. The walk's evidence is `docs/evidence/walk-coverage.json`.
 - The design pack (`/design/`) keeps its public role and is not rebuilt or embedded.
@@ -98,11 +101,34 @@ CI with no server and no database.
 
 **Inputs**
 
-- the frozen census `docs/evidence/walk-census.json`: `baseline {date, git_sha}`, the 52 app route
-  patterns, the 597 action names and their scopes (names from `docs/design/data/actions.json`, the
-  compiled registry dump; scopes from the action source scan used by `build-v2-coverage.py`);
-- `apps/walk/src/router/registry.js`: one row per surface (walk path, app path, room, spec file);
-- `apps/walk/e2e/*.spec.ts`.
+The frozen census `docs/evidence/walk-census.json` is written once at W0 and re-baselined only by
+a signed commit:
+
+```json
+{
+  "baseline": {"date": "YYYY-MM-DD", "git_sha": "<40 hex>"},
+  "routes": [{"pattern": "/boards", "view": "BoardIndex", "spec": "v1/board.spec.ts"}],
+  "actions": [{"name": "cards.move", "kind": "internal", "scopes": ["cards:write"],
+               "effect": "write", "confirm": "none", "tenancy": "tenant"}],
+  "counts": {"routes": 52, "actions": 597}
+}
+```
+
+The census is built from:
+
+- route patterns and views — `scripts/build-v2-coverage.py:app_routes()` and
+  `app_route_views()` (its `ROUTE` regex, line 42), the same parser the V2 record uses;
+- action names, scopes, kind, effect, confirm, tenancy and idempotence — parsed from the
+  `#[action(...)]` attributes under `crates/actions/src/**/*.rs`; the parsed names are
+  cross-checked against the 597 names in `docs/design/data/actions.json`, so a parse miss fails
+  the build instead of shrinking the census;
+- `apps/walk/src/router/routes/{core,portfolio-organisation,procedures-governance,measure-operations-utilities,v1}.js`
+  — one row per surface (walk path, app path, room, spec file), composed by
+  `apps/walk/src/router/registry.js`. One route file per delivery sibling; a sibling never edits
+  another's file;
+- `apps/walk/e2e/<wing>/*.spec.ts`.
+
+The census holds no live manifest and no server state.
 
 **Per-action states** (each machine-checkable):
 
@@ -121,42 +147,118 @@ green run. `verified` requires all four states plus the Playwright spec.
 `/walk/` in dev; the harness captures the `POST /api/actions/{name}/invocations` trace (names,
 status, order) and compares it. Pixels are not compared.
 
-**Exemptions** — `{surface, reason, signer, expires}`; an expired exemption fails the gate. The
-owner or the plan's named maintainer signs; the default expiry is 30 days.
+**Exemptions** — a separate signed record, `docs/evidence/walk-exemptions.json`, holding
+`{surface, reason, signer, expires}`; an expired exemption fails the gate. The owner or the plan's
+named maintainer signs; the default expiry is 30 days.
 
-**Output** — `docs/evidence/walk-coverage.json` with a `--check` mode in the walk workflow and in
-`web.yml` (or its successor) once the walk app is on `main`.
+**Output and check** — `docs/evidence/walk-coverage.json`, emitted by
+`python3 scripts/build-walk-coverage.py`; `--check` exits non-zero when a census route has no
+registry row, a census action lacks `reachable` or `schema-rendered`, a destination lacks its
+spec, or an exemption is expired. The check runs in the walk workflow and in `web.yml` (or its
+successor) once the walk app is on `main`; it needs no server, database or network.
 
 ## 7. Stages and exit gates
 
 | Stage | Work | Exit gate |
 |---|---|---|
-| **P0** | Governance (ADR 0021 accepted; §10.5.11/D67 land with this unit), census + instrument, spike | The spike proves PKCE redirect to `/walk/`, SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link, and the static copy; it measures canvas-2D vs Bevy 0.18 WASM and ADR 0022 records the winner and budgets; no unproven assumption enters P1 |
-| **P1** | Foundation + Portfolio end-to-end | Sign-in (dev and configured OIDC), tenant switch, manifest-driven nav, world entrance, Room `portfolio` read + **one real write**, deep link and back/forward, dev server, Dockerfile copy, `web.rs` fallback + test, spec green |
+| **P0** | Governance (ADR 0021 accepted; §10.5.11/D67 land with this unit), census + instrument, spike | The spike proves PKCE redirect to `/walk/` on the dev origin, SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link served by the spike's own `/walk/*` fallback, and a static copy; it measures canvas-2D vs Bevy 0.18 WASM and ADR 0022 records the winner and budgets. The production `web.rs` fallback and Dockerfile copy are W2 acceptance, not spike evidence; no unproven assumption enters P1 |
+| **P1** | Foundation + Portfolio end-to-end | Sign-in (dev; configured OIDC once the external redirect URI is registered — otherwise that one scenario is acceptance-blocked, not a construction blocker), tenant switch, manifest-driven nav, world entrance, Room `portfolio` read + **one real write**, deep link and back/forward, dev server, Dockerfile copy, `web.rs` fallback + test, spec green |
 | **P2** | Read parity across §10.5 | Every destination renders its reads with loading/empty/partial/error/denied and the honest gate; each has its spec |
 | **P3** | Write parity + gates | Every destination's writes go through the action sheet with `If-Match`/`Idempotency-Key`/approval, refusals shown verbatim, no optimistic mutation |
 | **P4** | Retained V1 surfaces | All 52 route patterns have a walk route; the V1 families have reads and their writes; specs |
 | **P5** | Slice-dependent surfaces | Meetings (T19), tools (T13–T15), operations (T7), ADM (T9), knowledge (T17) mirror `apps/web`'s state; a gate flips to live only when the owning slice does |
 | **P6** | Parity gate + primacy runbook | Instrument green; a11y/perf met; owner sign-off; if yes, old-route redirect map, `apps/web` freeze, stabilisation period, retirement; if no, the walk stays an alternative client |
 
-## 8. Work packages
+**External prerequisites.** The `/walk/` OIDC redirect-URI registration is an external change: the
+parent issue records it in Dependencies as an external `acceptance-blocked-by` with the owner as
+the actor, not as a `status:needs-human` label (that label would freeze all construction). The dev
+cookie (`/__dev/login`) and the dev origin's redirect URI unblock the spike; the walk never waits
+on the registration to build.
 
-Each is one issue, one branch, one PR (the ≤5 split is written per stage where a stage exceeds it).
+**Rust builds.** No local cargo: the wasm compile, lint and tests run on GitHub-hosted
+preflight/CI, and the issue records the run id; the PR opens only after that verdict, per the
+repository's `CLAUDE.md`. The spike's throwaway workflow is deleted with the spike.
 
-| WP | Title | Files | Acceptance |
+## 8. Delivery model and the issue split
+
+**The repository rule.** `docs/plans/03-DELIVERY.md` is the authority: one plan = one issue = one
+branch = exactly one PR by default; a plan may be split into at most **five** file-disjoint
+siblings only with the owner's written exception, and `lane/` branches are retired. This plan is
+therefore **one unit** unless the owner approves the split below.
+
+**Proposed exception — one parent + four siblings (5 total).** The walk is multi-session by shape
+(43 screens, 597 actions), so the parent keeps the dependency-bearing foundation and the siblings
+own disjoint destination wings:
+
+| Issue | Contains | Files it owns | Acceptance |
 |---|---|---|---|
-| **W0** | Governance, census and the instrument | `docs/evidence/walk-census.json`, `scripts/build-walk-coverage.py`, `docs/plans/00-INDEX.md` registration, the issue set | The census reproduces the baseline counts; `--check` fails on a missing route/action row and on an expired exemption; ADR 0021 accepted; programme registration merged |
-| **W1** | P0 spike | throwaway `spike/walk/` (deleted after), `docs/decisions/0022-walk-world-engine.md`, `docs/evidence/walk-spike.md` | Every mechanic in P0 proven with recorded commands and numbers; engine ADR merged with budgets |
-| **W2** | P1 foundation + Portfolio | `apps/walk/{index.html,src/**,e2e/**,dev-server.mjs,playwright.config.ts}`, `crates/api/src/web.rs` + test, `Dockerfile`, walk workflow | Sign-in, manifest nav, entrance, Portfolio read + one write, deep link, back/forward, spec green, fallback test green |
-| **W3** | P2 read parity | `apps/walk/src/destinations/**`, `e2e/*.spec.ts`, registry rows | Every destination `read` and its spec asserts empty/error/happy/gate; the instrument is green for reads |
-| **W4** | P3 write parity | destination modules, `src/forms/**`, specs | Every destination `write`; headers/approval/refusal tests; no optimistic mutation; the instrument is green for writes |
-| **W5** | P4 retained V1 | destination modules + registry + specs | All 52 routes mapped; V1 reads/writes covered; redirects to the operator app where a flow is not yet ported (named, not silent) |
-| **W6** | P5 slice-dependent | destination modules + specs | Each surface mirrors `apps/web`'s gate; a slice landing flips both clients in one contract change |
-| **W7** | P6 gate + primacy | `docs/evidence/walk-coverage.json`, runbook, redirect map, `apps/web` freeze | Instrument green; a11y/perf recorded; owner decision; if yes, the redirect map is tested and the reversal path documented |
-| **W8** | Hardening | `e2e/a11y.spec.ts`, perf harness, engine integration (if Bevy) | Budgets met; keyboard-only run; 5-minute soak; engine lazy-load and fallback proven |
+| **Parent G0** | W0 governance/census/instrument, W1 spike, W2 foundation + Portfolio, serving glue | `scripts/build-walk-coverage.py`, `docs/evidence/walk-*`, `spike/walk/**` (deleted), `apps/walk/index.html`, `src/main.js`, `src/auth/**`, `src/api/**`, `src/forms/**`, `src/router/registry.js`, `src/router/routes/core.js`, `src/shell/**`, `src/world/**`, `src/state/**`, `src/a11y/**`, `src/destinations/portfolio.js`, `e2e/shell/**`, `e2e/portfolio/**`, `dev-server.mjs`, `playwright.config.ts`, `crates/api/src/web.rs`, `Dockerfile`, the walk workflow | P0/W0/W1/W2 acceptance; Portfolio read + one write; the five route files exist as stubs |
+| **S1** | W3/W4 for Portfolio & plan (except `portfolio.*`) + Organisation | `src/destinations/{programme,plan,validation,execution,decisions,runs,meetings,organisation,jobs,agents,tools,project-types}.js`, `src/router/routes/portfolio-organisation.js`, `e2e/portfolio-organisation/**` | Every owned destination `read` and `write`; specs assert empty/error/happy/refusal/write; instrument green for its rows |
+| **S2** | W3/W4 for Procedures & authoring + Govern & design | `src/destinations/{procedures,processes,process-map,authoring,adm,architecture,requirements,models,copilot}.js`, `src/router/routes/procedures-governance.js`, `e2e/procedures-governance/**` | Same |
+| **S3** | W3/W4 for Knowledge + Measure & improve + Operations + Utilities | `src/destinations/{knowledge,improve,evals,benchmarks,usage,prompt-audit,metering,operations,search,platform,settings,approvals}.js`, `src/router/routes/measure-operations-utilities.js`, `e2e/measure-operations-utilities/**` | Same |
+| **S4** | W5 retained V1, W6 slice-dependent, W7 P6 gate + primacy, W8 hardening | `src/destinations/v1/**`, `src/router/routes/v1.js`, `e2e/v1/**`, `docs/evidence/walk-coverage.json`, the P6 runbook and redirect map | All 52 routes; P6 gate; a11y/perf; owner sign-off |
 
-**Single-writer seams:** `src/router/registry.js`, `src/api/manifest.js`, `src/shell/sheet-host.js`
-and `src/world/port.js` are edited by one WP at a time; destination modules are disjoint.
+**Dependencies.** The parent `blocks` S1–S4. S1–S3 are parallel and file-disjoint. S4 is
+`blocked-by` S1–S3. The parent creates all five route files as empty row lists, so a sibling fills
+only its own file and the duplicate-PR guard (`block-duplicate-pr.py`) never sees overlapping
+edits.
+
+**Work-package map.** W0–W2 are parts of the parent; W3–W4 are the destination work distributed
+across S1–S3 by wing; W5–W8 are S4. The stage table in §7 stays the content order; the split is by
+file ownership, not by read/write phase, because a destination module owns both its reads and its
+writes — splitting reads from writes would make the two issues touch the same files. Where a
+retained V1 route is already a §10.5 destination owned by S1–S3, S4 reuses that module and its
+route row, adding only the V1-retained spec trace; it never edits another sibling's file. Its
+`src/destinations/v1/**` holds only V1 surfaces with no owning destination module.
+
+**Shared seams.** `src/api/manifest.js`, `src/shell/sheet-host.js`, `src/world/port.js`,
+`src/forms/**` and `src/a11y/**` are parent-owned; siblings consume them and do not edit them. A
+sibling that needs a seam change stops and asks the parent's owner rather than forking the
+contract.
+
+**If the owner declines the split.** The whole plan is one issue (`GEMBA-WALK`), the stages are
+commits on one `issue/<n>-gemba-walk` branch, and the P6 gate closes the same PR. The plan states
+both paths so no session has to improvise.
+
+### 8.1 W0 runbook — the first session
+
+1. **Precondition.** The owner has accepted ADR 0021 in writing — either by directing its status
+   line (`docs/decisions/0021-gemba-walk-client.md:3`) to `Accepted` in this docs PR before it
+   merges, or in the W0 branch's first commit — after reviewing the "supersedes in part" wording,
+   and the docs are on `main`. Until then the parent issue is `status:blocked`; a session must not
+   start W0 on a Proposed ADR.
+2. **Create the label and the parent issue.** Create the `GEMBA-WALK` label if absent
+   (`gh label create GEMBA-WALK ...`), then create the parent issue from
+   `.github/ISSUE_TEMPLATE/unit.md` with that label and `status:ready` once step 1 is true
+   (otherwise `status:blocked`):
+   - Goal: the walk foundation is buildable, measured and served at `/walk/`.
+   - Plan source: `docs/plans/GEMBA-WALK.md` §7–§8.
+   - Programme: Tranche `unmapped` — this is a cross-cutting programme unit with no programme
+     tranche (the convention #760 and #745 use; tranche 0 is closed); Brief
+     `docs/decisions/0021-gemba-walk-client.md` and this plan; ADM `Preliminary` / `definition`;
+     Benefits `enabling — no direct benefit` with one sentence of reason.
+   - Baseline: `main@<sha>` measured at claim time; doc blob shas from
+     `git rev-parse main:docs/plans/GEMBA-WALK.md` and
+     `main:docs/design/GEMBA-WALK-SPEC.md`.
+   - Parts: W0, W1 and W2 from §7–§8, each with at least one BDD `Verify:` command.
+   - Dependencies: the plan's `depends_on` edges ([P0, T18, T19]), each resolved to a live issue
+     at claim time (a closed slice is a `related` note, not a blocker); the OIDC registration as
+     an external `acceptance-blocked-by` (owner/ops; not an issue and not a `status:needs-human`
+     label); the sibling edges from the table above.
+3. **Register the project** (a reviewable data change, not prose). The label is what
+   `project_for_issue()` matches, so it must exist before the seed is regenerated:
+   - add `GEMBA-WALK` to `CROSS_CUTTING` in `scripts/build-programme-seed.py` (name, plan path,
+     `track: "programme"`, issue numbers) and to `seed/programme-definition.json` under
+     `projects` with `{"adm_phase": "Preliminary", "plateau": "definition"}`;
+   - run `python3 scripts/build-programme-seed.py` and
+     `python3 scripts/check-programme-definition.py`; never hand-edit
+     `docs/design/data/issues.json` — `.github/workflows/issue-registry.yml` owns it.
+4. **Freeze the census and build the instrument** exactly as §6. Commit
+   `docs/evidence/walk-census.json`, `docs/evidence/walk-exemptions.json` and
+   `scripts/build-walk-coverage.py`. Acceptance: the script reproduces 52 routes and 597 actions;
+   `--check` returns non-zero for a missing registry row, an unreachable action, a missing spec
+   and an expired exemption; it runs with no server or database.
+5. **Record the spike and the engine ADR** (§7 P0 / §8 W1), then the foundation (§7 P1 / §8 W2).
 
 ## 9. Parity matrix (initial state at the baseline)
 
@@ -195,9 +297,9 @@ Every row starts `absent`. A row reaches `verified` only through §6.
 
 ## 11. Verification and definition of done
 
-**Per work package** — the WP's own acceptance table, its Playwright spec(s), the parity instrument's
-rows, and a contract test for each write (headers, refusal, refetch). A WP is not done because the
-screen renders; it is done when the state, the write and the refusal are proven.
+**Per issue** — the issue's own parts and acceptance criteria, its Playwright spec(s), the parity
+instrument's rows, and a contract test for each write (headers, refusal, refetch). An issue is not
+done because the screen renders; it is done when the state, the write and the refusal are proven.
 
 **Unit and type** — `node --test apps/walk/src` and `tsc --noEmit` (JSDoc) pass; pure modules only.
 
@@ -220,9 +322,11 @@ the truth and `apps/web` remains normative.
 
 ## 12. Session guide
 
-**Read order** — `docs/decisions/0021-gemba-walk-client.md` → `docs/design/GEMBA-WALK-SPEC.md` →
-this plan → SPEC_V2 §10.5 (the destination contracts) → `apps/web/src/api.rs` and
-`apps/web/src/auth.rs` (the client contract) → the owning slice's plan for the destination.
+**Read order** — `CLAUDE.md` → `docs/SPEC.md` → `docs/plans/00-INDEX.md` →
+`docs/plans/03-DELIVERY.md` → `docs/decisions/0021-gemba-walk-client.md` →
+`docs/design/GEMBA-WALK-SPEC.md` → this plan → SPEC_V2 §10.5 (the destination contracts) →
+`apps/web/src/api.rs` and `apps/web/src/auth.rs` (the client contract) → the owning slice's plan
+for the destination.
 
 **Commands** (available once W2 lands) —
 
@@ -237,14 +341,19 @@ python3 docs/design/scripts/build-docs.py && node docs/design/scripts/check-docs
 
 **Rules**
 
-- One issue per WP; push the lane branch before the work; one PR per repo per unit; no second PR
-  without the audited `SECOND_PR=` reason.
-- No Rust compilation on local hardware; the compile verdict is GitHub-hosted CI.
+- Claim the issue first (`issue-pickup`); no issue → no branch → no work. Work in
+  `.worktrees/issue-<n>`, branch `issue/<n>-<slug>`, one PR with `Closes #<n>`. Slices are commits
+  on that branch; they never get their own PR. `lane/` branches and the global lane protocol do
+  not apply in this repository.
+- The parent issue's five-sibling split is the only permitted split; a sibling that wants a sixth
+  issue stops and asks the owner.
+- No Rust compilation on local hardware; the compile/lint verdict is the repository's
+  GitHub-hosted preflight, and the PR's CI is the final gate. Record the run id on the issue.
 - No new table, action, event, port or decision store; if the walk seems to need one, stop and
   escalate — the answer is a contract-faithful screen, not a backend change.
 - The engine ADR (0022) precedes any Bevy code beyond the spike; until then the canvas baseline is
   the implementation.
-- Contract tests per WP: manifest gating, headers, refusal, refetch.
+- Contract tests per issue: manifest gating, headers, refusal, refetch.
 - The Do-Not list in the spec is the review checklist for every PR.
 
 ## 13. Non-goals

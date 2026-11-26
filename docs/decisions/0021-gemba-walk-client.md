@@ -96,6 +96,11 @@ decision open until it can be measured.
 - Cost: a second shell, auth flow and browser suite; two clients must track each destination's
   contract. The parity instrument and per-destination specs are the mitigation, and a change that
   updates one client without the other is visible in CI.
+- Delivery: `docs/plans/03-DELIVERY.md` defaults to one plan = one issue. The walk is
+  multi-session by shape, so the plan proposes a five-issue split — a dependency-bearing parent
+  and four file-disjoint wings — which the owner must approve as the written exception at W0.
+  Without that approval the whole plan is one issue. `lane/` branches are not used; the parent
+  issue is claimed before any branch.
 - Serving: a scoped `/walk/*` fallback in `crates/api/src/web.rs` (GET/HEAD only, non-asset paths)
   and a Dockerfile copy of the static output; both are serving changes, not API surface. Without the
   fallback, a walk deep link currently renders the operator app's `index.html`.
@@ -115,4 +120,5 @@ decision open until it can be measured.
 ## Links
 
 ADR 0001 (CSR by measurement) · ADR 0013 and D64 (the app is the UI) · SPEC_V2 §10.5, §10.5.11,
-§15.1 D66/D67 · `docs/design/GEMBA-WALK-SPEC.md` · `docs/plans/GEMBA-WALK.md` · issue created at W0.
+§15.1 D66/D67 · `docs/design/GEMBA-WALK-SPEC.md` · `docs/plans/GEMBA-WALK.md` · the parent issue
+is created by the plan's §8.1 runbook after the owner accepts this ADR.

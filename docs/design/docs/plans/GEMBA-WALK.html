@@ -24,8 +24,8 @@
       >
     </header>
     <main class="doc-body"><h1 id="gemba-walk--the-gemba-walk-client">GEMBA-WALK — the Gemba Walk client</h1>
-<p>Owner direction: 2026-11-26 · ADR: <code>docs/decisions/0021-gemba-walk-client.md</code> · Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code> · Baseline measured at <code>main@d958824f8</code> on 2026-11-26.</p>
-<p>This plan is deliberately <strong>not</strong> a SPEC_V2 §12 <code>T##</code> slice. The programme-seed generator parses only <code>docs/plans/slices/S*.md</code> and <code>**(T##)**</code> rows in §12, so a T-row would silently change <code>seed/programme.json</code> and fail <code>build-programme-seed.py --check</code>. The walk is registered as a cross-cutting project in <code>docs/plans/00-INDEX.md</code>; programme registration and the issue set are W0, taken only once the owner accepts ADR 0021.</p>
+<p>Owner direction: 2026-11-26 · ADR: <code>docs/decisions/0021-gemba-walk-client.md</code> · Spec: <code>docs/design/GEMBA-WALK-SPEC.md</code> · Baseline measured at <code>main@d958824f8</code> on 2026-11-26 and re-verified at <code>main@0d6db794b</code> on 2026-11-26 (counts unchanged).</p>
+<p>This plan is deliberately <strong>not</strong> a SPEC_V2 §12 <code>T##</code> slice. The programme-seed generator parses only <code>docs/plans/slices/S*.md</code> and <code>**(T##)**</code> rows in §12, so a T-row would silently change <code>seed/programme.json</code> and fail <code>build-programme-seed.py --check</code>. The walk is registered as a cross-cutting project in <code>docs/plans/00-INDEX.md</code>; the parent issue and the programme registration are W0, taken only once the owner accepts ADR 0021.</p>
 <h2 id="1-objective-and-gate">1. Objective and gate</h2>
 <p>Build a second, game-style client of the conveyor at <code>/walk/</code> with <strong>all features and all functionality</strong> — every read and every write through the existing registry — and measure it well enough that the owner can decide whether it becomes the primary UI.</p>
 <p><strong>Gate (P6):</strong> every §10.5 destination and every retained V1 route has a walk route and a Playwright spec asserting empty, error, happy and one refusal or write; every action in the frozen census is reachable and schema-rendered; the named write flows round-trip with the correct headers; the parity instrument is green with no expired exemption; accessibility and performance budgets are met; the owner signs the primacy decision. Until then <code>apps/web</code> is normative.</p>
@@ -84,7 +84,7 @@
 <h2 id="4-relationship-to-the-programme">4. Relationship to the programme</h2>
 <ul>
 <li>Not a §12 <code>T##</code> slice and not in <code>seed/programme.json</code> in this unit.</li>
-<li>W0 registers a programme project and creates the unit issues once ADR 0021 is accepted; the registration is a separate, reviewable data change (<code>seed/programme.json</code> + the issue ledger).</li>
+<li>W0 creates the parent issue and registers the programme project once ADR 0021 is accepted; the registration is a reviewable data change through <code>scripts/build-programme-seed.py</code> and <code>seed/programme-definition.json</code>, never a hand-edit of <code>seed/programme.json</code> or <code>docs/design/data/issues.json</code> (see §8.1).</li>
 <li>The V2 coverage instrument (D65, <code>scripts/build-v2-coverage.py</code>) continues to measure <code>apps/web</code> and is not touched. The walk's evidence is <code>docs/evidence/walk-coverage.json</code>.</li>
 <li>The design pack (<code>/design/</code>) keeps its public role and is not rebuilt or embedded.</li>
 </ul>
@@ -104,11 +104,22 @@
 <h2 id="6-the-parity-model-and-instrument">6. The parity model and instrument</h2>
 <p><code>scripts/build-walk-coverage.py</code> (W0) is the only measure of walk parity. It must be able to run in CI with no server and no database.</p>
 <p><strong>Inputs</strong></p>
+<p>The frozen census <code>docs/evidence/walk-census.json</code> is written once at W0 and re-baselined only by a signed commit:</p>
+<pre class="json"><code>{
+  &quot;baseline&quot;: {&quot;date&quot;: &quot;YYYY-MM-DD&quot;, &quot;git_sha&quot;: &quot;&lt;40 hex&gt;&quot;},
+  &quot;routes&quot;: [{&quot;pattern&quot;: &quot;/boards&quot;, &quot;view&quot;: &quot;BoardIndex&quot;, &quot;spec&quot;: &quot;v1/board.spec.ts&quot;}],
+  &quot;actions&quot;: [{&quot;name&quot;: &quot;cards.move&quot;, &quot;kind&quot;: &quot;internal&quot;, &quot;scopes&quot;: [&quot;cards:write&quot;],
+               &quot;effect&quot;: &quot;write&quot;, &quot;confirm&quot;: &quot;none&quot;, &quot;tenancy&quot;: &quot;tenant&quot;}],
+  &quot;counts&quot;: {&quot;routes&quot;: 52, &quot;actions&quot;: 597}
+}</code></pre>
+<p>The census is built from:</p>
 <ul>
-<li>the frozen census <code>docs/evidence/walk-census.json</code>: <code>baseline {date, git_sha}</code>, the 52 app route patterns, the 597 action names and their scopes (names from <code>docs/design/data/actions.json</code>, the compiled registry dump; scopes from the action source scan used by <code>build-v2-coverage.py</code>);</li>
-<li><code>apps/walk/src/router/registry.js</code>: one row per surface (walk path, app path, room, spec file);</li>
-<li><code>apps/walk/e2e/*.spec.ts</code>.</li>
+<li>route patterns and views — <code>scripts/build-v2-coverage.py:app_routes()</code> and <code>app_route_views()</code> (its <code>ROUTE</code> regex, line 42), the same parser the V2 record uses;</li>
+<li>action names, scopes, kind, effect, confirm, tenancy and idempotence — parsed from the <code>#[action(...)]</code> attributes under <code>crates/actions/src/**/*.rs</code>; the parsed names are cross-checked against the 597 names in <code>docs/design/data/actions.json</code>, so a parse miss fails the build instead of shrinking the census;</li>
+<li><code>apps/walk/src/router/routes/{core,portfolio-organisation,procedures-governance,measure-operations-utilities,v1}.js</code> — one row per surface (walk path, app path, room, spec file), composed by <code>apps/walk/src/router/registry.js</code>. One route file per delivery sibling; a sibling never edits another's file;</li>
+<li><code>apps/walk/e2e/&lt;wing&gt;/*.spec.ts</code>.</li>
 </ul>
+<p>The census holds no live manifest and no server state.</p>
 <p><strong>Per-action states</strong> (each machine-checkable):</p>
 <table>
 <thead>
@@ -142,8 +153,8 @@
 </table>
 <p><strong>Per-destination states</strong> — <code>absent</code>, <code>read</code>, <code>write</code>, <code>verified</code>, with the spec path and the last green run. <code>verified</code> requires all four states plus the Playwright spec.</p>
 <p><strong>Behavioural parity</strong> — for each named flow, the same scripted task runs against <code>apps/web</code> and <code>/walk/</code> in dev; the harness captures the <code>POST /api/actions/{name}/invocations</code> trace (names, status, order) and compares it. Pixels are not compared.</p>
-<p><strong>Exemptions</strong> — <code>{surface, reason, signer, expires}</code>; an expired exemption fails the gate. The owner or the plan's named maintainer signs; the default expiry is 30 days.</p>
-<p><strong>Output</strong> — <code>docs/evidence/walk-coverage.json</code> with a <code>--check</code> mode in the walk workflow and in <code>web.yml</code> (or its successor) once the walk app is on <code>main</code>.</p>
+<p><strong>Exemptions</strong> — a separate signed record, <code>docs/evidence/walk-exemptions.json</code>, holding <code>{surface, reason, signer, expires}</code>; an expired exemption fails the gate. The owner or the plan's named maintainer signs; the default expiry is 30 days.</p>
+<p><strong>Output and check</strong> — <code>docs/evidence/walk-coverage.json</code>, emitted by <code>python3 scripts/build-walk-coverage.py</code>; <code>--check</code> exits non-zero when a census route has no registry row, a census action lacks <code>reachable</code> or <code>schema-rendered</code>, a destination lacks its spec, or an exemption is expired. The check runs in the walk workflow and in <code>web.yml</code> (or its successor) once the walk app is on <code>main</code>; it needs no server, database or network.</p>
 <h2 id="7-stages-and-exit-gates">7. Stages and exit gates</h2>
 <table>
 <thead>
@@ -157,12 +168,12 @@
 <tr>
 <td><strong>P0</strong></td>
 <td>Governance (ADR 0021 accepted; §10.5.11/D67 land with this unit), census + instrument, spike</td>
-<td>The spike proves PKCE redirect to <code>/walk/</code>, SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link, and the static copy; it measures canvas-2D vs Bevy 0.18 WASM and ADR 0022 records the winner and budgets; no unproven assumption enters P1</td>
+<td>The spike proves PKCE redirect to <code>/walk/</code> on the dev origin, SSE via fetch, schema forms for read/write/destructive with approval, all headers, a deep link served by the spike's own <code>/walk/*</code> fallback, and a static copy; it measures canvas-2D vs Bevy 0.18 WASM and ADR 0022 records the winner and budgets. The production <code>web.rs</code> fallback and Dockerfile copy are W2 acceptance, not spike evidence; no unproven assumption enters P1</td>
 </tr>
 <tr>
 <td><strong>P1</strong></td>
 <td>Foundation + Portfolio end-to-end</td>
-<td>Sign-in (dev and configured OIDC), tenant switch, manifest-driven nav, world entrance, Room <code>portfolio</code> read + <strong>one real write</strong>, deep link and back/forward, dev server, Dockerfile copy, <code>web.rs</code> fallback + test, spec green</td>
+<td>Sign-in (dev; configured OIDC once the external redirect URI is registered — otherwise that one scenario is acceptance-blocked, not a construction blocker), tenant switch, manifest-driven nav, world entrance, Room <code>portfolio</code> read + <strong>one real write</strong>, deep link and back/forward, dev server, Dockerfile copy, <code>web.rs</code> fallback + test, spec green</td>
 </tr>
 <tr>
 <td><strong>P2</strong></td>
@@ -191,75 +202,77 @@
 </tr>
 </tbody>
 </table>
-<h2 id="8-work-packages">8. Work packages</h2>
-<p>Each is one issue, one branch, one PR (the ≤5 split is written per stage where a stage exceeds it).</p>
+<p><strong>External prerequisites.</strong> The <code>/walk/</code> OIDC redirect-URI registration is an external change: the parent issue records it in Dependencies as an external <code>acceptance-blocked-by</code> with the owner as the actor, not as a <code>status:needs-human</code> label (that label would freeze all construction). The dev cookie (<code>/__dev/login</code>) and the dev origin's redirect URI unblock the spike; the walk never waits on the registration to build.</p>
+<p><strong>Rust builds.</strong> No local cargo: the wasm compile, lint and tests run on GitHub-hosted preflight/CI, and the issue records the run id; the PR opens only after that verdict, per the repository's <code>CLAUDE.md</code>. The spike's throwaway workflow is deleted with the spike.</p>
+<h2 id="8-delivery-model-and-the-issue-split">8. Delivery model and the issue split</h2>
+<p><strong>The repository rule.</strong> <code>docs/plans/03-DELIVERY.md</code> is the authority: one plan = one issue = one branch = exactly one PR by default; a plan may be split into at most <strong>five</strong> file-disjoint siblings only with the owner's written exception, and <code>lane/</code> branches are retired. This plan is therefore <strong>one unit</strong> unless the owner approves the split below.</p>
+<p><strong>Proposed exception — one parent + four siblings (5 total).</strong> The walk is multi-session by shape (43 screens, 597 actions), so the parent keeps the dependency-bearing foundation and the siblings own disjoint destination wings:</p>
 <table>
 <thead>
 <tr>
-<th>WP</th>
-<th>Title</th>
-<th>Files</th>
+<th>Issue</th>
+<th>Contains</th>
+<th>Files it owns</th>
 <th>Acceptance</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>W0</strong></td>
-<td>Governance, census and the instrument</td>
-<td><code>docs/evidence/walk-census.json</code>, <code>scripts/build-walk-coverage.py</code>, <code>docs/plans/00-INDEX.md</code> registration, the issue set</td>
-<td>The census reproduces the baseline counts; <code>--check</code> fails on a missing route/action row and on an expired exemption; ADR 0021 accepted; programme registration merged</td>
+<td><strong>Parent G0</strong></td>
+<td>W0 governance/census/instrument, W1 spike, W2 foundation + Portfolio, serving glue</td>
+<td><code>scripts/build-walk-coverage.py</code>, <code>docs/evidence/walk-*</code>, <code>spike/walk/**</code> (deleted), <code>apps/walk/index.html</code>, <code>src/main.js</code>, <code>src/auth/**</code>, <code>src/api/**</code>, <code>src/forms/**</code>, <code>src/router/registry.js</code>, <code>src/router/routes/core.js</code>, <code>src/shell/**</code>, <code>src/world/**</code>, <code>src/state/**</code>, <code>src/a11y/**</code>, <code>src/destinations/portfolio.js</code>, <code>e2e/shell/**</code>, <code>e2e/portfolio/**</code>, <code>dev-server.mjs</code>, <code>playwright.config.ts</code>, <code>crates/api/src/web.rs</code>, <code>Dockerfile</code>, the walk workflow</td>
+<td>P0/W0/W1/W2 acceptance; Portfolio read + one write; the five route files exist as stubs</td>
 </tr>
 <tr>
-<td><strong>W1</strong></td>
-<td>P0 spike</td>
-<td>throwaway <code>spike/walk/</code> (deleted after), <code>docs/decisions/0022-walk-world-engine.md</code>, <code>docs/evidence/walk-spike.md</code></td>
-<td>Every mechanic in P0 proven with recorded commands and numbers; engine ADR merged with budgets</td>
+<td><strong>S1</strong></td>
+<td>W3/W4 for Portfolio &amp; plan (except <code>portfolio.*</code>) + Organisation</td>
+<td><code>src/destinations/{programme,plan,validation,execution,decisions,runs,meetings,organisation,jobs,agents,tools,project-types}.js</code>, <code>src/router/routes/portfolio-organisation.js</code>, <code>e2e/portfolio-organisation/**</code></td>
+<td>Every owned destination <code>read</code> and <code>write</code>; specs assert empty/error/happy/refusal/write; instrument green for its rows</td>
 </tr>
 <tr>
-<td><strong>W2</strong></td>
-<td>P1 foundation + Portfolio</td>
-<td><code>apps/walk/{index.html,src/**,e2e/**,dev-server.mjs,playwright.config.ts}</code>, <code>crates/api/src/web.rs</code> + test, <code>Dockerfile</code>, walk workflow</td>
-<td>Sign-in, manifest nav, entrance, Portfolio read + one write, deep link, back/forward, spec green, fallback test green</td>
+<td><strong>S2</strong></td>
+<td>W3/W4 for Procedures &amp; authoring + Govern &amp; design</td>
+<td><code>src/destinations/{procedures,processes,process-map,authoring,adm,architecture,requirements,models,copilot}.js</code>, <code>src/router/routes/procedures-governance.js</code>, <code>e2e/procedures-governance/**</code></td>
+<td>Same</td>
 </tr>
 <tr>
-<td><strong>W3</strong></td>
-<td>P2 read parity</td>
-<td><code>apps/walk/src/destinations/**</code>, <code>e2e/*.spec.ts</code>, registry rows</td>
-<td>Every destination <code>read</code> and its spec asserts empty/error/happy/gate; the instrument is green for reads</td>
+<td><strong>S3</strong></td>
+<td>W3/W4 for Knowledge + Measure &amp; improve + Operations + Utilities</td>
+<td><code>src/destinations/{knowledge,improve,evals,benchmarks,usage,prompt-audit,metering,operations,search,platform,settings,approvals}.js</code>, <code>src/router/routes/measure-operations-utilities.js</code>, <code>e2e/measure-operations-utilities/**</code></td>
+<td>Same</td>
 </tr>
 <tr>
-<td><strong>W4</strong></td>
-<td>P3 write parity</td>
-<td>destination modules, <code>src/forms/**</code>, specs</td>
-<td>Every destination <code>write</code>; headers/approval/refusal tests; no optimistic mutation; the instrument is green for writes</td>
-</tr>
-<tr>
-<td><strong>W5</strong></td>
-<td>P4 retained V1</td>
-<td>destination modules + registry + specs</td>
-<td>All 52 routes mapped; V1 reads/writes covered; redirects to the operator app where a flow is not yet ported (named, not silent)</td>
-</tr>
-<tr>
-<td><strong>W6</strong></td>
-<td>P5 slice-dependent</td>
-<td>destination modules + specs</td>
-<td>Each surface mirrors <code>apps/web</code>'s gate; a slice landing flips both clients in one contract change</td>
-</tr>
-<tr>
-<td><strong>W7</strong></td>
-<td>P6 gate + primacy</td>
-<td><code>docs/evidence/walk-coverage.json</code>, runbook, redirect map, <code>apps/web</code> freeze</td>
-<td>Instrument green; a11y/perf recorded; owner decision; if yes, the redirect map is tested and the reversal path documented</td>
-</tr>
-<tr>
-<td><strong>W8</strong></td>
-<td>Hardening</td>
-<td><code>e2e/a11y.spec.ts</code>, perf harness, engine integration (if Bevy)</td>
-<td>Budgets met; keyboard-only run; 5-minute soak; engine lazy-load and fallback proven</td>
+<td><strong>S4</strong></td>
+<td>W5 retained V1, W6 slice-dependent, W7 P6 gate + primacy, W8 hardening</td>
+<td><code>src/destinations/v1/**</code>, <code>src/router/routes/v1.js</code>, <code>e2e/v1/**</code>, <code>docs/evidence/walk-coverage.json</code>, the P6 runbook and redirect map</td>
+<td>All 52 routes; P6 gate; a11y/perf; owner sign-off</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Single-writer seams:</strong> <code>src/router/registry.js</code>, <code>src/api/manifest.js</code>, <code>src/shell/sheet-host.js</code> and <code>src/world/port.js</code> are edited by one WP at a time; destination modules are disjoint.</p>
+<p><strong>Dependencies.</strong> The parent <code>blocks</code> S1–S4. S1–S3 are parallel and file-disjoint. S4 is <code>blocked-by</code> S1–S3. The parent creates all five route files as empty row lists, so a sibling fills only its own file and the duplicate-PR guard (<code>block-duplicate-pr.py</code>) never sees overlapping edits.</p>
+<p><strong>Work-package map.</strong> W0–W2 are parts of the parent; W3–W4 are the destination work distributed across S1–S3 by wing; W5–W8 are S4. The stage table in §7 stays the content order; the split is by file ownership, not by read/write phase, because a destination module owns both its reads and its writes — splitting reads from writes would make the two issues touch the same files. Where a retained V1 route is already a §10.5 destination owned by S1–S3, S4 reuses that module and its route row, adding only the V1-retained spec trace; it never edits another sibling's file. Its <code>src/destinations/v1/**</code> holds only V1 surfaces with no owning destination module.</p>
+<p><strong>Shared seams.</strong> <code>src/api/manifest.js</code>, <code>src/shell/sheet-host.js</code>, <code>src/world/port.js</code>, <code>src/forms/**</code> and <code>src/a11y/**</code> are parent-owned; siblings consume them and do not edit them. A sibling that needs a seam change stops and asks the parent's owner rather than forking the contract.</p>
+<p><strong>If the owner declines the split.</strong> The whole plan is one issue (<code>GEMBA-WALK</code>), the stages are commits on one <code>issue/&lt;n&gt;-gemba-walk</code> branch, and the P6 gate closes the same PR. The plan states both paths so no session has to improvise.</p>
+<h3 id="81-w0-runbook--the-first-session">8.1 W0 runbook — the first session</h3>
+<ol type="1">
+<li><strong>Precondition.</strong> The owner has accepted ADR 0021 in writing — either by directing its status line (<code>docs/decisions/0021-gemba-walk-client.md:3</code>) to <code>Accepted</code> in this docs PR before it merges, or in the W0 branch's first commit — after reviewing the "supersedes in part" wording, and the docs are on <code>main</code>. Until then the parent issue is <code>status:blocked</code>; a session must not start W0 on a Proposed ADR.</li>
+<li><strong>Create the label and the parent issue.</strong> Create the <code>GEMBA-WALK</code> label if absent (<code>gh label create GEMBA-WALK ...</code>), then create the parent issue from <code>.github/ISSUE_TEMPLATE/unit.md</code> with that label and <code>status:ready</code> once step 1 is true (otherwise <code>status:blocked</code>):
+<ul>
+<li>Goal: the walk foundation is buildable, measured and served at <code>/walk/</code>.</li>
+<li>Plan source: <code>docs/plans/GEMBA-WALK.md</code> §7–§8.</li>
+<li>Programme: Tranche <code>unmapped</code> — this is a cross-cutting programme unit with no programme tranche (the convention #760 and #745 use; tranche 0 is closed); Brief <code>docs/decisions/0021-gemba-walk-client.md</code> and this plan; ADM <code>Preliminary</code> / <code>definition</code>; Benefits <code>enabling — no direct benefit</code> with one sentence of reason.</li>
+<li>Baseline: <code>main@&lt;sha&gt;</code> measured at claim time; doc blob shas from <code>git rev-parse main:docs/plans/GEMBA-WALK.md</code> and <code>main:docs/design/GEMBA-WALK-SPEC.md</code>.</li>
+<li>Parts: W0, W1 and W2 from §7–§8, each with at least one BDD <code>Verify:</code> command.</li>
+<li>Dependencies: the plan's <code>depends_on</code> edges ([P0, T18, T19]), each resolved to a live issue at claim time (a closed slice is a <code>related</code> note, not a blocker); the OIDC registration as an external <code>acceptance-blocked-by</code> (owner/ops; not an issue and not a <code>status:needs-human</code> label); the sibling edges from the table above.</li>
+</ul></li>
+<li><strong>Register the project</strong> (a reviewable data change, not prose). The label is what <code>project_for_issue()</code> matches, so it must exist before the seed is regenerated:
+<ul>
+<li>add <code>GEMBA-WALK</code> to <code>CROSS_CUTTING</code> in <code>scripts/build-programme-seed.py</code> (name, plan path, <code>track: "programme"</code>, issue numbers) and to <code>seed/programme-definition.json</code> under <code>projects</code> with <code>{"adm_phase": "Preliminary", "plateau": "definition"}</code>;</li>
+<li>run <code>python3 scripts/build-programme-seed.py</code> and <code>python3 scripts/check-programme-definition.py</code>; never hand-edit <code>docs/design/data/issues.json</code> — <code>.github/workflows/issue-registry.yml</code> owns it.</li>
+</ul></li>
+<li><strong>Freeze the census and build the instrument</strong> exactly as §6. Commit <code>docs/evidence/walk-census.json</code>, <code>docs/evidence/walk-exemptions.json</code> and <code>scripts/build-walk-coverage.py</code>. Acceptance: the script reproduces 52 routes and 597 actions; <code>--check</code> returns non-zero for a missing registry row, an unreachable action, a missing spec and an expired exemption; it runs with no server or database.</li>
+<li><strong>Record the spike and the engine ADR</strong> (§7 P0 / §8 W1), then the foundation (§7 P1 / §8 W2).</li>
+</ol>
 <h2 id="9-parity-matrix-initial-state-at-the-baseline">9. Parity matrix (initial state at the baseline)</h2>
 <p>Every row starts <code>absent</code>. A row reaches <code>verified</code> only through §6.</p>
 <table>
@@ -432,7 +445,7 @@
 </tbody>
 </table>
 <h2 id="11-verification-and-definition-of-done">11. Verification and definition of done</h2>
-<p><strong>Per work package</strong> — the WP's own acceptance table, its Playwright spec(s), the parity instrument's rows, and a contract test for each write (headers, refusal, refetch). A WP is not done because the screen renders; it is done when the state, the write and the refusal are proven.</p>
+<p><strong>Per issue</strong> — the issue's own parts and acceptance criteria, its Playwright spec(s), the parity instrument's rows, and a contract test for each write (headers, refusal, refetch). An issue is not done because the screen renders; it is done when the state, the write and the refusal are proven.</p>
 <p><strong>Unit and type</strong> — <code>node --test apps/walk/src</code> and <code>tsc --noEmit</code> (JSDoc) pass; pure modules only.</p>
 <p><strong>Browser</strong> — <code>npx playwright test -c apps/walk/playwright.config.ts</code> with the dev server; every spec asserts empty, error, happy and one refusal or write; auth and deep-link gates included.</p>
 <p><strong>Parity</strong> — <code>python3 scripts/build-walk-coverage.py --check</code> exits 0; the record is committed; an expired exemption fails.</p>
@@ -441,7 +454,7 @@
 <p><strong>Docs</strong> — <code>python3 docs/design/scripts/build-docs.py</code> and <code>node docs/design/scripts/check-docs.cjs</code> pass whenever a Markdown file changes.</p>
 <p><strong>DoD for the project</strong> — the P6 gate, not "the UI looks finished". Until P6 the plan's matrix is the truth and <code>apps/web</code> remains normative.</p>
 <h2 id="12-session-guide">12. Session guide</h2>
-<p><strong>Read order</strong> — <code>docs/decisions/0021-gemba-walk-client.md</code> → <code>docs/design/GEMBA-WALK-SPEC.md</code> → this plan → SPEC_V2 §10.5 (the destination contracts) → <code>apps/web/src/api.rs</code> and <code>apps/web/src/auth.rs</code> (the client contract) → the owning slice's plan for the destination.</p>
+<p><strong>Read order</strong> — <code>CLAUDE.md</code> → <code>docs/SPEC.md</code> → <code>docs/plans/00-INDEX.md</code> → <code>docs/plans/03-DELIVERY.md</code> → <code>docs/decisions/0021-gemba-walk-client.md</code> → <code>docs/design/GEMBA-WALK-SPEC.md</code> → this plan → SPEC_V2 §10.5 (the destination contracts) → <code>apps/web/src/api.rs</code> and <code>apps/web/src/auth.rs</code> (the client contract) → the owning slice's plan for the destination.</p>
 <p><strong>Commands</strong> (available once W2 lands) —</p>
 <pre><code>node apps/walk/dev-server.mjs                       # :8932, proxies /api to :8930
 npx playwright test -c apps/walk/playwright.config.ts
@@ -451,11 +464,12 @@ python3 scripts/build-walk-coverage.py --check
 python3 docs/design/scripts/build-docs.py &amp;&amp; node docs/design/scripts/check-docs.cjs</code></pre>
 <p><strong>Rules</strong></p>
 <ul>
-<li>One issue per WP; push the lane branch before the work; one PR per repo per unit; no second PR without the audited <code>SECOND_PR=</code> reason.</li>
-<li>No Rust compilation on local hardware; the compile verdict is GitHub-hosted CI.</li>
+<li>Claim the issue first (<code>issue-pickup</code>); no issue → no branch → no work. Work in <code>.worktrees/issue-&lt;n&gt;</code>, branch <code>issue/&lt;n&gt;-&lt;slug&gt;</code>, one PR with <code>Closes #&lt;n&gt;</code>. Slices are commits on that branch; they never get their own PR. <code>lane/</code> branches and the global lane protocol do not apply in this repository.</li>
+<li>The parent issue's five-sibling split is the only permitted split; a sibling that wants a sixth issue stops and asks the owner.</li>
+<li>No Rust compilation on local hardware; the compile/lint verdict is the repository's GitHub-hosted preflight, and the PR's CI is the final gate. Record the run id on the issue.</li>
 <li>No new table, action, event, port or decision store; if the walk seems to need one, stop and escalate — the answer is a contract-faithful screen, not a backend change.</li>
 <li>The engine ADR (0022) precedes any Bevy code beyond the spike; until then the canvas baseline is the implementation.</li>
-<li>Contract tests per WP: manifest gating, headers, refusal, refetch.</li>
+<li>Contract tests per issue: manifest gating, headers, refusal, refetch.</li>
 <li>The Do-Not list in the spec is the review checklist for every PR.</li>
 </ul>
 <h2 id="13-non-goals">13. Non-goals</h2>

@@ -64,6 +64,7 @@
 <ul>
 <li>Positive: the game UI can be built and measured without weakening the app; either client can be retired without a backend change; the owner gets a real basis for the primary-UI decision.</li>
 <li>Cost: a second shell, auth flow and browser suite; two clients must track each destination's contract. The parity instrument and per-destination specs are the mitigation, and a change that updates one client without the other is visible in CI.</li>
+<li>Delivery: <code>docs/plans/03-DELIVERY.md</code> defaults to one plan = one issue. The walk is multi-session by shape, so the plan proposes a five-issue split — a dependency-bearing parent and four file-disjoint wings — which the owner must approve as the written exception at W0. Without that approval the whole plan is one issue. <code>lane/</code> branches are not used; the parent issue is claimed before any branch.</li>
 <li>Serving: a scoped <code>/walk/*</code> fallback in <code>crates/api/src/web.rs</code> (GET/HEAD only, non-asset paths) and a Dockerfile copy of the static output; both are serving changes, not API surface. Without the fallback, a walk deep link currently renders the operator app's <code>index.html</code>.</li>
 <li>Identity: an external redirect-URI registration is required before production sign-in works.</li>
 <li>Performance: if Bevy is selected, its wasm bundle and startup are the dominant risk; the P0 spike measures them and the canvas baseline remains a working fallback behind the same port.</li>
@@ -77,7 +78,7 @@
 <li>The owner declines primacy at P6; the walk remains an alternative client and this ADR stays proposed rather than accepted.</li>
 </ul>
 <h2 id="links">Links</h2>
-<p>ADR 0001 (CSR by measurement) · ADR 0013 and D64 (the app is the UI) · SPEC_V2 §10.5, §10.5.11, §15.1 D66/D67 · <code>docs/design/GEMBA-WALK-SPEC.md</code> · <code>docs/plans/GEMBA-WALK.md</code> · issue created at W0.</p>
+<p>ADR 0001 (CSR by measurement) · ADR 0013 and D64 (the app is the UI) · SPEC_V2 §10.5, §10.5.11, §15.1 D66/D67 · <code>docs/design/GEMBA-WALK-SPEC.md</code> · <code>docs/plans/GEMBA-WALK.md</code> · the parent issue is created by the plan's §8.1 runbook after the owner accepts this ADR.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/decisions/0021-gemba-walk-client.md</code> at build time.</span>

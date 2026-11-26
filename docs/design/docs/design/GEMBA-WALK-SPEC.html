@@ -149,7 +149,13 @@
   src/auth/                   config load, PKCE, dev login, token in memory, /api/me
   src/api/                    fetch client, problem mapping, manifest cache, describe cache, SSE
   src/forms/                  JSON Schema -&gt; fields; validation; unsupported schema fallback
-  src/router/                 path &lt;-&gt; room/sheet mapping; back/forward; guards
+  src/router/registry.js      composes the per-wing route files; holds no destination rows
+  src/router/routes/          one file per delivery sibling:
+    core.js                     shell, entrance, Portfolio (the parent&#39;s exemplar)
+    portfolio-organisation.js   S1&#39;s rows
+    procedures-governance.js    S2&#39;s rows
+    measure-operations-utilities.js  S3&#39;s rows
+    v1.js                       S4&#39;s retained V1 rows
   src/shell/                  HUD, palette, map, notifications, sheet host, toasts
   src/world/port.js           the WorldView interface and scene types (JSDoc)
   src/world/canvas2d/         baseline renderer: projection, depth sort, collision, figures
@@ -157,10 +163,69 @@
   src/destinations/           one module per destination; read views + curated flows
   src/state/                  session store, per-screen stores, per-viewer prefs
   src/a11y/                   focus management, skip link, shortcuts, announcements
-  e2e/                        one Playwright spec per destination + shell/auth/parity
+  e2e/&lt;wing&gt;/                 one Playwright spec per destination + shell/auth/parity
   dev-server.mjs              static + same-origin proxy to :8930
   playwright.config.ts</code></pre>
-<p>Dependency rule: <code>destinations</code> may import <code>api</code>, <code>forms</code>, <code>shell</code> and <code>router</code>; <code>shell</code> may import <code>api</code>, <code>router</code>, <code>world/port</code>; <code>world/*</code> imports only <code>world/port</code> and pure helpers. No destination imports another destination. No engine module fetches, decides or stores authority.</p>
+<p>Each route file exports an array of <code>{walk, app, room, spec, load}</code> rows, where <code>load</code> is a lazy <code>import()</code> of the destination module; <code>registry.js</code> concatenates the rows in a fixed order. The parent creates all five files as empty arrays, so a delivery sibling adds rows to its own file and never edits a shared one.</p>
+<p>Dependency rule: <code>destinations</code> may import <code>api</code>, <code>forms</code>, <code>shell</code> and <code>router</code>; <code>shell</code> may import <code>api</code>, <code>router</code>, <code>world/port</code>; <code>world/*</code> imports only <code>world/port</code> and pure helpers. No destination imports another destination. A route file may lazily load only its own wing's destination modules, never another wing's. No engine module fetches, decides or stores authority.</p>
+<p><strong>Shared seams</strong> (parent-owned; siblings consume, never edit):</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Responsibility</th>
+<th>Minimum API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auth</code></td>
+<td>PKCE, dev login, token, <code>/api/me</code></td>
+<td><code>signIn()</code>, <code>signOut()</code>, <code>token()</code>, <code>principal()</code></td>
+</tr>
+<tr>
+<td><code>api</code></td>
+<td>same-origin fetch, headers, problems</td>
+<td><code>request(path, opts)</code>, <code>invoke(name, input, opts)</code></td>
+</tr>
+<tr>
+<td><code>manifest</code></td>
+<td>role-filtered action set</td>
+<td><code>load()</code>, <code>has(name)</code>, <code>scopes(name)</code></td>
+</tr>
+<tr>
+<td><code>forms</code></td>
+<td>JSON Schema → fields</td>
+<td><code>render(schema, value) -&gt; {element, value, errors}</code></td>
+</tr>
+<tr>
+<td><code>router</code></td>
+<td>path ↔︎ room/sheet, history</td>
+<td><code>navigate(path)</code>, <code>current()</code>, <code>onChange(fn)</code></td>
+</tr>
+<tr>
+<td><code>shell/sheet-host</code></td>
+<td>sheet lifecycle, focus</td>
+<td><code>open(spec)</code>, <code>close()</code>, <code>toast(problem)</code></td>
+</tr>
+<tr>
+<td><code>world/port</code></td>
+<td>engine-neutral scene</td>
+<td><code>mount</code>, <code>setScene</code>, <code>setCamera</code>, <code>setHighlight</code>, <code>on</code>, <code>resize</code>, <code>dispose</code></td>
+</tr>
+<tr>
+<td><code>sse</code></td>
+<td>token-bearing stream</td>
+<td><code>subscribe(topic, fn) -&gt; unsubscribe</code></td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>session + per-viewer prefs</td>
+<td><code>session</code>, <code>prefs</code>, <code>subscribe(fn)</code></td>
+</tr>
+</tbody>
+</table>
+<p>The exact parameter objects are the implementation's; the names and the responsibilities are not. <code>src/api</code> owns the header set (<code>Authorization</code>, <code>X-Active-Tenant</code>, <code>If-Match</code>, <code>Idempotency-Key</code>, <code>approval_id</code>) and the problem mapping; a destination never constructs them.</p>
 <h3 id="62-the-worldview-port">6.2 The <code>WorldView</code> port</h3>
 <p>The world is replaceable. The contract (JSDoc-typed; the exact names are the implementation's):</p>
 <ul>
@@ -287,9 +352,9 @@
 <ul>
 <li><strong>Unit (<code>node:test</code>)</strong> — projection, collision, depth sort, scene derivation, route mapping, schema-to-field mapping, problem mapping. Pure modules only; no DOM.</li>
 <li><strong>Type check</strong> — <code>tsc --noEmit</code> over JSDoc-typed modules; a type error fails the walk workflow.</li>
-<li><strong>Playwright, one spec per destination</strong> — empty, error, happy and one refusal (or one write where the destination owns a write), plus manifest gating (a control absent when its action is absent) and the headers on a write (<code>If-Match</code>, <code>Idempotency-Key</code>, <code>approval_id</code> where applicable).</li>
+<li><strong>Playwright, one spec per destination under <code>e2e/&lt;wing&gt;/</code></strong> — empty, error, happy and one refusal (or one write where the destination owns a write), plus manifest gating (a control absent when its action is absent) and the headers on a write (<code>If-Match</code>, <code>Idempotency-Key</code>, <code>approval_id</code> where applicable).</li>
 <li><strong>Auth</strong> — dev login, deep-link gate, sign-out, and a 401 path; the OIDC redirect is exercised in the P0 spike and in a deployed smoke where configured.</li>
-<li><strong>Parity instrument</strong> — <code>scripts/build-walk-coverage.py</code> compares the frozen census, the walk route registry and the walk specs; it emits <code>docs/evidence/walk-coverage.json</code> and exits non-zero on a missing destination, an expired exemption or a reachability gap. The schema and gate are in <code>docs/plans/GEMBA-WALK.md</code> §6.</li>
+<li><strong>Parity instrument</strong> — <code>scripts/build-walk-coverage.py</code> compares the frozen census, the composed route registry (<code>src/router/registry.js</code> fed by <code>src/router/routes/*.js</code>) and the walk specs; it emits <code>docs/evidence/walk-coverage.json</code> and exits non-zero on a missing destination, an expired exemption or a reachability gap. Exemptions live in <code>docs/evidence/walk-exemptions.json</code>. The census schema and gate are in <code>docs/plans/GEMBA-WALK.md</code> §6.</li>
 <li><strong>Accessibility</strong> — a keyboard-only navigation spec; focus/name assertions; a manual screen-reader pass per wing; contrast checked from computed styles.</li>
 <li><strong>Performance</strong> — the budgets in §9, measured in CI where stable and recorded in the plan's evidence otherwise; the engine protocol in §12 is separate and feeds ADR 0022.</li>
 </ul>

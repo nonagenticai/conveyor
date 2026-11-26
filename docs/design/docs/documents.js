@@ -222,8 +222,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/decisions/0021-gemba-walk-client.html",
       "source": "docs/decisions/0021-gemba-walk-client.md",
       "section": "Decisions",
-      "sha256": "495d3d11fa5e8e26eb0f1837c3a2ee58654ac6f6bf11903bbd3e96d4e9492fef",
-      "bytes": 8180,
+      "sha256": "7489b7f961a070a4e0b6b0a6e67fa2bc96950d877b99866d09e6baff208d9343",
+      "bytes": 8662,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0021-gemba-walk-client.md"
     },
     {
@@ -231,8 +231,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/GEMBA-WALK-SPEC.html",
       "source": "docs/design/GEMBA-WALK-SPEC.md",
       "section": "Design",
-      "sha256": "71372a3f7bf5e24a03d960427f6fafa4fc80bab746d77eea0cc0ea0f70153f26",
-      "bytes": 27311,
+      "sha256": "8aff3b8ee83e8de1ceffae13d9a636f90934c357353c990ed4ec99240d3dde76",
+      "bytes": 29436,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/GEMBA-WALK-SPEC.md"
     },
     {
@@ -1797,8 +1797,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/GEMBA-WALK.html",
       "source": "docs/plans/GEMBA-WALK.md",
       "section": "Plans",
-      "sha256": "034d42af5356173adb9d470b4ead507f6b0494bfe39bf4a3167f25ee591f614b",
-      "bytes": 18439,
+      "sha256": "b905ffe8f8bd04d674291e064998d026d9cbb4f6a47cbcb71c61e5601c23d8d7",
+      "bytes": 26128,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/GEMBA-WALK.md"
     },
     {
