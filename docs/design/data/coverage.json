@@ -576,8 +576,8 @@
         "numbers": [
           3
         ],
-        "open": 1,
-        "ready": 1,
+        "open": 0,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1656,9 +1656,10 @@
         "numbers": [
           72,
           744,
-          746
+          746,
+          762
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }

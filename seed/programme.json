@@ -111,7 +111,7 @@
       "key": "S04",
       "name": "Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest",
       "description": "Plan: docs/plans/slices/S04-action-registry.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S04-action-registry.md",
@@ -850,7 +850,7 @@
       "key": "T1",
       "name": "Plan spine",
       "description": "SPEC_V2 slice T1 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -858,7 +858,8 @@
         "issues": [
           72,
           744,
-          746
+          746,
+          762
         ],
         "depends_on": [
           "T0",
