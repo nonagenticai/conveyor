@@ -313,9 +313,10 @@ jobs:
   # Playwright is pinned and installed here: six checks launch a headless chromium, and the
   # pack has no package.json of its own.
   design-pack:
-    # Not a required context and up to 20 minutes long: on a merge_group run it would sit on the
-    # queue's critical path for no gate. The pull_request run is where the pack is validated.
-    if: ${{ !github.event.repository.private && github.event_name != 'merge_group' }}
+    # A required context (#789): the merge queue evaluates required checks on the merge-group ref,
+    # so this job must run there or every queued PR waits forever. Measured 2m56s on PR #775
+    # against the 20-minute cap; the pull_request run remains the pre-queue verdict.
+    if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
