@@ -1210,6 +1210,15 @@
     },
     {
       "rule": "seed_live_drift",
+      "subject": "S02",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "the seed derives `closed` from S02's closed unit issues, while the live row stays `active`: the retrospective rework's S02 slice is green on the replay record but not promoted, so a closure now would claim evidence the live record does not carry; the synchronisation waits on the #526 chain or a seed install"
+    },
+    {
+      "rule": "seed_live_drift",
       "subject": "S21",
       "severity": "P1",
       "disposition": "rework",
