@@ -1,40 +1,39 @@
 {
-  "blocked": 0,
-  "generated_at": "2026-11-26T09:47:06+00:00",
-  "green": 0,
+  "blocked": 1,
+  "generated_at": "2026-11-26T09:50:10+00:00",
+  "green": 3,
   "members": [
     {
       "factory_exit": 0,
-      "gaps": [
-        {
-          "detail": "1 mandatory artefact package(s) open: std-togaf-architecture-artifact-s00:S00",
-          "gap": "record",
-          "id": "S00-artefact-standard",
-          "kind": "snapshot",
-          "severity": "P1"
-        },
-        {
-          "detail": "the gate check 'S00-artefact-standard' did not pass",
-          "gap": "code",
-          "id": "gate",
-          "kind": "manifest",
-          "severity": "P0"
-        },
-        {
-          "detail": "the project is closed while its manifest is red",
-          "gap": "record",
-          "id": "closed-on-red",
-          "kind": "snapshot",
-          "severity": "P0"
-        }
-      ],
+      "gaps": [],
       "key": "S00",
       "log": "docs/evidence/rework/batch/tranche-0/S00.log",
       "publish_exit": 1,
-      "state": "RECEIPT_RED"
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "S01",
+      "log": "docs/evidence/rework/batch/tranche-0/S01.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
+    },
+    {
+      "gaps": [],
+      "key": "SPEC-V2",
+      "state": "BLOCKED"
+    },
+    {
+      "factory_exit": 0,
+      "gaps": [],
+      "key": "T0",
+      "log": "docs/evidence/rework/batch/tranche-0/T0.log",
+      "publish_exit": 1,
+      "state": "RECEIPT_GREEN"
     }
   ],
-  "red": 1,
-  "snapshot_sha": "abdc4b1a",
+  "red": 0,
+  "snapshot_sha": "bb240bc7",
   "tranche": 0
 }

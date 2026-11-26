@@ -39,3 +39,14 @@
 {"blocked": null, "content": "docs/evidence/rework/tranche-0/rework-content-S00.json", "key": "S00", "snapshot_sha": "abdc4b1a", "state": "PREFLIGHTED", "tranche": 0, "ts": "2026-11-26T09:46:45+00:00"}
 {"key": "S00", "snapshot_sha": "abdc4b1a", "state": "RUNNING", "tranche": 0, "ts": "2026-11-26T09:46:45+00:00"}
 {"factory_exit": 0, "gaps": [{"detail": "1 mandatory artefact package(s) open: std-togaf-architecture-artifact-s00:S00", "gap": "record", "id": "S00-artefact-standard", "kind": "snapshot", "severity": "P1"}, {"detail": "the gate check 'S00-artefact-standard' did not pass", "gap": "code", "id": "gate", "kind": "manifest", "severity": "P0"}, {"detail": "the project is closed while its manifest is red", "gap": "record", "id": "closed-on-red", "kind": "snapshot", "severity": "P0"}], "key": "S00", "log": "docs/evidence/rework/batch/tranche-0/S00.log", "snapshot_sha": "abdc4b1a", "state": "RECEIPT_RED", "tranche": 0, "ts": "2026-11-26T09:47:06+00:00"}
+{"blocked": null, "content": "docs/evidence/rework/tranche-0/rework-content-S00.json", "key": "S00", "snapshot_sha": "bb240bc7", "state": "PREFLIGHTED", "tranche": 0, "ts": "2026-11-26T09:48:06+00:00"}
+{"blocked": null, "content": "docs/evidence/rework/tranche-0/rework-content-S01.json", "key": "S01", "snapshot_sha": "bb240bc7", "state": "PREFLIGHTED", "tranche": 0, "ts": "2026-11-26T09:48:06+00:00"}
+{"blocked": "content rejected by rework-content-check", "content": "docs/evidence/rework/tranche-0/rework-content-SPEC-V2.json", "key": "SPEC-V2", "snapshot_sha": "bb240bc7", "state": "PREFLIGHTED", "tranche": 0, "ts": "2026-11-26T09:48:06+00:00"}
+{"blocked": null, "content": "docs/evidence/rework/tranche-0/rework-content-T0.json", "key": "T0", "snapshot_sha": "bb240bc7", "state": "PREFLIGHTED", "tranche": 0, "ts": "2026-11-26T09:48:06+00:00"}
+{"key": "SPEC-V2", "reason": "content rejected by rework-content-check", "snapshot_sha": "bb240bc7", "state": "BLOCKED", "tranche": 0, "ts": "2026-11-26T09:48:06+00:00"}
+{"key": "S00", "snapshot_sha": "bb240bc7", "state": "RUNNING", "tranche": 0, "ts": "2026-11-26T09:48:06+00:00"}
+{"factory_exit": 0, "gaps": [], "key": "S00", "log": "docs/evidence/rework/batch/tranche-0/S00.log", "snapshot_sha": "bb240bc7", "state": "RECEIPT_GREEN", "tranche": 0, "ts": "2026-11-26T09:48:30+00:00"}
+{"key": "S01", "snapshot_sha": "bb240bc7", "state": "RUNNING", "tranche": 0, "ts": "2026-11-26T09:48:30+00:00"}
+{"factory_exit": 0, "gaps": [], "key": "S01", "log": "docs/evidence/rework/batch/tranche-0/S01.log", "snapshot_sha": "bb240bc7", "state": "RECEIPT_GREEN", "tranche": 0, "ts": "2026-11-26T09:49:16+00:00"}
+{"key": "T0", "snapshot_sha": "bb240bc7", "state": "RUNNING", "tranche": 0, "ts": "2026-11-26T09:49:16+00:00"}
+{"factory_exit": 0, "gaps": [], "key": "T0", "log": "docs/evidence/rework/batch/tranche-0/T0.log", "snapshot_sha": "bb240bc7", "state": "RECEIPT_GREEN", "tranche": 0, "ts": "2026-11-26T09:50:10+00:00"}

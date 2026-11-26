@@ -1,0 +1,101 @@
+{
+  "body_sha256": "a91d382df0a5ec655532dc0043741050c8a0ff43f02afb02b5fac3608ef442c6",
+  "category": "project-registers",
+  "headings": [
+    {
+      "heading": "Risks",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Issues",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 1,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Assumptions",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Dependencies",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Benefits",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    },
+    {
+      "heading": "Changes",
+      "required": true,
+      "sources": [
+        {
+          "category": "project-registers",
+          "count": 2,
+          "file": "msp.json",
+          "kind": "rows",
+          "pointer": "/register_items"
+        }
+      ],
+      "status": "evidenced"
+    }
+  ],
+  "schema": "artefact-body/v1",
+  "skeleton_sha256": "30e438c3340c062dd1d9f892bc2bd0f5e842ba820cbc12b7696079fdb98e5be6",
+  "spec": "\u00a78.4",
+  "standard": "PMP",
+  "subject": {
+    "id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+    "key": "T0",
+    "kind": "project",
+    "title": "Model and contracts"
+  },
+  "title": "Project Registers \u2014 Model and contracts"
+}

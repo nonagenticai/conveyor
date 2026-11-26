@@ -1,46 +1,60 @@
 $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/rework-project.py --project S00 --content docs/evidence/rework/tranche-0/rework-content-S00.json --tranche-label tranche 0 --demo-cadence 01a1ff21-7354-7777-996b-4c8cb12f25e9
 
-  reopen: not needed
+  01 projects.reopen ok
   charter: already approved
   closure outputs: already ['closure-review']
   SoAW: already live
-  01 architecture.artifacts_supersede ok
-  02 architecture.artifacts_update ok
-  03 architecture.artifacts_approve ok
-  artefact: Stakeholder map — usage inventory re-versioned, bound and documented
+  02 documents.compose ok
+  03 documents.publish ok
   04 architecture.artifacts_supersede ok
   05 architecture.artifacts_update ok
   06 architecture.artifacts_approve ok
+  artefact: Stakeholder map — usage inventory re-versioned, bound and documented
+  07 documents.compose ok
+  08 documents.publish ok
+  09 architecture.artifacts_supersede ok
+  10 architecture.artifacts_update ok
+  11 architecture.artifacts_approve ok
   artefact: Driver/goal/objective — usage inventory re-versioned, bound and documented
-  07 architecture.artifacts_supersede ok
-  08 architecture.artifacts_update ok
-  09 architecture.artifacts_approve ok
+  12 documents.compose ok
+  13 documents.publish ok
+  14 architecture.artifacts_supersede ok
+  15 architecture.artifacts_update ok
+  16 architecture.artifacts_approve ok
   artefact: Requirements catalog — usage inventory re-versioned, bound and documented
-  10 architecture.artifacts_supersede ok
-  11 architecture.artifacts_update ok
-  12 architecture.artifacts_approve ok
-  artefact: Solution concept — usage inventory re-versioned, bound and documented
-  13 architecture.artifacts_supersede ok
-  14 architecture.artifacts_update ok
-  15 architecture.artifacts_approve ok
-  artefact: Business capability map — usage inventory re-versioned, bound and documented
-  16 architecture.artifacts_supersede ok
-  17 architecture.artifacts_update ok
-  18 architecture.artifacts_approve ok
-  artefact: Data entity catalog — usage inventory re-versioned, bound and documented
+  17 documents.compose ok
+  18 documents.publish ok
   19 architecture.artifacts_supersede ok
   20 architecture.artifacts_update ok
   21 architecture.artifacts_approve ok
+  artefact: Solution concept — usage inventory re-versioned, bound and documented
+  22 documents.compose ok
+  23 documents.publish ok
+  24 architecture.artifacts_supersede ok
+  25 architecture.artifacts_update ok
+  26 architecture.artifacts_approve ok
+  artefact: Business capability map — usage inventory re-versioned, bound and documented
+  27 documents.compose ok
+  28 documents.publish ok
+  29 architecture.artifacts_supersede ok
+  30 architecture.artifacts_update ok
+  31 architecture.artifacts_approve ok
+  artefact: Data entity catalog — usage inventory re-versioned, bound and documented
+  32 documents.compose ok
+  33 documents.publish ok
+  34 architecture.artifacts_supersede ok
+  35 architecture.artifacts_update ok
+  36 architecture.artifacts_approve ok
   artefact: Technology standards — usage inventory re-versioned, bound and documented
-  22 architecture.artifacts_link ok
-  23 architecture.artifacts_link ok
-  24 architecture.artifacts_link ok
-  25 architecture.artifacts_link ok
-  26 architecture.artifacts_link ok
-  27 architecture.artifacts_link ok
-  28 architecture.artifacts_link ok
-  29 architecture.artifacts_link ok
-  30 architecture.artifacts_link ok
+  37 architecture.artifacts_link ok
+  38 architecture.artifacts_link ok
+  39 architecture.artifacts_link ok
+  40 architecture.artifacts_link ok
+  41 architecture.artifacts_link ok
+  42 architecture.artifacts_link ok
+  43 architecture.artifacts_link ok
+  44 architecture.artifacts_link ok
+  45 architecture.artifacts_link ok
   document architecture-artifact: already present
   delivery contract: already live
   register risk: The dated samples cannot be re-measured, so a later reader cannot reproduce the counts already present
@@ -61,20 +75,28 @@ $ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.wo
   project-brief output: current
   evidence output: current
   Phase-G review: already recorded
-  31 cadences.credit_demo ok
+  46 cadences.credit_demo ok
   baseline approval: none pending
   change control: 1 change row(s) present
-  card discharge: 0 card(s) cleared of 569 open package(s)
-  closure gate: already approved
-  destructive gate: already approved
-  32 projects.close ok
+  47 approvals.request ok
+  48 approvals.decide ok
+  49 cards.comment ok
+  50 cards.move ok
+  51 cards.move ok
+  card cleared: std-togaf-architecture-artifact-s00:S00
+  card discharge: 1 card(s) cleared of 568 open package(s)
+  52 projects.close_request ok
+  53 approvals.decide ok
+  54 approvals.request ok
+  55 approvals.decide ok
+  56 projects.close ok
   closed S00: 01a1d039-0d26-7573-9b0c-e0f60af92003
-S00: 32 acts recorded
+S00: 56 acts recorded
 
 
 [exit 0]
 
-$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S00 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S00-snap-hhpvb4z0/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S00-snap-hhpvb4z0/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/S00-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
+$ /opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/scripts/publish-artefact-bodies.py --apply --project S00 --snapshot /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S00-snap-4lswq1zq/data --outputs-dir /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/rework-S00-snap-4lswq1zq/docs --bodies-out /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-r3-merge/docs/evidence/rework/batch/tranche-0/S00-bodies --local-bin /Users/georgedekker/Movies/nonagenticai/conveyor/target/claude/debug/conveyor
 
 {
   "schema": "artefact-publication/v1",
