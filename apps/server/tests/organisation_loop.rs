@@ -2820,7 +2820,11 @@ async fn architecture_and_benefits_acceptance() {
     let architecture_id = uuid_of(&architecture, "id");
     // The phase gate joins the standard's mandatory rows into the profile's set, so every
     // mandatory artefact of a phase must be approved before the phase advances.
-    let phases: [(&str, &str, &[(&str, &str)]); 7] = [
+    // One (artefact kind, artefact type) pair a phase's profile requires.
+    type PhaseArtefact = (&'static str, &'static str);
+    // (phase code, plateau, the phase's mandatory artefacts).
+    type Phase = (&'static str, &'static str, &'static [PhaseArtefact]);
+    let phases: [Phase; 7] = [
         (
             "preliminary",
             "psa",
